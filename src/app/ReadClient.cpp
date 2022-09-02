@@ -88,9 +88,10 @@ void ReadClient::StopResubscription()
 
 ReadClient::~ReadClient()
 {
-    Close(CHIP_NO_ERROR, /* allowResubscription = */ false, /* allowOnDone = */ false);
     if (IsSubscriptionType())
     {
+        StopResubscription();
+
         // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
         // will point to null)
@@ -150,7 +151,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOnDone)
+void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
 {
     if (IsReadType())
     {
@@ -192,10 +193,7 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOn
 
     mExchange.Release();
 
-    if (allowOnDone)
-    {
-        mpCallback.OnDone(this);
-    }
+    mpCallback.OnDone(this);
 }
 
 const char * ReadClient::GetStateStr() const
