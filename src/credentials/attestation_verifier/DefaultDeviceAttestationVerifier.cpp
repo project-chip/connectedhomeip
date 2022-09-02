@@ -172,6 +172,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         uint8_t akidBuf[Crypto::kAuthorityKeyIdentifierLength];
         MutableByteSpan akid(akidBuf);
         constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
+        CHIP_ERROR err                       = CHIP_NO_ERROR;
 
         VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
@@ -179,8 +180,15 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         VerifyOrExit(paaCert.Alloc(paaCertAllocatedLen), attestationError = AttestationVerificationResult::kNoMemory);
 
         paaDerBuffer = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
-        VerifyOrExit(mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+        err          = mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer);
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED,
                      attestationError = AttestationVerificationResult::kPaaNotFound);
+
+        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            VerifyOrExit(kTestAttestationTrustStore.GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+                         attestationError = AttestationVerificationResult::kPaaNotFound);
+        }
 
         VerifyOrExit(ExtractVIDPIDFromX509Cert(paaDerBuffer, paaVidPid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaaFormatInvalid);
