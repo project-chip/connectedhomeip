@@ -408,7 +408,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     }
 #endif // CHIP_DETAIL_LOGGING
     ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, port, txtString.c_str());
+                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);
