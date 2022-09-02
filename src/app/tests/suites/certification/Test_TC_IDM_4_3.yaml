@@ -461,7 +461,7 @@ tests:
           Subscribe to an attribute of type signed integer to the Harness
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -475,7 +475,7 @@ tests:
           Subscribe to an attribute of type floating point to the Harness
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -500,7 +500,7 @@ tests:
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
 
           here is an example command the TH can write an attribute in the userlabel cluster in the DUT to change the value that the TH subscribed in the above command.
-           userlabel write label-list "[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]" 1 0
+           userlabel write label-list '[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]' 1 0
 
           ./chip-tool userlabel subscribe label-list 100 500 1 0
           [1655896422.936972][1899:1904] CHIP:DMG: }
