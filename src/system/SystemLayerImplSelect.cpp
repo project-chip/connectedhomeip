@@ -170,6 +170,12 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     VerifyOrReturn(mLayerState.IsInitialized());
 
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
+
+    if (timer == nullptr)
+    {
+        // Check if the timer is maybe currently being processed
+        timer = mExpiredTimersBeingProcessed.Remove(onComplete, appState);
+    }
     VerifyOrReturn(timer != nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -469,9 +475,9 @@ void LayerImplSelect::HandleEvents()
 
     // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
     // since that could result in infinite handling of new timers blocking any other progress.
-    TimerList expiredTimers = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
-    TimerList::Node * timer = nullptr;
-    while ((timer = expiredTimers.PopEarliest()) != nullptr)
+    mExpiredTimersBeingProcessed = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
+    TimerList::Node * timer      = nullptr;
+    while ((timer = mExpiredTimersBeingProcessed.PopEarliest()) != nullptr)
     {
         mTimerPool.Invoke(timer);
     }

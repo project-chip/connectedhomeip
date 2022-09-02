@@ -70,13 +70,22 @@ public:
     void EventLoopEnds() override {}
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override
+    {
+        mDispatchQueue = dispatchQueue;
+    };
+    dispatch_queue_t GetDispatchQueue() override
+    {
+        return mDispatchQueue;
+    };
     void HandleTimerComplete(TimerList::Node * timer);
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
-    bool IsSelectResultValid() const { return mSelectResult >= 0; }
+    bool IsSelectResultValid() const
+    {
+        return mSelectResult >= 0;
+    }
 
 protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
@@ -101,6 +110,7 @@ protected:
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
+    TimerList mExpiredTimersBeingProcessed; // timers handled by HandleEvents
     timeval mNextTimeout;
 
     // Members for select loop
