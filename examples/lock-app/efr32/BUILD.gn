@@ -86,8 +86,8 @@ if (chip_enable_wifi) {
 }
 
 # ThunderBoards and Explorer Kit (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
-    efr32_board == "BRD2703A") {
+if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
+    silabs_board == "BRD2703A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -128,7 +128,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
@@ -315,7 +315,7 @@ efr32_executable("lock_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

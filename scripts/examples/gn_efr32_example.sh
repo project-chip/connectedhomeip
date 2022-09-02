@@ -179,14 +179,14 @@ else
     BUILD_DIR=$OUTDIR/$EFR32_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\"" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$EFR32_BOARD\"" "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/
