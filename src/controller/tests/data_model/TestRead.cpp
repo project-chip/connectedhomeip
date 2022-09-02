@@ -300,8 +300,8 @@ private:
 
     // Helper for MultipleReadHelper that does not spin the event loop, so we
     // don't end up with nested event loops.
-    static void MultipleReadHelperGuts(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount, uint32_t & aNumSuccessCalls,
-                                       uint32_t & aNumFailureCalls);
+    static void MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                           uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls);
 
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
@@ -2514,7 +2514,7 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
-            MultipleReadHelperGuts(apSuite, aCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
+            MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
         }
     };
 
@@ -2536,8 +2536,8 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
 
 // The guts of MultipleReadHelper which take references to the success/failure
 // counts to modify and assume the consumer will be spinning the event loop.
-void TestReadInteraction::MultipleReadHelperGuts(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
-                                                 uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
+void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                                     uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
 {
     NL_TEST_ASSERT(apSuite, aNumSuccessCalls == 0);
     NL_TEST_ASSERT(apSuite, aNumFailureCalls == 0);
@@ -2573,7 +2573,7 @@ void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext 
     uint32_t numSuccessCalls = 0;
     uint32_t numFailureCalls = 0;
 
-    MultipleReadHelperGuts(apSuite, aCtx, aReadCount, numSuccessCalls, numFailureCalls);
+    MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numSuccessCalls, numFailureCalls);
 
     aCtx.DrainAndServiceIO();
 

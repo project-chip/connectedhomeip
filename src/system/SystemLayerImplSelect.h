@@ -101,7 +101,7 @@ protected:
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
-    // List of expired times being processed right now.  Stored in a member so
+    // List of expired timers being processed right now.  Stored in a member so
     // we can cancel them.
     TimerList mExpiredTimers;
     timeval mNextTimeout;

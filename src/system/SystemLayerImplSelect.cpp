@@ -172,6 +172,10 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
     if (timer == nullptr)
     {
+        // The timer was not in our "will fire in the future" list, but it might
+        // be in the "we're about to fire these" chunk we already grabbed from
+        // that list.  Check for it there too, and if found there we still want
+        // to cancel it.
         timer = mExpiredTimers.Remove(onComplete, appState);
     }
     VerifyOrReturn(timer != nullptr);
