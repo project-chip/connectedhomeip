@@ -25,6 +25,8 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
+#include <DeviceInfoProviderImpl.h>
+
 #include "ThreadUtil.h"
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -72,6 +74,8 @@ bool sIsThreadEnabled     = false;
 bool sIsThreadAttached    = false;
 bool sHaveBLEConnections  = false;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 } // namespace
 
 using namespace chip;
@@ -108,6 +112,9 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();

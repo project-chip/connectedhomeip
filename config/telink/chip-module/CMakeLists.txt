@@ -221,6 +221,11 @@ if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
+if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
+    chip_gn_arg_bool("chip_build_example_providers" "true")
+    list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)
+endif()
+
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 # ==============================================================================
@@ -263,6 +268,10 @@ target_include_directories(chip INTERFACE
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
+endif()
+
+if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
+    target_include_directories(chip INTERFACE ${CHIP_ROOT}/examples/providers)
 endif()
 
 if (CONFIG_TELINK_BLE_LIB)
