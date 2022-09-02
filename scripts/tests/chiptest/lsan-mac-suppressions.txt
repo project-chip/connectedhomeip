@@ -33,3 +33,6 @@ leak:[CHIPToolKeypair signMessageECDSA_RAW:]
 # TODO: Figure out how we are managing to leak NSData while using ARC, though
 # this may just be a leak deep inside the CFPreferences stuff somewhere.
 leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]
+
+# TODO: https://github.com/project-chip/connectedhomeip/issues/22333
+leak:[MTRBaseCluster* subscribeAttribute*WithMinInterval:maxInterval:params:subscriptionEstablished:reportHandler:]

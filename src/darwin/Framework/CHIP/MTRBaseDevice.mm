@@ -1203,8 +1203,10 @@ exit:
                 = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
 
             auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                chip::Platform::Delete(callback);
                 [container onDone];
+                // Make sure we delete callback last, because doing that actually destroys our
+                // lambda, so we can't access captured values after that.
+                chip::Platform::Delete(callback);
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType>>(
