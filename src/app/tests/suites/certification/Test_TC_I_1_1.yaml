@@ -99,7 +99,6 @@ tests:
           value: []
           constraints:
               type: list
-
     #Commenting out the step IdentifyQueryResponse (0x00) is not supported by Matter 1.0
     #- label:
     #      "Read the optional command(IdentifyQueryResponse) in
@@ -111,7 +110,6 @@ tests:
     #      value: [0]
     #      constraints:
     #          type: list
-
     #Commenting out the step EventList attribute which is out of scope for matter V1.0
     #- label:
     #      "Read EventList attribute from the DUT and Verify that the DUT
