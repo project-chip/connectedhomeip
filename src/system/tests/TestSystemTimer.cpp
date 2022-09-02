@@ -126,6 +126,15 @@ public:
     TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0) {}
 };
 
+static TestContext * gCurrentTestContext = nullptr;
+
+class ScopedGlobalTestContext
+{
+public:
+    ScopedGlobalTestContext(TestContext * ctx) { gCurrentTestContext = ctx; }
+    ~ScopedGlobalTestContext() { gCurrentTestContext = nullptr; }
+};
+
 // Test input data.
 
 static volatile bool sOverflowTestDone;
@@ -204,7 +213,7 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     LayerEvents<LayerImpl>::ServiceEvents(lSys);
 }
 
-void CheckOrder(nlTestSuite * inSuite, void * aContext)
+static void CheckOrder(nlTestSuite * inSuite, void * aContext)
 {
     if (!LayerEvents<LayerImpl>::HasServiceEvents())
         return;
@@ -257,7 +266,7 @@ void CheckOrder(nlTestSuite * inSuite, void * aContext)
     Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
-void CheckCancellation(nlTestSuite * inSuite, void * aContext)
+static void CheckCancellation(nlTestSuite * inSuite, void * aContext)
 {
     if (!LayerEvents<LayerImpl>::HasServiceEvents())
         return;
@@ -319,6 +328,109 @@ void CheckCancellation(nlTestSuite * inSuite, void * aContext)
 
     Clock::Internal::SetSystemClockForTesting(savedClock);
 }
+
+namespace {
+
+namespace CancelTimerTest {
+
+// A bit lower than maximum system timers just in case, for systems that
+// have some form of limit
+constexpr unsigned kCancelTimerCount = CHIP_SYSTEM_CONFIG_NUM_TIMERS - 4;
+int gCallbackProcessed[kCancelTimerCount];
+
+/// Validates that gCallbackProcessed has valid values (0 or 1)
+void ValidateExecutedTimerCounts(nlTestSuite * suite)
+{
+    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    {
+        NL_TEST_ASSERT(suite, (gCallbackProcessed[i] == 0) || (gCallbackProcessed[i] == 1));
+    }
+}
+
+unsigned ExecutedTimerCount()
+{
+    unsigned count = 0;
+    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    {
+        if (gCallbackProcessed[i] != 0)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+void Callback(Layer * layer, void * state)
+{
+    unsigned idx = static_cast<unsigned>(reinterpret_cast<uintptr_t>(state));
+    if (gCallbackProcessed[idx] != 0)
+    {
+        ChipLogError(Test, "UNEXPECTED EXECUTION at index %u", idx);
+    }
+
+    gCallbackProcessed[idx]++;
+
+    if (ExecutedTimerCount() == kCancelTimerCount / 2)
+    {
+        ChipLogProgress(Test, "Cancelling timers");
+        for (unsigned i = 0; i < kCancelTimerCount; i++)
+        {
+            if (gCallbackProcessed[i] != 0)
+            {
+                continue;
+            }
+            ChipLogProgress(Test, "Timer %u is being cancelled", i);
+            gCurrentTestContext->mLayer->CancelTimer(Callback, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
+            gCallbackProcessed[i]++; // pretend executed.
+        }
+    }
+}
+
+void Test(nlTestSuite * inSuite, void * aContext)
+{
+    // Validates that timers can cancel other timers. Generally the test will
+    // do the following:
+    //   - schedule several timers to start at the same time
+    //   - within each timers, after half of them have run, make one timer
+    //     cancel all the other ones
+    //   - assert that:
+    //       - timers will run if scheduled
+    //       - once cancelled, timers will NOT run (i.e. a timer can cancel
+    //         other timers, even if they are expiring at the same time)
+    memset(gCallbackProcessed, 0, sizeof(gCallbackProcessed));
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    ScopedGlobalTestContext testScope(&testContext);
+
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    using namespace Clock::Literals;
+
+    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    {
+        NL_TEST_ASSERT(
+            suite, systemLayer.StartTimer(10_ms, Callback, reinterpret_cast<void *>(static_cast<uintptr_t>(i))) == CHIP_NO_ERROR);
+    }
+
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    ValidateExecutedTimerCounts(suite);
+    NL_TEST_ASSERT(suite, ExecutedTimerCount() == 0);
+
+    mockClock.AdvanceMonotonic(20_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+
+    ValidateExecutedTimerCounts(suite);
+    NL_TEST_ASSERT(suite, ExecutedTimerCount() == kCancelTimerCount);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+}
+
+} // namespace CancelTimerTest
+} // namespace
 
 // Test the implementation helper classes TimerPool, TimerList, and TimerData.
 namespace chip {
@@ -481,6 +593,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Timer::TestTimerOrder",           CheckOrder),
     NL_TEST_DEF("Timer::TestTimerCancellation",    CheckCancellation),
     NL_TEST_DEF("Timer::TestTimerPool",            chip::System::TestTimer::CheckTimerPool),
+    NL_TEST_DEF("Timer::TestCancelTimer",          CancelTimerTest::Test),
     NL_TEST_SENTINEL()
 };
 // clang-format on
