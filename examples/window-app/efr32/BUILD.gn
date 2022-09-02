@@ -34,6 +34,8 @@ declare_args() {
 
   # PIN code for PASE session establishment.
   setupPinCode = 20202021
+
+  #default Discriminator value
   setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
