@@ -57,9 +57,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: |
-                scripts/checkout_submodules.py --shallow --platform linux
-                git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+              run: scripts/checkout_submodules.py --shallow --platform linux
 
             - name: Get cirque cache key
               id: cirque-key
@@ -79,6 +77,7 @@ jobs:
             - name: Bootstrap
               timeout-minutes: 15
               run: |
+                  git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
