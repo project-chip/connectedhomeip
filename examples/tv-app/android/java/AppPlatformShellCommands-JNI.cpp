@@ -48,7 +48,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
     if (printHeader)
     {
         char str[64];
-        sprintf(str, "udc-commission %ld\r\n", (long) index);
+        sprintf(str, "udc-commission %ld\r\n", static_cast<long>(index));
         strcat(response, str);
     }
 
@@ -57,7 +57,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
     if (state == nullptr)
     {
         char str[64];
-        sprintf(str, "udc client[%d] null \r\n", index);
+        sprintf(str, "udc client[%ld] null \r\n", static_cast<long>(index));
         strcat(response, str);
     }
     else
@@ -367,7 +367,7 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray string
     // Fill in argv
     for (int i = 0; i < argc; i++)
     {
-        jstring string = (jstring)(env->GetObjectArrayElement(stringArray, i));
+        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
         argv[i]        = (char *) env->GetStringUTFChars(string, 0);
     }
 
@@ -378,7 +378,7 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray string
     for (int i = 0; i < argc; i++)
     {
         ChipLogProgress(DeviceLayer, " Value=%s ", argv[i]);
-        jstring string = (jstring)(env->GetObjectArrayElement(stringArray, i));
+        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
         env->ReleaseStringUTFChars(string, argv[i]);
     }
 
