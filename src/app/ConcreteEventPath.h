@@ -40,7 +40,8 @@ struct ConcreteEventPath : public ConcreteClusterPath
 
     bool operator==(const ConcreteEventPath & aOther) const
     {
-        return ConcreteClusterPath::operator==(aOther) && (mEventId == aOther.mEventId) && (mIsUrgentEvent == aOther.mIsUrgentEvent);
+        return ConcreteClusterPath::operator==(aOther) && (mEventId == aOther.mEventId) &&
+            (mIsUrgentEvent == aOther.mIsUrgentEvent);
     }
 
     bool operator!=(const ConcreteEventPath & aOther) const { return !(*this == aOther); }
@@ -51,7 +52,7 @@ struct ConcreteEventPath : public ConcreteClusterPath
             ((mEndpointId == path.mEndpointId) && (mClusterId == path.mClusterId) && (mEventId < path.mEventId));
     }
 
-    EventId mEventId = 0;
+    EventId mEventId    = 0;
     bool mIsUrgentEvent = false;
 };
 } // namespace app

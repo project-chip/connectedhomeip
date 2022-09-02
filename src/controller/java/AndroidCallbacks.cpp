@@ -519,7 +519,8 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
         env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJZ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId, aPath.mIsUrgentEvent);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId,
+                                         aPath.mIsUrgentEvent);
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;

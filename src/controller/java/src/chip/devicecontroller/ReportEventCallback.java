@@ -17,10 +17,9 @@
  */
 package chip.devicecontroller;
 
+import androidx.annotation.Nullable;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.NodeState;
-
-import androidx.annotation.Nullable;
 
 /** An interface for receiving read/subscribe CHIP reports. */
 public interface ReportEventCallback {

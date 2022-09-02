@@ -78,7 +78,8 @@ static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
-static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId, bool &outIsUrgentId);
+static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                                 bool & outIsUrgentId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 
 namespace {
@@ -1295,7 +1296,8 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId, bool &outIsUrgentId)
+CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                          bool & outIsUrgentId)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -1310,8 +1312,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
         env, eventPath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId",
                                                                  "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "IsUrgentEvent",
-                                                                 "()Z", &isUrgentEventMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "IsUrgentEvent", "()Z", &isUrgentEventMethod));
 
     jobject endpointIdObj = env->CallObjectMethod(eventPath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);

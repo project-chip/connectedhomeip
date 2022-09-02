@@ -25,7 +25,8 @@ public class ChipEventPath {
   private ChipPathId endpointId, clusterId, eventId;
   private boolean isUrgentEvent;
 
-  private ChipEventPath(ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgentEvent) {
+  private ChipEventPath(
+      ChipPathId endpointId, ChipPathId clusterId, ChipPathId eventId, boolean isUrgentEvent) {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
     this.eventId = eventId;
@@ -68,7 +69,12 @@ public class ChipEventPath {
   @Override
   public String toString() {
     return String.format(
-        Locale.ENGLISH, "Endpoint %s, cluster %s, event %s, isUrgent %s", endpointId, clusterId, eventId, isUrgentEvent ? "true" : "false");
+        Locale.ENGLISH,
+        "Endpoint %s, cluster %s, event %s, isUrgent %s",
+        endpointId,
+        clusterId,
+        eventId,
+        isUrgentEvent ? "true" : "false");
   }
 
   public static ChipEventPath newInstance(
@@ -79,7 +85,10 @@ public class ChipEventPath {
   /** Create a new {@link ChipEventPath} with only concrete ids. */
   public static ChipEventPath newInstance(long endpointId, long clusterId, long eventId) {
     return new ChipEventPath(
-        ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(eventId), false);
+        ChipPathId.forId(endpointId),
+        ChipPathId.forId(clusterId),
+        ChipPathId.forId(eventId),
+        false);
   }
 
   public static ChipEventPath newInstance(
@@ -88,8 +97,12 @@ public class ChipEventPath {
   }
 
   /** Create a new {@link ChipEventPath} with only concrete ids. */
-  public static ChipEventPath newInstance(long endpointId, long clusterId, long eventId, boolean isUrgentEvent) {
+  public static ChipEventPath newInstance(
+      long endpointId, long clusterId, long eventId, boolean isUrgentEvent) {
     return new ChipEventPath(
-        ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(eventId), isUrgentEvent);
+        ChipPathId.forId(endpointId),
+        ChipPathId.forId(clusterId),
+        ChipPathId.forId(eventId),
+        isUrgentEvent);
   }
 }
