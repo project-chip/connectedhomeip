@@ -95,6 +95,8 @@ protected:
 
     static std::set<CHIPCommandBridge *> sDeferredCleanups;
 
+    void StopCommissioners();
+
     void RestartCommissioners();
 
 private:
