@@ -502,9 +502,41 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             SetDAC(report.Get<RequestedCertificate>().certificate);
             break;
         case CommissioningStage::kSendAttestationRequest:
-            // These don't need to be deep copied to local memory because they are used in this one step then never again.
-            mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
-                .SetAttestationSignature(report.Get<AttestationResponse>().signature);
+            if (report.Get<AttestationResponse>().attestationElements.size() > kAttestationElementsLength)
+            {
+                ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %d larger than cache size %d",
+                             static_cast<int>(report.Get<AttestationResponse>().attestationElements.size()),
+                             static_cast<int>(kAttestationElementsLength));
+                mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements);
+            }
+            else
+            {
+                memcpy(mAttestationElements, report.Get<AttestationResponse>().attestationElements.data(),
+                       report.Get<AttestationResponse>().attestationElements.size());
+                mParams.SetAttestationElements(
+                    ByteSpan(mAttestationElements, report.Get<AttestationResponse>().attestationElements.size()));
+            }
+
+            if (report.Get<AttestationResponse>().signature.size() > kAttestationSignatureLength)
+            {
+                ChipLogError(Controller,
+                             "AutoCommissioner attestationSignature buffer size %d larger than "
+                             "cache size %d",
+                             static_cast<int>(report.Get<AttestationResponse>().signature.size()),
+                             static_cast<int>(kAttestationSignatureLength));
+                mParams.SetAttestationSignature(report.Get<AttestationResponse>().signature);
+            }
+            else
+            {
+                memcpy(mAttestationSignature, report.Get<AttestationResponse>().signature.data(),
+                       report.Get<AttestationResponse>().signature.size());
+                mParams.SetAttestationSignature(
+                    ByteSpan(mAttestationSignature, report.Get<AttestationResponse>().signature.size()));
+            }
+            // ? These don't need to be deep copied to local memory because they are used in this one step then never again.
+            // mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
+            //     .SetAttestationSignature(report.Get<AttestationResponse>().signature);
+
             // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)

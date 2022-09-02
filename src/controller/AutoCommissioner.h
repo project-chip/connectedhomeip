@@ -23,6 +23,9 @@
 namespace chip {
 namespace Controller {
 
+constexpr size_t kAttestationElementsLength  = 900;
+constexpr size_t kAttestationSignatureLength = 64;
+
 class DeviceCommissioner;
 
 class AutoCommissioner : public CommissioningDelegate
@@ -86,6 +89,9 @@ private:
     uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+
+    uint8_t mAttestationElements[kAttestationElementsLength];
+    uint8_t mAttestationSignature[kAttestationSignatureLength];
 };
 } // namespace Controller
 } // namespace chip
