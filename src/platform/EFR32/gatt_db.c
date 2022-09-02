@@ -55,9 +55,9 @@ GATT_DATA(const sli_bt_gattdb_value_t gattdb_attribute_field_26) = { .len  = 16,
                                                                      } };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
               gattdb_attribute_field_24)                         = { .properties = 0x3e,
-                                                                     .max_len    = 247,
-                                                                     .len        = 1,
-                                                                     .data       = {
+                                             .max_len    = 247,
+                                             .len        = 1,
+                                             .data       = {
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -79,9 +79,9 @@ GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
                                              } };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
               gattdb_attribute_field_22)                         = { .properties = 0x0a,
-                                                                     .max_len    = 247,
-                                                                     .len        = 1,
-                                                                     .data       = {
+                                             .max_len    = 247,
+                                             .len        = 1,
+                                             .data       = {
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
