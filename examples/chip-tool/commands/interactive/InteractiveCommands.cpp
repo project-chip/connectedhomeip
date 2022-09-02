@@ -81,6 +81,11 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         }
     }
 
+    if (command != nullptr)
+    {
+        free(command);
+    }
+
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
