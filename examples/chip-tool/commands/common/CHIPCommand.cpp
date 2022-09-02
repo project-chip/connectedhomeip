@@ -36,27 +36,63 @@ std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
-constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
-constexpr chip::FabricId kIdentityAlphaFabricId = 1;
-constexpr chip::FabricId kIdentityBetaFabricId  = 2;
-constexpr chip::FabricId kIdentityGammaFabricId = 3;
-constexpr chip::FabricId kIdentityOtherFabricId = 4;
-constexpr const char * kTrustStorePathVariable  = "CHIPTOOL_PAA_TRUST_STORE_PATH";
+constexpr chip::FabricId kIdentityNullFabricId    = chip::kUndefinedFabricId;
+constexpr chip::FabricId kIdentityAlphaFabricId   = 1;
+constexpr chip::FabricId kIdentityBetaFabricId    = 2;
+constexpr chip::FabricId kIdentityGammaFabricId   = 3;
+constexpr chip::FabricId kIdentityOtherFabricId   = 4;
+constexpr const char * kPAATrustStorePathVariable = "CHIPTOOL_PAA_TRUST_STORE_PATH";
+constexpr const char * kCDTrustStorePathVariable  = "CHIPTOOL_CD_TRUST_STORE_PATH";
 
-const chip::Credentials::AttestationTrustStore * CHIPCommand::sPaaTrustStore = nullptr;
+const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
-const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
+const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const char * cdTrustStorePath,
+                                          const chip::Credentials::AttestationTrustStore ** trustStore)
 {
-    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
-
-    if (attestationTrustStore.IsInitialized())
+    if (paaTrustStorePath == nullptr)
     {
-        return &attestationTrustStore;
+        paaTrustStorePath = getenv(kPAATrustStorePathVariable);
     }
 
-    return nullptr;
+    if (cdTrustStorePath == nullptr)
+    {
+        cdTrustStorePath = getenv(kCDTrustStorePathVariable);
+    }
+
+    if (paaTrustStorePath == nullptr && cdTrustStorePath == nullptr)
+    {
+        *trustStore = chip::Credentials::GetTestAttestationTrustStore();
+        return CHIP_NO_ERROR;
+    }
+
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath, cdTrustStorePath };
+
+    if (paaTrustStorePath != nullptr && attestationTrustStore.paaCount() == 0)
+    {
+        ChipLogError(chipTool, "No PAAs found in path: %s", paaTrustStorePath);
+        ChipLogError(chipTool,
+                     "Please specify a valid path containing trusted PAA certificates using "
+                     "the argument [--paa-trust-store-path paa/file/path] "
+                     "or environment variable [%s=paa/file/path]",
+                     kPAATrustStorePathVariable);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (cdTrustStorePath != nullptr && attestationTrustStore.cdCount() == 0)
+    {
+        ChipLogError(chipTool, "No CDs found in path: %s", cdTrustStorePath);
+        ChipLogError(chipTool,
+                     "Please specify a valid path containing trusted CD certificates using "
+                     "the argument [--cd-trust-store-path cd/file/path] "
+                     "or environment variable [%s=cd/file/path]",
+                     kCDTrustStorePathVariable);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    *trustStore = &attestationTrustStore;
+    return CHIP_NO_ERROR;
 }
 } // namespace
 
@@ -103,27 +139,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    if (!mPaaTrustStorePath.HasValue())
-    {
-        char * const trust_store_path = getenv(kTrustStorePathVariable);
-        if (trust_store_path != nullptr)
-        {
-            mPaaTrustStorePath.SetValue(trust_store_path);
-        }
-    }
-    sPaaTrustStore = mPaaTrustStorePath.HasValue() ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
-                                                   : chip::Credentials::GetTestAttestationTrustStore();
-    ;
-    if (mPaaTrustStorePath.HasValue() && sPaaTrustStore == nullptr)
-    {
-        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
-        ChipLogError(chipTool,
-                     "Please specify a valid path containing trusted PAA certificates using"
-                     "the argument [--paa-trust-store-path paa/file/path]"
-                     "or environment variable [%s=paa/file/path]",
-                     kTrustStorePathVariable);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    ReturnErrorOnFailure(
+        GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), mCDTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
 
@@ -343,7 +360,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
 
-    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sPaaTrustStore));
+    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);

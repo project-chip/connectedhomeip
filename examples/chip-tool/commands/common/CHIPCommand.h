@@ -65,6 +65,9 @@ public:
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
+        AddArgument("cd-trust-store-path", &mCDTrustStorePath,
+                    "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
+                    "directory.");
         AddArgument("commissioner-name", &mCommissionerName,
                     "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
                     "4.  The default if not specified is \"alpha\".");
@@ -156,11 +159,12 @@ private:
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
+    chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.
-    static const chip::Credentials::AttestationTrustStore * sPaaTrustStore;
+    static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
 
