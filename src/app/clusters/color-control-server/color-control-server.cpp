@@ -2018,8 +2018,8 @@ EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t
     }
 
     // now, kick off the state machine.
-    Attributes::ColorTemperature::Get(endpoint, &(colorTempTransitionState->initialValue));
-    Attributes::ColorTemperature::Get(endpoint, &(colorTempTransitionState->currentValue));
+    Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->initialValue));
+    Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->currentValue));
 
     colorTempTransitionState->finalValue     = colorTemperature;
     colorTempTransitionState->stepsRemaining = transitionTime;
@@ -2090,7 +2090,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpColorTemp.IsNull())
     {
         uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
-        status                    = Attributes::ColorTemperature::Get(endpoint, &updatedColorTemp);
+        status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
 
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -2107,7 +2107,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
                 // if startup color temp was set to null).
                 updatedColorTemp = startUpColorTemp.Value();
-                status           = Attributes::ColorTemperature::Set(endpoint, updatedColorTemp);
+                status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
 
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
@@ -2144,7 +2144,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
         emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     }
 
-    Attributes::ColorTemperature::Set(endpoint, colorTempTransitionState->currentValue);
+    Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
 
     emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState->currentValue);
 
@@ -2219,7 +2219,7 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
-    Attributes::ColorTemperature::Get(endpoint, &colorTempTransitionState->initialValue);
+    Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (moveMode == MOVE_MODE_UP)
@@ -2337,7 +2337,7 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
-    Attributes::ColorTemperature::Get(endpoint, &colorTempTransitionState->initialValue);
+    Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (stepMode == MOVE_MODE_UP)

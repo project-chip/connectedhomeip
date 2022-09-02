@@ -2246,16 +2246,6 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::FaultInjection::Id: {
-        using namespace Clusters::FaultInjection;
-        switch (aPath.mEventId) {
-
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     default: {
         *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
         break;

@@ -31,6 +31,7 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#include "esp_ota_ops.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -202,6 +203,22 @@ CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    memset(buf, 0, bufSize);
+    const esp_app_desc_t * appDescription = esp_ota_get_app_description();
+    ReturnErrorCodeIf(bufSize < sizeof(appDescription->version), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(appDescription->version) > ConfigurationManager::kMaxSoftwareVersionStringLength, CHIP_ERROR_INTERNAL);
+    strcpy(buf, appDescription->version);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    softwareVer = CHIP_CONFIG_SOFTWARE_VERSION_NUMBER;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)

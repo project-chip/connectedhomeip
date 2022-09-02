@@ -879,7 +879,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterColorControlAttributeCurrentYID = 0x00000004,
     MTRClusterColorControlAttributeDriftCompensationID = 0x00000005,
     MTRClusterColorControlAttributeCompensationTextID = 0x00000006,
-    MTRClusterColorControlAttributeColorTemperatureID = 0x00000007,
+    MTRClusterColorControlAttributeColorTemperatureMiredsID = 0x00000007,
     MTRClusterColorControlAttributeColorModeID = 0x00000008,
     MTRClusterColorControlAttributeOptionsID = 0x0000000F,
     MTRClusterColorControlAttributeNumberOfPrimariesID = 0x00000010,

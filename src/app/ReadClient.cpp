@@ -190,6 +190,8 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOn
         StopResubscription();
     }
 
+    mExchange.Release();
+
     if (allowOnDone)
     {
         mpCallback.OnDone(this);

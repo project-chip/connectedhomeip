@@ -60,6 +60,7 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -71,6 +72,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 
 @interface MTRDeviceController ()
 
@@ -101,6 +104,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+            return nil;
+        }
+
+        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
+        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kErrorPartialDacVerifierInit]) {
             return nil;
         }
 
@@ -143,6 +151,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = nullptr;
+        if (_operationalCredentialsDelegate != nil) {
+            _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
+        }
     }
 }
 
@@ -156,6 +167,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     if (_operationalCredentialsDelegate) {
         delete _operationalCredentialsDelegate;
         _operationalCredentialsDelegate = nullptr;
+    }
+
+    if (_partialDACVerifier) {
+        delete _partialDACVerifier;
+        _partialDACVerifier = nullptr;
     }
 
     if (_pairingDelegateBridge) {
@@ -701,6 +717,32 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 
     return result;
+}
+
+- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+{
+    VerifyOrReturnValue([self checkIsRunning], nil);
+
+    __block NSData * attestationChallenge;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        chip::CommissioneeDeviceProxy * deviceProxy;
+        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+        auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
+        VerifyOrReturn(success);
+
+        uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
+        chip::ByteSpan challenge(challengeBuffer);
+
+        errorCode = deviceProxy->GetAttestationChallenge(challenge);
+        success = ![self checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
+        VerifyOrReturn(success);
+
+        attestationChallenge = AsData(challenge);
+    });
+
+    return attestationChallenge;
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg

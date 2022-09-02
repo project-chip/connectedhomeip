@@ -71,10 +71,9 @@ tests:
           1. Launch chip-tool into interactive mode with the command
 
           ./chip-tool interactive start
-          basic subscribe-event shut-down 20 100 1 0
 
           2.  run below command in interactive mode shell and  Turn down the DUT
-
+          basic subscribe-event shut-down 20 100 1 0
 
           verify that ShutDown event as priority set has CRITICAL on TH(Chip-tool)
 

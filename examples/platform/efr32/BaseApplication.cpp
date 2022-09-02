@@ -156,7 +156,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     if (identifyObj == nullptr)
     {
-        EFR32_LOG("funct timer create failed");
+        EFR32_LOG("Invalid Identify Object!");
         appError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 

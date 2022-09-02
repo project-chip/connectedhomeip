@@ -461,7 +461,11 @@ CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
 
 CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    return ChipErrorToImErrorMap(ReadImpl(aPath, aEncoder));
+    // Note: We are not generating any errors under ReadImpl ourselves; it's
+    // just the IM encoding machinery that does it.  And we should propagate
+    // those errors through as-is, without mapping them to other errors, because
+    // they are used to communicate various state within said enoding machinery.
+    return ReadImpl(aPath, aEncoder);
 }
 
 CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)

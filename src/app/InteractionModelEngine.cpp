@@ -98,6 +98,11 @@ void InteractionModelEngine::Shutdown()
 
     mReadHandlers.ReleaseAll();
 
+    // Shut down any subscription clients that are still around.  They won't be
+    // able to work after this point anyway, since we're about to drop our refs
+    // to them.
+    ShutdownAllSubscriptions();
+
     //
     // We hold weak references to ReadClient objects. The application ultimately
     // actually owns them, so it's on them to eventually shut them down and free them
@@ -253,24 +258,37 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
 
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
-    {
-        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
-            readClient->GetPeerNodeId() == aPeerNodeId)
-        {
-            readClient->Close(CHIP_NO_ERROR);
-        }
-    }
+    ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex), MakeOptional(aPeerNodeId));
+}
+void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex)
+{
+    ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex));
 }
 
 void InteractionModelEngine::ShutdownAllSubscriptions()
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    ShutdownMatchingSubscriptions();
+}
+
+void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex,
+                                                           const Optional<NodeId> & aPeerNodeId)
+{
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType())
         {
-            readClient->Close(CHIP_NO_ERROR);
+            bool fabricMatches = !aFabricIndex.HasValue() || (aFabricIndex.Value() == readClient->GetFabricIndex());
+            bool nodeIdMatches = !aPeerNodeId.HasValue() || (aPeerNodeId.Value() == readClient->GetPeerNodeId());
+            if (fabricMatches && nodeIdMatches)
+            {
+                readClient->Close(CHIP_NO_ERROR);
+            }
         }
+        readClient = nextClient;
     }
 }
 

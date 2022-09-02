@@ -23,12 +23,15 @@ FOUNDATION_EXPORT NSErrorDomain const MTRErrorDomain;
 FOUNDATION_EXPORT NSErrorDomain const MTRInteractionErrorDomain;
 
 /**
- * ChipErrorDomain contains errors caused by data processing the framework
+ * MTRErrorDomain contains errors caused by data processing the framework
  * itself is performing.  These can be caused by invalid values provided to a
  * framework API, failure to decode an incoming message, and so forth.
  *
- * Errors reported by the other side of a Matter interaction use
- * MTRInteractionErrorDomain instead.
+ * This error domain also contains errors that are communicated via success
+ * responses from a server but mapped to an error on the client.
+ *
+ * Errors reported by the server side of a Matter interaction via the normal
+ * Matter error-reporting mechanisms use MTRInteractionErrorDomain instead.
  */
 // clang-format off
 typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
@@ -51,6 +54,11 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     MTRErrorCodeIntegrityCheckFailed = 8,
     MTRErrorCodeTimeout              = 9,
     MTRErrorCodeBufferTooSmall       = 10,
+    /**
+     * MTRErrorCodeFabricExists is returned when trying to commission a device
+     * into a fabric when it's already part of that fabric.
+     */
+    MTRErrorCodeFabricExists         = 11,
 };
 // clang-format on
 

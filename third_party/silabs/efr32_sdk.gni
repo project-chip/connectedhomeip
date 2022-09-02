@@ -208,6 +208,7 @@ template("efr32_sdk") {
     # USART include files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
+        (defined(invoker.use_wf200) && invoker.use_wf200) ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
         (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
         (defined(invoker.use_external_flash) && use_external_flash)) {
@@ -532,6 +533,7 @@ template("efr32_sdk") {
     # USART sources files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
+        (defined(invoker.use_wf200) && invoker.use_wf200) ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
         (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
         (defined(invoker.use_external_flash) && use_external_flash)) {
