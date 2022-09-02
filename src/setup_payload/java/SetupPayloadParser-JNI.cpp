@@ -51,7 +51,8 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     err = QRCodeSetupPayloadParser(qrString).populatePayload(payload);
     env->ReleaseStringUTFChars(qrCodeObj, qrString);
 
-    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload()) {
+    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload())
+    {
         jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
         JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
         return nullptr;
@@ -81,7 +82,8 @@ JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self,
     err = ManualSetupPayloadParser(entryCodeString).populatePayload(payload);
     env->ReleaseStringUTFChars(entryCode, entryCodeString);
 
-    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidManualCode()) {
+    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidManualCode())
+    {
         jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
         JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
         return nullptr;

@@ -4,11 +4,13 @@ package chip.setuppayload;
 public class SetupPayloadParser {
 
   /** Returns {@link SetupPayload} parsed from the QR code string. */
-  public SetupPayload parseQrCode(String qrCodeString) throws UnrecognizedQrCodeException, SetupPayloadException {
+  public SetupPayload parseQrCode(String qrCodeString)
+      throws UnrecognizedQrCodeException, SetupPayloadException {
     return fetchPayloadFromQrCode(qrCodeString, false);
   }
 
-  public SetupPayload parseQrCode(String qrCodeString, boolean isAllowInvalidPayload) throws UnrecognizedQrCodeException, SetupPayloadException {
+  public SetupPayload parseQrCode(String qrCodeString, boolean isAllowInvalidPayload)
+      throws UnrecognizedQrCodeException, SetupPayloadException {
     return fetchPayloadFromQrCode(qrCodeString, isAllowInvalidPayload);
   }
 
@@ -30,10 +32,12 @@ public class SetupPayloadParser {
   public native String getManualEntryCodeFromPayload(SetupPayload payload)
       throws SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromQrCode(String qrCodeString, boolean isAllowInvalidPayload)
+  private native SetupPayload fetchPayloadFromQrCode(
+      String qrCodeString, boolean isAllowInvalidPayload)
       throws UnrecognizedQrCodeException, SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromManualEntryCode(String entryCodeString, boolean isAllowInvalidPayload)
+  private native SetupPayload fetchPayloadFromManualEntryCode(
+      String entryCodeString, boolean isAllowInvalidPayload)
       throws InvalidEntryCodeFormatException, SetupPayloadException;
 
   static {
