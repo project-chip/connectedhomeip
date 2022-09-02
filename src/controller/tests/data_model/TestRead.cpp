@@ -3004,9 +3004,6 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // We have exactly one subscription than uses more resources than others, so the interaction model must evict it first, and we
     // will have exactly kExpectedParallelPaths only when that subscription have been evicted. We use this indirect method to verify
     // the subscriptions since the read client won't shutdown until the timeout fired.
-
-    // 6 over 18
-    ChipLogError(Test, "ATTR COUNT: %u over %u", (unsigned) readCallback.mAttributeCount, (unsigned) kExpectedParallelPaths);
     NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == kExpectedParallelPaths);
     NL_TEST_ASSERT(apSuite,
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
@@ -3062,16 +3059,10 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
                                     [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Some subscriptions on fabric 1 should be evicted since fabric 1 is using more resources than the limits.
-    ChipLogError(Test, "ATTR COUNT: %u over %u", (unsigned) readCallback.mAttributeCount,
-                 (unsigned) (app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                             app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric));
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount ==
                        app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
                            app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
-    ChipLogError(Test, "ATTR COUNT: %u over %u", (unsigned) readCallbackFabric2.mAttributeCount,
-                 (unsigned) (app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                             app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric));
     NL_TEST_ASSERT(apSuite,
                    readCallbackFabric2.mAttributeCount ==
                        app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
