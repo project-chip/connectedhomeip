@@ -47,6 +47,22 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
 };
 
+class StopCommand : public CHIPCommandBridge {
+public:
+    StopCommand()
+        : CHIPCommandBridge("stop")
+    {
+    }
+
+    CHIP_ERROR RunCommand() override
+    {
+        StopCommissioners();
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+};
+
 void ClearLine()
 {
     printf("\r\x1B[0J"); // Move cursor to the beginning of the line and clear from cursor to end of the screen
@@ -85,6 +101,13 @@ el_status_t RestartFunction()
     return CSstay;
 }
 
+el_status_t StopFunction()
+{
+    StopCommand cmd;
+    cmd.RunCommand();
+    return CSstay;
+}
+
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(kInteractiveModeHistoryFilePath);
@@ -94,6 +117,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
     el_bind_key(CTL('^'), RestartFunction);
+    el_bind_key(CTL('_'), StopFunction);
 
     char * command = nullptr;
     while (YES) {

@@ -136,11 +136,16 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
-void CHIPCommandBridge::RestartCommissioners()
+void CHIPCommandBridge::StopCommissioners()
 {
     for (auto & pair : mControllers) {
         [pair.second shutdown];
     }
+}
+
+void CHIPCommandBridge::RestartCommissioners()
+{
+    StopCommissioners();
 
     auto factory = [MTRControllerFactory sharedInstance];
     NSData * ipk = [gNocSigner getIPK];
@@ -159,9 +164,7 @@ void CHIPCommandBridge::RestartCommissioners()
 void CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
-    for (auto & pair : mControllers) {
-        [pair.second shutdown];
-    }
+    StopCommissioners();
     mControllers.clear();
     mCurrentController = nil;
 
