@@ -71,19 +71,19 @@ void BLEManagerImpl::_Shutdown()
 {
     if (mApplicationDelegate)
     {
-        delete (mApplicationDelegate);
+        delete mApplicationDelegate;
         mApplicationDelegate = nullptr;
     }
 
     if (mConnectionDelegate)
     {
-        delete (mConnectionDelegate);
+        delete mConnectionDelegate;
         mConnectionDelegate = nullptr;
     }
 
     if (mPlatformDelegate)
     {
-        delete (mPlatformDelegate);
+        delete mPlatformDelegate;
         mPlatformDelegate = nullptr;
     }
 }
