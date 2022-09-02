@@ -55,9 +55,9 @@ GATT_DATA(const sli_bt_gattdb_value_t gattdb_attribute_field_26) = { .len  = 16,
                                                                      } };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
               gattdb_attribute_field_24)                         = { .properties = 0x3e,
-                                             .max_len    = 247,
-                                             .len        = 1,
-                                             .data       = {
+                                                                     .max_len    = 247,
+                                                                     .len        = 1,
+                                                                     .data       = {
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -79,9 +79,9 @@ GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
                                              } };
 GATT_DATA(sli_bt_gattdb_attribute_chrvalue_t
               gattdb_attribute_field_22)                         = { .properties = 0x0a,
-                                             .max_len    = 247,
-                                             .len        = 1,
-                                             .data       = {
+                                                                     .max_len    = 247,
+                                                                     .len        = 1,
+                                                                     .data       = {
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -352,7 +352,7 @@ GATT_DATA(const sli_bt_gattdb_attribute_t gattdb_attributes_map[]) = {
       .caps           = 0xffff,
       .state          = 0x00,
       .datatype       = 0x05,
-      .characteristic = { .properties = 0x3e, .char_uuid = 0x8001 } },
+      .characteristic = { .properties = 0x1e, .char_uuid = 0x8001 } },
     { .handle      = 0x19,
       .uuid        = 0x8001,
       .permissions = 0x807,
@@ -366,7 +366,7 @@ GATT_DATA(const sli_bt_gattdb_attribute_t gattdb_attributes_map[]) = {
       .caps        = 0xffff,
       .state       = 0x00,
       .datatype    = 0x03,
-      .configdata  = { .flags = 0x03, .clientconfig_index = 0x01 } },
+      .configdata  = { .flags = 0x01, .clientconfig_index = 0x01 } },
     { .handle      = 0x1b,
       .uuid        = 0x0000,
       .permissions = 0x801,
