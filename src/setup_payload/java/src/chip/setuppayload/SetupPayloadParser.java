@@ -4,14 +4,23 @@ package chip.setuppayload;
 public class SetupPayloadParser {
 
   /** Returns {@link SetupPayload} parsed from the QR code string. */
-  public SetupPayload parseQrCode(String qrCodeString) throws UnrecognizedQrCodeException {
-    return fetchPayloadFromQrCode(qrCodeString);
+  public SetupPayload parseQrCode(String qrCodeString) throws UnrecognizedQrCodeException, SetupPayloadException {
+    return fetchPayloadFromQrCode(qrCodeString, false);
+  }
+
+  public SetupPayload parseQrCode(String qrCodeString, boolean isAllowInvalidPayload) throws UnrecognizedQrCodeException, SetupPayloadException {
+    return fetchPayloadFromQrCode(qrCodeString, isAllowInvalidPayload);
   }
 
   /** Returns {@link SetupPayload} parsed from the manual entry code string. */
   public SetupPayload parseManualEntryCode(String entryCodeString)
-      throws InvalidEntryCodeFormatException {
-    return fetchPayloadFromManualEntryCode(entryCodeString);
+      throws InvalidEntryCodeFormatException, SetupPayloadException {
+    return fetchPayloadFromManualEntryCode(entryCodeString, false);
+  }
+
+  public SetupPayload parseManualEntryCode(String entryCodeString, boolean isAllowInvalidPayload)
+      throws InvalidEntryCodeFormatException, SetupPayloadException {
+    return fetchPayloadFromManualEntryCode(entryCodeString, isAllowInvalidPayload);
   }
 
   /** Get QR code string from {@link SetupPayload}. */
@@ -21,11 +30,11 @@ public class SetupPayloadParser {
   public native String getManualEntryCodeFromPayload(SetupPayload payload)
       throws SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromQrCode(String qrCodeString)
-      throws UnrecognizedQrCodeException;
+  private native SetupPayload fetchPayloadFromQrCode(String qrCodeString, boolean isAllowInvalidPayload)
+      throws UnrecognizedQrCodeException, SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromManualEntryCode(String entryCodeString)
-      throws InvalidEntryCodeFormatException;
+  private native SetupPayload fetchPayloadFromManualEntryCode(String entryCodeString, boolean isAllowInvalidPayload)
+      throws InvalidEntryCodeFormatException, SetupPayloadException;
 
   static {
     System.loadLibrary("SetupPayloadParser");

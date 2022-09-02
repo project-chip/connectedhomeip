@@ -37,6 +37,7 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
+import chip.setuppayload.SetupPayloadParser.SetupPayloadException
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
@@ -145,7 +146,14 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             payload = SetupPayloadParser().parseQrCode(qrCode)
         } catch (ex: UnrecognizedQrCodeException) {
             Log.e(TAG, "Unrecognized QR Code", ex)
-            Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Unrecognized QR Code : ${ex.message}", Toast.LENGTH_SHORT).show()
+            payload = SetupPayload()
+            return
+        } catch (ex: SetupPayloadException) {
+            Log.e(TAG, "Exception ", ex)
+            Toast.makeText(requireContext(), "Exception : ${ex.message}", Toast.LENGTH_SHORT).show()
+            payload = SetupPayload()
+            return
         }
         FragmentUtil.getHost(this, Callback::class.java)
             ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
@@ -167,6 +175,17 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
                 if (hasCameraPermission() && !cameraStarted) {
                     startCamera()
                 }
+                payload = SetupPayload()
+                return@post
+            } catch (ex: SetupPayloadException) {
+                Log.e(TAG, "Exception ", ex)
+                Toast.makeText(requireContext(), "Exception : ${ex.message}", Toast.LENGTH_SHORT).show()
+
+                // Restart camera view.
+                if (hasCameraPermission() && !cameraStarted) {
+                    startCamera()
+                }
+                payload = SetupPayload()
                 return@post
             }
             FragmentUtil.getHost(this, Callback::class.java)
