@@ -275,6 +275,17 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+
+    if (mChipEventQueue != NULL) {
+        vQueueDelete(mChipEventQueue);
+        mChipEventQueue = NULL;
+    }
+
+    if (mChipStackLock != NULL) {
+        vSemaphoreDelete(mChipStackLock);
+        mChipStackLock = NULL;
+    }
 }
 
 template <class ImplClass>
