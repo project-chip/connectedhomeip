@@ -54,9 +54,11 @@ NS_ASSUME_NONNULL_BEGIN
      attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
          eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
-    MTR_LOG_DEBUG("Subscribing all attributes... Note that reportHandler is not supported.");
+    MTR_LOG_DEBUG("Subscribing all attributes... Note that attributeReportHandler, eventReportHandler, and resubscriptionScheduled "
+                  "are not supported.");
     if (attributeCacheContainer) {
         [attributeCacheContainer setXPCConnection:_xpcConnection controllerId:self.controller deviceId:self.nodeId];
     }

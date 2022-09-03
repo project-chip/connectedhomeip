@@ -216,6 +216,9 @@ public:
             }
             subscriptionEstablished:^() {
                 mSubscriptionEstablished = YES;
+            }
+            resubscriptionScheduled:^(NSError * error, NSNumber * resubscriptionDelay) {
+                NSLog(@"Subscription dropped with error %@.  Resubscription in %@ms", error, resubscriptionDelay);
             }];
 
         return CHIP_NO_ERROR;
