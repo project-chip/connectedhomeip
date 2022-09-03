@@ -29,6 +29,8 @@ static CHIP_ERROR AppCommandDispatch(int argc, char * argv[]);
 
 static chip::Shell::Engine sAppSubcommands;
 
+chip::EndpointId endpointId = DOOR_LOCK_SERVER_ENDPOINT;
+
 void RegisterAppShellCommands(void)
 {
     static const shell_command_t sAppSubCommands[] = {
@@ -70,20 +72,30 @@ CHIP_ERROR AppCommandLockHandler(int argc, char * argv[])
     else if (strcmp(argv[0], "on") == 0)
     {
         streamer_printf(streamer_get(), "Lock ...\n");
-        LockMgr().InitiateAction(LockManager::ACTOR_APP_CMD, LockManager::LOCK_ACTION);
+        LockMgr().InitiateAction(AppEvent::kEventType_app, LockManager::LOCK_ACTION);
     }
     else if (strcmp(argv[0], "off") == 0)
     {
         streamer_printf(streamer_get(), "Unlock ...\n");
-        LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, LockManager::UNLOCK_ACTION);
+        LockMgr().InitiateAction(AppEvent::kEventType_app, LockManager::UNLOCK_ACTION);
     }
     else if (strcmp(argv[0], "toggle") == 0)
     {
         streamer_printf(streamer_get(), "Toggling the lock ...\n");
         if (LockMgr().NextState())
-            LockMgr().InitiateAction(LockManager::ACTOR_APP_CMD, LockManager::LOCK_ACTION);
+            LockMgr().InitiateAction(AppEvent::kEventType_app, LockManager::LOCK_ACTION);
         else
-            LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, LockManager::UNLOCK_ACTION);
+            LockMgr().InitiateAction(AppEvent::kEventType_app, LockManager::UNLOCK_ACTION);
+    }
+    else if (strcmp(argv[0], "open") == 0)
+    {
+        streamer_printf(streamer_get(), "open ...\n");
+        LockMgr().SetDoorState(endpointId, DlDoorState::kDoorOpen);
+    }
+    else if (strcmp(argv[0], "close") == 0)
+    {
+        streamer_printf(streamer_get(), "close ...\n");
+        LockMgr().SetDoorState(endpointId, DlDoorState::kDoorClosed);
     }
     else
     {

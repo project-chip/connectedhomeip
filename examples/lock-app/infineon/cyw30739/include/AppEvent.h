@@ -29,6 +29,7 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lock,
         kEventType_Install,
+        kEventType_app,
     };
 
     uint16_t Type;
