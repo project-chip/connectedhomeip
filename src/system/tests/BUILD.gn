@@ -26,11 +26,14 @@ chip_test_suite("tests") {
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
-    "TestSystemScheduleWork.cpp",
     "TestSystemTimer.cpp",
     "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
   ]
+
+  if (chip_device_platform != "esp32") {
+    test_sources += [ "TestSystemScheduleWork.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
