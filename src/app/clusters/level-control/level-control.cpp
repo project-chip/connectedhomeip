@@ -87,6 +87,8 @@ typedef struct
 
 static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
+static chip::System::Clock::Timestamp nextTimestamp;
+
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
@@ -114,6 +116,27 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint);
 static void timerCallback(System::Layer *, void * callbackContext)
 {
     emberAfLevelControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
+}
+
+static uint32_t calculateNextTimestampMs(int32_t delayMs)
+{
+	 int32_t waitTime, latency;
+	 const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
+
+	 latency = (int32_t)currentTime.count() - (int32_t)nextTimestamp.count();
+
+	 if(latency > delayMs)
+	 {
+		 waitTime = 0;
+	 }
+	 else
+	 {
+		 waitTime = delayMs - latency;
+	 }
+
+	 nextTimestamp += chip::System::Clock::Milliseconds32(delayMs);
+
+	 return (uint32_t)waitTime;
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
@@ -247,7 +270,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     else
     {
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
-        schedule(endpoint, state->eventDurationMs);
+        schedule(endpoint, calculateNextTimestampMs(state->eventDurationMs));
     }
 }
 
@@ -678,7 +701,8 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     state->storedLevel = storedLevel;
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    schedule(endpoint, calculateNextTimestampMs(state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
     if (commandId == Commands::MoveToLevelWithOnOff::Id)
@@ -804,7 +828,8 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     state->storedLevel = INVALID_STORED_LEVEL;
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    schedule(endpoint, calculateNextTimestampMs(state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
 send_default_response:
@@ -930,7 +955,8 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     state->storedLevel = INVALID_STORED_LEVEL;
 
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    schedule(endpoint, calculateNextTimestampMs(state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
 send_default_response:
