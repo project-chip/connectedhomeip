@@ -119,13 +119,14 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
 void PlatformManagerImpl::_RunEventLoop()
 {
+    mRunLoopSem = dispatch_semaphore_create(0);
+
     _StartEventLoopTask();
 
     //
     // Block on the semaphore till we're signalled to stop by
     // _StopEventLoopTask()
     //
-    mRunLoopSem = dispatch_semaphore_create(0);
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
     dispatch_release(mRunLoopSem);
     mRunLoopSem = nullptr;
