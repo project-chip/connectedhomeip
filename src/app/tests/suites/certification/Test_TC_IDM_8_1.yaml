@@ -368,6 +368,9 @@ tests:
           data. Modify attribute1 on the DUT."
       verification: |
           DUT implementation required to verify the  list of structs which contain some fabric-sensitive data
+
+
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
