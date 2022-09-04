@@ -1,4 +1,5 @@
 #include "ameba_route_table.h"
+#include <stdbool.h>
 
 #include <string.h>
 
