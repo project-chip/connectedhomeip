@@ -155,6 +155,7 @@ protected:
     // requires vendorApp to be in the catalog of the platform
     ContentApp * LoadContentAppInternal(const CatalogVendorApp & vendorApp);
     ContentApp * GetContentAppInternal(const CatalogVendorApp & vendorApp);
+    CHIP_ERROR GetACLEntryIndex(size_t * foundIndex, FabricIndex fabricIndex, NodeId subjectNodeId);
 
     static const int kNoCurrentEndpointId = 0;
     EndpointId mCurrentAppEndpointId      = kNoCurrentEndpointId;

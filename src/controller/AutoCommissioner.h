@@ -38,6 +38,7 @@ public:
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
+    void StopCommissioning() { mStopCommissioning = true; };
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
@@ -69,6 +70,8 @@ private:
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    bool mStopCommissioning = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;

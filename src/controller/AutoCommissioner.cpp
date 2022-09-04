@@ -171,6 +171,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    if (mStopCommissioning)
+    {
+        return CommissioningStage::kCleanup;
+    }
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
@@ -345,6 +349,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
@@ -494,6 +499,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
+            if (mDeviceCommissioningInfo.nodeId != kUndefinedNodeId)
+            {
+                mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
+            }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -538,9 +547,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetAttestationSignature(
                     ByteSpan(mAttestationSignature, report.Get<AttestationResponse>().signature.size()));
             }
-            // ? These don't need to be deep copied to local memory because they are used in this one step then never again.
-            // mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
-            //    .SetAttestationSignature(report.Get<AttestationResponse>().signature);
 
             // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here

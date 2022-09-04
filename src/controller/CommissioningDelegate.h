@@ -177,11 +177,13 @@ public:
     // Attestation elements from the node. These are obtained from node in response to the AttestationRequest command. In the
     // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
+    // Warning: data is not deep copied to local memory and can only be read during PerformCommissioningStep.
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
 
     // Attestation signature from the node. This is obtained from node in response to the AttestationRequest command. In the
     // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
+    // Warning: data is not deep copied to local memory and can only be read during PerformCommissioningStep.
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
 
     // Product attestation intermediate certificate from the node. This is obtained from the node in response to the
@@ -195,6 +197,10 @@ public:
     // stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+
+    // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
+    // In the AutoCommissioner, this is set from kReadCommissioningInfo stage.
+    const Optional<NodeId> GetRemoteNodeId() const { return mRemoteNodeId; }
 
     // Node vendor ID from the basic information cluster. In the AutoCommissioner, this is automatically set from report from the
     // kReadCommissioningInfo stage.
@@ -328,6 +334,11 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
+    CommissioningParameters & SetRemoteNodeId(NodeId id)
+    {
+        mRemoteNodeId = MakeOptional(id);
+        return *this;
+    }
     CommissioningParameters & SetRemoteVendorId(VendorId id)
     {
         mRemoteVendorId = MakeOptional(id);
@@ -407,6 +418,7 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
@@ -491,6 +503,7 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
+    NodeId nodeId = kUndefinedNodeId;
 };
 
 struct AttestationErrorInfo

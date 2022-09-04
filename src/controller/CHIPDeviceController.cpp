@@ -1733,6 +1733,45 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
             return CHIP_NO_ERROR;
         }
     });
+
+    err = mAttributeCache->ForEachAttribute(
+        app::Clusters::OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
+            if (path.mAttributeId != app::Clusters::OperationalCredentials::Attributes::Fabrics::Id)
+            {
+                // Continue on
+                return CHIP_NO_ERROR;
+            }
+
+            switch (path.mAttributeId)
+            {
+            case app::Clusters::OperationalCredentials::Attributes::Fabrics::Id: {
+                app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
+                ReturnErrorOnFailure(
+                    this->mAttributeCache->Get<app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(path,
+                                                                                                                     fabrics));
+                auto iter = fabrics.begin();
+                while (iter.Next())
+                {
+                    auto & fabricDescriptor = iter.GetValue();
+                    ChipLogProgress(AppServer,
+                                    "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
+                                    " fabric.nodeId=0x" ChipLogFormatX64,
+                                    fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
+                                    ChipLogValueX64(fabricDescriptor.nodeId));
+                    if (GetFabricId() == fabricDescriptor.fabricId)
+                    {
+                        ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - found a matching fabric");
+                        info.nodeId = fabricDescriptor.nodeId;
+                    }
+                }
+
+                return CHIP_NO_ERROR;
+            }
+            default:
+                return CHIP_NO_ERROR;
+            }
+        });
+
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
@@ -1997,7 +2036,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
 
-        app::AttributePathParams readPaths[8];
+        app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
@@ -2018,9 +2057,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Read the requested minimum connection times from all network commissioning clusters
         readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
+        // Read the current fabrics
+        readPaths[8] = app::AttributePathParams(app::Clusters::OperationalCredentials::Id,
+                                                app::Clusters::OperationalCredentials::Attributes::Fabrics::Id);
 
         readParams.mpAttributePathParamsList    = readPaths;
-        readParams.mAttributePathParamsListSize = 8;
+        readParams.mAttributePathParamsListSize = 9;
+        readParams.mIsFabricFiltered            = false;
         if (timeout.HasValue())
         {
             readParams.mTimeout = timeout.Value();

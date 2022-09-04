@@ -455,6 +455,61 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
 }
 
+// Returns ACL entry with match subject or CHIP_ERROR_NOT_FOUND if no match is found
+CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex fabricIndex, NodeId subjectNodeId)
+{
+    size_t index = 0;
+    if (Access::GetAccessControl().GetEntryCount(fabricIndex, index) == CHIP_NO_ERROR)
+    {
+        while (index)
+        {
+            Access::AccessControl::Entry entry;
+            CHIP_ERROR err = Access::GetAccessControl().ReadEntry(fabricIndex, --index, entry);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d err %s",
+                              static_cast<int>(index), ErrorStr(err));
+            }
+            else
+            {
+                size_t count;
+                err = entry.GetSubjectCount(count);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogDetail(DeviceLayer,
+                                  "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d err %s",
+                                  static_cast<int>(index), ErrorStr(err));
+                    continue;
+                }
+                if (count)
+                {
+                    ChipLogDetail(DeviceLayer, "subjects: %u", static_cast<unsigned>(count));
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        NodeId subject;
+                        err = entry.GetSubject(i, subject);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogDetail(DeviceLayer,
+                                          "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d err %s",
+                                          static_cast<int>(i), static_cast<int>(index), ErrorStr(err));
+                            continue;
+                        }
+                        if (subject == subjectNodeId)
+                        {
+                            ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex found matching subject at index %d",
+                                          static_cast<int>(index));
+                            *foundIndex = index;
+                            return CHIP_NO_ERROR;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
@@ -482,12 +537,30 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 
     Access::Privilege vendorPrivilege = mContentAppFactory->GetVendorPrivilege(targetVendorId);
 
+    NodeId subjectNodeId    = sessionHandle->GetPeer().GetNodeId();
+    FabricIndex fabricIndex = sessionHandle->GetFabricIndex();
+
+    // first, delete existing ACLs for this nodeId
+    {
+        size_t index;
+        CHIP_ERROR err;
+        while (CHIP_NO_ERROR == (err = GetACLEntryIndex(&index, fabricIndex, subjectNodeId)))
+        {
+            err = Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, index);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d err %s", static_cast<int>(index),
+                              ErrorStr(err));
+            }
+        }
+    }
+
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
-    entry.SetFabricIndex(sessionHandle->GetFabricIndex());
+    entry.SetFabricIndex(fabricIndex);
     ReturnErrorOnFailure(entry.SetPrivilege(vendorPrivilege));
-    ReturnErrorOnFailure(entry.AddSubject(nullptr, sessionHandle->GetPeer().GetNodeId()));
+    ReturnErrorOnFailure(entry.AddSubject(nullptr, subjectNodeId));
 
     std::vector<Binding::Structs::TargetStruct::Type> bindings;
 
