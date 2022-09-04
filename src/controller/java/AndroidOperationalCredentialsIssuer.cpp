@@ -221,17 +221,19 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
                                                javaAttestationChallenge);
 
-    const ByteSpan & attestationElements = mAutoCommissioner->GetCommissioningParameters().GetAttestationElements().Value();
+    const ByteSpan & attestationElements = mAutoCommissioner->GetAttestationElements();
     jbyteArray javaAttestationElements;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), attestationElements.size(),
                                                javaAttestationElements);
+    // new log message below
+    ChipLogError(Controller, "AndroidOpCredsIssuer attestationElements size %d/%d", static_cast<int>(attestationElements.size()),
+                 static_cast<int>(env->GetArrayLength(javaAttestationElements)));
 
-    const ByteSpan & attestationNonce = mAutoCommissioner->GetCommissioningParameters().GetAttestationNonce().Value();
+    const ByteSpan & attestationNonce = mAutoCommissioner->GetAttestationNonce();
     jbyteArray javaAttestationNonce;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationNonce.data(), attestationNonce.size(), javaAttestationNonce);
 
-    const ByteSpan & attestationElementsSignature =
-        mAutoCommissioner->GetCommissioningParameters().GetAttestationSignature().Value();
+    const ByteSpan & attestationElementsSignature = mAutoCommissioner->GetAttestationSignature();
     jbyteArray javaAttestationElementsSignature;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElementsSignature.data(), attestationElementsSignature.size(),
                                                javaAttestationElementsSignature);

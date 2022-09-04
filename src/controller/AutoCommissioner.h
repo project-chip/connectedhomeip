@@ -41,6 +41,10 @@ public:
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
+    ByteSpan GetAttestationElements() const { return ByteSpan(mAttestationElements, mAttestationElementsLen); }
+    ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
+
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
@@ -90,7 +94,9 @@ private:
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 
+    uint16_t mAttestationElementsLen = 0;
     uint8_t mAttestationElements[kAttestationElementsLength];
+    uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[kAttestationSignatureLength];
 };
 } // namespace Controller
