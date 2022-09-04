@@ -64,7 +64,7 @@ tests:
 
 
 
-          ./chip-tool actions  read endpoint-list   1 1
+          ./chip-tool actions  read endpoint-lists   1 1
 
           Verify read command is received on TH(all-clusters-app
           )
@@ -157,7 +157,7 @@ tests:
           [1658393025.603258][13481:13486] CHIP:EM: Sending Standalone Ack for MessageCounter:114510707 on exchange 23501i
 
 
-          ./chip-tool bridgedactions  read action-list 1 1
+          ./chip-tool actions  read action-list 1 1
 
           Verify read command is received on TH(all-clusters-minimal-app) Log
 
@@ -184,7 +184,7 @@ tests:
 
 
 
-          ./chip-tool bridgedactions  read endpoint-list   1 1
+          ./chip-tool actions  read endpoint-lists  1 1
 
           Verify read command is received on TH(all-clusters-minimal-app)
 

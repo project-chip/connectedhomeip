@@ -141,11 +141,8 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep2c
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMinMiredsValue +
-                  ColorTempPhysicalMaxMiredsValue ) / 2
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 10s"
@@ -161,9 +158,8 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep2d
           constraints:
-              minValue: ColorTemperatureMiredsStep2c
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
@@ -174,13 +170,15 @@ tests:
               - name: "ms"
                 value: 5000
 
+    #Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/2175
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
-      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
+          value: ColorTempPhysicalMaxMiredsValue
           constraints:
-              minValue: ColorTemperatureMiredsStep2d
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
@@ -221,7 +219,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep3b
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
@@ -239,10 +236,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep3c
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
-              maxValue: ColorTemperatureMiredsStep3b
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -257,9 +253,10 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
+          value: ColorTempPhysicalMinMiredsValue
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
-              maxValue: ColorTemperatureMiredsStep3c
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A0008
