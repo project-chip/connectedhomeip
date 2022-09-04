@@ -459,8 +459,12 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                 timeoutSecs
                     = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
             }
+            BOOL shouldWaitAfterDeviceAttestation = NO;
+            if ([commissioningParams.deviceAttestationDelegate respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
+                shouldWaitAfterDeviceAttestation = YES;
+            }
             _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
-                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
+                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 

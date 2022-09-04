@@ -25,7 +25,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
-        NSLog(@"MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed failed with result: %hu", attestationResult);
+        NSLog(@"MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu", attestationResult);
 
         mResult = attestationResult;
 
