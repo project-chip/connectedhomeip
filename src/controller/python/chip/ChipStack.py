@@ -177,7 +177,7 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True, bluetoothAdapter=None):
+    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True, bluetoothAdapter=None, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
         self.networkLock = Lock()
@@ -190,6 +190,7 @@ class ChipStack(object):
         self.commissioningEventRes = None
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
+        self._enableServerInteractions = enableServerInteractions
 
         #
         # Locate and load the chip shared library.
@@ -266,7 +267,8 @@ class ChipStack(object):
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
-        res = self._ChipStackLib.pychip_DeviceController_StackInit(self._persistentStorage.GetSdkStorageObject())
+        res = self._ChipStackLib.pychip_DeviceController_StackInit(
+            self._persistentStorage.GetSdkStorageObject(), enableServerInteractions)
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -278,6 +280,10 @@ class ChipStack(object):
 
     def GetStorageManager(self):
         return self._persistentStorage
+
+    @property
+    def enableServerInteractions(self):
+        return self._enableServerInteractions
 
     @property
     def defaultLogFunct(self):
@@ -440,7 +446,7 @@ class ChipStack(object):
             self._ChipStackLib = chip.native.GetLibraryHandle()
             self._chipDLLPath = chip.native.FindNativeLibraryPath()
 
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p]
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32
