@@ -156,7 +156,7 @@ with newer versions.
 
     * When calling tcp_abort() from a raw API TCP callback function,
       make sure you return ERR_ABRT to prevent accessing unallocated memory.
-      (ERR_ABRT now means the applicaiton has called tcp_abort!)
+      (ERR_ABRT now means the application has called tcp_abort!)
 
   +++ Netconn API:
     * Changed netconn_receive() and netconn_accept() to return

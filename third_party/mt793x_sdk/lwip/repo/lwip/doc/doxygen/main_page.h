@@ -142,7 +142,7 @@
  * -------------
  * In mainloop mode, only @ref callbackstyle_api can be used.
  * The user has two possibilities to ensure there is only one 
- * exection context at a time in lwIP:
+ * execution context at a time in lwIP:
  *
  * 1) Deliver RX ethernet packets directly in interrupt context to lwIP
  *    by calling netif->input directly in interrupt. This implies all lwIP 
@@ -176,7 +176,7 @@
  *    it is safe to call any @ref callbackstyle_api from there.
  *
  * 2) Use @ref LWIP_TCPIP_CORE_LOCKING. All @ref callbackstyle_api
- *    functions can be called when lwIP core lock is aquired, see
+ *    functions can be called when lwIP core lock is acquired, see
  *    @ref LOCK_TCPIP_CORE() and @ref UNLOCK_TCPIP_CORE().
  *    These macros cannot be used in an interrupt context!
  *    Note the OS must correctly handle priority inversion for this.
@@ -253,7 +253,7 @@
  */
 
 /**
- * @page sys_init System initalization
+ * @page sys_init System initialization
 A truly complete and generic sequence for initializing the lwIP stack
 cannot be given because it depends on additional initializations for
 your runtime environment (e.g. timers).
@@ -338,7 +338,7 @@ Call these functions in the order of appearance:
  * - sockets.h
  * - sys.h
  * 
- * Additionaly, memory (de-)allocation functions may be
+ * Additionally, memory (de-)allocation functions may be
  * called from multiple threads (not ISR!) with NO_SYS=0
  * since they are protected by @ref SYS_LIGHTWEIGHT_PROT and/or
  * semaphores.

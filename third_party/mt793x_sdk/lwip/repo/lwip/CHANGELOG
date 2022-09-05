@@ -433,7 +433,7 @@ HISTORY
 
   2016-04-05: Simon Goldschmidt
   * timers.h/.c: prepare for overriding current timeout implementation: all
-    stack-internal caclic timers are avaliable in the lwip_cyclic_timers array
+    stack-internal caclic timers are available in the lwip_cyclic_timers array
 
   2016-03-23: Simon Goldschmidt
   * tcp: call accept-callback with ERR_MEM when allocating a pcb fails on

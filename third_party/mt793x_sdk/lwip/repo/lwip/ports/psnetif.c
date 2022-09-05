@@ -69,7 +69,7 @@
 #include "semphr.h"
 
 #define ATCMD_MAX_PKT_SIZE        1024
-#define ATCMD_MAX_RAW_DATA_SIZE   552 //1000   //ATCMD_MAX_PKT_SIZE substract  //AT+EIPDATA=<CID>,<Length>,<
+#define ATCMD_MAX_RAW_DATA_SIZE   552 //1000   //ATCMD_MAX_PKT_SIZE subtract  //AT+EIPDATA=<CID>,<Length>,<
 #define ATCMD_EIPDATA_HEADER      50
 
 #define MAX_PSNETIF_HEX_LENGTH  (3)
@@ -193,7 +193,7 @@ ps_netif_set_netinfo(u8_t context_id, gprs_net_info_struct *netinfo)
     dns_setserver(1, &dnsserver);
   }
   netif->context_id = context_id;
-  //limitation by uart buffer 1024. substract  //AT+EIPDATA=<CID>,<Length>,<
+  //limitation by uart buffer 1024. subtract  //AT+EIPDATA=<CID>,<Length>,<
   mtu = (mtu == 0) ? ATCMD_MAX_RAW_DATA_SIZE : mtu;
   netif->mtu = mtu > ATCMD_MAX_RAW_DATA_SIZE ? ATCMD_MAX_RAW_DATA_SIZE : mtu;
 
