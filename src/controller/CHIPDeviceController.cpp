@@ -544,7 +544,6 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         mSystemState->BleLayer()->CloseAllBleConnections();
     }
 #endif
-    mCommissioneeDevicePool.ReleaseObject(device);
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)
     {
