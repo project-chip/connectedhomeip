@@ -63,6 +63,7 @@
 #include <sys/time.h>
 
 #define LWIP_TIMEVAL_PRIVATE 0
+#define LWIP_NO_INTTYPES_H 1
 
 /* Define platform endianness */
 #ifndef BYTE_ORDER
