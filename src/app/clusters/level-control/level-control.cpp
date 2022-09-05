@@ -120,23 +120,23 @@ static void timerCallback(System::Layer *, void * callbackContext)
 
 static uint32_t calculateNextTimestampMs(int32_t delayMs)
 {
-	 int32_t waitTime, latency;
-	 const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
+    int32_t waitTime, latency;
+    const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
-	 latency = (int32_t)currentTime.count() - (int32_t)nextTimestamp.count();
+    latency = (int32_t) currentTime.count() - (int32_t) nextTimestamp.count();
 
-	 if(latency > delayMs)
-	 {
-		 waitTime = 0;
-	 }
-	 else
-	 {
-		 waitTime = delayMs - latency;
-	 }
+    if (latency > delayMs)
+    {
+        waitTime = 0;
+    }
+    else
+    {
+        waitTime = delayMs - latency;
+    }
 
-	 nextTimestamp += chip::System::Clock::Milliseconds32(delayMs);
+    nextTimestamp += chip::System::Clock::Milliseconds32(delayMs);
 
-	 return (uint32_t)waitTime;
+    return (uint32_t) waitTime;
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
