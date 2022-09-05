@@ -298,6 +298,11 @@ private:
     // succeed.
     static void MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount);
 
+    // Helper for MultipleReadHelper that does not spin the event loop, so we
+    // don't end up with nested event loops.
+    static void MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                           uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls);
+
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
@@ -2484,6 +2489,9 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
+    uint32_t numReadSuccessCalls = 0;
+    uint32_t numReadFailureCalls = 0;
+
     responseDirective = kSendDataResponse;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
@@ -2501,12 +2509,12 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount,
-                                        aReadCount](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount,
+                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
-            MultipleReadHelper(apSuite, aCtx, aReadCount);
+            MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
         }
     };
 
@@ -2522,40 +2530,50 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == aSubscribeCount);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == aSubscribeCount);
+    NL_TEST_ASSERT(apSuite, numReadSuccessCalls == aReadCount);
+    NL_TEST_ASSERT(apSuite, numReadFailureCalls == 0);
 }
 
-void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+// The guts of MultipleReadHelper which take references to the success/failure
+// counts to modify and assume the consumer will be spinning the event loop.
+void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                                     uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
 {
-    auto sessionHandle       = aCtx.GetSessionBobToAlice();
-    uint32_t numSuccessCalls = 0;
-    uint32_t numFailureCalls = 0;
+    NL_TEST_ASSERT(apSuite, aNumSuccessCalls == 0);
+    NL_TEST_ASSERT(apSuite, aNumFailureCalls == 0);
+
+    auto sessionHandle = aCtx.GetSessionBobToAlice();
 
     responseDirective = kSendDataResponse;
 
     uint16_t firstExpectedResponse = totalReadCount + 1;
 
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
+    auto onFailureCb = [apSuite, &aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        aNumFailureCalls++;
 
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
     for (size_t i = 0; i < aReadCount; ++i)
     {
-        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise,
-        // it's not safe to do so.
-        auto onSuccessCb = [&numSuccessCalls, &apSuite, firstExpectedResponse,
+        auto onSuccessCb = [&aNumSuccessCalls, apSuite, firstExpectedResponse,
                             i](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
             NL_TEST_ASSERT(apSuite, dataResponse == firstExpectedResponse + i);
-            numSuccessCalls++;
+            aNumSuccessCalls++;
         };
 
         NL_TEST_ASSERT(apSuite,
                        Controller::ReadAttribute<TestCluster::Attributes::Int16u::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
     }
+}
+
+void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+{
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numSuccessCalls, numFailureCalls);
 
     aCtx.DrainAndServiceIO();
 
