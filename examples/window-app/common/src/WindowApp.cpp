@@ -109,7 +109,10 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
     return nullptr;
 }
 
-CHIP_ERROR WindowApp::StartAppTask() { return CHIP_NO_ERROR;}
+CHIP_ERROR WindowApp::StartAppTask()
+{
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR WindowApp::Init()
 {

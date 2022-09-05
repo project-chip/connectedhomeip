@@ -57,9 +57,9 @@ int main(void)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     WindowApp & app = WindowApp::Instance();
-    
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
- 
+
     // Initialize device attestation config
 #ifdef EFR32_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());

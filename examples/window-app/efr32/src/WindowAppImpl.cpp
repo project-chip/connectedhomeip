@@ -179,10 +179,11 @@ CHIP_ERROR WindowAppImpl::StartAppTask()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return CHIP_NO_ERROR; 
+    return CHIP_NO_ERROR;
 }
 
-void WindowAppImpl::AppTaskMain(void * pvParameter){
+void WindowAppImpl::AppTaskMain(void * pvParameter)
+{
     CHIP_ERROR err = sInstance.Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -211,7 +212,7 @@ CHIP_ERROR WindowAppImpl::Init()
     WindowApp::Init();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     // Initialize App Task
-    
+
     // Initialize LEDs
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
@@ -221,14 +222,14 @@ CHIP_ERROR WindowAppImpl::Init()
     slLCD.Init();
 #endif
 
-return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WindowAppImpl::Start()
 {
-    #ifdef SL_WIFI
+#ifdef SL_WIFI
     sWiFiNetworkCommissioningInstance.Init();
-    #endif
+#endif
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
