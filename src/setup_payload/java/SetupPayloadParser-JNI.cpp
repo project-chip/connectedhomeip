@@ -40,7 +40,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     return JNI_VERSION_1_6;
 }
 
-JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj, jboolean isAllowInvalidPayload)
+JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     const char * qrString = NULL;
@@ -51,7 +51,7 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     err = QRCodeSetupPayloadParser(qrString).populatePayload(payload);
     env->ReleaseStringUTFChars(qrCodeObj, qrString);
 
-    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload())
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload())
     {
         jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
         JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
@@ -71,7 +71,7 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     return TransformSetupPayload(env, payload);
 }
 
-JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode, jboolean isAllowInvalidPayload)
+JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     const char * entryCodeString = NULL;
@@ -82,7 +82,7 @@ JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self,
     err = ManualSetupPayloadParser(entryCodeString).populatePayload(payload);
     env->ReleaseStringUTFChars(entryCode, entryCodeString);
 
-    if (isAllowInvalidPayload == JNI_FALSE && !payload.isValidManualCode())
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidManualCode())
     {
         jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
         JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);

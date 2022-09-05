@@ -9,9 +9,15 @@ public class SetupPayloadParser {
     return fetchPayloadFromQrCode(qrCodeString, false);
   }
 
-  public SetupPayload parseQrCode(String qrCodeString, boolean isAllowInvalidPayload)
+  /**
+   * Returns {@link SetupPayload} parsed from the QR code string.
+   *
+   * @param qrCodeString the QRCode for commissioning device.
+   * @param allowInvalidPayload Allow invalid payload components.
+   */
+  public SetupPayload parseQrCode(String qrCodeString, boolean allowInvalidPayload)
       throws UnrecognizedQrCodeException, SetupPayloadException {
-    return fetchPayloadFromQrCode(qrCodeString, isAllowInvalidPayload);
+    return fetchPayloadFromQrCode(qrCodeString, allowInvalidPayload);
   }
 
   /** Returns {@link SetupPayload} parsed from the manual entry code string. */
@@ -20,9 +26,15 @@ public class SetupPayloadParser {
     return fetchPayloadFromManualEntryCode(entryCodeString, false);
   }
 
-  public SetupPayload parseManualEntryCode(String entryCodeString, boolean isAllowInvalidPayload)
+  /**
+   * Returns {@link SetupPayload} parsed from the manual entry code string.
+   *
+   * @param entryCodeString the manual Pairing Code for commissioning device.
+   * @param allowInvalidPayload Allow invalid payload components.
+   */
+  public SetupPayload parseManualEntryCode(String entryCodeString, boolean allowInvalidPayload)
       throws InvalidEntryCodeFormatException, SetupPayloadException {
-    return fetchPayloadFromManualEntryCode(entryCodeString, isAllowInvalidPayload);
+    return fetchPayloadFromManualEntryCode(entryCodeString, allowInvalidPayload);
   }
 
   /** Get QR code string from {@link SetupPayload}. */
