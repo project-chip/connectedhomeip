@@ -65,8 +65,7 @@ public class AppPlatformService {
     this.context = context;
     discoveredEndpoints = context.getSharedPreferences(MATTER_APPPLATFORM_ENDPOINTS, Context.MODE_PRIVATE);
     mAppPlatform =
-        new AppPlatform(
-            new MatterCommissioningPrompter(activity), new ContentAppEndpointManagerImpl(context));
+        new AppPlatform(new ContentAppEndpointManagerImpl(context));
     ContentAppDiscoveryService.getReceiverInstance().registerSelf(context.getApplicationContext());
     Map<String, Integer> previouslyPersistedEndpoints = new HashMap();
     previouslyPersistedEndpoints.putAll((Map<String, Integer>) discoveredEndpoints.getAll());

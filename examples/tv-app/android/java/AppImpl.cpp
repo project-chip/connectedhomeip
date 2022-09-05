@@ -49,49 +49,6 @@ using namespace chip;
 using namespace chip::AppPlatform;
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-class MyPincodeService : public PincodeService
-{
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
-    {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
-    }
-};
-MyPincodeService gMyPincodeService;
-
-class MyPostCommissioningListener : public PostCommissioningListener
-{
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                SessionHandle & sessionHandle) override
-    {
-
-        ContentAppPlatform::GetInstance().ManageClientAccess(
-            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
-    }
-
-    /* Callback when command results in success */
-    static void OnSuccessResponse(void * context)
-    {
-        ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
-        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-        if (cdc != nullptr)
-        {
-            cdc->PostCommissioningSucceeded();
-        }
-    }
-
-    /* Callback when command results in failure */
-    static void OnFailureResponse(void * context, CHIP_ERROR error)
-    {
-        ChipLogProgress(Controller, "OnFailureResponse - Binding Add Failed");
-        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-        if (cdc != nullptr)
-        {
-            cdc->PostCommissioningFailed(error);
-        }
-    }
-};
-
-MyPostCommissioningListener gMyPostCommissioningListener;
 ContentAppFactoryImpl gFactory;
 
 ContentAppFactoryImpl * GetContentAppFactoryImpl()
@@ -427,7 +384,7 @@ Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager)
+CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
@@ -443,21 +400,6 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     }
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
-    if (cdc != nullptr && userPrompter != nullptr)
-    {
-        cdc->SetPincodeService(&gMyPincodeService);
-        cdc->SetUserPrompter(userPrompter);
-        cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
-    }
-
-    ChipLogProgress(AppServer, "Starting commissioner");
-    ReturnErrorOnFailure(InitCommissioner(CHIP_PORT + 2 + 10, CHIP_UDC_PORT));
-    ChipLogProgress(AppServer, "Started commissioner");
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.

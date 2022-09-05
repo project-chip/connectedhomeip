@@ -39,10 +39,10 @@ using namespace chip::Credentials;
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_AppPlatform_##METHOD_NAME
 
-JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app, jobject prompter, jobject contentAppEndpointManager)
+JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
-    InitVideoPlayerPlatform(new JNIMyUserPrompter(prompter), contentAppEndpointManager);
+    InitVideoPlayerPlatform(contentAppEndpointManager);
 }
 
 JNI_METHOD(jint, addContentApp)

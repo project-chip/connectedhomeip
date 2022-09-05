@@ -23,12 +23,12 @@ package com.matter.tv.server.tvapp;
 public class AppPlatform {
   private static final String TAG = "AppPlatform";
 
-  public AppPlatform(UserPrompter userPrompter, ContentAppEndpointManager manager) {
-    nativeInit(userPrompter, manager);
+  public AppPlatform(ContentAppEndpointManager manager) {
+    nativeInit(manager);
   }
 
   // Initializes the ContentAppPlatform on startup
-  public native void nativeInit(UserPrompter userPrompter, ContentAppEndpointManager manager);
+  public native void nativeInit(ContentAppEndpointManager manager);
 
   // Method to add a content app as a new endpoint
   public native int addContentApp(

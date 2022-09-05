@@ -19,12 +19,14 @@
 #pragma once
 
 #include <jni.h>
+#include "MyUserPrompter-JNI.h"
 
 class TvAppJNI
 {
 public:
     void InitializeWithObjects(jobject app);
     void PostClusterInit(int clusterId, int endpoint);
+    void InitializeCommissioner(JNIMyUserPrompter * userPrompter);
 
 private:
     friend TvAppJNI & TvAppJNIMgr();
