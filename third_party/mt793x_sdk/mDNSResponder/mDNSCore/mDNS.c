@@ -7999,7 +7999,7 @@ mDNSlocal void mDNSCoreReceiveQuery(mDNS *const m, const DNSMessage *const msg, 
 
     if (!InterfaceID && dstaddr && mDNSAddrIsDNSMulticast(dstaddr))
     {
-        LogMsg("Ignoring Query from %#-15a:%-5d to %#-15a:%-5d on 0x%p with "
+        LogMsg("Ignoring Query from %#-15a:%-5d to %#-15a:%-5d on %p with "
                "%2d Question%s %2d Answer%s %2d Authorit%s %2d Additional%s %d bytes (Multicast, but no InterfaceID)",
                srcaddr, mDNSVal16(srcport), dstaddr, mDNSVal16(dstport), InterfaceID,
                msg->h.numQuestions,   msg->h.numQuestions   == 1 ? ", "   : "s,",
@@ -8009,7 +8009,7 @@ mDNSlocal void mDNSCoreReceiveQuery(mDNS *const m, const DNSMessage *const msg, 
         return;
     }
 
-    mdnslogInfo("Received Query from %#-15a:%-5d to %#-15a:%-5d on 0x%p with "
+    mdnslogInfo("Received Query from %#-15a:%-5d to %#-15a:%-5d on %p with "
                   "%2d Question%s %2d Answer%s %2d Authorit%s %2d Additional%s %d bytes",
                   srcaddr, mDNSVal16(srcport), dstaddr, mDNSVal16(dstport), InterfaceID,
                   msg->h.numQuestions,   msg->h.numQuestions   == 1 ? ", "   : "s,",
@@ -10277,7 +10277,7 @@ mDNSlocal void mDNSCoreReceiveUpdate(mDNS *const m,
     mDNSu32 updatelease = 0;
     const mDNSu8 *ptr;
 
-    mdnslogInfo("Received Update from %#-15a:%-5d to %#-15a:%-5d on 0x%p with "
+    mdnslogInfo("Received Update from %#-15a:%-5d to %#-15a:%-5d on %p with "
            "%2d Question%s %2d Answer%s %2d Authorit%s %2d Additional%s %d bytes",
            srcaddr, mDNSVal16(srcport), dstaddr, mDNSVal16(dstport), InterfaceID,
            msg->h.numQuestions,   msg->h.numQuestions   == 1 ? ", "   : "s,",

@@ -6385,7 +6385,7 @@ mDNSexport void udsserver_info(mDNS * const m)
             CacheUsed++;
             if (q->ThisQInterval)
                 CacheActive++;
-            LogMsgNoIdent("%6d%6d %-7s%s%s %5d 0x%x%x 0x%p 0x%p %1d %2d %-5s%##s%s%s", i, n,
+            LogMsgNoIdent("%6d%6d %-7s%s%s %5d 0x%x%x %p %p %1d %2d %-5s%##s%s%s", i, n,
                           ifname                                 ? ifname
                               : mDNSOpaque16IsZero(q->TargetQID) ? ""
                                                                  : "-U-",
