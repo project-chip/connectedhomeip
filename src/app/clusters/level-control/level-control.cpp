@@ -118,20 +118,20 @@ static void timerCallback(System::Layer *, void * callbackContext)
     emberAfLevelControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
 }
 
-static uint32_t calculateNextTimestampMs(int32_t delayMs)
+static uint32_t calculateNextTimestampMs(uint32_t delayMs)
 {
-    int32_t waitTime, latency;
+    int32_t waitTime, latency, delay = (int32_t) delayMs;
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     latency = (int32_t) currentTime.count() - (int32_t) nextTimestamp.count();
 
-    if (latency > delayMs)
+    if (latency > delay)
     {
         waitTime = 0;
     }
     else
     {
-        waitTime = delayMs - latency;
+        waitTime = delay - latency;
     }
 
     nextTimestamp += chip::System::Clock::Milliseconds32(delayMs);
