@@ -448,6 +448,9 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         return;
     }
 
+    if (pairingDelegate != nullptr && pairingDelegate->IsDiscoverOnce())
+        return;
+
     // We failed to establish PASE.  Try the next thing we have discovered, if
     // any.
     if (TryNextRendezvousParameters())

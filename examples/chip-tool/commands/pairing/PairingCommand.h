@@ -145,7 +145,7 @@ public:
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-    bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
+    bool IsDiscoverOnce() override { return mDiscoverOnce.ValueOr(false); };
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

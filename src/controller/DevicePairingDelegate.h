@@ -109,6 +109,12 @@ public:
      * in order to resume the commissioning process.
      */
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called to check if the discover-once option is enabled.
+     */
+    virtual bool IsDiscoverOnce() { return false; }
 };
 
 } // namespace Controller
