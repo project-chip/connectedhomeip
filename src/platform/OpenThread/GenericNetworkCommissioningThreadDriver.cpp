@@ -119,9 +119,9 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Muta
     // Staging network not commissioned yet (active) or we are updating the dataset with same Extended Pan ID.
     VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || MatchesNetworkId(mStagingNetwork, newExtpanid) == Status::kSuccess,
                         Status::kBoundsExceeded);
+    mStagingNetwork = newDataset;
     VerifyOrReturnError(BackupConfiguration() == CHIP_NO_ERROR, Status::kUnknownError);
 
-    mStagingNetwork = newDataset;
     return Status::kSuccess;
 }
 
