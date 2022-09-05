@@ -24,7 +24,6 @@ public class MatterServantService extends Service {
     MatterServant.get().initCommissioner();
 
     AppPlatformService.get().init(this.getApplicationContext());
-
   }
 
   @Nullable

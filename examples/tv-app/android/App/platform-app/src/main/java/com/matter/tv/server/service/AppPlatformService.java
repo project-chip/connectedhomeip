@@ -23,23 +23,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-
 import androidx.annotation.NonNull;
-import com.matter.tv.server.MatterCommissioningPrompter;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.tvapp.AppPlatform;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * This class facilitates the communication with the ContentAppPlatform. It uses the JNI interface
- * provided via the {@link AppPlatform} class to communicate with the linux layer of the platform-app.
- * This class also manages the content app endpoints that get added via the ContentAppPlatform. It
- * manages the persistence of the endpoints that were discovered to be able to reuse endpointIds
- * after restart of the platform-app.
+ * provided via the {@link AppPlatform} class to communicate with the linux layer of the
+ * platform-app. This class also manages the content app endpoints that get added via the
+ * ContentAppPlatform. It manages the persistence of the endpoints that were discovered to be able
+ * to reuse endpointIds after restart of the platform-app.
  */
 public class AppPlatformService {
 
@@ -63,9 +60,9 @@ public class AppPlatformService {
 
   public void init(@NonNull Context context) {
     this.context = context;
-    discoveredEndpoints = context.getSharedPreferences(MATTER_APPPLATFORM_ENDPOINTS, Context.MODE_PRIVATE);
-    mAppPlatform =
-        new AppPlatform(new ContentAppEndpointManagerImpl(context));
+    discoveredEndpoints =
+        context.getSharedPreferences(MATTER_APPPLATFORM_ENDPOINTS, Context.MODE_PRIVATE);
+    mAppPlatform = new AppPlatform(new ContentAppEndpointManagerImpl(context));
     ContentAppDiscoveryService.getReceiverInstance().registerSelf(context.getApplicationContext());
     Map<String, Integer> previouslyPersistedEndpoints = new HashMap();
     previouslyPersistedEndpoints.putAll((Map<String, Integer>) discoveredEndpoints.getAll());
@@ -124,7 +121,8 @@ public class AppPlatformService {
     int retEndpointId = -1;
     int desiredEndpointId = discoveredEndpoints.getInt(app.getAppName(), -1);
     if (desiredEndpointId > 0) {
-      retEndpointId = mAppPlatform.addContentAppAtEndpoint(
+      retEndpointId =
+          mAppPlatform.addContentAppAtEndpoint(
               app.getVendorName(),
               app.getVendorId(),
               app.getAppName(),
@@ -133,7 +131,8 @@ public class AppPlatformService {
               desiredEndpointId,
               new ContentAppEndpointManagerImpl(context));
     } else {
-      retEndpointId = mAppPlatform.addContentApp(
+      retEndpointId =
+          mAppPlatform.addContentApp(
               app.getVendorName(),
               app.getVendorId(),
               app.getAppName(),
