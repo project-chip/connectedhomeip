@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <jni.h>
 #include "MyUserPrompter-JNI.h"
+#include <jni.h>
 
 class TvAppJNI
 {

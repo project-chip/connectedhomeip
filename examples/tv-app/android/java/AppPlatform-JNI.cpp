@@ -34,7 +34,7 @@ using namespace chip::Credentials;
 /*
  * This file provides the native implementation of methods of the
  * com.matter.tv.server.tvapp.AppPlatform class.
-*/
+ */
 
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_AppPlatform_##METHOD_NAME
@@ -60,7 +60,8 @@ JNI_METHOD(jint, addContentApp)
 }
 
 JNI_METHOD(jint, addContentAppAtEndpoint)
-(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jint endpointId, jobject manager)
+(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jint endpointId,
+ jobject manager)
 {
     chip::DeviceLayer::StackLock lock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

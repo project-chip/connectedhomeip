@@ -324,7 +324,7 @@ EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
 {
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
     EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
-                                                                    Span<const EmberAfDeviceType>(gContentAppDeviceType));
+                                                                      Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
@@ -334,8 +334,9 @@ EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
 EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, EndpointId desiredEndpointId)
 {
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
-    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
-                                                                    Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
+    EndpointId epId =
+        ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+                                                        Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
