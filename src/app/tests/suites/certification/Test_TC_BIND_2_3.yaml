@@ -202,6 +202,8 @@ tests:
           [1657719097.788418][4548:4554] CHIP:TOO:    }
 
 
+          Run this commands for both Ligh-switch-app and Lighting-app:
+
           ./chip-tool groupsettings add-group grp1 0x0001
 
           ./chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf

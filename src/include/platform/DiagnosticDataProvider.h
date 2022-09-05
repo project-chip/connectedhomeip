@@ -33,7 +33,7 @@ namespace DeviceLayer {
 
 // Maximum length of vendor defined name or prefix of the software thread that is
 // static for the duration of the thread.
-static constexpr size_t kMaxThreadNameLength = 32;
+static constexpr size_t kMaxThreadNameLength = 8;
 
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 constexpr size_t kMaxHardwareAddrSize = 8;
