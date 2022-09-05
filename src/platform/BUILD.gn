@@ -266,6 +266,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_BEKEN=1",
         "CHIP_DEVICE_LAYER_TARGET=Beken",
+      ]
     } else if (chip_device_platform == "mt793x") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_MT793X=1",
