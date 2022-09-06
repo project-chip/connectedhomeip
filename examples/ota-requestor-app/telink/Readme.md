@@ -124,8 +124,17 @@ Usage of OTA:
 
     -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
 
--   After commissioning the ota-requestor, use the chip-tool to announce the
-    ota-provider-app to start the OTA process
+-   Configure the ACL of the ota-provider-app to allow access
+
+    ```
+    ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' ${OTA_PROVIDER_NODE_ID} 0
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Use the chip-tool to announce the ota-provider-app to start the OTA process
 
     ```
     ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
