@@ -149,7 +149,7 @@ public:
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "secure"; };
+    const char * GetSessionTypeString() const override { return "S"; };
 #endif
 
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }

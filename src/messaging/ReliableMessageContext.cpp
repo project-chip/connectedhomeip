@@ -91,13 +91,6 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
                       "CHIP MessageCounter:" ChipLogFormatMessageCounter " not in RetransTable on exchange " ChipLogFormatExchange,
                       ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
     }
-    else
-    {
-        ChipLogDetail(ExchangeManager,
-                      "Removed CHIP MessageCounter:" ChipLogFormatMessageCounter
-                      " from RetransTable on exchange " ChipLogFormatExchange,
-                      ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-    }
 }
 
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
@@ -178,11 +171,6 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-
-    // Send the null message
-    ChipLogDetail(ExchangeManager,
-                  "Sending Standalone Ack for MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange,
-                  mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 
     CHIP_ERROR err = GetExchangeContext()->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                                        BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });

@@ -67,7 +67,7 @@ public:
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kUnauthenticated; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "unauthenticated"; };
+    const char * GetSessionTypeString() const override { return "U"; };
 #endif
 
     void Retain() override { ReferenceCounted<UnauthenticatedSession, NoopDeletor<UnauthenticatedSession>, 0>::Retain(); }

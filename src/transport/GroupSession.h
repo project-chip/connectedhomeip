@@ -45,7 +45,7 @@ public:
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "incoming group"; };
+    const char * GetSessionTypeString() const override { return "G"; };
 #endif
 
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
@@ -101,7 +101,7 @@ public:
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "outgoing group"; };
+    const char * GetSessionTypeString() const override { return "G"; };
 #endif
 
     // Peer node ID is unused: users care about the group, not the node
