@@ -76,6 +76,9 @@ public:
         AddArgument("use-max-sized-certs", 0, 1, &mUseMaxSizedCerts,
                     "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
                     "certificates are generated.");
+        AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
+                    "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
+                    "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -161,6 +164,7 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
+    chip::Optional<bool> mOnlyAllowTrustedCdKeys;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.

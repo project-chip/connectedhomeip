@@ -16,6 +16,7 @@
  */
 #include "FileAttestationTrustStore.h"
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -39,28 +40,27 @@ const char * GetFilenameExtension(const char * filename)
 }
 } // namespace
 
-FileAttestationTrustStore::FileAttestationTrustStore(const char * paaTrustStorePath, const char * cdTrustStorePath)
+FileAttestationTrustStore::FileAttestationTrustStore(const char * paaTrustStorePath)
 {
-    VerifyOrReturn(paaTrustStorePath != nullptr || cdTrustStorePath != nullptr);
+    VerifyOrReturn(paaTrustStorePath != nullptr);
 
     if (paaTrustStorePath != nullptr)
     {
-        LoadTrustStore(paaTrustStorePath, mPAADerCerts);
+        mPAADerCerts = LoadAllX509DerCerts(paaTrustStorePath);
         VerifyOrReturn(paaCount());
-    }
-
-    if (cdTrustStorePath != nullptr)
-    {
-        LoadTrustStore(cdTrustStorePath, mCDDerCerts);
-        VerifyOrReturn(cdCount());
     }
 
     mIsInitialized = true;
 }
 
-void FileAttestationTrustStore::LoadTrustStore(const char * trustStorePath,
-                                               std::vector<std::array<uint8_t, kMaxDERCertLength>> & certs)
+std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePath)
 {
+    std::vector<std::vector<uint8_t>> certs;
+    if (trustStorePath == nullptr)
+    {
+        return certs;
+    }
+
     DIR * dir;
 
     dir = opendir(trustStorePath);
@@ -73,32 +73,41 @@ void FileAttestationTrustStore::LoadTrustStore(const char * trustStorePath,
             const char * fileExtension = GetFilenameExtension(entry->d_name);
             if (strncmp(fileExtension, "der", strlen("der")) == 0)
             {
-                FILE * file;
-
-                std::array<uint8_t, kMaxDERCertLength> certificate;
+                std::vector<uint8_t> certificate(kMaxDERCertLength + 1);
                 std::string filename(trustStorePath);
 
                 filename += std::string("/") + std::string(entry->d_name);
 
-                file = fopen(filename.c_str(), "rb");
-                if (file != nullptr)
+                FILE * file = fopen(filename.c_str(), "rb");
+                if (file == nullptr)
                 {
-                    uint32_t certificateLength = fread(certificate.data(), sizeof(uint8_t), kMaxDERCertLength, file);
-                    if (certificateLength > 0)
+                    // On bad files, just skip.
+                    continue;
+                }
+
+                size_t certificateLength = fread(certificate.data(), sizeof(uint8_t), certificate.size(), file);
+                if ((certificateLength > 0) && (certificateLength <= kMaxDERCertLength))
+                {
+                    certificate.resize(certificateLength);
+                    // Only accumulate certificate if it has a subject key ID extension
                     {
-                        certs.push_back(certificate);
+                        uint8_t kidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
+                        MutableByteSpan kidSpan{ kidBuf };
+                        ByteSpan certSpan{ certificate.data(), certificate.size() };
+
+                        if (CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(certSpan, kidSpan))
+                        {
+                            certs.push_back(certificate);
+                        }
                     }
-                    fclose(file);
                 }
-                else
-                {
-                    certs.clear();
-                    break;
-                }
+                fclose(file);
             }
         }
         closedir(dir);
     }
+
+    return certs;
 }
 
 FileAttestationTrustStore::~FileAttestationTrustStore()
@@ -109,7 +118,6 @@ FileAttestationTrustStore::~FileAttestationTrustStore()
 void FileAttestationTrustStore::Cleanup()
 {
     mPAADerCerts.clear();
-    mCDDerCerts.clear();
     mIsInitialized = false;
 }
 
@@ -140,38 +148,6 @@ CHIP_ERROR FileAttestationTrustStore::GetProductAttestationAuthorityCert(const B
         {
             // Found a match
             return CopySpanToMutableSpan(ByteSpan{ candidate.data(), candidate.size() }, outPaaDerBuffer);
-        }
-    }
-
-    return CHIP_ERROR_CA_CERT_NOT_FOUND;
-}
-
-CHIP_ERROR FileAttestationTrustStore::GetCertificationDeclarationSigningKey(const ByteSpan & skid,
-                                                                            Crypto::P256PublicKey & pubKey) const
-{
-    // If the constructor has not tried to initialize the certification declaration certificates database, return
-    // CHIP_ERROR_NOT_IMPLEMENTED to use the testing trust store if the DefaultAttestationVerifier is in use.
-    if (mIsInitialized && cdCount() == 0)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    VerifyOrReturnError(!mCDDerCerts.empty(), CHIP_ERROR_CA_CERT_NOT_FOUND);
-    VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (auto candidate : mCDDerCerts)
-    {
-        uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
-        MutableByteSpan candidateSkidSpan{ skidBuf };
-        VerifyOrReturnError(CHIP_NO_ERROR ==
-                                Crypto::ExtractSKIDFromX509Cert(ByteSpan{ candidate.data(), candidate.size() }, candidateSkidSpan),
-                            CHIP_ERROR_INTERNAL);
-
-        if (skid.data_equal(candidateSkidSpan))
-        {
-            // Found a match
-            return Crypto::ExtractPubkeyFromX509Cert(ByteSpan{ candidate.data(), candidate.size() }, pubKey);
         }
     }
 

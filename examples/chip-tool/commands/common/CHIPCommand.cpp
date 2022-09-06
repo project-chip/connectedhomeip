@@ -48,7 +48,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
-const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const char * cdTrustStorePath,
+const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath,
                                           const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
@@ -56,18 +56,13 @@ const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const 
         paaTrustStorePath = getenv(kPAATrustStorePathVariable);
     }
 
-    if (cdTrustStorePath == nullptr)
-    {
-        cdTrustStorePath = getenv(kCDTrustStorePathVariable);
-    }
-
-    if (paaTrustStorePath == nullptr && cdTrustStorePath == nullptr)
+    if (paaTrustStorePath == nullptr)
     {
         *trustStore = chip::Credentials::GetTestAttestationTrustStore();
         return CHIP_NO_ERROR;
     }
 
-    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath, cdTrustStorePath };
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
 
     if (paaTrustStorePath != nullptr && attestationTrustStore.paaCount() == 0)
     {
@@ -77,17 +72,6 @@ const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const 
                      "the argument [--paa-trust-store-path paa/file/path] "
                      "or environment variable [%s=paa/file/path]",
                      kPAATrustStorePathVariable);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (cdTrustStorePath != nullptr && attestationTrustStore.cdCount() == 0)
-    {
-        ChipLogError(chipTool, "No CDs found in path: %s", cdTrustStorePath);
-        ChipLogError(chipTool,
-                     "Please specify a valid path containing trusted CD certificates using "
-                     "the argument [--cd-trust-store-path cd/file/path] "
-                     "or environment variable [%s=cd/file/path]",
-                     kCDTrustStorePathVariable);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -139,10 +123,33 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    ReturnErrorOnFailure(
-        GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), mCDTrustStorePath.ValueOr(nullptr), &sTrustStore));
+    ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
+
+    // After initializing first commissioner, add the additional CD certs once
+    {
+        const char * cdTrustStorePath = mCDTrustStorePath.ValueOr(nullptr);
+        if (cdTrustStorePath == nullptr)
+        {
+            cdTrustStorePath = getenv(kCDTrustStorePathVariable);
+        }
+
+        auto additionalCdCerts = chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath);
+        if (cdTrustStorePath != nullptr && additionalCdCerts.size() == 0)
+        {
+            ChipLogError(chipTool, "Warning: no CD signing certs found in path: %s, only defaults will be used", cdTrustStorePath);
+            ChipLogError(chipTool,
+                         "Please specify a path containing trusted CD verifying key certificates using "
+                         "the argument [--cd-trust-store-path cd/file/path] "
+                         "or environment variable [%s=cd/file/path]",
+                         kCDTrustStorePathVariable);
+        }
+        ReturnErrorOnFailure(mCredIssuerCmds->AddAdditionalCDVerifyingCerts(additionalCdCerts));
+    }
+    bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
+    mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
+                                               allowTestCdSigningKey);
 
     return CHIP_NO_ERROR;
 }

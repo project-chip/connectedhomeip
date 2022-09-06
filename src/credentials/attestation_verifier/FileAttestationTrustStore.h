@@ -25,26 +25,33 @@
 namespace chip {
 namespace Credentials {
 
+/**
+ * @brief Load all X.509 DER certificates in a given path.
+ *
+ * Silently ignores non-X.509 files and X.509 files without a subject key identifier.
+ *
+ * Returns an empty vector if no files are found or unrecoverable errors arise.
+ *
+ * @param trustStorePath - path from where to search for certificates.
+ * @return a vector of certificate DER data
+ */
+std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePath);
+
 class FileAttestationTrustStore : public AttestationTrustStore
 {
 public:
-    FileAttestationTrustStore(const char * paaTrustStorePath = nullptr, const char * cdTrustStorePath = nullptr);
+    FileAttestationTrustStore(const char * paaTrustStorePath = nullptr);
     ~FileAttestationTrustStore();
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override;
-    CHIP_ERROR GetCertificationDeclarationSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey) const override;
 
     bool IsInitialized() const { return mIsInitialized; }
     size_t paaCount() const { return mPAADerCerts.size(); };
-    size_t cdCount() const { return mCDDerCerts.size(); };
 
 protected:
-    std::vector<std::array<uint8_t, kMaxDERCertLength>> mPAADerCerts;
-    std::vector<std::array<uint8_t, kMaxDERCertLength>> mCDDerCerts;
+    std::vector<std::vector<uint8_t>> mPAADerCerts;
 
 private:
-    void LoadTrustStore(const char * trustStorePath, std::vector<std::array<uint8_t, kMaxDERCertLength>> & certs);
-
     bool mIsInitialized = false;
 
     void Cleanup();

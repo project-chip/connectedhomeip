@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace Credentials {
@@ -44,6 +45,7 @@ enum class AttestationVerificationResult : uint16_t
     kPaiArgumentInvalid   = 204,
     kPaiVendorIdMismatch  = 205,
     kPaiAuthorityNotFound = 206,
+    kPaiMissing           = 207,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
@@ -146,28 +148,73 @@ public:
      *
      */
     virtual CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const = 0;
+};
+
+/**
+ * @brief Helper utility to model obtaining verifying keys by Key ID
+ *
+ * API is synchronous. Real commissioner implementations may entirely
+ * hide key lookup behind the DeviceAttestationVerifier and never use this interface at all.
+ * It is provided as a utility to help build DeviceAttestationVerifier
+ * implementations suitable for testing or examples.
+ */
+class WellKnownKeysTrustStore
+{
+public:
+    WellKnownKeysTrustStore()          = default;
+    virtual ~WellKnownKeysTrustStore() = default;
+
+    // Not copyable
+    WellKnownKeysTrustStore(const WellKnownKeysTrustStore &) = delete;
+    WellKnownKeysTrustStore & operator=(const WellKnownKeysTrustStore &) = delete;
 
     /**
-     * @brief Look-up a CD signing key by SKID
+     * @brief Add a trusted key directly
      *
-     * The implementations of this interface must have access to a set of CDs to trust.
+     * @param[in] kid - Key ID to use. Usually 20 bytes long, max 32 bytes.
+     * @param[in] pubKey - Verifying public key to attach to the key ID.
      *
-     * Interface is synchronous, and therefore this should not be used unless to expose a CD
-     * store that is both fully local and quick to access.
-     *
-     * @param[in] skid        Key identifier (SKID) of the CD key to look-up (SHA-1 of public key)
-     * @param[in,out] pubKey  Reference to public key object that gets updated on success.
-     *
-     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `skid` is not usable
-     *          CHIP_ERROR_CA_CERT_NOT_FOUND if no CD signing key found that matches `skid.
-     *          By default CHIP_ERROR_NOT_IMPLEMENTED is returned if the method is not overriden. Depending on the
-     *          implementation it may results into using the development CD signing key.
-     *
+     * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `kid` or `pubKey` arguments
+     *          are not usable. CHIP_ERROR_NO_MEMORY if the trust store is full.
      */
-    virtual CHIP_ERROR GetCertificationDeclarationSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey) = 0;
+
+    /**
+     * @brief Add a trusted key via a public certificate.
+     *
+     * The subject public key of the certificate will be used.
+     * The subject key ID extensions of the certificate will be the `kid`.
+     *
+     * Verification of trust chaining is at the discretion of the implementation.
+     *
+     * @param[in] derCertBytes - Certificate containing the X.509 DER certificate with the key.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if derCertBytes is improperly
+     *         formatted or not trusted. CHIP_ERROR_NO_MEMORY if the trust store is full.
+     */
+    virtual CHIP_ERROR AddTrustedKey(const ByteSpan & derCertBytes) = 0;
+
+    /**
+     * @brief Look-up a verifying key by Key ID
+     *
+     * Interface is synchronous.
+     *
+     * @param[in] kid Buffer containing the key identifier (KID) of the verifying key to look-up. Usually
+     *                a SHA-1-sized buffer (20 bytes).
+     * @param[out] outPubKey Reference to where the verifying key found will be stored on CHIP_NO_ERROR
+     *
+     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `kid` or `pubKey` arguments
+     *          are not usable, CHIP_ERROR_KEY_NOT_FOUND if no key is found that matches `kid`.
+     */
+    virtual CHIP_ERROR LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const = 0;
+
+    /**
+     * @brief Returns true if `kid` identifies a known test key.
+     *
+     * @param kid - Key ID to use. Usually 20 bytes long, max 32 bytes.
+     * @return true if it's a test/development-only signing key identifier, false otherwise
+     */
+    virtual bool IsCdTestKey(const ByteSpan & kid) const = 0;
 };
 
 /**
@@ -180,9 +227,7 @@ public:
 class ArrayAttestationTrustStore : public AttestationTrustStore
 {
 public:
-    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts, const ByteSpan * cdDerCerts, size_t numCDCerts) :
-        mDerCerts(derCerts), mNumCerts(numCerts), mCDDerCerts(cdDerCerts), mNumCDCerts(numCDCerts)
-    {}
+    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
     {
@@ -210,37 +255,9 @@ public:
         return CHIP_ERROR_CA_CERT_NOT_FOUND;
     }
 
-    CHIP_ERROR GetCertificationDeclarationSigningKey(const ByteSpan & skid, Crypto::P256PublicKey & pubKey) const override
-    {
-        VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
-
-        size_t cdIdx;
-        ByteSpan candidate;
-
-        for (cdIdx = 0; cdIdx < mNumCDCerts; ++cdIdx)
-        {
-            uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
-            candidate                                            = mCDDerCerts[cdIdx];
-            MutableByteSpan candidateSkidSpan{ skidBuf };
-            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
-                                CHIP_ERROR_INTERNAL);
-
-            if (skid.data_equal(candidateSkidSpan))
-            {
-                // Found a match
-                return Crypto::ExtractPubkeyFromX509Cert(candidate, pubKey);
-            }
-        }
-
-        return CHIP_ERROR_CA_CERT_NOT_FOUND;
-    }
-
 protected:
     const ByteSpan * mDerCerts;
     const size_t mNumCerts;
-    const ByteSpan * mCDDerCerts;
-    const size_t mNumCDCerts;
 };
 
 class DeviceAttestationVerifier
@@ -328,9 +345,26 @@ public:
                                                            const Crypto::P256PublicKey & dacPublicKey,
                                                            const ByteSpan & csrNonce) = 0;
 
+    /**
+     * @brief Get the trust store used for the attestation verifier.
+     *
+     * Returns nullptr if not supported. Be careful not to hold-on to the trust store
+     * for too long. It is only expected to have same lifetime as the DeviceAttestationVerifier.
+     *
+     * @return a pointer to the trust store or nullptr if none is directly accessible.
+     */
+    virtual WellKnownKeysTrustStore * GetCertificationDeclarationTrustStore() { return nullptr; }
+
+    void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
+    bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
+
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
+
+    // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
+    // always supported development keys.
+    bool mEnableCdTestKeySupport = true;
 };
 
 /**
