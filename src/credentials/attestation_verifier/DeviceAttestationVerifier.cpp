@@ -116,8 +116,10 @@ void SetDeviceAttestationVerifier(DeviceAttestationVerifier * verifier)
 static inline Platform::ScopedMemoryBufferWithSize<uint8_t> CopyByteSpanHelper(const ByteSpan & span_to_copy)
 {
     Platform::ScopedMemoryBufferWithSize<uint8_t> bufferCopy;
-    bufferCopy.Alloc(span_to_copy.size());
-    memcpy(bufferCopy.Get(), span_to_copy.data(), span_to_copy.size());
+    if (bufferCopy.Alloc(span_to_copy.size()))
+    {
+        memcpy(bufferCopy.Get(), span_to_copy.data(), span_to_copy.size());
+    }
     return bufferCopy;
 }
 
