@@ -47,30 +47,23 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::Init");
 
     // If reading fails, wifi is not provisioned, no need to go further.
-    err = MT793XConfig::ReadConfigValueStr(MT793XConfig::kConfigKey_WiFiSSID,
-                                           mSavedNetwork.ssid,
-                                           sizeof(mSavedNetwork.ssid),
+    err = MT793XConfig::ReadConfigValueStr(MT793XConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
                                            ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = MT793XConfig::ReadConfigValueStr(MT793XConfig::kConfigKey_WiFiPSK,
-                                           mSavedNetwork.credentials,
-                                           sizeof(mSavedNetwork.credentials),
-                                           credentialsLen);
+    err = MT793XConfig::ReadConfigValueStr(MT793XConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
+                                           sizeof(mSavedNetwork.credentials), credentialsLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_WiFiSEC,
-                                           &mSavedNetwork.auth_mode,
-                                           sizeof(mSavedNetwork.auth_mode),
-                                           outLen);
+    err = MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_WiFiSEC, &mSavedNetwork.auth_mode,
+                                           sizeof(mSavedNetwork.auth_mode), outLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen,
-                       mSavedNetwork.credentials, credentialsLen);
+    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -80,21 +73,12 @@ CHIP_ERROR GenioWiFiDriver::CommitConfiguration()
 
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::CommitConfiguration");
 
-    ReturnErrorOnFailure(
-        MT793XConfig::WriteConfigValueStr(MT793XConfig::kConfigKey_WiFiSSID,
-                                          mStagingNetwork.ssid)
-    );
+    ReturnErrorOnFailure(MT793XConfig::WriteConfigValueStr(MT793XConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
 
-    ReturnErrorOnFailure(
-        MT793XConfig::WriteConfigValueStr(MT793XConfig::kConfigKey_WiFiPSK,
-                                          mStagingNetwork.credentials)
-    );
+    ReturnErrorOnFailure(MT793XConfig::WriteConfigValueStr(MT793XConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
 
-    ReturnErrorOnFailure(
-        MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_WiFiSEC,
-                                          &mStagingNetwork.auth_mode,
-                                          sizeof(mStagingNetwork.auth_mode))
-    );
+    ReturnErrorOnFailure(MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_WiFiSEC, &mStagingNetwork.auth_mode,
+                                                           sizeof(mStagingNetwork.auth_mode)));
 
     mSavedNetwork = mStagingNetwork;
 
@@ -111,13 +95,10 @@ CHIP_ERROR GenioWiFiDriver::RevertConfiguration()
 
 bool GenioWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
-    return networkId.size() == network.ssidLen &&
-           memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
+    return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status GenioWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid,
-                                           ByteSpan credentials,
-                                           MutableCharSpan & outDebugText,
+Status GenioWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                            uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
@@ -125,11 +106,8 @@ Status GenioWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid,
 
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::AddOrUpdateNetwork");
 
-    VerifyOrReturnError(mStagingNetwork.ssidLen == 0 ||
-                        NetworkMatch(mStagingNetwork, ssid),
-                        Status::kBoundsExceeded);
-    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials),
-                        Status::kOutOfRange);
+    VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
+    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
     memset(mStagingNetwork.credentials, 0, sizeof(mStagingNetwork.credentials));
@@ -145,9 +123,7 @@ Status GenioWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid,
     return Status::kSuccess;
 }
 
-Status GenioWiFiDriver::RemoveNetwork(ByteSpan networkId,
-                                      MutableCharSpan & outDebugText,
-                                      uint8_t & outNetworkIndex)
+Status GenioWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -161,9 +137,7 @@ Status GenioWiFiDriver::RemoveNetwork(ByteSpan networkId,
     return Status::kSuccess;
 }
 
-Status GenioWiFiDriver::ReorderNetwork(ByteSpan networkId,
-                                       uint8_t index,
-                                       MutableCharSpan & outDebugText)
+Status GenioWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::ReorderNetwork");
 
@@ -174,28 +148,23 @@ Status GenioWiFiDriver::ReorderNetwork(ByteSpan networkId,
     return Status::kSuccess;
 }
 
-CHIP_ERROR GenioWiFiDriver::ConnectWiFiNetwork(const char * ssid,
-                                               uint8_t ssidLen,
-                                               const char * key,
-                                               uint8_t keyLen)
+CHIP_ERROR GenioWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::ConnectWiFiNetwork");
 
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(
-                            ConnectivityManager::kWiFiStationMode_Enabled));
+    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
 
     // Set the wifi configuration
     filogic_wifi_sta_prov_t wifi_prov = {};
     memcpy(wifi_prov.ssid, ssid, ssidLen);
-    memcpy(wifi_prov.psk,  key,  keyLen);
+    memcpy(wifi_prov.psk, key, keyLen);
     wifi_prov.ssid_len  = ssidLen;
     wifi_prov.psk_len   = keyLen;
     wifi_prov.auth_mode = WIFI_AUTH_MODE_WPA2_PSK;
 
-    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s",
-                    static_cast<int>(ssidLen), ssid);
+    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
 
-    void *filogicCtx = PlatformMgrImpl().mFilogicCtx;
+    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
 
     // Configure the FILOGIC WiFi interface.
     filogic_wifi_sta_prov_set_sync(filogicCtx, &wifi_prov);
@@ -217,22 +186,17 @@ void GenioWiFiDriver::OnConnectWiFiNetwork()
     }
 }
 
-void GenioWiFiDriver::ConnectNetwork(ByteSpan networkId,
-                                     ConnectCallback * callback)
+void GenioWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kUnknownError;
 
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::ConnectNetwork");
 
-    VerifyOrExit(NetworkMatch(mStagingNetwork, networkId),
-                 networkingStatus = Status::kNetworkIDNotFound);
-    VerifyOrExit(mpConnectCallback == nullptr,
-                 networkingStatus = Status::kUnknownError);
+    VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
+    VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
 
-    err = ConnectWiFiNetwork(mStagingNetwork.ssid,
-                             mStagingNetwork.ssidLen,
-                             mStagingNetwork.credentials,
+    err = ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
                              mStagingNetwork.credentialsLen);
     if (err == CHIP_NO_ERROR)
     {
@@ -243,8 +207,7 @@ void GenioWiFiDriver::ConnectNetwork(ByteSpan networkId,
 exit:
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s",
-                                          chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -283,19 +246,17 @@ bool GenioWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
 
-    void *filogicCtx = PlatformMgrImpl().mFilogicCtx;
+    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
 
     if (!ssid.empty()) // ssid is given, only scan this network
     {
         char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
         memcpy(cSsid, ssid.data(), ssid.size());
-        filogic_wifi_scan(filogicCtx, (uint8_t *)cSsid, ssid.size(),
-                          kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
+        filogic_wifi_scan(filogicCtx, (uint8_t *) cSsid, ssid.size(), kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
     }
     else // scan all networks
     {
-        filogic_wifi_scan(filogicCtx, nullptr, 0,
-                          kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
+        filogic_wifi_scan(filogicCtx, nullptr, 0, kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
     }
     return true;
 }
@@ -309,18 +270,16 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
     {
         if (GetInstance().mpScanCallback != nullptr)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda( []()
-                {
-                    GetInstance().mpScanCallback->OnFinished(
-                        NetworkCommissioning::Status::kSuccess, CharSpan(),
-                        &mScanResponseIter);
-                    GetInstance().mpScanCallback = nullptr;
-                } );
+            DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                GetInstance().mpScanCallback = nullptr;
+            });
         }
     }
     else
     {
-        while ( aScanResult->is_valid ) {
+        while (aScanResult->is_valid)
+        {
             NetworkCommissioning::WiFiScanResponse scanResponse = {};
             chip::BitFlags<WiFiSecurity> security;
 
@@ -329,9 +288,8 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
             scanResponse.security.Set(security);
             scanResponse.channel = aScanResult->channel;
             scanResponse.rssi    = aScanResult->rssi;
-            scanResponse.ssidLen = strnlen((char *)aScanResult->ssid,
-                                           DeviceLayer::Internal::kMaxWiFiSSIDLength);
-            memcpy(scanResponse.ssid,  aScanResult->ssid,  scanResponse.ssidLen);
+            scanResponse.ssidLen = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
             memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 
             mScanResponseIter.Add(&scanResponse);
@@ -361,12 +319,11 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
 {
     ChipLogProgress(NetworkProvisioning, "GetConnectedNetwork");
 
-    void *filogicCtx = PlatformMgrImpl().mFilogicCtx;
+    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
 
     filogic_wifi_sta_prov_t wifi_prov;
 
-    if (!filogic_wifi_sta_get_link_status_sync(filogicCtx) ||
-        !filogic_wifi_sta_prov_get_sync(filogicCtx, &wifi_prov))
+    if (!filogic_wifi_sta_get_link_status_sync(filogicCtx) || !filogic_wifi_sta_prov_get_sync(filogicCtx, &wifi_prov))
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }

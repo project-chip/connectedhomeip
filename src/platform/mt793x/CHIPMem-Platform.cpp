@@ -44,8 +44,8 @@
 //#include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 
-#include <FreeRTOS.h>
 #include "task.h"
+#include <FreeRTOS.h>
 
 // MT793X SDK
 #include <syslog.h>
@@ -55,9 +55,7 @@
 #include <cstring>
 #include <stdlib.h>
 
-
 extern "C" log_create_module(connsys, PRINT_LEVEL_WARNING);
-
 
 #if CHIP_CONFIG_MEMORY_MGMT_PLATFORM
 

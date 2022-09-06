@@ -24,13 +24,13 @@
 
 #pragma once
 
-typedef void (*CHIPoBLECharCallback)(uint16_t, void*, uint16_t);
+typedef void (*CHIPoBLECharCallback)(uint16_t, void *, uint16_t);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "bt_type.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -118,9 +118,9 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
-    static bt_status_t BleMatterAppEventCallback(bt_msg_type_t msg, bt_status_t status, void *buff);
-    static void HandleRXCharWrite(uint16_t handle, void *data, uint16_t size);
-    static void HandleTXCharCCCDWrite(uint16_t handle, void *data, uint16_t size);
+    static bt_status_t BleMatterAppEventCallback(bt_msg_type_t msg, bt_status_t status, void * buff);
+    static void HandleRXCharWrite(uint16_t handle, void * data, uint16_t size);
+    static void HandleTXCharCCCDWrite(uint16_t handle, void * data, uint16_t size);
 };
 
 /**
@@ -150,7 +150,7 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer()
     return this;
 }
 
-//inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
+// inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 //{
 //    return mServiceMode;
 //}

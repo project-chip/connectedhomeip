@@ -17,7 +17,7 @@
 #include <string.h>
 #include <task.h>
 
-#define MT793X_LOG_ENABLED  (1)
+#define MT793X_LOG_ENABLED (1)
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
@@ -54,8 +54,7 @@ static void PrintLog(const char * msg)
 #endif
     }*/
 
-	printf("%s\n", msg);
-
+    printf("%s\n", msg);
 }
 #endif // MT793X_LOG_ENABLED
 

@@ -1,20 +1,14 @@
 
 
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
+extern void platform_assert(const char * expr, const char * file, int line);
 
-extern void platform_assert(const char *expr,
-                            const char *file,
-                            int        line);
-
-
-void __assert_func (const char * file,
-                    int          line,
-                    const char * func,
-                    const char * expr)
+void __assert_func(const char * file, int line, const char * func, const char * expr)
 {
     fflush(NULL);
     platform_assert(expr, file, line);
-    while (1);
+    while (1)
+        ;
 }

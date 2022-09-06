@@ -49,12 +49,10 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(NetworkProvisioning, "MT793x Wifi provision: SSID: %s", ssid);
-    err = NetworkCommissioning::GenioWiFiDriver::GetInstance().ConnectWiFiNetwork(
-            ssid, strlen(ssid), key, strlen(key));
+    err = NetworkCommissioning::GenioWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, strlen(ssid), key, strlen(key));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NetworkProvisioning, "MT793x:WiFi:Provision network: %s",
-                                          chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "MT793x:WiFi:Provision network: %s", chip::ErrorStr(err));
     }
 
     return err;

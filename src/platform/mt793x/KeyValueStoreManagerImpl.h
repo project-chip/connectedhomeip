@@ -52,9 +52,9 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 /**
-*
-* MT793x KVS implementation
-*/
+ *
+ * MT793x KVS implementation
+ */
 
 class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 {
@@ -63,7 +63,9 @@ class KeyValueStoreManagerImpl final : public KeyValueStoreManager
     friend class KeyValueStoreManager;
 
 public:
-    void Init() { /*nvdm_init();*/ }
+    void Init()
+    { /*nvdm_init();*/
+    }
 
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0) const;
 
@@ -83,9 +85,8 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-
-	const char * kNamespace = "CHIP_KVS";
-	static CHIP_ERROR MapNvdmStatus(nvdm_status_t nvdm_status);
+    const char * kNamespace = "CHIP_KVS";
+    static CHIP_ERROR MapNvdmStatus(nvdm_status_t nvdm_status);
     // ===== Members for internal use by the following friends.
 
     friend KeyValueStoreManager & KeyValueStoreMgr();
@@ -93,8 +94,6 @@ private:
 
     static KeyValueStoreManagerImpl sInstance;
 };
-
-
 
 /**
  * Returns the public interface of the KeyValueStoreManager singleton object.

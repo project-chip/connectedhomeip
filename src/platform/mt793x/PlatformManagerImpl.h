@@ -51,16 +51,13 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-    static void FilogicEventHandler(void *c,
-                                    filogic_async_event_id_t event,
-                                    filogic_async_event_data *data);
+    static void FilogicEventHandler(void * c, filogic_async_event_id_t event, filogic_async_event_data * data);
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
-    void *mFilogicCtx;
+    void * mFilogicCtx;
 
 private:
-
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);

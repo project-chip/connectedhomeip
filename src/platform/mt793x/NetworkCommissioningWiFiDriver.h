@@ -17,8 +17,8 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/NetworkCommissioning.h>
 #include <filogic.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -96,7 +96,7 @@ public:
         uint8_t ssidLen = 0;
         char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
         uint8_t credentialsLen = 0;
-        uint8_t auth_mode = 0;
+        uint8_t auth_mode      = 0;
     };
 
     // BaseDriver
@@ -120,10 +120,7 @@ public:
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
-    CHIP_ERROR ConnectWiFiNetwork(const char * ssid,
-                                  uint8_t ssidLen,
-                                  const char * key,
-                                  uint8_t keyLen);
+    CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wifi_auth_mode_t auth_mode);
 

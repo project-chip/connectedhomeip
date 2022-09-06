@@ -79,12 +79,7 @@ void startShellTask(void)
     cmd_misc_init();
     cmd_otcli_init();
 
-    shellTaskHandle = xTaskCreateStatic(MatterShellTask,
-                                        "matter_cli",
-                                        ArraySize(shellStack),
-                                        NULL,
-                                        SHELL_TASK_PRIORITY,
-                                        shellStack,
+    shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack,
                                         &shellTaskStruct);
 }
 

@@ -62,8 +62,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
-//    rebootCause = RMU_ResetCauseGet();
-//    RMU_ResetCauseClear();
+    //    rebootCause = RMU_ResetCauseGet();
+    //    RMU_ResetCauseClear();
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
@@ -94,7 +94,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 
 CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 {
-	uint32_t bootCount = 0;
+    uint32_t bootCount = 0;
     if (MT793XConfig::ConfigValueExists(MT793XConfig::kConfigKey_BootCount))
     {
         GetRebootCount(bootCount);
@@ -129,15 +129,15 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                uint32_t & value)
 {
-	CHIP_ERROR err;
-	MT793XConfig::Key configKey{ MT793XConfig::kConfigNamespace_ChipCounters, (char*)&persistedStorageKey };
+    CHIP_ERROR err;
+    MT793XConfig::Key configKey{ MT793XConfig::kConfigNamespace_ChipCounters, (char *) &persistedStorageKey };
 
     err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-	SuccessOrExit(err);
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -146,13 +146,13 @@ exit:
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                 uint32_t value)
 {
-	CHIP_ERROR err;
-	MT793XConfig::Key configKey{ MT793XConfig::kConfigNamespace_ChipCounters, (char*)&persistedStorageKey };
+    CHIP_ERROR err;
+    MT793XConfig::Key configKey{ MT793XConfig::kConfigNamespace_ChipCounters, (char *) &persistedStorageKey };
 
-	err = WriteConfigValue(configKey, value);
-	{
+    err = WriteConfigValue(configKey, value);
+    {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-	}
+    }
     SuccessOrExit(err);
 
 exit:

@@ -44,7 +44,6 @@
 
 #include "filogic.h"
 
-
 namespace Inet {
 class IPAddress;
 } // namespace Inet
@@ -52,7 +51,7 @@ class IPAddress;
 namespace chip {
 namespace DeviceLayer {
 
-//class PlatformManagerImpl;
+// class PlatformManagerImpl;
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for MediaTek Genio platforms.
@@ -95,13 +94,12 @@ private:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR              WiFiInit(void);
-    WiFiStationMode         GetFilogicStationMode(void);
-    WiFiAPMode              GetFilogicAPMode(void);
-    filogic_wifi_opmode_t   GetFilogicNextOpMode(WiFiStationMode wifiStationMode,
-                                                 WiFiAPMode      wifiAPMode);
-    void                    SetFlogicNextMode(filogic_wifi_opmode_t nextMode);
-    void                    _OnWiFiPlatformEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR WiFiInit(void);
+    WiFiStationMode GetFilogicStationMode(void);
+    WiFiAPMode GetFilogicAPMode(void);
+    filogic_wifi_opmode_t GetFilogicNextOpMode(WiFiStationMode wifiStationMode, WiFiAPMode wifiAPMode);
+    void SetFlogicNextMode(filogic_wifi_opmode_t nextMode);
+    void _OnWiFiPlatformEvent(const ChipDeviceEvent * event);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -124,8 +122,7 @@ private:
     void ChangeWiFiAPState(WiFiAPState newState);
     void DriveAPState(void);
     CHIP_ERROR ConfigureWiFiAP(void);
-    static void DriveAPState(::chip::System::Layer * aLayer,
-                             void * aAppState);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
     WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
     bool _IsWiFiAPApplicationControlled(void);
@@ -159,7 +156,7 @@ private:
     void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
-    void UpdateInternetConnectivityState(bool haveIPv4Conn, bool haveIPv6Conn, const uint8_t *ipAddr);
+    void UpdateInternetConnectivityState(bool haveIPv4Conn, bool haveIPv6Conn, const uint8_t * ipAddr);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     WiFiAPMode mWiFiAPMode;
@@ -167,7 +164,7 @@ private:
     System::Clock::Timeout mWiFiAPIdleTimeout;
     System::Clock::Timestamp mLastAPDemandTime;
 #endif
-    void *mFilogicCtx;
+    void * mFilogicCtx;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)

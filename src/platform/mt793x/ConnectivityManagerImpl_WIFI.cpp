@@ -23,8 +23,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -35,8 +35,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
-#include "wifi_api_ex.h"
 #include "mt7933_pos.h"
+#include "wifi_api_ex.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -49,7 +49,7 @@ namespace DeviceLayer {
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
 {
-    CHIP_ERROR        err         = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
     ChipLogProgress(DeviceLayer, "ConnectivityManager Wi-Fi init");
 
@@ -59,15 +59,13 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationState             = kWiFiStationState_NotConnected;
     mLastStationConnectFailTime   = System::Clock::kZero;
-    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(
-                                    CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    mWiFiAPMode                   = kWiFiAPMode_Disabled;
-    mWiFiAPState                  = kWiFiAPState_NotActive;
-    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(
-                                    CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
-    mLastAPDemandTime             = System::Clock::kZero;
+    mWiFiAPMode        = kWiFiAPMode_Disabled;
+    mWiFiAPState       = kWiFiAPState_NotActive;
+    mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+    mLastAPDemandTime  = System::Clock::kZero;
 #endif
     mFlags.ClearAll();
 
@@ -116,12 +114,11 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
     if (event->Type != DeviceEventType::kMtkWiFiEvent)
         return;
 
-    ChipLogProgress(DeviceLayer, "%s WiFi event %s", __func__,
-                    filogic_event_to_name(event->Platform.FilogicEvent.event));
+    ChipLogProgress(DeviceLayer, "%s WiFi event %s", __func__, filogic_event_to_name(event->Platform.FilogicEvent.event));
 
-    const filogic_async_event_data *event_data;
-    bool hadIPv4Conn  = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    bool hadIPv6Conn  = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    const filogic_async_event_data * event_data;
+    bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
 
     event_data = &event->Platform.MtkWiFiEvent.event_data;
 
@@ -131,44 +128,44 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         {
             mWiFiStationState = kWiFiStationState_NotConnected;
             DriveStationState();
-        } else
-        if (FILOGIC_WIFI_PORT_AP == event_data->u.wifi_init.port)
+        }
+        else if (FILOGIC_WIFI_PORT_AP == event_data->u.wifi_init.port)
         {
             ConfigureWiFiAP();
             ChangeWiFiAPState(kWiFiAPState_Activating);
-        } else
+        }
+        else
             assert(0);
-    } else
-    if (event_data->event_id == FILOGIC_AP_START_OK)
+    }
+    else if (event_data->event_id == FILOGIC_AP_START_OK)
     {
         ChangeWiFiAPState(kWiFiAPState_Active);
-    } else
-    if (event_data->event_id == FILOGIC_SET_OPMODE_OK)
+    }
+    else if (event_data->event_id == FILOGIC_SET_OPMODE_OK)
     {
         if (event_data->u.wifi_opmode.opmode == WIFI_MODE_STA_ONLY)
             ChangeWiFiStationState(kWiFiStationState_NotConnected);
-        else
-        if (event_data->u.wifi_opmode.opmode == WIFI_MODE_AP_ONLY)
+        else if (event_data->u.wifi_opmode.opmode == WIFI_MODE_AP_ONLY)
             ChangeWiFiAPState(kWiFiAPState_Active);
         else
             assert(0);
-    } else
-    if (event_data->event_id == FILOGIC_AP_STATION_CONNECTED)
+    }
+    else if (event_data->event_id == FILOGIC_AP_STATION_CONNECTED)
     {
         MaintainOnDemandWiFiAP();
-    } else
-    if (event_data->event_id == FILOGIC_AP_STATION_DISCONNECTED)
+    }
+    else if (event_data->event_id == FILOGIC_AP_STATION_DISCONNECTED)
     {
-    } else
-    if (event_data->event_id == FILOGIC_STA_DISCONNECTED_FROM_AP)
+    }
+    else if (event_data->event_id == FILOGIC_STA_DISCONNECTED_FROM_AP)
     {
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
         }
         DriveStationState();
-    } else
-    if (!hadIPv4Conn && event_data->event_id == FILOGIC_STA_IPV4_ADDR_READY)
+    }
+    else if (!hadIPv4Conn && event_data->event_id == FILOGIC_STA_IPV4_ADDR_READY)
     {
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
@@ -190,8 +187,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         DriveStationState();
         UpdateInternetConnectivityState(FALSE, TRUE, event_data->u.ipv6_str.addr);
     }
-    else
-    if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
+    else if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
     {
         ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
         if (mWiFiStationState == kWiFiStationState_Connecting)
@@ -206,8 +202,8 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::GetFilogicStationMode(void)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    filogic_wifi_opmode_t   opmode;
-    int32_t                 ret;
+    filogic_wifi_opmode_t opmode;
+    int32_t ret;
 
     filogic_wifi_opmode_get_sync(mFilogicCtx, &opmode);
 
@@ -220,8 +216,8 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::GetFilogicStationM
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::GetFilogicAPMode(void)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    filogic_wifi_opmode_t   opmode;
-    int32_t                 ret;
+    filogic_wifi_opmode_t opmode;
+    int32_t ret;
 
     filogic_wifi_opmode_get_sync(mFilogicCtx, &opmode);
 
@@ -231,17 +227,15 @@ ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::GetFilogicAPMode(void)
     return kWiFiAPMode_Disabled;
 }
 
-filogic_wifi_opmode_t ConnectivityManagerImpl::GetFilogicNextOpMode(
-    WiFiStationMode         staMode,
-    WiFiAPMode              apMode)
+filogic_wifi_opmode_t ConnectivityManagerImpl::GetFilogicNextOpMode(WiFiStationMode staMode, WiFiAPMode apMode)
 {
-    bool                    sta, ap;
-    filogic_wifi_opmode_t   opmode;
+    bool sta, ap;
+    filogic_wifi_opmode_t opmode;
 
     ChipLogProgress(DeviceLayer, "%s %d %d", __func__, staMode, apMode);
 
     sta = staMode == kWiFiStationMode_Enabled;
-    ap  = apMode  == kWiFiAPMode_Enabled;
+    ap  = apMode == kWiFiAPMode_Enabled;
 
     if (sta && ap)
         opmode = FILOGIC_WIFI_OPMODE_DUAL;
@@ -285,9 +279,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
 
     if (mWiFiStationMode != val)
     {
-        ChipLogProgress(DeviceLayer,
-                        "WiFi station mode change: %s -> %s",
-                        WiFiStationModeToStr(mWiFiStationMode),
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
                         WiFiStationModeToStr(val));
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
         mWiFiStationMode = val;
@@ -361,9 +353,9 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 void ConnectivityManagerImpl::DriveAPState(void)
 {
-    CHIP_ERROR              err = CHIP_NO_ERROR;
-    WiFiAPMode              driverAPMode = GetFilogicAPMode();
-    filogic_wifi_opmode_t   nextMode;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    WiFiAPMode driverAPMode = GetFilogicAPMode();
+    filogic_wifi_opmode_t nextMode;
 
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
@@ -391,9 +383,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP(void)
     // TODO, generate
     uint16_t discriminator = 0x8888;
 
-    ssid_len = snprintf(ssid, sizeof(ssid), "%s%03X-%04X-%04X",
-                        CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-                        discriminator,
+    ssid_len       = snprintf(ssid, sizeof(ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator,
                         CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     int8_t channel = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
 
@@ -417,8 +407,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 
     if (mWiFiAPMode != val)
     {
-        ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s",
-                        WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
+        ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
     }
 
     mWiFiAPMode = val;
@@ -431,8 +420,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand ||
-        mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
@@ -443,8 +431,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand ||
-        mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
@@ -455,11 +442,9 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand ||
-        mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        if (mWiFiAPState == kWiFiAPState_Activating ||
-            mWiFiAPState == kWiFiAPState_Active)
+        if (mWiFiAPState == kWiFiAPState_Activating || mWiFiAPState == kWiFiAPState_Active)
         {
             mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         }
@@ -475,20 +460,18 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP */
 
-
 /****************************************************************************
  * ConnectivityManager Private Methods
  ****************************************************************************/
-
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 void ConnectivityManagerImpl::DriveStationState()
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    CHIP_ERROR  err = CHIP_NO_ERROR;
-    int32_t     status;
-    bool        stationConnected;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int32_t status;
+    bool stationConnected;
 
     // Refresh the current station mode.
     GetWiFiStationMode();
@@ -512,8 +495,7 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Advance the station state to Connected if it was previously NotConnected or
         // a previously initiated connect attempt succeeded.
-        if (mWiFiStationState == kWiFiStationState_NotConnected ||
-            mWiFiStationState == kWiFiStationState_Connecting_Succeeded)
+        if (mWiFiStationState == kWiFiStationState_NotConnected || mWiFiStationState == kWiFiStationState_Connecting_Succeeded)
         {
             ChangeWiFiStationState(kWiFiStationState_Connected);
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
@@ -545,8 +527,7 @@ void ConnectivityManagerImpl::DriveStationState()
 
         // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
         // or if a previous initiated connect attempt failed.
-        if (mWiFiStationState == kWiFiStationState_Connected ||
-            mWiFiStationState == kWiFiStationState_Disconnecting ||
+        if (mWiFiStationState == kWiFiStationState_Connected || mWiFiStationState == kWiFiStationState_Disconnecting ||
             mWiFiStationState == kWiFiStationState_Connecting_Failed)
         {
             WiFiStationState prevState = mWiFiStationState;
@@ -650,25 +631,24 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
 
     if (mWiFiStationState != newState)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s",
-                        WiFiStationStateToStr(mWiFiStationState),
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
     }
 }
 
-void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn, bool haveIPv6Conn, const uint8_t *ipAddr)
+void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn, bool haveIPv6Conn, const uint8_t * ipAddr)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    bool hadIPv4Conn  = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    bool hadIPv6Conn  = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
     IPAddress addr;
 
     // If the WiFi station is currently in the connected state...
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
-        IPAddress::FromString((char *)ipAddr, addr);
+        IPAddress::FromString((char *) ipAddr, addr);
     }
 
     // If the internet connectivity state has changed...
@@ -676,13 +656,13 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn,
     {
         // Update the current state.
         mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
-              .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
+            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
 
         (void) PlatformMgr().PostEvent(&event);

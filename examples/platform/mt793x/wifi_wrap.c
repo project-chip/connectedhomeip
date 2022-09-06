@@ -4,21 +4,15 @@
 
 #include <stdlib.h>
 
-
 /****************************************************************************/
-
 
 extern void mt793xLog(const char * aFormat, ...);
 
-
-extern void mt793x_wpa_log_cb(void *ctx, int level, int type,
-                              const char *txt, size_t len);
-
+extern void mt793x_wpa_log_cb(void * ctx, int level, int type, const char * txt, size_t len);
 
 /****************************************************************************/
 
-
-void __wrap__wlan_printf(int skip, int level, const char *fmt, ...)
+void __wrap__wlan_printf(int skip, int level, const char * fmt, ...)
 {
     va_list ap;
 
