@@ -144,10 +144,6 @@ else
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
-            --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
-                shift
-                ;;
             --additional_data_advertising)
                 optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
                 shift

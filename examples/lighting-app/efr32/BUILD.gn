@@ -63,7 +63,7 @@ declare_args() {
   disable_lcd = false
 
   # Argument to Disable IPv4 for wifi(rs911)
-  chip_enable_wifi_ipv4 = false
+  chip_enable_wifi_ipv4 = true
 
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
