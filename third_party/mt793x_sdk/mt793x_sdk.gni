@@ -31,9 +31,11 @@ declare_args() {
 }
 
 if (mt793x_sdk_developer == "") {
-  import("${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/matter_sdk.gni")
+  import(
+      "${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/matter_sdk.gni")
 } else {
-  import("${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/matter_sdk_internal.gni")
+  import(
+      "${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/matter_sdk_internal.gni")
 }
 
 template("mt793x_sdk") {
@@ -41,7 +43,7 @@ template("mt793x_sdk") {
 
   matter_sdk("matter_sdk") {
     include_dirs = []
-    
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -65,7 +67,7 @@ template("mt793x_sdk") {
 
   config("${sdk_target_name}_config") {
     if (!defined(include_dirs)) {
-        include_dirs = []
+      include_dirs = []
     }
 
     if (defined(invoker.include_dirs)) {
@@ -79,7 +81,6 @@ template("mt793x_sdk") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
-
   }
 
   # TODO - Break up this monolith and make it configurable.
@@ -94,10 +95,8 @@ template("mt793x_sdk") {
       public_configs = []
     }
 
-    public_deps = [
-      ":matter_sdk",
-    ]
+    public_deps = [ ":matter_sdk" ]
 
-    public_configs += [ ":${sdk_target_name}_config", ]
+    public_configs += [ ":${sdk_target_name}_config" ]
   }
 }

@@ -31,7 +31,8 @@ chip_build_tests = true
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
-custom_toolchain = "//third_party/connectedhomeip/config/mt793x/toolchain:mt793x"
+custom_toolchain =
+    "//third_party/connectedhomeip/config/mt793x/toolchain:mt793x"
 
 pw_build_PIP_CONSTRAINTS =
     [ "//third_party/connectedhomeip/scripts/constraints.txt" ]

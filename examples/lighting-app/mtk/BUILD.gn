@@ -70,8 +70,8 @@ mt793x_executable("lighting_app") {
   defines = []
 
   sources = [
-    "src/LEDWidget.cpp",
     "src/AppTask.cpp",
+    "src/LEDWidget.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",

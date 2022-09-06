@@ -458,6 +458,7 @@ if (chip_device_platform != "none") {
     }
 
     public_deps += [ _platform_target ]
+
     # The platform target needs to include the headers, so allow that here.
     # It should be considered logically part of this target.
     allow_circular_includes_from = [

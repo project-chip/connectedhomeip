@@ -48,12 +48,12 @@ source_set("mtk-matter-shell") {
     defines = [ "ENABLE_CHIP_SHELL" ]
 
     sources = [
-        "matter_shell.cpp",
-        "malloc_wrap.c",
-        "assert_wrap.c",
-        "lwip_wrap.c",
-        "wifi_wrap.c",
-        "wrap_write.c",
+      "assert_wrap.c",
+      "lwip_wrap.c",
+      "malloc_wrap.c",
+      "matter_shell.cpp",
+      "wifi_wrap.c",
+      "wrap_write.c",
     ]
     include_dirs = [ "." ]
 

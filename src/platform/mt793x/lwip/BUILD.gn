@@ -22,7 +22,8 @@ import("${lwip_root}/lwip.gni")
 
 assert(chip_with_lwip)
 
-assert(lwip_platform == "external", "Unsupported lwIP platform: ${lwip_platform}")
+assert(lwip_platform == "external",
+       "Unsupported lwIP platform: ${lwip_platform}")
 
 declare_args() {
   # Enable lwIP debugging.
@@ -45,7 +46,9 @@ import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
 #}
 
 config("lwip_config") {
-  include_dirs = [ "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc" ]
+  include_dirs = [
+    "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc",
+  ]
 }
 
 lwip_target("lwip") {

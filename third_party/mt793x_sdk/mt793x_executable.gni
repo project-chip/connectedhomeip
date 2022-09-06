@@ -32,41 +32,48 @@ template("mt793x_executable") {
 
   action("scatter_file") {
     script = "${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/scripts/scatter_file_generator.py"
-    outputs = [
-      "${target_gen_dir}/scatter.ini"
-    ]
+    outputs = [ "${target_gen_dir}/scatter.ini" ]
 
     args = [
-      "--output", "/" + rebase_path(root_out_dir, "/") + "/scatter.ini",
-      "--bl_path",  "mt7931an_bootloader-xip.sgn",
-      "--img_path", "${objcopy_image_name}",
-      "--bt_path",  "BT_RAM_CODE_MT7933_2_1_hdr.bin",
-      "--wifi_path",  "WIFI_RAM_CODE_MT7933_ALL.bin",
+      "--output",
+      "/" + rebase_path(root_out_dir, "/") + "/scatter.ini",
+      "--bl_path",
+      "mt7931an_bootloader-xip.sgn",
+      "--img_path",
+      "${objcopy_image_name}",
+      "--bt_path",
+      "BT_RAM_CODE_MT7933_2_1_hdr.bin",
+      "--wifi_path",
+      "WIFI_RAM_CODE_MT7933_ALL.bin",
     ]
 
-    gen_deps = [":$flash_target_name"]
+    gen_deps = [ ":$flash_target_name" ]
   }
 
   action("copy_file") {
     script = "${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/scripts/copy_file.py"
-    outputs = [
-      "${target_out_dir}"
-    ]
+    outputs = [ "${target_out_dir}" ]
 
     args = [
-      "--outputdir", "/" + rebase_path(root_out_dir, "/"),
-      "--bl_path", rebase_path(mt793x_sdk_build_root, root_out_dir) + "/filogic/project/mt7933_hdk/apps/matter_sdk/bootloader/mt7931an_bootloader-xip.sgn",
-      "--bt_path", rebase_path(mt793x_sdk_build_root, root_out_dir) + "/filogic/prebuilt/driver/chip/mt7933/BT_RAM_CODE_MT7933_2_1_hdr.bin",
-      "--wifi_path", rebase_path(mt793x_sdk_build_root, root_out_dir) + "/filogic/prebuilt/driver/chip/mt7933/WIFI_RAM_CODE_MT7933_ALL.bin",
+      "--outputdir",
+      "/" + rebase_path(root_out_dir, "/"),
+      "--bl_path",
+      rebase_path(mt793x_sdk_build_root, root_out_dir) + "/filogic/project/mt7933_hdk/apps/matter_sdk/bootloader/mt7931an_bootloader-xip.sgn",
+      "--bt_path",
+      rebase_path(mt793x_sdk_build_root, root_out_dir) +
+          "/filogic/prebuilt/driver/chip/mt7933/BT_RAM_CODE_MT7933_2_1_hdr.bin",
+      "--wifi_path",
+      rebase_path(mt793x_sdk_build_root, root_out_dir) +
+          "/filogic/prebuilt/driver/chip/mt7933/WIFI_RAM_CODE_MT7933_ALL.bin",
     ]
 
-    gen_deps = [":$flash_target_name"]
+    gen_deps = [ ":$flash_target_name" ]
   }
   group(target_name) {
     deps = [
       ":$flash_target_name",
-      ":scatter_file",
       ":copy_file",
+      ":scatter_file",
     ]
   }
 }
