@@ -236,7 +236,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     strcpy(ServiceType, type);
     strcat(ServiceType, ".");
     strcat(ServiceType, GetProtocolString(protocol));
-    err = DNSServiceBrowse(&BrowseClient, 
+    err = DNSServiceBrowse(&BrowseClient,
                      0,
                      0,
                      ServiceType,
@@ -273,7 +273,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     strcat(ServiceType, ".");
     strcat(ServiceType, GetProtocolString(service->mProtocol));
 
-    err = DNSServiceResolve(&ResolveClient, 
+    err = DNSServiceResolve(&ResolveClient,
                             0,
                             0,
                             service->mName,

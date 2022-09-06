@@ -35,7 +35,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-	
+
 	// Factory config keys
 	const MT793XConfig::Key MT793XConfig::kConfigKey_SerialNum             = { .Namespace = kConfigNamespace_ChipFactory, .Name = "serial-num" };
     const MT793XConfig::Key MT793XConfig::kConfigKey_UniqueId              = { .Namespace = kConfigNamespace_ChipFactory, .Name = "unique-id" };
@@ -70,7 +70,7 @@ namespace Internal {
 	// CHIP Counter Keys
 	const MT793XConfig::Key MT793XConfig::kConfigKey_BootCount             = { .Namespace = kConfigNamespace_ChipCounters, .Name ="boot-count" };
     const MT793XConfig::Key MT793XConfig::kConfigKey_TotalOperationalHours = { .Namespace = kConfigNamespace_ChipCounters, .Name ="total-hours" };
-	
+
 #define NVDM_SEM_TIMEOUT_MS 5
 
 static SemaphoreHandle_t nvdm_sem;
@@ -80,7 +80,7 @@ CHIP_ERROR MT793XConfig::Init()
 {
 	CHIP_ERROR err;
 	nvdm_status_t nvdm_status;
-	
+
     nvdm_sem = xSemaphoreCreateBinaryStatic(&nvdm_sem_struct);
 
     if (nvdm_sem == NULL)
@@ -91,7 +91,7 @@ CHIP_ERROR MT793XConfig::Init()
 	nvdm_status = nvdm_init();
 	err = MapNvdmStatus(nvdm_status);
 	SuccessOrExit(err);
-	
+
 exit:
     OnExit();
     return CHIP_NO_ERROR;
@@ -335,7 +335,7 @@ bool MT793XConfig::ConfigValueExists(Key key)
         err = CHIP_ERROR_TIMEOUT;
         SuccessOrExit(err);
     }
-	
+
     // Query NVDM item
 	nvdm_query_begin();
 	while(nvdm_query_next_group_name(group_name) == NVDM_STATUS_OK) {
@@ -348,7 +348,7 @@ bool MT793XConfig::ConfigValueExists(Key key)
 		}
 	}
 	nvdm_query_end();
-    
+
 exit:
     OnExit();
     return ret;
@@ -357,7 +357,7 @@ exit:
 CHIP_ERROR MT793XConfig::FactoryResetConfig(void)
 {
 	CHIP_ERROR err;
-	
+
     if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
     {
         err = CHIP_ERROR_TIMEOUT;

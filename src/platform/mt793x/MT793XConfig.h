@@ -49,18 +49,18 @@ class MT793XConfig
 {
 public:
 public:
-	
+
 	typedef struct
 	{
 		const char * Namespace;
 		const char * Name;
 	}Key;
-	
+
 	//NVM3 key base offsets used by the CHIP Device Layer.
-	static constexpr char* kConfigNamespace_ChipFactory = (char*)"chip-factory"; 
+	static constexpr char* kConfigNamespace_ChipFactory = (char*)"chip-factory";
     static constexpr char* kConfigNamespace_ChipConfig = (char*)"chip-config";
     static constexpr char* kConfigNamespace_ChipCounters = (char*)"chip-counters";
-	
+
 	// Factory config keys
 	static const Key kConfigKey_SerialNum;
     static const Key kConfigKey_UniqueId;
@@ -74,7 +74,7 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
-	
+
 	// CHIP Config Keys
 	static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
@@ -93,7 +93,7 @@ public:
     static const Key kConfigKey_WiFiSEC;
     static const Key kConfigKey_GroupKeyBase;
     static const Key kConfigKey_GroupKeyMax;
-	
+
 	// CHIP Counter Keys
 	static const Key kConfigKey_BootCount;
     static const Key kConfigKey_TotalOperationalHours;
@@ -128,4 +128,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

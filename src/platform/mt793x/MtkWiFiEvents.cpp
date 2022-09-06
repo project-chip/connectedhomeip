@@ -8,5 +8,3 @@
 
 
 using namespace ::chip::DeviceLayer;
-
-

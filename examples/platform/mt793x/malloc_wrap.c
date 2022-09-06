@@ -25,4 +25,3 @@ void *__wrap__realloc_r(void * REENT, void *ptr, size_t size)
     while (!p) ;
     return p;
 }
-

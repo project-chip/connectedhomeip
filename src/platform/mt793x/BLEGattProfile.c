@@ -99,4 +99,3 @@ const bt_gatts_service_t chipOBle_gatts_service = {
     .required_encryption_key_size = 0,
     .records = chipOBle_service_rec
 };
-

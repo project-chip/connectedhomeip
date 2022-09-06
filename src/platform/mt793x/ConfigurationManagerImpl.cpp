@@ -97,7 +97,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 	uint32_t bootCount = 0;
     if (MT793XConfig::ConfigValueExists(MT793XConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);		
+        GetRebootCount(bootCount);
     }
     return MT793XConfig::WriteConfigValue(MT793XConfig::kConfigKey_BootCount, bootCount + 1);
 }
@@ -148,7 +148,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 {
 	CHIP_ERROR err;
 	MT793XConfig::Key configKey{ MT793XConfig::kConfigNamespace_ChipCounters, (char*)&persistedStorageKey };
-	
+
 	err = WriteConfigValue(configKey, value);
 	{
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;

@@ -95,7 +95,7 @@ CHIP_ERROR GenioWiFiDriver::CommitConfiguration()
                                           &mStagingNetwork.auth_mode,
                                           sizeof(mStagingNetwork.auth_mode))
     );
-                                          
+
     mSavedNetwork = mStagingNetwork;
 
     return CHIP_NO_ERROR;
@@ -122,7 +122,7 @@ Status GenioWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid,
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    
+
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::AddOrUpdateNetwork");
 
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 ||
@@ -282,9 +282,9 @@ bool GenioWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::StartScanWiFiNetworks");
 
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-    
+
     void *filogicCtx = PlatformMgrImpl().mFilogicCtx;
-    
+
     if (!ssid.empty()) // ssid is given, only scan this network
     {
         char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
