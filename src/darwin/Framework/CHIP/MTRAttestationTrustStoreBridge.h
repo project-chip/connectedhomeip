@@ -22,9 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 class MTRAttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore {
 public:
-    MTRAttestationTrustStoreBridge(NSArray<NSData *> * _Nullable paaCerts, NSArray<NSData *> * _Nullable cdCerts)
+    MTRAttestationTrustStoreBridge(NSArray<NSData *> * paaCerts)
         : mPaaCerts(paaCerts)
-        , mCDCerts(cdCerts)
     {
     }
     ~MTRAttestationTrustStoreBridge() {};
@@ -32,12 +31,8 @@ public:
     CHIP_ERROR GetProductAttestationAuthorityCert(
         const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const override;
 
-    CHIP_ERROR GetCertificationDeclarationSigningKey(
-        const chip::ByteSpan & skid, chip::Crypto::P256PublicKey & pubKey) const override;
-
 private:
-    NSArray<NSData *> * _Nullable mPaaCerts;
-    NSArray<NSData *> * _Nullable mCDCerts;
+    NSArray<NSData *> * mPaaCerts;
 };
 
 NS_ASSUME_NONNULL_END

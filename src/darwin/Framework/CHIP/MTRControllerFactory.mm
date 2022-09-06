@@ -54,6 +54,7 @@ static NSString * const kErrorControllersInit = @"Init controllers array failure
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
+static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 
 @interface MTRControllerFactory ()
@@ -257,8 +258,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         // Initialize device attestation verifier
         const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.paaCerts || startupParams.cdCerts) {
-            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts, startupParams.cdCerts);
+        if (startupParams.paaCerts) {
+            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 return;
@@ -272,6 +273,22 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         if (_deviceAttestationVerifier == nullptr) {
             MTR_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
             return;
+        }
+
+        if (startupParams.cdCerts) {
+            auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
+            if (cdTrustStore == nullptr) {
+                MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
+                return;
+            }
+
+            for (NSData * cdSigningCert in startupParams.cdCerts) {
+                errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
+                if (errorCode != CHIP_NO_ERROR) {
+                    MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
+                    return;
+                }
+            }
         }
 
         chip::Controller::FactoryInitParams params;

@@ -477,7 +477,7 @@ CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto:
     // Seconds, search externally added keys
     for (size_t keyIdx = 0; keyIdx < mNumTrustedKeys; keyIdx++)
     {
-        auto & entry = mTrustedKeys[mNumTrustedKeys];
+        auto & entry = mTrustedKeys[keyIdx];
         if (kid.data_equal(entry.GetKid()))
         {
             outPubKey = entry.publicKey;
