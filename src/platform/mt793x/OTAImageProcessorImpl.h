@@ -22,8 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
-#include <fstream>
-
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
