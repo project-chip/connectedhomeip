@@ -123,7 +123,7 @@ jobs:
                           enable_standalone_chip_tool_build=true \
                           enable_linux_all_clusters_app_build=true \
                           enable_linux_lighting_app_build=true \
-                       
+                      '
             - name: Run Tests
               timeout-minutes: 25
               run: |
