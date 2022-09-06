@@ -273,3 +273,19 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+[submodule "third_party/mt793x_sdk/filogic"]
+    path = third_party/mt793x_sdk/filogic
+    url = https://git@github.com/MediaTek-Labs/genio-matter-bsp.git
+    branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/lwip"]
+    path = third_party/mt793x_sdk/lwip
+    url = https://github.com/matter-mtk/genio-matter-lwip.git
+    branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/mDNSResponder"]
+    path = third_party/mt793x_sdk/mDNSResponder
+    url = https://github.com/matter-mtk/genio-matter-mdnsresponder.git
+    branch = main
+	platforms = genio
+
