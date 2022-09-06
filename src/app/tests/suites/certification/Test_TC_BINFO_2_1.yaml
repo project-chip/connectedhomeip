@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #not supported in YAML
+    #Saving the CountryCode during commissioning not supported in YAML
     - label:
           "During Commissioning, TH Saves the CountryCode Information from
           SetRegulatoryConfig command"
@@ -441,7 +441,7 @@ tests:
           value: ManufacturingDateValue
 
     - label: "TH reads PartNumber from the DUT"
-      PICS: BINFO.S.A000c && PART_NUM
+      PICS: BINFO.S.A000c
       command: "readAttribute"
       attribute: "PartNumber"
       response:
@@ -460,7 +460,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "TH reads PartNumber from the DUT"
-      PICS: BINFO.S.A000c && PART_NUM
+      PICS: BINFO.S.A000c
       command: "readAttribute"
       attribute: "PartNumber"
       response:

@@ -273,10 +273,10 @@ namespace {
 class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
 public:
     SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
-        ErrorCallback errorCallback, SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler,
-        OnDoneHandler _Nullable onDoneHandler)
-        : MTRBaseSubscriptionCallback(
-            queue, attributeReportCallback, eventReportCallback, errorCallback, nil, subscriptionEstablishedHandler, onDoneHandler)
+        ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
+        : MTRBaseSubscriptionCallback(queue, attributeReportCallback, eventReportCallback, errorCallback,
+            resubscriptionScheduledHandler, subscriptionEstablishedHandler, onDoneHandler)
     {
     }
 
@@ -296,6 +296,7 @@ public:
          eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     if (self.paseDevice != nil) {
         // We don't support subscriptions over PASE.
@@ -308,78 +309,79 @@ public:
     // Copy params before going async.
     params = [params copy];
 
-    [self.deviceController getSessionForNode:self.nodeID
-                           completionHandler:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                               NSError * _Nullable error) {
-                               if (error != nil) {
-                                   dispatch_async(queue, ^{
-                                       errorHandler(error);
-                                   });
-                                   return;
-                               }
+    [self.deviceController
+        getSessionForNode:self.nodeID
+        completionHandler:^(
+            ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session, NSError * _Nullable error) {
+            if (error != nil) {
+                dispatch_async(queue, ^{
+                    errorHandler(error);
+                });
+                return;
+            }
 
-                               // Wildcard endpoint, cluster, attribute, event.
-                               auto attributePath = std::make_unique<AttributePathParams>();
-                               auto eventPath = std::make_unique<EventPathParams>();
-                               ReadPrepareParams readParams(session.Value());
-                               readParams.mMinIntervalFloorSeconds = minInterval;
-                               readParams.mMaxIntervalCeilingSeconds = maxInterval;
-                               readParams.mpAttributePathParamsList = attributePath.get();
-                               readParams.mAttributePathParamsListSize = 1;
-                               readParams.mpEventPathParamsList = eventPath.get();
-                               readParams.mEventPathParamsListSize = 1;
-                               readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
+            // Wildcard endpoint, cluster, attribute, event.
+            auto attributePath = std::make_unique<AttributePathParams>();
+            auto eventPath = std::make_unique<EventPathParams>();
+            ReadPrepareParams readParams(session.Value());
+            readParams.mMinIntervalFloorSeconds = minInterval;
+            readParams.mMaxIntervalCeilingSeconds = maxInterval;
+            readParams.mpAttributePathParamsList = attributePath.get();
+            readParams.mAttributePathParamsListSize = 1;
+            readParams.mpEventPathParamsList = eventPath.get();
+            readParams.mEventPathParamsListSize = 1;
+            readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
 
-                               std::unique_ptr<SubscriptionCallback> callback;
-                               std::unique_ptr<ReadClient> readClient;
-                               std::unique_ptr<ClusterStateCache> attributeCache;
-                               if (attributeCacheContainer) {
-                                   __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
-                                   callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler,
-                                       eventReportHandler, errorHandler, subscriptionEstablishedHandler, ^{
-                                           MTRAttributeCacheContainer * container = weakPtr;
-                                           if (container) {
-                                               container.cppAttributeCache = nullptr;
-                                           }
-                                       });
-                                   attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
-                                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                                       attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-                               } else {
-                                   callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler,
-                                       eventReportHandler, errorHandler, subscriptionEstablishedHandler, nil);
-                                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                                       callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-                               }
+            std::unique_ptr<SubscriptionCallback> callback;
+            std::unique_ptr<ReadClient> readClient;
+            std::unique_ptr<ClusterStateCache> attributeCache;
+            if (attributeCacheContainer) {
+                __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
+                callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler, errorHandler,
+                    resubscriptionScheduledHandler, subscriptionEstablishedHandler, ^{
+                        MTRAttributeCacheContainer * container = weakPtr;
+                        if (container) {
+                            container.cppAttributeCache = nullptr;
+                        }
+                    });
+                attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
+                readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                    attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+            } else {
+                callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler, errorHandler,
+                    resubscriptionScheduledHandler, subscriptionEstablishedHandler, nil);
+                readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                    callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+            }
 
-                               CHIP_ERROR err;
-                               if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
-                                   err = readClient->SendRequest(readParams);
-                               } else {
-                                   // SendAutoResubscribeRequest cleans up the params, even on failure.
-                                   attributePath.release();
-                                   eventPath.release();
-                                   err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-                               }
+            CHIP_ERROR err;
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                err = readClient->SendRequest(readParams);
+            } else {
+                // SendAutoResubscribeRequest cleans up the params, even on failure.
+                attributePath.release();
+                eventPath.release();
+                err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            }
 
-                               if (err != CHIP_NO_ERROR) {
-                                   dispatch_async(queue, ^{
-                                       errorHandler([MTRError errorForCHIPErrorCode:err]);
-                                   });
+            if (err != CHIP_NO_ERROR) {
+                dispatch_async(queue, ^{
+                    errorHandler([MTRError errorForCHIPErrorCode:err]);
+                });
 
-                                   return;
-                               }
+                return;
+            }
 
-                               if (attributeCacheContainer) {
-                                   attributeCacheContainer.cppAttributeCache = attributeCache.get();
-                                   // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
-                                   callback->AdoptAttributeCache(std::move(attributeCache));
-                               }
-                               // Callback and ReadClient will be deleted when OnDone is called or an error is
-                               // encountered.
-                               callback->AdoptReadClient(std::move(readClient));
-                               callback.release();
-                           }];
+            if (attributeCacheContainer) {
+                attributeCacheContainer.cppAttributeCache = attributeCache.get();
+                // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
+                callback->AdoptAttributeCache(std::move(attributeCache));
+            }
+            // Callback and ReadClient will be deleted when OnDone is called or an error is
+            // encountered.
+            callback->AdoptReadClient(std::move(readClient));
+            callback.release();
+        }];
 }
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler

@@ -109,7 +109,7 @@ tests:
           1b..1d below."
       PICS: SWTCH.C.F00
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads global attribute FeatureMap."
@@ -141,9 +141,9 @@ tests:
           the switch is operated."
       PICS: SWTCH.C.F00 && SWTCH.C.M.EV
       verification: |
-          In Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"SwitchLatched","NewPosition":0}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"SwitchLatched","NewPosition":0}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659679728.732056][2530:2538] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
           [1659679728.732389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7706
@@ -171,7 +171,7 @@ tests:
           minute period) DUT reads attribute CurrentPosition regularly,"
       PICS: SWTCH.C.F00 && SWTCH.C.M.RA
       verification: |
-          In Raspi platform to change the simulated switch between positions using the below commands
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
           echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
 
@@ -204,9 +204,9 @@ tests:
           NewPosition reflecting the new state) on every change"
       PICS: SWTCH.C.F00 && SWTCH.C.M.EV
       verification: |
-          In Raspi platform to change the simulated switch between positions using the below commands
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659621148.831745][8590:8596] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
           [1659621148.832236][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f54
@@ -283,7 +283,7 @@ tests:
           3b..3d below."
       PICS: SWTCH.C.F01
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads global attribute FeatureMap."
@@ -315,9 +315,9 @@ tests:
           switch is operated."
       PICS: SWTCH.C.F01 && SWTCH.C.M.EV
       verification: |
-          In Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"InitialPress","NewPosition":0}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"InitialPress","NewPosition":0}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":0}"
           [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
@@ -339,7 +339,7 @@ tests:
           [1659683181.743470][2829:2835] CHIP:TOO:     NewPosition: 0
           [1659683181.743506][2829:2835] CHIP:TOO:    }
 
-          echo "{"Name":"ShortRelease","PreviousPosition":0}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"ShortRelease","PreviousPosition":0}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659683678.805455][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":0}"
           [1659683678.805739][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7715
@@ -361,7 +361,7 @@ tests:
 
           if SWTCH.C.F03, also:
 
-          echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
@@ -377,7 +377,7 @@ tests:
           [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
@@ -401,9 +401,9 @@ tests:
           to 0 - wait 10 seconds DUT reads attribute CurrentPosition regularly"
       PICS: SWTCH.C.F01 && SWTCH.C.M.RA
       verification: |
-          In Raspi platform to change the simulated switch between positions using the below commands
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
@@ -412,7 +412,7 @@ tests:
 
           After 0.2 seconds, send this command
 
-          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659683678.805455][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659683678.805739][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7715
@@ -446,9 +446,9 @@ tests:
           the event ShortRelease (with field PreviousPosition=1) wait 10 seconds"
       PICS: SWTCH.C.F01 && SWTCH.C.M.EV
       verification: |
-          In Raspi platform to change the simulated switch between positions using the below commands
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
           [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
@@ -456,7 +456,7 @@ tests:
           [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
 
           After 0.2 seconds, send this command
-          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"ShortRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659684051.064329][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
           [1659684051.064820][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7716
@@ -507,17 +507,17 @@ tests:
           LongRelease (with field PreviousPosition=1) wait 8 seconds"
       PICS: SWTCH.C.F01 && SWTCH.C.F03 && SWTCH.C.M.EV
       verification: |
-          In Raspi platform to change the simulated switch between positions using the below commands
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
-          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"InitialPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           After 0.75 seconds, send this command
 
-          echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"LongPress","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           After 2 seconds, send this command
 
-          echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of DUT)
+          echo "{"Name":"LongRelease","PreviousPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           After 8 seconds, repeat this set of commands
           Repeat this for 1 minute total.
