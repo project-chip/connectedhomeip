@@ -95,4 +95,3 @@ extern uint8_t __attribute__((section(".bss.lwip_SYS_TIMEOUT")))    memp_memory_
 #endif
 
 #endif /* CHIP_LWIP_FREERTOS_ARCH_CC_H */
-

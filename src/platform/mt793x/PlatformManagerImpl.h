@@ -75,7 +75,7 @@ private:
     static PlatformManagerImpl sInstance;
 
     void *mFilogicCtx;
-    
+
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 };
 
@@ -94,7 +94,7 @@ inline PlatformManager & PlatformMgr(void)
  * Returns the platform-specific implementation of the PlatformManager
  * singleton object.
  *
- * Chip applications can use this to gain access to features of the 
+ * Chip applications can use this to gain access to features of the
  * PlatformManager that are specific to the MT793x platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)

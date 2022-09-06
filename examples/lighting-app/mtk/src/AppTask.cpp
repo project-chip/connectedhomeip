@@ -365,7 +365,7 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
                 MT793X_LOG("not handled key release event, mFunction = %x", sAppTask.mFunction);
                 break;
         }
-        
+
         sStatusLED.Set(false);
 
         sAppTask.mFunction = kFunction_NoneSelected;

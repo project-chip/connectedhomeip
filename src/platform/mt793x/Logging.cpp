@@ -53,9 +53,9 @@ static void PrintLog(const char * msg)
         PigweedLogger::putString(newline, sz);
 #endif
     }*/
-		
+
 	printf("%s\n", msg);
-	
+
 }
 #endif // MT793X_LOG_ENABLED
 

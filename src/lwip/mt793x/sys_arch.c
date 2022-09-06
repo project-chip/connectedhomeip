@@ -507,12 +507,12 @@ void sys_init(void)
 
     s = hal_trng_init();
 
-    if (s == HAL_TRNG_STATUS_OK) 
+    if (s == HAL_TRNG_STATUS_OK)
     {
         s = hal_trng_get_generated_random_number(&seed);
     }
 
-    if (s == HAL_TRNG_STATUS_OK) 
+    if (s == HAL_TRNG_STATUS_OK)
     {
         srand((unsigned int)seed);
     }
@@ -634,4 +634,3 @@ void sys_assert( const char *pcMessage )
 /*-------------------------------------------------------------------------*
  * End of File:  sys_arch.c
  *-------------------------------------------------------------------------*/
-

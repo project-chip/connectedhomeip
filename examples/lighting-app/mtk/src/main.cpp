@@ -169,7 +169,7 @@ void vStartTask( void * pvParameters );
 void mt793xLog(const char * aFormat, ...)
 {
     va_list vargs;
-    
+
     va_start(vargs, aFormat);
     vprintf(aFormat, vargs);
     va_end(vargs);

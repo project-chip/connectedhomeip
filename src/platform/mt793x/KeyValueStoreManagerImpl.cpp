@@ -41,7 +41,7 @@ namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-/** 
+/**
 * MT793x KVS Implemetation
 */
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
@@ -49,34 +49,34 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 {
 	CHIP_ERROR err;
     nvdm_status_t nvdm_status;
-	
+
 	nvdm_status = nvdm_read_data_item(kNamespace, key, (uint8_t *)value, (uint32_t*)&value_size);
 	if (read_bytes_size)
     {
         *read_bytes_size = value_size;
     }
 	err = MapNvdmStatus(nvdm_status);
-	
+
     return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    
+
 	CHIP_ERROR err;
     nvdm_status_t nvdm_status;
-	
+
 	nvdm_status = nvdm_write_data_item(kNamespace, key, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *)value, value_size);
 	err = MapNvdmStatus(nvdm_status);
 
-    return err; 
+    return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
 	CHIP_ERROR err;
     nvdm_status_t nvdm_status;
-	
+
     nvdm_status = nvdm_delete_data_item(kNamespace, key);
 	err = MapNvdmStatus(nvdm_status);
 
@@ -84,13 +84,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
-{	
+{
 	CHIP_ERROR err;
     nvdm_status_t nvdm_status;
-	
+
 	nvdm_status = nvdm_delete_group(kNamespace);
 	err = MapNvdmStatus(nvdm_status);
-	
+
     return err;
 }
 
@@ -129,7 +129,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapNvdmStatus(nvdm_status_t nvdm_status)
 		err = CHIP_ERROR_INTERNAL;
         break;
     }
-	
+
     return err;
 }
 
