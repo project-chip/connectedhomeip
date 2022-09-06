@@ -419,9 +419,11 @@ void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * s
 
 CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator)
 {
-    if (error == CHIP_ERROR_POSIX(ENOBUFS)
+    if (
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        || error == System::MapErrorLwIP(ERR_MEM)
+        error == System::MapErrorLwIP(ERR_MEM)
+#else
+        error == CHIP_ERROR_POSIX(ENOBUFS)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     )
     {
