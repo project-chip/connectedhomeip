@@ -88,7 +88,7 @@ err_t sys_sem_new(sys_sem_t * sem, u8_t count)
 void sys_sem_free(sys_sem_t * sem)
 {
     vSemaphoreDelete(*sem);
-    SYS_STATS_DEC(sem.used);
+    SYS_STATS_DEC(sem);
 }
 
 void sys_sem_signal(sys_sem_t * sem)
@@ -143,7 +143,7 @@ err_t sys_mutex_new(sys_mutex_t * mutex)
 void sys_mutex_free(sys_mutex_t * mutex)
 {
     vSemaphoreDelete(*mutex);
-    SYS_STATS_DEC(mutex.used);
+    SYS_STATS_DEC(mutex);
 }
 
 void sys_mutex_lock(sys_mutex_t * mutex)
