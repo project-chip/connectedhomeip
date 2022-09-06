@@ -58,9 +58,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == OnOffSwitchConfiguration::Id)
     {
-        ChipLogProgress(
-            Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-            ChipLogValueMEI(attributeId), type, *value, size);
+        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
     }

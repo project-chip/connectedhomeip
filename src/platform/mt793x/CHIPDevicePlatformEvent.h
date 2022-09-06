@@ -32,7 +32,7 @@
 #endif
 #include "filogic.h"
 
-#define MTK_EVENT_BUF_LEN   40
+#define MTK_EVENT_BUF_LEN 40
 
 namespace chip {
 namespace DeviceLayer {
@@ -70,22 +70,22 @@ struct ChipDevicePlatformEvent final
     {
         struct
         {
-            filogic_async_event_id_t    event;
-            uint8_t                     payload[MTK_EVENT_BUF_LEN];
-            uint32_t                    length;
+            filogic_async_event_id_t event;
+            uint8_t payload[MTK_EVENT_BUF_LEN];
+            uint32_t length;
         } FilogicEvent;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         struct
         {
-            filogic_async_event_data    event_data;
+            filogic_async_event_data event_data;
         } MtkWiFiEvent;
 #endif
         struct
         {
             wifi_event_t event;
-            uint8_t      *payload;
-            uint32_t     length;
+            uint8_t * payload;
+            uint32_t length;
         } MtkIPEvent;
     };
 };

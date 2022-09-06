@@ -42,8 +42,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
 #endif
 
-#include "mt7933_pos.h"
 #include "filogic.h"
+#include "mt7933_pos.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;

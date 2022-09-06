@@ -51,9 +51,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-    static void FilogicEventHandler(void *c,
-                                    filogic_async_event_id_t event,
-                                    filogic_async_event_data *data);
+    static void FilogicEventHandler(void * c, filogic_async_event_id_t event, filogic_async_event_data * data);
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -74,7 +72,7 @@ private:
 
     static PlatformManagerImpl sInstance;
 
-    void *mFilogicCtx;
+    void * mFilogicCtx;
 
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 };

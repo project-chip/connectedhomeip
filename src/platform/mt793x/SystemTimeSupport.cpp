@@ -40,7 +40,7 @@ ClockImpl gClockImpl;
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-//    return Clock::Microseconds64(::esp_timer_get_time());
+    //    return Clock::Microseconds64(::esp_timer_get_time());
     return static_cast<chip::System::Clock::Microseconds64>(0);
 }
 
@@ -104,11 +104,8 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
         const time_t timep = tv.tv_sec;
         struct tm calendar;
         localtime_r(&timep, &calendar);
-        ChipLogProgress(DeviceLayer,
-                        "Real time clock set to %ld (%04d/%02d/%02d %02d:%02d:%02d UTC)",
-                        tv.tv_sec, calendar.tm_year,
-                        calendar.tm_mon, calendar.tm_mday,
-                        calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%04d/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec, calendar.tm_year,
+                        calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;

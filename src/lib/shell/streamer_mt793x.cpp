@@ -35,7 +35,7 @@ namespace {
 int streamer_mt793x_init(streamer_t * streamer)
 {
     (void) streamer;
-    //bsp_io_def_uart_init();
+    // bsp_io_def_uart_init();
     return 0;
 }
 
@@ -45,7 +45,7 @@ ssize_t streamer_mt793x_read(streamer_t * streamer, char * buffer, size_t length
     (void) streamer;
 
     while (i < length)
-        buffer[i++] = (char)bsp_io_def_uart_getchar();
+        buffer[i++] = (char) bsp_io_def_uart_getchar();
     return length;
 }
 

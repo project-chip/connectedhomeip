@@ -111,7 +111,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     struct CHIPoBLEConState
     {
-        //bd_addr address;
+        // bd_addr address;
         uint16_t mtu : 10;
         uint16_t allocated : 1;
         uint16_t subscribed : 1;

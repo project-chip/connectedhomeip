@@ -55,13 +55,11 @@ using namespace ::chip::DeviceLayer;
 
 volatile int apperror_cnt;
 
-
 /***************************************************************************
  * Application Error hang
  ****************************************************************************/
 
-
-void appError( int err )
+void appError(int err)
 {
     printf("!!!!!!!!!!!! Application Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
@@ -69,102 +67,85 @@ void appError( int err )
         ;
 }
 
-
-void appError( CHIP_ERROR error )
+void appError(CHIP_ERROR error)
 {
-    appError( static_cast<int>( error.AsInteger() ) );
+    appError(static_cast<int>(error.AsInteger()));
 }
-
 
 /***************************************************************************
  * FORWARD DECLARATIONS
  ****************************************************************************/
 
+extern "C" void system_init(void);
 
-extern "C" void system_init ( void );
-
-
-void vStartTask( void * pvParameters );
-
+void vStartTask(void * pvParameters);
 
 /***************************************************************************
  * FreeRTOS callback functions
  ****************************************************************************/
 
+#if (configUSE_DAEMON_TASK_STARTUP_HOOK == 1)
 
-#if ( configUSE_DAEMON_TASK_STARTUP_HOOK == 1 )
-
-    extern "C" void vApplicationDaemonTaskStartupHook ( void )
-    {
-    #define START_TASK_STACK_SIZE ( 1000 )
+extern "C" void vApplicationDaemonTaskStartupHook(void)
+{
+#define START_TASK_STACK_SIZE (1000)
     BaseType_t xReturned;
 
-        xReturned = xTaskCreate(
-            vStartTask,             /* Function that implements the task. */
-            "startTask",            /* Text name for the task. */
-            START_TASK_STACK_SIZE,  /* Stack size in words, not bytes. */
-            ( void * ) 0,           /* Parameter passed into the task. */
-            tskIDLE_PRIORITY,       /* Priority at which the task is created. */
-            NULL );                 /* Used to pass out the created task's handle. */
+    xReturned = xTaskCreate(vStartTask,            /* Function that implements the task. */
+                            "startTask",           /* Text name for the task. */
+                            START_TASK_STACK_SIZE, /* Stack size in words, not bytes. */
+                            (void *) 0,            /* Parameter passed into the task. */
+                            tskIDLE_PRIORITY,      /* Priority at which the task is created. */
+                            NULL);                 /* Used to pass out the created task's handle. */
 
-        configASSERT( xReturned == pdPASS  );
-    }
+    configASSERT(xReturned == pdPASS);
+}
 
 #endif /* configUSE_DAEMON_TASK_STARTUP_HOOK */
 
+#if (configUSE_IDLE_HOOK == 1)
 
-#if ( configUSE_IDLE_HOOK == 1 )
-
-    /* for idle task feed wdt (DO NOT enter sleep mode)*/
-    extern "C" void vApplicationIdleHook ( void )
-    {
-    #ifdef MTK_SYSTEM_HANG_CHECK_ENABLE
-    #ifdef HAL_WDT_MODULE_ENABLED
-        hal_wdt_feed(HAL_WDT_FEED_MAGIC);
-    #endif
-    #endif
-    }
+/* for idle task feed wdt (DO NOT enter sleep mode)*/
+extern "C" void vApplicationIdleHook(void)
+{
+#ifdef MTK_SYSTEM_HANG_CHECK_ENABLE
+#ifdef HAL_WDT_MODULE_ENABLED
+    hal_wdt_feed(HAL_WDT_FEED_MAGIC);
+#endif
+#endif
+}
 
 #endif /* configUSE_IDLE_HOOK */
 
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
 
-#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
-
-    extern "C" void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
-                                                    StackType_t  **ppxTimerTaskStackBuffer,
-                                                    uint32_t      *pulTimerTaskStackSize )
+extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
+                                               uint32_t * pulTimerTaskStackSize)
+{
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+    *ppxTimerTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
+    if (*ppxTimerTaskTCBBuffer != NULL)
     {
-        *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
-        *ppxTimerTaskTCBBuffer = ( StaticTask_t * ) pvPortMalloc( sizeof( StaticTask_t ) );
-        if( *ppxTimerTaskTCBBuffer != NULL )
-        {
-            *ppxTimerTaskStackBuffer = ( StackType_t * ) pvPortMalloc(
-                ( ( ( size_t ) *pulTimerTaskStackSize ) * sizeof( StackType_t ) )
-            );
-        }
+        *ppxTimerTaskStackBuffer = (StackType_t *) pvPortMalloc((((size_t) *pulTimerTaskStackSize) * sizeof(StackType_t)));
     }
+}
 
-    extern "C" void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
-                                                   StackType_t  **ppxIdleTaskStackBuffer,
-                                                   uint32_t      *pulIdleTaskStackSize )
+extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
+                                              uint32_t * pulIdleTaskStackSize)
+{
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+    *ppxIdleTaskTCBBuffer = (StaticTask_t *) pvPortMalloc(sizeof(StaticTask_t));
+    if (*ppxIdleTaskTCBBuffer != NULL)
     {
-        *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
-        *ppxIdleTaskTCBBuffer = ( StaticTask_t * ) pvPortMalloc( sizeof( StaticTask_t ) );
-        if( *ppxIdleTaskTCBBuffer != NULL )
-        {
-            *ppxIdleTaskStackBuffer = ( StackType_t * ) pvPortMalloc(
-                ( ( ( size_t ) *pulIdleTaskStackSize ) * sizeof( StackType_t ) )
-            );
-        }
+        *ppxIdleTaskStackBuffer = (StackType_t *) pvPortMalloc((((size_t) *pulIdleTaskStackSize) * sizeof(StackType_t)));
     }
+}
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
-
 
 /*******************************************************************************
  * DECLARATIONS
  ******************************************************************************/
-
 
 void mt793xLog(const char * aFormat, ...)
 {
@@ -176,18 +157,15 @@ void mt793xLog(const char * aFormat, ...)
     printf("\n");
 }
 
-
-void mt793xLogRedirectCallback ( const char * module,
-                                 uint8_t      category,
-                                 const char * msg,
-                                 va_list      args )
+void mt793xLogRedirectCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    int     len;
-    char    *buf;
+    int len;
+    char * buf;
 
     len = strlen(module) + 1 + vsnprintf(NULL, 0, msg, args) + 1;
-    buf = (char *)malloc(len);
-    if (buf) {
+    buf = (char *) malloc(len);
+    if (buf)
+    {
         len = sprintf(buf, "%s ", module);
         vsprintf(buf + len, msg, args);
         printf("%s\n", buf);
@@ -195,48 +173,43 @@ void mt793xLogRedirectCallback ( const char * module,
     }
 }
 
-
-void mt793xSwdPortConfig ( void )
+void mt793xSwdPortConfig(void)
 {
-    *(volatile uint32_t *)0x30404358 = 0x00070700;
-    *(volatile uint32_t *)0x30404354 = 0x00020200;
-    *(volatile uint32_t *)0x304030e0 = 0x1e8210;
-    *(volatile uint32_t *)0x304030d4 = 0;
+    *(volatile uint32_t *) 0x30404358 = 0x00070700;
+    *(volatile uint32_t *) 0x30404354 = 0x00020200;
+    *(volatile uint32_t *) 0x304030e0 = 0x1e8210;
+    *(volatile uint32_t *) 0x304030d4 = 0;
 }
-
 
 /***************************************************************************
  * Button Callback
  ****************************************************************************/
 
-
-void vButtonCallback(const filogic_button_t *button_event)
+void vButtonCallback(const filogic_button_t * button_event)
 {
     GetAppTask().ButtonHandler(*button_event);
 }
-
 
 /***************************************************************************
  * Startup task
  ****************************************************************************/
 
-
-void vStartRunning ( void )
+void vStartRunning(void)
 {
     CHIP_ERROR error;
 
-    chip::Logging::SetLogRedirectCallback( mt793xLogRedirectCallback );
+    chip::Logging::SetLogRedirectCallback(mt793xLogRedirectCallback);
 
-    assert( chip::Platform::MemoryInit() == CHIP_NO_ERROR );
+    assert(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
 
     assert(chip::DeviceLayer::PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
 
     // Wi-Fi ?
-    //chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
+    // chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 
-   assert(chip::DeviceLayer::PlatformMgr().StartEventLoopTask() == CHIP_NO_ERROR);
+    assert(chip::DeviceLayer::PlatformMgr().StartEventLoopTask() == CHIP_NO_ERROR);
 
-   assert(GetAppTask().StartAppTask() == CHIP_NO_ERROR);
+    assert(GetAppTask().StartAppTask() == CHIP_NO_ERROR);
 
     assert(filogic_button_set_callback(vButtonCallback));
 
@@ -247,26 +220,22 @@ void vStartRunning ( void )
 #endif
 }
 
-
-void vStartTask( void * pvParameters )
+void vStartTask(void * pvParameters)
 {
-    ( void ) pvParameters;
+    (void) pvParameters;
 
     vStartRunning();
 
-    vTaskDelete( NULL );
+    vTaskDelete(NULL);
 }
-
 
 /***************************************************************************
  * Main Function
  ****************************************************************************/
 
-
 extern "C" int main(void)
 {
-    mbedtls_platform_set_calloc_free( CHIPPlatformMemoryCalloc,
-                                      CHIPPlatformMemoryFree );
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
@@ -281,7 +250,8 @@ extern "C" int main(void)
     chip::Platform::MemoryShutdown();
 
     // Should never get here.
-    while (1) ;
+    while (1)
+        ;
 
     return 0;
 }

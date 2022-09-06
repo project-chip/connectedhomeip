@@ -45,63 +45,53 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-
-#define FACTORY_RESET_TRIGGER_TIMEOUT       3000
+#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE                 (4096)
-#define APP_TASK_PRIORITY                   2
-#define APP_EVENT_QUEUE_SIZE                10
-#define EXAMPLE_VENDOR_ID                   0xcafe
-
+#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_PRIORITY 2
+#define APP_EVENT_QUEUE_SIZE 10
+#define EXAMPLE_VENDOR_ID 0xcafe
 
 #ifdef portYIELD_FROM_ISR
-#define OS_YIELD_FROM_ISR(yield)   portYIELD_FROM_ISR(yield)
+#define OS_YIELD_FROM_ISR(yield) portYIELD_FROM_ISR(yield)
 #elif portEND_SWITCHING_ISR
-#define OS_YIELD_FROM_ISR(yield)   portEND_SWITCHING_ISR(yield)
+#define OS_YIELD_FROM_ISR(yield) portEND_SWITCHING_ISR(yield)
 #else
 #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
 #endif
 
-
 #define UNUSED_PARAMETER(a) (a = a)
-
 
 namespace {
 
-TimerHandle_t   sFunctionTimer; // FreeRTOS app sw timer.
-TaskHandle_t    sAppTaskHandle;
-QueueHandle_t   sAppEventQueue;
+TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
-LEDWidget       sStatusLED;
-LEDWidget       sLightLED;
+LEDWidget sStatusLED;
+LEDWidget sLightLED;
 
-bool            sIsWiFiProvisioned = false;
-bool            sIsWiFiEnabled     = false;
-bool            sIsWiFiAttached    = false;
+bool sIsWiFiProvisioned = false;
+bool sIsWiFiEnabled     = false;
+bool sIsWiFiAttached    = false;
 
-uint8_t         sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
-StaticQueue_t   sAppEventQueueStruct;
+uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
+StaticQueue_t sAppEventQueueStruct;
 
-StackType_t     appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-StaticTask_t    appTaskStruct;
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
 
-}
-
+} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
-
 AppTask AppTask::sAppTask;
-
 
 CHIP_ERROR AppTask::StartAppTask()
 {
-    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE,
-                                        sizeof(AppEvent),
-                                        sAppEventQueueBuffer,
-                                        &sAppEventQueueStruct);
+    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
         MT793X_LOG("Failed to allocate app event queue");
@@ -109,19 +99,12 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain,
-                                       APP_TASK_NAME,
-                                       ArraySize(appStack),
-                                       NULL,
-                                       1,
-                                       appStack,
-                                       &appTaskStruct);
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
         return APP_ERROR_CREATE_TASK_FAILED;
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR AppTask::Init()
 {
@@ -129,7 +112,7 @@ CHIP_ERROR AppTask::Init()
 
     // Wait for the WiFi to be initialized
     MT793X_LOG("APP: Wait WiFi Init");
-    vTaskDelay(1000); //TODO
+    vTaskDelay(1000); // TODO
     MT793X_LOG("APP: Done WiFi Init");
 
     // Init ZCL Data Model and start server
@@ -167,12 +150,11 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
-    //PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+    // PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kSoftAP));
 
     return error;
 }
-
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
@@ -189,9 +171,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue,
-                                                 &event,
-                                                 pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -238,13 +218,12 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
 {
-    bool                        initiated = false;
-    LightingManager::Action_t   action;
-    int32_t                     actor;
-    CHIP_ERROR                  err = CHIP_NO_ERROR;
+    bool initiated = false;
+    LightingManager::Action_t action;
+    int32_t actor;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
@@ -279,47 +258,43 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-
 void AppTask::ButtonTimerEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer ||
-        sAppTask.mFunctionTimerActive == false)
+    if (aEvent->Type != AppEvent::kEventType_Timer || sAppTask.mFunctionTimerActive == false)
     {
         return;
     }
 
     switch (sAppTask.mFunction)
     {
-        case kFunction_NoneSelected:
-            break;
+    case kFunction_NoneSelected:
+        break;
 
-        case kFunction_LightSwitch:
-            // Start timer for user to cancel the facotry reset, if needed
-            MT793X_LOG("Factory Reset Triggered.");
-            MT793X_LOG("Release button within %ums to cancel.",
-                       FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-            sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-            sAppTask.mFunction = kFunction_FactoryReset;
+    case kFunction_LightSwitch:
+        // Start timer for user to cancel the facotry reset, if needed
+        MT793X_LOG("Factory Reset Triggered.");
+        MT793X_LOG("Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.mFunction = kFunction_FactoryReset;
 
-            // Turn off all LEDs before starting blink to make sure blink is
-            // co-ordinated.
-            sStatusLED.Set(false);
-            sStatusLED.Blink(500);
-            break;
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
+        sStatusLED.Set(false);
+        sStatusLED.Blink(500);
+        break;
 
-        case kFunction_FactoryReset:
-            MT793X_LOG("Factory Reset Start.");
-            // Actually trigger Factory Reset
-            sAppTask.mFunction = kFunction_NoneSelected;
-            ConfigurationMgr().InitiateFactoryReset();
-            sStatusLED.Set(true);
-            break;
+    case kFunction_FactoryReset:
+        MT793X_LOG("Factory Reset Start.");
+        // Actually trigger Factory Reset
+        sAppTask.mFunction = kFunction_NoneSelected;
+        ConfigurationMgr().InitiateFactoryReset();
+        sStatusLED.Set(true);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
-
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
 {
@@ -351,19 +326,19 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
 
         switch (sAppTask.mFunction)
         {
-            case kFunction_LightSwitch:
-                MT793X_LOG("AppTask light switch");
-                AppEvent event;
-                event.Type = AppEvent::kEventType_Button;
-                LightActionEventHandler(&event);
-                break;
-            case kFunction_FactoryReset:
-                // factory reset cancelled, restore LED
-                MT793X_LOG("AppTask factory reset cancelled");
-                break;
-            default:
-                MT793X_LOG("not handled key release event, mFunction = %x", sAppTask.mFunction);
-                break;
+        case kFunction_LightSwitch:
+            MT793X_LOG("AppTask light switch");
+            AppEvent event;
+            event.Type = AppEvent::kEventType_Button;
+            LightActionEventHandler(&event);
+            break;
+        case kFunction_FactoryReset:
+            // factory reset cancelled, restore LED
+            MT793X_LOG("AppTask factory reset cancelled");
+            break;
+        default:
+            MT793X_LOG("not handled key release event, mFunction = %x", sAppTask.mFunction);
+            break;
         }
 
         sStatusLED.Set(false);
@@ -372,8 +347,7 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
     }
 }
 
-
-void AppTask::ButtonHandler(const filogic_button_t &button)
+void AppTask::ButtonHandler(const filogic_button_t & button)
 {
     AppEvent button_event            = {};
     button_event.Type                = AppEvent::kEventType_Button;
@@ -381,7 +355,6 @@ void AppTask::ButtonHandler(const filogic_button_t &button)
     button_event.Handler             = SingleButtonEventHandler;
     sAppTask.PostEvent(&button_event);
 }
-
 
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
@@ -391,7 +364,6 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
     event.Handler            = ButtonTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
-
 
 void AppTask::CancelTimer()
 {
@@ -403,7 +375,6 @@ void AppTask::CancelTimer()
 
     mFunctionTimerActive = false;
 }
-
 
 void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
@@ -425,7 +396,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
@@ -441,7 +411,6 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     }
 }
 
-
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
     // action has been completed bon the light
@@ -455,7 +424,6 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 }
 
-
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
@@ -465,7 +433,6 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
-
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
@@ -477,9 +444,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
             BaseType_t higherPrioTaskWoken;
 
             higherPrioTaskWoken = pdFALSE;
-            status              = xQueueSendFromISR(sAppEventQueue,
-                                                    aEvent,
-                                                    &higherPrioTaskWoken);
+            status              = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
             OS_YIELD_FROM_ISR(higherPrioTaskWoken);
         }
         else
@@ -495,7 +460,6 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         MT793X_LOG("Event Queue is NULL should never happen");
     }
 }
-
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {

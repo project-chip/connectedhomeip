@@ -24,9 +24,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/mt793x/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/mt793x/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
 #include <tcpip_wrapper.h>
@@ -94,24 +94,24 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
-void PlatformManagerImpl::FilogicEventHandler(void *c,
-                                              filogic_async_event_id_t event,
-                                              filogic_async_event_data *data)
+void PlatformManagerImpl::FilogicEventHandler(void * c, filogic_async_event_id_t event, filogic_async_event_data * data)
 {
-    ChipDeviceEvent e = {0};
+    ChipDeviceEvent e = { 0 };
 
     ChipLogProgress(DeviceLayer, "%s %s", __func__, filogic_event_to_name(event));
 
-    if (event < FILOGIC_EVENT_ID_MAX) {
-        e.Type                        = DeviceEventType::kMtkWiFiEvent;
+    if (event < FILOGIC_EVENT_ID_MAX)
+    {
+        e.Type = DeviceEventType::kMtkWiFiEvent;
         memcpy(&e.Platform.MtkWiFiEvent.event_data, data, sizeof(*data));
         ChipLogError(DeviceLayer, "event %s", filogic_event_to_name(event));
         (void) sInstance.PostEvent(&e);
-    } else {
+    }
+    else
+    {
         ChipLogError(DeviceLayer, "Unhandled event %d", event);
     }
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

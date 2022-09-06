@@ -743,7 +743,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // set_random_address call causes problems with MG24 family.
     // Todo fix in GSDK.
     const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
-    //bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
+    // bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
     (void) unusedBdAddr;
 #endif

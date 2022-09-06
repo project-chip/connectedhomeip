@@ -37,8 +37,7 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
     /* Save into internal Keys */
     (void) Internal::MT793XConfig::WriteConfigValueStr(Internal::MT793XConfig::kConfigKey_WiFiSSID, (char *) ssid);
     (void) Internal::MT793XConfig::WriteConfigValueStr(Internal::MT793XConfig::kConfigKey_WiFiPSK, key);
-    (void) Internal::MT793XConfig::WriteConfigValueBin(Internal::MT793XConfig::kConfigKey_WiFiSEC, &security,
-                                                      sizeof(security));
+    (void) Internal::MT793XConfig::WriteConfigValueBin(Internal::MT793XConfig::kConfigKey_WiFiSEC, &security, sizeof(security));
     ChipLogProgress(DeviceLayer, "SP WiFi STA provision set (SSID: %s)", ssid);
 
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);

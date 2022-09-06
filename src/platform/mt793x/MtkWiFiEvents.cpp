@@ -6,5 +6,4 @@
 
 #include <wifi_api_ex.h>
 
-
 using namespace ::chip::DeviceLayer;

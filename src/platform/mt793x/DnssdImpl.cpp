@@ -17,11 +17,11 @@
 
 #include "lib/dnssd/platform/Dnssd.h"
 
-#include <lwip/ip4_addr.h>
-#include <lwip/ip6_addr.h>
+#include "dns_sd.h"
 #include "lwip/mld6.h"
 #include "mdns.h"
-#include "dns_sd.h"
+#include <lwip/ip4_addr.h>
+#include <lwip/ip6_addr.h>
 
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CHIPMem.h>
@@ -38,20 +38,19 @@ static constexpr size_t kMaxResults     = 20;
 namespace chip {
 namespace Dnssd {
 
-#define SERVICE_DOMAIN            ("local")
+#define SERVICE_DOMAIN ("local")
 
 static DNSServiceRef client = NULL;
 static TXTRecordRef PublishTxtRecord;
 
-
-//ChipLogProgress(ServiceProvisioning
+// ChipLogProgress(ServiceProvisioning
 
 /**
-  * @brief     mDNS Daemon Task entry
-  * @param[in] void *not_used:Not used
-  * @return    None
-  */
-static void mdnsd_entry(void *not_used)
+ * @brief     mDNS Daemon Task entry
+ * @param[in] void *not_used:Not used
+ * @return    None
+ */
+static void mdnsd_entry(void * not_used)
 {
     ChipLogProgress(ServiceProvisioning, "mdnsd_entry start");
     mdnsd_start();
@@ -64,10 +63,10 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 #if LWIP_IPV6
-    struct netif *sta_if = netif_default;
+    struct netif * sta_if = netif_default;
     ip6_addr_t mld_address;
 #endif /* #if LWIP_IPV6 */
-//    esp_err_t espError;
+    //    esp_err_t espError;
 
 #if LWIP_IPV6
     sta_if->ip6_autoconfig_enabled = 1;
@@ -78,19 +77,15 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     ChipLogProgress(ServiceProvisioning, "create mdnsd_task");
 
     // xTaskHandle create mDNS daemon task
-    if (pdPASS != xTaskCreate(mdnsd_entry,
-                              "mdnsd",
-                              (15 * 1024) / sizeof(portSTACK_TYPE),
-                              NULL,
-                              TASK_PRIORITY_NORMAL,
-                              NULL)) {
+    if (pdPASS != xTaskCreate(mdnsd_entry, "mdnsd", (15 * 1024) / sizeof(portSTACK_TYPE), NULL, TASK_PRIORITY_NORMAL, NULL))
+    {
         ChipLogProgress(ServiceProvisioning, "Cannot create mdnsd_task");
         error = CHIP_ERROR_INTERNAL;
     }
-//    espError = mdns_init();
-//    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
+    //    espError = mdns_init();
+    //    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
 
-//exit:
+    // exit:
     // if (espError != ESP_OK)
     // {
     //     ChipLogError(DeviceLayer, "esp mdns internal error: %s", esp_err_to_name(espError));
@@ -112,13 +107,13 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    CHIP_ERROR error        = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    DNSServiceFlags flags = 0;
-    char ServiceType[kDnssdTypeMaxSize + 10] = {0};
+    DNSServiceFlags flags                    = 0;
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
 
-    (void)callback;
-    (void)context;
+    (void) callback;
+    (void) context;
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdPublishService");
 
@@ -135,7 +130,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         TXTRecordCreate(&PublishTxtRecord, 0, NULL);
         for (size_t i = 0; i < service->mTextEntrySize; i++)
         {
-            err = TXTRecordSetValue(&PublishTxtRecord, service->mTextEntries[i].mKey, service->mTextEntries[i].mDataSize, service->mTextEntries[i].mData);
+            err = TXTRecordSetValue(&PublishTxtRecord, service->mTextEntries[i].mKey, service->mTextEntries[i].mDataSize,
+                                    service->mTextEntries[i].mData);
             VerifyOrExit(err == 0, error = CHIP_ERROR_INTERNAL);
         }
     }
@@ -148,24 +144,24 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     ChipLogProgress(ServiceProvisioning, "ServiceType:   %s", ServiceType);
     ChipLogProgress(ServiceProvisioning, "ServiceDomain: %s", SERVICE_DOMAIN);
     ChipLogProgress(ServiceProvisioning, "Hostname:      %s", service->mHostName);
-    ChipLogProgress(ServiceProvisioning, "ServicePort:   %d", (int)service->mPort);
+    ChipLogProgress(ServiceProvisioning, "ServicePort:   %d", (int) service->mPort);
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdPublishService - DNSServiceRegister");
 
     // Register Bonjour Service
-    err = DNSServiceRegister(&client,                                   // DNSServiceRef
-                             flags,                                     // DNSServiceFlags
-                             kDNSServiceInterfaceIndexAny,              // interface index
-                             service->mName,                            // service name
-                             ServiceType,                               // service type
-                             SERVICE_DOMAIN,                            // domain
-                             NULL,                                      // host
-                             //service->mHostName,                        // host
-                             htons(service->mPort),                     // port
-                             TXTRecordGetLength(&PublishTxtRecord),     // txt record length
-                             TXTRecordGetBytesPtr(&PublishTxtRecord),   // txt record pointer
-                             NULL,                                      // callback
-                             NULL);                                     // context
+    err = DNSServiceRegister(&client,                      // DNSServiceRef
+                             flags,                        // DNSServiceFlags
+                             kDNSServiceInterfaceIndexAny, // interface index
+                             service->mName,               // service name
+                             ServiceType,                  // service type
+                             SERVICE_DOMAIN,               // domain
+                             NULL,                         // host
+                             // service->mHostName,                        // host
+                             htons(service->mPort),                   // port
+                             TXTRecordGetLength(&PublishTxtRecord),   // txt record length
+                             TXTRecordGetBytesPtr(&PublishTxtRecord), // txt record pointer
+                             NULL,                                    // callback
+                             NULL);                                   // context
     VerifyOrExit(err == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -193,47 +189,32 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 
 static DNSServiceRef BrowseClient = NULL;
 
-void ChipDNSServiceBrowseReply(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    uint32_t interfaceIndex,
-    DNSServiceErrorType errorCode,
-    const char                          *serviceName,
-    const char                          *regtype,
-    const char                          *replyDomain,
-    void                                *context
-)
+void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
+                               const char * serviceName, const char * regtype, const char * replyDomain, void * context)
 {
-    DnssdBrowseCallback ChipBrowseHandler = (DnssdBrowseCallback)context;
+    DnssdBrowseCallback ChipBrowseHandler = (DnssdBrowseCallback) context;
     DnssdService service;
 
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", serviceName);
     strcpy(service.mName, serviceName);
 
     ChipBrowseHandler(NULL, &service, 1, CHIP_NO_ERROR);
-
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
 {
-    CHIP_ERROR error        = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    char ServiceType[kDnssdTypeMaxSize + 10] = {0};
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
 
-    (void)addressType;
+    (void) addressType;
     ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", type);
     strcpy(ServiceType, type);
     strcat(ServiceType, ".");
     strcat(ServiceType, GetProtocolString(protocol));
-    err = DNSServiceBrowse(&BrowseClient,
-                     0,
-                     0,
-                     ServiceType,
-                     SERVICE_DOMAIN,
-                     ChipDNSServiceBrowseReply,
-                     (void*)callback);
-    ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int)err);
+    err = DNSServiceBrowse(&BrowseClient, 0, 0, ServiceType, SERVICE_DOMAIN, ChipDNSServiceBrowseReply, (void *) callback);
+    ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int) err);
     if (err)
     {
         error = CHIP_ERROR_INTERNAL;
@@ -243,45 +224,28 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
 static DNSServiceRef ResolveClient = NULL;
 
-void ChipDNSServiceResolveReply
-(
-    DNSServiceRef sdRef,
-    DNSServiceFlags flags,
-    uint32_t interfaceIndex,
-    DNSServiceErrorType errorCode,
-    const char                          *fullname,
-    const char                          *hosttarget,
-    uint16_t port,                                   /* In network byte order */
-    uint16_t txtLen,
-    const unsigned char                 *txtRecord,
-    void                                *context
-)
+void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
+                                const char * fullname, const char * hosttarget, uint16_t port, /* In network byte order */
+                                uint16_t txtLen, const unsigned char * txtRecord, void * context)
 {
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceResolveReply");
 }
-
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    char ServiceType[kDnssdTypeMaxSize + 10] = {0};
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdResolve %s", service->mName);
     strcpy(ServiceType, service->mType);
     strcat(ServiceType, ".");
     strcat(ServiceType, GetProtocolString(service->mProtocol));
 
-    err = DNSServiceResolve(&ResolveClient,
-                      0,
-                      0,
-                      service->mName,
-                      ServiceType,
-                      SERVICE_DOMAIN,
-                      ChipDNSServiceResolveReply,
-                      (void*)callback);
-    ChipLogProgress(ServiceProvisioning, "DNSServiceResolve %d", (int)err);
+    err = DNSServiceResolve(&ResolveClient, 0, 0, service->mName, ServiceType, SERVICE_DOMAIN, ChipDNSServiceResolveReply,
+                            (void *) callback);
+    ChipLogProgress(ServiceProvisioning, "DNSServiceResolve %d", (int) err);
     if (err)
     {
         error = CHIP_ERROR_INTERNAL;
