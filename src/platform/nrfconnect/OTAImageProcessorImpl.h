@@ -56,7 +56,7 @@ public:
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
-private:
+protected:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
 
