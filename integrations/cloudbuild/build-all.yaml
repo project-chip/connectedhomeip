@@ -28,8 +28,8 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target-glob '*' --skip-target-glob
-              '{imx-*,tizen-*,*-androidstudio-*,*-tests*,*-chip-test}' build --create-archives
-              /workspace/artifacts/
+              '{imx-*,tizen-*,*-androidstudio-*,*-tests*,*-chip-test}' build
+              --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
           - Bootstrap
