@@ -386,7 +386,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t handle, void *data, uint16_t siz
     buf = System::PacketBufferHandle::NewWithData(data, writeLen, 0, 0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    ChipLogDetail(DeviceLayer, "Write request/command received for CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+    ChipLogDetail(DeviceLayer, "Write request/command received for CHIPoBLE RX characteristic (con %u, len %u)",
                   handle, buf->DataLength());
 
     // Post an event to the CHIP queue to deliver the data into the CHIP stack.
