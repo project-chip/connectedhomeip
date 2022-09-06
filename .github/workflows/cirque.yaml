@@ -81,7 +81,11 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- sh -c 'git config --global --add safe.directory `pwd` && git config --global --add safe.directory `pwd`/third_party/pigweed/repo && scripts/build/gn_bootstrap.sh'
+                    -- sh -c '\
+                       git config --global --add safe.directory `pwd` \
+                       && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
+                       && scripts/build/gn_bootstrap.sh\
+                    '
 
             - name: Cirque Bootstrap
               timeout-minutes: 15
@@ -106,15 +110,19 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- ./gn_build.sh \
-                    chip_build_tests=false \
-                    chip_enable_wifi=false \
-                    chip_im_force_fabric_quota_check=true \
-                    enable_default_builds=false \
-                    enable_host_gcc_build=true \
-                    enable_standalone_chip_tool_build=true \
-                    enable_linux_all_clusters_app_build=true \
-                    enable_linux_lighting_app_build=true
+                    -- sh -c '\
+                       git config --global --add safe.directory `pwd` \
+                       && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
+                       && ./gn_build.sh \
+                          chip_build_tests=false \
+                          chip_enable_wifi=false \
+                          chip_im_force_fabric_quota_check=true \
+                          enable_default_builds=false \
+                          enable_host_gcc_build=true \
+                          enable_standalone_chip_tool_build=true \
+                          enable_linux_all_clusters_app_build=true \
+                          enable_linux_lighting_app_build=true \
+                       '
             - name: Run Tests
               timeout-minutes: 25
               run: |
