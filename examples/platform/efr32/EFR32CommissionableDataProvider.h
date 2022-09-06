@@ -16,12 +16,12 @@
  */
 #pragma once
 
-#include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
+namespace EFR32 {
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
@@ -29,15 +29,18 @@ namespace DeviceLayer {
  */
 
 class EFR32DeviceDataProvider : public CommissionableDataProvider
-#if ENABLE_DEVICE_DATA_PROVIDER
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     ,
                                 public Internal::GenericDeviceInstanceInfoProvider<Internal::EFR32Config>
-#endif // ENABLE_DEVICE_DATA_PROVIDER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 {
 public:
-#if ENABLE_DEVICE_DATA_PROVIDER
-    , Internal::GenericDeviceInstanceInfoProvider<Internal::EFR32Config>(ConfigurationManagerImpl::GetDefaultInstance())
-#endif // ENABLE_DEVICE_DATA_PROVIDER
+    EFR32DeviceDataProvider() :
+        CommissionableDataProvider()
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+        ,
+        Internal::GenericDeviceInstanceInfoProvider<Internal::EFR32Config>(ConfigurationManagerImpl::GetDefaultInstance())
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     {}
 
     // ===== Members functions that implement the CommissionableDataProvider
@@ -46,10 +49,10 @@ public:
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen) override;
-    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-#if ENABLE_DEVICE_DATA_PROVIDER
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     // ===== Members functions that implement the GenericDeviceInstanceInfoProvider
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
@@ -57,8 +60,16 @@ public:
     CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-#endif // ENABLE_DEVICE_DATA_PROVIDER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 };
 
+/**
+ * @brief Get implementation of the EFR32DeviceDataProvider
+ *
+ * @returns a singleton CommissionableDataProvider of the EFR32 platform implementation
+ */
+CommissionableDataProvider * GetEFR32DeviceDataProvider();
+
+} // namespace EFR32
 } // namespace DeviceLayer
 } // namespace chip

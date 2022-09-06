@@ -353,6 +353,11 @@ efr32_executable("lighting_app") {
     deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
   }
 
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
+  }
+
   output_dir = root_out_dir
 }
 

@@ -15,11 +15,15 @@
  *    limitations under the License.
  */
 
+#include "EFR32CommissionableDataProvider.h"
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 
 namespace chip {
 namespace DeviceLayer {
+namespace EFR32 {
 
+// using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
 
 CHIP_ERROR EFR32DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
@@ -76,6 +80,11 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifie
     verifierBuf.reduce_size(verifierLen);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode)
+{
+    return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_SetupPinCode, setupPasscode);
 }
 
 #if ENABLE_DEVICE_DATA_PROVIDER
@@ -135,5 +144,12 @@ CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan 
 }
 #endif // ENABLE_DEVICE_DATA_PROVIDER
 
+CommissionableDataProvider * GetEFR32DeviceDataProvider()
+{
+    static EFR32DeviceDataProvider sDataProvider;
+    return &sDataProvider;
+}
+
+} // namespace EFR32
 } // namespace DeviceLayer
 } // namespace chip
