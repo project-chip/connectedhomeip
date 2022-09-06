@@ -24,7 +24,7 @@
 #include "bt_gap_le.h"
 #include "bt_gatts.h"
 #include "bt_uuid.h"
-#include "BLEManagerImpl.h"
+#include "BLEManagerImpl.h"
 
 #define CHIPOBLEPROFILE_SERVICE_UUID_16 (0xFFF6)
 #define CHIPOBLEPROFILE_CHAR_UUID_RX { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
@@ -75,7 +75,7 @@ BT_GATTS_NEW_CHARC_VALUE_CALLBACK(chipOBle_profile_rx_value, CHIPOBLEPROFILE_CHA
                     BT_GATTS_REC_PERM_READABLE | BT_GATTS_REC_PERM_WRITABLE, ble_rx_charc_callback);
 
 BT_GATTS_NEW_CHARC_128(chipOBle_profile_tx_char,
-                      BT_GATT_CHARC_PROP_READ | BT_GATT_CHARC_PROP_INDICATE, 0x0018, CHIPOBLEPROFILE_CHAR_UUID_TX);
+                      BT_GATT_CHARC_PROP_READ | BT_GATT_CHARC_PROP_INDICATE, 0x0018, CHIPOBLEPROFILE_CHAR_UUID_TX);
 
 BT_GATTS_NEW_CHARC_VALUE_CALLBACK(chipOBle_profile_tx_value, CHIPOBLEPROFILE_CHAR_SERVER_TX_UUID128,
                     BT_GATTS_REC_PERM_READABLE | BT_GATTS_REC_PERM_WRITABLE, ble_tx_charc_value_callback);
