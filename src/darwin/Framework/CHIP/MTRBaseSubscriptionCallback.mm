@@ -102,7 +102,18 @@ void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubs
 
 CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
-    return apReadClient->DefaultResubscribePolicy(aTerminationCause);
+    CHIP_ERROR err = ClusterStateCache::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause);
+    ReturnErrorOnFailure(err);
+
+    if (mResubscriptionCallback != nil) {
+        auto callback = mResubscriptionCallback;
+        auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
+        auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
+        dispatch_async(mQueue, ^{
+            callback(error, delayMs);
+        });
+    }
+    return CHIP_NO_ERROR;
 }
 
 void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSubscription)

@@ -23,10 +23,6 @@ leak:ERR_get_state
 leak:[BleConnection initWithDiscriminator:]
 leak:[CBXpcConnection initWithDelegate:queue:options:sessionType:]
 
-# TODO: ClusterBase::SubscribeAttribute creates a subscription that cannot
-# actually be shut down in any way.
-leak:ClusterBase::SubscribeAttribute
-
 # TODO: Figure out how we are managing to leak NSData while using ARC!
 leak:[CHIPToolKeypair signMessageECDSA_RAW:]
 

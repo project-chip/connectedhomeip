@@ -30,9 +30,6 @@ PICS:
     - label: "Does the device support manufacturing date"
       id: MANF_DATE
 
-    - label: "Does the device support part number"
-      id: PART_NUM
-
     - label: "Does the device support Intermediate CA Certificate"
       id: DM_ICACERT
 

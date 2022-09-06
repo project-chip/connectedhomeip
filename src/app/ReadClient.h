@@ -474,10 +474,8 @@ private:
      * If aError != CHIP_NO_ERROR, this will trigger re-subscriptions if allowResubscription is true
      * AND if this ReadClient instance is tracking a subscription AND the applications decides to do so
      * in their implementation of Callback::OnResubscriptionNeeded().
-     *
-     * If allowOnDone is false, will not call OnDone.
      */
-    void Close(CHIP_ERROR aError, bool allowResubscription = true, bool allowOnDone = true);
+    void Close(CHIP_ERROR aError, bool allowResubscription = true);
 
     void StopResubscription();
     void ClearActiveSubscriptionState();

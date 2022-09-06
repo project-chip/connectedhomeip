@@ -116,7 +116,7 @@ tests:
 
           [1656497453.684077][25847:25853] CHIP:DMG:        status = 0x00 (SUCCESS),
 
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -271,7 +271,7 @@ tests:
     - label: "TH reads the LockOperationError event from DUT"
       PICS: DRLK.S.E03
       verification: |
-          ./chip-tool doorlock read-event lock-operation 1 1
+          ./chip-tool doorlock read-event lock-operation-error 1 1
 
           Verify " LockOperationType is set to Unlock and Event priority is set to CRITICAL" on the TH(Chip-tool) Log:
 
@@ -555,7 +555,7 @@ tests:
           [1659778601.601785][3414:3419] CHIP:DMG:                        },
           [1659778601.601823][3414:3419] CHIP:DMG:
 
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with status as SUCCESS" on the TH(Chip-tool) Log:
 

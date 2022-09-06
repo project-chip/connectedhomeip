@@ -130,7 +130,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                   established[0] = @YES;
                                   completionHandler(nil);
                               }
-                          }];
+                          }
+                          resubscriptionScheduled:nil];
                   }];
 }
 @end

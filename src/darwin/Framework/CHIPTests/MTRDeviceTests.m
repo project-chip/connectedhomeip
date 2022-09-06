@@ -776,7 +776,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
         subscriptionEstablished:^() {
             [subscribeExpectation fulfill];
-        }];
+        }
+        resubscriptionScheduled:nil];
     [self waitForExpectations:@[ subscribeExpectation ] timeout:60];
 
     // Invoke command to set the attribute to a known state

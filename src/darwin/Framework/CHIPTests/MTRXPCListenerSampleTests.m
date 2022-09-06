@@ -395,7 +395,8 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
                                       established[0] = @YES;
                                       completion(nil);
                                   }
-                              }];
+                              }
+                              resubscriptionScheduled:nil];
                       }];
     } else {
         NSLog(@"Failed to get shared controller");
@@ -1794,7 +1795,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         subscriptionEstablished:^() {
             NSLog(@"Attribute cache subscribed attributes");
             [expectation fulfill];
-        }];
+        }
+        resubscriptionScheduled:nil];
     // Wait for subscription establishment. This can take very long to collect initial reports.
     NSLog(@"Waiting for initial report...");
     [self waitForExpectations:@[ expectation ] timeout:120];
