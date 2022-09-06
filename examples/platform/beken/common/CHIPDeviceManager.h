@@ -47,7 +47,7 @@ namespace DeviceManager {
  *   Applications interested in receiving specific callbacks can specialize this class and handle
  *   these events in their implementation of this class.
  */
-class CHIPDeviceManagerCallbacks
+class DLL_EXPORT CHIPDeviceManagerCallbacks
 {
 public:
     /**
@@ -57,7 +57,7 @@ public:
      * @param event   ChipDeviceEvent that occurred
      * @param arg     arguments specific to the event, if any
      */
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) {}
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     /**
      * @brief
@@ -66,14 +66,13 @@ public:
      * @param endpoint           endpoint id
      * @param clusterID          cluster id
      * @param attributeId        attribute id that was changed
-     * @param mask               mask of the attribute
      * @param manufacturerCode   manufacturer code
      * @param type               attribute type
      * @param size               size of the attribute
      * @param value              pointer to the new value
      */
     virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+                                             uint8_t type, uint16_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
