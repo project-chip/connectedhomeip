@@ -77,7 +77,6 @@ jobs:
             - name: Bootstrap
               timeout-minutes: 15
               run: |
-                  git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
