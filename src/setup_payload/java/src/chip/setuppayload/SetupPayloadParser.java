@@ -13,7 +13,8 @@ public class SetupPayloadParser {
    * Returns {@link SetupPayload} parsed from the QR code string.
    *
    * @param qrCodeString the QRCode for commissioning device.
-   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload element validation is not checked. (See detail 5.1.3 in Matter Spec.)
+   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
+   *     element validation is not checked. (See detail 5.1.3 in Matter Spec.)
    */
   public SetupPayload parseQrCode(String qrCodeString, boolean allowInvalidPayload)
       throws UnrecognizedQrCodeException, SetupPayloadException {
@@ -30,7 +31,8 @@ public class SetupPayloadParser {
    * Returns {@link SetupPayload} parsed from the manual entry code string.
    *
    * @param entryCodeString the manual Pairing Code for commissioning device.
-   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload element validation is not checked. (See detail 5.1.4 in Matter Spec.)
+   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
+   *     element validation is not checked. (See detail 5.1.4 in Matter Spec.)
    */
   public SetupPayload parseManualEntryCode(String entryCodeString, boolean allowInvalidPayload)
       throws InvalidEntryCodeFormatException, SetupPayloadException {
