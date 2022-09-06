@@ -21,13 +21,13 @@ An example showing the use of CHIP on the MediaTek MT793X.
 ## Introduction
 
 The MT793X lighting example provides a baseline demonstration of a Light control
-device, built using CHIP and the MediaTek Filogic SDK. It can be controlled by
-a Chip controller over Wi-Fi network..
+device, built using CHIP and the MediaTek Filogic SDK. It can be controlled by a
+Chip controller over Wi-Fi network..
 
 The MT793X device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
-procedure. Network credentials are then provided to the MT793X device
-which will then join the network.
+procedure. Network credentials are then provided to the MT793X device which will
+then join the network.
 
 The lighting example is intended to serve both as a means to explore the
 workings of CHIP as well as a template for creating real products based on the
