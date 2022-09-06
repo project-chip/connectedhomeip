@@ -42,7 +42,7 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       PICS:
-          " !DGTHREAD.S.F00 && !DGTHREAD.S.F01 && !DGTHREAD.S.F02 &&
+          " !DGTHREAD.S.F.00 && !DGTHREAD.S.F01 && !DGTHREAD.S.F02 &&
           !DGTHREAD.S.F03 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -52,9 +52,9 @@ tests:
               type: bitmap32
 
     - label:
-          "Given DGTHREAD.S.F00(PKTCNT) ensure featuremap has the correct bit
+          "Given DGTHREAD.S.F.00(PKTCNT) ensure featuremap has the correct bit
           set"
-      PICS: DGTHREAD.S.F00
+      PICS: DGTHREAD.S.F.00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

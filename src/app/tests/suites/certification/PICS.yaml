@@ -3521,7 +3521,7 @@ PICS:
     - label:
           "Does the DUT(server) support the Server supports the counts for the
           number of received and transmitted packets feature?"
-      id: DGTHREAD.S.F00
+      id: DGTHREAD.S.F.00
 
     - label:
           "Does the DUT(server) support the Server supports the counts for the
