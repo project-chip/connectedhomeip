@@ -1065,7 +1065,7 @@ void DeviceCommissioner::OnArmFailSafeExtendedForDeviceAttestation(
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
-        ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
+        ChipLogProgress(Controller, "Device attestation completed, delegating continuation to client");
         deviceAttestationDelegate->OnDeviceAttestationCompleted(commissioner, commissioner->mDeviceBeingCommissioned,
                                                                 *commissioner->mAttestationDeviceInfo,
                                                                 commissioner->mAttestationResult);
@@ -1097,10 +1097,7 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
     auto & params                                                      = mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
 
-    if (deviceAttestationDelegate->ShouldWaitAfterDeviceAttestation())
-    {
-        mAttestationDeviceInfo = Platform::MakeUnique<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo>(info);
-    }
+    mAttestationDeviceInfo = Platform::MakeUnique<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo>(info);
 
     auto expiryLengthSeconds = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
     if (expiryLengthSeconds.HasValue())
