@@ -31,8 +31,6 @@ template("mt793x_executable") {
   }
 
   group(target_name) {
-    deps = [
-      ":$flash_target_name",
-    ]
+    deps = [ ":$flash_target_name" ]
   }
 }

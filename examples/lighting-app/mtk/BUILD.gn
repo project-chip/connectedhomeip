@@ -31,7 +31,7 @@ declare_args() {
   chip_print_memory_usage = true
 
   # PIN code for PASE session establishment.
-  setupPinCode       = 20202021
+  setupPinCode = 20202021
   setupDiscriminator = 3840
 }
 
@@ -65,8 +65,8 @@ mt793x_executable("lighting_app") {
     "src/AppTask.cpp",
     "src/LEDWidget.cpp",
     "src/LightingManager.cpp",
-    "src/main.cpp",
     "src/ZclCallbacks.cpp",
+    "src/main.cpp",
   ]
 
   deps = [

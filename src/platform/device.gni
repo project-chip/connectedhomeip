@@ -68,7 +68,6 @@ declare_args() {
       chip_device_platform == "mt793x" ||
       (chip_device_platform == "darwin" && current_os == "mac")
 
-
   # Enable ble support.
   if (chip_device_platform == "fake") {
     chip_enable_ble = false

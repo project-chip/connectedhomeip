@@ -16,4 +16,3 @@ declare_args() {
   # Root directory for mt793x SDK build files.
   mt793x_sdk_build_root = "//third_party/mt793x_sdk"
 }
-

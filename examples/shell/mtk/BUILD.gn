@@ -34,9 +34,7 @@ declare_args() {
 }
 
 mt793x_sdk("sdk") {
-  sources = [
-    "${mt793x_project_dir}/include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${mt793x_project_dir}/include/CHIPProjectConfig.h" ]
 
   include_dirs = [
     "${chip_root}/src/platform/mt793x",

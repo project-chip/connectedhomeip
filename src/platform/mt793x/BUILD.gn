@@ -25,10 +25,9 @@ if (chip_enable_openthread) {
 
 static_library("mt793x") {
   sources = [
-    "Logging.cpp",
-    "CHIPMem-Platform.cpp",
     "../SingletonConfigurationManager.cpp",
     "CHIPDevicePlatformEvent.h",
+    "CHIPMem-Platform.cpp",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
@@ -37,16 +36,17 @@ static_library("mt793x") {
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "DnssdImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
     "MT793XConfig.cpp",
     "MT793XConfig.h",
+    "MtkWiFiEvents.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SystemTimeSupport.cpp",
     "SystemPlatformConfig.h",
-    "DnssdImpl.cpp",
-    "MtkWiFiEvents.cpp",
+    "SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ble) {
@@ -65,9 +65,10 @@ static_library("mt793x") {
     ]
   }
 
-  public_deps = [ "${chip_root}/src/app:app_config",
-                  "${chip_root}/src/platform:platform_base",
-                ]
+  public_deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   deps = [
     "$dir_pw_kvs:crc16",
