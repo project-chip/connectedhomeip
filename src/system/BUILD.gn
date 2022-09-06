@@ -53,6 +53,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   import("//build_overrides/p6.gni")
 } else if (chip_device_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
+} else if (chip_device_platform == "mt793x") {
+  import("//build_overrides/mt793x_sdk.gni")
 }
 
 buildconfig_header("system_buildconfig") {
@@ -162,6 +164,10 @@ source_set("system_config_header") {
 
       # Add platform here as needed.
     }
+  }
+
+  if (chip_device_platform == "mt793x") {
+    public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
   }
 }
 
