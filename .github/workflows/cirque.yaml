@@ -82,7 +82,7 @@ jobs:
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
                     -- sh -c '\
-                       git config --global --add safe.directory `pwd` \
+                       git config --global --add safe.directory '*' \
                        && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
                        && scripts/build/gn_bootstrap.sh\
                     '
@@ -111,9 +111,7 @@ jobs:
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
                     -- sh -c '\
-                       git config --global --add safe.directory `pwd` \
-                       && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
-                       && git config --global --add safe.directory `pwd`/examples/common/QRCode/repo \
+                       git config --global --add safe.directory '*' \
                        && ./gn_build.sh \
                           chip_build_tests=false \
                           chip_enable_wifi=false \
