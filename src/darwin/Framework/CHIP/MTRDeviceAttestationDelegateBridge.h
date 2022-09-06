@@ -57,7 +57,7 @@ private:
     id<MTRDeviceAttestationDelegate> mDeviceAttestationDelegate;
     dispatch_queue_t mQueue;
     chip::Optional<uint16_t> mExpiryTimeoutSecs;
-    bool mShouldWaitAfterDeviceAttestation;
+    const bool mShouldWaitAfterDeviceAttestation;
 };
 
 NS_ASSUME_NONNULL_END
