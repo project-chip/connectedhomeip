@@ -166,10 +166,10 @@ SECTIONS
     PROVIDE( _data_run = ADDR(.data) );
     PROVIDE( _data_run_end = ADDR(.data) + SIZEOF(.data));
 
-    *(.tcm_code)
-    *(.tcm_const)
-    *(.sclock_rlt_code)
-    *(.sclock_rlt_const)
+    *(.tcm_code*)
+    *(.tcm_const*)
+    *(.sclock_rlt_code*)
+    *(.sclock_rlt_const*)
     *(.data .data.*)
     *(.gnu.linkonce.d.*)
 
