@@ -50,11 +50,8 @@ public:
      *   This method is invoked when device attestation fails for a device that is being commissioned. The client
      *   handling the failure has the option to continue commissioning or fail the operation.
      *
-     *   If ShouldWaitAfterDeviceAttestation returns false, then in the case attestationResult is successful, the
-     *   commissioner would finish commissioning the device after OnDeviceAttestationCompleted returns.
-     *
-     *   If ShouldWaitAfterDeviceAttestation returns true, then the commissioner will always wait for a
-     *   ContinueCommissioningAfterDeviceAttestation call after calling OnDeviceAttestationCompleted.
+     *   Optionally, when ShouldWaitAfterDeviceAttestation is overridden to return true, this method is also
+     *   invoked when device attestation succeeds.
      *
      *   @param deviceCommissioner The commissioner object that is commissioning the device
      *   @param device The proxy represent the device being commissioned
