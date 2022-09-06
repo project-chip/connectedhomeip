@@ -81,7 +81,7 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- sh -c 'ROOT=`git rev-parse --show-toplevel` && git config --global --add safe.directory $ROOT && scripts/build/gn_bootstrap.sh'
+                    -- sh -c 'git config --global --add safe.directory `pwd` && git config --global --add safe.directory `pwd`/third_party/pigweed/repo && scripts/build/gn_bootstrap.sh'
 
             - name: Cirque Bootstrap
               timeout-minutes: 15
