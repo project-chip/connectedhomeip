@@ -263,6 +263,7 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchIdentifyReadSubCommands[] = {
         { &IdentifyReadHelpHandler, "help", "Usage : switch identify read <attribute>" },
+        { &IdentifyReadAttributeList, "attlist", "Read attribute list" },
         { &IdentifyReadIdentifyTime, "identifytime", "Read identifytime attribute" },
         { &IdentifyReadIdentifyType, "identifytype", "Read identifytype attribute" },
     };
@@ -280,6 +281,7 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchOnOffReadSubCommands[] = {
         { &OnOffReadHelpHandler, "help", "Usage : switch ononff read <attribute>" },
+        { &OnOffReadAttributeList, "attlist", "Read attribute list" },
         { &OnOffReadOnOff, "onoff", "Read onoff attribute" },
         { &OnOffReadGlobalSceneControl, "GSC", "Read GlobalSceneControl attribute" },
         { &OnOffReadOnTime, "ontime", "Read ontime attribute" },
@@ -302,6 +304,7 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchLevelControlReadSubCommands[] = {
         { &LevelControlReadHelpHandler, "help", "Usage : switch levelcontrol read <attribute>" },
+        { &LevelControlReadAttributeList, "attlist", "Read attribute list" },
         { &LevelControlReadCurrentLevel, "currentlevel", "Read currentlevel attribute" },
         { &LevelControlReadRemainingTime, "remainingtime", "Read remainingtime attribute" },
         { &LevelControlReadMinLevel, "minlevel", "Read minlevel attribute" },
@@ -345,6 +348,7 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchColorControlReadSubCommands[] = {
         // fill in read color control attributes commands
         { &ColorControlReadHelpHandler, "help", "Usage : switch colorcontrol read <attribute>" },
+        { &ColorControlReadAttributeList, "attlist", "Read attribute list" },
         { &ColorControlReadCurrentHue, "currenthue", "Read currenthue attribute" },
         { &ColorControlReadCurrentSaturation, "currentsat", "Read currentsaturaion attribute" },
         { &ColorControlReadRemainingTime, "remaintime", "Read remainingtime attribute" },
@@ -407,6 +411,7 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchThermostatReadSubCommands[] = {
         { &ThermostatReadHelpHandler, "help", "Usage : switch thermostat read <attribute>" },
+        { &ThermostatReadAttributeList, "attlist", "Read attribute list" },
         { &ThermostatReadLocalTemperature, "localtemp", "Read localtemperature attribute" },
         { &ThermostatReadAbsMinHeatSetpointLimit, "absminHSL", "Read absminheatsetpointlimit attribute" },
         { &ThermostatReadAbsMaxHeatSetpointLimit, "absmaxHSL", "Read absmaxheatsetpointlimit attribute" },

@@ -54,6 +54,11 @@ void ProcessLevelControlUnicastBindingRead(BindingCommandData * data, const Embe
 
     switch (data->attributeId)
     {
+    case Clusters::LevelControl::Attributes::AttributeList::Id:
+        Controller::ReadAttribute<Clusters::LevelControl::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
     case Clusters::LevelControl::Attributes::CurrentLevel::Id:
         Controller::ReadAttribute<Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onSuccess, onFailure);
@@ -489,6 +494,17 @@ CHIP_ERROR LevelControlRead(int argc, char ** argv)
     }
 
     return sShellSwitchLevelControlReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR LevelControlReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::LevelControl::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::LevelControl::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)

@@ -54,6 +54,11 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBin
 
     switch (data->attributeId)
     {
+    case Clusters::Identify::Attributes::AttributeList::Id:
+        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
     case Clusters::Identify::Attributes::IdentifyTime::Id:
         Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onSuccess, onFailure);
@@ -182,6 +187,17 @@ CHIP_ERROR IdentifyRead(int argc, char ** argv)
     }
 
     return sShellSwitchIdentifyReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR IdentifyReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::Identify::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::Identify::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR IdentifyReadIdentifyTime(int argc, char ** argv)

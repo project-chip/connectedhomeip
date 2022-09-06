@@ -54,6 +54,11 @@ void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const Embe
 
     switch (data->attributeId)
     {
+    case Clusters::ColorControl::Attributes::AttributeList::Id:
+        Controller::ReadAttribute<Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
     case Clusters::ColorControl::Attributes::CurrentHue::Id:
         Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onSuccess, onFailure);
@@ -939,7 +944,7 @@ CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
+    data->commandId           = Clusters::ColorControl::Commands::StepColor::Id;
     data->clusterId           = Clusters::ColorControl::Id;
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
@@ -959,7 +964,7 @@ CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
     }
 
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::ColorControl::Commands::MoveColor::Id;
+    data->commandId           = Clusters::ColorControl::Commands::MoveToColorTemperature::Id;
     data->clusterId           = Clusters::ColorControl::Id;
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
@@ -1149,6 +1154,17 @@ CHIP_ERROR ColorControlRead(int argc, char ** argv)
     }
 
     return sShellSwitchColorControlReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR ColorControlReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::ColorControl::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::ColorControl::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ColorControlReadCurrentHue(int argc, char ** argv)

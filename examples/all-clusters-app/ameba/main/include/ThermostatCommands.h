@@ -54,6 +54,11 @@ void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const EmberB
 
     switch (data->attributeId)
     {
+    case Clusters::Thermostat::Attributes::AttributeList::Id:
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
     case Clusters::Thermostat::Attributes::LocalTemperature::Id:
         Controller::ReadAttribute<Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onSuccess, onFailure);
@@ -228,6 +233,17 @@ CHIP_ERROR ThermostatRead(int argc, char ** argv)
     }
 
     return sShellSwitchThermostatReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR ThermostatReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::Thermostat::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::Thermostat::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThermostatReadLocalTemperature(int argc, char ** argv)

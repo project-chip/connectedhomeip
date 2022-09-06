@@ -54,6 +54,11 @@ void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const EmberBindin
 
     switch (data->attributeId)
     {
+    case Clusters::OnOff::Attributes::AttributeList::Id:
+        Controller::ReadAttribute<Clusters::OnOff::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         onSuccess, onFailure);
+        break;
+
     case Clusters::OnOff::Attributes::OnOff::Id:
         Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          onSuccess, onFailure);
@@ -297,6 +302,17 @@ CHIP_ERROR OnOffRead(int argc, char ** argv)
     }
 
     return sShellSwitchOnOffReadSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR OnOffReadAttributeList(int argc, char ** argv)
+{
+    BindingCommandData * data = Platform::New<BindingCommandData>();
+    data->attributeId         = Clusters::OnOff::Attributes::AttributeList::Id;
+    data->clusterId           = Clusters::OnOff::Id;
+    data->isReadAttribute     = true;
+
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
