@@ -83,8 +83,7 @@ jobs:
                     --volume /tmp:/tmp \
                     -- sh -c '\
                        git config --global --add safe.directory "*" \
-                       && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
-                       && scripts/build/gn_bootstrap.sh\
+                       && scripts/build/gn_bootstrap.sh \
                     '
 
             - name: Cirque Bootstrap
