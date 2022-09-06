@@ -113,6 +113,7 @@ jobs:
                     -- sh -c '\
                        git config --global --add safe.directory `pwd` \
                        && git config --global --add safe.directory `pwd`/third_party/pigweed/repo \
+                       && git config --global --add safe.directory `pwd`/examples/common/QRCode/repo \
                        && ./gn_build.sh \
                           chip_build_tests=false \
                           chip_enable_wifi=false \
