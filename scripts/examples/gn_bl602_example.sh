@@ -38,7 +38,7 @@ shift
 OUTPUT_DIR=$1
 shift
 
-export BL_IOT_SDK_PATH="$MATTER_ROOT"/third_party/bouffalolab/bl602_sdk/repo
+export BL_IOT_SDK_PATH="$MATTER_ROOT"/third_party/bouffalolab/repo
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Linux/bin:$PATH"

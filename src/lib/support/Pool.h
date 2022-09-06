@@ -354,25 +354,26 @@ public:
         if (object != nullptr)
         {
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
-            if (node != nullptr)
+            // Releasing an object that is not allocated indicates likely memory
+            // corruption; better to safe-crash than proceed at this point.
+            VerifyOrDie(node != nullptr);
+
+            node->mObject = nullptr;
+            Platform::Delete(object);
+
+            // The node needs to be released immediately if we are not in the middle of iteration.
+            // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
+            if (mObjects.mIterationDepth == 0)
             {
-                node->mObject = nullptr;
-                Platform::Delete(object);
-
-                // The node needs to be released immediately if we are not in the middle of iteration.
-                // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
-                if (mObjects.mIterationDepth == 0)
-                {
-                    node->Remove();
-                    Platform::Delete(node);
-                }
-                else
-                {
-                    mObjects.mHaveDeferredNodeRemovals = true;
-                }
-
-                DecreaseUsage();
+                node->Remove();
+                Platform::Delete(node);
             }
+            else
+            {
+                mObjects.mHaveDeferredNodeRemovals = true;
+            }
+
+            DecreaseUsage();
         }
     }
 

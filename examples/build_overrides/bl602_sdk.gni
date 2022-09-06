@@ -15,5 +15,5 @@
 declare_args() {
   # Root directory for bl602 SDK.
   bl602_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/bouffalolab/bl602_sdk"
+      "//third_party/connectedhomeip/third_party/bouffalolab/bl602"
 }

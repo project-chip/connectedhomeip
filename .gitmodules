@@ -233,11 +233,6 @@
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
 	branch = main
 	platforms = cc13x2_26x2
-[submodule "third_party/bouffalolab/bl602"]
-	path = third_party/bouffalolab/bl602_sdk/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
-	branch = bl602_release
-	platforms = bl602
 [submodule "third_party/ti_simplelink_sdk/repo_cc32xx"]
 	path = third_party/ti_simplelink_sdk/repo_cc32xx
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
@@ -273,3 +268,8 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+[submodule "boufalolab_repo"]
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk.git
+	branch = master
+	platforms = bl602
