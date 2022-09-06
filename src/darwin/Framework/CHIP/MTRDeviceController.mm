@@ -719,7 +719,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return result;
 }
 
-- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 
