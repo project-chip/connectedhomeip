@@ -195,9 +195,16 @@ CHIP_ERROR ThermostatSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR SetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        return ThermostatHelpHandler(argc, argv);
+    }
+
     BindingCommandData * data = Platform::New<BindingCommandData>();
     data->commandId           = Clusters::Thermostat::Commands::SetpointRaiseLower::Id;
     data->clusterId           = Clusters::Thermostat::Id;
+    data->args[0]             = atoi(argv[0]);
+    data->args[1]             = atoi(argv[1]);
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;

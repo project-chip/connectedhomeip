@@ -255,6 +255,7 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DCHIP_SHELL_MAX_TOKENS=11
 )
 
 if (matter_enable_persistentstorage_audit)

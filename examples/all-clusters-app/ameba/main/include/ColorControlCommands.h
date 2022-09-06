@@ -381,6 +381,34 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
                                          stepHueCommand, onSuccess, onFailure);
         break;
 
+    case Clusters::ColorControl::Commands::MoveToSaturation::Id:
+        moveToSaturationCommand.saturation = static_cast<uint8_t>(data->args[0]);
+        moveToSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[1]);
+        moveToSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveToSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToSaturationCommand, onSuccess, onFailure);
+        break;
+
+    case Clusters::ColorControl::Commands::MoveSaturation::Id:
+        moveSaturationCommand.moveMode = static_cast<EmberAfSaturationMoveMode>(data->args[0]);
+        moveSaturationCommand.rate = static_cast<uint8_t>(data->args[1]);
+        moveSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveSaturationCommand, onSuccess, onFailure);
+        break;
+
+    case Clusters::ColorControl::Commands::StepSaturation::Id:
+        stepSaturationCommand.stepMode = static_cast<EmberAfSaturationStepMode>(data->args[0]);
+        stepSaturationCommand.stepSize = static_cast<uint8_t>(data->args[1]);
+        stepSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[2]);
+        stepSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        stepSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stepSaturationCommand, onSuccess, onFailure);
+        break;
+
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
         moveToHueAndSaturationCommand.hue = static_cast<uint8_t>(data->args[0]);
         moveToHueAndSaturationCommand.saturation = static_cast<uint8_t>(data->args[1]);
@@ -562,6 +590,31 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
         stepHueCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
         stepHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand);
+        break;
+
+    case Clusters::ColorControl::Commands::MoveToSaturation::Id:
+        moveToSaturationCommand.saturation = static_cast<uint8_t>(data->args[0]);
+        moveToSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[1]);
+        moveToSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveToSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand);
+        break;
+
+    case Clusters::ColorControl::Commands::MoveSaturation::Id:
+        moveSaturationCommand.moveMode = static_cast<EmberAfSaturationMoveMode>(data->args[0]);
+        moveSaturationCommand.rate = static_cast<uint8_t>(data->args[1]);
+        moveSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
+        moveSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveSaturationCommand);
+        break;
+
+    case Clusters::ColorControl::Commands::StepSaturation::Id:
+        stepSaturationCommand.stepMode = static_cast<EmberAfSaturationStepMode>(data->args[0]);
+        stepSaturationCommand.stepSize = static_cast<uint8_t>(data->args[1]);
+        stepSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[2]);
+        stepSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        stepSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepSaturationCommand);
         break;
 
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:

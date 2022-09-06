@@ -14,7 +14,7 @@ control.
     -   [Cluster control](#cluster-control)
     -   [Running RPC Console](#running-rpc-console)
     -   [Running Matter Shell](#running-matter-shell)
-    -   [Binding and Controlling a Lighting Device](#binding-and-controlling-a-lighting-device)
+    -   [Binding and Controlling a Device](#binding-and-controlling-a-device)
 
 ---
 
@@ -158,7 +158,7 @@ to be On or Off.
                 onWTO           on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>
                 read            Usage : switch levelcontrol read <attribute>
 
-## Binding and Controlling a Device (controllee)
+## Binding and Controlling a Device
 
 -   This example shows how to bind a Switch Device to a Controllee Device and
     control it through the Matter Shell. One binding client (Switch Device) and
