@@ -103,7 +103,7 @@ tests:
           TH_CR1"
       PICS: CADMIN.S.A0001 && PICS_USER_PROMPT
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read admin-fabric-index  1 0
 
@@ -127,7 +127,7 @@ tests:
           [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
           [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
           [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
-          [1649245801.244491][10091:10096] CHIP:TOO:       Label: 
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
           [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
           [1649245801.244552][10091:10096] CHIP:TOO:      }
           [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
@@ -148,7 +148,7 @@ tests:
           TH_CR1"
       PICS: CADMIN.S.A0002 && PICS_USER_PROMPT
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read admin-vendor-id 1 0
 
@@ -171,7 +171,7 @@ tests:
           [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
           [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
           [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
-          [1649245801.244491][10091:10096] CHIP:TOO:       Label: 
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
           [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
           [1649245801.244552][10091:10096] CHIP:TOO:      }
           [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
