@@ -39,15 +39,12 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
-              name: Checkout
+            - uses: actions/checkout@v3
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+                  submodules: true
+                  token: ${{ github.token }}
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform android
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -59,8 +56,6 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform android
             - name: Build Android CHIPTool and CHIPTest (ARM)
               run: |
                   ./scripts/run_in_build_env.sh \
