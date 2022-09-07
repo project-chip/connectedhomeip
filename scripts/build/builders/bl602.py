@@ -65,18 +65,19 @@ class Bl602Builder(GnBuilder):
 
         self.argsOpt = []
 
-        toolchain = os.path.join( root, '../../examples/platform/bouffalolab/common/toolchain')
-        objcopy   = toolchain
+        toolchain = os.path.join(root, '../../examples/platform/bouffalolab/common/toolchain')
+        objcopy = toolchain
         platform_os = platform.system()
         if "Linux" == platform_os:
-            toolchain   = 'custom_toolchain="{}:linux_riscv_gcc"'.format(toolchain)
-            objcopy     = os.path.join( root, '../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy')
+            toolchain = 'custom_toolchain="{}:linux_riscv_gcc"'.format(toolchain)
+            objcopy = os.path.join(root, '../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy')
         elif "Darwin" == platform_os:
-            toolchain   = 'custom_toolchain="{}:darwin_riscv_gcc"'.format(toolchain)
-            objcopy     = os.path.join( root, '../../third_party/bouffalolab/repo/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy')
+            toolchain = 'custom_toolchain="{}:darwin_riscv_gcc"'.format(toolchain)
+            objcopy = os.path.join(
+                root, '../../third_party/bouffalolab/repo/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy')
         else:
-            toolchain   = None
-            objcopy     = None
+            toolchain = None
+            objcopy = None
 
         if toolchain:
             self.argsOpt.append(toolchain)

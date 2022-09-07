@@ -70,23 +70,24 @@ class BouffalolabBuilder(GnBuilder):
 
         boufflab_chip = "bl702" if "BL70" in module_type else "bl602"
         super(BouffalolabBuilder, self).__init__(
-                root=os.path.join(  root, 'examples',
-                                    app.ExampleName(), 'bouffalolab', boufflab_chip),
-                runner=runner
-            )
+            root=os.path.join(root, 'examples',
+                              app.ExampleName(), 'bouffalolab', boufflab_chip),
+            runner=runner
+        )
 
         toolchain = os.path.join(root, '../../examples/platform/bouffalolab/common/toolchain')
-        objcopy   = toolchain
+        objcopy = toolchain
         platform_os = platform.system()
         if "Linux" == platform_os:
-            toolchain   = 'custom_toolchain="{}:linux_riscv_gcc"'.format(toolchain)
-            objcopy     = os.path.join( root, '../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy')
+            toolchain = 'custom_toolchain="{}:linux_riscv_gcc"'.format(toolchain)
+            objcopy = os.path.join(root, '../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy')
         elif "Darwin" == platform_os:
-            toolchain   = 'custom_toolchain="{}:darwin_riscv_gcc"'.format(toolchain)
-            objcopy     = os.path.join( root, '../../third_party/bouffalolab/repo/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy')
+            toolchain = 'custom_toolchain="{}:darwin_riscv_gcc"'.format(toolchain)
+            objcopy = os.path.join(
+                root, '../../third_party/bouffalolab/repo/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy')
         else:
-            toolchain   = None
-            objcopy     = None
+            toolchain = None
+            objcopy = None
 
         self.app = app
         self.board = board

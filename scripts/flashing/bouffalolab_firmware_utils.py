@@ -89,6 +89,7 @@ BOUFFALO_OPTIONS = {
     },
 }
 
+
 class Flasher(firmware_utils.Flasher):
 
     isErase = False
@@ -113,7 +114,7 @@ class Flasher(firmware_utils.Flasher):
         arguments = [__file__]
         work_dir = None
 
-        print ("self.option", self.option)
+        print("self.option", self.option)
 
         if self.option.reset:
             self.reset()
@@ -140,11 +141,11 @@ class Flasher(firmware_utils.Flasher):
 
             if value:
                 if value == True:
-                    arg = ("--{}".format (key)).strip()
+                    arg = ("--{}".format(key)).strip()
                 elif isinstance(value, pathlib.Path):
-                    arg = ("--{}={}".format (key, os.path.join(os.getcwd(), str(value)))).strip()
+                    arg = ("--{}={}".format(key, os.path.join(os.getcwd(), str(value)))).strip()
                 else:
-                    arg = ("--{}={}".format (key, value)).strip()
+                    arg = ("--{}={}".format(key, value)).strip()
 
             arguments.append(arg)
 
@@ -158,6 +159,7 @@ class Flasher(firmware_utils.Flasher):
         run_main()
 
         return self
+
 
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
