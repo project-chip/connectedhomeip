@@ -76,7 +76,7 @@ using namespace chip::app::Clusters;
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
 
-class CustomServerStorageDelegate : public PersistentStorageDelegate
+class MyServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -105,7 +105,7 @@ class CustomServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
-class CustomCommissionerCallback : public CommissionerCallback
+class MyCommissionerCallback : public CommissionerCallback
 {
     void ReadyForCommissioning(uint32_t pincode, uint16_t longDiscriminator, PeerAddress peerAddress) override
     {
@@ -115,49 +115,15 @@ class CustomCommissionerCallback : public CommissionerCallback
 
 AutoCommissioner gAutoCommissioner;
 
-class CustomCredsIssuer : public ExampleOperationalCredentialsIssuer
-{
-    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override
-    {
-        // add parsing here
-        const ByteSpan & attestationElements = gAutoCommissioner.GetCommissioningParameters().GetAttestationElements().Value();
-        ChipLogError(Controller, "CustomCredsIssuer attestationElements size %d", static_cast<int>(attestationElements.size()));
-
-        ByteSpan certificationDeclarationSpan;
-        ByteSpan attestationNonceSpan;
-        uint32_t timestampDeconstructed;
-        ByteSpan firmwareInfoSpan;
-        DeviceAttestationVendorReservedDeconstructor vendorReserved;
-
-        CHIP_ERROR err = DeconstructAttestationElements(attestationElements, certificationDeclarationSpan, attestationNonceSpan,
-                                                        timestampDeconstructed, firmwareInfoSpan, vendorReserved);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed to parse attestation elements");
-        }
-        else
-        {
-            ChipLogError(Controller, "Parse attestation elements success");
-        }
-
-        return ExampleOperationalCredentialsIssuer::GenerateNOCChain(csrElements, csrNonce, attestationSignature,
-                                                                     attestationChallenge, DAC, PAI, onCompletion);
-    }
-};
-
 DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
-CustomCommissionerCallback gCommissionerCallback;
-CustomServerStorageDelegate gServerStorage;
-CustomCredsIssuer gOpCredsIssuer;
+MyCommissionerCallback gCommissionerCallback;
+MyServerStorageDelegate gServerStorage;
+ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
-Credentials::PartialDACVerifier gPartialDACVerifier;
-FabricId gFabricId = 1;
 
-CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
+CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, FabricId fabricId)
 {
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
@@ -178,7 +144,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     params.controllerVendorId = static_cast<VendorId>(vendorId);
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
-    gOpCredsIssuer.SetFabricIdForNextNOCRequest(gFabricId);
+    if (fabricId != kUndefinedFabricId)
+    {
+        gOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId);
+    }
 
     // No need to explicitly set the UDC port since we will use default
     ChipLogProgress(Support, " ----- UDC listening on port %d", udcListenPort);
@@ -188,9 +157,6 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
     const Credentials::AttestationTrustStore * testingRootStore = Credentials::GetTestAttestationTrustStore();
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-
-    // Uncomment the following line to perform DAC verification during NOC chain generation
-    // SetDeviceAttestationVerifier(&gPartialDACVerifier);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -245,7 +211,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
 
     ChipLogProgress(Support,
                     "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
-                    ChipLogValueX64(gCommissioner.GetNodeId()), ChipLogValueX64(gFabricId), static_cast<unsigned>(fabricIndex));
+                    ChipLogValueX64(gCommissioner.GetNodeId()), ChipLogValueX64(fabricId), static_cast<unsigned>(fabricIndex));
 
     return CHIP_NO_ERROR;
 }

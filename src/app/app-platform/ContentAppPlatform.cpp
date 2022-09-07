@@ -527,6 +527,8 @@ constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
 // constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
 // constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
 
+// Add ACLs on this device for the given client,
+// and create bindings on the given client so that it knows what it has access to.
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
                                                   uint16_t targetVendorId, NodeId localNodeId,
                                                   Controller::WriteResponseSuccessCallback successCb,
@@ -575,6 +577,13 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
      * We could have organized things differently, for example,
      * - a single ACL for (a) and (b) which is shared by many subjects
      * - a single ACL entry per subject for (c)
+     *
+     * We are also creating the following set of bindings on the remote device:
+     * a) Video Player endpoint
+     * b) Speaker endpoint
+     * c) selection of content app endpoints (0 to many)
+     * The purpose of the bindings is to inform the client of its access to
+     * nodeId and endpoints on the app platform.
      */
 
     ChipLogProgress(Controller, "Create video player endpoint ACL and binding");

@@ -1735,7 +1735,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     });
 
     // Try to parse as much as we can here before returning, even if this is an error.
-    return_err = err == CHIP_NO_ERROR ? return_err : err;
+    return_err = (err == CHIP_NO_ERROR) ? return_err : err;
 
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {

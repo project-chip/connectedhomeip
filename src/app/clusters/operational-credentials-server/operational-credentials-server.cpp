@@ -958,8 +958,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
     err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
                                                     emptyVendorReserved, attestationElementsSpan);
-    VerifyOrExit((err == CHIP_NO_ERROR) && (attestationElementsSpan.size() <= Credentials::kMaxRspLen),
-                 finalStatus = Status::Failure);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
     // Append attestation challenge in the back of the reserved space for the signature
     memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
@@ -1090,8 +1089,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
                                                   kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
-        VerifyOrExit((err == CHIP_NO_ERROR) && (nocsrElementsSpan.size() <= Credentials::kMaxRspLen),
-                     finalStatus = Status::Failure);
+        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
         // Append attestation challenge in the back of the reserved space for the signature
         memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
