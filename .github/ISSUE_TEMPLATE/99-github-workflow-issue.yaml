@@ -56,4 +56,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a workflow issue!"
+          value: "Thanks for helping improve our development workflows"

@@ -55,4 +55,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a documentation issue!"
+          value: "Thanks for helping improve our documentation."
