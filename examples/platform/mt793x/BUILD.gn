@@ -49,7 +49,6 @@ source_set("mtk-matter-shell") {
 
     sources = [
       "assert_wrap.c",
-      "lwip_wrap.c",
       "malloc_wrap.c",
       "matter_shell.cpp",
       "wifi_wrap.c",
