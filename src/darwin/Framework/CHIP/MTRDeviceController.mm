@@ -459,8 +459,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                 timeoutSecs
                     = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
             }
+            BOOL shouldWaitAfterDeviceAttestation = NO;
+            if ([commissioningParams.deviceAttestationDelegate
+                    respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
+                shouldWaitAfterDeviceAttestation = YES;
+            }
             _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
-                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
+                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 
@@ -486,7 +491,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             : chip::Credentials::AttestationVerificationResult::kSuccess;
 
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
-        auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceProxy,
+        auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -719,7 +724,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return result;
 }
 
-- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 
