@@ -136,6 +136,7 @@ CHIP_ERROR WindowApp::Run()
 #else
     oldState.isWiFiProvisioned = !ConnectivityMgr().IsWiFiStationProvisioned();
 #endif
+    EFR32_LOG("App Started >>>");
     while (true)
     {
         ProcessEvents();
