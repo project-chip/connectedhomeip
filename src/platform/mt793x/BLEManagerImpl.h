@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 typedef void (*CHIPoBLECharCallback)(uint16_t, void *, uint16_t);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
