@@ -29,4 +29,4 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  message: "All PRs require an issue at this point, please link an issue or mention it in the body using #<issue_id>"
+                  message: "All PRs require an issue to be accepted, please link an issue or mention it in the body using #<issue_id>"
