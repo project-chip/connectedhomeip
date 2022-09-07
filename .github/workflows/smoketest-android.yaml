@@ -15,6 +15,7 @@
 name: Smoke test - Android
 
 on:
+    push:
     pull_request:
     workflow_dispatch:
 
