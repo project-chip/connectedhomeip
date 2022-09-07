@@ -35,7 +35,6 @@ namespace {
 int streamer_mt793x_init(streamer_t * streamer)
 {
     (void) streamer;
-    // bsp_io_def_uart_init();
     return 0;
 }
 
