@@ -63,3 +63,6 @@ colorama
 
 # update tornado for pw_watch
 tornado
+
+# bouffalolab
+bflb-iot-tool

@@ -55,8 +55,7 @@ jobs:
       - name: Build example BL602 Lighting App
         timeout-minutes: 30
         run: |
-          ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bl602-light build"
+          scripts/examples/gn_bl602_example.sh lighting-app ./out/bl602-light
 
       - name: Get Lighting size stats
         run: |

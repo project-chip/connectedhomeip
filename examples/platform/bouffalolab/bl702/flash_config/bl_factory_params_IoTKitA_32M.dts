@@ -1,0 +1,116 @@
+/dts-v1/;
+// version: 17
+// last_comp_version: 16
+// boot_cpuid_phys: 0x0
+
+/ {
+    model = "bl bl702 AVB board";
+    compatible = "bl,bl702-sample", "bl,bl702-common";
+    #address-cells = <0x1>;
+    #size-cells = <0x1>;
+    gpio {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        max_num = <40>;
+        gpio0 {
+            status = "okay";
+            pin  = <22>;
+            feature = "led";
+            active = "Hi"; //Hi or Lo
+            mode = "onoff"; //blink or hearbeat or onoff
+            time = <100>; //duration for this mode
+        };
+        gpio1 {
+            status = "disable";
+            pin  = <6>;
+            feature = "led";
+            active = "Hi"; //Hi or Lo
+            mode = "blink"; //blink or hearbeat or onoff
+            time = <100>; //duration for this mode
+        };
+        gpio2 {
+            status = "disable";
+            pin = <5>;
+            feature = "button";
+            active = "Hi";
+            mode = "multipress";
+            button {
+                debounce = <10>;
+                short_press_ms {
+                    start = <30>;
+                    end = <4000>;
+                    kevent = <2>;
+                };
+                long_press_ms {
+                    start = <4001>;
+                    end = <10000>;
+                    kevent = <3>;
+                };
+                longlong_press_ms {
+                    start = <10001>;
+                    kevent = <4>;
+                };
+                trig_level = "Lo";
+            };
+            hbn_use = "disable";
+        };
+    };
+    uart {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        uart@4000A000 {
+            status = "okay";
+            id = <0>;
+            compatible = "bl702_uart";
+            path = "/dev/ttyS0";
+            baudrate = <2000000>;
+            pin {
+                rx = <15>;
+                tx = <14>;
+            };
+            feature {
+                tx = "okay";
+                rx = "okay";
+                cts = "disable";
+                rts = "disable";
+            };
+        };
+        uart@4000A100 {
+            status = "disable";
+            id = <1>;
+            compatible = "bl702_uart";
+            path = "/dev/ttyS1";
+            baudrate = <115200>;
+            pin {
+                rx = <3>;
+                tx = <4>;
+            };
+            feature {
+                tx = "okay";
+                rx = "okay";
+                cts = "disable";
+                rts = "disable";
+            };
+        };
+    };
+    wireless {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        mac {
+            mode = "MBF";  // 'M': manufacture; 'B': efuse; 'F': flash
+            mac_addr = [C8 43 57 82 73 40 88 88];
+        };
+        brd_rf {
+            xtal_mode = "MF";
+            xtal = <36 36 0 60 60>;
+            pwr = <14>;
+            pwr_mode = "bf";//B: only use power offset in EFUSE; b: use power offset in EFUSE with incremental mode; F: only use power offset in Flash; f: use power offset in Flash with incremental mode
+            //pwr_offset = <10 10>;//due to the limit of current DTC, negative value is used. So we work around by adding all the poweroffset with 10. so 8 represents -2; 10 represents 0; 13 represents 3
+            pwr_offset_zigbee = <10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10>;
+            pwr_offset_ble = <10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10>;
+        };
+        rf_temp {
+            en_tcal = <0>;
+        };
+    };
+};

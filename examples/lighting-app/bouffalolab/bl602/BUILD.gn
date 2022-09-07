@@ -43,6 +43,8 @@ declare_args() {
 
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
+
+  bouffalolab_objcopy = ""
 }
 
 show_qr_code = false
@@ -77,6 +79,7 @@ bl602_sdk("sdk") {
 
 bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
+  objcopy     = bouffalolab_objcopy
 
   sources = [
     #"${bl602_project_dir}/include/CHIPProjectConfig.h",
