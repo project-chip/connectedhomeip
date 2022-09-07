@@ -324,7 +324,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, FabricId fabricId,
                                                          chip::NodeId nodeId, chip::VendorId adminVendorId,
                                                          const char * paaTrustStorePath, bool useTestCommissioner,
-                                                         CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen)
+                                                         bool enableServerInteractions, CASEAuthTag * caseAuthTags,
+                                                         uint32_t caseAuthTagLen)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -381,7 +382,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
-    initParams.enableServerInteractions       = true;
+    initParams.enableServerInteractions       = enableServerInteractions;
     initParams.controllerVendorId             = adminVendorId;
     initParams.permitMultiControllerFabrics   = true;
 

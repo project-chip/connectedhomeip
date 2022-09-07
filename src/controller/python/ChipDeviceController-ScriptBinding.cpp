@@ -111,7 +111,8 @@ chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter);
+ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter,
+                                                         bool enableServerInteractions);
 ChipError::StorageType pychip_DeviceController_StackShutdown();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -228,7 +229,8 @@ void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * s
     delete storageAdapter;
 }
 
-ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter)
+ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter,
+                                                         bool enableServerInteractions)
 {
     VerifyOrDie(storageAdapter != nullptr);
 
@@ -243,7 +245,7 @@ ChipError::StorageType pychip_DeviceController_StackInit(Controller::Python::Sto
     ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(storageAdapter).AsInteger());
     factoryParams.opCertStore = &sPersistentStorageOpCertStore;
 
-    factoryParams.enableServerInteractions = true;
+    factoryParams.enableServerInteractions = enableServerInteractions;
 
     // Hack needed due to the fact that DnsSd server uses the CommissionableDataProvider even
     // when never starting commissionable advertising. This will not be used but prevents

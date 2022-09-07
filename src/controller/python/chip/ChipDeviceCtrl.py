@@ -218,12 +218,13 @@ class ChipDeviceController():
             c_catTags[i] = item
 
         self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
-            c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, POINTER(c_uint32), c_uint32]
+            c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32]
         self._dmLib.pychip_OpCreds_AllocateController.restype = c_uint32
 
+        # TODO(erjiaqing@): Figure out how to control enableServerInteractions for a single device controller (node)
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
-                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, c_catTags, len(catTags))
+                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags))
         )
 
         if res != 0:
