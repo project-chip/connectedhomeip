@@ -23,7 +23,7 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    android:
+    full_android:
         name: Run
         timeout-minutes: 75
 
