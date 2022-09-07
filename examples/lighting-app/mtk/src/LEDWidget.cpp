@@ -82,9 +82,6 @@ void LEDWidget::Toggle(void)
 
 void LEDWidget::DoBlink(void)
 {
-    // turn off then turn on
-    Set(false);
-    Set(true);
     StartTimer(mOn);
 }
 
@@ -115,7 +112,7 @@ void LEDWidget::Blink(int on, int off)
     {
         mOn  = on;
         mOff = off;
-        printf("%s blink: on %d off %d\n", Name(), mOn, mOff);
+        // printf("%s blink: on %d off %d\n", Name(), mOn, mOff);
         DoBlink();
     }
 }
@@ -149,5 +146,5 @@ void LEDWidget::Color(enum led_color color)
         break;
     }
 
-    printf("%s color %d\n", Name(), color);
+    // printf("%s color %d\n", Name(), color);
 }
