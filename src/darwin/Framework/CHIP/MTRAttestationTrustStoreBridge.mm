@@ -16,8 +16,7 @@
  */
 
 #import "MTRAttestationTrustStoreBridge.h"
-
-static chip::ByteSpan asByteSpan(NSData * value) { return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length); }
+#import "NSDataSpanConversion.h"
 
 CHIP_ERROR MTRAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
     const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
@@ -29,7 +28,7 @@ CHIP_ERROR MTRAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
 
     for (paaIdx = 0; paaIdx < mPaaCerts.count; ++paaIdx) {
         uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
-        candidate = asByteSpan(mPaaCerts[paaIdx]);
+        candidate = AsByteSpan(mPaaCerts[paaIdx]);
         chip::MutableByteSpan candidateSkidSpan { skidBuf };
         VerifyOrReturnError(
             CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan), CHIP_ERROR_INTERNAL);
