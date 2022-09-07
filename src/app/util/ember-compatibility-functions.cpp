@@ -415,6 +415,8 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
                                  mCluster->generatedCommandList);
     default:
+        VerifyOrDieWithMsg(false, DataManagement, "Unexpected global attribute: " ChipLogFormatMEI,
+                           ChipLogValueMEI(aPath.mAttributeId));
         return CHIP_NO_ERROR;
     }
 }
@@ -551,16 +553,19 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
-    switch (aPath.mAttributeId)
+    bool isGlobalAttributeNotInMetadata = false;
+    for (auto & attr : GlobalAttributesNotInMetadata)
     {
-    case Clusters::Globals::Attributes::AttributeList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-        attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        break;
-    default:
+        if (attr == aPath.mAttributeId)
+        {
+            isGlobalAttributeNotInMetadata = true;
+            attributeCluster               = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+            break;
+        }
+    }
+
+    if (!isGlobalAttributeNotInMetadata)
+    {
         attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
