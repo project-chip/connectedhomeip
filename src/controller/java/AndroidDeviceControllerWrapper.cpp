@@ -246,7 +246,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     else
     {
-        ChipLogProgress(Controller, "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer",
+        ChipLogProgress(Controller,
+                        "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer",
                         static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
 
         *errInfoOnFailure = ephemeralKey.Initialize();
