@@ -81,10 +81,10 @@ using namespace ::chip::DeviceLayer;
 
 ot_system_event_t ot_system_event_var;
 
-void otSysProcessDrivers(otInstance *aInstance) 
+void otSysProcessDrivers(otInstance *aInstance)
 {
     ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
-    
+
     OT_GET_NOTIFY(sevent);
     ot_alarmTask(sevent);
     // ot_uartTask(sevent);

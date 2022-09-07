@@ -119,7 +119,7 @@ AppTask AppTask::sAppTask;
 StackType_t AppTask::appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t AppTask::appTaskStruct;
 
-void PlatformManagerImpl::PlatformInit(void) 
+void PlatformManagerImpl::PlatformInit(void)
 {
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
     uartInit();
@@ -138,7 +138,7 @@ void PlatformManagerImpl::PlatformInit(void)
     ChipLogProgress(NotSpecified, "Initializing CHIP stack");
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR) {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed"); 
+        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
 
@@ -152,7 +152,7 @@ void PlatformManagerImpl::PlatformInit(void)
     ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR) {
-        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed"); 
+        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed");
         appError(ret);
     }
 
@@ -162,7 +162,7 @@ void PlatformManagerImpl::PlatformInit(void)
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (ret != CHIP_NO_ERROR) {
-        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed"); 
+        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
         appError(ret);
     }
 
@@ -178,7 +178,7 @@ void PlatformManagerImpl::PlatformInit(void)
 
     ret = chip::Server::GetInstance().Init(initParams);
     if (ret != CHIP_NO_ERROR) {
-        ChipLogError(NotSpecified, "chip::Server::GetInstance().Init(initParams) failed"); 
+        ChipLogError(NotSpecified, "chip::Server::GetInstance().Init(initParams) failed");
         appError(ret);
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -187,7 +187,7 @@ void PlatformManagerImpl::PlatformInit(void)
     // Start OpenThread task
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR) {
-        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed"); 
+        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed");
         appError(ret);
     }
 
@@ -219,7 +219,7 @@ void StartAppTask(void)
 
     easyflash_init();
 
-    GetAppTask().sAppTaskHandle = xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME, 
+    GetAppTask().sAppTaskHandle = xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME,
         ArraySize(GetAppTask().appStack), NULL, APP_TASK_PRIORITY, GetAppTask().appStack, &GetAppTask().appTaskStruct);
     if (GetAppTask().sAppTaskHandle == NULL)
     {
@@ -229,7 +229,7 @@ void StartAppTask(void)
 }
 
 #if CONFIG_ENABLE_CHIP_SHELL
-void AppTask::AppShellTask(void *args) 
+void AppTask::AppShellTask(void *args)
 {
     Engine::Root().RunMainLoop();
 }
@@ -376,8 +376,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         else {
             GetAppTask().PostEvent(APP_EVENT_SYS_BLE_ADV);
         }
-        ChipLogProgress(NotSpecified, "Thread state, ble conn %d\r\n", 
-            ConnectivityMgr().NumBLEConnections()); 
+        ChipLogProgress(NotSpecified, "Thread state, ble conn %d\r\n",
+            ConnectivityMgr().NumBLEConnections());
         break;
     case DeviceEventType::kThreadStateChange:
 
@@ -385,9 +385,9 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
         }
 
-        ChipLogProgress(NotSpecified, "Thread state, prov %d, enabled %d, attached %d\r\n", 
-            ConnectivityMgr().IsThreadProvisioned(), ConnectivityMgr().IsThreadEnabled(), 
-            ConnectivityMgr().IsThreadAttached()); 
+        ChipLogProgress(NotSpecified, "Thread state, prov %d, enabled %d, attached %d\r\n",
+            ConnectivityMgr().IsThreadProvisioned(), ConnectivityMgr().IsThreadEnabled(),
+            ConnectivityMgr().IsThreadAttached());
         break;
     case DeviceEventType::kWiFiConnectivityChange:
         GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
@@ -631,7 +631,7 @@ void AppTask::IdentifyStopHandler(Identify *)
     GetAppTask().PostEvent(APP_EVENT_IDENTIFY_STOP);
 }
 
-void AppTask::IdentifyHandleOp(app_event_t event) 
+void AppTask::IdentifyHandleOp(app_event_t event)
 {
     static uint32_t identifyState = 0;
 
@@ -688,4 +688,3 @@ void AppTask::ButtonEventHandler(void * arg)
     }
 }
 #endif
-

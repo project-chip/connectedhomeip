@@ -72,7 +72,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     // Calculate the Heap used based on Total heap - Free heap
 
 #ifdef CFG_USE_PSRAM
-    int64_t heapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() 
+    int64_t heapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize()
                         - xPortGetFreeHeapSizePsram());
 #else
     size_t freeHeapSize = xPortGetFreeHeapSize();
@@ -90,7 +90,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
 
 #ifdef CFG_USE_PSRAM
-    int64_t HighestHeapUsageRecorded = (get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize() 
+    int64_t HighestHeapUsageRecorded = (get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize()
                                         - xPortGetMinimumEverFreeHeapSizePsram());
 #else
     size_t freeHeapSize = xPortGetFreeHeapSize();

@@ -99,13 +99,13 @@ void set_color_red(uint8_t currLevel)
 
 void set_color_green(uint8_t currLevel)
 {
-    printf("set_color_green\r\n"); 
+    printf("set_color_green\r\n");
     set_color(currLevel, 84, 254);
 }
 
 void set_color_yellow(uint8_t currLevel)
 {
-    printf("set_color_yellow\r\n"); 
+    printf("set_color_yellow\r\n");
     set_color(currLevel, 42, 254);
 }
 
@@ -166,7 +166,7 @@ void set_color(uint8_t currLevel, uint8_t currHue, uint8_t currSat)
         break;
     }
 
-    // change level to pwm duty_cycle 
+    // change level to pwm duty_cycle
     // 0-254 to 0-10000
     hosal_pwm_config_t para[3];
     para[0].duty_cycle = blue * PWM_DUTY_CYCLE / 254;

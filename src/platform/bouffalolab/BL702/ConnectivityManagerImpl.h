@@ -70,7 +70,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-public: 
+public:
     static WiFiStationState mWiFiStationState;
     static void GetWiFiMacAddress(uint8_t *);
 #endif

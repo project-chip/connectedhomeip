@@ -76,7 +76,7 @@ struct bt_gatt_attr sChipoBleAttributes[] = {
     BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)
 };
 
-struct bt_gatt_service sChipoBleService = 
+struct bt_gatt_service sChipoBleService =
 {
     .attrs = sChipoBleAttributes,
     .attr_count = sizeof(sChipoBleAttributes)/ sizeof(sChipoBleAttributes[0]),

@@ -201,7 +201,7 @@ bool BL702Config::ConfigValueExists(const char * key)
 }
 
 
-CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes) 
+CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes)
 {
     size_t read_len = 0, datalen;
     env_node_obj node;
@@ -259,7 +259,7 @@ CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_siz
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
-CHIP_ERROR BL702Config::WriteKVS(const char * key, const void * value, size_t value_size) 
+CHIP_ERROR BL702Config::WriteKVS(const char * key, const void * value, size_t value_size)
 {
     EfErrCode ret = EF_NO_ERR;
 
@@ -352,10 +352,10 @@ CHIP_ERROR BL702Config::ReadWiFiInfo(const char *ssid, uint32_t ssid_size, const
     return saved_value_len? CHIP_NO_ERROR:CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
-CHIP_ERROR BL702Config::ClearWiFiInfo(void) 
+CHIP_ERROR BL702Config::ClearWiFiInfo(void)
 {
     ef_port_env_lock();
-    if ( EF_NO_ERR == ef_del_env(kBLConfigKey_wifissid) 
+    if ( EF_NO_ERR == ef_del_env(kBLConfigKey_wifissid)
         && EF_NO_ERR == ef_del_env(kBLConfigKey_wifipassword)) {
         ef_port_env_unlock();
 
@@ -366,7 +366,7 @@ CHIP_ERROR BL702Config::ClearWiFiInfo(void)
     return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
-bool BL702Config::isWiFiInfoSaved() 
+bool BL702Config::isWiFiInfoSaved()
 {
     env_node_obj node;
 

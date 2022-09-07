@@ -66,7 +66,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-    
+
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 

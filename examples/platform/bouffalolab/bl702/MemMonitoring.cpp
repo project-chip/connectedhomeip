@@ -46,7 +46,7 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
             ChipLogProgress(NotSpecified, "Task Name\tstate\tpriority\thighWaterMark");
             uxTaskGetSystemState(pTaskStatus, uxTaskGetNumberOfTasks(), &pulTotalRunTime);
             for (uint32_t i = 0; i < uxTaskGetNumberOfTasks(); i ++) {
-                ChipLogProgress(NotSpecified, "%s%s\t%c\t%ld/%ld\t\t%d", 
+                ChipLogProgress(NotSpecified, "%s%s\t%c\t%ld/%ld\t\t%d",
                     (pTaskStatus + i)->pcTaskName, strlen((pTaskStatus + i)->pcTaskName) < 7? "\t": "",
                     (pTaskStatus + i)->eCurrentState > eDeleted? 'N' : taskState[(pTaskStatus + i)->eCurrentState],
                     (pTaskStatus + i)->uxCurrentPriority, (pTaskStatus + i)->uxBasePriority,
@@ -55,9 +55,9 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
             free(pTaskStatus);
         }
         ChipLogProgress(NotSpecified, "\r\n");
-        ChipLogProgress(NotSpecified, "SRAM Heap, min left: %d, current left %d", 
+        ChipLogProgress(NotSpecified, "SRAM Heap, min left: %d, current left %d",
             xPortGetMinimumEverFreeHeapSize(), xPortGetFreeHeapSize());
-        ChipLogProgress(NotSpecified, "PSRAM Heap, min left: %d, current left %d", 
+        ChipLogProgress(NotSpecified, "PSRAM Heap, min left: %d, current left %d",
             xPortGetMinimumEverFreeHeapSizePsram(), xPortGetFreeHeapSizePsram());
         ChipLogProgress(NotSpecified, "============================= / total run time %ld", pulTotalRunTime);
 

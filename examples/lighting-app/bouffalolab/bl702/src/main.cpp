@@ -193,7 +193,7 @@ extern "C" void setup_heap()
     vPortDefineHeapRegions(xHeapRegions);
 }
 
-extern "C" size_t get_heap_size(void) 
+extern "C" size_t get_heap_size(void)
 {
     return (size_t)&_heap_size;
 }
@@ -206,7 +206,7 @@ static constexpr HeapRegion_t xPsramHeapRegions[] = {
     { NULL, 0 }  /* Terminates the array. */
 };
 
-extern "C" size_t get_heap3_size(void) 
+extern "C" size_t get_heap3_size(void)
 {
     return (size_t)&_heap3_size;
 }
@@ -252,7 +252,7 @@ extern "C" void do_psram_test()
 }
 #endif
 
-extern "C" void bl702_init(void) 
+extern "C" void bl702_init(void)
 {
     bl_sys_early_init();
 

@@ -139,7 +139,7 @@ void ColorLEDWidget::SetLevel(uint8_t level)
     SetColor(level, light_h, light_s);
 }
 
-void ColorLEDWidget::SetColor(uint8_t level, uint8_t hue, uint8_t sat) 
+void ColorLEDWidget::SetColor(uint8_t level, uint8_t hue, uint8_t sat)
 {
     set_color(level, hue, sat);
     light_v = level; light_h = hue; light_s = sat;

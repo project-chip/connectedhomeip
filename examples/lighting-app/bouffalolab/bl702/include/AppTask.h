@@ -52,8 +52,8 @@ public:
         APP_EVENT_BTN_FACTORY_RESET_CANCEL  = 0x00000002,
         APP_EVENT_BTN_FACTORY_RESET_IND     = 0x00000004,
         APP_EVENT_BTN_FACTORY_RESET_PW_PRC  = 0x00000008,
-        
-        APP_EVENT_INIT_ALL_MASK             = APP_EVENT_STARTED 
+
+        APP_EVENT_INIT_ALL_MASK             = APP_EVENT_STARTED
                 | APP_EVENT_BTN_FACTORY_RESET_CANCEL | APP_EVENT_BTN_FACTORY_RESET_IND,
         APP_EVENT_TIMER                     = 0x00000010,
 
@@ -62,7 +62,7 @@ public:
         APP_EVENT_SYS_PROVISIONED           = 0x00000400,
         APP_EVENT_FACTORY_RESET             = 0x00001000,
 
-        APP_EVENT_SYS_ALL_MASK              = APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN 
+        APP_EVENT_SYS_ALL_MASK              = APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN
             | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
 
         APP_EVENT_LIGHTING_ONOFF            = 0x00010000,
@@ -83,12 +83,12 @@ public:
         APP_EVENT_ALL_MASK                  = APP_EVENT_LIGHTING_MASK | APP_EVENT_INIT_ALL_MASK | APP_EVENT_SYS_ALL_MASK | APP_EVENT_TIMER | APP_EVENT_IDENTIFY_MASK,
     };
 
-    void SetEndpointId(EndpointId endpointId) { 
-        if (mEndpointId != (EndpointId)-1) 
-            mEndpointId = endpointId; 
+    void SetEndpointId(EndpointId endpointId) {
+        if (mEndpointId != (EndpointId)-1)
+            mEndpointId = endpointId;
     }
 
-    EndpointId GetEndpointId(void) { 
+    EndpointId GetEndpointId(void) {
         return mEndpointId;
     }
     void PostEvent(app_event_t event);
@@ -142,7 +142,7 @@ private:
     uint32_t                mBlinkOnTimeMS;
     uint32_t                mBlinkOffTimeMS;
     uint64_t                buttonPressedTimeout;
-    
+
     static StackType_t      appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
     static StaticTask_t     appTaskStruct;
     static AppTask          sAppTask;

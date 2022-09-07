@@ -48,8 +48,8 @@ exit:
 #endif // CHIP_ENABLE_OPENTHREAD
 }
 
-CHIP_ERROR 
-DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * passwd) 
+CHIP_ERROR
+DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * passwd)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR err = CHIP_NO_ERROR;

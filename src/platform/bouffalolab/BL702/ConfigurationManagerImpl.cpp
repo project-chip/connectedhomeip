@@ -65,7 +65,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     mBootReason = to_underlying(BootReasonType::kUnspecified);
     if (BL_RST_POR == bootCause) {
         mBootReason = to_underlying(BootReasonType::kPowerOnReboot);
-    } 
+    }
     else if (BL_RST_BOR == bootCause) {
         mBootReason = to_underlying(BootReasonType::kBrownOutReset);
     }

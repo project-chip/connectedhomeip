@@ -42,7 +42,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 protected:
     void _RunEventLoop(void);
-    
+
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
@@ -89,7 +89,7 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
     return PlatformManagerImpl::sInstance;
 }
 
-inline void PlatformManagerImpl::_RunEventLoop(void) 
+inline void PlatformManagerImpl::_RunEventLoop(void)
 {
     PlatformInit();
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
