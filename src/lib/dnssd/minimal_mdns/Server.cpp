@@ -364,14 +364,19 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             /// for sending via `CloneData`
             ///
             /// TODO: this wastes one copy of the data and that could be optimized away
-            if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
+            PacketBufferHandle tempBuf = data.CloneData();
+            if (tempBuf.IsNull()) {
+                // Not enough memory available to clone pbuf
+                err = CHIP_ERROR_NO_MEMORY;
+            }
+            else if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
             {
-                err = udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+                err = udp->SendTo(mIpv6BroadcastAddress, port, tempBuf, udp->GetBoundInterface());
             }
 #if INET_CONFIG_ENABLE_IPV4
             else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
             {
-                err = udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+                err = udp->SendTo(mIpv4BroadcastAddress, port, tempBuf, udp->GetBoundInterface());
             }
 #endif
             else
