@@ -5568,4 +5568,4 @@ PICS:
       id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
 
     - label: "Does the device support the Factory Reset Method?"
-      id: MCORE.UI.FACTORYRESET
+      id: PICS_MCORE_UI_FACTORYRESET
