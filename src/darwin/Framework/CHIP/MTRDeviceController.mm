@@ -696,32 +696,24 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     });
 }
 
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
++ (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
 {
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+    chip::Spake2pVerifier verifier;
+    CHIP_ERROR err = verifier.Generate(iterations, AsByteSpan(salt), setupPincode);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("computePaseVerifier generation failed: %s", chip::ErrorStr(err));
         return nil;
     }
 
-    __block NSData * result;
-    __block chip::Spake2pVerifier paseVerifier;
-    __block chip::ByteSpan saltByteSpan = chip::ByteSpan(static_cast<const uint8_t *>(salt.bytes), salt.length);
+    uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
+    chip::MutableByteSpan serializedBytes(serializedBuffer);
+    err = verifier.Serialize(serializedBytes);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("computePaseVerifier serialization failed: %s", chip::ErrorStr(err));
+        return nil;
+    }
 
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->ComputePASEVerifier(iterations, setupPincode, saltByteSpan, paseVerifier);
-            MTR_LOG_ERROR("ComputePaseVerifier: %s", chip::ErrorStr(errorCode));
-
-            uint8_t serializedVerifier[sizeof(paseVerifier.mW0) + sizeof(paseVerifier.mL)];
-            memcpy(serializedVerifier, paseVerifier.mW0, chip::kSpake2p_WS_Length);
-            memcpy(&serializedVerifier[sizeof(paseVerifier.mW0)], paseVerifier.mL, sizeof(paseVerifier.mL));
-
-            result = [NSData dataWithBytes:serializedVerifier length:sizeof(serializedVerifier)];
-        }
-    });
-
-    return result;
+    return AsData(serializedBytes);
 }
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
