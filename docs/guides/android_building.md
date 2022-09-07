@@ -171,7 +171,7 @@ which allows us to directly edit core Matter code in-IDE.
    and `matterSourceBuildAbiFilters` to the desired ABIs in
    [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
-3) Open the project in Android Studio and run **Sync Project with Gradle
+3) Open the project in Android Studio and run **File -> Sync Project with Gradle
    Files**.
 
 4) Use one of the following options to build an Android package:
