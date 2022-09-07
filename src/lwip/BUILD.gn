@@ -104,13 +104,13 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_configs = [ "${chip_root}/src:includes" ]
     public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
   }
-} 
-else if (lwip_platform == "bl702_lwip") {
+} else if (lwip_platform == "bl702_lwip") {
   import("//build_overrides/bl702_sdk.gni")
 
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bl702_sdk_build_root}:bl702_sdk" ]
+
     #public_configs = [ "${bl702_sdk_build_root}:bl702_lwip_port_config" ]
     #public_configs += [ "${bl702_sdk_build_root}:bl702_lwip_config" ]
   }

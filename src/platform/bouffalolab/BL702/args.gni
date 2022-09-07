@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build_overrides/bl702_sdk.gni")
+import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("${chip_root}/examples/platform/bouffalolab/bl702/args.gni")
 
@@ -32,6 +32,8 @@ chip_config_memory_management = "platform"
 
 openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file = "bl702-openthread-core-bl-config.h"
-openthread_core_config_platform_check_file = "bl702-openthread-core-bl-config-check.h"
-openthread_project_include_dirs = [ "${chip_root}/src/platform/bouffalolab/BL702" ]
-openthread_external_platform ="${bl702_sdk_build_root}:bl702_sdk"
+openthread_core_config_platform_check_file =
+    "bl702-openthread-core-bl-config-check.h"
+openthread_project_include_dirs =
+    [ "${chip_root}/src/platform/bouffalolab/BL702" ]
+openthread_external_platform = "${bl702_sdk_build_root}:bl702_sdk"

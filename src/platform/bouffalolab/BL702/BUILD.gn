@@ -27,10 +27,9 @@ static_library("BL702") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "BlePlatformConfig.h",
-    "bl702Config.cpp",
-    "bl702Config.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CHIPmemory.cpp",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
@@ -46,7 +45,8 @@ static_library("BL702") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "CHIPmemory.cpp",
+    "bl702Config.cpp",
+    "bl702Config.h",
   ]
 
   deps = []
@@ -76,8 +76,8 @@ static_library("BL702") {
     import("//build_overrides/bl702_sdk.gni")
     import("${bl702_sdk_build_root}/bl702_sdk.gni")
     public_deps += [
-      "${bl702_sdk_build_root}:mbedtls",
       "${bl702_sdk_build_root}:bl702_sdk",
+      "${bl702_sdk_build_root}:mbedtls",
     ]
 
     sources += [

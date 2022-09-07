@@ -29,12 +29,9 @@ config("bl702_mbedtls_config") {
 
 mbedtls_target("mbedtls") {
   public_configs = [ ":bl702_mbedtls_config" ]
-  include_dirs = [
-    "${chip_root}/src/platform/bouffalolab/BL702",
-  ]
+  include_dirs = [ "${chip_root}/src/platform/bouffalolab/BL702" ]
 }
 
 group("bl702_sdk") {
-  public_deps = [ bl702_sdk_target]
+  public_deps = [ bl702_sdk_target ]
 }
-

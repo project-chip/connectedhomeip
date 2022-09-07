@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 template("riscv_toolchain") {
   gcc_toolchain(target_name) {
-
     _tool_name_root = ""
-    _toolchain_path = "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv"
+    _toolchain_path =
+        "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv"
     if ("linux_riscv_gcc" == target_name) {
       _tool_name_root = _toolchain_path + "/Linux/bin/"
-    } 
-    else if ("darwin_riscv_gcc" == target_name) {
+    } else if ("darwin_riscv_gcc" == target_name) {
       _tool_name_root = _toolchain_path + "/Darwin/bin/"
     }
     _tool_name_root = _tool_name_root + "riscv64-unknown-elf-"

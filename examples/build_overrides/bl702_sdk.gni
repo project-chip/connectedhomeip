@@ -14,6 +14,6 @@
 
 declare_args() {
   # Root directory for BL702 SDK.
-  bl702_sdk_build_root = 
+  bl702_sdk_build_root =
       "//third_party/connectedhomeip/third_party/bouffalolab/bl702"
 }

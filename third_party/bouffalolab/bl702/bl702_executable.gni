@@ -52,19 +52,21 @@ template("bl702_executable") {
   flashing_options += [ "--xtal" ]
   flashing_options += [ "32M" ]
   flashing_options += [ "--pt" ]
-  flashing_options += [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  flashing_options +=
+      [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   flashing_options += [ "--dts" ]
-  flashing_options += [ rebase_path("bl_factory_params_IoTKitA_32M_115200.dts", root_out_dir, root_out_dir) ]
-  flashing_options += [ "--ota" ] 
-  flashing_options += [ "ota_images/" ] 
+  flashing_options += [ rebase_path("bl_factory_params_IoTKitA_32M_115200.dts",
+                                    root_out_dir,
+                                    root_out_dir) ]
+  flashing_options += [ "--ota" ]
+  flashing_options += [ "ota_images/" ]
 
   # set 2000000 baudrate for image download by default
   flashing_options += [ "--baudrate" ]
-  flashing_options += [ "2000000" ] 
+  flashing_options += [ "2000000" ]
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]
   }
 }
-

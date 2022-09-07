@@ -393,7 +393,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the bl702 lighting app example.
     enable_bl702_lighting_app_build = enable_bl702_builds
-    
+
     # Build the mw320 shell app example.
     enable_mw320_shell_build = enable_mw320_builds
 

@@ -79,7 +79,7 @@ bl602_sdk("sdk") {
 
 bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
-  objcopy     = bouffalolab_objcopy
+  objcopy = bouffalolab_objcopy
 
   sources = [
     #"${bl602_project_dir}/include/CHIPProjectConfig.h",

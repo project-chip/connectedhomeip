@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/bl702_sdk.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/bl702_sdk.gni")
 import("//build_overrides/pigweed.gni")
 import("${chip_root}/src/platform/device.gni")
 
-import("${build_root}/config/defaults.gni")
 import("${bl702_sdk_build_root}/bl702_executable.gni")
 import("${bl702_sdk_build_root}/bl702_sdk.gni")
+import("${build_root}/config/defaults.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
@@ -36,27 +36,26 @@ examples_plat_dir = "${chip_root}/examples/platform/bouffalolab/bl702"
 
 declare_args() {
   # Dump memory usage at link time.
-  chip_print_memory_usage     = true
+  chip_print_memory_usage = true
 
-  config_cache_size           = 8192
+  config_cache_size = 8192
 
   # Monitor & log memory usage at runtime.
-  enable_heap_monitoring      = false
+  enable_heap_monitoring = false
 
-  board                       = "BL706-IoT-DVK"
-  module_type                 = "BL706C-22"
-  enable_psram                = true 
-  baudrate                    = 2000000
+  board = "BL706-IoT-DVK"
+  module_type = "BL706C-22"
+  enable_psram = true
+  baudrate = 2000000
 
-  setupPinCode                = 20202021
-  setupDiscriminator          = 3840
-  OTA_periodic_query_timeout  = 86400
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+  OTA_periodic_query_timeout = 86400
 
-  bouffalolab_objcopy         = ""
+  bouffalolab_objcopy = ""
 }
 
 bl702_sdk("sdk") {
-
   include_dirs = [
     "${chip_root}/src/platform/bouffalolab/BL702",
     "${bl702_project_dir}/include",
@@ -74,11 +73,11 @@ bl702_sdk("sdk") {
   ]
 
   if ("BL706C-22" == module_type) {
-    defines += ["CFG_PSRAM_DUAL_BANK=1"]
+    defines += [ "CFG_PSRAM_DUAL_BANK=1" ]
   }
 
   if (enable_psram) {
-    defines += ["CFG_USE_PSRAM=1"]
+    defines += [ "CFG_USE_PSRAM=1" ]
   }
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED=1" ]
@@ -88,34 +87,33 @@ bl702_sdk("sdk") {
 
 bl702_executable("lighting_app") {
   output_name = "chip-bl702-lighting-example.out"
-  objcopy     = bouffalolab_objcopy
+  objcopy = bouffalolab_objcopy
 
   defines = [
     "APP_TASK_STACK_SIZE=2044",
-    "CHIP_UART_BAUDRATE=${baudrate}"
+    "CHIP_UART_BAUDRATE=${baudrate}",
   ]
 
   if (enable_psram) {
-    defines += ["CFG_USE_PSRAM=1"]
+    defines += [ "CFG_USE_PSRAM=1" ]
   }
 
   if ("BL706-NIGHT-LIGHT" == board) {
-    defines += ["APP_BOARD_LED_STATUS=0"]
-    defines += ["BL706_NIGHT_LIGHT"]
-    defines += ["APP_BOARD_BTN=0"]
-  }
-  else if ("BL702-IoT-DVK" == board || "BL706-IoT-DVK" == board){
-    defines += ["APP_BOARD_LED_STATUS=1"]
-    defines += ["APP_BOARD_BTN=1"]
+    defines += [ "APP_BOARD_LED_STATUS=0" ]
+    defines += [ "BL706_NIGHT_LIGHT" ]
+    defines += [ "APP_BOARD_BTN=0" ]
+  } else if ("BL702-IoT-DVK" == board || "BL706-IoT-DVK" == board) {
+    defines += [ "APP_BOARD_LED_STATUS=1" ]
+    defines += [ "APP_BOARD_BTN=1" ]
   }
 
   sources = [
-    "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/uart.c",
     "${bl702_project_dir}/src/AppTask.cpp",
     "${bl702_project_dir}/src/ZclCallbacks.cpp",
     "${bl702_project_dir}/src/main.cpp",
+    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/demo_pwm.c",
+    "${examples_plat_dir}/uart.c",
   ]
 
   deps = [
@@ -124,18 +122,17 @@ bl702_executable("lighting_app") {
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils"
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
   ]
 
   if (chip_openthread_ftd) {
-    defines += ["CHIP_DEVICE_CONFIG_THREAD_FTD=1"]
+    defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
     deps += [
       "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
       "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
     ]
-  }
-  else {
-    defines += ["CHIP_DEVICE_CONFIG_THREAD_FTD=0"]
+  } else {
+    defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
     deps += [
       "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
       "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
@@ -155,6 +152,7 @@ bl702_executable("lighting_app") {
 
       "PW_RPC_OTCLI_SERVICE=1",
       "PW_RPC_THREAD_SERVICE=1",
+
       #"PW_RPC_TRACING_SERVICE=1",
     ]
 
@@ -178,7 +176,6 @@ bl702_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
-
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_bl702",
@@ -190,15 +187,10 @@ bl702_executable("lighting_app") {
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/bouffalolab/bl702",
     ]
-  }
-  else if (chip_build_libshell) {
-    defines += [
-      "CONFIG_ENABLE_CHIP_SHELL=${chip_build_libshell}"
-    ]
+  } else if (chip_build_libshell) {
+    defines += [ "CONFIG_ENABLE_CHIP_SHELL=${chip_build_libshell}" ]
 
-    deps += [
-      "${chip_root}/examples/shell/shell_common:shell_common",
-    ]
+    deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
 
     include_dirs += [
       "${chip_root}/src/lib/shell",
@@ -218,15 +210,17 @@ bl702_executable("lighting_app") {
 
   if (enable_psram) {
     ldscript = "${examples_plat_dir}/ldscripts/psram_flash.ld"
-  }
-  else {
+  } else {
     ldscript = "${examples_plat_dir}/ldscripts/flash.ld"
   }
 
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
-  cflags_c = [ "-Wno-unused-variable", "-Wno-old-style-declaration" ]
+  cflags_c = [
+    "-Wno-unused-variable",
+    "-Wno-old-style-declaration",
+  ]
   cflags = [ "-Wno-unused-variable" ]
   if (chip_print_memory_usage) {
     ldflags += [
