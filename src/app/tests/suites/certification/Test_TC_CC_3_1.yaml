@@ -137,7 +137,7 @@ tests:
       response:
           constraints:
               minValue: 102
-              maxValue: 120
+              maxValue: 138
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -255,7 +255,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 135
+              minValue: 115
               maxValue: 150
 
     - label: "Wait 5s"
@@ -366,7 +366,7 @@ tests:
       response:
           constraints:
               minValue: 105
-              maxValue: 120
+              maxValue: 138
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -475,7 +475,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 60
+              minValue: 48
               maxValue: 72
 
     - label: "Wait 5s"

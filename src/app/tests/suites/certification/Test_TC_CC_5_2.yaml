@@ -97,8 +97,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 31500
-              maxValue: 32500
+              minValue: 27200
+              maxValue: 36800
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -106,8 +106,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 26500
-              maxValue: 27500
+              minValue: 22900
+              maxValue: 31100
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -123,8 +123,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 30500
-              maxValue: 31500
+              minValue: 26350
+              maxValue: 35650
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -132,8 +132,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 27500
-              maxValue: 28500
+              minValue: 23800
+              maxValue: 32200
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -150,8 +150,8 @@ tests:
       response:
           saveAs: CurrentXValue
           constraints:
-              minValue: 29500
-              maxValue: 30500
+              minValue: 25500
+              maxValue: 34500
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
@@ -160,8 +160,8 @@ tests:
       response:
           saveAs: CurrentYValue
           constraints:
-              minValue: 28500
-              maxValue: 29500
+              minValue: 24650
+              maxValue: 33350
 
     - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.F03 && CC.S.C47.Rsp
@@ -180,8 +180,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 29500
-              maxValue: 30500
+              minValue: 25500
+              maxValue: 34500
 
     #Checking range as exactly delay might not be achieved due to attribute reads
     - label: "TH reads CurrentY attribute from DUT"
@@ -190,8 +190,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 28500
-              maxValue: 29500
+              minValue: 24650
+              maxValue: 33350
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

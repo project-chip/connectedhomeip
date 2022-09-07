@@ -135,7 +135,7 @@ tests:
       response:
           constraints:
               minValue: 102
-              maxValue: 120
+              maxValue: 138
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
