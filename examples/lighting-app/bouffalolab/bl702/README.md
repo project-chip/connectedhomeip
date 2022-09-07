@@ -9,7 +9,7 @@ Current supported develop boards:
 ## Build
 
 ### Prerequisite
-- Clone connectedhomeip github repo and update all submdoule;
+- Clone connectedhomeip github repo and update all submodule;
 - Install all tools (likely already present for CHIP developers).
 - Setup connectedhomeip environment:
   - First time, or environment is out of date. Please execute the following script under root folder of connectedhomeip repo to install and setup environment, which will take some minutes; meanwhile, Bouffalolab flash tool, `bflb-iot-tool`, will be installed. 
@@ -21,7 +21,7 @@ Current supported develop boards:
     ```shell
     source scripts/activate.sh
     ```
-## Build CHIP BL702 Ligiting App example
+## Build CHIP BL702 Lighting App example
 
 - Build with script `gn_bouffalolab_example.sh` under root folder of connectedhomeip repo
   - Command format:
@@ -77,7 +77,7 @@ Current supported develop boards:
 
   - Using script `chip-bl702-lighting-example.flash.py`.
 
-    After building gets done, a python `chip-bl702-lighting-example.flash.py` will generated under build output folder. Such as chip-bl702-lighting-example.flash.py for lighting-app example. Plese check `help` option of script for more detail.
+    After building gets done, a python `chip-bl702-lighting-example.flash.py` will generated under build output folder. Such as chip-bl702-lighting-example.flash.py for lighting-app example. Please check `help` option of script for more detail.
 
     - Hold BOOT pin and reset board, let it be in download mode.
     - Download image as following execution under build output folder:
@@ -90,16 +90,16 @@ Current supported develop boards:
         ```shell
         ./chip-bl702-lighting-example.flash.py --build
         ```
-        After script excuted, a folder `ota_images` and image `FW_OTA.bin.xz.hash` will generated. `FW_OTA.bin.xz.hash` is compressed with hash verification with `chip-bl702-lighting-example.bin`.
+        After script executed, a folder `ota_images` and image `FW_OTA.bin.xz.hash` will generated. `FW_OTA.bin.xz.hash` is compressed with hash verification with `chip-bl702-lighting-example.bin`.
 
     > Note, `chip-bl702-lighting-example.flash.py` uses `bflb-iot-tool` download image. Please make sure current terminal is under matter build environment, or `bflb-iot-tool` is installed.
   
   - BLDevCube
     Start BLDevCube_path 
     - Hold BOOT pin and reset board, let it be in download mode.
-    - Select default `Factory params` uder BLDevCube_path Software path;
+    - Select default `Factory params` under BLDevCube_path Software path;
     - Select DTS file `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts`;
-    - Select Parition Table `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml`;
+    - Select Partition Table `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml`;
     - Select Firmware Bin chip-bl702-lighting-example.bin;
     - Selected Chip Erase if need;
     - Choice Target COM port.
@@ -114,7 +114,7 @@ Current supported develop boards:
   - Night Light
     Unprovisioned state: light shows yellow.
     Provisioned state: light show white.
-    Facotry Reset: Power cycle 3 times before light is on; at 3rd time, light shows green and does factory reset after 3 seconds later. And factory reset can be cancelled during 3 seconds wait time.
+    Factory Reset: Power cycle 3 times before light is on; at 3rd time, light shows green and does factory reset after 3 seconds later. And factory reset can be cancelled during 3 seconds wait time.
 
 - UART baudrate for log and shell command
   - By default, UART baudrate is 2000000
@@ -154,7 +154,7 @@ which `<identify_duration>` is how many seconds to execute identify command.
 
 ### Build ota-provider-app as [guide](../../../ota-provider-app/linux/README.md)
 
-### Create the Matter OTA with Bouffalab OTA bin `FW_OTA.bin.xz.hash`
+### Create the Matter OTA with Bouffalo Lab OTA bin `FW_OTA.bin.xz.hash`
 - Under connectedhomeip repo path
     ```shell
     $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> lighting-app.ota
@@ -177,7 +177,7 @@ which `<identify_duration>` is how many seconds to execute identify command.
 
 ### Start ota software upgrade
 - BLE commission BL702 lighting if not commissioned.
-- Start OTA software upgrade prcess
+- Start OTA software upgrade process
     ```shell
     ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 <node_id_to_lighting_app> 0
     ```
