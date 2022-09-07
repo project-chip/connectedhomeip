@@ -12,12 +12,12 @@ Current supported develop boards:
 - Clone connectedhomeip github repo and update all submdoule;
 - Install all tools (likely already present for CHIP developers).
 - Setup connectedhomeip environment:
-  - First time, or environment is out of date. Please execute the following script under root folder of connectedhomeip repo to install and setup enviroment, which will take some minutes; meanwhile, Bouffalolab flash tool, `bflb-iot-tool`, will be installed. 
+  - First time, or environment is out of date. Please execute the following script under root folder of connectedhomeip repo to install and setup environment, which will take some minutes; meanwhile, Bouffalolab flash tool, `bflb-iot-tool`, will be installed. 
     ```shell
     source scripts/bootstrap.sh
     ```
     > Note, `scripts/bootstrap.sh` only installs `bflb-iot-tool` under connectedhomeip build context.
-  - Others, please execute the following script before any build commands executed; and `bflb-iot-tool` will import under this enviroment.
+  - Others, please execute the following script before any build commands executed; and `bflb-iot-tool` will import under this environment.
     ```shell
     source scripts/activate.sh
     ```
@@ -92,7 +92,7 @@ Current supported develop boards:
         ```
         After script excuted, a folder `ota_images` and image `FW_OTA.bin.xz.hash` will generated. `FW_OTA.bin.xz.hash` is compressed with hash verification with `chip-bl702-lighting-example.bin`.
 
-    > Note, `chip-bl702-lighting-example.flash.py` uses `bflb-iot-tool` download image. Please make sure current terminal is under matter build enviroment, or `bflb-iot-tool` is installed.
+    > Note, `chip-bl702-lighting-example.flash.py` uses `bflb-iot-tool` download image. Please make sure current terminal is under matter build environment, or `bflb-iot-tool` is installed.
   
   - BLDevCube
     Start BLDevCube_path 

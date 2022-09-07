@@ -53,7 +53,7 @@ public:
     using Key = const char *;
 
     /** Key definitions for well-known keys */
-    /** Manufactering config keys, which should be saved in a specified place */
+    /** Manufacturing config keys, which should be saved in a specified place */
     static constexpr const char* kConfigKey_SerialNum                   = (KCONFIG_SECT_FACTORY "_serial-num");
     static constexpr const char* kConfigKey_MfrDeviceId                 = (KCONFIG_SECT_FACTORY "_device-id");
     static constexpr const char* kConfigKey_MfrDeviceCert               = (KCONFIG_SECT_FACTORY "_device-cert");
