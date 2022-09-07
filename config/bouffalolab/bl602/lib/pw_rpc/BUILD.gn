@@ -16,6 +16,17 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/target_types.gni")
 
+config("pw_string_config") {
+  defines = [
+    "_GLIBCXX_USE_C99_MATH_TR1",
+    "_LDBL_EQ_DBL",
+  ]
+}
+
+pw_source_set("pw_string_dep") {
+  public_configs = [ ":pw_string_config" ]
+}
+
 static_library("pw_rpc") {
   output_name = "libPwRpc"
 

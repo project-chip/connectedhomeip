@@ -82,6 +82,7 @@ assert(!(use_rs911x && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
+  enable_openthread_cli = false
 }
 
 chip_data_model("chef-common") {
@@ -91,8 +92,9 @@ chip_data_model("chef-common") {
   is_server = true
 }
 
-# ThunderBoards  (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
+# ThunderBoards and Explorer Kit (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
+    efr32_board == "BRD2703A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -191,7 +193,8 @@ efr32_executable("chef_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
@@ -207,7 +210,7 @@ efr32_executable("chef_app") {
   if (chip_enable_openthread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread_device",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
   }

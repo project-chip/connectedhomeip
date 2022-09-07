@@ -87,7 +87,7 @@ struct DnssdService
  * any pointer inside this structure.
  *
  * @param[in] context     The context passed to ChipDnssdBrowse or ChipDnssdResolve.
- * @param[in] result      The mdns resolve result, can be nullptr if error
+ * @param[in] result      The mDNS resolve result, can be nullptr if error
  *                        happens.  The mAddress of this object will be ignored.
  * @param[in] addresses   IP addresses that we resolved.
  * @param[in] error       The error code.
@@ -102,13 +102,19 @@ using DnssdResolveCallback = void (*)(void * context, DnssdService * result, con
  * The callback function SHALL NOT take the ownership of the service pointer or
  * any pointer inside this structure.
  *
+ * The callback function SHALL release its internal resources only when the
+ * finalBrowse is true or when the error is not CHIP_NO_ERROR. Calling this
+ * callback function again in either case is a programming error.
+ *
  * @param[in] context       The context passed to ChipDnssdBrowse or ChipDnssdResolve.
  * @param[in] services      The service list, can be nullptr.
  * @param[in] servicesSize  The size of the service list.
+ * @param[in] finalBrowse   When true, this is the last callback for this browse.
  * @param[in] error         The error code.
  *
  */
-using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error);
+using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse,
+                                     CHIP_ERROR error);
 
 /**
  * The callback function for mDNS publish.
@@ -118,17 +124,18 @@ using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, si
  * The callback function SHALL NOT take the ownership of the service pointer or
  * any pointer inside this structure.
  *
- * @param[in] context       The context passed to ChipDnssdPublish.
- * @param[in] type          The published type if no errors has occured, nullptr otherwise.
+ * @param[in] context       The context passed to ChipDnssdPublishService.
+ * @param[in] type          The published type if no errors have occured, nullptr otherwise.
+ * @param[in] instanceName  The published instance name if no errors have occured, nullptr otherwise.
  * @param[in] error         The error code.
  *
  */
-using DnssdPublishCallback = void (*)(void * context, const char * type, CHIP_ERROR error);
+using DnssdPublishCallback = void (*)(void * context, const char * type, const char * instanceName, CHIP_ERROR error);
 
 using DnssdAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
- * This function initializes the mdns module
+ * This function initializes the mDNS module
  *
  * @param[in] initCallback    The callback for notifying the initialization result.
  * @param[in] errorCallback   The callback for notifying internal errors.
@@ -141,7 +148,7 @@ using DnssdAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
 
 /**
- * This function shuts down the mdns module
+ * This function shuts down the mDNS module
  */
 void ChipDnssdShutdown();
 
@@ -188,7 +195,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate();
 
 /**
- * This function browses the services published by mdns
+ * This function browses the services published by mDNS
  *
  * @param[in] type        The service type.
  * @param[in] protocol    The service protocol.
@@ -206,7 +213,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
 
 /**
- * This function resolves the services published by mdns
+ * This function resolves the services published by mDNS
  *
  * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
  * @param[in] interface     The interface to send queries.

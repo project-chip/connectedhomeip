@@ -492,12 +492,9 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
     switch (requestorCore->mOnConnectedAction)
     {
     case kQueryImage:
-        requestorCore->RecordErrorUpdateState(error);
-        break;
     case kDownload:
-        requestorCore->RecordErrorUpdateState(error);
-        break;
     case kApplyUpdate:
+    case kNotifyUpdateApplied:
         requestorCore->RecordErrorUpdateState(error);
         break;
     default:
@@ -767,6 +764,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
         args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
+    args.metadataForProvider = mMetadataForProvider;
     Controller::OtaSoftwareUpdateProviderCluster cluster(exchangeMgr, sessionHandle, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);

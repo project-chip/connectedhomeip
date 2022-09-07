@@ -156,7 +156,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     if (identifyObj == nullptr)
     {
-        EFR32_LOG("funct timer create failed");
+        EFR32_LOG("Invalid Identify Object!");
         appError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -391,7 +391,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             CancelFunctionTimer();
             mFunction = kFunction_NoneSelected;
 
-#ifdef DISPLAY_ENABLED
+#ifdef QR_CODE_ENABLED
             // TOGGLE QRCode/LCD demo UI
             slLCD.ToggleQRCode();
 #endif

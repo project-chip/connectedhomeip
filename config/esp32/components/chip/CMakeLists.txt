@@ -31,7 +31,11 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash)
+
+if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
+    list(APPEND CHIP_REQURIE_COMPONENTS mdns)
+endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
@@ -62,6 +66,18 @@ macro(chip_gn_arg_bool arg boolean)
         string(APPEND chip_gn_args "${arg} = false\n")
     endif()
 endmacro()
+
+# ESP-IDF lets user set software version string by two ways:
+# 1. Project's CMakeLists.txt file and 2. Config option
+# It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
+# So, below makes the same provision for software version number
+if (CONFIG_APP_PROJECT_VER_FROM_CONFIG)
+    chip_gn_arg_append("chip_config_software_version_number" ${CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER})
+elseif (DEFINED PROJECT_VER_NUMBER)
+    chip_gn_arg_append("chip_config_software_version_number" ${PROJECT_VER_NUMBER})
+else()
+    chip_gn_arg_append("chip_config_software_version_number" 0)
+endif()
 
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
@@ -270,7 +286,9 @@ if(CONFIG_BT_ENABLED)
         idf_component_get_property(bt_lib bt COMPONENT_LIB)
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/libcontroller_5p0_seq.a)
+        if(CONFIG_IDF_TARGET_ESP32H2_BETA_VERSION_2)
+            list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/beta2/libble_app.a)
+        endif()
     else()
         idf_component_get_property(bt_lib bt COMPONENT_LIB)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
@@ -287,7 +305,7 @@ if(CONFIG_OPENTHREAD_ENABLED)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
-if(NOT CONFIG_USE_MINIMAL_MDNS)
+if(NOT CONFIG_USE_MINIMAL_MDNS AND NOT CONFIG_IDF_TARGET_ESP32H2)
     idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()

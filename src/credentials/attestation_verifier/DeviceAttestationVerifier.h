@@ -20,7 +20,9 @@
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace Credentials {
@@ -44,6 +46,7 @@ enum class AttestationVerificationResult : uint16_t
     kPaiArgumentInvalid   = 204,
     kPaiVendorIdMismatch  = 205,
     kPaiAuthorityNotFound = 206,
+    kPaiMissing           = 207,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
@@ -108,8 +111,6 @@ struct DeviceInfoForAttestation
     uint8_t paaSKID[Crypto::kSubjectKeyIdentifierLength] = { 0 };
 };
 
-typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);
-
 /**
  * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
  *
@@ -146,6 +147,73 @@ public:
      *
      */
     virtual CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const = 0;
+};
+
+/**
+ * @brief Helper utility to model obtaining verifying keys by Key ID
+ *
+ * API is synchronous. Real commissioner implementations may entirely
+ * hide key lookup behind the DeviceAttestationVerifier and never use this interface at all.
+ * It is provided as a utility to help build DeviceAttestationVerifier
+ * implementations suitable for testing or examples.
+ */
+class WellKnownKeysTrustStore
+{
+public:
+    WellKnownKeysTrustStore()          = default;
+    virtual ~WellKnownKeysTrustStore() = default;
+
+    // Not copyable
+    WellKnownKeysTrustStore(const WellKnownKeysTrustStore &) = delete;
+    WellKnownKeysTrustStore & operator=(const WellKnownKeysTrustStore &) = delete;
+
+    /**
+     * @brief Add a trusted key directly
+     *
+     * @param[in] kid - Key ID to use. Usually 20 bytes long, max 32 bytes.
+     * @param[in] pubKey - Verifying public key to attach to the key ID.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `kid` or `pubKey` arguments
+     *          are not usable. CHIP_ERROR_NO_MEMORY if the trust store is full.
+     */
+    virtual CHIP_ERROR AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey) = 0;
+
+    /**
+     * @brief Add a trusted key via a public certificate.
+     *
+     * The subject public key of the certificate will be used.
+     * The subject key ID extensions of the certificate will be the `kid`.
+     *
+     * Verification of trust chaining is at the discretion of the implementation.
+     *
+     * @param[in] derCertBytes - Certificate containing the X.509 DER certificate with the key.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if derCertBytes is improperly
+     *         formatted or not trusted. CHIP_ERROR_NO_MEMORY if the trust store is full.
+     */
+    virtual CHIP_ERROR AddTrustedKey(const ByteSpan & derCertBytes) = 0;
+
+    /**
+     * @brief Look-up a verifying key by Key ID
+     *
+     * Interface is synchronous.
+     *
+     * @param[in] kid Buffer containing the key identifier (KID) of the verifying key to look-up. Usually
+     *                a SHA-1-sized buffer (20 bytes).
+     * @param[out] outPubKey Reference to where the verifying key found will be stored on CHIP_NO_ERROR
+     *
+     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `kid` or `pubKey` arguments
+     *          are not usable, CHIP_ERROR_KEY_NOT_FOUND if no key is found that matches `kid`.
+     */
+    virtual CHIP_ERROR LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const = 0;
+
+    /**
+     * @brief Returns true if `kid` identifies a known test key.
+     *
+     * @param kid - Key ID to use. Usually 20 bytes long, max 32 bytes.
+     * @return true if it's a test/development-only signing key identifier, false otherwise
+     */
+    virtual bool IsCdTestKey(const ByteSpan & kid) const = 0;
 };
 
 /**
@@ -222,6 +290,43 @@ public:
         uint16_t productId;
     };
 
+    // Copies the bytes passed to it, and holds the PAI, DAC, and CD for additional verification step
+    class AttestationDeviceInfo
+    {
+    public:
+        AttestationDeviceInfo(const AttestationInfo & attestationInfo);
+        AttestationDeviceInfo(const ByteSpan & attestationElementsBuffer, const ByteSpan paiDerBuffer, const ByteSpan dacDerBuffer);
+
+        ~AttestationDeviceInfo() = default;
+
+        // Returns buffer containing the PAI certificate from device in DER format.
+        const ByteSpan paiDerBuffer() const { return ByteSpan(mPaiDerBuffer.Get(), mPaiDerBuffer.AllocatedSize()); }
+
+        // Returns buffer containing the DAC certificate from device in DER format.
+        const ByteSpan dacDerBuffer() const { return ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()); }
+
+        // Returns optional buffer containing the certificate declaration from device.
+        const Optional<ByteSpan> cdBuffer() const
+        {
+            if (mCdBuffer.Get())
+            {
+                return MakeOptional(ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()));
+            }
+            else
+            {
+                return Optional<ByteSpan>();
+            }
+        }
+
+    private:
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiDerBuffer;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mDacDerBuffer;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuffer;
+    };
+
+    typedef void (*OnAttestationInformationVerification)(void * context, const AttestationInfo & info,
+                                                         AttestationVerificationResult result);
+
     /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
      *
@@ -276,9 +381,26 @@ public:
                                                            const Crypto::P256PublicKey & dacPublicKey,
                                                            const ByteSpan & csrNonce) = 0;
 
+    /**
+     * @brief Get the trust store used for the attestation verifier.
+     *
+     * Returns nullptr if not supported. Be careful not to hold-on to the trust store
+     * for too long. It is only expected to have same lifetime as the DeviceAttestationVerifier.
+     *
+     * @return a pointer to the trust store or nullptr if none is directly accessible.
+     */
+    virtual WellKnownKeysTrustStore * GetCertificationDeclarationTrustStore() { return nullptr; }
+
+    void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
+    bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
+
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
+
+    // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
+    // always supported development keys.
+    bool mEnableCdTestKeySupport = true;
 };
 
 /**

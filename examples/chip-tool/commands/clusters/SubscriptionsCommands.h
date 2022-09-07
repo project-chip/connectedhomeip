@@ -27,7 +27,8 @@ class ShutdownSubscription : public CHIPCommand
 {
 public:
     ShutdownSubscription(CredentialIssuerCommands * credsIssuerConfig) :
-        CHIPCommand("shutdown-one", credsIssuerConfig, "Shut down a single subscription, identified by its subscription id.")
+        CHIPCommand("shutdown-one", credsIssuerConfig,
+                    "Shut down a single subscription, identified by its subscription id and target node id.")
     {
         AddArgument("subscription-id", 0, UINT64_MAX, &mSubscriptionId);
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId,

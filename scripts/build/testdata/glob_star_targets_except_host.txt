@@ -43,6 +43,7 @@ esp32-devkitc-all-clusters-minimal
 esp32-devkitc-all-clusters-minimal-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-light
+esp32-devkitc-light-rpc
 esp32-devkitc-lock
 esp32-devkitc-ota-requestor
 esp32-devkitc-ota-requestor-rpc
@@ -110,6 +111,7 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
+telink-tlsr9518adk80d-ota-requestor
 tizen-arm-all-clusters
 tizen-arm-all-clusters-minimal
 tizen-arm-chip-tool

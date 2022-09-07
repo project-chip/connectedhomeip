@@ -16,6 +16,7 @@
 
 #import "MTRCertificates.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging.h"
 #import "MTRMemory.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
@@ -194,6 +195,23 @@ using namespace chip::Credentials;
         *error = [MTRError errorForCHIPErrorCode:err];
     }
     return nil;
+}
+
++ (nullable NSData *)convertX509Certificate:(NSData *)x509Certificate
+{
+
+    chip::ByteSpan x509CertBytes = AsByteSpan(x509Certificate);
+
+    uint8_t chipCertBuffer[chip::Credentials::kMaxCHIPCertLength];
+    chip::MutableByteSpan chipCertBytes(chipCertBuffer);
+
+    CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
+    MTR_LOG_ERROR("ConvertX509CertToChipCert: %{public}s", chip::ErrorStr(errorCode));
+
+    if (errorCode != CHIP_NO_ERROR)
+        return nil;
+
+    return AsData(chipCertBytes);
 }
 
 @end

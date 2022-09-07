@@ -258,6 +258,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     ChipLogProgress(Controller, "newDeviceController() called");
 
     // Retrieve initialization params.
+    jmethodID getFabricId;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getFabricId", "()J", &getFabricId);
+    SuccessOrExit(err);
+
     jmethodID getUdpListenPort;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort", "()I", &getUdpListenPort);
     SuccessOrExit(err);
@@ -279,6 +283,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     jmethodID getAttemptNetworkScanThread;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanThread", "()Z",
                                                         &getAttemptNetworkScanThread);
+    SuccessOrExit(err);
+
+    jmethodID getSkipCommissioningComplete;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getSkipCommissioningComplete", "()Z",
+                                                        &getSkipCommissioningComplete);
     SuccessOrExit(err);
 
     jmethodID getKeypairDelegate;
@@ -309,6 +318,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     {
+        uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
         uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
         jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
@@ -319,15 +329,16 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
         uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
-            sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
-            DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi,
-            attemptNetworkScanThread, &err);
+            sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
+            DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
+            rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
         SuccessOrExit(err);
 
         if (adminSubject != kUndefinedNodeId)
@@ -379,7 +390,7 @@ JNI_METHOD(void, commissionDevice)
 
     ChipLogProgress(Controller, "commissionDevice() called");
 
-    CommissioningParameters commissioningParams = CommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (networkCredentials != nullptr)
     {
         err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
@@ -417,7 +428,7 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
-    CommissioningParameters commissioningParams = CommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
 
     if (csrNonce != nullptr)
@@ -451,7 +462,8 @@ JNI_METHOD(void, pairDeviceWithAddress)
             .SetDiscriminator(discriminator)
             .SetSetupPINCode(pinCode)
             .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
-    CommissioningParameters commissioningParams = CommissioningParameters();
+
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);

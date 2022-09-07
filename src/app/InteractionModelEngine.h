@@ -140,6 +140,11 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
+     * Tears down all active subscriptions for a given fabric.
+     */
+    void ShutdownSubscriptions(FabricIndex aFabricIndex);
+
+    /**
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
@@ -503,6 +508,13 @@ private:
      * resources than we guaranteed.
      */
     Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount, size_t aRequestedEventPathCount);
+
+    /**
+     * Helper for various ShutdownSubscriptions functions.  The subscriptions
+     * that match all the provided arguments will be shut down.
+     */
+    void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
+                                       const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);

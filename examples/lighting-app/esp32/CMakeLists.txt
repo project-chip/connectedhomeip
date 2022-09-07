@@ -17,6 +17,10 @@
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
+
+set(PROJECT_VER "v1.0")
+set(PROJECT_VER_NUMBER 1)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
@@ -45,3 +49,25 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
 
 flashing_script()
+
+if (CONFIG_ENABLE_PW_RPC)
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cmake)
+
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_sys_io pw_sys_io.esp32)
+pw_set_backend(pw_trace pw_trace_tokenized)
+
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+
+get_target_property(_target_cxx_flags pw_build.cpp17 INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
+set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
+endif(CONFIG_ENABLE_PW_RPC)

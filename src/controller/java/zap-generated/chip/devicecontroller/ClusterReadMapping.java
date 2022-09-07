@@ -8134,18 +8134,20 @@ public class ClusterReadMapping {
             readColorControlCompensationTextCommandParams);
     readColorControlInteractionInfo.put(
         "readCompensationTextAttribute", readColorControlCompensationTextAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readColorControlColorTemperatureCommandParams =
+    Map<String, CommandParameterInfo> readColorControlColorTemperatureMiredsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readColorControlColorTemperatureAttributeInteractionInfo =
+    InteractionInfo readColorControlColorTemperatureMiredsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorTemperatureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readColorTemperatureMiredsAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readColorControlColorTemperatureCommandParams);
+            readColorControlColorTemperatureMiredsCommandParams);
     readColorControlInteractionInfo.put(
-        "readColorTemperatureAttribute", readColorControlColorTemperatureAttributeInteractionInfo);
+        "readColorTemperatureMiredsAttribute",
+        readColorControlColorTemperatureMiredsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readColorControlColorModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readColorControlColorModeAttributeInteractionInfo =
@@ -8715,7 +8717,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readStartUpColorTemperatureMiredsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.ColorControlCluster
+                              .StartUpColorTemperatureMiredsAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlStartUpColorTemperatureMiredsCommandParams);
@@ -12422,81 +12426,6 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readClusterRevisionAttribute", readTestClusterClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("testCluster", readTestClusterInteractionInfo);
-    Map<String, InteractionInfo> readFaultInjectionInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readFaultInjectionGeneratedCommandListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readFaultInjectionGeneratedCommandListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .readGeneratedCommandListAttribute(
-                      (ChipClusters.FaultInjectionCluster.GeneratedCommandListAttributeCallback)
-                          callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedFaultInjectionClusterGeneratedCommandListAttributeCallback(),
-            readFaultInjectionGeneratedCommandListCommandParams);
-    readFaultInjectionInteractionInfo.put(
-        "readGeneratedCommandListAttribute",
-        readFaultInjectionGeneratedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readFaultInjectionAcceptedCommandListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readFaultInjectionAcceptedCommandListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .readAcceptedCommandListAttribute(
-                      (ChipClusters.FaultInjectionCluster.AcceptedCommandListAttributeCallback)
-                          callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedFaultInjectionClusterAcceptedCommandListAttributeCallback(),
-            readFaultInjectionAcceptedCommandListCommandParams);
-    readFaultInjectionInteractionInfo.put(
-        "readAcceptedCommandListAttribute",
-        readFaultInjectionAcceptedCommandListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readFaultInjectionAttributeListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readFaultInjectionAttributeListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .readAttributeListAttribute(
-                      (ChipClusters.FaultInjectionCluster.AttributeListAttributeCallback) callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedFaultInjectionClusterAttributeListAttributeCallback(),
-            readFaultInjectionAttributeListCommandParams);
-    readFaultInjectionInteractionInfo.put(
-        "readAttributeListAttribute", readFaultInjectionAttributeListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readFaultInjectionFeatureMapCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readFaultInjectionFeatureMapAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readFaultInjectionFeatureMapCommandParams);
-    readFaultInjectionInteractionInfo.put(
-        "readFeatureMapAttribute", readFaultInjectionFeatureMapAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readFaultInjectionClusterRevisionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readFaultInjectionClusterRevisionAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.FaultInjectionCluster) cluster)
-                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readFaultInjectionClusterRevisionCommandParams);
-    readFaultInjectionInteractionInfo.put(
-        "readClusterRevisionAttribute", readFaultInjectionClusterRevisionAttributeInteractionInfo);
-    readAttributeMap.put("faultInjection", readFaultInjectionInteractionInfo);
     return readAttributeMap;
   }
 }

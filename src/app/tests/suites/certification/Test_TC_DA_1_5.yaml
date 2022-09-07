@@ -101,19 +101,21 @@ tests:
           CSRNonce is saved as csr_nonce_returned if present, vendor_reserved
           fields are saved as vendor1, vendor2 and vendor3"
       verification: |
-          verification step to be updated.
       disabled: true
 
     - label:
           "TH1 creates nocsr_tbs = nosr_elements_message ||
           attestation_challenge"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
-    - label: ""
+    - label:
+          "if vendor_reserved fields are present in the noscr_elements_message,
+          TH1 verifies that attestation_challenge does not appear in any of the
+          vendor fields"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

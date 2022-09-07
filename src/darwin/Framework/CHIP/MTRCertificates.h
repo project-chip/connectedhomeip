@@ -125,6 +125,16 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error;
 
+/**
+ * Convert the given X.509v3 DER encoded certificate to the Matter certificate
+ * format.
+ *
+ * Returns nil if the conversion fails (e.g. if the input data cannot be parsed
+ * as a DER encoded X.509 certificate, or if the certificate cannot be
+ * represented in the Matter certificate format).
+ */
++ (nullable NSData *)convertX509Certificate:(NSData *)x509Certificate;
+
 @end
 
 NS_ASSUME_NONNULL_END

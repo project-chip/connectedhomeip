@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2021 Project CHIP Authors
+#   Copyright (c) 2022 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,3 +21,42 @@ config TELINK_BLE_LIB
 	default n
 	help
 	  Include third party Telink BLE SDK
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_REQUESTOR
+	bool
+	default y
+	imply BOOTLOADER_MCUBOOT
+	imply IMG_MANAGER
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 256
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures size of the buffer used by OTA Requestor when downloading and
+	  writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  When a user consents to apply a firmware update, and the update package is
+	  downloaded, reboot the device automatically to swap the old and the new
+	  firmware images.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	default y if CHIP_OTA_REQUESTOR
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+# Enable getting reboot reasons information
+config HWINFO
+    bool
+    default y

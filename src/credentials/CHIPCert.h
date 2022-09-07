@@ -193,7 +193,13 @@ struct ChipRDN
 
     bool IsEqual(const ChipRDN & other) const;
     bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
-    void Clear() { mAttrOID = chip::ASN1::kOID_NotSpecified; }
+    void Clear()
+    {
+        mAttrOID               = chip::ASN1::kOID_NotSpecified;
+        mAttrIsPrintableString = false;
+        mChipVal               = 0;
+        mString                = CharSpan{};
+    }
 };
 
 /**
@@ -507,6 +513,12 @@ CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & 
  */
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
 
+struct FutureExtension
+{
+    ByteSpan OID;
+    ByteSpan Extension;
+};
+
 struct X509CertRequestParams
 {
     int64_t SerialNumber;
@@ -514,6 +526,7 @@ struct X509CertRequestParams
     uint32_t ValidityEnd;
     ChipDN SubjectDN;
     ChipDN IssuerDN;
+    Optional<FutureExtension> FutureExt;
 };
 
 /**

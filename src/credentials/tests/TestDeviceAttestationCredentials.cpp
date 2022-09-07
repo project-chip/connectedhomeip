@@ -148,7 +148,8 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-static void OnAttestationInformationVerificationCallback(void * context, AttestationVerificationResult result)
+static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
+                                                         AttestationVerificationResult result)
 {
     AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
     *pResult                                = result;
@@ -205,7 +206,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
 
     attestationResult = AttestationVerificationResult::kNotImplemented;
-    Callback::Callback<OnAttestationInformationVerification> attestationInformationVerificationCallback(
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationInformationVerificationCallback(
         OnAttestationInformationVerificationCallback, &attestationResult);
 
     Credentials::DeviceAttestationVerifier::AttestationInfo info(

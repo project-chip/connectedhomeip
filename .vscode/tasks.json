@@ -438,6 +438,7 @@
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
+                "telink-tlsr9518adk80d-ota-requestor",
                 "tizen-arm-light"
             ]
         },

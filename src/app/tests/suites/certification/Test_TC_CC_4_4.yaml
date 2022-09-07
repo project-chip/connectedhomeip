@@ -47,7 +47,7 @@ tests:
     - label:
           "TH sends MoveToHueAndSaturation command to DUT with Hue=200,
           Saturation=50 and TransitionTime=0 (immediately)"
-      PICS: CC.S.F01 && CC.S.C06.Rsp
+      PICS: CC.S.F00 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
@@ -71,20 +71,23 @@ tests:
                 value: 100
 
     - label: "TH reads CurrentHue attribute from DUT."
-      PICS: CC.S.F01 && CC.S.A0000 && CC.S.C06.Rsp
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           value: 200
-          constraints:
-              type: int8u
-              minValue: 0
-              maxValue: 254
+
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          value: 50
 
     - label:
           "TH sends MoveToHueAndSaturation command to DUT with Hue=160,
           Saturation=80 and TransitionTime=200 (20s)"
-      PICS: CC.S.F01 && CC.S.C06.Rsp
+      PICS: CC.S.F00 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
@@ -113,17 +116,17 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 175
-              maxValue: 185
+              minValue: 165
+              maxValue: 195
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 60
-              maxValue: 70
+              minValue: 55
+              maxValue: 75
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -140,16 +143,16 @@ tests:
       response:
           constraints:
               minValue: 160
-              maxValue: 170
+              maxValue: 185
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
               type: int8u
-              minValue: 70
+              minValue: 68
               maxValue: 80
 
     - label: "Wait 5s"
@@ -168,7 +171,7 @@ tests:
           value: 160
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -179,6 +182,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 2
@@ -186,8 +190,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 3

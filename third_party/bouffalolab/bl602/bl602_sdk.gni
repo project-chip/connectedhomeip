@@ -1,0 +1,641 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/bl602_sdk.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("bl602_board.gni")
+
+declare_args() {
+  # Location of the bl602 SDK.
+  bl602_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
+}
+
+assert(bl602_sdk_root != "", "bl602_sdk_root must be specified")
+
+# Defines an bl602 SDK build target.
+#
+# Parameters:
+#   bl602_sdk_root - The location of the bl602 SDK.
+#   sources - The sources files to build.
+template("bl602_sdk") {
+  if (defined(invoker.bl602_sdk_root)) {
+    bl602_sdk_root = invoker.bl602_sdk_root
+  }
+
+  assert(bl602_sdk_root != "", "bl602_sdk_root must be specified")
+
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+    libs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    # Treat these includes as system includes, so warnings in them are not fatal.
+    _include_dirs = [
+      "${bl602_sdk_root}",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/config",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/panic",
+
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/config",
+      "${bl602_sdk_root}/components/network/lwip/src/include",
+      "${bl602_sdk_root}/components/network/lwip/src/include/lwip",
+      "${bl602_sdk_root}/components/network/lwip/src/include/lwip/apps",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+
+      #"${bl602_sdk_root}/components/network/lwip_mdns",
+
+      "${bl602_sdk_root}/components/platform/hosal",
+      "${bl602_sdk_root}/components/platform/hosal/include",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal",
+      "${bl602_sdk_root}/components/utils/include",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/priv_inc",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/inc/blcrypto_suite",
+
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Device/Bouffalo/BL602/Peripherals",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/RISCV/Device/Bouffalo/BL602/Startup",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/RISCV/Core/Include",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/soft_crc",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/partition",
+
+      "${bl602_sdk_root}/components/sys/bltime/include",
+
+      "${bl602_sdk_root}/components/stage/easyflash4/inc",
+      "${bl602_sdk_root}/components/sys/blmtd/include",
+      "${bl602_sdk_root}/components/stage/blfdt/inc",
+
+      "${bl602_sdk_root}/components/stage/blog",
+      "${bl602_sdk_root}/components/stage/cli/cli/include",
+      "${bl602_sdk_root}/components/utils/include",
+
+      "${chip_root}/third_party/mbedtls/repo/include",
+
+      "${bl602_sdk_root}/components/sys/bloop/bloop/include",
+      "${bl602_sdk_root}/components/sys/bloop/loopset/include",
+      "${bl602_sdk_root}/components/sys/bloop/looprt/include",
+
+      "${bl602_sdk_root}/components/fs/vfs/include",
+      "${bl602_sdk_root}/components/stage/yloop/include",
+
+      "${bl602_sdk_root}/components/network/wifi/include",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal",
+      "${bl602_sdk_root}/components/stage/yloop/include/aos",
+      "${bl602_sdk_root}/components/stage/yloop/include/aos",
+
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/include/zephyr",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/port/include",
+      "${bl602_sdk_root}/components/network/ble/blestack/src",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/include",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/include/bluetooth",
+      "${bl602_sdk_root}/components/network/ble/blecontroller/ble_inc",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/include/drivers/bluetooth",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/include/misc",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
+
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver",
+      "${bl602_sdk_root}/components/network/dns_server/include",
+
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/inc/blcrypto_suite",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/inc",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/priv_inc",
+      "${bl602_sdk_root}/components/network/wifi/modules/supplicant/src/sae",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/ring_buffer",
+      "${bl602_sdk_root}/components/utils/include",
+
+      "${bl602_sdk_root}/components/stage/cli/cli/include/",
+      "${bl602_sdk_root}/components/sys/blota/include",
+      "${bl602_sdk_root}/components/utils/include/",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc/",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/",
+
+      #bl602 portable
+      "${chip_root}/third_party/bouffalolab/bl602/portable",
+
+      # rebase add
+      "${bl602_sdk_root}/components/network/wifi_hosal/include",
+      "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter",
+      "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",
+      "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include/bl_os_adapter",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/include/bl_supplicant",
+
+      # wpa_supplicant
+      "${bl602_sdk_root}/components/security/wpa_supplicant/port",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/ap",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/common",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/eap_peer",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/rsn_supp",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/utils",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/test",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/port/include",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/include",
+
+      "${bl602_sdk_root}/security/wpa_supplicant/src/",
+
+      # hosal
+      "${bl602_sdk_root}/components/platform/hosal/sec_common",
+    ]
+
+    #    if (bl602_board == "BL-HWC-G1") {
+    #      _include_dirs += [ "${bl602_sdk_root}/hardware/board/config/bl_hwc_g1" ]
+    #    }
+
+    bl_sdk_ver = getenv("BL_SDK_VER")
+    defines = [
+      "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"",
+      "__STARTUP_CLEAR_BSS",
+      "HARD_FAULT_LOG_ENABLE",
+      "RETARGET_VCOM",
+      "RETARGET_USART0",
+      "ARCH_RISCV",
+      "portasmHANDLE_INTERRUPT=interrupt_entry",
+
+      "SYS_APP_TASK_STACK_SIZE=2048",
+      "SYS_APP_TASK_PRIORITY=28",
+      "BL_SDK_VER=\"$bl_sdk_ver\"",
+
+      "SYS_BLOG_ENABLE=1",
+      "SYS_VFS_ENABLE=1",
+      "SYS_AOS_LOOP_ENABLE=1",
+      "BL602_USE_HAL_DRIVER=1",
+      "BL602=BL602",
+      "SYS_LOOPRT_ENABLE=1",
+      "CFG_TXDESC=2",
+      "CFG_STA_MAX=1",
+      "CFG_CHIP_BL602",
+
+      #      "SYS_AOS_CLI_ENABLE=1",
+
+      # set CONFIG_RENDEZVOUS_MODE to RENDEZVOUS_MODE_BLE (2)
+      "CONFIG_RENDEZVOUS_MODE=2",
+
+      # bluetooth
+      "CONFIG_SET_TX_PWR",
+      "CFG_BLE_ENABLE",
+      "BFLB_BLE",
+      "CFG_BLE",
+      "CFG_SLEEP",
+      "OPTIMIZE_DATA_EVT_FLOW_FROM_CONTROLLER",
+      "CFG_BT_RESET",
+      "CFG_CON=1",
+      "CFG_BLE_TX_BUFF_DATA=2",
+
+      #      "CONFIG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BT_PERIPHERAL=1",
+      "CONFIG_BT_L2CAP_DYNAMIC_CHANNEL",
+      "CONFIG_BT_GATT_CLIENT",
+      "CONFIG_BT_CONN=1",
+      "CONFIG_BT_GATT_DIS_PNP",
+      "CONFIG_BT_GATT_DIS_SERIAL_NUMBER",
+      "CONFIG_BT_GATT_DIS_FW_REV",
+      "CONFIG_BT_GATT_DIS_HW_REV",
+      "CONFIG_BT_GATT_DIS_SW_REV",
+      "CONFIG_BT_ECC",
+      "CONFIG_BT_GATT_DYNAMIC_DB",
+      "CONFIG_BT_GATT_SERVICE_CHANGED",
+      "CONFIG_BT_KEYS_OVERWRITE_OLDEST",
+      "CONFIG_BT_KEYS_SAVE_AGING_COUNTER_ON_PAIRING",
+      "CONFIG_BT_GAP_PERIPHERAL_PREF_PARAMS",
+      "CONFIG_BT_BONDABLE",
+      "CONFIG_BT_HCI_VS_EVT_USER",
+      "CONFIG_BT_ASSERT",
+      "CONFIG_BT_SETTINGS_CCC_LAZY_LOADING",
+      "CONFIG_BT_SETTINGS_USE_PRINTK",
+      "CFG_BLE_STACK_DBG_PRINT",
+
+      #"__FILENAME__=__FILE__",
+      "__FILENAME__=\"\b\"",
+      "BL602_LOG_ENABLED=1",
+      "ENOTSUP=134",
+
+      #dump backtrace
+      "CONF_ENABLE_FRAME_PTR=1",
+      "CONF_ENABLE_FUNC_BACKTRACE_ELF=out/bl602-light/chip-bl602-lighting-example.out",
+      "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=128",
+
+      # board defines
+      "BL_CHIP_NAME=\"BL602\"",
+
+      #include defines
+      "OS_USING_FREERTOS",
+      "BL602_MATTER_SUPPORT",
+      "TD_DIAGNOSIS_STA",
+    ]
+
+    if (bl602_board == "BL-HWC-G1") {
+      defines += [
+        "BL602_UART0_TX_GPIO=16",
+        "BL602_UART0_RX_GPIO=7",
+      ]
+    } else if (bl602_board == "3R-HWC-G1") {
+      defines += [
+        "BL602_UART0_TX_GPIO=2",
+        "BL602_UART0_RX_GPIO=1",
+      ]
+    }
+
+    defines += board_defines
+
+    libs += [
+      "${bl602_sdk_root}/components/network/wifi/lib/libwifi.a",
+      "${bl602_sdk_root}/components/network/ble/blecontroller_602_m0s1/lib/libblecontroller_602_m0s1.a",
+    ]
+
+    cflags = [
+      "-include",
+      rebase_path(
+          "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/errno.h",
+          root_build_dir),
+    ]
+
+    #cflags = ["-include", rebase_path("${bl602_sdk_root}/components/network/ble/blestack/src/common/include/errno.h", root_build_dir), ]
+    # for src/platform/bouffalolab/BL602/BLEManagerImpl.cpp
+    # TODO: 3R
+    #cflags += [ "-fpermissive" ]
+
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+      "-Wno-error",
+      "-fcommon",
+      "-fno-jump-tables",
+    ]
+
+    cflags_cc = [ "-fpermissive" ]
+    cflags_cc += [ "-std=c++17" ]
+    cflags_cc += [ "-D _GNU_SOURCE" ]
+
+    #cflags_cc += [ "-fcommon" ]
+    #cflags_cc += [ "-fno-rtti" ]
+    #cflags_cc += [ "-Wnon-virtual-dtor" ]
+    #cflags_cc += [ "-frtti" ]
+
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+
+    cflags += [ "-save-temps=obj" ]
+    cflags += [ "-Wno-maybe-uninitialized" ]
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  source_set(sdk_target_name) {
+    sources = [
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_flash.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_wdt.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_ota.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_flash.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sf_cfg_ext.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sflash_ext.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_timer.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_xip_sflash_ext.c",
+      "${bl602_sdk_root}/components/stage/cli/cli/cli.c",
+      "${bl602_sdk_root}/components/stage/easyflash4/src/easyflash.c",
+      "${bl602_sdk_root}/components/stage/easyflash4/src/ef_env.c",
+      "${bl602_sdk_root}/components/stage/easyflash4/src/ef_port.c",
+      "${bl602_sdk_root}/components/stage/easyflash4/src/ef_utils.c",
+      "${bl602_sdk_root}/components/sys/blmtd/bl_mtd.c",
+      "${bl602_sdk_root}/components/sys/blota/bl_sys_ota_cli.c",
+      "${bl602_sdk_root}/components/utils/src/utils_hexdump.c",
+      "${bl602_sdk_root}/components/utils/src/utils_sha256.c",
+      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
+      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
+      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md.c",
+      "${chip_root}/third_party/mbedtls/repo/library/oid.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkwrite.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
+    ]
+
+    sources += [
+      "${bl602_sdk_root}/components/fs/vfs/device/vfs_uart.c",
+      "${bl602_sdk_root}/components/fs/vfs/src/vfs.c",
+      "${bl602_sdk_root}/components/fs/vfs/src/vfs_file.c",
+      "${bl602_sdk_root}/components/fs/vfs/src/vfs_inode.c",
+      "${bl602_sdk_root}/components/fs/vfs/src/vfs_register.c",
+      "${bl602_sdk_root}/components/libc/newlibc/stdatomic.c",
+      "${bl602_sdk_root}/components/libc/newlibc/syscalls.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper/bl_hci_wrapper.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/atomic_c.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/buf.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/dec.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/log.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/poll.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/hci_onchip/hci_driver.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/att.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/bl_host_assist.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/conn.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/crypto.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/gatt.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/hci_core.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/l2cap.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/settings.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/host/uuid.c",
+      "${bl602_sdk_root}/components/network/ble/blestack/src/port/bl_port.c",
+      "${bl602_sdk_root}/components/network/dns_server/src/dns_server.c",
+      "${bl602_sdk_root}/components/network/dns_server/src/web_server.c",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/ethernetif.c",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/sys_arch.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/api_lib.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/api_msg.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/err.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/if_api.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/netbuf.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/netdb.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/netifapi.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/sockets.c",
+      "${bl602_sdk_root}/components/network/lwip/src/api/tcpip.c",
+      "${bl602_sdk_root}/components/network/lwip/src/apps/altcp_tls/altcp_tls_mbedtls.c",
+      "${bl602_sdk_root}/components/network/lwip/src/apps/altcp_tls/altcp_tls_mbedtls_mem.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/altcp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/altcp_alloc.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/altcp_tcp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/def.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/dns.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/inet_chksum.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/init.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ip.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/autoip.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/dhcp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/etharp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/icmp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/igmp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/ip4.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/ip4_addr.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv4/ip4_frag.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/dhcp6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/ethip6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/icmp6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/inet6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/ip6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/ip6_addr.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/ip6_frag.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/mld6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/ipv6/nd6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/mem.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/memp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/netif.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/pbuf.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/raw.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/stats.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/sys.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/tcp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/tcp_in.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/tcp_out.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/timeouts.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/udp.c",
+      "${bl602_sdk_root}/components/network/lwip/src/core/utils.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/bridgeif.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/bridgeif_fdb.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/ethernet.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/lowpan6.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/lowpan6_ble.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/lowpan6_common.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/slipif.c",
+      "${bl602_sdk_root}/components/network/lwip/src/netif/zepif.c",
+      "${bl602_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c",
+
+      #"${bl602_sdk_root}/components/network/lwip_mdns/mdns_server.c",
+      "${bl602_sdk_root}/components/network/sntp/sntp.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_cmds.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_irqs.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_main.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_mod_params.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_msg_rx.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_msg_tx.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_platform.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_rx.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_tx.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_utils.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/ipc_host.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/stateMachine.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_api.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_cli.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_event.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_ext.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_profile.c",
+      "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_netif.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_chip.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_dma.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_efuse.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_gpio.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_hbn.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_irq.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_pds.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_pm.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_pwm.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_rtc.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_sec.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_sys.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_timer.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_uart.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_wifi.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_board.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_boot2.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_button.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_gpio.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_hbn.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_sys.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hal_wifi.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_dma.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_pwm.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_uart.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/boot/gcc/start.S",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/strntoumax.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print/platform_device.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_dma.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_ef_ctrl.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_glb.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_hbn.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_efuse.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_media.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_pwm.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_romapi.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sec_eng.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_uart.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/event_groups.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/list.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/misaligned/fp_asm.S",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/misaligned/misaligned_ldst.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/panic/panic_c.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/port.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/portASM.S",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/MemMang/heap_5.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/queue.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/stream_buffer.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/tasks.c",
+      "${bl602_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/timers.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_aes.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_bignum.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_ecp.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_ecp_curves.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_export_fw.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc_glue.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc_secp256r1_mul.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_platform_util.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_porting.c",
+      "${bl602_sdk_root}/components/stage/blfdt/src/fdt.c",
+      "${bl602_sdk_root}/components/stage/blfdt/src/fdt_ro.c",
+      "${bl602_sdk_root}/components/stage/blog/blog.c",
+      "${bl602_sdk_root}/components/stage/yloop/src/aos_freertos.c",
+      "${bl602_sdk_root}/components/stage/yloop/src/device.c",
+      "${bl602_sdk_root}/components/stage/yloop/src/local_event.c",
+      "${bl602_sdk_root}/components/stage/yloop/src/select.c",
+      "${bl602_sdk_root}/components/stage/yloop/src/yloop.c",
+      "${bl602_sdk_root}/components/sys/bloop/bloop/src/bloop_base.c",
+      "${bl602_sdk_root}/components/sys/bloop/bloop/src/bloop_handler_sys.c",
+      "${bl602_sdk_root}/components/sys/bloop/looprt/src/looprt.c",
+      "${bl602_sdk_root}/components/sys/bloop/loopset/src/loopset_led.c",
+      "${bl602_sdk_root}/components/sys/bltime/bl_sys_time.c",
+      "${bl602_sdk_root}/components/utils/src/utils_crc.c",
+      "${bl602_sdk_root}/components/utils/src/utils_dns.c",
+      "${bl602_sdk_root}/components/utils/src/utils_hmac_sha1_fast.c",
+      "${bl602_sdk_root}/components/utils/src/utils_list.c",
+      "${bl602_sdk_root}/components/utils/src/utils_log.c",
+      "${bl602_sdk_root}/components/utils/src/utils_notifier.c",
+      "${bl602_sdk_root}/components/utils/src/utils_psk_fast.c",
+      "${bl602_sdk_root}/components/utils/src/utils_rbtree.c",
+
+      #rebase add
+      "${bl602_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
+      "${bl602_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
+      "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/bl_os_hal.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
+      "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
+      "${bl602_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_supplicant_api.c",
+      "${bl602_sdk_root}/components/utils/src/utils_getopt.c",
+      "${bl602_sdk_root}/components/utils/src/utils_string.c",
+      "${bl602_sdk_root}/components/utils/src/utils_tlv_bl.c",
+
+      #bl602 portable
+      "${chip_root}/third_party/bouffalolab/bl602/portable/async_log.c",
+      "${chip_root}/third_party/bouffalolab/bl602/portable/bfl_main.c",
+      "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
+      "${chip_root}/third_party/bouffalolab/bl602/portable/wifi_mgmr_portable.c",
+
+      #wap_supplicant
+      "${bl602_sdk_root}/components/security/wpa_supplicant/port/os_bl.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/ap/ap_config.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/ap/wpa_auth_ie.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/ap/wpa_auth_rsn_ccmp_only.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_hostap.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpa3.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpa_main.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpas_glue.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wps.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/common/sae.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/common/wpa_common.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-cbc.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-internal-bl.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-omac1.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-unwrap.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-wrap.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/crypto_internal-modexp.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/dh_group5.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/dh_groups.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/md5-internal.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/md5.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/rc4.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1-internal.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1-pbkdf2.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256-internal.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256-prf.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/eap_peer/eap_common.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/pmksa_cache.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/wpa.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/wpa_ie.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/utils/common.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/utils/wpa_debug.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/utils/wpabuf.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_build.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_parse.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_process.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_common.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_dev_attr.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_enrollee.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_registrar.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/src/wps/wps_validate.c",
+      "${bl602_sdk_root}/components/security/wpa_supplicant/test/test_crypto-bl.c",
+    ]
+
+    #    } else if (bl_family == "bl706") {
+    #      sources += [
+    #      ]
+    #    }
+
+    public_deps = [
+      #      "${segger_rtt_root}:segger_rtt",
+      #      "${segger_rtt_root}:segger_rtt_printf",
+      #      "${segger_rtt_root}:segger_rtt_syscalls",
+    ]
+
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    public_configs = [ ":${sdk_target_name}_config" ]
+  }
+}

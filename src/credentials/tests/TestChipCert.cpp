@@ -102,6 +102,14 @@ static const BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
 static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
 static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
 
+constexpr uint8_t sOID_Extension_SubjectAltName[] = { 0x55, 0x1d, 0x11 };
+constexpr char kExtension_SubjectAltName[]        = "test@example.com";
+
+FutureExtension ext{ ByteSpan(sOID_Extension_SubjectAltName),
+                     ByteSpan(reinterpret_cast<uint8_t *>(const_cast<char *>(kExtension_SubjectAltName)),
+                              strlen(kExtension_SubjectAltName)) };
+Optional<FutureExtension> kSubjectAltNameAsFutureExt(ext);
+
 static CHIP_ERROR LoadTestCertSet01(ChipCertificateSet & certSet)
 {
     CHIP_ERROR err;
@@ -212,15 +220,24 @@ static void TestChipCert_ChipDN(nlTestSuite * inSuite, void * inContext)
     const static CATValues noc_cats = { { 0xABCD0001, chip::kUndefinedCAT, chip::kUndefinedCAT } };
 
     ChipDN chip_dn;
+    uint8_t certType = kCertType_FirmwareSigning; // Start with non-default value
+
+    NL_TEST_ASSERT(inSuite, chip_dn.IsEmpty());
+    NL_TEST_ASSERT(inSuite, chip_dn.RDNCount() == 0);
+    NL_TEST_ASSERT(inSuite, chip_dn.GetCertType(certType) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip_dn.IsEmpty() == true);
+    NL_TEST_ASSERT(inSuite, certType == kCertType_NotSpecified);
+
     NL_TEST_ASSERT(inSuite, chip_dn.AddAttribute_CommonName(CharSpan(noc_rdn, strlen(noc_rdn)), false) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, chip_dn.AddAttribute_MatterNodeId(0xAAAABBBBCCCCDDDD) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, chip_dn.AddAttribute_MatterFabricId(0xFAB00000FAB00001) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, chip_dn.AddAttribute_GivenName(CharSpan(noc_rdn2, strlen(noc_rdn2)), true) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, chip_dn.AddCATs(noc_cats) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip_dn.RDNCount() == 5);
 
     NL_TEST_ASSERT(inSuite, chip_dn.AddAttribute_GivenName(CharSpan(noc_rdn2, strlen(noc_rdn2)), true) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, chip_dn.RDNCount() == 5);
 
-    uint8_t certType;
     NL_TEST_ASSERT(inSuite, chip_dn.GetCertType(certType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, certType == kCertType_Node);
 
@@ -1247,6 +1264,15 @@ static void TestChipCert_GenerateRootCert(nlTestSuite * inSuite, void * inContex
 
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
 
+    // Test with FutureExtension
+    X509CertRequestParams root_params2 = { 1234, 631161876, 729942000, root_dn, root_dn, kSubjectAltNameAsFutureExt };
+    MutableByteSpan signed_cert_span2(signed_cert);
+    NL_TEST_ASSERT(inSuite, NewRootX509Cert(root_params2, keypair, signed_cert_span2) == CHIP_NO_ERROR);
+    outCert = MutableByteSpan(outCertBuf);
+
+    NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span2, outCert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
+
     // Test error case: root cert subject provided ICA OID Attribute.
     root_params.SubjectDN.Clear();
     NL_TEST_ASSERT(inSuite, root_params.SubjectDN.AddAttribute_MatterICACId(0xabcdabcd) == CHIP_NO_ERROR);
@@ -1325,6 +1351,15 @@ static void TestChipCert_GenerateICACert(nlTestSuite * inSuite, void * inContext
 
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
 
+    // Test with FutureExtension
+    X509CertRequestParams ica_params2 = { 1234, 631161876, 729942000, ica_dn, issuer_dn, kSubjectAltNameAsFutureExt };
+    MutableByteSpan signed_cert_span2(signed_cert);
+    NL_TEST_ASSERT(inSuite, NewICAX509Cert(ica_params2, ica_keypair.Pubkey(), keypair, signed_cert_span2) == CHIP_NO_ERROR);
+    outCert = MutableByteSpan(outCertBuf);
+
+    NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span2, outCert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
+
     // Test error case: ICA cert subject provided a node ID attribute
     ica_params.SubjectDN.Clear();
     NL_TEST_ASSERT(inSuite, ica_params.SubjectDN.AddAttribute_MatterNodeId(0xABCDABCDABCDABCD) == CHIP_NO_ERROR);
@@ -1370,6 +1405,16 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
 
     NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span, outCert) == CHIP_NO_ERROR);
 
+    NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
+
+    // Test with FutureExtension
+    X509CertRequestParams noc_params2 = { 123456, 631161876, 729942000, noc_dn, issuer_dn, kSubjectAltNameAsFutureExt };
+    MutableByteSpan signed_cert_span2(signed_cert);
+    NL_TEST_ASSERT(inSuite,
+                   NewNodeOperationalX509Cert(noc_params2, noc_keypair.Pubkey(), keypair, signed_cert_span2) == CHIP_NO_ERROR);
+    outCert = MutableByteSpan(outCertBuf);
+
+    NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span2, outCert) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
 
     // Test error case: NOC cert subject doesn't have NodeId attribute

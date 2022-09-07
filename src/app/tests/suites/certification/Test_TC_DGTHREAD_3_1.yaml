@@ -507,7 +507,7 @@ tests:
     - label: "DUT reads ChannelPage0Mask attribute value from TH"
       PICS: DGTHREAD.C.A003c
       verification: |
-          ./chip-tool threadnetworkdiagnostics read channel-mask 54 0
+          ./chip-tool threadnetworkdiagnostics read channel-page0mask 54 0
 
           Verify "ChannelMask response" on the TH(All-cluster-app) Log:
 

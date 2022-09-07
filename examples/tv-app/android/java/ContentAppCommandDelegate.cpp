@@ -37,31 +37,6 @@ namespace AppPlatform {
 using CommandHandlerInterface = chip::app::CommandHandlerInterface;
 using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
-const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
-{
-    // to support the hardcoded sample apps.
-    if (mSendCommandMethod == nullptr)
-    {
-        return "Failed";
-    }
-
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    UtfString jCommandPayload(env, commandPayload.c_str());
-    ChipLogProgress(Zcl, "ContentAppCommandDelegate::sendCommand with payload %s", commandPayload.c_str());
-    jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epID),
-                                                   jCommandPayload.jniValue());
-    if (env->ExceptionCheck())
-    {
-        ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        // TODO : Need to have proper errors passed back.
-        return "Failed";
-    }
-    const char * ret = env->GetStringUTFChars(resp, 0);
-    return ret;
-}
-
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
 {
     if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT)

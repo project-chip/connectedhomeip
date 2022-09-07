@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.91
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -112,23 +112,28 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v2
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-objdir-linux-gcc-debug
-                  path: out/
-                  # objdirs are big; don't hold on to them too long.
-                  retention-days: 5
+            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+            # having the job timeout.
+            #
+            # If re-enabling, some subset of this should be picked
+            #
+            # - name: Uploading objdir for debugging
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ failure() && !env.ACT }}
+            #   with:
+            #       name: crash-objdir-linux-gcc-debug
+            #       path: out/
+            #       # objdirs are big; don't hold on to them too long.
+            #       retention-days: 5
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-        timeout-minutes: 120
+        timeout-minutes: 150
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.91
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -185,31 +190,14 @@ jobs:
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 90
               run: |
-                  for BUILD_TYPE  in gcc_release clang; do
-                      case $BUILD_TYPE in
-                          "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true';;
-                      esac
-
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
-                  done
-            - name: Clang-tidy validation
-              timeout-minutes: 45
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
-                       --compile-database out/clang/compile_commands.json \
-                       check \
-                    "
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
+                  scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
+                  BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Run Tests with sanitizers
               timeout-minutes: 60
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
-                  # for BUILD_TYPE in asan msan tsan ubsan; do
                     for BUILD_TYPE in asan tsan ubsan; do
                         case $BUILD_TYPE in
                             "asan") GN_ARGS='is_clang=true is_asan=true';;
@@ -218,9 +206,20 @@ jobs:
                             "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
                         esac
 
-                        scripts/build/gn_gen.sh --args="$GN_ARGS"
-                        scripts/tests/gn_tests.sh
+                        rm -rf ./out/sanitizers
+                        BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                        BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
+            - name: Clang-tidy validation
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/sanitizers/compile_commands.json \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/' \
+                       check \
+                    "
             - name: Build using build_examples.py
               timeout-minutes: 60
               run: |
@@ -245,14 +244,19 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v2
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-objdir-linux
-                  path: out/
-                  # objdirs are big; don't hold on to them too long.
-                  retention-days: 5
+            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+            # having the job timeout.
+            #
+            # If re-enabling, some subset of this should be picked
+            #
+            # - name: Uploading objdir for debugging
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ failure() && !env.ACT }}
+            #   with:
+            #       name: crash-objdir-linux
+            #       path: out/
+            #       # objdirs are big; don't hold on to them too long.
+            #       retention-days: 5
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -279,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.91
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0

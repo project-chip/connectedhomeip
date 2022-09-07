@@ -45,9 +45,6 @@ if (chip_enable_wifi) {
   pkg_config("capi-network-wifi-manager") {
     packages = [ "capi-network-wifi-manager" ]
   }
-  pkg_config("capi-network-softap") {
-    packages = [ "capi-network-softap" ]
-  }
 }
 
 if (chip_enable_ble) {
@@ -74,10 +71,7 @@ source_set("tizen") {
   }
 
   if (chip_enable_wifi) {
-    public_configs += [
-      ":capi-network-wifi-manager",
-      ":capi-network-softap",
-    ]
+    public_configs += [ ":capi-network-wifi-manager" ]
   }
 
   if (chip_enable_ble) {

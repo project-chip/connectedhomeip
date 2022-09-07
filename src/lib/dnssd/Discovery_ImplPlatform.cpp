@@ -147,9 +147,15 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     proxy->Release();
 }
 
-static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
+static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        proxy->Release();
+        return;
+    }
 
     for (size_t i = 0; i < servicesSize; ++i)
     {
@@ -165,7 +171,11 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
             HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(address, 1), error);
         }
     }
-    proxy->Release();
+
+    if (finalBrowse)
+    {
+        proxy->Release();
+    }
 }
 
 CHIP_ERROR AddPtrRecord(DiscoveryFilter filter, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen)
@@ -433,11 +443,11 @@ CHIP_ERROR DiscoveryImplPlatform::UpdateCommissionableInstanceName()
     return CHIP_NO_ERROR;
 }
 
-void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Discovery, "mDNS service published: %s", type);
+        ChipLogProgress(Discovery, "mDNS service published: %s; instance name: %s", type, instanceName);
     }
     else
     {

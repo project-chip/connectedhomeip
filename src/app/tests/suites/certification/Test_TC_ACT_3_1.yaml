@@ -39,7 +39,7 @@ tests:
       verification: |
           ./chip-tool actions  read action-list 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848323.188336][28392:28392] CHIP:IM: Received Read request
           [1658848323.188433][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -64,7 +64,7 @@ tests:
 
 
 
-          ./chip-tool actions  read endpoint-list   1 1
+          ./chip-tool actions  read endpoint-lists   1 1
 
           Verify read command is received on TH(all-clusters-app
           )
@@ -98,7 +98,7 @@ tests:
 
           ./chip-tool actions read setup-url 1 1
 
-          Verify read command is received on TH(all-clusters-app)
+          Verify read command is received on TH(bridge-app)
 
           [1658848453.728775][28392:28392] CHIP:IM: Received Read request
           [1658848453.728895][28392:28392] CHIP:DMG: ReadRequestMessage =
@@ -157,7 +157,7 @@ tests:
           [1658393025.603258][13481:13486] CHIP:EM: Sending Standalone Ack for MessageCounter:114510707 on exchange 23501i
 
 
-          ./chip-tool bridgedactions  read action-list 1 1
+          ./chip-tool actions  read action-list 1 1
 
           Verify read command is received on TH(all-clusters-minimal-app) Log
 
@@ -184,7 +184,7 @@ tests:
 
 
 
-          ./chip-tool bridgedactions  read endpoint-list   1 1
+          ./chip-tool actions  read endpoint-lists  1 1
 
           Verify read command is received on TH(all-clusters-minimal-app)
 

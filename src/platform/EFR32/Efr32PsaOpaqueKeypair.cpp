@@ -407,13 +407,17 @@ CHIP_ERROR EFR32OpaqueP256Keypair::Deserialize(P256SerializedKeypair & input)
 CHIP_ERROR EFR32OpaqueP256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     MutableByteSpan csr(out_csr, csr_length);
-    return GenerateCertificateSigningRequest(this, csr);
+    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+    return err;
 }
 
 CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error     = CHIP_NO_ERROR;
     size_t output_length = 0;
+
+    VerifyOrExit((msg != nullptr) && (msg_length > 0), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     error = Sign(msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 

@@ -170,6 +170,14 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     VerifyOrReturn(mLayerState.IsInitialized());
 
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
+    if (timer == nullptr)
+    {
+        // The timer was not in our "will fire in the future" list, but it might
+        // be in the "we're about to fire these" chunk we already grabbed from
+        // that list.  Check for it there too, and if found there we still want
+        // to cancel it.
+        timer = mExpiredTimers.Remove(onComplete, appState);
+    }
     VerifyOrReturn(timer != nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -199,8 +207,31 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-    CancelTimer(onComplete, appState);
-
+    // Ideally we would not use a timer here at all, but if we try to just
+    // ScheduleLambda the lambda needs to capture the following:
+    // 1) onComplete
+    // 2) appState
+    // 3) The `this` pointer, because onComplete needs to be passed a pointer to
+    //    the System::Layer.
+    //
+    // On a 64-bit system that's 24 bytes, but lambdas passed to ScheduleLambda
+    // are capped at CHIP_CONFIG_LAMBDA_EVENT_SIZE which is 16 bytes.
+    //
+    // So for now use a timer as a poor-man's closure that captures `this` and
+    // onComplete and appState in a single pointer, so we fit inside the size
+    // limit.
+    //
+    // TODO: We could do something here where we compile-time condition on the
+    // sizes of things and use a direct ScheduleLambda if it would fit and this
+    // setup otherwise.
+    //
+    // TODO: But also, unit tests seem to do SystemLayer::ScheduleWork without
+    // actually running a useful event loop (in the PlatformManager sense),
+    // which breaks if we use ScheduleLambda here, since that does rely on the
+    // PlatformManager event loop. So for now, keep scheduling an expires-ASAP
+    // timer, but just make sure we don't cancel existing timers with the same
+    // callback and appState, so ScheduleWork invocations don't stomp on each
+    // other.
     TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -469,9 +500,10 @@ void LayerImplSelect::HandleEvents()
 
     // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
     // since that could result in infinite handling of new timers blocking any other progress.
-    TimerList expiredTimers = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
+    VerifyOrDieWithMsg(mExpiredTimers.Empty(), DeviceLayer, "Re-entry into HandleEvents from a timer callback?");
+    mExpiredTimers          = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
     TimerList::Node * timer = nullptr;
-    while ((timer = expiredTimers.PopEarliest()) != nullptr)
+    while ((timer = mExpiredTimers.PopEarliest()) != nullptr)
     {
         mTimerPool.Invoke(timer);
     }

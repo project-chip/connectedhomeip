@@ -1496,7 +1496,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u remainingTime = 2;
   readonly attribute int16u currentX = 3;
   readonly attribute int16u currentY = 4;
-  readonly attribute int16u colorTemperature = 7;
+  readonly attribute int16u colorTemperatureMireds = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
@@ -1511,7 +1511,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u colorTempPhysicalMinMireds = 16395;
   readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
+  attribute access(write: manage) nullable int16u startUpColorTemperatureMireds = 16400;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -2027,7 +2027,7 @@ endpoint 1 {
     ram      attribute remainingTime;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperature default = 0x00FA;
+    ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute colorMode default = 0x01;
     ram      attribute options;
     ram      attribute numberOfPrimaries;

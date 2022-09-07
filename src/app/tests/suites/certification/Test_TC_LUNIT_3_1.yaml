@@ -43,7 +43,7 @@ tests:
               type: enum8
 
     - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000.Fahrenheit
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -51,14 +51,14 @@ tests:
           value: 0
 
     - label: "TH reads TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 0
 
     - label: "TH writes 1 (Celsius) to TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000.Celsius
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -66,14 +66,14 @@ tests:
           value: 1
 
     - label: "TH reads TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 1
 
     - label: "TH writes 2 (Kelvin) to TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000.Kelvin
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -81,14 +81,14 @@ tests:
           value: 2
 
     - label: "TH reads TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000
+      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 2
 
     - label: "TH writes 5 to TemperatureUnit attribute"
-      PICS: LUNIT.C.A0000
+      PICS: LUNIT.S.A0000
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"

@@ -32,7 +32,9 @@
 
 #include <dns-sd-internal.h>
 #include <glib.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer::Internal;
@@ -91,13 +93,13 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
     if (result != DNSSD_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, result);
-        rCtx->mCallback(rCtx->mCbContext, nullptr, GetChipError(result));
+        rCtx->mCallback(rCtx->mCbContext, nullptr, nullptr, GetChipError(result));
         // After this point, the context might be no longer valid
         rCtx->mInstance->RemoveContext(rCtx);
         return;
     }
 
-    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, CHIP_NO_ERROR);
+    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, rCtx->mName, CHIP_NO_ERROR);
 }
 
 gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
@@ -122,7 +124,7 @@ gboolean OnBrowseTimeout(void * userData)
     auto * bCtx = reinterpret_cast<BrowseContext *>(userData);
 
     bCtx->MainLoopQuit();
-    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
+    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), true, CHIP_NO_ERROR);
 
     // After this point the context might be no longer valid
     bCtx->mInstance->RemoveContext(bCtx);
@@ -213,7 +215,7 @@ exit:
 
     if (ret != DNSSD_ERROR_NONE)
     {
-        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, GetChipError(ret));
+        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, true, GetChipError(ret));
         // After this point the context might be no longer valid
         bCtx->mInstance->RemoveContext(bCtx);
     }
@@ -524,7 +526,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                 if (ret != DNSSD_ERROR_NONE)
                 {
                     ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret);
-                    callback(context, nullptr, err = GetChipError(ret));
+                    callback(context, nullptr, nullptr, err = GetChipError(ret));
                 }
             }
 
@@ -573,7 +575,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, err);
+        callback(context, nullptr, nullptr, err);
         RemoveContext(serviceCtx);
     }
     return err;
@@ -612,7 +614,7 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, 0, err);
+        callback(context, nullptr, 0, true, err);
         RemoveContext(browseCtx);
     }
     return err;

@@ -90,6 +90,10 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         make_unique<ReadAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
         make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22341 }}
+        {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
+        make_unique<ReadAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{/if}}
         {{/zcl_attributes_server}}
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
@@ -107,6 +111,10 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{#zcl_attributes_server}}
         {{#if isReportable}}
         make_unique<SubscribeAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22341 }}
+        {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
+        make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{/if}}
         {{/if}}
         {{/zcl_attributes_server}}
         //

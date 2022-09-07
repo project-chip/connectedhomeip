@@ -33,6 +33,13 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   private static final String ANDROID_PACKAGE_ADDED_ACTION = "android.intent.action.PACKAGE_ADDED";
   private static final String ANDROID_PACKAGE_REPLACED_ACTION =
       "android.intent.action.PACKAGE_REPLACED";
+  public static final String DISCOVERY_APPAGENT_ACTION_ADD = "com.matter.tv.server.appagent.add";
+  public static final String DISCOVERY_APPAGENT_ACTION_REMOVE =
+      "com.matter.tv.server.appagent.remove";
+  public static final String DISCOVERY_APPAGENT_EXTRA_PACKAGENAME =
+      "com.matter.tv.server.appagent.pkg";
+  public static final String DISCOVERY_APPAGENT_EXTRA_ENDPOINTID =
+      "com.matter.tv.server.appagent.endpointId";
 
   private static ResourceUtils resourceUtils = ResourceUtils.getInstance();
 
@@ -105,9 +112,9 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
       ContentApp app = new ContentApp(pkg, vendorName, vendorId, productId, supportedClusters);
       applications.put(pkg, app);
 
-      Intent in = new Intent("com.matter.tv.server.appagent.add");
+      Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_ADD);
       Bundle extras = new Bundle();
-      extras.putString("com.matter.tv.server.appagent.add.pkg", pkg);
+      extras.putString(DISCOVERY_APPAGENT_EXTRA_PACKAGENAME, pkg);
       in.putExtras(extras);
       context.sendBroadcast(in);
     } catch (PackageManager.NameNotFoundException e) {
@@ -117,15 +124,19 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
   private void handlePackageRemoved(final Intent intent, final Context context) {
     String pkg = intent.getData().getSchemeSpecificPart();
-    Log.i(TAG, pkg + " Removed.");
-
-    applications.remove(pkg);
-
-    Intent in = new Intent("com.matter.tv.server.appagent.remove");
-    Bundle extras = new Bundle();
-    extras.putString("com.matter.tv.server.appagent.add.pkg", pkg);
-    in.putExtras(extras);
-    context.sendBroadcast(in);
+    ContentApp contentApp = applications.get(pkg);
+    if (contentApp != null) {
+      applications.remove(pkg);
+      Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_REMOVE);
+      Bundle extras = new Bundle();
+      extras.putString(DISCOVERY_APPAGENT_EXTRA_PACKAGENAME, pkg);
+      extras.putInt(DISCOVERY_APPAGENT_EXTRA_ENDPOINTID, contentApp.getEndpointId());
+      in.putExtras(extras);
+      context.sendBroadcast(in);
+      Log.i(TAG, "Removing Matter content app " + pkg);
+    } else {
+      Log.i(TAG, "App not found in set of Matter content apps. Doing nothing for app " + pkg);
+    }
   }
 
   public void registerSelf(Context context) {

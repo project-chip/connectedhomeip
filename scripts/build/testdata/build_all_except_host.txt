@@ -612,6 +612,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
 
+# Generating esp32-devkitc-light-rpc
+mkdir -p {out}/esp32-devkitc-light-rpc
+
+cp examples/lighting-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc reconfigure'
+
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
 
@@ -1152,6 +1163,13 @@ export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
+
+# Generating telink-tlsr9518adk80d-ota-requestor
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-ota-requestor -b tlsr9518adk80d {root}/examples/ota-requestor-app/telink'
 
 # Generating tizen-arm-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters
@@ -1948,6 +1966,13 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
 
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc build'
+
 rm -f examples/lock-app/esp32/sdkconfig
 
 # Building esp32-devkitc-lock
@@ -2357,6 +2382,9 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building telink-tlsr9518adk80d-light-switch
 ninja -C {out}/telink-tlsr9518adk80d-light-switch
+
+# Building telink-tlsr9518adk80d-ota-requestor
+ninja -C {out}/telink-tlsr9518adk80d-ota-requestor
 
 # Building tizen-arm-all-clusters
 ninja -C {out}/tizen-arm-all-clusters

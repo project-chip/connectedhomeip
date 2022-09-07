@@ -23,6 +23,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/PoolWrapper.h>
 
+#include <lib/dnssd/minimal_mdns/ListenIterator.h>
 #include <lib/dnssd/minimal_mdns/core/BytesRange.h>
 
 namespace mdns {
@@ -36,25 +37,6 @@ void GetIpv6Into(chip::Inet::IPAddress & dest);
 void GetIpv4Into(chip::Inet::IPAddress & dest);
 
 } // namespace BroadcastIpAddresses
-
-/// Provides a list of intefaces to listen on.
-///
-/// When listening on IP, both IP address type (IPv4 or IPv6) and interface id
-/// are important. In particular, when using link-local IP addresses, the actual
-/// interface matters (e.g. FF02::FB will care over which IPv6 interface it is sent)
-///
-/// For MDNS in particular, you may want:
-///  - IPv4 listen on InterfaceId::Null()
-///  - IPv6 listen on every specific interface id available (except local loopback and other
-///    not usable interfaces like docker)
-class ListenIterator
-{
-public:
-    virtual ~ListenIterator() {}
-
-    // Get the next interface/address type to listen on
-    virtual bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) = 0;
-};
 
 /// Handles mDNS Server Callbacks
 class ServerDelegate

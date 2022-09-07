@@ -52,7 +52,7 @@ public:
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
-    static constexpr uint8_t kMaxLevel = 255;
+    static constexpr uint8_t kMaxLevel = 254;
 
     friend LightingManager & LightingMgr();
     State_t mState;

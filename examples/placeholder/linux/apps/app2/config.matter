@@ -1916,7 +1916,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u currentY = 4;
   attribute bitmap8 options = 15;
   readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
+  attribute access(write: manage) nullable int16u startUpColorTemperatureMireds = 16400;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
