@@ -24,7 +24,7 @@
 class CommonDeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) override;
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
@@ -40,7 +40,9 @@ public:
     }
     virtual void OnIPv4ConnectivityEstablished() {}
     virtual void OnIPv4ConnectivityLost() {}
-    DeviceCallbacksDelegate * mDelegate = nullptr;
     void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
     DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
+
+private:
+    DeviceCallbacksDelegate * mDelegate = nullptr;
 };

@@ -107,16 +107,12 @@ extern "C" void BkQueryImageCmdHandler(char * pcWriteBuffer, int xWriteBufferLen
 
     QueryImageCmdHandler();
     ChipLogProgress(DeviceLayer, "QueryImageCmdHandler begin");
-
-    return;
 }
 
 extern "C" void BkApplyUpdateCmdHandler(char * pcWriteBuffer, int xWriteBufferLen, int argc, char ** argv)
 {
-    // ApplyUpdateCmdHandler();
+    ApplyUpdateCmdHandler();
     ChipLogProgress(DeviceLayer, "ApplyUpdateCmdHandler send request");
-
-    return;
 }
 
 extern "C" void BkNotifyUpdateApplied(char * pcWriteBuffer, int xWriteBufferLen, int argc, char ** argv)
@@ -148,8 +144,6 @@ extern "C" void BkNotifyUpdateApplied(char * pcWriteBuffer, int xWriteBufferLen,
 
     NotifyUpdateAppliedHandler(version);
     ChipLogProgress(DeviceLayer, "NotifyUpdateApplied send request");
-
-    return;
 }
 
 static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)

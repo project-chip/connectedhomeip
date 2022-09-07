@@ -27,8 +27,6 @@ using namespace chip;
 using namespace chip::DeviceLayer;
 using namespace chip::System;
 
-// DeviceCallbacksDelegate * appDelegate = nullptr;
-
 void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogProgress(Zcl, "DeviceEventCallback, event->Type:%d \r\n", event->Type);
@@ -38,9 +36,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
         OnInternetConnectivityChange(event);
         break;
 
-    // case DeviceEventType::kSessionEstablished:
-    //   OnSessionEstablished(event);
-    //    break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         ChipLogProgress(Zcl, "IP(%s) changed event",
                         (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ? "IPv4" : "IPv6");
@@ -71,7 +66,7 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ChipLogProgress(Zcl, "Server ready at:%d", CHIP_PORT);
-        // chip::app::DnssdServer::Instance().StartServer();
+        // we start dnssd when ipv6 is ready.
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
