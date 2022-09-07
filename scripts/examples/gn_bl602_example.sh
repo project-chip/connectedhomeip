@@ -22,7 +22,7 @@ BL602_BOARD=BL-HWC-G1
 
 # Build script for GN examples GitHub workflow.
 
-MATTER_ROOT=$(dirname `readlink -f $0`)/../../
+MATTER_ROOT=$(dirname "$(readlink -f "$0")")/../../
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 

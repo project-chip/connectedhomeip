@@ -20,7 +20,7 @@ set -e
 
 # Build script for GN Bouffalolab examples GitHub workflow.
 
-MATTER_ROOT=$(dirname `readlink -f $0`)/../../
+MATTER_ROOT=$(dirname "$(readlink -f "$0")")/../../
 source "$MATTER_ROOT/scripts/activate.sh"
 
 # export BL_IOT_SDK_PATH=$MATTER_ROOT/third_party/bouffalolab/repo
@@ -37,13 +37,13 @@ bl702_module_type="BL706C-22"
 
 print_help() {
     bl702_boards_help=""
-    for board in ${bl702_boards[@]}
+    for board in "${bl702_boards[@]}"
     do
         bl702_boards_help=$bl702_boards_help$board"\n            "
     done
 
     bl702_modules_help=""
-    for module in ${bl702_modules[@]}
+    for module in "${bl702_modules[@]}"
     do
         bl702_modules_help=$bl702_modules_help$module"\n                "
     done
@@ -113,13 +113,13 @@ else
 
     while [ $# -gt 0 ]; do
         if [[ "$1" == "module_type"* ]]; then
-            module_type=`echo $1 | awk -F'=' '{print $2}'`
+            module_type=`echo "$1" | awk -F'=' '{print $2}'`
 
             shift
             continue
         fi
         if [[ "$1" == "baudrate"* ]]; then
-            baudrate=`echo $1 | awk -F'=' '{print $2}'`
+            baudrate=`echo "$1" | awk -F'=' '{print $2}'`
 
             shift
             continue
