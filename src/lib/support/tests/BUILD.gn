@@ -60,7 +60,10 @@ chip_test_suite("tests") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+    "-Wno-error=uninitialized",
+  ]
 
   public_deps = [
     "${chip_root}/src/credentials",
