@@ -1,36 +1,19 @@
-name: "\U0001F41B Bug report"
-description: Create a report to help Matter
-title: "[BUG] "
+name: "\U0001F4A1 Feature Request"
+description: Create an feature to be considered future release
+title: "[Feature] "
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for reporting an issue against the Matter SDK! We need information about the bug report to follow up, so please help us out by filling out this information.
+              Thanks for submitting a feature request to the Matter SDK! We need information about the feature to follow up, so please help us out by filling out this information.
     - type: textarea
       id: repro
       attributes:
-          label: Reproduction steps
-          description: "How do you trigger this bug? Please walk us through it step by step."
+          label: Feature description
+          description: "What feature are you looking to add? Please walk us through it!"
           value: |
-              1.
-              2.
-              3.
               ...
           render: bash
-      validations:
-          required: true
-    - type: input
-      id: prevalence
-      attributes:
-          label: Bug prevalence
-          description: "How often do you or others encounter this bug?"
-          placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
-      validations:
-          required: true
-    - type: input
-      attributes:
-          label: GitHub hash of the SDK that was being used
-          description: Hash of the GitHub SDK used
       validations:
           required: true
     - type: dropdown
@@ -39,6 +22,7 @@ body:
           description: What platforms are affected?
           multiple: true
           options:
+              - all
               - ameba
               - android
               - cc13x2_cc26x2
@@ -48,6 +32,7 @@ body:
               - freeRTOS
               - IMX8
               - k32w
+              - nrf connect
               - nrf
               - python
               - raspi
@@ -74,4 +59,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a bug!"
+          value: "Thanks for submitting a new feature request."

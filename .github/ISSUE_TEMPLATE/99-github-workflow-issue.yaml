@@ -1,36 +1,22 @@
-name: "\U0001F41B Bug report"
-description: Create a report to help Matter
-title: "[BUG] "
+name: "\U0001F477 GitHub / CI / Workflow"
+description: Create an issue to improve CI / Workflows
+title: "[Workflow] "
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for reporting an issue against the Matter SDK! We need information about the bug report to follow up, so please help us out by filling out this information.
+              Thanks for reporting an issue against the Matter SDK's workflows! We need information about the bug report to follow up, so please help us out by filling out this information.
     - type: textarea
       id: repro
       attributes:
-          label: Reproduction steps
-          description: "How do you trigger this bug? Please walk us through it step by step."
+          label: Workflow issues
+          description: "What updates to the workflows are needed?"
           value: |
               1.
               2.
               3.
               ...
           render: bash
-      validations:
-          required: true
-    - type: input
-      id: prevalence
-      attributes:
-          label: Bug prevalence
-          description: "How often do you or others encounter this bug?"
-          placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
-      validations:
-          required: true
-    - type: input
-      attributes:
-          label: GitHub hash of the SDK that was being used
-          description: Hash of the GitHub SDK used
       validations:
           required: true
     - type: dropdown
@@ -48,21 +34,17 @@ body:
               - freeRTOS
               - IMX8
               - k32w
+              - nrf connect
               - nrf
               - python
               - raspi
               - vscode
               - windows
               - other
-              - core
+              - core (please add to version below)
+              - all
       validations:
-          required: true
-    - type: input
-      id: platform-versions
-      attributes:
-          label: Platform Version(s)
-          description: "What platform version(s) are affected [optional]"
-          placeholder: "eg: 1.0.1, N/A"
+          required: false
     - type: textarea
       attributes:
           label: Anything else?
@@ -74,4 +56,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a bug!"
+          value: "Thanks for helping improve our development workflows"
