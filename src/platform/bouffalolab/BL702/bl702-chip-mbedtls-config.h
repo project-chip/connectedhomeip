@@ -27,8 +27,7 @@
  */
 
 // Spans multiple lines to avoid being processed by unifdef
-#ifndef \
-    MBEDTLS_CONFIG_H
+#ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
 // #include "openthread-core-config.h"

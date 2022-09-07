@@ -34,7 +34,7 @@ namespace {
 int streamer_bl702_init(streamer_t * streamer)
 {
     (void) streamer;
-//    uartInit();
+    // uartInit();
     return 0;
 }
 

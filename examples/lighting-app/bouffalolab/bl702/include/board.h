@@ -34,7 +34,6 @@
 
 #pragma once
 
-
 #define CHIP_UART_PORT                  0
 #define CHIP_UART_RX_BUFFSIZE           256
 

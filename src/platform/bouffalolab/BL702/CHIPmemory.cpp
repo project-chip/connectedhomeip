@@ -147,7 +147,4 @@ bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 } // namespace Platform
 } // namespace chip
 
-
-
-
 #endif // CHIP_CONFIG_MEMORY_MGMT_MALLOC
