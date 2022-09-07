@@ -46,17 +46,11 @@ constexpr uint8_t kUpdateTokenLen = 32;
                 completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler
 {
-    NSError * error;
-
     auto isBDXProtocolSupported =
         [params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
     if (!isBDXProtocolSupported) {
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
-        error =
-            [[NSError alloc] initWithDomain:@"OTAProviderDomain"
-                                       code:MTRErrorCodeGeneralError
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Protocol is not supported.", nil) }];
-        completionHandler(_selectedCandidate, error);
+        completionHandler(_selectedCandidate, nil);
         return;
     }
 
@@ -64,10 +58,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
     if (!hasCandidate) {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-        error = [[NSError alloc]
-            initWithDomain:@"OTAProviderDomain"
-                      code:MTRErrorCodeInvalidState
-                  userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unable to select Candidate.", nil) }];
+        completionHandler(_selectedCandidate, nil);
         return;
     }
 
@@ -78,7 +69,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
         _selectedCandidate.userConsentNeeded
             = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
         NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
-        completionHandler(_selectedCandidate, error);
+        completionHandler(_selectedCandidate, nil);
         return;
     }
 
@@ -101,7 +92,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
         break;
     }
     _selectedCandidate.status = @(_queryImageStatus);
-    completionHandler(_selectedCandidate, error);
+    completionHandler(_selectedCandidate, nil);
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
