@@ -51,8 +51,6 @@ declare_args() {
   setupPinCode = 20202021
   setupDiscriminator = 3840
   OTA_periodic_query_timeout = 86400
-
-  bouffalolab_objcopy = ""
 }
 
 bl702_sdk("sdk") {
@@ -87,7 +85,6 @@ bl702_sdk("sdk") {
 
 bl702_executable("lighting_app") {
   output_name = "chip-bl702-lighting-example.out"
-  objcopy = bouffalolab_objcopy
 
   defines = [
     "APP_TASK_STACK_SIZE=2044",

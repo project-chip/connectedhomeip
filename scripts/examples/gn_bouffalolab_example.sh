@@ -96,13 +96,7 @@ else
     baudrate=2000000
     optArgs=""
 
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        optArgs=custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:linux_riscv_gcc\"
-        optArgs=$optArgs" "bouffalolab_objcopy=\"$MATTER_ROOT/third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy\"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        optArgs=custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:darwin_riscv_gcc\"
-        optArgs=$optArgs" "bouffalolab_objcopy=\"$MATTER_ROOT/third_party/bouffalolab/repo/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy\"
-    fi
+    optArgs=custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:riscv_gcc\"
 
     shift
     shift

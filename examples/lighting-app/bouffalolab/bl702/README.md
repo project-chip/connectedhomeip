@@ -195,7 +195,7 @@ which `<identify_duration>` is how many seconds to execute identify command.
 
 ### Build ota-provider-app as [guide](../../../ota-provider-app/linux/README.md)
 
-### Create the Matter OTA with Bouffalo Lab OTA bin `FW_OTA.bin.xz.hash`
+### Create the Matter OTA with Bouffalolab OTA bin `FW_OTA.bin.xz.hash`
 
 -   Under connectedhomeip repo path
 

@@ -22,8 +22,11 @@ template("bl602_executable") {
 
   objcopy_image_name = output_base_name + ".bin"
   objcopy_image_format = "binary"
-  if (invoker.objcopy == "") {
-    invoker.objcopy = "riscv64-unknown-elf-objcopy"
+  objcopy = "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv"
+  if ( "linux" == host_os ) {
+    objcopy = objcopy + "/Linux/bin/riscv64-unknown-elf-objcopy"
+  } else if ( "mac" == host_os || "darwin" == host_os ) {
+    objcopy = objcopy + "/Darwin/bin/riscv64-unknown-elf-objcopy"
   }
 
   # Copy flashing dependencies to the output directory so that the output

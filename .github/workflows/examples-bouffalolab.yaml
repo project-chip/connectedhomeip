@@ -55,14 +55,16 @@ jobs:
       - name: Build example BL702 Lighting App
         timeout-minutes: 30
         run: |
-          ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/bouffalolab-BL706-IoT-DVK-BL706C-22-light BL706-IoT-DVK
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702 lighting-app \
             out/bouffalolab-BL706-IoT-DVK-BL706C-22-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
 
       - name: Build example BL702 Lighting App with RPCs
         timeout-minutes: 30
         run: |
-          ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc BL706-IoT-DVK 'import("//with_pw_rpc.gni")'
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702+rpc lighting-app \
             out/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
 

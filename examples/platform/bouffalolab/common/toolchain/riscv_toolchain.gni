@@ -22,9 +22,9 @@ template("riscv_toolchain") {
     _tool_name_root = ""
     _toolchain_path =
         "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv"
-    if ("linux_riscv_gcc" == target_name) {
+    if ( "linux" == host_os ) {
       _tool_name_root = _toolchain_path + "/Linux/bin/"
-    } else if ("darwin_riscv_gcc" == target_name) {
+    } else if ( "mac" == host_os || "darwin" == host_os ) {
       _tool_name_root = _toolchain_path + "/Darwin/bin/"
     }
     _tool_name_root = _tool_name_root + "riscv64-unknown-elf-"

@@ -14,12 +14,7 @@
 
 import("riscv_toolchain.gni")
 
-riscv_toolchain("linux_riscv_gcc") {
-  toolchain_args = {
-  }
-}
-
-riscv_toolchain("darwin_riscv_gcc") {
+riscv_toolchain("riscv_gcc") {
   toolchain_args = {
   }
 }
