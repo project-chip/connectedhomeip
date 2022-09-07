@@ -15,8 +15,6 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
-#chip_device_platform = "mt793x"
-
 chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
@@ -26,8 +24,6 @@ lwip_platform = "external"
 
 chip_build_tests = true
 
-#Enabling this causes some error
-#chip_inet_config_enable_tun_endpoint = false
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
