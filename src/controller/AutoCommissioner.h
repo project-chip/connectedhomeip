@@ -18,13 +18,11 @@
 #pragma once
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
 namespace Controller {
-
-constexpr size_t kAttestationElementsLength  = 900;
-constexpr size_t kAttestationSignatureLength = 64;
 
 class DeviceCommissioner;
 
@@ -98,9 +96,9 @@ private:
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 
     uint16_t mAttestationElementsLen = 0;
-    uint8_t mAttestationElements[kAttestationElementsLength];
+    uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
-    uint8_t mAttestationSignature[kAttestationSignatureLength];
+    uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 };
 } // namespace Controller
 } // namespace chip

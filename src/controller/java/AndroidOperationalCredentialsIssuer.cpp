@@ -225,9 +225,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jbyteArray javaAttestationElements;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), attestationElements.size(),
                                                javaAttestationElements);
-    // new log message below
-    ChipLogError(Controller, "AndroidOpCredsIssuer attestationElements size %d/%d", static_cast<int>(attestationElements.size()),
-                 static_cast<int>(env->GetArrayLength(javaAttestationElements)));
+    ChipLogProgress(Controller, "AndroidOpCredsIssuer attestationElements size %d/%d", static_cast<int>(attestationElements.size()),
+                    static_cast<int>(env->GetArrayLength(javaAttestationElements)));
 
     const ByteSpan & attestationNonce = mAutoCommissioner->GetAttestationNonce();
     jbyteArray javaAttestationNonce;

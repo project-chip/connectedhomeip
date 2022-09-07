@@ -76,7 +76,7 @@ using namespace chip::app::Clusters;
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
 
-class MyServerStorageDelegate : public PersistentStorageDelegate
+class CustomServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -105,7 +105,7 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
-class MyCommissionerCallback : public CommissionerCallback
+class CustomCommissionerCallback : public CommissionerCallback
 {
     void ReadyForCommissioning(uint32_t pincode, uint16_t longDiscriminator, PeerAddress peerAddress) override
     {
@@ -115,16 +115,15 @@ class MyCommissionerCallback : public CommissionerCallback
 
 AutoCommissioner gAutoCommissioner;
 
-class MyCredsIssuer : public ExampleOperationalCredentialsIssuer
+class CustomCredsIssuer : public ExampleOperationalCredentialsIssuer
 {
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override
     {
-        ChipLogError(Controller, "---------------------------MyCredsIssuer ");
         // add parsing here
         const ByteSpan & attestationElements = gAutoCommissioner.GetCommissioningParameters().GetAttestationElements().Value();
-        ChipLogError(Controller, "MyCredsIssuer attestationElements size %d", static_cast<int>(attestationElements.size()));
+        ChipLogError(Controller, "CustomCredsIssuer attestationElements size %d", static_cast<int>(attestationElements.size()));
 
         ByteSpan certificationDeclarationSpan;
         ByteSpan attestationNonceSpan;
@@ -150,9 +149,9 @@ class MyCredsIssuer : public ExampleOperationalCredentialsIssuer
 
 DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
-MyCommissionerCallback gCommissionerCallback;
-MyServerStorageDelegate gServerStorage;
-MyCredsIssuer gOpCredsIssuer;
+CustomCommissionerCallback gCommissionerCallback;
+CustomServerStorageDelegate gServerStorage;
+CustomCredsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 Credentials::PartialDACVerifier gPartialDACVerifier;

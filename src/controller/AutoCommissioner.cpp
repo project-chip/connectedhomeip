@@ -510,43 +510,33 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendDACCertificateRequest:
             SetDAC(report.Get<RequestedCertificate>().certificate);
             break;
-        case CommissioningStage::kSendAttestationRequest:
-            if (report.Get<AttestationResponse>().attestationElements.size() > kAttestationElementsLength)
+        case CommissioningStage::kSendAttestationRequest: {
+            auto & elements  = report.Get<AttestationResponse>().attestationElements;
+            auto & signature = report.Get<AttestationResponse>().signature;
+            if (elements.size() > sizeof(mAttestationElements))
             {
-                ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %d larger than cache size %d",
-                             static_cast<int>(report.Get<AttestationResponse>().attestationElements.size()),
-                             static_cast<int>(kAttestationElementsLength));
-                mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements);
+                ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %u larger than cache size %u",
+                             static_cast<unsigned>(elements.size()), static_cast<unsigned>(sizeof(mAttestationElements)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
             }
-            else
-            {
-                memcpy(mAttestationElements, report.Get<AttestationResponse>().attestationElements.data(),
-                       report.Get<AttestationResponse>().attestationElements.size());
-                mAttestationElementsLen = static_cast<uint16_t>(report.Get<AttestationResponse>().attestationElements.size());
-                mParams.SetAttestationElements(
-                    ByteSpan(mAttestationElements, report.Get<AttestationResponse>().attestationElements.size()));
-                ChipLogError(Controller, "AutoCommissioner setting attestationElements buffer size %d/%d",
-                             static_cast<int>(report.Get<AttestationResponse>().attestationElements.size()),
-                             static_cast<int>(mParams.GetAttestationElements().Value().size()));
-            }
+            memcpy(mAttestationElements, elements.data(), elements.size());
+            mAttestationElementsLen = static_cast<uint16_t>(elements.size());
+            mParams.SetAttestationElements(ByteSpan(mAttestationElements, elements.size()));
+            ChipLogError(Controller, "AutoCommissioner setting attestationElements buffer size %u/%u",
+                         static_cast<unsigned>(elements.size()),
+                         static_cast<unsigned>(mParams.GetAttestationElements().Value().size()));
 
-            if (report.Get<AttestationResponse>().signature.size() > kAttestationSignatureLength)
+            if (signature.size() > sizeof(mAttestationSignature))
             {
                 ChipLogError(Controller,
-                             "AutoCommissioner attestationSignature buffer size %d larger than "
-                             "cache size %d",
-                             static_cast<int>(report.Get<AttestationResponse>().signature.size()),
-                             static_cast<int>(kAttestationSignatureLength));
-                mParams.SetAttestationSignature(report.Get<AttestationResponse>().signature);
+                             "AutoCommissioner attestationSignature buffer size %u larger than "
+                             "cache size %u",
+                             static_cast<unsigned>(signature.size()), static_cast<unsigned>(sizeof(mAttestationSignature)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
             }
-            else
-            {
-                memcpy(mAttestationSignature, report.Get<AttestationResponse>().signature.data(),
-                       report.Get<AttestationResponse>().signature.size());
-                mAttestationSignatureLen = static_cast<uint16_t>(report.Get<AttestationResponse>().signature.size());
-                mParams.SetAttestationSignature(
-                    ByteSpan(mAttestationSignature, report.Get<AttestationResponse>().signature.size()));
-            }
+            memcpy(mAttestationSignature, signature.data(), signature.size());
+            mAttestationSignatureLen = static_cast<uint16_t>(signature.size());
+            mParams.SetAttestationSignature(ByteSpan(mAttestationSignature, signature.size()));
 
             // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here
@@ -557,6 +547,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
             }
             break;
+        }
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
             nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;

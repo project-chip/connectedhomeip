@@ -1734,6 +1734,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
         }
     });
 
+    // Try to parse as much as we can here before returning, even if this is an error.
+    return_err = err == CHIP_NO_ERROR ? return_err : err;
+
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
             if (path.mAttributeId != app::Clusters::OperationalCredentials::Attributes::Fabrics::Id)
@@ -1742,6 +1745,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 return CHIP_NO_ERROR;
             }
 
+            // this code is checking if the device is already on the commissioner's fabric.
+            // if a matching fabric is found, then remember the nodeId so that the commissioner
+            // can cancel commissioning (before it fails in AddNoc) and know it's nodeId.
             switch (path.mAttributeId)
             {
             case app::Clusters::OperationalCredentials::Attributes::Fabrics::Id: {

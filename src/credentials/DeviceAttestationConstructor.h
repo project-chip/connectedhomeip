@@ -23,6 +23,9 @@
 namespace chip {
 namespace Credentials {
 
+// As per specifications section 11.22.5.1. Constant RESP_MAX
+constexpr size_t kMaxRspLen = 900;
+
 // CSRNonce and AttestationNonce need to be this size
 constexpr size_t kExpectedAttestationNonceSize = 32;
 

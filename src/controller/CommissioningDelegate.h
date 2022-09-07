@@ -177,13 +177,11 @@ public:
     // Attestation elements from the node. These are obtained from node in response to the AttestationRequest command. In the
     // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
-    // Warning: data is not deep copied to local memory and can only be read during PerformCommissioningStep.
     const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
 
     // Attestation signature from the node. This is obtained from node in response to the AttestationRequest command. In the
     // AutoCommissioner, this is automatically set from the report from the kSendAttestationRequest stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
-    // Warning: data is not deep copied to local memory and can only be read during PerformCommissioningStep.
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
 
     // Product attestation intermediate certificate from the node. This is obtained from the node in response to the
