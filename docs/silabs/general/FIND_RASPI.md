@@ -4,7 +4,7 @@
 
 Sometimes it can be difficult to find your Raspberry Pi on the network. One way of interacting with the Raspberry Pi is connecting a keyboard, mouse and monitor to it. The preferred method, however, is over SSH. For this, you will need to know the IP address of your Raspberry Pi.
 
-[This](https://raspberryexpert.com/find-raspberry-pi-ip-address/) is a good tutorial on how to find the IP address.
+This is a [good tutorial](https://raspberryexpert.com/find-raspberry-pi-ip-address/) on how to find the IP address.
 
 
 | Platform | Strategy |

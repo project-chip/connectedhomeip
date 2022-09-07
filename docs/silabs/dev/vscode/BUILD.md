@@ -17,7 +17,7 @@ Search for "run build task" and select the "Run Build Task" option.
 
 ### Step 3:
 
-A new drop down menu will appear, select "Build efr32 example".
+A new drop down menu will appear. Select "Build efr32 example".
 
 ### Step 4:
 
@@ -31,7 +31,7 @@ Select the appropriate target board.
 
 ## Windows
 
-Building for Windows requires one extra step prior to running the build example
+Building for Windows requires one extra step before running the build example
 task.
 
 ### Step 1:
@@ -40,8 +40,7 @@ Press (Ctrl + Shift + P) to trigger the command pallet.
 
 ### Step 2:
 
-Search for "run build task" and select "Run build task" from the drop
-down menu.
+Search for "run build task" and select "Run build task" from the drop-down menu.
 
 ### Step 3:
 
@@ -50,10 +49,10 @@ On the next menu, select "Windows setup" from the options.
 ### Step 4:
 
 The next menu contains two options, "setup" and
-"cleanup". Select _setup_ in order to initiate the setup process or _cleanup_ to
-clean up the environment after building the examples. This step installs crucial
+"cleanup". Select _setup_ in order to initiate the setup process. This step installs crucial
 packages that are required to build the examples such as openssl. if openssl
-is not detected, an installation will be initiated in a new window. Follow the installation prompts in order for the setup to be successful.
+is not detected, an installation will be initiated in a new window. Follow the installation prompts in order for the setup to be successful. Select _cleanup_ to
+clean up the environment after building the examples. 
 
 ### Step 5:
 

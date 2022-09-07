@@ -10,7 +10,7 @@ To flash the Ubuntu OS onto the SD card:
 1. Insert the flashed SD card (directly or using a card reader) into the
    laptop/PC that will run the Raspberry Pi Imager tool
 2. Launch Raspberry Pi 4 Imager
-3. Click on 'Choose OS' --> 'Other General-purpose OS' --> 'Ubuntu' --> 'Ubuntu
+3. Click 'Choose OS' --> 'Other General-purpose OS' --> 'Ubuntu' --> 'Ubuntu
    22.04 64-bit server OS'
 4. Click 'Storage' and select the 'SD card detect'
 5. This Raspberry Pi 4's console can be accessed in multiple ways, refer to:
@@ -48,23 +48,23 @@ start using the Raspberry Pi:
 
     > `$ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
     >  libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-    >  python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev'
+    >  python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev`
 
     <br>
     > If you see any popups between installs, you can select 'Ok' or 'Continue'
 
 ## Installing prerequisites on Raspberry Pi 4
 
-Finally, install some Raspberry Pi specific dependencies:
+Finally, install some Raspberry Pi-specific dependencies:
 
-In
-[this link to the Project CHIP GitHub Site](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md),
-follow the instructions in the section "Installing prerequisites on Raspberry Pi
+Follow the instructions in 
+[the Project CHIP GitHub Site](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md),
+in the section "Installing prerequisites on Raspberry Pi
 4".
 
 ## Bluetooth Setup
 
-Make sure BLE is up and running on Raspberry Pi. Raspberry Pi internally has
+Make sure Bluetooth LE (BLE) is up and running on Raspberry Pi. Raspberry Pi internally has
 some issues with BLE that may cause it to crash. Because BLE is used for
 commissioning on Matter, make sure BLE is running.
 

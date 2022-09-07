@@ -26,9 +26,9 @@ If you don't have Wireshark, you can
 
 ## 3. Follow Instructions for Wireshark Integration
 
-In order to capture from a Silicon Labs device like a WSTK you will need to use
+To capture from a Silicon Labs device like a WSTK use
 the Silabs-PTI.jar utility you built in the previous step. You will further need
-to integrate the execution of the utility into Wireskark through Wireshark's
+to integrate the execution of the utility into Wireshark through Wireshark's
 `excap` interface. A complete guide to
 [Wireshark Integration is provided here](https://github.com/SiliconLabs/java_packet_trace_library/blob/master/doc/wireshark.md).
 You integrate the Silabs-PTI.jar utility into Wirehshark by adding a small

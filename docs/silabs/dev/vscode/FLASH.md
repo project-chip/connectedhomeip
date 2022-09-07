@@ -32,13 +32,13 @@ Select "Flash efr32 example" from the options.
 
 ### Step 4:
 
-On the next down menu, please choose the proper example to flash to your
+On the next menu, select the example to flash to your
 target device. The example must have an "out" directory that contains a
 binary file with the ".out" extension.
 
 ### Step 4:
 
-The final prompt will ask the user to choose the target device. Please select the target device.
+In response to the final prompt, select the target device.
 
 ## ![](../../images/flash_efr32_example.gif)
 

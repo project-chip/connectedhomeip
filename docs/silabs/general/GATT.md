@@ -1,16 +1,11 @@
 # Using Simplicity Studio's GATT Configurator with Matter
 
 The Simplicity Studio Bluetooth GATT Configurator is an Advanced Configurator
-within the Simplitiy Studio Project Confguration suite. For more information on
+within the Simplicity Studio Project Configuration suite. For more information on
 using the
-[Simplicity Studio Project Configurator in Matter please refer to this guide](./PINTOOL.md).
+[Simplicity Studio Project Configurator in Matter refer to this guide](./PINTOOL.md).
 Use of the BLE GATT Configurator in Matter assumes that you are already familiar
 with creating and using an `Empty C++` Project in Simplicity Studio.
-
-Once you have created your `Empty C++` project, you can add the Bluetooth
-component which will give you access to the GATT configurator for your project.
-More information on use of the
-[BLE GATT Configurator in Simplicity Studio is provided here](https://docs.silabs.com/simplicity-studio-5-users-guide/latest/ss-5-users-guide-developing-with-project-configurator/bluetooth-gatt-configurator).
 
 The basic steps for using the Simplicity Studio BLE GATT Configurator are as
 follows:
@@ -37,7 +32,7 @@ follows:
     More information on using the
     [BLE GATT Configurator is provided here.](https://docs.silabs.com/simplicity-studio-5-users-guide/latest/ss-5-users-guide-developing-with-project-configurator/bluetooth-gatt-configurator)
 
-5. Save your project which will force the generation of your BLE GATT
+5. Save your project, which will force the generation of your BLE GATT
    Configuration
 
 6. BLE GATT database is stored in the `autogen` folder in your project directory

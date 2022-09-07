@@ -1,43 +1,162 @@
 # Building Your Wi-Fi Matter End Device and the Chip-Tool
 
-## Compiling the Lighting-app
+# Build Environment using Linux
+
+This section will go through the steps required to build the demo using Linux.
+
+> **Do not execute any commands on this page as ROOT (no _su_ required), unless
+> specified**
+
+<br>
+
+## Prepare Linux Packages
+
+Update the latest packages by typing following commands in terminal:
+
+```shell
+$ sudo apt update
+$ sudo apt install
+```
+
+<br>
+
+## Prerequisites for Matter (CHIP) project on Linux
+
+### 1. Installing packages on Ubuntu Laptop/PC
+
+-   Open the Linux terminal from Start menu
+-   Install required packages on Ubuntu Laptop/PC using the following commands:
+
+        ```shell
+        $ sudo apt install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+         libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+         python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+        ```
+
+    <br>
+
+### 2. Matter codebase
+
+-   Check out Matter codebase from GitHub:
+
+    -   Download the
+        [Matter codebase](https://github.com/SiliconLabs/matter.git) from here
+        as follows:
+
+        `$ git clone https://github.com/SiliconLabs/matter.git`
+
+-   Sync submodules by running the following commands:
+
+    ```shell
+    $ cd matter
+    $ ./scripts/checkout_submodules.py --shallow --platform efr32
+    ```
+
+-   Environment Builds
+
+    -   Activate environment builds:
+
+        `$ . scripts/bootstrap.sh`
+
+    -   Create a directory where binaries will be updated:
+
+        `$ mkdir out`
+
+-   **[Optional:** Increasing stack size **]** <br> &emsp; Navigate to
+    `git/matter` and open the file in the path
+    `examples/lighting-app/efr32/include/FreeRTOSConfig.h`. Find the macro:
+    \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
+    **`320`**.
+
+<br>
+
+<br>
+
+## 3 .Compiling the Lighting-app
 
 The following commands are for building the example. Depending on which device
 you are using, select the appropriate build command to run.
 
-> Please note that these examples reference a specific board the BRD4161A. You
-> may be using a different board like the BRD4186C, please change the board
-> referenced in the build command to your specific board before running the
-> command.
+> Please change the board referenced in the build command to your specific board
+> before running the command.
 
 Build command for RS911x + EFR32MG12:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD4161A --wifi rs911x |& tee out/rs911x_lighting.out`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx --wifi rs911x |& tee out/rs911x_lighting.log`
 
 Build command for WF200 + EFR32MG12:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD4161A is_debug=false --wifi wf200 |& tee out/rs911x_lighting.out`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx is_debug=false --wifi wf200 |& tee out/wf200_lighting.log`
 
 Build command for RS911x + EFR32MG24:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_mg24_lighting BRD4186C disable_lcd=true show_qr_code=false use_external_flash=false --wifi rs911x`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true show_qr_code=false use_external_flash=false --wifi rs911x`
 
 Build command for WF200 + EFR32MG24:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_mg24_lighting BRD4186C disable_lcd=true show_qr_code=false use_external_flash=false --wifi wf200`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true show_qr_code=false use_external_flash=false chip_build_libshell=false --wifi wf200`
+
+MG12 Boards:
+
+```
+BRD4161A, BRD4163A, BRD4164A
+```
+
+MG24 Boards:
+
+```
+BRD4186C, BRD4187C
+```
+
+By using the following flags we can enable or disable the features of lighting
+application.
+
+1.  `rs91x_wpa3_only` : To use rs91x wifi in wpa3 enable this flag while
+    building.
+
+    ```shell
+    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx rs91x_wpa3_only=true --wifi rs911x |& tee out/rs911x_lighting.log
+    ```
+
+2.  `chip_enable_wifi_ipv4` : To enable ipv4 of device add this flag while
+    building the application.
+
+    ```shell
+    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs911x |& tee out/rs911x_lighting.log
+    ```
+
+3.  `To enable different options for WPA/WPA2` :
+
+    1)Get the router address by entering `route -n` or ifconfig of ipconfig.
+
+    2)Enter router address in the browser and enter the appropriate username and
+    password.
+
+    3)Select appropriate band.
+
+    4)In security, select type.
+
+    > Note: It is enabled by default for the rs911x, wf200.
+
+4.  `Flag to get the complete logs without truncation` :
+
+    ```shell
+    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs911x |& tee out/rs911x_lighting.log
+    ```
 
 Run the following:
 
-> `$ cd matter`
-
-> `$ <appropriate_build_command_from_above>`
+```shell
+$ cd matter
+$ <appropriate_build_command_from_above>
+```
 
 <br>
 
-> Look for build problems in `out/*.out`, which is the log file that was
+> Look for build problems in `out/*.log`, which is the log file that was
 > generated by the above command
 
-The generated software can be found in `out/rs911x_xxx/BRD4161A/*.out`.
+The generated software can be found in `out/rs911x_xxx/BRD4161A/*.log`.
 
 This is what you will flash into the EFR32.
 
@@ -48,16 +167,15 @@ This is what you will flash into the EFR32.
 -   Build the ChipTool on a laptop which has Wi-Fi and Bluetooth LE
 -   Run the following commands:
 
-    > `$ cd $MATTER_WORKDIR/matter` <br>
-
-    > `$ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone`
+    ```shell
+    $ cd $MATTER_WORKDIR/matter
+    $ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone
+    ```
 
     This will build chiptool in `out/standalone`
 
-Now you have all the binaries to flash onto the Silicon Labs platform (MG12,
-MG24, etc...). For more information on how to flash a Silicon Labs device please
-consult the [Flashing Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
-page.
+For more information on how to flash a Silicon Labs device please consult the
+[Flashing Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md) page.
 
 ---
 

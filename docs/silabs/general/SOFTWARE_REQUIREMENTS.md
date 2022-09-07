@@ -1,9 +1,11 @@
 # Matter Software Requirements
 
-## **System Agnostic Software Requirements (Windows/Mac/Linux):**
+This section first covers system-agnostic software requirements and then requirements by system (Windows, Mac, and Linux). Finally, if you are working with Matter over Wi-Fi, you need to [update the firmware](#wi-fi-rs9116-specific-requirements)
+
+## **System-Agnostic Software Requirements (Windows/Mac/Linux):**
 
 1. SSH Client ([PuTTY](https://www.putty.org/), Terminal, or similar):
-    > SSH client is used to communicate with the Raspberry Pi over a secure
+    > The SSH client is used to communicate with the Raspberry Pi over a secure
     > shell.
 2. [Raspberry Pi Disk Imager](https://www.raspberrypi.com/software/)
     > Raspberry Pi Disk Imager is used to flash the SD Card that contains the
@@ -25,7 +27,7 @@
 
     > `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
 
-5. If you are using an EFR32MG2x device you will require a bootloader to run the
+5. If you are using an EFR32MG2x device you will need a bootloader to run the
    demo applications. When you flash your application image be sure to include a
    bootloader as well (if one is not already present). Bootloader images are
    provided on the [Matter Artifacts page](../general/ARTIFACTS.md).
@@ -34,7 +36,7 @@
 
 ## **Windows-Specific Software Requirements:**
 
-&emsp; These requirements are in addition to those mentioned above, for Windows
+&emsp; These requirements are in addition to the system-agnostic requirements, for Windows
 only. <br>
 
 &emsp; A Unix-like command line:
@@ -51,7 +53,7 @@ only. <br>
 
 ## **Mac-Specific Requirements (building own images):**
 
-&emsp; These requirements are in addition to those mentioned above for Mac OS
+&emsp; These requirements are in addition to the system-agnostic requirements for Mac OS
 users building their own images. <br>
 
 1. Install Homebrew
@@ -70,12 +72,12 @@ users building their own images. <br>
 
 <br>
     
-    Depending on your Mac processor, you will have to complete the following additional steps.
+Depending on your Mac processor, you will have to complete the following additional steps.
 
 ### **Apple Silicon (M1) Software Requirements:**
 
 Users may also have to specify which `pkg-config`/`openssl` to use by adding
-these lines of code to `bootstrap.sh` as well:
+these lines of code to `bootstrap.sh`:
 
 > `$ export PATH="/opt/homebrew/opt/openssl@3/bin:$PATH"`
 
@@ -97,7 +99,7 @@ dependency.
 
 <br>
 
-## **Linux Specific Requirements:**
+## **Linux-Specific Requirements:**
 
 On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
@@ -106,18 +108,18 @@ satisfied with the following:
 
 <br>
 
-## **Wi-Fi RS9116 Specific Requirements:**
+## **Wi-Fi RS9116-Specific Requirements:**
 
 Before you run the demo or development on the RS9116 please be sure that you
 update the RS9116 firmware.
 
 Pre-Built Rs9116 firmware is available on the
-[Matter Artifacts page](../general/ARTIFACTS.md)
+[Matter Artifacts page](../general/ARTIFACTS.md). The following instructions are found on the docs.silabs.com website:
 
 1. [Setting up TeraTerm](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup)
 2. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
 
 ---
 
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
 [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

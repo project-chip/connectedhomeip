@@ -1,10 +1,10 @@
 # Matter over Thread Demo Overview
 
-This section reviews the steps for running an example lighting-app for Matter
+This section reviews the steps for running an example lighting app for Matter
 over Thread. See [this file](THREAD.md) for an introduction to the Matter over
 Thread setup.
 
-At a high level, we will walk through starting a Thread network, commissioning a
+At a high level, this section walks through starting a Thread network, commissioning a
 new device to the Thread network using Bluetooth LE, and finally sending a basic
 OnOff command to the end device.
 
@@ -12,7 +12,7 @@ OnOff command to the end device.
 
 ## Step 0: Prerequisites
 
-Before beginning your Silicon Labs Matter project be sure you have satisfied all
+Before beginning your Silicon Labs Matter over Thread project be sure you have satisfied all
 of the [Matter Hardware](../general/HARDWARE_REQUIREMENTS.md) and
 [Matter Software](../general/SOFTWARE_REQUIREMENTS.md) Requirements.
 
@@ -20,8 +20,8 @@ of the [Matter Hardware](../general/HARDWARE_REQUIREMENTS.md) and
 
 ## Step 1: Setting up the Matter Hub (Raspberry Pi)
 
-The Matter Hub consists of the OTBR and the ChipTool running on a Raspberry Pi.
-Silicon Labs has developed a Raspberry Pi image that can be downloaded and
+The Matter Hub consists of the Open Thread Border Router (OTBR) and the chiptool running on a Raspberry Pi.
+Silicon Labs has developed a Raspberry Pi image combining the OTBR and chiptool that can be downloaded and
 flashed onto an SD Card, which is then inserted into the Raspberry Pi.
 
 The Matter Controller sends IPv6 packets to the OTBR, which converts the IPv6

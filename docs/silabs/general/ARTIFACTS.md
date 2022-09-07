@@ -9,7 +9,7 @@ used to set up the Matter Demo for the Thread and Wi-Fi use cases.
 
 The Matter Hub image is intended to be flashed onto an SD card for a Raspberry
 Pi. The Matter Hub Image provides both an Open Thread Border Router and the
-Matter "ChipTool". Note the image is ~10GB in size so depending on your internet
+Matter chiptool. Note the image is ~10GB in size so depending on your internet
 connection this download may take some time. Start the Matter Hub Raspberry Pi
 image download here:
 
@@ -41,7 +41,7 @@ https://github.com/SiliconLabs/matter/releases/tag/v0.3.0
 ## Matter Bootloader Binaries
 
 If you are using the OTA functionality and especially if you are using an
-EFR32MG2x device you will need to flash a bootloader binary on your device along
+EFR32MG2x device, you will need to flash a bootloader binary on your device along
 with the application image. Bootloader binaries for all of the Matter supported
 devices are available here:
 

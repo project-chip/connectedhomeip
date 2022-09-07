@@ -1,6 +1,6 @@
-# Setup VS Code environment
+# Set Up the VS Code environment
 
-## Requirements
+## General Requirements
 
 1. Install Visual Studio Code for your operating system of choice here:
    https://code.visualstudio.com/Download
@@ -20,19 +20,19 @@
 8. ARM GCC Toolchain
    (https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) -
    required arm-none-eabi tools
-9. J-Link Software Tools - required J-Link GDB Server for J-Link based debuggers
+9. J-Link Software Tools - required J-Link GDB Server for J-Link-based debuggers
    (https://www.segger.com/downloads/jlink)
 10. Python - (https://www.python.org/downloads/)
 
 ### Installing prerequisites on macOS
 
-On macOS, first install Xcode from the Mac App Store. The remaining dependencies
-can be installed and satisfied using [Brew](https://brew.sh/):
+On macOS, you must install Xcode from the Mac App Store. The remaining
+dependencies can be installed and satisfied using [Brew](https://brew.sh/):
 
 > `$ brew install openssl pkg-config`
 
-However, that does not expose the package to `pkg-config`. To fix that, one
-needs to run something like the following:
+However, that does not expose the package to `pkg-config`. To fix that, run
+something like the following:
 
 Intel:
 

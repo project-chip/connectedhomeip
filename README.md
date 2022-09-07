@@ -2,12 +2,34 @@
 
 # Silicon Labs Matter
 
-Welcome to the Silicon Labs Matter Github repo. This is your one stop shop for
-all things related to Silicon Labs and Matter development.
+Welcome to the Silicon Labs Matter Github repo. Matter is an application layer
+that provides a standardized interface between protocols and devices. With
+Matter, it is transparent to the underlying device whether the interaction is
+from a Thread application or a Wi-Fi application. For more information on Matter
+in general see the main
+[Matter Overview](https://www.silabs.com/wireless/matter) page. This repo is the
+starting point for all Silicon Labs-related Matter development. Silicon Labs
+supports Matter on both 802.15.4 (Thread) and 802.11 (Wi-Fi) transport
+protocols.
 
-**To develop a Matter application with Silicon Labs please start here:**
+_To see release notes containing list of features and knowns issues go to
+[SiliconLabs/matter/releases](https://github.com/SiliconLabs/matter/releases)
+and find the corresponding notes for the release you are using._
 
-**[Silicon Labs Matter Table of Contents](./docs/silabs/README.md)**
+![Silicon Labs](./docs/silabs/images/silicon_labs_matter.png)
+
+This repo contains documentation, demos, examples and all the code needed for
+Matter Accessory Device development on both Thread and Wi-Fi. The Thread
+development use cases differs from Wi-Fi because the Thread protocol requires
+the use of an Open Thread Border Router (OTBR).
+
+-   To get started with the Thread demo and development see
+    [Matter Thread](./docs/silabs/thread/DEMO_OVERVIEW.md)
+-   To get started with the Wi-Fi demo and development see
+    [Matter Wi-Fi](./docs/silabs/wifi/DEMO_OVERVIEW.md)
+
+The full documentation set starts here:
+[Silicon Labs Matter Table of Contents](./docs/silabs/README.md)
 
 ---
 

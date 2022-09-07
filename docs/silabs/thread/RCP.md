@@ -17,8 +17,8 @@ First, in order to flash the RCP, connect it to your laptop directly by USB.
 We have provided two ways to get the required image to flash the RCP. You can
 use one of the following options:
 
-1. Use the pre-built image `ot-rcp` image file
-2. Build the image file from the '`ot-efr32`' repository, which is listed on the
+1. Use the pre-built 'ot-rcp' image file
+2. Build the image file from the 'ot-efr32' repository, which is listed on the
    [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
 
 <br>
@@ -27,7 +27,7 @@ use one of the following options:
 
 RCP image files for all demo boards are accessible through the
 [Matter Artifacts Page](../general/ARTIFACTS.md). If you are using a pre-built
-image file, you can skip forward to Step #2: Flashing the RCP.
+image file, you can skip to [Step #2: Flash the RCP](#step-2-flash-the-rcp).
 
 <br>
 
@@ -35,7 +35,7 @@ image file, you can skip forward to Step #2: Flashing the RCP.
 
 **1. Clone the ot-efr32 repository**
 
-The ot-efr32 repo is located in Github here:
+The 'ot-efr32' repo is located in Github here:
 https://github.com/SiliconLabs/ot-efr32.
 
 You must have Git installed on your local machine. To clone the repo use the
@@ -65,10 +65,10 @@ https://github.com/SiliconLabs/ot-efr32/blob/main/src/README.md to build the RCP
 image for your EFR platform.
 
 This process will build several images for your board. The filename of the image
-to be flashed onto the board to create an RCP is '`ot-rcp.s37`'.
+to be flashed onto the board to create an RCP is 'ot-rcp.s37'.
 
 The output of the build process puts all the image files in the following
-location: `<git>/ot-efr32/build/<efr32xgxx>`
+location: '<git>/ot-efr32/build/<efr32xgxx>'
 
 <br>
 
@@ -77,9 +77,8 @@ location: `<git>/ot-efr32/build/<efr32xgxx>`
 Once you get the RCP image, either by downloading a prebuilt image or building
 the image file from the repo, you can flash it onto your device. This is done
 directly from your laptop and not through the Raspberry Pi, so make sure that
-the device is connected directly over USB to your laptop. Further information on
-flashing a Silicon Labs device is located here:
-[How to Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
+the device is connected directly over USB to your laptop. See
+[How to Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md) for more information.
 
 Once you have flashed the image, the device becomes the RCP. Disconnect it from
 you laptop and connect it via USB to the Raspberry Pi.

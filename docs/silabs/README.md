@@ -1,8 +1,8 @@
 # Silicon Labs Matter Table of Contents
 
-1. [Silicon Labs Matter Overview](OVERVIEW.md) <br>
+1. [Silicon Labs Matter Documentation Overview](OVERVIEW.md) <br>
 
-2. Matter Pre-requisites
+2. Matter Prerequisites
 
     1. [Matter Hardware Requirements](general/HARDWARE_REQUIREMENTS.md)
     2. [Matter Software Requirements](general/SOFTWARE_REQUIREMENTS.md) <br><br>
@@ -44,7 +44,7 @@
     8. [Building a Custom Matter Device](general/CUSTOM_MATTER_DEVICE.md)
     9. [Matter OTA Software Update](general/OTA_SOFTWARE_UPDATE.md)
     10. [Matter Attestation Credentials for EFR32](../../silabs_examples/credentials/README.md)
-    11. [Using Simplicity Studio's Pin Tool and Project Configurator with Matter](./general/PINTOOL.m)
+    11. [Using Simplicity Studio's Pin Tool and Project Configurator with Matter](./general/PINTOOL.md)
     12. [Using Simplicity Studio's BLE GATT Configurator with Matter](./general/GATT.md)
     13. [Using Simplicity Studio's Energy Profiler with Matter](./general/EP.md)
     14. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)<br><br>

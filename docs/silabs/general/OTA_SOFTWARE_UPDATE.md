@@ -7,7 +7,7 @@ controlled by the `chip_enable_ota_requestor` compile flag.
 ## Running the OTA Download Scenario
 
 -   For Matter with OpenThread: Bring up the OpenThread Border Router as
-    discussed in examples/lighting-app/efr32/README.md and get its operational
+    discussed in [Thread Demo Overview](../thread/DEMO_OVERVIEW.md) and get its operational
     dataset.
 
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
@@ -69,7 +69,7 @@ where operationalDataset is obtained from the OpenThread Border Router.
 Internal storage bootloader for Matter OTA software update is supported on MG24
 boards only. In this use case both the running image and the downloadable update
 image must fit on the internal flash at the same time. This in turn requires
-that both images are built with a reduced feature set such as disabled logging
+that both images are built with a reduced feature set, such as disabled logging
 and Matter shell. The following set of compile flags leaves out all the optional
 features and results in the minimal image size:
 

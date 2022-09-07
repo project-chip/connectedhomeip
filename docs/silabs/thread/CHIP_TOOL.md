@@ -1,4 +1,4 @@
-# Using the ChipTool
+# Using the Chiptool
 
 The following commands show how to start a new Thread network from the local
 OTBR, commission an EFR32 Matter End Device (Matter Accessory Device), and then
@@ -7,17 +7,17 @@ send the on/off commands with the `mattertool` automated script.
 | **Command**              | **Usage**                                                                 |
 | ------------------------ | ------------------------------------------------------------------------- |
 | `mattertool startThread` | Starts the thread network on the OTBR                                     |
-| `mattertool bleThread`   | Starts commissioning of a Matter Accessory Device using the ChipTool      |
-| `mattertool on`          | Sends the _on_ command to the Matter Accessory Device using the ChipTool  |
-| `mattertool off`         | Sends the _off_ command to the Matter Accessory Device using the ChipTool |
+| `mattertool bleThread`   | Starts commissioning of a Matter Accessory Device using the chiptool      |
+| `mattertool on`          | Sends the _on_ command to the Matter Accessory Device using the chiptool  |
+| `mattertool off`         | Sends the _off_ command to the Matter Accessory Device using the chiptool |
 
-You can also use the full ChipTool command as usual (still using mattertool)
+You can also use the full chiptool command set (still using mattertool)
 
 > `$ mattertool levelcontrol read current-level 106 1`
 
 <br><br>
 
-## Informational Section [Optional]
+## Advanced information on the Matter Hub
 
 ### Image tree
 
@@ -38,7 +38,7 @@ You can also use the full ChipTool command as usual (still using mattertool)
 
 ## Open Thread Border Router (OTBR)
 
-For information on what commits to use for the OTBR and RCP, please consult the
+For information on what commits to use for the OTBR and RCP, consult the
 [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
 
 The pre-installed OTBR is configured for the infrastructure interface eth0.
@@ -82,7 +82,7 @@ Change OTBR commit reference/version
 
 <br>
 
-## Upgrading the Matter - ChipTool
+## Upgrading the Matter - Chiptool
 
 For more information on the commit hashes used for this demo please consult the
 following page:
@@ -98,7 +98,7 @@ To change the ChipTool commit reference/version, follow these steps:
 
 > `$ mattertool buildCT`
 
-The mattertool script centralizes and simplifies the use of ChipTool and
+The mattertool script centralizes and simplifies the use of chiptool and
 starting a clean thread network.
 
 <br>
@@ -109,15 +109,15 @@ Available commands:
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
 | help         | Prints help options                                                                                           |
 | startThread  | Start a new thread network and store the operational thread dataset for the commissioning purpose (bleThread) |
-| bleThread    | For Matter Ble thread commissioning with an EFR32 device                                                      |
-| bleWifi      | For Matter Ble Wi-FI commissioning with an EFR32 device                                                       |
-| buildCT      | Clean build of the chip-tool                                                                                  |
+| bleThread    | For Matter Bluetooth LE thread commissioning with an EFR32 device                                             |
+| bleWifi      | For Matter Bluetooth LE Wi-FI commissioning with an EFR32 device                                              |
+| buildCT      | Clean build of the chiptool                                                                                   |
 | cleanVars    | Erase every Set variable used in the script. They will be set back to default or randomized value             |
-| off          | Turn off the Light on the already commissioned EFR32 device                                                   |
-| on           | Turn on the Light on the already commissioned EFR32 device                                                    |
-| toggle       | Toggle the Light on the already commissioned EFR32 device                                                     |
+| off          | Turn off the Light on the already-commissioned EFR32 device                                                   |
+| on           | Turn on the Light on the already-commissioned EFR32 device                                                    |
+| toggle       | Toggle the Light on the already-commissioned EFR32 device                                                     |
 | parsePayload | Parse the given Payload (QrCode string)                                                                       |
-| rebuildCT    | Rebuild the chip-tool                                                                                         |
+| rebuildCT    | Rebuild the chiptool                                                                                          |
 | vars         | Print the Variables in use by the script                                                                      |
 
 <br>
@@ -163,7 +163,7 @@ available options to change some of them.
 > remain at the default set value.
 
 > For commissioning commands (bleThread, bleWifi) NODE_ID will be randomized if
-> it is the same as the last paring
+> it is the same as the last pairing
 
 > When the startThread command is used, THREAD_DATA_SET will be assigned with
 > the right operation dataset for the created Thread Network.

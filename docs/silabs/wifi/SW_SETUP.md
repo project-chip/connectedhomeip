@@ -22,27 +22,21 @@ application images.
 
 1. To download the
    [SiliconLabs Matter codebase](https://github.com/SiliconLabs/matter.git) run
-   the following commands. Create a working directory named `git`:
+   the following commands.
 
-    > `$ mkdir git`
-
-    > `$ cd git`
-
-    > `$ MATTER_WORKDIR=git` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
-
-    > `$ git clone https://github.com/SiliconLabs/matter.git`
+    ```shell
+     $ git clone https://github.com/SiliconLabs/matter.git
+    ```
 
 2. Bootstrapping:
 
-    > `$ cd matter`
-
-    > `$ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32`
-
-    > `$ . scripts/bootstrap.sh`
-
-    Create a directory where binaries will be updated/compiled called `out`:
-
-    > `$ mkdir out`
+    ```shell
+    $ cd matter
+    $ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32
+    $ . scripts/bootstrap.sh
+    # Create a directory where binaries will be updated/compiled called `out`
+    $ mkdir out
+    ```
 
 <br>
 
@@ -51,19 +45,36 @@ application images.
 The following commands are for building the example. Depending on which device
 you are using, select the appropriate build command to run.
 
-Build command for RS911x:
+Build command for EFR32MG12 + RS911x:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD4161A --wifi rs911x |& tee out/rs911x_lighting.out`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx --wifi rs911x |& tee out/rs911x_lighting.log`
 
-Build command for WF200:
+Build command for EFR32MG12 + WF200:
 
-> `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD4161A is_debug=false --wifi wf200 |& tee out/rs911x_lighting.out`
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32 out/wf200_lighting_app BRD41xxx is_debug=false --wifi wf200 |& tee out/wf200_lighting.log`
+
+In above command BRD41xxx represent the MG12 boards
+
+> `BRD4161A, BRD4163A, BRD4164A`
+
+Build command for EFR32MG24 + RS911x:
+
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true show_qr_code=false use_external_flash=false --wifi rs911x`
+
+Build command for EFR32MG24 + WF200:
+
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true show_qr_code=false use_external_flash=false chip_build_libshell=false --wifi wf200`
+
+In above command BRD41xxx represent the MG24 boards
+
+> `BRD4186C, BRD4187C`
 
 Run the following:
 
-> `$ cd matter`
-
-> `$ <appropriate_build_command_from_above>`
+```shell
+$ cd matter
+$ <appropriate_build_command_from_above>
+```
 
 The generated software can be found in `out/rs911x_xxx/BRD4161A/*.out` for the
 RS9116 and in `out/wf200_xxx/BRD4161A/*.out` for the WF200.
@@ -81,7 +92,7 @@ access to a Raspberry Pi that will work as well.
 
 1. Build the Chip-Tool
 
-    > `$ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone`
+    `$ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone`
 
     This will build chiptool in `out/standalone`.
 

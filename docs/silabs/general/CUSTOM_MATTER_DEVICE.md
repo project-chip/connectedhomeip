@@ -1,10 +1,10 @@
 # Custom Matter Device Development
 
-Build a customizable lighting app using the Matter protocol
+Build a customizable lighting app using the Matter protocol.
 
 ## Overview
 
-This guide will cover the basics of building a customizable lighting application
+This guide covers the basics of building a customizable lighting application
 using Matter.
 
 ## Using Matter with Clusters
@@ -25,12 +25,12 @@ Note that you can also create your own custom cluster.
 ## ZAP configuration
 
 From the matter repository, run the following command in a terminal to launch
-the ZAP UI. This will open up the ZAP configuration for the EFR32 lighting
+the ZAP user interface (UI). This will open up the ZAP configuration for the EFR32 lighting
 application example.
 
 > `$ ./scripts/tools/zap/run_zaptool.sh examples/lighting-app/lighting-common/lighting-app.zap`
 
-On the left hand side of the application, there is a tab for Endpoint 0 and
+On the left side of the application, there is a tab for Endpoint 0 and
 Endpoint 1. Endpoint 0 is known as the root node. This endpoint is akin to a
 "read me first" endpoint that describes itself and the other endpoints that make
 up the node. Endpoint 1 represents a lighting application device type. There are
@@ -39,8 +39,8 @@ common across most device types, such as identify and group clusters. Others,
 such as the On/Off, Level Control and Color Control clusters are required for a
 lighting application device type.
 
-Clicking on the blue settings icon on the right hand side of the application
-will bring you to the zap configuration settings for that cluster. Each cluster
+Clicking on the blue settings icon on the right side of the application
+brings you to the zap configuration settings for that cluster. Each cluster
 has some required attributes that may cause compile-time errors if they are not
 selected in the zap configuration. Other attributes are optional and are allowed
 to be disabled. Clusters also have a list of client-side commands, again some
@@ -48,14 +48,14 @@ are mandatory and others are optional depending on the cluster. ZCL offers an
 extensive list of optional attributes and commands that allow you to customize
 your application to the full power of the Matter SDK.
 
-For example, if one was building a lighting application which only includes
+For example, if a lighting application only includes
 single color LEDs instead of RGB LEDs, it might make sense to disable the Color
-Control cluster in the ZAP configuration. Similarly, if one were to build a
-lighting application that doesn't take advantage of the Level Control cluster,
+Control cluster in the ZAP configuration. Similarly, if a
+lighting application doesn't take advantage of the Level Control cluster,
 which allows you to customize current flow to an LED, it might make sense to
 disable the Level Control cluster.
 
-Each time a modification is made to the ZAP UI, one must save (Electron→Save on
+Each time a modification is made to the ZAP UI, save (Electron→Save on
 a Mac toolbar) the current ZAP configuration and run the following command to
 generate ZAP code.
 
@@ -73,7 +73,7 @@ received.
 ## Adding a cluster to a ZAP configuration
 
 In the ZAP UI, navigate to the Level Control cluster. Make sure this cluster is
-enabled as a server in the drop down menu in the "Enable" column. Then click on
+enabled as a server in the drop-down menu in the "Enable" column. Then click on
 the blue settings wheel in the "Configure" column. This cluster can be used to
 gather power source configuration settings from a Matter device. It contains a
 few required attributes, and a number of optional attributes.
@@ -86,13 +86,13 @@ is set to enabled. Set the default value of this attribute as 1.
 ## Adding a new command
 
 Navigate to the commands tab in zap and enable the MoveToLevel command. Now save
-the current zap configuration, and run the aforementioned generate.py script.
+the current zap configuration, and run the generate.py script above.
 
 ## React to Level Control cluster commands in ZclCallbacks
 
 In the MatterPostAttributeCallback function in ZclCallbacks, add the following
-line of code or similar. This will give the application the ability to react to
-MoveToLevel commands. The developer can define platform specific behavior for a
+line of code or a similar line. This will give the application the ability to react to
+MoveToLevel commands. You can define platform-specific behavior for a
 MoveToLevel action.
 
     else if (clusterId == LevelControl::Id)
@@ -113,7 +113,7 @@ MoveToLevel action.
 Rebuild the application and load the new executable on your EFR32 device. Send
 the following mattertool commands and verify that the current-level default
 attribute was updated as was configured. Replace {desired_level} with 10, and
-node_ID with the node ID assigned to the device upon commissioning
+node_ID with the node ID assigned to the device upon commissioning.
 
 > `$ mattertool levelcontrol read current-level 1 1 // Returns 1`
 
@@ -121,8 +121,8 @@ node_ID with the node ID assigned to the device upon commissioning
 
 > `$ mattertool levelcontrol read current-level 1 1 // Returns 10`
 
-More Information Silicon Labs lighting example on a Thunderboard Sense 2 -
-[sl-newlight/efr32](../../../silabs_examples/sl-newLight/efr32/README.md)
+For more information on running a Silicon Labs lighting example on a Thunderboard Sense 2 see 
+[sl-newlight/efr32](../../../silabs_examples/sl-newLight/efr32/README.md).
 
 ---
 

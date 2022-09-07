@@ -1,6 +1,6 @@
 # Debugging in VS Code
 
-This section covers remote Debugging (GDB jlink) of Matter Examples in VS Code.
+This section covers remote debugging (GDB jlink) of Matter examples in VS Code.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ This section covers remote Debugging (GDB jlink) of Matter Examples in VS Code.
 
 ## Settings
 
-Before starting a debug session please ensure the following:
+Before starting a debug session ensure the following:
 
 <ol>
 <div style="text-align: justify"> 
@@ -32,8 +32,7 @@ Use the shortcut (Ctrl + Shift + P) to trigger the command pallet.
 
 ### Step 2:
 
-A drop down menu will appear along with a prompt. Please
-select the "Debug efr32 example app" and Start Debugging, or press F5 on
+A drop-down menu will appear along with a prompt. Select the "Debug efr32 example app" and Start Debugging, or press F5 on
 your keyboard.
 
 ### Step 3:
@@ -42,7 +41,7 @@ Select the example you want to debug.
 
 ### Step 4:
 
-Select the desired target device, from the drop down menu.
+From the drop-down menu, select the desired target device.
 
 ![](../../images/debug_session.gif)
 

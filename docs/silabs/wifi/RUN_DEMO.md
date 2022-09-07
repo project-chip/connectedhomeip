@@ -1,56 +1,60 @@
-# Runing the Matter Demo over Wi-fi
+# Running the Matter Demo over Wi-fi
 
-## Flashing images/binaries on MG12 platform using Ozone, Simplicity Studio or Simplicity Commander.
+## Flashing images/binaries on MG12, MG24 platform using Ozone, Simplicity Studio or Simplicity Commander.
 
-1. Plug the WSTK and EFR into the laptop.
+> Note: If you are coming from Simplicity Studio, you may have already installed
+> the demo image in Simplicity Studio in which case you can skip forward to the
+> next step.
 
-2. Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this
-   will display a GUI. If you are not using Ozone, you can follow the
-   instructions to
-   [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
+1.  Plug the WSTK and EFR into the laptop.
 
-3. In 'New Project Wizard':
+2.  Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this
+    will display a GUI. If you are not using Ozone, you can follow the
+    instructions to
+    [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
+
+3.  In 'New Project Wizard':
 
     1. Click the three-dots on the 'Device' tab and select 'Manufacturer' as
        '`Silicon Labs`'
-    2. Select 'Device' as '`EFR32MG12PXXF1024`' or `EFR32MG24XX` depending on
-       the device you are using.
+    2. Select 'Device' as '`EFR32MG12PxxxF1024`' or `EFR32MG24Bxxx1536`
+       depending on the device you are using.
     3. Click 'OK'
     4. The 'Register set' tab will get filled automatically
     5. 'Peripherals' tab need not be changed as it is optional
 
-4. Click 'Next' - the window that is displayed will contain:
+4.  Click 'Next' - the window that is displayed will contain:
 
-    - Serial Number: Read from device
-    - Target Interface: JTAG
-    - Speed: 4MHz
-    - Host Interface: USB
-    - There will be one product in the 'Emulators connected via USB' tab -
-      select this and click 'Next'
+    -   Serial Number: Read from device
+    -   Target Interface: JTAG
+    -   Speed: 4MHz
+    -   Host Interface: USB
+    -   There will be one product in the 'Emulators connected via USB' tab -
+        select this and click 'Next'
 
-5. Click on the 'Silicon Labs device' detected, and then click 'Next'
+5.  Click on the 'Silicon Labs device' detected, and then click 'Next'
 
-6. You will be asked to select the image/binary to be loaded: click on the
-   three-dots on that tab and navigate to '`out/rs911x_lighting/BRD4161A`'
-   through 'Browse', select the file named `chip-efr32-lighting-example.out` and
-   click 'Next'. This is the image built in previous step.
+6.  You will be asked to select the image/binary to be loaded: click on the
+    three-dots on that tab and navigate to '`out/rs911x_lighting/BRD4161A`'
+    through 'Browse', select the file named `chip-efr32-lighting-example.out`
+    and click 'Next'. This is the image built in previous step.
 
-    > Note that you may be using a different board like the BRD4186C in which
-    > case your image will be in a directory corresponding to that board
-    > identifier.
+    > Note that you may be using a different board like the BRD4163A, BRD4164A,
+    > BRD4186C, or BRD4187C in which case your image will be in a directory
+    > corresponding to that board identifier.
 
-7. Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
-   click 'Finish'
+7.  Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
+    click 'Finish'
 
     > Ignore Diagnostics warning about 'FreeRTOS' detected - click 'Continue'
 
-8. Select 'Download and Reset Program' in the dropdown next to the Power button
-   on the top left of the page
+8.  Select 'Download and Reset Program' in the dropdown next to the Power button
+    on the top left of the page
 
     > The Silabs chip, EFR32MG12 or EFR32MG24 will be erased and programmed
 
-9. Run the image by clicking the 'Play' button on the top left (or press the F5
-   key)
+9.  Run the image by clicking the 'Play' button on the top left (or press the F5
+    key)
 
     > The output of the EFR32 can be viewed on the console of the Ozone GUI
 
@@ -92,9 +96,9 @@
     > '\$SSID' is a placeholder for your Wi-Fi SSID and '\$PSK' is a placeholder
     > for the password of your Wi-Fi network.
 
-3. To turn **on** the LED on the EFR32MG12:
+3. To turn **on** the LED on the EFR32MG12 or EFR32MG24 :
     > `$ out/standalone/chip-tool onoff on 1122 1`
-4. To turn **off** the LED on the EFR32MG12:
+4. To turn **off** the LED on the EFR32MG12 or EFR32MG24 :
     > `$ out/standalone/chip-tool onoff off 1122 1`
 
 If there are any failures, run the following command and then re-run the
@@ -113,8 +117,8 @@ need to unplug the Ethernet connection and try running the Chip-Tool as in step
 
 As the device remembers the Access Point credentials given for commissioning, if
 you want to run the demo multiple times, do a factory reset by pressing the BTN0
-on EFR32 MG12 for about 6-7 seconds. The LED0 will flash 3 times and the QR code
-will appear again on the LCD screen.
+on EFR32MG12 or EFR32MG24 for about 6-7 seconds. The LED0 will flash 3 times and
+the QR code will appear again on the LCD screen.
 
 <br>
 

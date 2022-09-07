@@ -1,6 +1,6 @@
 # Setting up the Matter Hub (Raspberry Pi)
 
-The Matter Hub consists of the Open Thread Border Router (OTBR) and the ChipTool
+The Matter Hub consists of the Open Thread Border Router (OTBR) and the chiptool
 running on a Raspberry Pi. Silicon Labs has developed a Raspberry Pi image that
 can be downloaded and flashed onto an SD Card for the Raspberry Pi.
 
@@ -30,7 +30,7 @@ The image can be downloaded from the
 > Please note that this image, even when zipped up, is quite large ~5GB so this
 > download will take a while if you are on a slow connection. This image
 > includes both the Ubuntu operating system as well as the OTBR and Chip-Tool,
-> so there is a lot of sofware pre-packaged in this image, hence the size.
+> hence the size.
 
 <br>
 
@@ -60,35 +60,38 @@ Wi-Fi network.
 > connect your Raspberry Pi to a network as you can interface with it directly
 > as you would with any computer running Ubuntu Linux.
 
-The preference here is to use Ethernet, however if you are using Wi-Fi for your
-connection to the Raspberry Pi, please see
+The preference here is to use Ethernet, however, if you are using Wi-Fi for your
+connection to the Raspberry Pi, see
 [Connecting Raspberry Pi to Wi-Fi](https://www.raspberrypi.com/documentation/computers/configuration.html#configuring-networking)
 for instructions on how to connect your Raspberry Pi to a Wi-Fi network.
 
-Once you have connected your Raspberry Pi to the network, you will want to
-connect to your Raspberry Pi over SSH. In order to do this you will need the IP
-address of your Raspberry Pi. Please see the
-[Finding Your Raspberry Pi page](../general/FIND_RASPI.md) for more information
-on finding the Raspberry Pi on the local network.
+Once you have connected your Raspberry Pi to the network, you need to connect to
+your Raspberry Pi over SSH. This requires the IP address of your Raspberry Pi.
+See [Finding Your Raspberry Pi](../general/FIND_RASPI.md) for more information
+on finding the IP address and connecting to the Raspberry Pi by SSH. .
 
 #### Raspberry Pi Login Credentials
 
--   user: **ubuntu**
--   password: **raspberrypi**
+-   user: **`ubuntu`**
+-   password: **`raspberrypi`** **OR** **`ubuntu`** (0.3.0 and above)
 
-> When you log into the Raspberry Pi for the first time over SSH you may receive
-> a warning regarding a 'key fingerprint' - this is normal and expected. You can
-> get past this by just typing '_yes_' at the prompt.
+> **Note:** On later images of the Matter Hub the password has changed to the
+> default "ubuntu". you will be asked to change your password the first time you
+> log in. You may change it to whatever value you like.
+
+> **Note:** When you log into the Raspberry Pi for the first time over SSH you
+> may receive a warning regarding a 'key fingerprint' - this is normal and
+> expected. You can get past this by typing '_yes_' at the prompt.
 
 <br>
 
 ### Step 4: Using the Matter Hub
 
-The ChipTool, also referred to as the `mattertool`, is provided as a pre-built
+The chiptool, also referred to as the `mattertool`, is provided as a pre-built
 application inside the Raspberry Pi image.
 
-Please refer to the ChipTool page for information on using the Matter Hub with
-`mattertool` commands: [ChipTool page](./CHIP_TOOL.md)
+Refer to the [ChipTool page](./CHIP_TOOL.md) for information on using the Matter
+Hub with `mattertool` commands.
 
 ---
 
