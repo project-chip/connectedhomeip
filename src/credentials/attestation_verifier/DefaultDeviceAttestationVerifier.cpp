@@ -22,6 +22,7 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <string.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -49,6 +50,62 @@ static const ByteSpan kTestPaaRoots[] = {
     TestCerts::sTestCert_PAA_FFF1_Cert,
     TestCerts::sTestCert_PAA_NoVID_Cert,
 };
+
+// Test CD Signing Key from `credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem`
+// used to verify any in-SDK development CDs. The associated keypair to do actual signing is in
+// `credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem`.
+//
+// -----BEGIN CERTIFICATE-----
+// MIIBszCCAVqgAwIBAgIIRdrzneR6oI8wCgYIKoZIzj0EAwIwKzEpMCcGA1UEAwwg
+// TWF0dGVyIFRlc3QgQ0QgU2lnbmluZyBBdXRob3JpdHkwIBcNMjEwNjI4MTQyMzQz
+// WhgPOTk5OTEyMzEyMzU5NTlaMCsxKTAnBgNVBAMMIE1hdHRlciBUZXN0IENEIFNp
+// Z25pbmcgQXV0aG9yaXR5MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPDmJIkUr
+// VcrzicJb0bykZWlSzLkOiGkkmthHRlMBTL+V1oeWXgNrUhxRA35rjO3vyh60QEZp
+// T6CIgu7WUZ3suqNmMGQwEgYDVR0TAQH/BAgwBgEB/wIBATAOBgNVHQ8BAf8EBAMC
+// AQYwHQYDVR0OBBYEFGL6gjNZrPqplj4c+hQK3fUE83FgMB8GA1UdIwQYMBaAFGL6
+// gjNZrPqplj4c+hQK3fUE83FgMAoGCCqGSM49BAMCA0cAMEQCICxUXOTkV9im8NnZ
+// u+vW7OHd/n+MbZps83UyH8b6xxOEAiBUB3jodDlyUn7t669YaGIgtUB48s1OYqdq
+// 58u5L/VMiw==
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gTestCdPubkeyBytes[65] = { 0x04, 0x3c, 0x39, 0x89, 0x22, 0x45, 0x2b, 0x55, 0xca, 0xf3, 0x89, 0xc2, 0x5b,
+                                             0xd1, 0xbc, 0xa4, 0x65, 0x69, 0x52, 0xcc, 0xb9, 0x0e, 0x88, 0x69, 0x24, 0x9a,
+                                             0xd8, 0x47, 0x46, 0x53, 0x01, 0x4c, 0xbf, 0x95, 0xd6, 0x87, 0x96, 0x5e, 0x03,
+                                             0x6b, 0x52, 0x1c, 0x51, 0x03, 0x7e, 0x6b, 0x8c, 0xed, 0xef, 0xca, 0x1e, 0xb4,
+                                             0x40, 0x46, 0x69, 0x4f, 0xa0, 0x88, 0x82, 0xee, 0xd6, 0x51, 0x9d, 0xec, 0xba };
+
+constexpr uint8_t gTestCdPubkeyKid[20] = { 0x62, 0xfa, 0x82, 0x33, 0x59, 0xac, 0xfa, 0xa9, 0x96, 0x3e,
+                                           0x1c, 0xfa, 0x14, 0x0a, 0xdd, 0xf5, 0x04, 0xf3, 0x71, 0x60 };
+
+// Official CD "Signing Key 001"
+//
+// -----BEGIN CERTIFICATE-----
+// MIICCDCCAa2gAwIBAgIHY3NhY2RzMTAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjA4MTExOTMxMTVaGA8yMDcyMDcy
+// OTE5MzExNVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwMTEUMBIGCisGAQQBgqJ8AgEMBEM1
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARbW8Ou1rqjg/3Pm51ac/rqfmXr
+// WSfBxcArHPpLi9trm36yUlE/I/IqWDOdyK24gEYKySHTdte5cMUMO+bm0jbwo2Yw
+// ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
+// g/rXgegtAYtPFPChx/aEAYzF0Z8wHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDSQAwRgIhAIbSu8KoWTj5792UxtJ/uSgQXVTLRRsm
+// 09ys2m37JxDvAiEA8WMKDbRbwOtkabIyqwDgmiR3KwkyYwaqN4GPsRKfxwQ=
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gCdSigningKey001PubkeyBytes[65] = {
+    0x04, 0x5b, 0x5b, 0xc3, 0xae, 0xd6, 0xba, 0xa3, 0x83, 0xfd, 0xcf, 0x9b, 0x9d, 0x5a, 0x73, 0xfa, 0xea,
+    0x7e, 0x65, 0xeb, 0x59, 0x27, 0xc1, 0xc5, 0xc0, 0x2b, 0x1c, 0xfa, 0x4b, 0x8b, 0xdb, 0x6b, 0x9b, 0x7e,
+    0xb2, 0x52, 0x51, 0x3f, 0x23, 0xf2, 0x2a, 0x58, 0x33, 0x9d, 0xc8, 0xad, 0xb8, 0x80, 0x46, 0x0a, 0xc9,
+    0x21, 0xd3, 0x76, 0xd7, 0xb9, 0x70, 0xc5, 0x0c, 0x3b, 0xe6, 0xe6, 0xd2, 0x36, 0xf0
+};
+
+constexpr uint8_t gCdSigningKey001Kid[20] = { 0x83, 0xfa, 0xd7, 0x81, 0xe8, 0x2d, 0x01, 0x8b, 0x4f, 0x14,
+                                              0xf0, 0xa1, 0xc7, 0xf6, 0x84, 0x01, 0x8c, 0xc5, 0xd1, 0x9f };
+
+std::array<ByteSpan, 2> gCdKids                 = { ByteSpan{ gTestCdPubkeyKid }, ByteSpan{ gCdSigningKey001Kid } };
+std::array<Crypto::P256PublicKey, 2> gCdPubkeys = { Crypto::P256PublicKey{ gTestCdPubkeyBytes },
+                                                    Crypto::P256PublicKey{ gCdSigningKey001PubkeyBytes } };
 
 const ArrayAttestationTrustStore kTestAttestationTrustStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
 
@@ -87,64 +144,6 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
         return AttestationVerificationResult::kInternalError;
     }
 }
-
-/**
- * @brief Look-up of well-known keys used for CD signing by CSA.
- *
- * Current version uses only test key/cert provided in spec.
- */
-CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, MutableByteSpan & outCertificate)
-{
-    struct CertChainLookupTable
-    {
-        const uint8_t mCertificate[kMax_x509_Certificate_Length];
-        const uint8_t mSKID[Crypto::kSubjectKeyIdentifierLength];
-    };
-
-    static CertChainLookupTable
-        sCertChainLookupTable[] = {
-            { { 0x30, 0x82, 0x01, 0xb3, 0x30, 0x82, 0x01, 0x5a, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x45, 0xda, 0xf3, 0x9d,
-                0xe4, 0x7a, 0xa0, 0x8f, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x2b, 0x31,
-                0x29, 0x30, 0x27, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x20, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x54, 0x65,
-                0x73, 0x74, 0x20, 0x43, 0x44, 0x20, 0x53, 0x69, 0x67, 0x6e, 0x69, 0x6e, 0x67, 0x20, 0x41, 0x75, 0x74, 0x68, 0x6f,
-                0x72, 0x69, 0x74, 0x79, 0x30, 0x20, 0x17, 0x0d, 0x32, 0x31, 0x30, 0x36, 0x32, 0x38, 0x31, 0x34, 0x32, 0x33, 0x34,
-                0x33, 0x5a, 0x18, 0x0f, 0x39, 0x39, 0x39, 0x39, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x35, 0x39, 0x35, 0x39, 0x5a,
-                0x30, 0x2b, 0x31, 0x29, 0x30, 0x27, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x20, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72,
-                0x20, 0x54, 0x65, 0x73, 0x74, 0x20, 0x43, 0x44, 0x20, 0x53, 0x69, 0x67, 0x6e, 0x69, 0x6e, 0x67, 0x20, 0x41, 0x75,
-                0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02,
-                0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x3c, 0x39, 0x89, 0x22,
-                0x45, 0x2b, 0x55, 0xca, 0xf3, 0x89, 0xc2, 0x5b, 0xd1, 0xbc, 0xa4, 0x65, 0x69, 0x52, 0xcc, 0xb9, 0x0e, 0x88, 0x69,
-                0x24, 0x9a, 0xd8, 0x47, 0x46, 0x53, 0x01, 0x4c, 0xbf, 0x95, 0xd6, 0x87, 0x96, 0x5e, 0x03, 0x6b, 0x52, 0x1c, 0x51,
-                0x03, 0x7e, 0x6b, 0x8c, 0xed, 0xef, 0xca, 0x1e, 0xb4, 0x40, 0x46, 0x69, 0x4f, 0xa0, 0x88, 0x82, 0xee, 0xd6, 0x51,
-                0x9d, 0xec, 0xba, 0xa3, 0x66, 0x30, 0x64, 0x30, 0x12, 0x06, 0x03, 0x55, 0x1d, 0x13, 0x01, 0x01, 0xff, 0x04, 0x08,
-                0x30, 0x06, 0x01, 0x01, 0xff, 0x02, 0x01, 0x01, 0x30, 0x0e, 0x06, 0x03, 0x55, 0x1d, 0x0f, 0x01, 0x01, 0xff, 0x04,
-                0x04, 0x03, 0x02, 0x01, 0x06, 0x30, 0x1d, 0x06, 0x03, 0x55, 0x1d, 0x0e, 0x04, 0x16, 0x04, 0x14, 0x62, 0xfa, 0x82,
-                0x33, 0x59, 0xac, 0xfa, 0xa9, 0x96, 0x3e, 0x1c, 0xfa, 0x14, 0x0a, 0xdd, 0xf5, 0x04, 0xf3, 0x71, 0x60, 0x30, 0x1f,
-                0x06, 0x03, 0x55, 0x1d, 0x23, 0x04, 0x18, 0x30, 0x16, 0x80, 0x14, 0x62, 0xfa, 0x82, 0x33, 0x59, 0xac, 0xfa, 0xa9,
-                0x96, 0x3e, 0x1c, 0xfa, 0x14, 0x0a, 0xdd, 0xf5, 0x04, 0xf3, 0x71, 0x60, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48,
-                0xce, 0x3d, 0x04, 0x03, 0x02, 0x03, 0x47, 0x00, 0x30, 0x44, 0x02, 0x20, 0x2c, 0x54, 0x5c, 0xe4, 0xe4, 0x57, 0xd8,
-                0xa6, 0xf0, 0xd9, 0xd9, 0xbb, 0xeb, 0xd6, 0xec, 0xe1, 0xdd, 0xfe, 0x7f, 0x8c, 0x6d, 0x9a, 0x6c, 0xf3, 0x75, 0x32,
-                0x1f, 0xc6, 0xfa, 0xc7, 0x13, 0x84, 0x02, 0x20, 0x54, 0x07, 0x78, 0xe8, 0x74, 0x39, 0x72, 0x52, 0x7e, 0xed, 0xeb,
-                0xaf, 0x58, 0x68, 0x62, 0x20, 0xb5, 0x40, 0x78, 0xf2, 0xcd, 0x4e, 0x62, 0xa7, 0x6a, 0xe7, 0xcb, 0xb9, 0x2f, 0xf5,
-                0x4c, 0x8b },
-              { 0x62, 0xfa, 0x82, 0x33, 0x59, 0xac, 0xfa, 0xa9, 0x96, 0x3e,
-                0x1c, 0xfa, 0x14, 0x0a, 0xdd, 0xf5, 0x04, 0xf3, 0x71, 0x60 } }
-        };
-
-    size_t certChainLookupTableIdx;
-    for (certChainLookupTableIdx = 0; certChainLookupTableIdx < ArraySize(sCertChainLookupTable); ++certChainLookupTableIdx)
-    {
-        if (skid.data_equal(ByteSpan(sCertChainLookupTable[certChainLookupTableIdx].mSKID)))
-        {
-            break;
-        }
-    }
-
-    VerifyOrReturnError(certChainLookupTableIdx < ArraySize(sCertChainLookupTable), CHIP_ERROR_INVALID_ARGUMENT);
-
-    return CopySpanToMutableSpan(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, outCertificate);
-}
-
 } // namespace
 
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
@@ -165,6 +164,9 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
+
+    // Ensure PAI is present
+    VerifyOrExit(!info.paiDerBuffer.empty(), attestationError = AttestationVerificationResult::kPaiMissing);
 
     // match DAC and PAI VIDs
     {
@@ -203,6 +205,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         uint8_t akidBuf[Crypto::kAuthorityKeyIdentifierLength];
         MutableByteSpan akid(akidBuf);
         constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
+        CHIP_ERROR err                       = CHIP_NO_ERROR;
 
         VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
@@ -210,8 +213,15 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         VerifyOrExit(paaCert.Alloc(paaCertAllocatedLen), attestationError = AttestationVerificationResult::kNoMemory);
 
         paaDerBuffer = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
-        VerifyOrExit(mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+        err          = mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer);
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED,
                      attestationError = AttestationVerificationResult::kPaaNotFound);
+
+        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            VerifyOrExit(kTestAttestationTrustStore.GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+                         attestationError = AttestationVerificationResult::kPaaNotFound);
+        }
 
         VerifyOrExit(ExtractVIDPIDFromX509Cert(paaDerBuffer, paaVidPid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaaFormatInvalid);
@@ -283,17 +293,21 @@ exit:
 AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
                                                                                             ByteSpan & certDeclBuffer)
 {
-    uint8_t certificate[Credentials::kMaxDERCertLength];
-    MutableByteSpan certificateSpan(certificate);
-    ByteSpan skid;
-
-    VerifyOrReturnError(CMS_ExtractKeyId(cmsEnvelopeBuffer, skid) == CHIP_NO_ERROR,
+    ByteSpan kid;
+    VerifyOrReturnError(CMS_ExtractKeyId(cmsEnvelopeBuffer, kid) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationNoKeyId);
 
-    VerifyOrReturnError(GetCertificationDeclarationCertificate(skid, certificateSpan) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kCertificationDeclarationNoCertificateFound);
+    Crypto::P256PublicKey verifyingKey;
+    CHIP_ERROR err = mCdKeysTrustStore.LookupVerifyingKey(kid, verifyingKey);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, AttestationVerificationResult::kCertificationDeclarationNoCertificateFound);
 
-    VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, certificateSpan, certDeclBuffer) == CHIP_NO_ERROR,
+    // Disallow test key if support not enabled
+    if (mCdKeysTrustStore.IsCdTestKey(kid) && !IsCdTestKeySupported())
+    {
+        return AttestationVerificationResult::kCertificationDeclarationNoCertificateFound;
+    }
+
+    VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, verifyingKey, certDeclBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationInvalidSignature);
 
     return AttestationVerificationResult::kSuccess;
@@ -310,7 +324,7 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
 
     if (!firmwareInfo.empty())
     {
-        // TODO: check if version_number field in Certification Declaration matches the one in Firmware Information.
+        // TODO: validate contents based on DCL
     }
 
     // The vendor_id field in the Certification Declaration SHALL match the VendorID attribute found in the Basic Information
@@ -411,6 +425,68 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     ReturnErrorOnFailure(ValidateAttestationSignature(dacPublicKey, nocsrElementsBuffer, attestationChallengeBuffer, signature));
 
     return CHIP_NO_ERROR;
+}
+
+bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
+{
+    return kid.data_equal(ByteSpan{ gTestCdPubkeyKid });
+}
+
+CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey)
+{
+    ReturnErrorCodeIf(kid.size() > SingleKeyEntry::kMaxKidSize, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(kid.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(mNumTrustedKeys == kMaxNumTrustedKeys, CHIP_ERROR_NO_MEMORY);
+
+    auto & entry = mTrustedKeys[mNumTrustedKeys];
+
+    entry.kidSize = kid.size();
+    memcpy(&entry.kidBuffer[0], kid.data(), kid.size());
+    entry.publicKey = pubKey;
+
+    ++mNumTrustedKeys;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & derCertBytes)
+{
+    // TODO: Verify cert against CD root of trust (i.e. verify signatures). To do so,
+    //       we are missing primitives to validate X.509 paths of total length 2.
+
+    uint8_t kidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
+    MutableByteSpan kidSpan{ kidBuf };
+    P256PublicKey pubKey;
+
+    VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(derCertBytes, kidSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractPubkeyFromX509Cert(derCertBytes, pubKey), CHIP_ERROR_INVALID_ARGUMENT);
+    return AddTrustedKey(kidSpan, pubKey);
+}
+
+CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const
+{
+    // First, search for the well known keys
+    for (size_t keyIdx = 0; keyIdx < gCdKids.size(); keyIdx++)
+    {
+        if (kid.data_equal(gCdKids[keyIdx]))
+        {
+            outPubKey = gCdPubkeys[keyIdx];
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // Seconds, search externally added keys
+    for (size_t keyIdx = 0; keyIdx < mNumTrustedKeys; keyIdx++)
+    {
+        auto & entry = mTrustedKeys[keyIdx];
+        if (kid.data_equal(entry.GetKid()))
+        {
+            outPubKey = entry.publicKey;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // If we get here, the desired key was not found
+    return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
