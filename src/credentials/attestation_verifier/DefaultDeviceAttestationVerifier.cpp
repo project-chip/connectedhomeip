@@ -277,7 +277,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     }
 
 exit:
-    onCompletion->mCall(onCompletion->mContext, attestationError);
+    onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
 
 AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,

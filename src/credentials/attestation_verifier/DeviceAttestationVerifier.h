@@ -20,6 +20,7 @@
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -107,8 +108,6 @@ struct DeviceInfoForAttestation
     // Subject Key Identifier (SKID) from PAA cert
     uint8_t paaSKID[Crypto::kSubjectKeyIdentifierLength] = { 0 };
 };
-
-typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);
 
 /**
  * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
@@ -221,6 +220,43 @@ public:
         VendorId vendorId;
         uint16_t productId;
     };
+
+    // Copies the bytes passed to it, and holds the PAI, DAC, and CD for additional verification step
+    class AttestationDeviceInfo
+    {
+    public:
+        AttestationDeviceInfo(const AttestationInfo & attestationInfo);
+        AttestationDeviceInfo(const ByteSpan & attestationElementsBuffer, const ByteSpan paiDerBuffer, const ByteSpan dacDerBuffer);
+
+        ~AttestationDeviceInfo() = default;
+
+        // Returns buffer containing the PAI certificate from device in DER format.
+        const ByteSpan paiDerBuffer() const { return ByteSpan(mPaiDerBuffer.Get(), mPaiDerBuffer.AllocatedSize()); }
+
+        // Returns buffer containing the DAC certificate from device in DER format.
+        const ByteSpan dacDerBuffer() const { return ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()); }
+
+        // Returns optional buffer containing the certificate declaration from device.
+        const Optional<ByteSpan> cdBuffer() const
+        {
+            if (mCdBuffer.Get())
+            {
+                return MakeOptional(ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()));
+            }
+            else
+            {
+                return Optional<ByteSpan>();
+            }
+        }
+
+    private:
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiDerBuffer;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mDacDerBuffer;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuffer;
+    };
+
+    typedef void (*OnAttestationInformationVerification)(void * context, const AttestationInfo & info,
+                                                         AttestationVerificationResult result);
 
     /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
