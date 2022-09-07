@@ -37,14 +37,12 @@ bl702_module_type="BL706C-22"
 
 print_help() {
     bl702_boards_help=""
-    for board in "${bl702_boards[@]}"
-    do
+    for board in "${bl702_boards[@]}"; do
         bl702_boards_help=$bl702_boards_help$board"\n            "
     done
 
     bl702_modules_help=""
-    for module in "${bl702_modules[@]}"
-    do
+    for module in "${bl702_modules[@]}"; do
         bl702_modules_help=$bl702_modules_help$module"\n                "
     done
 
@@ -87,7 +85,6 @@ print_help() {
     "
 }
 
-
 if [ "$#" -lt "3" ]; then
     print_help
 else
@@ -113,13 +110,13 @@ else
 
     while [ $# -gt 0 ]; do
         if [[ "$1" == "module_type"* ]]; then
-            module_type=`echo "$1" | awk -F'=' '{print $2}'`
+            module_type=$(echo "$1" | awk -F'=' '{print $2}')
 
             shift
             continue
         fi
         if [[ "$1" == "baudrate"* ]]; then
-            baudrate=`echo "$1" | awk -F'=' '{print $2}'`
+            baudrate=$(echo "$1" | awk -F'=' '{print $2}')
 
             shift
             continue
