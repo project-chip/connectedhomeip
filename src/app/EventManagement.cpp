@@ -118,6 +118,7 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
     mpEventNumberCounter = apEventNumberCounter;
     mLastEventNumber     = mpEventNumberCounter->GetValue();
+    mCurrentEventEpoch   = mpEventNumberCounter->GetValue();
 
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
@@ -642,7 +643,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectLi
     const bool recurse = false;
     TLVReader reader;
     CircularEventBufferWrapper bufWrapper;
-    EventLoadOutContext context(aWriter, PriorityLevel::Invalid, aEventMin);
+    EventLoadOutContext context(aWriter, PriorityLevel::Invalid, aEventMin + mCurrentEventEpoch);
 
     context.mSubjectDescriptor     = aSubjectDescriptor;
     context.mpInterestedEventPaths = apEventPathList;
