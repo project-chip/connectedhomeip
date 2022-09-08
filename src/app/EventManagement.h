@@ -510,8 +510,8 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mCurrentEventEpoch = 0;
-    EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    EventNumber mLastEventNumber   = 0; ///< Last event Number vended
+    Timestamp mLastEventTimestamp;      ///< The timestamp of the last event in this buffer
 };
 } // namespace app
 } // namespace chip
