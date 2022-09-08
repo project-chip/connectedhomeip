@@ -490,6 +490,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
                                                      GAP_ADV_EVT_MASK_SET_TERMINATED);
 
         Util_constructClock(&sInstance.clkAdvTimeout, AdvTimeoutHandler, ADV_TIMEOUT, 0, false, (uintptr_t) NULL);
+        Util_constructClock(&sInstance.clkFastAdvTimeout, FastAdvTimeoutHandler, FAST_ADV_TIMEOUT, 0, false, (uintptr_t) NULL);
     }
     if (sInstance.mFlags.Has(Flags::kBLEStackAdvInitialized))
 
@@ -831,6 +832,10 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
                     // Start advertisement timeout timer
                     Util_startClock(&sInstance.clkAdvTimeout);
+                    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+                    {
+                        Util_startClock(&sInstance.clkFastAdvTimeout);
+                    }
 
                     sInstance.mFlags.Set(Flags::kAdvertising);
                 }
@@ -845,6 +850,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 sInstance.mFlags.Clear(Flags::kAdvertising);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
+                Util_stopClock(&sInstance.clkFastAdvTimeout);
             }
         }
     }
@@ -1093,6 +1099,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
 
         /* Stop advertisement timeout timer */
         Util_stopClock(&sInstance.clkAdvTimeout);
+        Util_stopClock(&sInstance.clkFastAdvTimeout);
 
         DriveBLEState();
 
@@ -1714,6 +1721,22 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
         BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
 
         sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+
+        /* Send event to process state change request */
+        DriveBLEState();
+    }
+}
+
+void BLEManagerImpl::FastAdvTimeoutHandler(uintptr_t arg)
+{
+    BLEMGR_LOG("BLEMGR: FastAdvTimeoutHandler");
+
+    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
+
+        sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
+        sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
 
         /* Send event to process state change request */
         DriveBLEState();
