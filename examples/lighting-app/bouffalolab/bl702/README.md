@@ -7,7 +7,7 @@ Current supported develop boards:
 -   BL702-IoT-DVK
 -   BL706-IoT-DVK
 -   BL706-NIGHT-LIGHT
-    > Note, please make sure both of flash and PSRAM shipped with develop
+    > Note, please make sure both of flash and `PSRAM` shipped with develop
     > board/device are at lease 2MB.
 
 ## Build
@@ -126,10 +126,9 @@ Current supported develop boards:
         > download image. Please make sure current terminal is under matter
         > build environment, or `bflb-iot-tool` is installed.
 
-    -   BLDevCube Start BLDevCube_path
+    - Using Bouffalo Lab flash tool`BLDevCube`
         -   Hold BOOT pin and reset board, let it be in download mode.
-        -   Select default `Factory params` under BLDevCube_path Software path;
-        -   Select DTS file
+        -   Select `DTS` file
             `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts`;
         -   Select Partition Table
             `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml`;

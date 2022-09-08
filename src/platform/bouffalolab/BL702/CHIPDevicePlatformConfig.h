@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the chip Device Layer
- *          for the Bouffalolab BL702 platform.
- */
 
 #pragma once
 

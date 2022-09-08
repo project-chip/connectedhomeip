@@ -60,9 +60,9 @@ if (lwip_platform == "cc13x2_26x2") {
 } else if (lwip_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (lwip_platform == "bl602") {
-  import("//build_overrides/bl602_sdk.gni")
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "bl702") {
-  import("//build_overrides/bl702_sdk.gni")
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "mw320") {
   import("//build_overrides/mw320_sdk.gni")
 }
@@ -110,9 +110,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bl702_sdk_build_root}:bl702_sdk" ]
-
-    #public_configs = [ "${bl702_sdk_build_root}:bl702_lwip_port_config" ]
-    #public_configs += [ "${bl702_sdk_build_root}:bl702_lwip_config" ]
   }
 
   group("all") {

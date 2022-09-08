@@ -16,9 +16,9 @@
  */
 
 /**
- *    @file
- *          Provides an implementation of the BLEManager singleton object
- *          for the BL702 platform.
+ * @file
+ *    Provides an implementation of the BLEManager object for the Bouffalolab
+ *    BL702 platform.
  */
 
 #pragma once

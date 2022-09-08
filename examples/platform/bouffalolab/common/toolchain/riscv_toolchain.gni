@@ -16,18 +16,17 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/gcc_toolchain.gni")
+import("//build_overrides/bouffalolab_iot_sdk.gni")
 
 template("riscv_toolchain") {
   gcc_toolchain(target_name) {
     _tool_name_root = ""
-    _toolchain_path =
-        "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv"
+
     if ( "linux" == host_os ) {
-      _tool_name_root = _toolchain_path + "/Linux/bin/"
+      _tool_name_root = "${root_build_dir}/../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-"
     } else if ( "mac" == host_os || "darwin" == host_os ) {
-      _tool_name_root = _toolchain_path + "/Darwin/bin/"
+      _tool_name_root = "${root_build_dir}/../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-"
     }
-    _tool_name_root = _tool_name_root + "riscv64-unknown-elf-"
 
     ar = _tool_name_root + "ar"
     cc = _tool_name_root + "gcc"

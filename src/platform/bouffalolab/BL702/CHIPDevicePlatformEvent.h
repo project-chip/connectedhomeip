@@ -16,14 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Defines platform-specific event types and data for the chip
- *          for the Bouffalolab BL702 platform.
- *
- * NOTE: currently a bare-bones implementation to allow for building.
- */
-
 #pragma once
 
 #include <platform/CHIPDeviceEvent.h>

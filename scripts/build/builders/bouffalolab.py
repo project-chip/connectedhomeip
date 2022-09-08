@@ -68,10 +68,10 @@ class BouffalolabBuilder(GnBuilder):
                  module_type: str = "BL706C-22",
                  ):
 
-        boufflab_chip = "bl702" if "BL70" in module_type else "bl602"
+        bouffalo_chip = "bl702" if "BL70" in module_type else "bl602"
         super(BouffalolabBuilder, self).__init__(
             root=os.path.join(root, 'examples',
-                              app.ExampleName(), 'bouffalolab', boufflab_chip),
+                              app.ExampleName(), 'bouffalolab', bouffalo_chip),
             runner=runner
         )
 

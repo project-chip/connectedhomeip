@@ -16,13 +16,11 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer for the Texas Instruments CC1352 platform.
- *
- * NOTE: Empty because BLE is not enabled, but build defines this file
- *       to be included by the build configuration.
- */
-
 #pragma once
+
+// ==================== Platform Adaptations ====================
+
+struct bt_conn;
+#define BLE_CONNECTION_OBJECT bt_conn *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
+#define BLE_MAX_RECEIVE_WINDOW_SIZE 5

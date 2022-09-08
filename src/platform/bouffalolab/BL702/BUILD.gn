@@ -26,7 +26,6 @@ static_library("BL702") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPmemory.cpp",
@@ -73,7 +72,7 @@ static_library("BL702") {
   if (chip_enable_openthread) {
     # needed for MTD/FTD
 
-    import("//build_overrides/bl702_sdk.gni")
+    import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bl702_sdk_build_root}/bl702_sdk.gni")
     public_deps += [
       "${bl702_sdk_build_root}:bl702_sdk",
@@ -91,10 +90,4 @@ static_library("BL702") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
-
-  # if (chip_enable_wifi) {
-  #   sources += [
-  #     "DnssdImpl.cpp",
-  #   ]
-  # }
 }

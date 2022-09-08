@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//args.gni")
-import("//build_overrides/bl702_sdk.gni")
+import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")

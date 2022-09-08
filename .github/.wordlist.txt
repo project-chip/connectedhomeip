@@ -155,7 +155,6 @@ Bootloader
 BorderRouterAP
 bouffalolab
 Bouffalolab
-BLDevCube
 BRD
 breakpoint
 bredr
@@ -402,7 +401,6 @@ df
 dfe
 dfu
 DgDxsfHx
-DTS
 dhclient
 DHCP
 DHCPC
@@ -1057,7 +1055,6 @@ PSCAN
 PSECT
 PSK
 PSoC
-PSRAM
 PTR
 pts
 PulseWidthModulation
