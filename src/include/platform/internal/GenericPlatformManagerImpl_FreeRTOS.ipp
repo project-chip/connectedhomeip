@@ -85,6 +85,12 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
             ExitNow(err = CHIP_ERROR_NO_MEMORY);
         }
     }
+    else
+    {
+        // Clear out any events that might be stuck in the queue, so we start
+        // with a clean slate, as if we had just re-created the queue.
+        xQueueReset(mChipEventQueue);
+    }
 
     mShouldRunEventLoop.store(false);
 
@@ -158,7 +164,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
     ChipDeviceEvent event;
 
     // Lock the CHIP stack.
-    Impl()->LockChipStack();
+    StackLock lock;
 
     bool oldShouldRunEventLoop = false;
     if (!mShouldRunEventLoop.compare_exchange_strong(oldShouldRunEventLoop /* expected */, true /* desired */))
@@ -211,13 +217,13 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
             waitTime = portMAX_DELAY;
         }
 
-        // Unlock the CHIP stack, allowing other threads to enter CHIP while the event loop thread is sleeping.
-        Impl()->UnlockChipStack();
-
-        BaseType_t eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
-
-        // Lock the CHIP stack.
-        Impl()->LockChipStack();
+        BaseType_t eventReceived = pdFALSE;
+        {
+            // Unlock the CHIP stack, allowing other threads to enter CHIP while
+            // the event loop thread is sleeping.
+            StackUnlock unlock;
+            eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
+        }
 
         // If an event was received, dispatch it.  Continue receiving events from the queue and
         // dispatching them until the queue is empty.
