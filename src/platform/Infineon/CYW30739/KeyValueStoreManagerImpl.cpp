@@ -149,8 +149,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     err = CYW30739Config::ClearConfigValue(entry->GetKeyConfigKey());
     VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    err = CYW30739Config::ClearConfigValue(entry->GetValueConfigKey());
-    VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    if (entry->GetValueSize() != 0)
+    {
+        err = CYW30739Config::ClearConfigValue(entry->GetValueConfigKey());
+        VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
 
     slist_del(entry, &mKeyConfigIdList);
     Platform::Delete(entry);
