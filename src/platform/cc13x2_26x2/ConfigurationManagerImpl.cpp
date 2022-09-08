@@ -104,42 +104,6 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     return ret;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetBootReason(BootReasonType & bootReason)
-{
-    switch (SysCtrlResetSourceGet())
-    {
-    case RSTSRC_PWR_ON:
-    case RSTSRC_WAKEUP_FROM_SHUTDOWN:
-        bootReason = BootReasonType::kPowerOnReboot;
-        break;
-
-    case RSTSRC_PIN_RESET:
-    case RSTSRC_WAKEUP_FROM_TCK_NOISE:
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-        break;
-
-    case RSTSRC_VDDS_LOSS:
-    case RSTSRC_VDDR_LOSS:
-    case RSTSRC_CLK_LOSS:
-        bootReason = BootReasonType::kBrownOutReset;
-        break;
-
-    case RSTSRC_SYSRESET:
-    case RSTSRC_WARMRESET:
-        bootReason = BootReasonType::kSoftwareReset;
-        // We do not have a clean way to differentiate between a software reset
-        // and a completed software update.
-        // bootReason = kSoftwareUpdateCompleted;
-        break;
-
-    default:
-        bootReason = BootReasonType::kUnknownEnumValue;
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
     CHIP_ERROR ret;

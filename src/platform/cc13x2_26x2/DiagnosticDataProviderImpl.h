@@ -35,7 +35,7 @@ class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
 
-    // ===== Methods that implement the PlatformManager abstract interface.
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
