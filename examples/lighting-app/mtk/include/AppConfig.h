@@ -27,7 +27,7 @@
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 10
 
-// EFR Logging
+// Genio Logging
 #ifdef __cplusplus
 extern "C" {
 #endif

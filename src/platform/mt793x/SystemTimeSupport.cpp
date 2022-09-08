@@ -20,13 +20,13 @@
 /**
  *    @file
  *          Provides implementations of the CHIP System Layer platform
- *          time/clock functions that are suitable for use on the ESP32 platform.
+ *          time/clock functions that are suitable for use on the Genio platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ESP32/SystemTimeSupport.h>
+#include <platform/mt793x/SystemTimeSupport.h>
 
 namespace chip {
 namespace System {
