@@ -120,10 +120,8 @@ RUN set -x \
     && ./configure --host=arm-linux-gnueabi --disable-client --disable-manpages --enable-testing --enable-tools \
     && make lib/bluetooth/bluetooth.h lib/bluetooth/hci.h \
     && make emulator/btvirt -j$(nproc) \
-    && mkdir temp_btvirt \
-    && install emulator/btvirt temp_btvirt \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
-    ./temp_btvirt/* /usr/bin/ \
+    emulator/btvirt /usr/bin/ \
     # Grant access to vHCI for network_fw group
     && UDEV_BT_VHCI=/usr/lib/udev/rules.d/99-bluetooth-vhci.rules \
     && echo 'KERNEL=="vhci", MODE="0660", GROUP="network_fw"' \
