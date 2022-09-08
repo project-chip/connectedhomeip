@@ -226,13 +226,12 @@ tests:
                 value: 3000
 
     ### Mandatory Depends on the FeatureMap
-    ### Issue https://github.com/project-chip/connectedhomeip/issues/22265
     - label:
           "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               type: Percent100ths
@@ -245,7 +244,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
               type: Percent
@@ -258,7 +257,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               type: Percent100ths
@@ -271,7 +270,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009 && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
               type: Percent
@@ -321,7 +320,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           constraints:
               type: Percent100ths
@@ -334,7 +333,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c && PICS_SKIP_SAMPLE_APP
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           constraints:
               type: Percent100ths

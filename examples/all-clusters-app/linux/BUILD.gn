@@ -26,6 +26,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
+    "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
     "main-common.cpp",
