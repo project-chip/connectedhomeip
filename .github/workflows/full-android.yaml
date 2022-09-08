@@ -48,6 +48,12 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            # To use act like:
+            #   act -j full_android
+            #
+            # Note you likely still need to have non submodules setup for the
+            # local machine, like:
+            #   git submodule deinit --all
             - uses: actions/checkout@v3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
