@@ -19,6 +19,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -137,6 +138,9 @@ void pychip_server_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
+
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
 
     ConfigurationMgr().LogDeviceConfig();
 
