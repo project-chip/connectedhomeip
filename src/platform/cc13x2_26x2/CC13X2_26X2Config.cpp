@@ -69,9 +69,9 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pSalt          
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                  .itemID   = 0x000c } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount             = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x000d } };
+                                                                                       .itemID   = 0x000d } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_TotalOperationalHours = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x000f } };
+                                                                                       .itemID   = 0x000f } };
 
 // Keys stored in the Chip-config namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceConfig      = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,

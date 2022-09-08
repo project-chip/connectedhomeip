@@ -129,7 +129,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(BootReasonType & bootReason)
         bootReason = BootReasonType::kSoftwareReset;
         // We do not have a clean way to differentiate between a software reset
         // and a completed software update.
-        //bootReason = kSoftwareUpdateCompleted;
+        // bootReason = kSoftwareUpdateCompleted;
         break;
 
     default:
@@ -159,7 +159,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 {
     return WriteConfigValue(CC13X2_26X2Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
-
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
