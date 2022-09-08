@@ -17,6 +17,7 @@ import coloredlogs
 import click
 import logging
 import os
+import re
 import sys
 import subprocess
 
@@ -82,40 +83,37 @@ def main(log_level, target, chip_tool_target, verbose):
             raise Exception("Can't create ISO file image")
 
         logging.info("Correct created /opt/app.iso")
-    except:
+    except subprocess.CalledProcessError as e:
+        print(e.output)
         raise
 
     logging.info("Testing target: %s", target)
     print("============== TEST BEGIN ================")
-    status = subprocess.Popen('%s/qemu_launcher.sh' % script_path,      text=True,
+    status = subprocess.Popen('%s/qemu_launcher.sh' % script_path,
+                              text=True,
                               encoding="850",
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               universal_newlines=True)
-    output = ""
-    while status.poll() is None:
-        line = status.stdout.readline()
-        if verbose:
-            print(line, end='')
-        output += line
-
     try:
-        if status.returncode != 0:
-            raise Exception("Target %s testing failed with code %d" %
-                            (target, status.returncode))
+        while status.poll() is None:
+            line = status.stdout.readline()
+            if verbose:
+                print(line, end='')
 
-        for line in output.split('\n'):
-            if 'CHIP test' in line and line.find("status: 0") == -1:
+            if status.returncode is not None:
+                raise Exception("Target %s testing failed with code: " % target + str(status.returncode))
+
+            if re.match(r"^CHIP test(\s+([A-Za-z0-9]+\s+)+)status: [1-9]+$", line):
                 raise Exception("CHIP test FAILED: %s" % line)
 
-        logging.info("Target %s PASSED", target)
-    except:
-        if not verbose:
-            print(output)
+    except Exception as e:
+        logging.fatal(e)
         print("============== TEST END ================")
         raise
 
     print("============== TEST END ================")
+    logging.info("Target %s PASSED", target)
 
 
 if __name__ == '__main__':

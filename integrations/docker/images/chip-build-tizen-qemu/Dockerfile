@@ -88,18 +88,14 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     libguestfs-tools \
     linux-image-generic-hwe-20.04 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/ \
     && SYSTEMD_SYSTEM=/usr/lib/systemd/system \
     # Add extra libraries
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
-    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* /usr/lib/ \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
-    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* /usr/lib/ \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
-    $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* /usr/lib/ \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
-    $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* /usr/lib/ \
+    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* \
+    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* \
+    $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* \
+    $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* \
+    /usr/lib/ \
     # Disable failing systemd services
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob rm \
     $SYSTEMD_SYSTEM/deviced.service \
@@ -128,11 +124,11 @@ RUN set -x \
     | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $UDEV_BT_VHCI \
     # Create vHCI devices on startup (modify RPi4 hciattach script)
     && BT_DEV_START_SH=/usr/etc/bluetooth/bt-dev-start-rpi3.sh \
-    && echo > temp.txt \
+    && echo \
     "#!/bin/sh\n" \
     "/usr/bin/btvirt -l2 &\n" \
     "sleep 0.5\n" \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $BT_DEV_START_SH \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $BT_DEV_START_SH \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
@@ -142,7 +138,7 @@ RUN set -x \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda mkdir /opt-ro \
     # Mount Tizen system partition as a tmp-based overlay
     && SYSTEMD_UNIT_OPT_PRE_MOUNT=$SYSTEMD_SYSTEM/opt.pre-mount.service \
-    && echo > temp.txt \
+    && echo \
     "[Unit]\n" \
     "DefaultDependencies=no\n" \
     "RequiresMountsFor=/tmp\n" \
@@ -150,11 +146,11 @@ RUN set -x \
     "Type=oneshot\n" \
     "ExecStart=mkdir -p /tmp/.opt-upper /tmp/.opt-work\n" \
     "RemainAfterExit=yes\n" \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_PRE_MOUNT \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_PRE_MOUNT \
     #
     && SYSTEMD_UNIT_OPT_MOUNT=$SYSTEMD_SYSTEM/opt.mount \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > temp.txt \
+    && echo \
     "[Unit]\nConditionPathIsMountPoint=!/opt\n" \
     "RequiresMountsFor=/opt-ro /tmp\n" \
     "Wants=opt.pre-mount.service\n" \
@@ -164,11 +160,11 @@ RUN set -x \
     "Where=/opt\n" \
     "Type=overlay\n" \
     "Options=lowerdir=/opt-ro,upperdir=/tmp/.opt-upper,workdir=/tmp/.opt-work\n" \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_MOUNT \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_MOUNT \
     #
     && SYSTEMD_UNIT_OPT_POST_MOUNT=$SYSTEMD_SYSTEM/opt.post-mount.service \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > temp.txt \
+    && echo \
     "[Unit]\n" \
     "DefaultDependencies=no\n" \
     "RequiresMountsFor=/opt\n" \
@@ -176,21 +172,21 @@ RUN set -x \
     "Type=oneshot\n" \
     "ExecStart=chsmack -a * /tmp/.opt-work/work\n" \
     "RemainAfterExit=yes\n" \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_POST_MOUNT \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT \
     # Mount Matter APP drive on startup
     && SYSTEMD_UNIT_CHIP_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf \
     $SYSTEMD_UNIT_CHIP_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > temp.txt \
+    && echo \
     "[Unit]\n" \
     "ConditionPathIsMountPoint=!/mnt/chip\n" \
     "[Mount]\n" \
     "What=/dev/disk/by-label/CHIP\nWhere=/mnt/chip\n" \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_CHIP_MOUNT \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_CHIP_MOUNT \
     && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda mkdir /mnt/chip \
     # Run Chip testing script on login
-    && echo "/mnt/chip/testing_process.sh" > temp.txt \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt /root/.profile \
+    && echo "/mnt/chip/testing_process.sh" \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - /root/.profile \
     # Setup auto-login for root user
     && SGETTY=/usr/lib/systemd/system/serial-getty@.service \
     && virt-edit $TIZEN_FS_IMAGE_ROOT -e \
@@ -202,6 +198,8 @@ RUN set -x \
     libguestfs-tools \
     linux-image-generic-hwe-20.04 \
     && apt-get autoremove -fy \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 # ------------------------------------------------------------------------------
