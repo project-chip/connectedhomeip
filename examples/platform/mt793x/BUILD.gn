@@ -43,7 +43,7 @@ config("chip_examples_project_config") {
   ]
 }
 
-source_set("mtk-matter-shell") {
+source_set("genio-matter-shell") {
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]
 

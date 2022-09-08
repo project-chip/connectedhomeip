@@ -208,7 +208,7 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", serviceName);
     strcpy(service.mName, serviceName);
 
-    ChipBrowseHandler(NULL, &service, 1, CHIP_NO_ERROR);
+    ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,

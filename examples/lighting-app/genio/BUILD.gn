@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-mt793x_project_dir = "${chip_root}/examples/lighting-app/mtk"
+mt793x_project_dir = "${chip_root}/examples/lighting-app/genio"
 mt793x_examples_plat_dir = "${chip_root}/examples/platform/mt793x"
 
 declare_args() {
@@ -83,7 +83,7 @@ mt793x_executable("lighting_app") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-    "${mt793x_examples_plat_dir}:mtk-matter-shell",
+    "${mt793x_examples_plat_dir}:genio-matter-shell",
   ]
 
   if (chip_enable_ota_requestor) {

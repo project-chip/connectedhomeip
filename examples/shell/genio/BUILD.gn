@@ -25,7 +25,7 @@ import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
 
 assert(current_os == "freertos")
 
-mt793x_project_dir = "${chip_root}/examples/shell/mtk"
+mt793x_project_dir = "${chip_root}/examples/shell/genio"
 mt793x_ex_plat_dir = "${chip_root}/examples/platform/mt793x"
 
 declare_args() {
@@ -53,7 +53,7 @@ mt793x_executable("shell_app") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
-    "${mt793x_ex_plat_dir}:mtk-matter-shell",
+    "${mt793x_ex_plat_dir}:genio-matter-shell",
   ]
 
   include_dirs = [ "include" ]
