@@ -16,14 +16,14 @@ will be expanded are denoted with `$` .
 Unless specified, numerical values are represented in decimal notation.
 
 ```
-<<< [E:$exchange_id M: $message_id (Ack: $ack_message_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$message_type_name)
+<<< [E:$exchange_id M: $msg_id (Ack: $ack_msg_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
 ```
 
 | Field                | Description                                                                                                                            |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | exchange_id          | Exchange ID + IsInitiator flag from message header ('i' if initiator, 'r' if responder')                                               |
-| message_id           | Message counter                                                                                                                        |
-| ack_message_id       | If present, the ACK message counter. Otherwise, this entire field is omitted from display                                              |
+| msg_id               | Message counter                                                                                                                        |
+| ack_msg_id           | If present, the ACK message counter. Otherwise, this entire field is omitted from display                                              |
 | msg_category         | U: Un-secure Unicast, S: Secure Unicast, G: Secure Groupcast                                                                           |
 | fabric_index         | Fabric index on the sending side                                                                                                       |
 | destination          | 64-bit Node Identifier that can represent both group, operational and temporary node identifiers depending on `$msg_category` (in hex) |
@@ -31,7 +31,7 @@ Unless specified, numerical values are represented in decimal notation.
 | protocol_id          | 16-bit Protocol ID within the common vendor namespace (in hex)                                                                         |
 | msg_type             | 8-bit message type ID (in hex)                                                                                                         |
 | protocol_name        | If available, a logical name for the protocol                                                                                          |
-| message_type_name    | If available, a logical name for the message type                                                                                      |
+| msg_type_name        | If available, a logical name for the message type                                                                                      |
 
 #### Examples:
 
@@ -63,7 +63,7 @@ will be expanded are denoted with `$` .
 Unless specified, numerical values are represented in decimal notation.
 
 ```
->>> [E:$exchange_id M: $message_id (Ack: $ack_message_id)] ($msg_category) Msg RX from $fabric_index:$source [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$message_type_name)
+>>> [E:$exchange_id M: $msg_id (Ack: $ack_msg_id)] ($msg_category) Msg RX from $fabric_index:$source [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
 ```
 
 This has a similar legend to that for transmission except `$source` denoting the

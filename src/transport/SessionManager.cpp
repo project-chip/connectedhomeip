@@ -256,6 +256,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
+#if CHIP_PROGRESS_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
 
     if (fabricIndex != kUndefinedFabricIndex)
@@ -271,20 +272,21 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
     //
-    // 32-bit value maximum = 10 chars + text preamble (7) + trailer (1) + null (1) + 1 buffer = 20
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
     //
     char ackBuf[20];
     ackBuf[0] = '\0';
     if (payloadHeader.GetAckMessageCounter().HasValue())
     {
-        snprintf(ackBuf, sizeof(ackBuf), " (Ack: " ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
+#endif
 
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
-                    "<<< [E:" ChipLogFormatExchangeId " M: " ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
+                    "<<< [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
                     " [%04X] --- Type %04X:%02X (%s:%s)",
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
                     sessionHandle->GetSessionTypeString(), static_cast<uint16_t>(fabricIndex), ChipLogValueX64(destination),

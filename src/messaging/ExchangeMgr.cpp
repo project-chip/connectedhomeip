@@ -191,14 +191,18 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
+#if CHIP_PROGRESS_LOGGING
     auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
     auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
 
+    //
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
+    //
     char ackBuf[20];
     ackBuf[0] = '\0';
     if (payloadHeader.GetAckMessageCounter().HasValue())
     {
-        snprintf(ackBuf, sizeof(ackBuf), " (Ack: " ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
 
     CompressedFabricId compressedFabricId = 0;
@@ -210,14 +214,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             compressedFabricId = fabricInfo->GetCompressedFabricId();
         }
     }
+#endif
 
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
     ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " M: " ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
-                    " [%04x] --- Type %04x:%02x (%s:%s)",
-                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
+                    " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
                     session->GetSessionTypeString(), static_cast<uint16_t>(session->GetFabricIndex()),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
                     static_cast<uint16_t>(payloadHeader.GetProtocolID().GetProtocolId()),
