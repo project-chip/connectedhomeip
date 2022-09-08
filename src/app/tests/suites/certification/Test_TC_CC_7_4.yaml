@@ -127,8 +127,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 56
-              maxValue: 74
+              minValue: 50
+              maxValue: 80
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -145,7 +145,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: 16000
+              minValue: 13600
               maxValue: 18400
 
     - label: "TH reads CurrentSaturation attribute from DUT"
@@ -155,7 +155,7 @@ tests:
       response:
           constraints:
               minValue: 68
-              maxValue: 80
+              maxValue: 92
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
