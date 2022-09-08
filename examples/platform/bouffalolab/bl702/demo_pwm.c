@@ -20,7 +20,7 @@ hosal_pwm_dev_t rgb_pwm[] = {
         .config.pin        = LED_B_PIN,
         .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
         .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
-                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+                                       // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     },
 #if MAX_PWM_CHANNEL == 3
     {
@@ -29,7 +29,7 @@ hosal_pwm_dev_t rgb_pwm[] = {
         .config.pin        = LED_R_PIN,
         .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
         .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
-                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+                                       // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     },
     {
         .port = LED_G_PIN_PORT,
@@ -37,7 +37,7 @@ hosal_pwm_dev_t rgb_pwm[] = {
         .config.pin        = LED_G_PIN,
         .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
         .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
-                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+                                       // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     }
 #endif
 };

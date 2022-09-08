@@ -34,7 +34,7 @@ void MemMonitoring::startHeapMonitoring()
 void MemMonitoring::HeapMonitoring(void * pvParameter)
 {
     TaskStatus_t * pTaskStatus = NULL;
-    char taskState[] = { 'X', 'R', 'B', 'S', 'D' }; // eRunning, eReady, eBlocked, eSuspended, eDeleted
+    char taskState[]           = { 'X', 'R', 'B', 'S', 'D' }; // eRunning, eReady, eBlocked, eSuspended, eDeleted
     uint32_t pulTotalRunTime;
 
     while (1)
