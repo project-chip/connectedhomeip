@@ -11,9 +11,7 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     bc \
-    btrfs-progs \
     genisoimage \
-    squashfs-tools \
     qemu-system-arm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
@@ -31,7 +29,8 @@ WORKDIR /tmp/workdir
 COPY files/0001-smack-add-permissive-mode.patch .
 
 RUN set -x \
-    # Download
+    # ------------------------------------------------------------------------------
+    # Download Linux rpi4 kernel
     && wget --progress=dot:giga -r -nd --no-parent -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/tizen/$TIZEN_VERSION-unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
@@ -67,37 +66,53 @@ ENV TIZEN_FS_IMAGE_DATA /opt/tizen-iot-sysdata.img
 
 WORKDIR /tmp/workdir
 
-COPY files/rootfs-security-smack.xattrs .
-
 RUN set -x \
-    && ROOT=$PWD/rootfs \
-    && SYSTEMD_SYSTEM=$ROOT/usr/lib/systemd/system \
-    # Download
+    # ------------------------------------------------------------------------------
+    # Download Tizen images
     && wget --progress=dot:giga -r -nd --no-parent -A 'tizen-*.tar.gz' \
-    http://download.tizen.org/snapshots/tizen/$TIZEN_VERSION-unified/latest/images/standard/iot-headless-2parts-armv7l-btrfs-rootfs-rpi/ \
+    http://download.tizen.org/snapshots/tizen/unified/latest/images/standard/tizen-headless-armv7l/  \
     # Unpack
     && tar -xzf tizen-*.tar.gz \
     && mv system-data.img $TIZEN_FS_IMAGE_DATA \
-    # Build patched (read xattrs from file) SquashFS tools
-    && wget https://github.com/Arkq/squashfs-tools/archive/refs/heads/master.zip \
-    && unzip master.zip \
-    && make -C squashfs-tools-master/squashfs-tools -j$(nproc) \
-    # Extract files from RootFS image
-    && mkdir $ROOT \
-    && btrfs restore --metadata --symlinks rootfs.img $ROOT \
+    && mv rootfs.img $TIZEN_FS_IMAGE_ROOT \
+    # Cleanup
+    && rm -rf /tmp/workdir \
+    && : # last line
+
+WORKDIR /tmp/workdir
+
+RUN set -x \
+    # ------------------------------------------------------------------------------
+    # Install libguestfs and linux-image-generic for guestfish
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    libguestfs-tools \
+    linux-image-generic-hwe-20.04 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/ \
+    && SYSTEMD_SYSTEM=/usr/lib/systemd/system \
     # Add extra libraries
-    && cp $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* $ROOT/usr/lib/ \
-    && cp $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* $ROOT/usr/lib/ \
-    && cp $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* $ROOT/usr/lib/ \
-    && cp $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* $ROOT/usr/lib/ \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
+    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* /usr/lib/ \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
+    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* /usr/lib/ \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
+    $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* /usr/lib/ \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
+    $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* /usr/lib/ \
     # Disable failing systemd services
-    && rm $SYSTEMD_SYSTEM/deviced.service \
-    && rm $SYSTEMD_SYSTEM/display-manager* \
-    && rm $SYSTEMD_SYSTEM/mnt-inform.mount \
-    && rm $SYSTEMD_SYSTEM/stability-monitor.service \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob rm \
+    $SYSTEMD_SYSTEM/deviced.service \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob rm \
+    $SYSTEMD_SYSTEM/mnt-inform.mount \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob rm \
+    $SYSTEMD_SYSTEM/murphyd.service \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob rm \
+    $SYSTEMD_SYSTEM/pulseaudio.service \
     # Add HCI emulator (btvirt) from BlueZ project
     && wget -O bluez.tar.gz https://github.com/bluez/bluez/archive/refs/tags/5.64.tar.gz \
-    && tar -xzf bluez.tar.gz && cd bluez-* \
+    && tar -xzf bluez.tar.gz \
+    && cd bluez-* \
     && export CFLAGS="--sysroot=${TIZEN_SDK_SYSROOT}" \
     && export PKG_CONFIG_PATH="${TIZEN_SDK_SYSROOT}/usr/lib/pkgconfig" \
     && export PKG_CONFIG_SYSROOT_DIR="${TIZEN_SDK_SYSROOT}" \
@@ -105,26 +120,31 @@ RUN set -x \
     && ./configure --host=arm-linux-gnueabi --disable-client --disable-manpages --enable-testing --enable-tools \
     && make lib/bluetooth/bluetooth.h lib/bluetooth/hci.h \
     && make emulator/btvirt -j$(nproc) \
-    && install emulator/btvirt $ROOT/usr/bin/ \
+    && mkdir temp_btvirt \
+    && install emulator/btvirt temp_btvirt \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda glob copy-in \
+    ./temp_btvirt/* /usr/bin/ \
     # Grant access to vHCI for network_fw group
-    && UDEV_BT_VHCI=$ROOT/usr/lib/udev/rules.d/99-bluetooth-vhci.rules \
-    && echo 'KERNEL=="vhci", MODE="0660", GROUP="network_fw"' > $UDEV_BT_VHCI \
+    && UDEV_BT_VHCI=/usr/lib/udev/rules.d/99-bluetooth-vhci.rules \
+    && echo 'KERNEL=="vhci", MODE="0660", GROUP="network_fw"' > temp.txt \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $UDEV_BT_VHCI \
     # Create vHCI devices on startup (modify RPi4 hciattach script)
-    && BT_DEV_START_SH=$ROOT/usr/etc/bluetooth/bt-dev-start-rpi3.sh \
-    && echo > $BT_DEV_START_SH \
+    && BT_DEV_START_SH=/usr/etc/bluetooth/bt-dev-start-rpi3.sh \
+    && echo > temp.txt \
     "#!/bin/sh\n" \
     "/usr/bin/btvirt -l2 &\n" \
     "sleep 0.5\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $BT_DEV_START_SH \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
-    && ln -frs $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && mv $SYSTEMD_SYSTEM/opt.mount $SYSTEMD_UNIT_OPT_RO_MOUNT \
-    && sed -i -e 's#/opt#/opt-ro#g' $SYSTEMD_UNIT_OPT_RO_MOUNT \
-    && sed -i -e 's#Options=#Options=ro,#' $SYSTEMD_UNIT_OPT_RO_MOUNT \
-    && mkdir -p $ROOT/opt-ro \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda mv $SYSTEMD_SYSTEM/opt.mount $SYSTEMD_UNIT_OPT_RO_MOUNT \
+    && virt-edit $TIZEN_FS_IMAGE_ROOT -e 's#/opt#/opt-ro#g' $SYSTEMD_UNIT_OPT_RO_MOUNT \
+    && virt-edit $TIZEN_FS_IMAGE_ROOT -e 's#Options=#Options=ro,#' $SYSTEMD_UNIT_OPT_RO_MOUNT \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda mkdir /opt-ro \
     # Mount Tizen system partition as a tmp-based overlay
     && SYSTEMD_UNIT_OPT_PRE_MOUNT=$SYSTEMD_SYSTEM/opt.pre-mount.service \
-    && echo > $SYSTEMD_UNIT_OPT_PRE_MOUNT \
+    && echo > temp.txt \
     "[Unit]\n" \
     "DefaultDependencies=no\n" \
     "RequiresMountsFor=/tmp\n" \
@@ -132,11 +152,12 @@ RUN set -x \
     "Type=oneshot\n" \
     "ExecStart=mkdir -p /tmp/.opt-upper /tmp/.opt-work\n" \
     "RemainAfterExit=yes\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_PRE_MOUNT \
+    #
     && SYSTEMD_UNIT_OPT_MOUNT=$SYSTEMD_SYSTEM/opt.mount \
-    && ln -frs $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > $SYSTEMD_UNIT_OPT_MOUNT \
-    "[Unit]\n" \
-    "ConditionPathIsMountPoint=!/opt\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
+    && echo > temp.txt \
+    "[Unit]\nConditionPathIsMountPoint=!/opt\n" \
     "RequiresMountsFor=/opt-ro /tmp\n" \
     "Wants=opt.pre-mount.service\n" \
     "After=opt.pre-mount.service\n" \
@@ -145,9 +166,11 @@ RUN set -x \
     "Where=/opt\n" \
     "Type=overlay\n" \
     "Options=lowerdir=/opt-ro,upperdir=/tmp/.opt-upper,workdir=/tmp/.opt-work\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_MOUNT \
+    #
     && SYSTEMD_UNIT_OPT_POST_MOUNT=$SYSTEMD_SYSTEM/opt.post-mount.service \
-    && ln -frs $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > $SYSTEMD_UNIT_OPT_POST_MOUNT \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
+    && echo > temp.txt \
     "[Unit]\n" \
     "DefaultDependencies=no\n" \
     "RequiresMountsFor=/opt\n" \
@@ -155,44 +178,32 @@ RUN set -x \
     "Type=oneshot\n" \
     "ExecStart=chsmack -a * /tmp/.opt-work/work\n" \
     "RemainAfterExit=yes\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_OPT_POST_MOUNT \
     # Mount Matter APP drive on startup
     && SYSTEMD_UNIT_CHIP_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
-    && ln -frs $SYSTEMD_UNIT_CHIP_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
-    && echo > $SYSTEMD_UNIT_CHIP_MOUNT \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda ln-sf \
+    $SYSTEMD_UNIT_CHIP_MOUNT $SYSTEMD_SYSTEM/local-fs.target.requires \
+    && echo > temp.txt \
     "[Unit]\n" \
     "ConditionPathIsMountPoint=!/mnt/chip\n" \
     "[Mount]\n" \
-    "What=/dev/disk/by-label/CHIP\n" \
-    "Where=/mnt/chip\n" \
-    && mkdir -p $ROOT/mnt/chip \
-    # Install Matter APP on startup
-    && SYSTEMD_UNIT_CHIP_INSTALL=$SYSTEMD_SYSTEM/chip-install-tpk.service \
-    && ln -frs $SYSTEMD_UNIT_CHIP_INSTALL $SYSTEMD_SYSTEM/default.target.wants \
-    && echo > $SYSTEMD_UNIT_CHIP_INSTALL \
-    "[Service]\n" \
-    "Type=oneshot\n" \
-    "ExecStart=sh -c \"pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*\"\n" \
-    "RemainAfterExit=yes\n" \
-    && : # last line
-
-RUN set -x \
-    && ROOT=$PWD/rootfs \
-    && SYSTEMD_SYSTEM=$ROOT/usr/lib/systemd/system \
-    # XXXX
-    && wget --progress=dot:mega -r -nd --no-parent \
-    http://download.tizen.org/releases/milestone/tizen/unified/latest/repos/standard/packages/armv7l/ \
-    -A 'strace-*.armv7l.rpm' \
-    && unrpm *.rpm \
-    && cp usr/bin/strace $ROOT/usr/bin/ \
+    "What=/dev/disk/by-label/CHIP\nWhere=/mnt/chip\n" \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $SYSTEMD_UNIT_CHIP_MOUNT \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda mkdir /mnt/chip \
+    # Run Chip testing script on login
+    && echo "/mnt/chip/testing_process.sh" > temp.txt \
+    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt /root/.profile \
     # Setup auto-login for root user
-    && mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyAMA0.service.d \
-    && AUTOLOGIN_CONF=$ROOT/etc/systemd/system/serial-getty@ttyAMA0.service.d/autologin.conf \
-    # && echo "[Service]\nExecStart=" > $AUTOLOGIN_CONF \
-    # && echo "ExecStart=-/sbin/agetty -o '-p -- \\u' --noclear --keep-baud 115200,38400,9600 --autologin root - %I \$TERM" >> $AUTOLOGIN_CONF \
-    # Create RootFS image as SquashFS
-    && squashfs-tools-master/squashfs-tools/mksquashfs $ROOT $TIZEN_FS_IMAGE_ROOT -xattrs-file rootfs-security-smack.xattrs \
+    && SGETTY=/usr/lib/systemd/system/serial-getty@.service \
+    && virt-edit $TIZEN_FS_IMAGE_ROOT -e \
+    's#^ExecStart=.*#ExecStart=-/sbin/agetty -o "-p -f root" --noclear -a root --keep-baud 115200 %I \$TERM#' $SGETTY \
     # Cleanup
     && rm -rf /tmp/workdir \
+    && rm -rf /var/tmp/.guestfs-0 \
+    && apt-get purge -fy \
+    libguestfs-tools \
+    linux-image-generic-hwe-20.04 \
+    && apt-get autoremove -fy \
     && : # last line
 
 # ------------------------------------------------------------------------------
