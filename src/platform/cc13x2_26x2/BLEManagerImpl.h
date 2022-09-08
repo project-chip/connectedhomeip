@@ -76,9 +76,6 @@ using namespace chip::Ble;
 // How often to read current current RPA (in ms)
 #define READ_RPA_EVT_PERIOD 3000
 
-// 30 second Fast Advertisement CHIP Timeout period
-#define FAST_ADV_TIMEOUT (30000)
-
 // 15 Minute Advertisement CHIP Timeout period
 #define ADV_TIMEOUT (900000)
 
@@ -298,7 +295,6 @@ private:
 
     ClockP_Struct clkRpaRead;
     ClockP_Struct clkAdvTimeout;
-    ClockP_Struct clkFastAdvTimeout;
     // Memory to pass RPA read event ID to clock handler
     ClockEventData_t argRpaRead = { .event = READ_RPA_EVT };
 

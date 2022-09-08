@@ -101,6 +101,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
         (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
+
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
  * `ExtImageInfo_t` structure every 4K for 1M. This structure points to where
  * the executable image is in external flash with a uint32_t. It is possible to
@@ -275,10 +276,24 @@ static bool validateExtFlashImage(NVS_Handle handle, size_t otaHeaderLen)
     return (crc == header.crc32);
 }
 
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    NVS_Handle handle;
+    NVS_Params nvsParams;
+    NVS_Params_init(&nvsParams);
+    handle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
+
+    if (NULL != handle)
+    {
+        eraseExtFlashMetaHeader(handle);
+        NVS_close(handle);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_NO_ERROR;
+}
+
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    NVS_Params nvsParams;
-    NVS_Handle handle;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -291,22 +306,26 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    NVS_Params_init(&nvsParams);
-    handle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
-    if (NULL == handle)
+    if (NULL == imageProcessor->mNvsHandle)
     {
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
-        return;
+        NVS_Params nvsParams;
+        NVS_Params_init(&nvsParams);
+        imageProcessor->mNvsHandle = NVS_open(CONFIG_NVSEXTERNAL, &nvsParams);
+
+        if (NULL == imageProcessor->mNvsHandle)
+        {
+            imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
+            return;
+        }
     }
 
-    if (!eraseExtFlashMetaHeader(handle))
+    if (!eraseExtFlashMetaHeader(imageProcessor->mNvsHandle))
     {
-        NVS_close(handle);
+        NVS_close(imageProcessor->mNvsHandle);
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 
-    imageProcessor->mNvsHandle = handle;
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 

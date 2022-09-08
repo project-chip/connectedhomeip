@@ -490,7 +490,6 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
                                                      GAP_ADV_EVT_MASK_SET_TERMINATED);
 
         Util_constructClock(&sInstance.clkAdvTimeout, AdvTimeoutHandler, ADV_TIMEOUT, 0, false, (uintptr_t) NULL);
-        Util_constructClock(&sInstance.clkFastAdvTimeout, FastAdvTimeoutHandler, FAST_ADV_TIMEOUT, 0, false, (uintptr_t) NULL);
     }
     if (sInstance.mFlags.Has(Flags::kBLEStackAdvInitialized))
 
@@ -831,11 +830,15 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 {
 
                     // Start advertisement timeout timer
-                    Util_startClock(&sInstance.clkAdvTimeout);
                     if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
                     {
-                        Util_startClock(&sInstance.clkFastAdvTimeout);
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout, CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
                     }
+                    else
+                    {
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout, ADV_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                    }
+                    Util_startClock(&sInstance.clkAdvTimeout);
 
                     sInstance.mFlags.Set(Flags::kAdvertising);
                 }
@@ -850,7 +853,9 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 sInstance.mFlags.Clear(Flags::kAdvertising);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
-                Util_stopClock(&sInstance.clkFastAdvTimeout);
+
+                // reset fast advertising
+                sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
             }
         }
     }
@@ -1099,7 +1104,8 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
 
         /* Stop advertisement timeout timer */
         Util_stopClock(&sInstance.clkAdvTimeout);
-        Util_stopClock(&sInstance.clkFastAdvTimeout);
+        // reset fast advertising
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         DriveBLEState();
 
@@ -1718,26 +1724,19 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
 
     if (sInstance.mFlags.Has(Flags::kAdvertisingEnabled))
     {
-        BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
+        if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+        {
+            BLEMGR_LOG("BLEMGR: Fast advertising timeout reached");
 
-        sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
+            sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+        }
+        else
+        {
+            BLEMGR_LOG("BLEMGR: Advertising timeout reached");
 
-        /* Send event to process state change request */
-        DriveBLEState();
-    }
-}
-
-void BLEManagerImpl::FastAdvTimeoutHandler(uintptr_t arg)
-{
-    BLEMGR_LOG("BLEMGR: FastAdvTimeoutHandler");
-
-    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
-    {
-        BLEMGR_LOG("BLEMGR: FastAdvTimeoutHandler fast ble adv 30 second timeout");
-
-        sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
-        sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-
+            sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+        }
         /* Send event to process state change request */
         DriveBLEState();
     }
