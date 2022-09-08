@@ -67,12 +67,29 @@ tizen_sdk_package("chip-all-clusters-minimal-app:tpk") {
   sign_security_profile = "CHIP"
 }
 
+qemu_test("chip-all-clusters-minimal-app:qemu-test") {
+  deps = [ ":chip-all-clusters-minimal-app:test" ]
+}
+
+group("chip-all-clusters-minimal-app:test") {
+  testonly = true
+  deps = [
+    ":chip-all-clusters-minimal-app",
+    ":chip-all-clusters-minimal-app:tpk",
+  ]
+}
+
 group("tizen") {
   deps = [ ":chip-all-clusters-minimal-app" ]
 }
 
 group("tizen:tpk") {
   deps = [ ":chip-all-clusters-minimal-app:tpk" ]
+}
+
+group("tizen:test") {
+  testonly = true
+  deps = [ ":chip-all-clusters-minimal-app" ]
 }
 
 group("default") {

@@ -46,6 +46,15 @@ tizen_sdk_package("chip-lighting-app:tpk") {
   ]
   manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
+  print("Tutaj:", target_name)
+}
+
+group("chip-lighting-app:test") {
+  testonly = true
+  deps = [
+    ":chip-lighting-app",
+    ":chip-lighting-app:tpk",
+  ]
 }
 
 group("tizen") {
@@ -54,6 +63,11 @@ group("tizen") {
 
 group("tizen:tpk") {
   deps = [ ":chip-lighting-app:tpk" ]
+}
+
+group("tizen:test") {
+  testonly = true
+  deps = [ ":chip-lighting-app:test" ]
 }
 
 group("default") {

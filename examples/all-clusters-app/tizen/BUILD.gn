@@ -67,12 +67,25 @@ tizen_sdk_package("chip-all-clusters-app:tpk") {
   sign_security_profile = "CHIP"
 }
 
+group("chip-all-clusters-app:test") {
+  testonly = true
+  deps = [
+    ":chip-all-clusters-app",
+    ":chip-all-clusters-app:tpk",
+  ]
+}
+
 group("tizen") {
   deps = [ ":chip-all-clusters-app" ]
 }
 
 group("tizen:tpk") {
   deps = [ ":chip-all-clusters-app:tpk" ]
+}
+
+group("tizen:test") {
+  testonly = true
+  deps = [ ":chip-all-clusters-app:test" ]
 }
 
 group("default") {

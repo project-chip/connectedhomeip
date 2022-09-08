@@ -43,11 +43,11 @@ from .target import BuildTarget, TargetPart
 def BuildHostTestRunnerTarget():
     target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE),
     ])
 
-    target.AppendFixedTargets([
+    target.AppendTestsTargets([
         TargetPart('efr32-test-runner', app=HostApp.EFR32_TEST_RUNNER)
     ])
 
@@ -59,11 +59,11 @@ def BuildHostTestRunnerTarget():
 def BuildHostFakeTarget():
     target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('fake', board=HostBoard.FAKE),
     ])
 
-    target.AppendFixedTargets([
+    target.AppendTestsTargets([
         TargetPart('tests', app=HostApp.TESTS),
     ])
 
@@ -93,7 +93,7 @@ def BuildHostTarget():
     if cross_compile:
         board_parts.append(TargetPart('arm64', board=HostBoard.ARM64).OnlyIfRe('-(clang|nodeps)'))
 
-    target.AppendFixedTargets(board_parts)
+    target.AppendBoard(board_parts)
 
     # Add all the applications
     app_parts = [
@@ -114,15 +114,15 @@ def BuildHostTarget():
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
         TargetPart('dynamic-bridge', app=HostApp.DYNAMIC_BRIDGE),
-        TargetPart('tests', app=HostApp.TESTS),
-        TargetPart('chip-cert', app=HostApp.CERT_TOOL),
+        TargetPart('chip-cert', app=HostApp.CERT_TOOL), TargetPart('tests', app=HostApp.TESTS),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
         app_parts.append(TargetPart('darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN))
 
-    target.AppendFixedTargets(app_parts)
+    target.AppendAppsTargets(app_parts)
+    target.AppendTestsTargets([TargetPart('tests', app=HostApp.TESTS), ])
 
     target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
@@ -155,7 +155,7 @@ def BuildEsp32Target():
     target = BuildTarget('esp32', Esp32Builder)
 
     # boards
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('m5stack', board=Esp32Board.M5Stack).OnlyIfRe('-(all-clusters|ota-requestor)'),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
@@ -163,7 +163,7 @@ def BuildEsp32Target():
     ])
 
     # applications
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
@@ -174,6 +174,8 @@ def BuildEsp32Target():
         TargetPart('bridge', app=Esp32App.BRIDGE),
         TargetPart('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
+    ])
+    target.AppendTestsTargets([
         TargetPart('tests', app=Esp32App.TESTS).OnlyIfRe('-qemu-'),
     ])
 
@@ -187,7 +189,7 @@ def BuildEfr32Target():
     target = BuildTarget('efr32', Efr32Builder)
 
     # board
-    target.AppendFixedTargets([
+    board_parts = [
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4163a', board=Efr32Board.BRD4163A),
@@ -197,15 +199,20 @@ def BuildEfr32Target():
         TargetPart('brd4186a', board=Efr32Board.BRD4186A),
         TargetPart('brd4187a', board=Efr32Board.BRD4187A),
         TargetPart('brd4304a', board=Efr32Board.BRD4304A),
-    ])
+    ]
+    target.AppendBoard(board_parts)
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
         TargetPart('switch', app=Efr32App.SWITCH),
-        TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
+    ])
+
+    # testing
+    target.AppendTestsTargets([
+        TargetPart('unit-test', app=Efr32App.UNIT_TEST),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -233,8 +240,12 @@ def BuildEfr32Target():
 def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
-    target.AppendFixedTargets([
-        TargetPart('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+    target.AppendBoard([
+        TargetPart('native', board=NrfBoard.NATIVE_POSIX_64).OnlyIfRe('posix-64-tests'),
+    ])
+
+    target.AppendTestsTargets([
+        TargetPart('posix-64-tests', app=NrfApp.UNIT_TESTS).OnlyIfRe('native'),
     ])
 
     return target
@@ -244,14 +255,14 @@ def BuildNrfTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('nrf5340dk', board=NrfBoard.NRF5340DK),
         TargetPart('nrf52840dk', board=NrfBoard.NRF52840DK),
         TargetPart('nrf52840dongle').OnlyIfRe('-(all-clusters|light)'),
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=NrfApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=NrfApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('lock', app=NrfApp.LOCK),
@@ -272,7 +283,7 @@ def BuildAndroidTarget():
     target = BuildTarget('android', AndroidBuilder)
 
     # board
-    target.AppendFixedTargets([
+    board_parts = [
         TargetPart('arm', board=AndroidBoard.ARM),
         TargetPart('arm64', board=AndroidBoard.ARM64),
         TargetPart('x86', board=AndroidBoard.X86),
@@ -281,15 +292,21 @@ def BuildAndroidTarget():
         TargetPart('androidstudio-arm64', board=AndroidBoard.AndroidStudio_ARM64).OnlyIfRe('chip-tool'),
         TargetPart('androidstudio-x86', board=AndroidBoard.AndroidStudio_X86).OnlyIfRe('chip-tool'),
         TargetPart('androidstudio-x64', board=AndroidBoard.AndroidStudio_X64).OnlyIfRe('chip-tool'),
-    ])
+    ]
+    target.AppendBoard(board_parts)
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('chip-tool', app=AndroidApp.CHIP_TOOL),
-        TargetPart('chip-test', app=AndroidApp.CHIP_TEST),
         TargetPart('tv-server', app=AndroidApp.TV_SERVER),
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
+    ])
+
+    # testing
+    target.AppendTestsTargets([
+        TargetPart('chip-test', app=AndroidApp.CHIP_TEST),
+
     ])
 
     return target
@@ -299,12 +316,12 @@ def BuildMbedTarget():
     target = BuildTarget('mbed', MbedBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('lock', app=MbedApp.LOCK),
         TargetPart('light', app=MbedApp.LIGHT),
         TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
@@ -325,12 +342,12 @@ def BuildInfineonTarget():
     target = BuildTarget('infineon', InfineonBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('psoc6', board=InfineonBoard.PSOC6BOARD)
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('lock', app=InfineonApp.LOCK),
         TargetPart('light', app=InfineonApp.LIGHT),
         TargetPart('all-clusters', app=InfineonApp.ALL_CLUSTERS),
@@ -348,12 +365,12 @@ def BuildAmebaTarget():
     target = BuildTarget('ameba', AmebaBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('amebad', board=AmebaBoard.AMEBAD),
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
@@ -368,7 +385,7 @@ def BuildK32WTarget():
     target = BuildTarget('k32w', K32WBuilder)
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('light', app=K32WApp.LIGHT, release=True),
         TargetPart('shell', app=K32WApp.SHELL, release=True),
         TargetPart('lock', app=K32WApp.LOCK, release=True),
@@ -388,7 +405,7 @@ def Buildcc13x2x7_26x2x7Target():
     target = BuildTarget('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL),
         TargetPart('lock', app=cc13x2x7_26x2x7App.LOCK),
@@ -407,12 +424,12 @@ def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),
         TargetPart('lock',  app=Cyw30739App.LOCK),
         TargetPart('ota-requestor',  app=Cyw30739App.OTA_REQUESTOR),
@@ -427,12 +444,12 @@ def BuildQorvoTarget():
     target = BuildTarget('qpg', QpgBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('qpg6105', board=QpgBoard.QPG6105),
     ])
 
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('lock', app=QpgApp.LOCK),
         TargetPart('light', app=QpgApp.LIGHT),
         TargetPart('shell', app=QpgApp.SHELL),
@@ -446,16 +463,20 @@ def BuildTizenTarget():
     target = BuildTarget('tizen', TizenBuilder)
 
     # board
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('arm', board=TizenBoard.ARM),
     ])
-
     # apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
+    ])
+
+    # Testing
+    target.AppendTestsTargets([
+        TargetPart('qemu-tests', app=TizenApp.CHIP_QEMU_TESTS).OnlyIfRe('-arm-'),
     ])
 
     target.AppendModifier(name="no-ble", enable_ble=False)
@@ -470,7 +491,7 @@ def BuildBouffalolabTarget():
     target = BuildTarget('bouffalolab', BouffalolabBuilder)
 
     # Boards
-    target.AppendFixedTargets([
+    target.AppendBoard([
         TargetPart('BL602-IoT-Matter-V1', board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
         TargetPart('BL602-IOT-DVK-3S', board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
         TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
@@ -480,7 +501,7 @@ def BuildBouffalolabTarget():
     ])
 
     # Apps
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
@@ -494,7 +515,7 @@ def BuildBouffalolabTarget():
 def BuildIMXTarget():
     target = BuildTarget('imx', IMXBuilder)
 
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('chip-tool', app=IMXApp.CHIP_TOOL),
         TargetPart('lighting-app', app=IMXApp.LIGHT),
         TargetPart('thermostat', app=IMXApp.THERMOSTAT),
@@ -510,21 +531,21 @@ def BuildIMXTarget():
 
 def BuildMW320Target():
     target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets([TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
+    target.AppendAppsTargets([TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
     return target
 
 
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
-    target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
+    target.AppendAppsTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
     return target
 
 
 def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
-    target.AppendFixedTargets([TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
+    target.AppendBoard([TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
 
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
@@ -540,7 +561,7 @@ def BuildTelinkTarget():
 def BuildOpenIotSdkTargets():
     target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
 
-    target.AppendFixedTargets([
+    target.AppendAppsTargets([
         TargetPart('shell', app=OpenIotSdkApp.SHELL),
         TargetPart('lock', app=OpenIotSdkApp.LOCK),
     ])

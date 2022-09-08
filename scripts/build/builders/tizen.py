@@ -49,6 +49,12 @@ class TizenApp(Enum):
         ('chip-tool',
          'chip-tool.map'))
 
+    CHIP_QEMU_TESTS = Tool(
+        'chip-qemu-tests',
+        'src/test_driver/tizen',
+        ('chip-qemu-tests',
+         'chip-qemu-tests.map'))
+
     @property
     def is_tpk(self):
         """If True, this app is a TPK."""
