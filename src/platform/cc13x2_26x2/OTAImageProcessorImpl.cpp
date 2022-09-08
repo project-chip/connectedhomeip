@@ -101,7 +101,6 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
         (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
-
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
  * `ExtImageInfo_t` structure every 4K for 1M. This structure points to where
  * the executable image is in external flash with a uint32_t. It is possible to

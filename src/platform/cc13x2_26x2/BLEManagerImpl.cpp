@@ -836,7 +836,8 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     }
                     else
                     {
-                        Util_rescheduleClock(&sInstance.clkAdvTimeout, ADV_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout,
+                                             ADV_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
                     }
                     Util_startClock(&sInstance.clkAdvTimeout);
 
