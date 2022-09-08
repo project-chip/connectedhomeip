@@ -898,8 +898,7 @@ void Command::ResetArguments()
                 break;
             }
             case ArgumentType::VectorBool: {
-                auto vectorArgument = static_cast<std::vector<bool> *>(arg.value);
-                vectorArgument->clear();
+                ResetOptionalArg<std::vector<bool>>(arg);
                 break;
             }
             case ArgumentType::Vector16: {
