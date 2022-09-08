@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/PlatformManager.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/PlatformManager.h>
 #include <platform/bouffalolab/BL702/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
@@ -35,18 +35,18 @@
 
 #include <bl_sec.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 
-extern "C" void bl_rand_stream(unsigned char*, int);
+extern "C" void bl_rand_stream(unsigned char *, int);
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     bl_rand_stream(output, len);
-    if(olen) {
+    if (olen)
+    {
         *olen = len;
     }
 
@@ -77,14 +77,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // to finish the initialization process.
     /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
     backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
 
 exit:
     return err;
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

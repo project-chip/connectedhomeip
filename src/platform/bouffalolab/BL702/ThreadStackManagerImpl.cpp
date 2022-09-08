@@ -38,8 +38,8 @@
 
 #include <mbedtls/platform.h>
 
-#include <utils_list.h>
 #include <openthread_port.h>
+#include <utils_list.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -81,7 +81,7 @@ using namespace ::chip::DeviceLayer;
 
 ot_system_event_t ot_system_event_var;
 
-void otSysProcessDrivers(otInstance *aInstance)
+void otSysProcessDrivers(otInstance * aInstance)
 {
     ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
 
@@ -109,17 +109,17 @@ extern "C" void otSysEventSignalPending(void)
     }
 }
 
-extern "C" otInstance *otrGetInstance()
+extern "C" otInstance * otrGetInstance()
 {
     return ThreadStackMgrImpl().OTInstance();
 }
 
-extern "C" void *otPlatCAlloc(size_t aNum, size_t aSize)
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
     return calloc(aNum, aSize);
 }
 
-extern "C" void otPlatFree(void *aPtr)
+extern "C" void otPlatFree(void * aPtr)
 {
     free(aPtr);
 }

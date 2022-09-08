@@ -26,21 +26,21 @@
 
 #include <FreeRTOS.h>
 
+#include "AppConfig.h"
+#include <AppTask.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <AppTask.h>
-#include "AppConfig.h"
 
 #include <blog.h>
 extern "C" {
 #include <bl702_glb.h>
 #include <bl702_hbn.h>
-#include <bl_sys.h>
 #include <bl_irq.h>
-#include <bl_sec.h>
-#include <bl_rtc.h>
-#include <bl_timer.h>
 #include <bl_psram.h>
+#include <bl_rtc.h>
+#include <bl_sec.h>
+#include <bl_sys.h>
+#include <bl_timer.h>
 #include <hal_board.h>
 #include <hal_boot2.h>
 
@@ -65,7 +65,8 @@ void appError(int err)
 {
     ChipLogProgress(NotSpecified, "!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1);
+    while (1)
+        ;
 }
 
 void appError(CHIP_ERROR error)
@@ -108,13 +109,13 @@ extern "C" void vApplicationIdleHook(void)
 }
 
 extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
-                                   uint32_t * pulIdleTaskStackSize)
+                                              uint32_t * pulIdleTaskStackSize)
 {
     /* If the buffers to be provided to the Idle task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
     the stack and so not exists after this function exits. */
     static StaticTask_t xIdleTaskTCB;
-    static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
+    static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
 
     /* Pass out a pointer to the StaticTask_t structure in which the Idle task's
     state will be stored. */
@@ -133,7 +134,7 @@ extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuff
 application must provide an implementation of vApplicationGetTimerTaskMemory()
 to provide the memory that is used by the Timer service task. */
 extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
-                                    uint32_t * pulTimerTaskStackSize)
+                                               uint32_t * pulTimerTaskStackSize)
 {
     /* If the buffers to be provided to the Timer task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
@@ -160,22 +161,22 @@ extern "C" void vApplicationTickHook(void) {}
 
 extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
-extern "C" void user_vAssertCalled(void) __attribute__ ((weak, alias ("vAssertCalled")));
+extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
 extern "C" void vAssertCalled(void)
 {
-    void * ra = (void*)__builtin_return_address(0);
+    void * ra = (void *) __builtin_return_address(0);
 
     taskDISABLE_INTERRUPTS();
     ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
-    while(1);
+    while (1)
+        ;
 }
 
 // ================================================================================
 // Main Code
 // ================================================================================
-extern "C" uint8_t  _heap_start;
-extern "C" size_t   _heap_size; // @suppress("Type cannot be resolved")
-
+extern "C" uint8_t _heap_start;
+extern "C" size_t _heap_size; // @suppress("Type cannot be resolved")
 
 extern "C" uint32_t __psram_bss_init_start;
 extern "C" uint32_t __psram_bss_init_end;
@@ -183,8 +184,8 @@ extern "C" uint32_t __psram_bss_init_end;
 static uint32_t __attribute__((section(".rsvd_data"))) psram_reset_count;
 
 static constexpr HeapRegion_t xHeapRegions[] = {
-    { &_heap_start, (size_t)&_heap_size }, // set on runtime
-    { NULL, 0 }  /* Terminates the array. */
+    { &_heap_start, (size_t) &_heap_size }, // set on runtime
+    { NULL, 0 }                             /* Terminates the array. */
 };
 
 extern "C" void setup_heap()
@@ -195,39 +196,41 @@ extern "C" void setup_heap()
 
 extern "C" size_t get_heap_size(void)
 {
-    return (size_t)&_heap_size;
+    return (size_t) &_heap_size;
 }
 
 #ifdef CFG_USE_PSRAM
-extern "C" uint8_t  _heap3_start;
-extern "C" size_t   _heap3_size; // @suppress("Type cannot be resolved")
+extern "C" uint8_t _heap3_start;
+extern "C" size_t _heap3_size; // @suppress("Type cannot be resolved")
 static constexpr HeapRegion_t xPsramHeapRegions[] = {
-    { &_heap3_start, (size_t)&_heap3_size },
-    { NULL, 0 }  /* Terminates the array. */
+    { &_heap3_start, (size_t) &_heap3_size }, { NULL, 0 } /* Terminates the array. */
 };
 
 extern "C" size_t get_heap3_size(void)
 {
-    return (size_t)&_heap3_size;
+    return (size_t) &_heap3_size;
 }
 
 extern "C" void do_psram_test()
 {
     static constexpr char teststr[] = "bouffalolab psram test string";
 
-    do {
+    do
+    {
 
-        uint8_t *pheap = &_heap3_start;
-        size_t size = (size_t)&_heap3_size;
+        uint8_t * pheap = &_heap3_start;
+        size_t size     = (size_t) &_heap3_size;
 
-        size = size > sizeof(teststr)? sizeof(teststr) : size;
+        size = size > sizeof(teststr) ? sizeof(teststr) : size;
         memset(pheap, 0, size);
-        if (pheap[0] != 0) {
+        if (pheap[0] != 0)
+        {
             break;
         }
 
         memcpy(pheap, teststr, size);
-        if (0 != memcmp(pheap, teststr, size)) {
+        if (0 != memcmp(pheap, teststr, size))
+        {
             break;
         }
 
@@ -235,15 +238,16 @@ extern "C" void do_psram_test()
 
         psram_reset_count = 0xffffff00;
         return;
-    } while(0);
+    } while (0);
 
-    if ((psram_reset_count & 0xffffff00) != 0xffffff00) {
+    if ((psram_reset_count & 0xffffff00) != 0xffffff00)
+    {
         psram_reset_count = 0xffffff00;
     }
 
-    if ((psram_reset_count & 0x000000ff) > 3) {
-        ChipLogError(NotSpecified, "PSRAM is still failed to initialize after %ld system reset",
-                psram_reset_count & 0x000000ff);
+    if ((psram_reset_count & 0x000000ff) > 3)
+    {
+        ChipLogError(NotSpecified, "PSRAM is still failed to initialize after %ld system reset", psram_reset_count & 0x000000ff);
         vAssertCalled();
     }
 
@@ -271,7 +275,7 @@ extern "C" void bl702_init(void)
     do_psram_test();
 #endif
 
-    //bl_rtc_init();
+    // bl_rtc_init();
     hal_boot2_init();
 
     /* board config is set after system is init*/
@@ -282,14 +286,16 @@ extern "C" void bl702_init(void)
     vPortDefineHeapRegionsPsram(xPsramHeapRegions);
 #endif
 
-    ChipLogProgress(NotSpecified, "Heap %u@%p"
+    ChipLogProgress(NotSpecified,
+                    "Heap %u@%p"
 #if defined(CFG_USE_PSRAM)
-        ", %u@%p"
+                    ", %u@%p"
 #endif /*CFG_USE_PSRAM*/
-        ,
-        (unsigned int)&_heap_size, &_heap_start
+                    ,
+                    (unsigned int) &_heap_size, &_heap_start
 #if defined(CFG_USE_PSRAM)
-        ,(unsigned int)&_heap3_size, &_heap3_start
+                    ,
+                    (unsigned int) &_heap3_size, &_heap3_start
 #endif /*CFG_USE_PSRAM*/
     );
 }

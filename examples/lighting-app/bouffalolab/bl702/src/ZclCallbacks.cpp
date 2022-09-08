@@ -22,11 +22,11 @@
 
 #include "AppConfig.h"
 
+#include <AppTask.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <AppTask.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -41,29 +41,25 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_ONOFF);
-        ChipLogProgress(Zcl,
-                        "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+        ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
+                        type, *value, size);
     }
     else if (clusterId == LevelControl::Id)
     {
         GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_LEVEL);
-        ChipLogProgress(Zcl,
-                        "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
     else if (clusterId == ColorControl::Id)
     {
         GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_COLOR);
-        ChipLogProgress(Zcl,
-                        "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
     else if (clusterId == OnOffSwitchConfiguration::Id)
     {
         GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_ONOFF);
-        ChipLogProgress(Zcl,
-                        "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
     else if (clusterId == Identify::Id)

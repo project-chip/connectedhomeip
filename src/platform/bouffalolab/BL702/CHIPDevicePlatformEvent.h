@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceEvent.h>
 #include <bluetooth/bluetooth.h>
 #include <conn_internal.h>
+#include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
 namespace DeviceLayer {

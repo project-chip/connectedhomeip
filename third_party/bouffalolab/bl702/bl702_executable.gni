@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/toolchain/flashable_executable.gni")
 import("//build_overrides/bouffalolab_iot_sdk.gni")
+import("${build_root}/toolchain/flashable_executable.gni")
 
 template("bl702_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
@@ -25,10 +25,12 @@ template("bl702_executable") {
   objcopy_image_format = "binary"
 
   objcopy = "riscv64-unknown-elf-objcopy"
-  if ( "linux" == host_os ) {
-    objcopy = "../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-objcopy"
-  } else if ( "mac" == host_os || "darwin" == host_os ) {
-    objcopy = "../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-objcopy"
+  if ("linux" == host_os) {
+    objcopy =
+        "../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-objcopy"
+  } else if ("mac" == host_os || "darwin" == host_os) {
+    objcopy =
+        "../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-objcopy"
   }
 
   # Copy flashing dependencies to the output directory so that the output

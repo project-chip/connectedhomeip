@@ -63,7 +63,6 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     const char * newline = "\r\n";
     PigweedLogger::putString(newline, strlen(newline));
 #endif
-
 }
 
 } // namespace Platform

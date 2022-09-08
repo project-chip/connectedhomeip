@@ -46,8 +46,7 @@ public:
     CHIP_ERROR GetBootReason(uint32_t & bootReason);
 
 private:
-
-    uint32_t    mBootReason;
+    uint32_t mBootReason;
 
     // ===== Members that implement the ConfigurationManager public interface.
 

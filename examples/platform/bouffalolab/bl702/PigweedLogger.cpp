@@ -68,7 +68,8 @@ int putString(const char * buffer, size_t size)
 {
     assert(sWriteBufferPos < kWriteBufferSize);
 
-    if (sLoggerLock) {
+    if (sLoggerLock)
+    {
         xSemaphoreTake(sLoggerLock, portMAX_DELAY);
     }
 
@@ -91,7 +92,8 @@ int putString(const char * buffer, size_t size)
             send();
     }
 
-    if (sLoggerLock) {
+    if (sLoggerLock)
+    {
         xSemaphoreGive(sLoggerLock);
     }
     return size;

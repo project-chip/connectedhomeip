@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "uart.h"
 #include "pw_sys_io/sys_io.h"
+#include "uart.h"
 
 namespace pw::sys_io {
 

@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/core/OTAImageHeader.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
 namespace chip {
@@ -57,9 +57,9 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    MutableByteSpan         mBlock;
-    OTADownloader   *       mDownloader;
-    OTAImageHeaderParser    mHeaderParser;
+    MutableByteSpan mBlock;
+    OTADownloader * mDownloader;
+    OTAImageHeaderParser mHeaderParser;
 };
 
 } // namespace chip

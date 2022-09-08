@@ -62,24 +62,17 @@ const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 
-
 struct bt_gatt_attr sChipoBleAttributes[] = {
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
-    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
-                            BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-                            BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-                            nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
-    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
-                            BT_GATT_CHRC_NOTIFY,
-                            BT_GATT_PERM_NONE,
-                            nullptr, nullptr, nullptr),
+    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                           BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
+    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_NONE, nullptr, nullptr, nullptr),
     BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)
 };
 
-struct bt_gatt_service sChipoBleService =
-{
-    .attrs = sChipoBleAttributes,
-    .attr_count = sizeof(sChipoBleAttributes)/ sizeof(sChipoBleAttributes[0]),
+struct bt_gatt_service sChipoBleService = {
+    .attrs      = sChipoBleAttributes,
+    .attr_count = sizeof(sChipoBleAttributes) / sizeof(sChipoBleAttributes[0]),
 };
 
 static const int kCHIPoBLE_CCC_AttributeIndex = 3;
@@ -274,7 +267,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = bt_le_adv_stop();
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
-    err = bt_le_adv_start(&advParams, advertisingData, sizeof(advertisingData)/sizeof(advertisingData[0]), scanResponseDataPtr, scanResponseDataLen);
+    err = bt_le_adv_start(&advParams, advertisingData, sizeof(advertisingData) / sizeof(advertisingData[0]), scanResponseDataPtr,
+                          scanResponseDataLen);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     // Transition to the Advertising state...
@@ -498,8 +492,7 @@ CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
     const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02x)",
-                  bt_conn_index(writeEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02x)", bt_conn_index(writeEvent->BtConn));
 
     HandleWriteReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                         PacketBufferHandle::Adopt(writeEvent->Data));
@@ -620,7 +613,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     params->func      = HandleTXCompleted;
     params->user_data = nullptr;
 
-    status = bt_gatt_notify_cb((bt_conn*)conId, params);
+    status = bt_gatt_notify_cb((bt_conn *) conId, params);
     VerifyOrExit(status == 0, err = MapErrorZephyr(status));
 
 exit:

@@ -133,7 +133,6 @@ inline bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
     return true;
 }
 
-
 inline ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     return kWiFiStationMode_Enabled;

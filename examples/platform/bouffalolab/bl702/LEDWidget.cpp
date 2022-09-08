@@ -17,25 +17,21 @@
  *    limitations under the License.
  */
 
-
 #include <bl702_glb.h>
-#include <bl_sys.h>
 #include <bl_gpio.h>
-#include <hosal_gpio.h>
+#include <bl_sys.h>
 #include <board.h>
 #include <demo_pwm.h>
+#include <hosal_gpio.h>
 
 #include "LEDWidget.h"
 
 void LEDWidget::Init()
 {
-    mPin              = LED1_PIN;
+    mPin = LED1_PIN;
 
-    hosal_gpio_dev_t gpio_led = {
-    .config = OUTPUT_OPEN_DRAIN_NO_PULL,
-    .priv = NULL
-    };
-    gpio_led.port = mPin;
+    hosal_gpio_dev_t gpio_led = { .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
+    gpio_led.port             = mPin;
 
     hosal_gpio_init(&gpio_led);
     SetOnoff(false);
@@ -48,25 +44,23 @@ void LEDWidget::Toggle(void)
 
 void LEDWidget::SetOnoff(bool state)
 {
-    hosal_gpio_dev_t gpio_led = {
-        .port = mPin,
-        .config = OUTPUT_OPEN_DRAIN_NO_PULL,
-        .priv = NULL
-    };
+    hosal_gpio_dev_t gpio_led = { .port = mPin, .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
 
     mOnoff = state;
 
-    if (state) {
+    if (state)
+    {
         hosal_gpio_output_set(&gpio_led, 1);
     }
-    else {
+    else
+    {
         hosal_gpio_output_set(&gpio_led, 0);
     }
 }
 
 bool LEDWidget::GetOnoff(void)
 {
-    return mOnoff ? true: false;
+    return mOnoff ? true : false;
 }
 
 void DimmableLEDWidget::Init()
@@ -85,15 +79,19 @@ void DimmableLEDWidget::Toggle(void)
 void DimmableLEDWidget::SetOnoff(bool state)
 {
     mOnoff = state;
-    if (mOnoff) {
-        if (light_v) {
+    if (mOnoff)
+    {
+        if (light_v)
+        {
             set_level(light_v);
         }
-        else {
+        else
+        {
             set_level(254);
         }
     }
-    else {
+    else
+    {
         set_level(0);
     }
 }
@@ -102,7 +100,7 @@ void DimmableLEDWidget::SetLevel(uint8_t level)
 {
     set_level(level);
     light_v = level;
-    mOnoff = light_v > 0;
+    mOnoff  = light_v > 0;
 }
 
 void ColorLEDWidget::Init()
@@ -121,15 +119,19 @@ void ColorLEDWidget::Toggle(void)
 void ColorLEDWidget::SetOnoff(bool state)
 {
     mOnoff = state;
-    if (mOnoff) {
-        if (0 == light_v) {
+    if (mOnoff)
+    {
+        if (0 == light_v)
+        {
             set_color(254, light_h, light_s);
         }
-        else {
+        else
+        {
             set_color(light_v, light_h, light_s);
         }
     }
-    else {
+    else
+    {
         set_color(0, light_h, light_s);
     }
 }
@@ -142,6 +144,8 @@ void ColorLEDWidget::SetLevel(uint8_t level)
 void ColorLEDWidget::SetColor(uint8_t level, uint8_t hue, uint8_t sat)
 {
     set_color(level, hue, sat);
-    light_v = level; light_h = hue; light_s = sat;
-    mOnoff = light_v > 0;
+    light_v = level;
+    light_h = hue;
+    light_s = sat;
+    mOnoff  = light_v > 0;
 }

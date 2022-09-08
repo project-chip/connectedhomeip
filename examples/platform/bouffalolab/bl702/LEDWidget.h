@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 
-
 class LEDWidget
 {
 public:
@@ -30,11 +29,11 @@ public:
     bool GetOnoff(void);
     void Toggle(void);
 
-    uint8_t     mOnoff;
-    uint8_t     mPin;
+    uint8_t mOnoff;
+    uint8_t mPin;
 };
 
-class DimmableLEDWidget: public LEDWidget
+class DimmableLEDWidget : public LEDWidget
 {
 public:
     void Init(void);
@@ -42,10 +41,10 @@ public:
     void SetOnoff(bool state);
     void SetLevel(uint8_t level);
 
-    uint8_t     light_v;
+    uint8_t light_v;
 };
 
-class ColorLEDWidget: public DimmableLEDWidget
+class ColorLEDWidget : public DimmableLEDWidget
 {
 public:
     void Init(void);
@@ -54,6 +53,6 @@ public:
     void SetLevel(uint8_t level);
     void SetColor(uint8_t level, uint8_t hue, uint8_t sat);
 
-    uint8_t     light_h;
-    uint8_t     light_s;
+    uint8_t light_h;
+    uint8_t light_s;
 };

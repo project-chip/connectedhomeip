@@ -21,8 +21,8 @@
  *          for BL702 platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/BL702/DiagnosticDataProviderImpl.h>
@@ -32,13 +32,10 @@
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 
-
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
-
 
 namespace chip {
 namespace DeviceLayer {
-
 
 extern "C" size_t get_heap_size(void);
 extern "C" size_t get_heap3_size(void);
@@ -61,9 +58,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 #ifdef CFG_USE_PSRAM
     size_t freeHeapSize = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
 #else
-    size_t freeHeapSize = xPortGetFreeHeapSize();
+    size_t freeHeapSize              = xPortGetFreeHeapSize();
 #endif
-    currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
+    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
@@ -72,10 +69,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     // Calculate the Heap used based on Total heap - Free heap
 
 #ifdef CFG_USE_PSRAM
-    int64_t heapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize()
-                        - xPortGetFreeHeapSizePsram());
+    int64_t heapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() - xPortGetFreeHeapSizePsram());
 #else
-    size_t freeHeapSize = xPortGetFreeHeapSize();
+    size_t freeHeapSize              = xPortGetFreeHeapSize();
 #endif
 
     // Something went wrong, this should not happen
@@ -90,10 +86,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
 
 #ifdef CFG_USE_PSRAM
-    int64_t HighestHeapUsageRecorded = (get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize()
-                                        - xPortGetMinimumEverFreeHeapSizePsram());
+    int64_t HighestHeapUsageRecorded =
+        (get_heap_size() + get_heap3_size() - xPortGetMinimumEverFreeHeapSize() - xPortGetMinimumEverFreeHeapSizePsram());
 #else
-    size_t freeHeapSize = xPortGetFreeHeapSize();
+    size_t freeHeapSize              = xPortGetFreeHeapSize();
     int64_t HighestHeapUsageRecorded = (get_heap_size() - xPortGetMinimumEverFreeHeapSize());
 #endif
 

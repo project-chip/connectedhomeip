@@ -37,7 +37,7 @@
 extern "C" void otSysEventSignalPending(void);
 extern "C" void otrLock(void);
 extern "C" void otrUnlock(void);
-extern "C" otInstance *otrGetInstance();
+extern "C" otInstance * otrGetInstance();
 
 namespace chip {
 namespace DeviceLayer {

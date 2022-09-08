@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 
 // ==================== Platform Adaptations ====================
@@ -33,9 +32,9 @@
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
 
 // ========== CHIP Platform Configuration =========
-#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE   (4 * 1024)
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE     (6 * 1024)
-#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE     15
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (4 * 1024)
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
+#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 15
 
 #if CHIP_ENABLE_OPENTHREAD
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1

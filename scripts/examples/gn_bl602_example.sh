@@ -38,7 +38,6 @@ shift
 OUTPUT_DIR=$1
 shift
 
-
 GN_ARGS=()
 
 NINJA_ARGS=()

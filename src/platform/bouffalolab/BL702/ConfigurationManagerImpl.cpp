@@ -62,32 +62,39 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<BL702Config>::Init();
 
     BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
-    mBootReason = to_underlying(BootReasonType::kUnspecified);
-    if (BL_RST_POR == bootCause) {
+    mBootReason               = to_underlying(BootReasonType::kUnspecified);
+    if (BL_RST_POR == bootCause)
+    {
         mBootReason = to_underlying(BootReasonType::kPowerOnReboot);
     }
-    else if (BL_RST_BOR == bootCause) {
+    else if (BL_RST_BOR == bootCause)
+    {
         mBootReason = to_underlying(BootReasonType::kBrownOutReset);
     }
-    else if( BL_RST_WDT == bootCause) {
+    else if (BL_RST_WDT == bootCause)
+    {
         mBootReason = to_underlying(BootReasonType::kHardwareWatchdogReset);
     }
     // else if (BL_RST_HBN == bootCause) {
     //     mBootReason = BootReasonType::SoftwareReset;
     // }
-    else if (BL_RST_SOFTWARE == bootCause) {
+    else if (BL_RST_SOFTWARE == bootCause)
+    {
         mBootReason = to_underlying(BootReasonType::kSoftwareReset);
     }
 
-    if (BL_RST_HBN != bootCause) {
-        if (CHIP_NO_ERROR == ReadConfigValue(BL702Config::kCounterKey_BootCount, bootCount)) {
+    if (BL_RST_HBN != bootCause)
+    {
+        if (CHIP_NO_ERROR == ReadConfigValue(BL702Config::kCounterKey_BootCount, bootCount))
+        {
             bootCount += 1;
         }
         WriteConfigValue(BL702Config::kCounterKey_BootCount, bootCount + 1);
     }
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed) {
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
         InitiateFactoryReset();
     }

@@ -44,53 +44,50 @@ struct Identify;
 class AppTask
 {
 public:
+    enum app_event_t
+    {
+        APP_EVENT_NONE = 0x00000000,
 
-    enum app_event_t {
-        APP_EVENT_NONE                      = 0x00000000,
+        APP_EVENT_STARTED                  = 0x00000001,
+        APP_EVENT_BTN_FACTORY_RESET_CANCEL = 0x00000002,
+        APP_EVENT_BTN_FACTORY_RESET_IND    = 0x00000004,
+        APP_EVENT_BTN_FACTORY_RESET_PW_PRC = 0x00000008,
 
-        APP_EVENT_STARTED                   = 0x00000001,
-        APP_EVENT_BTN_FACTORY_RESET_CANCEL  = 0x00000002,
-        APP_EVENT_BTN_FACTORY_RESET_IND     = 0x00000004,
-        APP_EVENT_BTN_FACTORY_RESET_PW_PRC  = 0x00000008,
+        APP_EVENT_INIT_ALL_MASK = APP_EVENT_STARTED | APP_EVENT_BTN_FACTORY_RESET_CANCEL | APP_EVENT_BTN_FACTORY_RESET_IND,
+        APP_EVENT_TIMER         = 0x00000010,
 
-        APP_EVENT_INIT_ALL_MASK             = APP_EVENT_STARTED
-                | APP_EVENT_BTN_FACTORY_RESET_CANCEL | APP_EVENT_BTN_FACTORY_RESET_IND,
-        APP_EVENT_TIMER                     = 0x00000010,
+        APP_EVENT_SYS_BLE_ADV     = 0x00000100,
+        APP_EVENT_SYS_BLE_CONN    = 0x00000200,
+        APP_EVENT_SYS_PROVISIONED = 0x00000400,
+        APP_EVENT_FACTORY_RESET   = 0x00001000,
 
-        APP_EVENT_SYS_BLE_ADV               = 0x00000100,
-        APP_EVENT_SYS_BLE_CONN              = 0x00000200,
-        APP_EVENT_SYS_PROVISIONED           = 0x00000400,
-        APP_EVENT_FACTORY_RESET             = 0x00001000,
+        APP_EVENT_SYS_ALL_MASK =
+            APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
 
-        APP_EVENT_SYS_ALL_MASK              = APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN
-            | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
+        APP_EVENT_LIGHTING_ONOFF      = 0x00010000,
+        APP_EVENT_LIGHTING_LEVEL      = 0x00020000,
+        APP_EVENT_LIGHTING_COLOR      = 0x00040000,
+        APP_EVENT_LIGHTING_CHECK      = 0x00080000,
+        APP_EVENT_LIGHTING_GO_THROUGH = 0x00100000,
+        APP_EVENT_LIGHTING_MASK =
+            APP_EVENT_LIGHTING_ONOFF | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR | APP_EVENT_LIGHTING_CHECK,
 
-        APP_EVENT_LIGHTING_ONOFF            = 0x00010000,
-        APP_EVENT_LIGHTING_LEVEL            = 0x00020000,
-        APP_EVENT_LIGHTING_COLOR            = 0x00040000,
-        APP_EVENT_LIGHTING_CHECK            = 0x00080000,
-        APP_EVENT_LIGHTING_GO_THROUGH       = 0x00100000,
-        APP_EVENT_LIGHTING_MASK             = APP_EVENT_LIGHTING_ONOFF
-            | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR | APP_EVENT_LIGHTING_CHECK,
+        APP_EVENT_IDENTIFY_START    = 0x01000000,
+        APP_EVENT_IDENTIFY_IDENTIFY = 0x02000000,
+        APP_EVENT_IDENTIFY_STOP     = 0x04000000,
+        APP_EVENT_IDENTIFY_MASK     = APP_EVENT_IDENTIFY_START | APP_EVENT_IDENTIFY_IDENTIFY | APP_EVENT_IDENTIFY_STOP,
 
-
-
-        APP_EVENT_IDENTIFY_START            = 0x01000000,
-        APP_EVENT_IDENTIFY_IDENTIFY         = 0x02000000,
-        APP_EVENT_IDENTIFY_STOP             = 0x04000000,
-        APP_EVENT_IDENTIFY_MASK             = APP_EVENT_IDENTIFY_START | APP_EVENT_IDENTIFY_IDENTIFY |APP_EVENT_IDENTIFY_STOP,
-
-        APP_EVENT_ALL_MASK                  = APP_EVENT_LIGHTING_MASK | APP_EVENT_INIT_ALL_MASK | APP_EVENT_SYS_ALL_MASK | APP_EVENT_TIMER | APP_EVENT_IDENTIFY_MASK,
+        APP_EVENT_ALL_MASK =
+            APP_EVENT_LIGHTING_MASK | APP_EVENT_INIT_ALL_MASK | APP_EVENT_SYS_ALL_MASK | APP_EVENT_TIMER | APP_EVENT_IDENTIFY_MASK,
     };
 
-    void SetEndpointId(EndpointId endpointId) {
-        if (mEndpointId != (EndpointId)-1)
+    void SetEndpointId(EndpointId endpointId)
+    {
+        if (mEndpointId != (EndpointId) -1)
             mEndpointId = endpointId;
     }
 
-    EndpointId GetEndpointId(void) {
-        return mEndpointId;
-    }
+    EndpointId GetEndpointId(void) { return mEndpointId; }
     void PostEvent(app_event_t event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
 
@@ -133,19 +130,19 @@ private:
     static void AppTaskMain(void * pvParameter);
 
     static CHIP_ERROR StartAppShellTask();
-    static void AppShellTask(void *args);
+    static void AppShellTask(void * args);
 
-    EndpointId              mEndpointId     = (EndpointId)1;
-    TaskHandle_t            sAppTaskHandle;
-    QueueHandle_t           sAppEventQueue;
-    TimerHandle_t           sTimer;
-    uint32_t                mBlinkOnTimeMS;
-    uint32_t                mBlinkOffTimeMS;
-    uint64_t                buttonPressedTimeout;
+    EndpointId mEndpointId = (EndpointId) 1;
+    TaskHandle_t sAppTaskHandle;
+    QueueHandle_t sAppEventQueue;
+    TimerHandle_t sTimer;
+    uint32_t mBlinkOnTimeMS;
+    uint32_t mBlinkOffTimeMS;
+    uint64_t buttonPressedTimeout;
 
-    static StackType_t      appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-    static StaticTask_t     appTaskStruct;
-    static AppTask          sAppTask;
+    static StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+    static StaticTask_t appTaskStruct;
+    static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)

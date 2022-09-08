@@ -5,36 +5,39 @@
  * web site:    https://www.bouffalolab.com/
  */
 
-#include <stdio.h>
-#include <hosal_pwm.h>
 #include "demo_pwm.h"
 #include "board.h"
+#include <hosal_pwm.h>
+#include <stdio.h>
 
-#define PWM_FREQ            1000
-#define PWM_DUTY_CYCLE      10000
+#define PWM_FREQ 1000
+#define PWM_DUTY_CYCLE 10000
 
 hosal_pwm_dev_t rgb_pwm[] = {
     {
         .port = LED_B_PIN_PORT,
         /* pwm config */
-        .config.pin = LED_B_PIN,
-        .config.duty_cycle = 0, //duty_cycle range is 0~10000 correspond to 0~100%
-        .config.freq = PWM_FREQ,       //freq range is between 0~40MHZ,for more detail you can reference https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+        .config.pin        = LED_B_PIN,
+        .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
+        .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
+                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     },
 #if MAX_PWM_CHANNEL == 3
     {
         .port = LED_R_PIN_PORT,
         /* pwm config */
-        .config.pin = LED_R_PIN,
-        .config.duty_cycle = 0, //duty_cycle range is 0~10000 correspond to 0~100%
-        .config.freq = PWM_FREQ,       //freq range is between 0~40MHZ,for more detail you can reference https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+        .config.pin        = LED_R_PIN,
+        .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
+        .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
+                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     },
     {
         .port = LED_G_PIN_PORT,
         /* pwm config */
-        .config.pin = LED_G_PIN,
-        .config.duty_cycle = 0,//duty_cycle range is 0~10000 correspond to 0~100%
-        .config.freq = PWM_FREQ,       //freq range is between 0~40MHZ,for more detail you can reference https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
+        .config.pin        = LED_G_PIN,
+        .config.duty_cycle = 0,        // duty_cycle range is 0~10000 correspond to 0~100%
+        .config.freq       = PWM_FREQ, // freq range is between 0~40MHZ,for more detail you can reference
+                                 // https://dev.bouffalolab.com/media/doc/602/open/reference_manual/zh/html/content/PWM.html
     }
 #endif
 };
@@ -42,25 +45,28 @@ hosal_pwm_dev_t rgb_pwm[] = {
 void demo_hosal_pwm_init(void)
 {
     /* init pwm with given settings */
-    for (uint32_t i = 0; i < pwm_channel_max; i ++) {
+    for (uint32_t i = 0; i < pwm_channel_max; i++)
+    {
         hosal_pwm_init(rgb_pwm + i);
     }
 }
 
-
 void demo_hosal_pwm_start(void)
 {
     /* start pwm */
-    for (uint32_t i = 0; i < pwm_channel_max; i ++) {
+    for (uint32_t i = 0; i < pwm_channel_max; i++)
+    {
         hosal_pwm_start(rgb_pwm + i);
     }
 }
 
-void demo_hosal_pwm_change_param(hosal_pwm_config_t *para)
+void demo_hosal_pwm_change_param(hosal_pwm_config_t * para)
 {
     /* change pwm param */
-    for (uint32_t i = 0; i < pwm_channel_max; i ++) {
-        if (para[i].duty_cycle > PWM_DUTY_CYCLE ) {
+    for (uint32_t i = 0; i < pwm_channel_max; i++)
+    {
+        if (para[i].duty_cycle > PWM_DUTY_CYCLE)
+        {
             para[i].duty_cycle = PWM_DUTY_CYCLE;
         }
         hosal_pwm_para_chg(rgb_pwm + i, para[i]);
@@ -69,7 +75,8 @@ void demo_hosal_pwm_change_param(hosal_pwm_config_t *para)
 
 void demo_hosal_pwm_stop(void)
 {
-    for (uint32_t i = 0; i < pwm_channel_max; i ++) {
+    for (uint32_t i = 0; i < pwm_channel_max; i++)
+    {
         hosal_pwm_stop(rgb_pwm + i);
         hosal_pwm_finalize(rgb_pwm + i);
     }
@@ -79,13 +86,13 @@ void set_level(uint8_t currLevel)
 {
     hosal_pwm_config_t para;
 
-    if(currLevel <= 5 && currLevel >=1)
+    if (currLevel <= 5 && currLevel >= 1)
     {
-        currLevel = 5;  // avoid demo off
+        currLevel = 5; // avoid demo off
     }
 
     para.duty_cycle = currLevel * PWM_DUTY_CYCLE / 254;
-    para.freq = PWM_FREQ;
+    para.freq       = PWM_FREQ;
 
     printf("[set_level] currLevel:0x%02x\r\n", currLevel);
     demo_hosal_pwm_change_param(&para);
@@ -112,15 +119,15 @@ void set_color_yellow(uint8_t currLevel)
 void set_color(uint8_t currLevel, uint8_t currHue, uint8_t currSat)
 {
 #if MAX_PWM_CHANNEL == 3
-    uint16_t hue = (uint16_t)currHue * 360 / 254;
-    uint8_t  sat = (uint16_t)currSat * 100 / 254;
+    uint16_t hue = (uint16_t) currHue * 360 / 254;
+    uint8_t sat  = (uint16_t) currSat * 100 / 254;
 
-    if(currLevel <= 5 && currLevel >=1)
+    if (currLevel <= 5 && currLevel >= 1)
     {
-        currLevel = 5;  // avoid demo off
+        currLevel = 5; // avoid demo off
     }
 
-    if(sat > 100)
+    if (sat > 100)
     {
         sat = 100;
     }
@@ -170,13 +177,14 @@ void set_color(uint8_t currLevel, uint8_t currHue, uint8_t currSat)
     // 0-254 to 0-10000
     hosal_pwm_config_t para[3];
     para[0].duty_cycle = blue * PWM_DUTY_CYCLE / 254;
-    para[0].freq = PWM_FREQ;
+    para[0].freq       = PWM_FREQ;
     para[1].duty_cycle = red * PWM_DUTY_CYCLE / 254;
-    para[1].freq = PWM_FREQ;
+    para[1].freq       = PWM_FREQ;
     para[2].duty_cycle = green * PWM_DUTY_CYCLE / 254;
-    para[2].freq = PWM_FREQ;
+    para[2].freq       = PWM_FREQ;
 
-    printf("[set_color] currLevel:0x%02x, currHue:0x%02x, currSat:0x%02x, hue:0x%04x, sat:0x%02x, red:0x%lx, green:0x%lx, blue:0x%lx \r\n",
+    printf("[set_color] currLevel:0x%02x, currHue:0x%02x, currSat:0x%02x, hue:0x%04x, sat:0x%02x, red:0x%lx, green:0x%lx, "
+           "blue:0x%lx \r\n",
            currLevel, currHue, currSat, hue, sat, red, green, blue);
 
     demo_hosal_pwm_change_param(para);

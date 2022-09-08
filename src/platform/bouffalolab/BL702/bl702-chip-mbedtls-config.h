@@ -99,20 +99,19 @@
 #define MBEDTLS_PEM_PARSE_C
 #define MBEDTLS_PK_WRITE_C
 
-#define MBEDTLS_MPI_WINDOW_SIZE            1 /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE              32 /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS             256 /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE            2 /**< Maximum window size used */
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
+#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
+#define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
 
-#define MBEDTLS_PLATFORM_STD_CALLOC      calloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE        free /**< Default free to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_CALLOC calloc /**< Default allocator to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_FREE free     /**< Default free to use, can be undefined */
 
-#define MBEDTLS_SSL_MAX_CONTENT_LEN      900 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
 
-
-#define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
+#define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 #define MBEDTLS_X509_CSR_WRITE_C
 #define MBEDTLS_X509_CREATE_C
@@ -120,8 +119,7 @@
 #define MBEDTLS_PKCS5_C
 
 // Spans multiple lines to avoid being processed by unifdef
-#if defined(\
-    MBEDTLS_USER_CONFIG_FILE)
+#if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 

@@ -34,8 +34,8 @@
 
 #pragma once
 
-#define CHIP_UART_PORT                  0
-#define CHIP_UART_RX_BUFFSIZE           256
+#define CHIP_UART_PORT 0
+#define CHIP_UART_RX_BUFFSIZE 256
 
 #ifdef BL706_NIGHT_LIGHT
 
@@ -48,40 +48,38 @@
 // #define LED_G_PIN_PORT                  0
 // #define LED_G_PIN                       0
 
+#define LED_B_PIN_PORT 2
+#define LED_B_PIN 12
 
-#define LED_B_PIN_PORT                  2
-#define LED_B_PIN                       12
+#define LED_R_PIN_PORT 0
+#define LED_R_PIN 10
 
-#define LED_R_PIN_PORT                  0
-#define LED_R_PIN                       10
+#define LED_G_PIN_PORT 1
+#define LED_G_PIN 16
 
-#define LED_G_PIN_PORT                  1
-#define LED_G_PIN                       16
+#define LED1_PIN LED_B_PIN_PORT
 
-#define LED1_PIN                        LED_B_PIN_PORT
-
-#define MAX_PWM_CHANNEL                 3
+#define MAX_PWM_CHANNEL 3
 
 #else
 
-#define LED1_PIN                        22
+#define LED1_PIN 22
 
-#define LED_B_PIN_PORT                  1
-#define LED_B_PIN                       31
-#define MAX_PWM_CHANNEL                 1
+#define LED_B_PIN_PORT 1
+#define LED_B_PIN 31
+#define MAX_PWM_CHANNEL 1
 
 #endif
 
 #if APP_BOARD_BTN
-#define LED_BTN_RESET                   11
+#define LED_BTN_RESET 11
 #endif
 
-#define SPI_WIFI_MISO_PIN               4
-#define SPI_WIFI_MOSI_PIN               5
-#define SPI_WIFI_CLK_PIN                3
-#define SPI_WIFI_CS_PIN                 6
-#define SPI_WIFI_IRQ_PIN                10
+#define SPI_WIFI_MISO_PIN 4
+#define SPI_WIFI_MOSI_PIN 5
+#define SPI_WIFI_CLK_PIN 3
+#define SPI_WIFI_CS_PIN 6
+#define SPI_WIFI_IRQ_PIN 10
 
-#define CHIP_UART_PIN_RX                15
-#define CHIP_UART_PIN_TX                14
-
+#define CHIP_UART_PIN_RX 15
+#define CHIP_UART_PIN_TX 14

@@ -40,9 +40,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-
-
-
 // // Prefix used for Easyflash keys that contain Chip group encryption keys.
 CHIP_ERROR BL702Config::Init()
 {
@@ -60,13 +57,18 @@ CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint8_t * val, size_t 
 
     ef_port_env_lock();
 
-    if (true == ef_get_env_obj(key, &node)) {
+    if (true == ef_get_env_obj(key, &node))
+    {
 
         readsize = 0;
-        if (val && size) {
-            if (size > node.value_len) {
+        if (val && size)
+        {
+            if (size > node.value_len)
+            {
                 readsize = node.value_len;
-            } else {
+            }
+            else
+            {
                 readsize = size;
             }
         }
@@ -86,27 +88,29 @@ CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint8_t * val, size_t 
 CHIP_ERROR BL702Config::ReadConfigValue(const char * key, bool & val)
 {
     size_t readlen = 0;
-    return ReadConfigValue(key, (uint8_t *)&val, 1, readlen);
+    return ReadConfigValue(key, (uint8_t *) &val, 1, readlen);
 }
 
 CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint32_t & val)
 {
     size_t readlen = 0;
-    return ReadConfigValue(key, (uint8_t *)&val, sizeof(val), readlen);
+    return ReadConfigValue(key, (uint8_t *) &val, sizeof(val), readlen);
 }
 
 CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint64_t & val)
 {
     size_t readlen = 0;
-    return ReadConfigValue(key, (uint8_t *)&val, sizeof(val), readlen);
+    return ReadConfigValue(key, (uint8_t *) &val, sizeof(val), readlen);
 }
 
 CHIP_ERROR BL702Config::ReadConfigValueStr(const char * key, char * buf, size_t bufSize, size_t & outLen)
 {
     size_t readlen = 0;
-    if(CHIP_NO_ERROR == ReadConfigValue(key, (uint8_t *) buf, bufSize, readlen)) {
+    if (CHIP_NO_ERROR == ReadConfigValue(key, (uint8_t *) buf, bufSize, readlen))
+    {
         outLen = readlen;
-        if (readlen && readlen < bufSize) {
+        if (readlen && readlen < bufSize)
+        {
             buf[readlen] = '\0';
         }
 
@@ -119,7 +123,8 @@ CHIP_ERROR BL702Config::ReadConfigValueStr(const char * key, char * buf, size_t 
 CHIP_ERROR BL702Config::ReadConfigValueBin(const char * key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     size_t readlen = 0;
-    if(CHIP_NO_ERROR == ReadConfigValue(key, (uint8_t *) buf, bufSize, readlen)) {
+    if (CHIP_NO_ERROR == ReadConfigValue(key, (uint8_t *) buf, bufSize, readlen))
+    {
         outLen = readlen;
         return CHIP_NO_ERROR;
     }
@@ -133,53 +138,56 @@ CHIP_ERROR BL702Config::WriteConfigValue(const char * key, uint8_t * val, size_t
 
     ef_port_env_lock();
 
-    if (size && val) {
+    if (size && val)
+    {
         ret = ef_set_env_blob(key, val, size);
     }
 
     ef_port_env_unlock();
 
-    if (ret == EF_NO_ERR) {
+    if (ret == EF_NO_ERR)
+    {
         return CHIP_NO_ERROR;
     }
-    else {
+    else
+    {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 }
 
 CHIP_ERROR BL702Config::WriteConfigValue(const char * key, bool val)
 {
-    return WriteConfigValue(key, (uint8_t *)&val, sizeof(val));
+    return WriteConfigValue(key, (uint8_t *) &val, sizeof(val));
 }
 
 CHIP_ERROR BL702Config::WriteConfigValue(const char * key, uint32_t val)
 {
-    return WriteConfigValue(key, (uint8_t *)&val, sizeof(val));
+    return WriteConfigValue(key, (uint8_t *) &val, sizeof(val));
 }
 
 CHIP_ERROR BL702Config::WriteConfigValue(const char * key, uint64_t val)
 {
-    return WriteConfigValue(key, (uint8_t *)&val, sizeof(val));
+    return WriteConfigValue(key, (uint8_t *) &val, sizeof(val));
 }
 
 CHIP_ERROR BL702Config::WriteConfigValueStr(const char * key, const char * str)
 {
-    return WriteConfigValue(key, (uint8_t *)str, strlen(str) + 1);
+    return WriteConfigValue(key, (uint8_t *) str, strlen(str) + 1);
 }
 
 CHIP_ERROR BL702Config::WriteConfigValueStr(const char * key, const char * str, size_t strLen)
 {
-    return WriteConfigValue(key, (uint8_t *)str, strLen);
+    return WriteConfigValue(key, (uint8_t *) str, strLen);
 }
 
 CHIP_ERROR BL702Config::WriteConfigValueBin(const char * key, const uint8_t * data, size_t dataLen)
 {
-    return WriteConfigValue(key, (uint8_t *)data, dataLen);
+    return WriteConfigValue(key, (uint8_t *) data, dataLen);
 }
 
 CHIP_ERROR BL702Config::ClearConfigValue(const char * key)
 {
-    return EF_NO_ERR == ef_del_env(key)? CHIP_NO_ERROR : CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return EF_NO_ERR == ef_del_env(key) ? CHIP_NO_ERROR : CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 CHIP_ERROR BL702Config::FactoryResetConfig(void)
@@ -191,7 +199,7 @@ CHIP_ERROR BL702Config::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void BL702Config::RunConfigUnitTest(){}
+void BL702Config::RunConfigUnitTest() {}
 
 bool BL702Config::ConfigValueExists(const char * key)
 {
@@ -200,7 +208,6 @@ bool BL702Config::ConfigValueExists(const char * key)
     return ef_get_env_obj(key, &node);
 }
 
-
 CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes)
 {
     size_t read_len = 0, datalen;
@@ -208,41 +215,51 @@ CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_siz
 
     ef_port_env_lock();
 
-    char * p = (char *)malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p) {
+    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
+    if (!p)
+    {
         ef_port_env_unlock();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS)- 1] = '_';
+    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
     strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
 
-    if (true == ef_get_env_obj(p, &node)) {
+    if (true == ef_get_env_obj(p, &node))
+    {
 
-        if (offset_bytes > node.value_len) {
+        if (offset_bytes > node.value_len)
+        {
             free(p);
             ef_port_env_unlock();
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         datalen = node.value_len - offset_bytes;
-        if (value_size && value) {
+        if (value_size && value)
+        {
 
-            if (value_size > datalen) {
+            if (value_size > datalen)
+            {
                 read_len = datalen;
-            } else {
+            }
+            else
+            {
                 read_len = value_size;
             }
 
             ef_port_read(node.addr.value + offset_bytes, (uint32_t *) value, read_len);
 
-            if (read_bytes_size) {
+            if (read_bytes_size)
+            {
                 *read_bytes_size = read_len;
             }
         }
-        else {
-            if (read_bytes_size) {
+        else
+        {
+            if (read_bytes_size)
+            {
                 *read_bytes_size = 0;
             }
         }
@@ -253,7 +270,7 @@ CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_siz
         return CHIP_NO_ERROR;
     }
 
-    free (p);
+    free(p);
     ef_port_env_unlock();
 
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -265,27 +282,31 @@ CHIP_ERROR BL702Config::WriteKVS(const char * key, const void * value, size_t va
 
     ef_port_env_lock();
 
-    char * p = (char *)malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p) {
+    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
+    if (!p)
+    {
         ef_port_env_unlock();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS)- 1] = '_';
+    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
     strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
 
-    if (value && value_size) {
+    if (value && value_size)
+    {
         ret = ef_set_env_blob(p, value, value_size);
     }
 
     free(p);
     ef_port_env_unlock();
 
-    if (ret == EF_NO_ERR) {
+    if (ret == EF_NO_ERR)
+    {
         return CHIP_NO_ERROR;
     }
-    else {
+    else
+    {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 }
@@ -294,14 +315,15 @@ CHIP_ERROR BL702Config::ClearKVS(const char * key)
 {
     ef_port_env_lock();
 
-    char * p = (char *)malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p) {
+    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
+    if (!p)
+    {
         ef_port_env_unlock();
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
     memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS)- 1] = '_';
+    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
     strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
 
     ef_del_env(p);
@@ -312,14 +334,15 @@ CHIP_ERROR BL702Config::ClearKVS(const char * key)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BL702Config::WriteWiFiInfo(const char *ssid, const char *passwd)
+CHIP_ERROR BL702Config::WriteWiFiInfo(const char * ssid, const char * passwd)
 {
-    char *pssid = (char *)ssid, *ppass = (char *)passwd;
+    char *pssid = (char *) ssid, *ppass = (char *) passwd;
 
     ef_port_env_lock();
 
-    if ( EF_NO_ERR == ef_set_env_blob(kBLConfigKey_wifissid, pssid, strlen(pssid))
-        && EF_NO_ERR == ef_set_env_blob(kBLConfigKey_wifipassword, ppass, strlen(ppass))) {
+    if (EF_NO_ERR == ef_set_env_blob(kBLConfigKey_wifissid, pssid, strlen(pssid)) &&
+        EF_NO_ERR == ef_set_env_blob(kBLConfigKey_wifipassword, ppass, strlen(ppass)))
+    {
 
         ef_port_env_unlock();
 
@@ -331,32 +354,33 @@ CHIP_ERROR BL702Config::WriteWiFiInfo(const char *ssid, const char *passwd)
     return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
-CHIP_ERROR BL702Config::ReadWiFiInfo(const char *ssid, uint32_t ssid_size, const char *passwd, uint32_t passwd_size)
+CHIP_ERROR BL702Config::ReadWiFiInfo(const char * ssid, uint32_t ssid_size, const char * passwd, uint32_t passwd_size)
 {
     size_t saved_value_len = 0;
-    char *pssid = (char *)ssid, *ppass = (char *)passwd;
+    char *pssid = (char *) ssid, *ppass = (char *) passwd;
 
-    memset((void *)ssid, 0, ssid_size);
-    memset((void *)passwd, 0, passwd_size);
+    memset((void *) ssid, 0, ssid_size);
+    memset((void *) passwd, 0, passwd_size);
 
     ef_port_env_lock();
 
-    ef_get_env_blob(kBLConfigKey_wifissid, (void*)pssid, ssid_size, &saved_value_len);
-    if (saved_value_len != 0) {
+    ef_get_env_blob(kBLConfigKey_wifissid, (void *) pssid, ssid_size, &saved_value_len);
+    if (saved_value_len != 0)
+    {
         saved_value_len = 0;
-        ef_get_env_blob(kBLConfigKey_wifipassword, (void*)ppass, passwd_size, &saved_value_len);
+        ef_get_env_blob(kBLConfigKey_wifipassword, (void *) ppass, passwd_size, &saved_value_len);
     }
 
     ef_port_env_unlock();
 
-    return saved_value_len? CHIP_NO_ERROR:CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    return saved_value_len ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
 CHIP_ERROR BL702Config::ClearWiFiInfo(void)
 {
     ef_port_env_lock();
-    if ( EF_NO_ERR == ef_del_env(kBLConfigKey_wifissid)
-        && EF_NO_ERR == ef_del_env(kBLConfigKey_wifipassword)) {
+    if (EF_NO_ERR == ef_del_env(kBLConfigKey_wifissid) && EF_NO_ERR == ef_del_env(kBLConfigKey_wifipassword))
+    {
         ef_port_env_unlock();
 
         return CHIP_NO_ERROR;
@@ -375,7 +399,6 @@ bool BL702Config::isWiFiInfoSaved()
 
     return ef_get_env_obj(kBLConfigKey_wifissid, &node) && ef_get_env_obj(kBLConfigKey_wifipassword, &node);
 }
-
 
 } // namespace Internal
 } // namespace DeviceLayer

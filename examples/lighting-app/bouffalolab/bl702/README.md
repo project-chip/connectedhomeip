@@ -126,7 +126,7 @@ Current supported develop boards:
         > download image. Please make sure current terminal is under matter
         > build environment, or `bflb-iot-tool` is installed.
 
-    - Using `Bouffalo Lab` flash tool`BLDevCube`
+    -   Using `Bouffalo Lab` flash tool`BLDevCube`
         -   Hold BOOT pin and reset board, let it be in download mode.
         -   Select `DTS` file
             `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts`;
