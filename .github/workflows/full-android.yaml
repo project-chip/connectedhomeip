@@ -45,16 +45,12 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
             - uses: actions/checkout@v3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
-              with:
-                  submodules: true
-                  token: ${{ github.token }}
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform android
             - name: Bootstrap
