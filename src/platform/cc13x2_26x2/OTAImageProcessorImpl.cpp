@@ -406,12 +406,17 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         uint8_t * header = reinterpret_cast<uint8_t *>(&(imageProcessor->mFixedOtaHeader));
         if (imageProcessor->mBlock.size() + imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
         {
+            // the first block is smaller than the header, somehow
             memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
         }
         else
         {
+            // we have received the whole header, fill it up
             memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
                    sizeof(imageProcessor->mFixedOtaHeader) - imageProcessor->mParams.downloadedBytes);
+
+            // update the total size for download tracking
+            imageProcessor->mParams.totalFileBytes = imageProcessor->mFixedOtaHeader.totalSize;
         }
     }
 
