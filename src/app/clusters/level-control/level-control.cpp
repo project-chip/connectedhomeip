@@ -73,8 +73,8 @@ static constexpr size_t kLevelControlStateTableSize =
 
 typedef struct
 {
-	chip::System::Clock::Milliseconds32 prevCallbackDuration;
-	chip::System::Clock::Timestamp nextTimestamp;
+    chip::System::Clock::Milliseconds32 prevCallbackDuration;
+    chip::System::Clock::Timestamp nextTimestamp;
 } NextWaitTimeState;
 
 typedef struct
@@ -125,25 +125,24 @@ static void timerCallback(System::Layer *, void * callbackContext)
 
 static uint32_t calculateNextWaitTimeMs(NextWaitTimeState * nextwaitTimeState, uint32_t delayMs)
 {
-	chip::System::Clock::Timestamp latency;
-    auto delay = chip::System::Clock::Milliseconds32(delayMs);
-    auto waitTime = delay;
+    chip::System::Clock::Timestamp latency;
+    auto delay             = chip::System::Clock::Milliseconds32(delayMs);
+    auto waitTime          = delay;
     const auto currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    if((currentTime > nextwaitTimeState->nextTimestamp) && (nextwaitTimeState->prevCallbackDuration < delay))
+    if ((currentTime > nextwaitTimeState->nextTimestamp) && (nextwaitTimeState->prevCallbackDuration < delay))
     {
-		latency = currentTime - nextwaitTimeState->nextTimestamp;
+        latency = currentTime - nextwaitTimeState->nextTimestamp;
 
-		if (latency >= delay)
-		{
-			waitTime = chip::System::Clock::Milliseconds32(0);
-		}
-		else
-		{
-			waitTime -= latency;
-		}
-
-	}
+        if (latency >= delay)
+        {
+            waitTime = chip::System::Clock::Milliseconds32(0);
+        }
+        else
+        {
+            waitTime -= latency;
+        }
+    }
 
     nextwaitTimeState->nextTimestamp += chip::System::Clock::Milliseconds32(delayMs);
     nextwaitTimeState->prevCallbackDuration = chip::System::Clock::Milliseconds32(0);
@@ -719,7 +718,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
     // The setup was successful, so mark the new state as active and return.
     state->nextWaitTimeState.prevCallbackDuration = chip::System::Clock::Milliseconds32(0);
-    state->nextWaitTimeState.nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    state->nextWaitTimeState.nextTimestamp        = chip::System::SystemClock().GetMonotonicTimestamp();
     schedule(endpoint, calculateNextWaitTimeMs(&state->nextWaitTimeState, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -847,7 +846,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
 
     // The setup was successful, so mark the new state as active and return.
     state->nextWaitTimeState.prevCallbackDuration = chip::System::Clock::Milliseconds32(0);
-    state->nextWaitTimeState.nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    state->nextWaitTimeState.nextTimestamp        = chip::System::SystemClock().GetMonotonicTimestamp();
     schedule(endpoint, calculateNextWaitTimeMs(&state->nextWaitTimeState, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -975,7 +974,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
 
     // The setup was successful, so mark the new state as active and return.
     state->nextWaitTimeState.prevCallbackDuration = chip::System::Clock::Milliseconds32(0);
-    state->nextWaitTimeState.nextTimestamp = chip::System::SystemClock().GetMonotonicTimestamp();
+    state->nextWaitTimeState.nextTimestamp        = chip::System::SystemClock().GetMonotonicTimestamp();
     schedule(endpoint, calculateNextWaitTimeMs(&state->nextWaitTimeState, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
