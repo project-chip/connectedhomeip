@@ -25,6 +25,7 @@
 #pragma once
 
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
@@ -38,6 +39,12 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason);
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR IncreaseBootCount(void);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
