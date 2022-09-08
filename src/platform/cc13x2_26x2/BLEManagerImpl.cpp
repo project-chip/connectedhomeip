@@ -1733,7 +1733,7 @@ void BLEManagerImpl::FastAdvTimeoutHandler(uintptr_t arg)
 
     if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
+        BLEMGR_LOG("BLEMGR: FastAdvTimeoutHandler fast ble adv 30 second timeout");
 
         sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
         sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
