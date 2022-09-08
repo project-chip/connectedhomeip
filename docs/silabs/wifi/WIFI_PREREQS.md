@@ -20,32 +20,28 @@ follows:
 
 ![Overview](./images/wifi_setup.png)
 
-> Note : For EFR32MG24 + RS911x hardware overview will be looking like same
-> which is shown in the above diagram, only EFR32MG24 board need to change.
+>Note: For EFR32MG24 + RS911x hardware overview will be looking like same which is shown in the above diagram, only MG12 >board need to replace with MG24.
 
 ## EFR32MG12 + WF200 Hardware Overview
 
 ![EFR32MG12 + WF200 connection ](./images/MG12_WF200.jpg)
 
-<br>
-
-> Note : For EFR32MG24 + WF200 hardware overview also looking like same which is
-> shown in the above diagram. Only EFR32MG24 board need to change.
-
+> Note : 
+> 1. For EFR32MG24 + WF200 hardware overview also looking like same which is shown in the above diagram. Only EFR32MG24 >board need to change. 
+> 2. Make sure on wf200 board interface slide button should in SPI mode and other slide button should be in "ON BOARD LDO" 
 ## Hardware
 
 -   Linux PC/Laptop **or** Raspberry Pi 4 (This is for running the ChipTool to
     commission and control the device)
 -   Kits/Boards:
     -   SLWSTK6000B Wireless Starter Kit main board
-    -   BRD4161A/BRD4163A/BRD4164A/BRD4186C/BRD4187C daughter boards are
-        supported
+    -   BRD4161A/BRD4163A/BRD4164A/BRD4186C/BRD4187C daughter boards are supported
         -   [SLWRB4161A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4161a-efr32mg12-radio-board)
         -   [SLWRB4163A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4163a-efr32mg12-radio-board)
         -   [SLWRB4164A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4164a-efr32mg12-radio-board)
         -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
         -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
-            > BLE and Matter code run here
+        > BLE and Matter code run here
     -   Wi-Fi Dev Kit, either
         [RS9116X-SB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk-development-kit)
         **or**
@@ -55,7 +51,6 @@ follows:
     -   Jumper Cables (included in the RS9116 kit)
 -   Access point with Internet access
 -   microSD card (32GB) (if using Raspberry Pi)
--   **[Optional]** Android Mobile phone (If using the ChipTool on Android)
 
 <br>
 
@@ -90,8 +85,9 @@ follows:
 Pre-Built Rs9116 firmware is available on the
 [Matter Artifacts page](../general/ARTIFACTS.md)
 
-1. [Setting up TeraTerm](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup)
-2. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
+1. Connect rs911x `USB-CDC` port to host machine.
+2. [Setting up TeraTerm](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup)
+3. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
 
 ---
 

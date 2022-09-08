@@ -113,7 +113,7 @@ must be on the same Wi-Fi network as your RS9116 or WF200 and there cannot be
 another network interface on the device that is running the Chip-Tool. For
 instance, if you have an Ethernet connection as well as a Wi-Fi connection, you
 need to unplug the Ethernet connection and try running the Chip-Tool as in step
-#3 above.
+#2 above.
 
 As the device remembers the Access Point credentials given for commissioning, if
 you want to run the demo multiple times, do a factory reset by pressing the BTN0

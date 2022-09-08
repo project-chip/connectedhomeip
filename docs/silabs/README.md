@@ -15,13 +15,11 @@
     4. [Creating a Thread Matter End Device](thread/BUILD_FLASH_MAD.md)
     5. [Using the Chip-Tool](thread/CHIP_TOOL.md)<BR> <BR>
 
-4. [Matter over Wi-Fi](wifi/WIFI.md)
+4. Matter over Wi-Fi
 
     1. [Matter Wi-Fi Demo Overview](wifi/DEMO_OVERVIEW.md)
-    2. [Building A Matter Wi-Fi End Device](wifi/BUILD_CHIP_ENV.md)
+    2. [Building A Matter Wi-Fi End Device](wifi/SW_SETUP.md)
     3. [Running Matter Demo over Wi-Fi](wifi/RUN_DEMO.md)
-    4. [optional]
-       [Running Matter Demo over Wi-Fi using Android](wifi/WIFI_ANDROID.md)
        <br><br>
 
 5. Development using VS Code

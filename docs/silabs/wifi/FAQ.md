@@ -6,14 +6,11 @@
 
 ### 1. Bluetooth connection fails when trying to commission the system through the ChipTool:
 
-<br>
-
 **Command leading to error:**
 
 `$ out/standalone/chip-tool pairing ble-wifi 1122 mySSID myPassword 20202021 3840`
 
-> Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's
-> password**.
+Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 
 <br>
 
@@ -57,7 +54,7 @@
     > Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's
     > password**.
 
-<br> <br>
+<br> 
 
 ### 2. Unsupported certificate format Error:
 
@@ -179,6 +176,17 @@ network)
 > Verify external power is supplied to rs911x
 
 <br>
+
+### 9 . To enable different security options on AP/Router 
+
+1. Get the router address by entering `route -n` or ifconfig of ipconfig.
+
+2. Enter router address in the browser and enter the appropriate username and
+    password.
+
+3. Select appropriate band.
+
+4. In security, select type(WPA/WPA2/WPA3). 
 
 ---
 
