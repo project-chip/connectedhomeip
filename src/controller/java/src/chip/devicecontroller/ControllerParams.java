@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 /** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {
 
+  private final long fabricId;
   private final int udpListenPort;
   private final int controllerVendorId;
   private final int failsafeTimerSeconds;
@@ -22,6 +23,7 @@ public final class ControllerParams {
 
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
+    this.fabricId = builder.fabricId;
     this.udpListenPort = builder.udpListenPort;
     this.controllerVendorId = builder.controllerVendorId;
     this.failsafeTimerSeconds = builder.failsafeTimerSeconds;
@@ -34,6 +36,10 @@ public final class ControllerParams {
     this.operationalCertificate = builder.operationalCertificate;
     this.ipk = builder.ipk;
     this.adminSubject = builder.adminSubject;
+  }
+
+  public long getFabricId() {
+    return fabricId;
   }
 
   /** Gets the UDP listening port; 0 indicates "any available port" */
@@ -105,6 +111,7 @@ public final class ControllerParams {
 
   /** Builder for {@link ControllerParams}. */
   public static class Builder {
+    private long fabricId = 1;
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
     private int controllerVendorId = 0xFFFF;
     private int failsafeTimerSeconds = 30;
@@ -119,6 +126,14 @@ public final class ControllerParams {
     private long adminSubject = 0;
 
     private Builder() {}
+
+    public Builder setFabricId(long fabricId) {
+      if (fabricId < 1) {
+        throw new IllegalArgumentException("fabricId must be > 0");
+      }
+      this.fabricId = fabricId;
+      return this;
+    }
 
     public Builder setUdpListenPort(int udpListenPort) {
       if (udpListenPort < 0) {
