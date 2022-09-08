@@ -247,8 +247,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     else
     {
         ChipLogProgress(Controller,
-                        "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer",
-                        static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
+                        "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
 
         *errInfoOnFailure = ephemeralKey.Initialize();
         if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -293,7 +292,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     ChipLogProgress(Controller, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
                     static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
-    ChipLogByteSpan(Controller, compressedFabricIdSpan);
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan ipkSpan;
     std::vector<uint8_t> ipkBuffer;
