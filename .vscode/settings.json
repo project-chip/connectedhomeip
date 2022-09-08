@@ -127,7 +127,7 @@
         "**/third_party/**": true
     },
     "files.eol": "\n",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "better-comments.tags": [
         {
             "tag": "!",
