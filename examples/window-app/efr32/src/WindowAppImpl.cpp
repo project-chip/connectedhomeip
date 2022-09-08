@@ -163,6 +163,7 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
     sWiFiNetworkCommissioningInstance.Init();
+    /* added for commisioning with wifi */
 #endif
 
     sInstance.Run();
