@@ -126,8 +126,8 @@ RUN set -x \
     ./temp_btvirt/* /usr/bin/ \
     # Grant access to vHCI for network_fw group
     && UDEV_BT_VHCI=/usr/lib/udev/rules.d/99-bluetooth-vhci.rules \
-    && echo 'KERNEL=="vhci", MODE="0660", GROUP="network_fw"' > temp.txt \
-    && guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload temp.txt $UDEV_BT_VHCI \
+    && echo 'KERNEL=="vhci", MODE="0660", GROUP="network_fw"' \
+    | guestfish --rw -a $TIZEN_FS_IMAGE_ROOT -m /dev/sda upload - $UDEV_BT_VHCI \
     # Create vHCI devices on startup (modify RPi4 hciattach script)
     && BT_DEV_START_SH=/usr/etc/bluetooth/bt-dev-start-rpi3.sh \
     && echo > temp.txt \
