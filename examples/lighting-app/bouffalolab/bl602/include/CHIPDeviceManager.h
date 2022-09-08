@@ -24,7 +24,8 @@
  *      activities within the CHIP stack. This is a singleton object.
  */
 
-#pragma once
+#ifndef CHIP_LOCK_DEVICEMANAGER_H_
+#define CHIP_LOCK_DEVICEMANAGER_H_
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -57,7 +58,7 @@ public:
      * @param event   ChipDeviceEvent that occurred
      * @param arg     arguments specific to the event, if any
      */
-    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     /**
      * @brief
      *   Called after an attribute has been changed
@@ -70,10 +71,10 @@ public:
      * @param size               size of the attribute
      * @param value              pointer to the new value
      */
-    void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     uint8_t type, uint16_t size, uint8_t * value)
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t type, uint16_t size, uint8_t * value)
     {}
-    // virtual ~CHIPDeviceManagerCallbacks();
+    virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
 /**
@@ -119,3 +120,5 @@ private:
 
 } // namespace DeviceManager
 } // namespace chip
+
+#endif /* CHIP_LOCK_DEVICEMANAGER_H_ */

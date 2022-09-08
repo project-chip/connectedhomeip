@@ -25,7 +25,6 @@
 #include <wifi_mgmr.h>
 #include <wifi_mgmr_api.h>
 #include <wifi_mgmr_ext.h>
-#include <wifi_mgmr_portable.h>
 
 #include <limits>
 #include <stdint.h>
@@ -231,7 +230,7 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     {
         memset(WiFiSSIDStr, 0, sizeof(WiFiSSIDStr));
         memcpy(WiFiSSIDStr, ssid.data(), ssid.size());
-        err       = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, NULL, WiFiSSIDStr, 1, 0);
+        err       = (CHIP_ERROR) wifi_mgmr_scan_adv(NULL, NULL, NULL, 0, WiFiSSIDStr);
         scan_type = 1;
     }
     else
@@ -248,7 +247,7 @@ CHIP_ERROR BLWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
 void BLWiFiDriver::OnScanWiFiNetworkDone()
 {
-    int ap_num = 0;
+    int ap_num;
 
     ap_num = wifi_mgmr_get_scan_ap_num();
     if (!ap_num)
