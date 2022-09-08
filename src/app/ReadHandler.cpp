@@ -769,7 +769,8 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 
     if (!IsChunkedReport())
     {
-        ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxInterval);
+        ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with min %d seconds and max %d seconds",
+                        mMinIntervalFloorSeconds, mMaxInterval);
         mFlags.Set(ReadHandlerFlags::HoldReport);
         mFlags.Set(ReadHandlerFlags::HoldSync);
         ReturnErrorOnFailure(

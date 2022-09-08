@@ -285,13 +285,13 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, CHIP_ERROR_INTERNAL);
+    callback(context, nullptr, 0, true, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), CHIP_NO_ERROR);
+    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(this);
 }
 

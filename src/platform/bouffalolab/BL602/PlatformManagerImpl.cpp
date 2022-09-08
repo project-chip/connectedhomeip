@@ -43,6 +43,10 @@
 #include <tcpip.h>
 #include <wifi_mgmr_ext.h>
 
+extern "C" {
+#include <bl_sec.h>
+}
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -149,9 +153,9 @@ static void WifiStaConnected(void)
     }
 
     memset(ap_ssid, 0, sizeof(ap_ssid));
-    wifi_mgmr_sta_ssid_get(ap_ssid);
-    wifi_mgmr_ap_item_t * ap_info = mgmr_get_ap_info_handle();
-    wifi_mgmr_get_scan_result_filter(ap_info, ap_ssid);
+    // wifi_mgmr_sta_ssid_get(ap_ssid);
+    // wifi_mgmr_ap_item_t * ap_info = mgmr_get_ap_info_handle();
+    // wifi_mgmr_get_scan_result_filter(ap_info, ap_ssid);
 
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
     ConnectivityMgrImpl().WifiStationStateChange();

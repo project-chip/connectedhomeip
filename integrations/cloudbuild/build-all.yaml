@@ -6,7 +6,7 @@ steps:
           - "--init"
           - "--recursive"
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.5.96"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -21,15 +21,15 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.96"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target-glob '*' --skip-target-glob
-              '{imx-*,tizen-*,*-androidstudio-*,*-tests*,*-chip-test}' build --create-archives
-              /workspace/artifacts/
+              '{imx-*,tizen-*,*-androidstudio-*,*-tests*,*-chip-test}' build
+              --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
           - Bootstrap

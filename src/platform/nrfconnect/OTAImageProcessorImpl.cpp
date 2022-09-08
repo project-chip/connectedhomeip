@@ -71,7 +71,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         writer.image_id = image_id;
         writer.open     = [](int id, size_t size) { return dfu_target_init(DFU_TARGET_IMAGE_TYPE_MCUBOOT, id, size, nullptr); };
         writer.write    = [](const uint8_t * chunk, size_t chunk_size) { return dfu_target_write(chunk, chunk_size); };
-        writer.close    = [](bool success) { return dfu_target_done(success); };
+        writer.close    = [](bool success) { return success ? dfu_target_done(success) : dfu_target_reset(); };
 
         ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_register_writer(&writer)));
     };

@@ -182,6 +182,13 @@ public:
      */
     void RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate);
 
+    /**
+     * Map a send error code to the error code we should actually use for
+     * success checks.  This maps some error codes to CHIP_NO_ERROR as
+     * appropriate.
+     */
+    static CHIP_ERROR MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator);
+
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();

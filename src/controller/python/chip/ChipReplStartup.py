@@ -94,7 +94,7 @@ args = parser.parse_args()
 chip.native.Init()
 
 ReplInit(args.debug)
-chipStack = ChipStack(persistentStoragePath=args.storagepath)
+chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
 certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
 certificateAuthorityManager.LoadAuthoritiesFromStorage()

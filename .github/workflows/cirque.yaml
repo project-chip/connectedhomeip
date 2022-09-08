@@ -29,7 +29,7 @@ jobs:
         timeout-minutes: 75
 
         env:
-            DOCKER_RUN_VERSION: 0.5.56
+            DOCKER_RUN_VERSION: 0.5.99
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
         runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: connectedhomeip/chip-build-cirque:0.5.91
+        #             image: connectedhomeip/chip-build-cirque:0.5.99
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -81,7 +81,10 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- scripts/build/gn_bootstrap.sh
+                    -- sh -c '\
+                       git config --global --add safe.directory "*" \
+                       && scripts/build/gn_bootstrap.sh \
+                    '
 
             - name: Cirque Bootstrap
               timeout-minutes: 15
@@ -106,15 +109,18 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- ./gn_build.sh \
-                    chip_build_tests=false \
-                    chip_enable_wifi=false \
-                    chip_im_force_fabric_quota_check=true \
-                    enable_default_builds=false \
-                    enable_host_gcc_build=true \
-                    enable_standalone_chip_tool_build=true \
-                    enable_linux_all_clusters_app_build=true \
-                    enable_linux_lighting_app_build=true
+                    -- sh -c '\
+                       git config --global --add safe.directory "*" \
+                       && ./gn_build.sh \
+                          chip_build_tests=false \
+                          chip_enable_wifi=false \
+                          chip_im_force_fabric_quota_check=true \
+                          enable_default_builds=false \
+                          enable_host_gcc_build=true \
+                          enable_standalone_chip_tool_build=true \
+                          enable_linux_all_clusters_app_build=true \
+                          enable_linux_lighting_app_build=true \
+                      '
             - name: Run Tests
               timeout-minutes: 25
               run: |
