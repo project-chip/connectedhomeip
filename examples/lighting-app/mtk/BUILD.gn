@@ -46,7 +46,6 @@ declare_args() {
 mt793x_sdk("sdk") {
   sources = [
     "${mt793x_project_dir}/include/CHIPProjectConfig.h",
-    "${mt793x_project_dir}/include/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
