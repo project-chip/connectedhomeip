@@ -44,6 +44,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -525,40 +526,68 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
                                                   const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval,
                                                   uint32_t aKeyLeaseInterval)
 {
-    ChipLogDetail(DeviceLayer, "%s +", __func__);
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int threadErr    = THREAD_ERROR_NONE;
-
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    int threadErr;
 
     threadErr = thread_srp_client_register_service(mThreadInstance, aInstanceName, aName, aPort);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(
+        threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE,
+        (ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+
+    SrpClientService service;
+    Platform::CopyString(service.mInstanceName, aInstanceName);
+    Platform::CopyString(service.mName, aName);
+    service.mPort = aPort;
+    mSrpClientServices.push_back(service);
 
     return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(DeviceLayer, "FAIL: thread_srp_client_register_service");
-    return error;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_RemoveSrpService(const char * aInstanceName, const char * aName)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    int threadErr;
+
+    threadErr = thread_srp_client_remove_service(mThreadInstance, aInstanceName, aName);
+    VerifyOrReturnError(
+        threadErr == THREAD_ERROR_NONE,
+        (ChipLogError(DeviceLayer, "thread_srp_client_remove_service() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_InvalidateAllSrpServices()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    for (auto & service : mSrpClientServices)
+    {
+        service.mValid = false;
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    for (auto it = mSrpClientServices.begin(); it != mSrpClientServices.end();)
+    {
+        if (!it->mValid)
+        {
+            auto err = _RemoveSrpService(it->mInstanceName, it->mName);
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+            it = mSrpClientServices.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void ThreadStackManagerImpl::_ThreadIpAddressCb(int index, char * ipAddr, thread_ipaddr_type_e ipAddrType, void * userData)
