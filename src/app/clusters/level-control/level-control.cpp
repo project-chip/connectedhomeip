@@ -71,11 +71,11 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 static constexpr size_t kLevelControlStateTableSize =
     EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-typedef struct
+struct CallbackScheduleState
 {
     System::Clock::Milliseconds32 prevDuration;  // The duration of the previous scheduled callback.
     System::Clock::Timestamp nextIdealTimestamp; // The ideal time stamp for the next callback to be scheduled.
-} CallbackScheduleState;
+};
 
 typedef struct
 {
