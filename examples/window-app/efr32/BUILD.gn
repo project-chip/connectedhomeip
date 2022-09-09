@@ -172,7 +172,6 @@ efr32_executable("window_app") {
   defines = []
 
   sources = [
-    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
@@ -182,6 +181,10 @@ efr32_executable("window_app") {
     "src/WindowAppImpl.cpp",
     "src/main.cpp",
   ]
+
+  if (use_wstk_leds) {
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
 
   if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]

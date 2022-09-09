@@ -20,14 +20,19 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+
+#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
+#include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
+
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-#include "sl_simple_led_instances.h"
+
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -52,8 +57,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef ENABLE_WSTK_LEDS
 #define SYSTEM_STATE_LED &sl_led_led0
 #define LOCK_STATE_LED &sl_led_led1
+#endif // ENABLE_WSTK_LEDS
+
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LOCK_SWITCH &sl_button_btn1
 
@@ -67,7 +75,9 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
+#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLockLED;
+#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 } // namespace
@@ -227,9 +237,11 @@ CHIP_ERROR AppTask::Init()
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
+#ifdef ENABLE_WSTK_LEDS
     // Initialize LEDs
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
+#endif // ENABLE_WSTK_LEDS
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
@@ -362,10 +374,13 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     {
         bool locked = (aAction == LockManager::LOCK_ACTION);
         EFR32_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
+#ifdef ENABLE_WSTK_LEDS
         sLockLED.Set(!locked);
+#endif // ENABLE_WSTK_LEDS
+
 #ifdef DISPLAY_ENABLED
         sAppTask.GetLCD().WriteDemoUI(locked);
-#endif
+#endif // DISPLAY_ENABLED
     }
 
     if (aActor == AppEvent::kEventType_Button)
