@@ -319,14 +319,15 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, jobject manager)
+EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
+                                                uint16_t productId, const char * szApplicationVersion, jobject manager)
 {
-    DataVersion* dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app =
         new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
-    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
-                                                                      Span<const EmberAfDeviceType>(gContentAppDeviceType));
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(
+        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
+        Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
@@ -334,15 +335,16 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
     return epId;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, jobject manager, EndpointId desiredEndpointId)
+EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
+                                                uint16_t productId, const char * szApplicationVersion, jobject manager,
+                                                EndpointId desiredEndpointId)
 {
-    DataVersion* dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app =
         new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
-    EndpointId epId =
-        ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
-                                                        Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(
+        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
+        Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
@@ -359,14 +361,15 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);
             EndpointId removedEndpointID = ContentAppPlatform::GetInstance().RemoveContentApp(app);
-            // Only remove the app from the set of content apps if they were dynamically added and not part of the static list of apps
+            // Only remove the app from the set of content apps if they were dynamically added and not part of the static list of
+            // apps
             if (removedEndpointID != 0 && i > APP_LIBRARY_SIZE)
             {
                 mContentApps.erase(mContentApps.begin() + static_cast<int>(i));
-                DataVersion* dataVersionBuf = mDataVersions.at(i - APP_LIBRARY_SIZE);
+                DataVersion * dataVersionBuf = mDataVersions.at(i - APP_LIBRARY_SIZE);
                 mDataVersions.erase(mDataVersions.begin() + static_cast<int>(i - APP_LIBRARY_SIZE));
                 // deallocate memory for objects that were created when adding the content app dynamically.
-                delete [] dataVersionBuf;
+                delete[] dataVersionBuf;
                 delete app;
             }
             return removedEndpointID;
@@ -427,8 +430,7 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId,
-                         szApplicationVersion, manager);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
@@ -438,8 +440,7 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId,
-                         szApplicationVersion, manager, endpointId);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager, endpointId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
