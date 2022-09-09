@@ -110,7 +110,7 @@ tests:
           ./chip-tool colorcontrol move-to-color-temperature 150 300 0 0 1 1
 
 
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
           [1657911906.102478][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911906.102603][2977:2977] CHIP:DMG: {
           [1657911906.102633][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -152,7 +152,7 @@ tests:
           ./chip-tool colorcontrol read color-temperature 1 1
 
 
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
@@ -185,7 +185,7 @@ tests:
 
 
 
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
 
           [1659955779.460043][2718:2718] CHIP:DMG: InvokeRequestMessage =
           [1659955779.460071][2718:2718] CHIP:DMG: {
@@ -235,7 +235,7 @@ tests:
 
 
 
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
@@ -316,7 +316,7 @@ tests:
       PICS: CC.C.C4c.Rsp & CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =
@@ -392,7 +392,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
-          Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
+          Verify response contains an ColorTemperature in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
           [1659955633.975650][2718:2718] CHIP:DMG:         AttributePathIBs =

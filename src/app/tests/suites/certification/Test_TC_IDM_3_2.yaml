@@ -219,7 +219,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -229,7 +229,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -239,7 +239,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -249,7 +249,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -259,7 +259,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of  data type List
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -299,8 +299,7 @@ tests:
           [1649152707.515250][16226:16231] CHIP:DMG: }
           [1649152707.515374][16226:16231] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
-
-          ./chip-tool any read-by-id 0x0008 0x0010 1 1
+          ./chip-tool any read-by-id 0x0204 0 1 1
           [1655201353.941835][3634:3639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 263686993
           [1655201353.941926][3634:3639] CHIP:TOO: temperature display mode: 1
           [1655201353.942030][3634:3639] CHIP:EM: Sending Standalone Ack for MessageCounter:58103180 on exchange 16578i
@@ -523,7 +522,7 @@ tests:
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
           [1659419722.669629][1915:1920] CHIP:DMG: WriteResponseMessage =
           [1659419722.669657][1915:1920] CHIP:DMG: {
           [1659419722.669687][1915:1920] CHIP:DMG: AttributeStatusIBs =
@@ -580,7 +579,7 @@ tests:
 
           With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to send below mentioned command to Grant access to all clusters again.
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]' 1 0
       disabled: true
 
     - label:
@@ -843,5 +842,5 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute which need NEEDS_TIMED_INTERACTION.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true

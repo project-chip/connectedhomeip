@@ -271,8 +271,7 @@ tests:
           [1657909470.828845][2933:2933] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
-    - label:
-          "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute"
+    - label: "DUT reads from the TH the (0x0007) ColorTemperature attribute"
       PICS: CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1

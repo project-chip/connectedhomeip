@@ -164,8 +164,7 @@ tests:
               type: list
               contains: [6]
 
-    - label:
-          "Read the optional attribute(ColorTemperatureMireds) in AttributeList"
+    - label: "Read the optional attribute(ColorTemperature) in AttributeList"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "AttributeList"
