@@ -1,0 +1,16 @@
+FROM debian:bullseye
+
+RUN apt-get update && \
+    apt-get install -y \
+    libglib2.0-0 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY examples/chef/tmp/rootnode_dimmablelight_bCwGYSDpoe /
+COPY examples/chef/tmp/rootnode_dimmablelight_bCwGYSDpoe.map /
+COPY examples/chef/tmp/rootnode_dimmablelight_bCwGYSDpoe.matter /
+COPY examples/chef/tmp/rootnode_dimmablelight_bCwGYSDpoe_hashmeta.yaml /
+
+ENV DBUS_SYSTEM_BUS_ADDRESS="unix:path=/var/run/dbus/system_bus_socket"
+
+CMD ["/rootnode_dimmablelight_bCwGYSDpoe"]
