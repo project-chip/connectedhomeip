@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
