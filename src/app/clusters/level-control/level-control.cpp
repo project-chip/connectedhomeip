@@ -73,8 +73,8 @@ static constexpr size_t kLevelControlStateTableSize =
 
 typedef struct
 {
-    System::Clock::Milliseconds32 prevDuration;     // The duration of the previous scheduled callback.
-    System::Clock::Timestamp nextIdealTimestamp;    // The ideal time stamp for the next callback to be scheduled.
+    System::Clock::Milliseconds32 prevDuration;  // The duration of the previous scheduled callback.
+    System::Clock::Timestamp nextIdealTimestamp; // The ideal time stamp for the next callback to be scheduled.
 } CallbackScheduleState;
 
 typedef struct
@@ -123,7 +123,7 @@ static void timerCallback(System::Layer *, void * callbackContext)
     emberAfLevelControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
 }
 
-static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState& callbackSchedule, uint32_t delayMs)
+static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedule, uint32_t delayMs)
 {
     auto delay             = System::Clock::Milliseconds32(delayMs);
     auto waitTime          = delay;
