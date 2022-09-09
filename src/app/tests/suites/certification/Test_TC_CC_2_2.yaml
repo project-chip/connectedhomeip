@@ -272,7 +272,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute"
+          "DUT reads from the TH the (0x0007) ColorTemperature attribute"
       PICS: CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1

@@ -66,7 +66,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -78,7 +78,7 @@ tests:
 
     - label:
           "TH sends MoveToColorTemperature command to DUT with
-          ColorTemperatureMireds=(ColorTempPhysicalMinMireds +
+          ColorTemperature=(ColorTempPhysicalMinMireds +
           ColorTempPhysicalMaxMireds)/2 and TransitionTime=0 (immediately)."
       PICS: CC.S.F04 && CC.S.C0a.Rsp
       command: "MoveToColorTemperature"
@@ -136,7 +136,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -153,7 +153,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -171,7 +171,7 @@ tests:
                 value: 5000
 
     #Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/2175
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -214,7 +214,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -231,7 +231,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -248,7 +248,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
