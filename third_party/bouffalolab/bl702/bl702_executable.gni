@@ -62,7 +62,7 @@ template("bl702_executable") {
   flashing_options +=
       [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   flashing_options += [ "--dts" ]
-  flashing_options += [ rebase_path("bl_factory_params_IoTKitA_32M_115200.dts",
+  flashing_options += [ rebase_path("bl_factory_params_IoTKitA_32M.dts",
                                     root_out_dir,
                                     root_out_dir) ]
   flashing_options += [ "--ota" ]
