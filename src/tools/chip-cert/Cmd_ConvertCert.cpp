@@ -87,21 +87,21 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <in-file/str> <out-file/stdout>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <in-file> <out-file>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Convert operational certificate between CHIP and X.509 formats.\n"
+    "Convert a certificate between CHIP and X509 forms.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <in-file/str>\n"
+    "  <in-file>\n"
     "\n"
-    "       File or string containing certificate to be converted.\n"
-    "       The format of the input certificate is auto-detected and can be any of:\n"
-    "       X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
+    "       The input certificate file name, or - to read from stdin. The\n"
+    "       format of the input certificate is auto-detected and can be any\n"
+    "       of: X.509 PEM, X.509 DER, CHIP base-64 or CHIP raw TLV.\n"
     "\n"
-    "  <out-file/stdout>\n"
+    "  <out-file>\n"
     "\n"
-    "       The output certificate file name, or '-' to write to stdout.\n"
+    "       The output certificate file name, or - to write to stdout.\n"
     "\n"
 );
 
@@ -113,9 +113,9 @@ OptionSet * gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gInFileNameOrStr = nullptr;
-const char * gOutFileName     = nullptr;
-CertFormat gOutCertFormat     = kCertFormat_Default;
+const char * gInFileName  = nullptr;
+const char * gOutFileName = nullptr;
+CertFormat gOutCertFormat = kCertFormat_Default;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -151,7 +151,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc == 0)
     {
-        PrintArgError("%s: Please specify the name of the input certificate file or the certificate string.\n", progName);
+        PrintArgError("%s: Please specify the name of the input certificate file, or - for stdin.\n", progName);
         return false;
     }
 
@@ -167,8 +167,8 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
         return false;
     }
 
-    gInFileNameOrStr = argv[0];
-    gOutFileName     = argv[1];
+    gInFileName  = argv[0];
+    gOutFileName = argv[1];
 
     return true;
 }
@@ -192,7 +192,7 @@ bool Cmd_ConvertCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileNameOrStr, cert.get());
+    res = ReadCert(gInFileName, cert.get());
     VerifyTrueOrExit(res);
 
     res = WriteCert(gOutFileName, cert.get(), gOutCertFormat);

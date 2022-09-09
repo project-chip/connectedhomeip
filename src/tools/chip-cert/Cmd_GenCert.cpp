@@ -110,29 +110,27 @@ const char * const gCmdOptionHelp =
     "\n"
     "       NID_info_access extension to be added to the list of certificate extensions.\n"
     "\n"
-    "   -C, --ca-cert <file/str>\n"
+    "   -C, --ca-cert <file>\n"
     "\n"
-    "       File or string containing CA certificate to be used to sign the new certificate.\n"
+    "       File containing CA certificate to be used to sign the new certificate.\n"
     "\n"
-    "   -K, --ca-key <file/str>\n"
+    "   -K, --ca-key <file>\n"
     "\n"
-    "       File or string containing CA private key to be used to sign the new certificate.\n"
+    "       File containing CA private key to be used to sign the new certificate.\n"
     "\n"
-    "   -k, --key <file/str>\n"
+    "   -k, --key <file>\n"
     "\n"
-    "       File or string containing the public and private keys for the new certificate.\n"
+    "       File containing the public and private keys for the new certificate.\n"
     "       If not specified, a new key pair will be generated.\n"
     "\n"
-    "   -o, --out <file/stdout>\n"
+    "   -o, --out <file>\n"
     "\n"
     "       File to contain the new certificate.\n"
-    "       If specified '-' then output is written to stdout.\n"
     "\n"
-    "   -O, --out-key <file/stdout>\n"
+    "   -O, --out-key <file>\n"
     "\n"
     "       File to contain the public/private key for the new certificate.\n"
     "       This option must be specified if the --key option is not.\n"
-    "       If specified '-' then output is written to stdout.\n"
     "\n"
     "  -F, --out-format <format>\n"
     "\n"
@@ -245,19 +243,19 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 ToolChipDN gSubjectDN;
-uint8_t gCertType                           = kCertType_NotSpecified;
-int gPathLengthConstraint                   = kPathLength_NotSpecified;
-bool gSelfSign                              = false;
-const char * gCACertFileNameOrStr           = nullptr;
-const char * gCAKeyFileNameOrStr            = nullptr;
-const char * gInKeyFileNameOrStr            = nullptr;
-const char * gOutCertFileName               = nullptr;
-const char * gOutKeyFileName                = nullptr;
-CertFormat gOutCertFormat                   = kCertFormat_Default;
-KeyFormat gOutKeyFormat                     = kKeyFormat_Default;
-uint32_t gValidDays                         = kCertValidDays_Undefined;
-FutureExtensionWithNID gFutureExtensions[3] = { { 0, nullptr } };
-uint8_t gFutureExtensionsCount              = 0;
+uint8_t gCertType                    = kCertType_NotSpecified;
+int gPathLengthConstraint            = kPathLength_NotSpecified;
+bool gSelfSign                       = false;
+const char * gCACertFileName         = nullptr;
+const char * gCAKeyFileName          = nullptr;
+const char * gInKeyFileName          = nullptr;
+const char * gOutCertFileName        = nullptr;
+const char * gOutKeyFileName         = nullptr;
+CertFormat gOutCertFormat            = kCertFormat_Default;
+KeyFormat gOutKeyFormat              = kKeyFormat_Default;
+uint32_t gValidDays                  = kCertValidDays_Undefined;
+FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
+uint8_t gFutureExtensionsCount       = 0;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -428,13 +426,13 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gFutureExtensionsCount++;
         break;
     case 'k':
-        gInKeyFileNameOrStr = arg;
+        gInKeyFileName = arg;
         break;
     case 'C':
-        gCACertFileNameOrStr = arg;
+        gCACertFileName = arg;
         break;
     case 'K':
-        gCAKeyFileNameOrStr = arg;
+        gCAKeyFileName = arg;
         break;
     case 'o':
         gOutCertFileName = arg;
@@ -749,18 +747,18 @@ bool Cmd_GenCert(int argc, char * argv[])
         }
     }
 
-    if (gCACertFileNameOrStr == nullptr && !gSelfSign)
+    if (gCACertFileName == nullptr && !gSelfSign)
     {
-        fprintf(stderr, "Please specify the CA certificate using the --ca-cert option.\n");
+        fprintf(stderr, "Please specify the CA certificate file name using the --ca-cert option.\n");
         ExitNow(res = false);
     }
-    else if (gCACertFileNameOrStr != nullptr && gSelfSign)
+    else if (gCACertFileName != nullptr && gSelfSign)
     {
         fprintf(stderr, "Please don't specify --ca-cert option for the self signed certificate. \n");
         ExitNow(res = false);
     }
 
-    if (gCACertFileNameOrStr != nullptr && gCAKeyFileNameOrStr == nullptr)
+    if (gCACertFileName != nullptr && gCAKeyFileName == nullptr)
     {
         fprintf(stderr, "Please specify the CA key file name using the --ca-key option.\n");
         ExitNow(res = false);
@@ -772,7 +770,7 @@ bool Cmd_GenCert(int argc, char * argv[])
         ExitNow(res = false);
     }
 
-    if (gInKeyFileNameOrStr == nullptr && gOutKeyFileName == nullptr)
+    if (gInKeyFileName == nullptr && gOutKeyFileName == nullptr)
     {
         fprintf(stderr, "Please specify the file name for the new public/private key using the --out-key option.\n");
         ExitNow(res = false);
@@ -812,9 +810,9 @@ bool Cmd_GenCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    if (gInKeyFileNameOrStr != nullptr)
+    if (gInKeyFileName != nullptr)
     {
-        res = ReadKey(gInKeyFileNameOrStr, newKey);
+        res = ReadKey(gInKeyFileName, newKey);
         VerifyTrueOrExit(res);
     }
     else
@@ -838,10 +836,10 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
     else
     {
-        res = ReadCert(gCACertFileNameOrStr, caCert.get());
+        res = ReadCert(gCACertFileName, caCert.get());
         VerifyTrueOrExit(res);
 
-        res = ReadKey(gCAKeyFileNameOrStr, caKey);
+        res = ReadKey(gCAKeyFileName, caKey);
         VerifyTrueOrExit(res);
 
         caCertPtr = caCert.get();

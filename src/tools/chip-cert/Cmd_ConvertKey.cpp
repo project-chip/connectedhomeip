@@ -110,26 +110,21 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <in-file/str> <out-file/stdout>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <in-file> <out-file>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Convert private/public key between CHIP and X.509 formats.\n"
+    "Convert a private key between CHIP and PEM/DER forms."
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "   <in-file/str>\n"
+    "   <in-file>\n"
     "\n"
-    "       File or string containing private/public key to be converted.\n"
-    "       The format of the input key is auto-detected and can be any of:\n"
-    "       X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
+    "       The input private key file name, or - to read from stdin. The\n"
+    "       format of the input key is auto-detected and can be any\n"
+    "       of: PEM, DER, CHIP base-64 or CHIP raw.\n"
     "\n"
-    "       Note: the private key formats include both private and public keys, while\n"
-    "       the public key formats include only public keys. Therefore, conversion from any\n"
-    "       private key format to public key is supported but conversion from public key\n"
-    "       to private CANNOT be done.\n"
+    "   <out-file>\n"
     "\n"
-    "   <out-file/stdout>\n"
-    "\n"
-    "       The output private key file name, or '-' to write to stdout.\n"
+    "       The output private key file name, or - to write to stdout.\n"
     "\n"
 );
 
@@ -141,7 +136,7 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-ormat on
 
-const char * gInFileNameOrStr = nullptr;
+const char * gInFileName = nullptr;
 const char * gOutFileName = nullptr;
 KeyFormat gOutFormat = kKeyFormat_Chip_Base64;
 
@@ -208,7 +203,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
         return false;
     }
 
-    gInFileNameOrStr  = argv[0];
+    gInFileName  = argv[0];
     gOutFileName = argv[1];
 
     return true;
@@ -233,7 +228,7 @@ bool Cmd_ConvertKey(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadKey(gInFileNameOrStr, key);
+    res = ReadKey(gInFileName, key);
     VerifyTrueOrExit(res);
 
     if (IsPrivateKeyFormat(gOutFormat) && EC_KEY_get0_private_key(EVP_PKEY_get1_EC_KEY(key.get())) == nullptr)

@@ -49,20 +49,20 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -d, --dac <file/str>\n"
+    "  -d, --dac <cert-file>\n"
     "\n"
-    "       File or string containing Device Attestation Certificate (DAC) to be validated.\n"
-    "       The DAC format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
+    "       A file containing Device Attestation Certificate (DAC) to be\n"
+    "       validated. The DAC is provided in the DER encoded format.\n"
     "\n"
-    "  -i, --pai <file/str>\n"
+    "  -i, --pai <cert-file>\n"
     "\n"
-    "       File or string containing Product Attestation Intermediate (PAI) Certificate.\n"
-    "       The PAI format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
+    "       A file containing Product Attestation Intermediate (PAI) Certificate.\n"
+    "       The PAI is provided in the DER encoded format.\n"
     "\n"
-    "  -a, --paa <file/str>\n"
+    "  -a, --paa <cert-file>\n"
     "\n"
-    "       File or string containing trusted Product Attestation Authority (PAA) Certificate.\n"
-    "       The PAA format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
+    "       A file containing trusted Product Attestation Authority (PAA) Certificate.\n"
+    "       The PAA is provided in the DER encoded format.\n"
     "\n"
     ;
 
@@ -89,22 +89,22 @@ OptionSet * gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gDACFileNameOrStr = nullptr;
-const char * gPAIFileNameOrStr = nullptr;
-const char * gPAAFileNameOrStr = nullptr;
+const char * gDACFileName = nullptr;
+const char * gPAIFileName = nullptr;
+const char * gPAAFileName = nullptr;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
     switch (id)
     {
     case 'd':
-        gDACFileNameOrStr = arg;
+        gDACFileName = arg;
         break;
     case 'i':
-        gPAIFileNameOrStr = arg;
+        gPAIFileName = arg;
         break;
     case 'a':
-        gPAAFileNameOrStr = arg;
+        gPAAFileName = arg;
         break;
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
@@ -171,37 +171,37 @@ bool Cmd_ValidateAttCert(int argc, char * argv[])
 
     VerifyOrReturnError(ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets), false);
 
-    if (gDACFileNameOrStr == nullptr)
+    if (gDACFileName == nullptr)
     {
-        fprintf(stderr, "Please specify the DAC certificate using the --dac option.\n");
+        fprintf(stderr, "Please specify the DAC certificate file name using the --dac option.\n");
         return false;
     }
 
-    if (gPAIFileNameOrStr == nullptr)
+    if (gPAIFileName == nullptr)
     {
-        fprintf(stderr, "Please specify the PAI certificate using the --pai option.\n");
+        fprintf(stderr, "Please specify the PAI certificate file name using the --pai option.\n");
         return false;
     }
 
-    if (gPAAFileNameOrStr == nullptr)
+    if (gPAAFileName == nullptr)
     {
-        fprintf(stderr, "Please specify the PAA certificate using the --paa option.\n");
+        fprintf(stderr, "Please specify the PAA certificate file name using the --paa option.\n");
         return false;
     }
 
-    if (!ReadCertDER(gDACFileNameOrStr, dac))
+    if (!ReadCertDERRaw(gDACFileName, dac))
     {
-        fprintf(stderr, "Failed to read DAC Certificate: %s\n", gDACFileNameOrStr);
+        fprintf(stderr, "Unable to open DAC Certificate File: %s\n", gDACFileName);
         return false;
     }
-    if (!ReadCertDER(gPAIFileNameOrStr, pai))
+    if (!ReadCertDERRaw(gPAIFileName, pai))
     {
-        fprintf(stderr, "Failed to read PAI Certificate: %s\n", gPAIFileNameOrStr);
+        fprintf(stderr, "Unable to open PAI Certificate File: %s\n", gPAIFileName);
         return false;
     }
-    if (!ReadCertDER(gPAAFileNameOrStr, paa))
+    if (!ReadCertDERRaw(gPAAFileName, paa))
     {
-        fprintf(stderr, "Failed to read PAA Certificate: %s\n", gPAAFileNameOrStr);
+        fprintf(stderr, "Unable to open PAA Certificate File: %s\n", gPAAFileName);
         return false;
     }
 

@@ -508,52 +508,51 @@ exit:
     return res;
 }
 
-} // namespace
-
-bool ReadCert(const char * fileNameOrStr, X509 * cert)
+bool ReadCertPEM(const char * fileName, X509 * cert)
 {
-    CertFormat origCertFmt;
-    return ReadCert(fileNameOrStr, cert, origCertFmt);
+    bool res    = true;
+    FILE * file = nullptr;
+
+    res = OpenFile(fileName, file);
+    VerifyTrueOrExit(res);
+
+    if (PEM_read_X509(file, &cert, nullptr, nullptr) == nullptr)
+    {
+        ReportOpenSSLErrorAndExit("PEM_read_X509", res = false);
+    }
+
+exit:
+    CloseFile(file);
+    return res;
 }
 
-bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
+} // namespace
+
+bool ReadCert(const char * fileName, X509 * cert)
+{
+    CertFormat origCertFmt;
+    return ReadCert(fileName, cert, origCertFmt);
+}
+
+bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
 {
     bool res         = true;
     uint32_t certLen = 0;
     std::unique_ptr<uint8_t[]> certBuf;
 
-    // If fileNameOrStr is a file name
-    if (access(fileNameOrStr, R_OK) == 0)
+    res = ReadFileIntoMem(fileName, nullptr, certLen);
+    VerifyTrueOrExit(res);
+
+    certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
+
+    res = ReadFileIntoMem(fileName, certBuf.get(), certLen);
+    VerifyTrueOrExit(res);
+
+    certFmt = DetectCertFormat(certBuf.get(), certLen);
+    if (certFmt == kCertFormat_Unknown)
     {
-        res = ReadFileIntoMem(fileNameOrStr, nullptr, certLen);
-        VerifyTrueOrExit(res);
-
-        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
-
-        res = ReadFileIntoMem(fileNameOrStr, certBuf.get(), certLen);
-        VerifyTrueOrExit(res);
-
-        certFmt = DetectCertFormat(certBuf.get(), certLen);
-        if (certFmt == kCertFormat_Unknown)
-        {
-            fprintf(stderr, "Unrecognized Cert Format in File: %s\n", fileNameOrStr);
-            return false;
-        }
-    }
-    // Otherwise, treat fileNameOrStr as a pointer to the certificate string
-    else
-    {
-        certLen = static_cast<uint32_t>(strlen(fileNameOrStr));
-
-        certFmt = DetectCertFormat(reinterpret_cast<const uint8_t *>(fileNameOrStr), certLen);
-        if (certFmt == kCertFormat_Unknown)
-        {
-            fprintf(stderr, "Unrecognized Cert Format in the Input Argument: %s\n", fileNameOrStr);
-            return false;
-        }
-
-        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
-        memcpy(certBuf.get(), fileNameOrStr, certLen);
+        fprintf(stderr, "Unrecognized Cert Format in File: %s\n", fileName);
+        return false;
     }
 
     if ((certFmt == kCertFormat_X509_Hex) || (certFmt == kCertFormat_Chip_Hex))
@@ -566,15 +565,8 @@ bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
 
     if (certFmt == kCertFormat_X509_PEM)
     {
-        VerifyOrReturnError(chip::CanCastTo<int>(certLen), false);
-
-        std::unique_ptr<BIO, void (*)(BIO *)> certBIO(
-            BIO_new_mem_buf(static_cast<const void *>(certBuf.get()), static_cast<int>(certLen)), &BIO_free_all);
-
-        if (PEM_read_bio_X509(certBIO.get(), &cert, nullptr, nullptr) == nullptr)
-        {
-            ReportOpenSSLErrorAndExit("PEM_read_bio_X509", res = false);
-        }
+        res = ReadCertPEM(fileName, cert);
+        VerifyTrueOrExit(res);
     }
     else if ((certFmt == kCertFormat_X509_DER) || (certFmt == kCertFormat_X509_Hex))
     {
@@ -620,12 +612,12 @@ exit:
     return res;
 }
 
-bool ReadCertDER(const char * fileNameOrStr, MutableByteSpan & cert)
+bool ReadCertDERRaw(const char * fileName, MutableByteSpan & cert)
 {
     bool res = true;
     std::unique_ptr<X509, void (*)(X509 *)> certX509(X509_new(), &X509_free);
 
-    VerifyOrReturnError(ReadCert(fileNameOrStr, certX509.get()), false);
+    VerifyOrReturnError(ReadCertPEM(fileName, certX509.get()) == true, false);
 
     uint8_t * certPtr = cert.data();
     int certLen       = i2d_X509(certX509.get(), &certPtr);
@@ -668,14 +660,14 @@ exit:
     return res;
 }
 
-bool LoadChipCert(const char * fileNameOrStr, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
+bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
     BitFlags<CertDecodeFlags> decodeFlags;
     std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
 
-    res = ReadCert(fileNameOrStr, cert.get());
+    res = ReadCert(fileName, cert.get());
     VerifyTrueOrExit(res);
 
     res = X509ToChipCert(cert.get(), chipCert);
@@ -693,7 +685,7 @@ bool LoadChipCert(const char * fileNameOrStr, bool isTrused, ChipCertificateSet 
     err = certSet.LoadCert(chipCert, decodeFlags);
     if (err != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "Error reading %s\n%s\n", fileNameOrStr, chip::ErrorStr(err));
+        fprintf(stderr, "Error reading %s\n%s\n", fileName, chip::ErrorStr(err));
         ExitNow(res = false);
     }
 
@@ -754,6 +746,8 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
         fprintf(stderr, "Unsupported certificate format\n");
         ExitNow(res = false);
     }
+
+    printf("\r\n");
 
 exit:
     OPENSSL_free(derCert);

@@ -72,20 +72,19 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "   -K, --key <file/str>\n"
+    "   -K, --key <file>\n"
     "\n"
-    "       File or string containing private key to be used to sign the Certification Declaration.\n"
+    "       File containing private key to be used to sign the Certification Declaration.\n"
     "\n"
-    "   -C, --cert <file/str>\n"
+    "   -C, --cert <file>\n"
     "\n"
-    "       File or string containing certificate associated with the private key that is used\n"
+    "       File containing certificate associated with the private key that is used\n"
     "       to sign the Certification Declaration. The Subject Key Identifier in the\n"
     "       certificate will be included in the signed Certification Declaration message.\n"
     "\n"
-    "   -O, --out <file/stdout>\n"
+    "   -O, --out <file>\n"
     "\n"
     "       File to contain the signed Certification Declaration message.\n"
-    "       If specified '-' then output is written to stdout.\n"
     "\n"
     "   -f, --format-version <int>\n"
     "\n"
@@ -135,9 +134,9 @@ const char * const gCmdOptionHelp =
     "\n"
     "       DAC Origin Product Id in hex.\n"
     "\n"
-    "   -a, --authorized-paa-cert <file/str>\n"
+    "   -a, --authorized-paa-cert <file>\n"
     "\n"
-    "       File or string containing PAA certificate authorized to sign PAI which signs the DAC\n"
+    "       File containing PAA certificate authorized to sign PAI which signs the DAC\n"
     "       for a product carrying this CD. This field is optional and if present, only specified\n"
     "       PAAs will be authorized to sign device's PAI for the lifetime of the generated CD.\n"
     "       Maximum 10 authorized PAA certificates can be specified.\n"
@@ -361,9 +360,9 @@ private:
 };
 
 CertificationElements gCertElements;
-const char * gCertFileNameOrStr = nullptr;
-const char * gKeyFileNameOrStr  = nullptr;
-const char * gSignedCDFileName  = nullptr;
+const char * gCertFileName     = nullptr;
+const char * gKeyFileName      = nullptr;
+const char * gSignedCDFileName = nullptr;
 CDStructConfig gCDConfig;
 
 bool ExtractSKIDFromX509Cert(X509 * cert, ByteSpan & skid)
@@ -381,10 +380,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     switch (id)
     {
     case 'C':
-        gCertFileNameOrStr = arg;
+        gCertFileName = arg;
         break;
     case 'K':
-        gKeyFileNameOrStr = arg;
+        gKeyFileName = arg;
         break;
     case 'O':
         gSignedCDFileName = arg;
@@ -484,9 +483,9 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
         {
-            const char * fileNameOrStr = arg;
+            const char * fileName = arg;
             std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
-            VerifyOrReturnError(ReadCert(fileNameOrStr, cert.get()), false);
+            VerifyOrReturnError(ReadCert(fileName, cert.get()), false);
 
             ByteSpan skid;
             VerifyOrReturnError(ExtractSKIDFromX509Cert(cert.get(), skid), false);
@@ -1099,15 +1098,15 @@ bool Cmd_GenCD(int argc, char * argv[])
                 "declaration.\n");
     }
 
-    if (gKeyFileNameOrStr == nullptr)
+    if (gKeyFileName == nullptr)
     {
-        fprintf(stderr, "Please specify the signing private key using the --key option.\n");
+        fprintf(stderr, "Please specify the signing private key file name using the --key option.\n");
         return false;
     }
 
-    if (gCertFileNameOrStr == nullptr)
+    if (gCertFileName == nullptr)
     {
-        fprintf(stderr, "Please specify the signing certificate using the --cert option.\n");
+        fprintf(stderr, "Please specify the signing certificate file name using the --cert option.\n");
         return false;
     }
 
@@ -1147,8 +1146,8 @@ bool Cmd_GenCD(int argc, char * argv[])
         std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
         std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> key(EVP_PKEY_new(), &EVP_PKEY_free);
 
-        VerifyOrReturnError(ReadCert(gCertFileNameOrStr, cert.get()), false);
-        VerifyOrReturnError(ReadKey(gKeyFileNameOrStr, key), false);
+        VerifyOrReturnError(ReadCert(gCertFileName, cert.get()), false);
+        VerifyOrReturnError(ReadKey(gKeyFileName, key), false);
 
         // Extract the subject key id from the X509 certificate.
         ByteSpan signerKeyId;

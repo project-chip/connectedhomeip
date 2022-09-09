@@ -50,15 +50,15 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -c, --cert <file/str>\n"
+    "  -c, --cert <cert-file>\n"
     "\n"
-    "       File or string containing an untrusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is Intermediate CA certificate (ICAC).\n"
+    "       A file containing an untrusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is Intermediate CA certificate.\n"
     "\n"
-    "  -t, --trusted-cert <file/str>\n"
+    "  -t, --trusted-cert <cert-file>\n"
     "\n"
-    "       File or string containing a trusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is trust anchor root certificate (RCAC).\n"
+    "       A file containing a trusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is trust anchor root certificate.\n"
     "\n"
     ;
 
@@ -72,17 +72,15 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <file/str>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <target-cert-file>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
     "Validate a chain of CHIP certificates.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <file/str>\n"
+    "  <target-cert-file>\n"
     "\n"
-    "      File or string containing the certificate to be validated.\n"
-    "      The formats of all input certificates are auto-detected and can be any of:\n"
-    "      X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
+    "      A file containing the certificate to be validated.\n"
     "\n"
 );
 

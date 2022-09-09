@@ -46,10 +46,10 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "   -o, --out <file/stdout>\n"
+    "   -o, --out\n"
     "\n"
     "       The output printed certificate file name. If not specified\n"
-    "       or if specified '-' then output is written to stdout.\n"
+    "       or if specified - then output is written to stdout.\n"
     "\n"
     ;
 
@@ -63,15 +63,15 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [<options...>] <file/str>\n",
+    "Usage: " CMD_NAME " [<options...>] <cert-file>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Print a CHIP operational certificate.\n"
+    "Print a CHIP certificate.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <file/str>\n"
+    "  <cert-file>\n"
     "\n"
-    "       File or string containing a CHIP certificate.\n"
+    "       A file containing a CHIP certificate.\n"
     "\n"
 );
 
@@ -83,8 +83,8 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gInFileNameOrStr = nullptr;
-const char * gOutFileName     = "-";
+const char * gInFileName  = nullptr;
+const char * gOutFileName = "-";
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -115,7 +115,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
         return false;
     }
 
-    gInFileNameOrStr = argv[0];
+    gInFileName = argv[0];
 
     return true;
 }
@@ -385,7 +385,7 @@ bool Cmd_PrintCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileNameOrStr, cert.get());
+    res = ReadCert(gInFileName, cert.get());
     VerifyTrueOrExit(res);
 
     res = PrintCert(gOutFileName, cert.get());
