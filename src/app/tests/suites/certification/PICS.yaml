@@ -30,9 +30,6 @@ PICS:
     - label: "Does the device support manufacturing date"
       id: MANF_DATE
 
-    - label: "Does the device support part number"
-      id: PART_NUM
-
     - label: "Does the device support Intermediate CA Certificate"
       id: DM_ICACERT
 
@@ -80,7 +77,7 @@ PICS:
     - label: "Does the device implement the CompensationText attribute?"
       id: CC.S.A0006
 
-    - label: "Does the device implement the ColorTemperatureMireds attribute?"
+    - label: "Does the device implement the ColorTemperature attribute?"
       id: CC.S.A0007
 
     - label: "Does the device implement the ColorMode attribute?"
@@ -325,7 +322,7 @@ PICS:
     - label: "Does the device implement the CompensationText attribute?"
       id: CC.C.A0006
 
-    - label: "Does the device implement the ColorTemperatureMireds attribute?"
+    - label: "Does the device implement the ColorTemperature attribute?"
       id: CC.C.A0007
 
     - label: "Does the device implement the ColorMode attribute?"

@@ -237,9 +237,8 @@ tests:
               maxValue: 65279
 
     - label:
-          "TH sends MoveToColorTemperature command to DUT with
-          ColorTemperatureMireds= ColorTempPhysicalMaxMireds / 2 and
-          TransitionTime=0 (immediately)."
+          "TH sends MoveToColorTemperature command to DUT with ColorTemperature=
+          ColorTempPhysicalMaxMireds / 2 and TransitionTime=0 (immediately)."
       PICS: CC.S.C0a.Rsp
       command: "MoveToColorTemperature"
       arguments:
@@ -304,12 +303,12 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          saveAs: ColorTemperatureMiredsStep4f
+          saveAs: ColorTemperatureStep4f
           constraints:
               minValue:
                   ( ColorTempPhysicalMaxMireds + ColorTempPhysicalMinMireds ) /
@@ -324,12 +323,12 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          value: ColorTemperatureMiredsStep4f
+          value: ColorTemperatureStep4f
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=20000,
