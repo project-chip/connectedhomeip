@@ -578,9 +578,9 @@ typedef void (*BinaryInputBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DescriptorDeviceListListAttributeCallback)(
+typedef void (*DescriptorDeviceTypeListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & data);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context,
@@ -3261,43 +3261,46 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorDeviceListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>
+class MTRDescriptorDeviceTypeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>
 {
 public:
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                       bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                     keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                           MTRDeviceController * controller, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
 
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> &
+            value);
 };
 
-class MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge : public MTRDescriptorDeviceListListAttributeCallbackBridge
+class MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge
+    : public MTRDescriptorDeviceTypeListListAttributeCallbackBridge
 {
 public:
-    MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        MTRDescriptorDeviceListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        MTRDescriptorDeviceListListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
