@@ -67,7 +67,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -79,7 +79,7 @@ tests:
 
     - label:
           "TH sends MoveToColorTemperature command to DUT with
-          ColorTemperatureMireds=310 and TransitionTime=0 (immediately)."
+          ColorTemperature=310 and TransitionTime=0 (immediately)."
       PICS: CC.S.F04 && CC.S.C0a.Rsp
       command: "MoveToColorTemperature"
       arguments:
@@ -103,7 +103,7 @@ tests:
 
     - label:
           "TH sends MoveToColorTemperatur command to DUT with
-          ColorTemperatureMireds=250 and TransitionTime=300 (30s)."
+          ColorTemperature=250 and TransitionTime=300 (30s)."
       PICS: CC.S.F04 && CC.S.C0a.Rsp
       command: "MoveToColorTemperature"
       arguments:
@@ -125,7 +125,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C0a.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -142,7 +142,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C0a.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -159,7 +159,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C0a.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -176,7 +176,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "TH reads ColorTemperature attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C0a.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"

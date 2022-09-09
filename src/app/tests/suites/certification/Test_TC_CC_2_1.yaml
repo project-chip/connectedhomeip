@@ -100,7 +100,7 @@ tests:
               type: char_string
               maxLength: 254
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT"
+    - label: "TH reads ColorTemperature attribute from DUT"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"

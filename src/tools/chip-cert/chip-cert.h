@@ -400,10 +400,10 @@ extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
-extern bool ReadCert(const char * fileName, X509 * cert);
-extern bool ReadCert(const char * fileName, X509 * cert, CertFormat & origCertFmt);
-extern bool ReadCertDERRaw(const char * fileName, chip::MutableByteSpan & cert);
-extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert);
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCertDER(const char * fileNameOrStr, chip::MutableByteSpan & cert);
+extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);
 
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
@@ -423,7 +423,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
-extern bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
+extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
                     bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
 extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
