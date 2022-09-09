@@ -160,7 +160,7 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 
 void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
 {
-    const otExtAddress *extAddr;
+    const otExtAddress * extAddr;
     LockThreadStack();
     extAddr = otLinkGetExtendedAddress(OTInstance());
     UnlockThreadStack();
