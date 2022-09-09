@@ -25,6 +25,7 @@
 
 #include "SetupPayload.h"
 
+#include <algorithm>
 #include <lib/core/CHIPError.h>
 #include <string>
 #include <utility>
@@ -41,7 +42,15 @@ private:
     std::string mDecimalStringRepresentation;
 
 public:
-    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(std::move(decimalRepresentation)) {}
+    ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(std::move(decimalRepresentation))
+    {
+        // '-' might be being used in the decimal code as a digit group
+        // separator, to aid in readability.  It's not actually part of the
+        // decomal code, so strip it out.
+        mDecimalStringRepresentation.erase(
+            std::remove(mDecimalStringRepresentation.begin(), mDecimalStringRepresentation.end(), '-'),
+            mDecimalStringRepresentation.end());
+    }
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 
     static CHIP_ERROR CheckDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit);

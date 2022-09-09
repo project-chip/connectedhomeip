@@ -285,13 +285,13 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, CHIP_ERROR_INTERNAL);
+    callback(context, nullptr, 0, true, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), CHIP_NO_ERROR);
+    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -408,7 +408,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     }
 #endif // CHIP_DETAIL_LOGGING
     ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, port, txtString.c_str());
+                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

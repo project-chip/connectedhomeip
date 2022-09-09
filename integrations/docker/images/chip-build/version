@@ -1,1 +1,1 @@
-0.5.98 Version bump reason: Update Telink Docker
+0.5.99 Version bump reason: fix IMX SDK root in vscode dockerfile

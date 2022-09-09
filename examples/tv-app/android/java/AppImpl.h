@@ -53,10 +53,9 @@
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
 CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager);
-CHIP_ERROR PreServerInit();
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager);
-void SendTestMessage(EndpointId epID, const char * message);
+EndpointId RemoveContentApp(EndpointId epId);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -133,7 +132,7 @@ public:
 
     EndpointId AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager);
 
-    void SendTestMessage(EndpointId epID, const char * message);
+    EndpointId RemoveContentApp(EndpointId epId);
 
     // Gets the catalog vendor ID used by this platform
     uint16_t GetPlatformCatalogVendorId() override;

@@ -314,7 +314,7 @@ CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
         }
     }
 exit:
-    ctx->mBrowseCb(ctx->mCbContext, ctx->mServices, ctx->mServiceSize, error);
+    ctx->mBrowseCb(ctx->mCbContext, ctx->mServices, ctx->mServiceSize, true, error);
     return RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
 }
 

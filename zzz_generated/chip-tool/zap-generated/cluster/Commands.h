@@ -5045,7 +5045,7 @@ private:
 | * CurrentY                                                          | 0x0004 |
 | * DriftCompensation                                                 | 0x0005 |
 | * CompensationText                                                  | 0x0006 |
-| * ColorTemperature                                                  | 0x0007 |
+| * ColorTemperatureMireds                                            | 0x0007 |
 | * ColorMode                                                         | 0x0008 |
 | * Options                                                           | 0x000F |
 | * NumberOfPrimaries                                                 | 0x0010 |
@@ -11411,52 +11411,53 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "current-hue", Attributes::CurrentHue::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "current-saturation", Attributes::CurrentSaturation::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "current-x", Attributes::CurrentX::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "current-y", Attributes::CurrentY::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "drift-compensation", Attributes::DriftCompensation::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary1intensity", Attributes::Primary1Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "primary2x", Attributes::Primary2X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary2y", Attributes::Primary2Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary2intensity", Attributes::Primary2Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "primary3x", Attributes::Primary3X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary3y", Attributes::Primary3Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary3intensity", Attributes::Primary3Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "primary4x", Attributes::Primary4X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary4y", Attributes::Primary4Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary4intensity", Attributes::Primary4Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "primary5x", Attributes::Primary5X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary5y", Attributes::Primary5Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary5intensity", Attributes::Primary5Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "primary6x", Attributes::Primary6X::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary6y", Attributes::Primary6Y::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "primary6intensity", Attributes::Primary6Intensity::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "white-point-x", Attributes::WhitePointX::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "white-point-y", Attributes::WhitePointY::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "color-point-rx", Attributes::ColorPointRX::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-ry", Attributes::ColorPointRY::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-rintensity", Attributes::ColorPointRIntensity::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "color-point-gx", Attributes::ColorPointGX::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-gy", Attributes::ColorPointGY::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-gintensity", Attributes::ColorPointGIntensity::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "color-point-bx", Attributes::ColorPointBX::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-by", Attributes::ColorPointBY::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "color-point-bintensity", Attributes::ColorPointBIntensity::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "enhanced-current-hue", Attributes::EnhancedCurrentHue::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "enhanced-color-mode", Attributes::EnhancedColorMode::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "color-loop-active", Attributes::ColorLoopActive::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "color-loop-direction", Attributes::ColorLoopDirection::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "color-loop-time", Attributes::ColorLoopTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "current-hue", Attributes::CurrentHue::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "current-saturation", Attributes::CurrentSaturation::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "current-x", Attributes::CurrentX::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "current-y", Attributes::CurrentY::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "drift-compensation", Attributes::DriftCompensation::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "color-temperature-mireds", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "color-temperature", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "primary1x", Attributes::Primary1X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary1y", Attributes::Primary1Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary1intensity", Attributes::Primary1Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "primary2x", Attributes::Primary2X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary2y", Attributes::Primary2Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary2intensity", Attributes::Primary2Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "primary3x", Attributes::Primary3X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary3y", Attributes::Primary3Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary3intensity", Attributes::Primary3Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "primary4x", Attributes::Primary4X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary4y", Attributes::Primary4Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary4intensity", Attributes::Primary4Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "primary5x", Attributes::Primary5X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary5y", Attributes::Primary5Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary5intensity", Attributes::Primary5Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "primary6x", Attributes::Primary6X::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary6y", Attributes::Primary6Y::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "primary6intensity", Attributes::Primary6Intensity::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "white-point-x", Attributes::WhitePointX::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "white-point-y", Attributes::WhitePointY::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "color-point-rx", Attributes::ColorPointRX::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-ry", Attributes::ColorPointRY::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-rintensity", Attributes::ColorPointRIntensity::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "color-point-gx", Attributes::ColorPointGX::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-gy", Attributes::ColorPointGY::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-gintensity", Attributes::ColorPointGIntensity::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "color-point-bx", Attributes::ColorPointBX::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-by", Attributes::ColorPointBY::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "color-point-bintensity", Attributes::ColorPointBIntensity::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "enhanced-current-hue", Attributes::EnhancedCurrentHue::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "enhanced-color-mode", Attributes::EnhancedColorMode::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "color-loop-active", Attributes::ColorLoopActive::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "color-loop-direction", Attributes::ColorLoopDirection::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "color-loop-time", Attributes::ColorLoopTime::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "color-loop-start-enhanced-hue", Attributes::ColorLoopStartEnhancedHue::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "color-loop-stored-enhanced-hue", Attributes::ColorLoopStoredEnhancedHue::Id,
@@ -11501,16 +11502,18 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
             Id, "color-point-bintensity", 0, UINT8_MAX, Attributes::ColorPointBIntensity::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
             Id, "start-up-color-temperature-mireds", 0, UINT16_MAX, Attributes::StartUpColorTemperatureMireds::Id,
-            credsIssuerConfig),                                                                                                 //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "current-hue", Attributes::CurrentHue::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "current-saturation", Attributes::CurrentSaturation::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "current-x", Attributes::CurrentX::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "current-y", Attributes::CurrentY::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "drift-compensation", Attributes::DriftCompensation::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::ColorTemperature::Id, credsIssuerConfig),          //
+            credsIssuerConfig),                                                                                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "current-hue", Attributes::CurrentHue::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "current-saturation", Attributes::CurrentSaturation::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "current-x", Attributes::CurrentX::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "current-y", Attributes::CurrentY::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "drift-compensation", Attributes::DriftCompensation::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "color-temperature-mireds", Attributes::ColorTemperatureMireds::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //

@@ -25,7 +25,6 @@ if (bl602_board == "") {
 assert(bl602_board != "", "bl602_board must be specified")
 
 board_defines = []
-#  bl602_family = ""
 #  bl602_mcu = ""
 #  enable_fem = true
 #  board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]

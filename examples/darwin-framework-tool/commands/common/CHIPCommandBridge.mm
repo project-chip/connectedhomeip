@@ -32,6 +32,9 @@ std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
 OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
+constexpr const char * kTrustStorePathVariable = "PAA_TRUST_STORE_PATH";
+
+CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
@@ -55,13 +58,55 @@ CHIP_ERROR CHIPCommandBridge::Run()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CHIPCommandBridge::GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult)
+{
+    NSMutableArray * paaCerts = [[NSMutableArray alloc] init];
+
+    if (!mPaaTrustStorePath.HasValue()) {
+        char * const trust_store_path = getenv(kTrustStorePathVariable);
+        if (trust_store_path != nullptr) {
+            mPaaTrustStorePath.SetValue(trust_store_path);
+        }
+    }
+    if (mPaaTrustStorePath.HasValue()) {
+        NSError * error;
+        NSString * paaStorePath = [NSString stringWithCString:mPaaTrustStorePath.Value() encoding:NSUTF8StringEncoding];
+        NSArray * derFolder = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:paaStorePath error:&error];
+        if (error) {
+            NSLog(@"Error: %@", error);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        NSArray * derFiles = [derFolder filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self ENDSWITH '.der'"]];
+        if ([derFiles count] == 0) {
+            NSLog(@"Unable to find DER cert files");
+            return CHIP_ERROR_INTERNAL;
+        }
+        for (id derFile in derFiles) {
+            NSString * certPath = [NSString stringWithFormat:@"%@/%@", paaStorePath, derFile];
+            NSData * fileData = [NSData dataWithContentsOfFile:certPath];
+            if (fileData) {
+                [paaCerts addObject:fileData];
+            }
+        }
+    } else {
+        return CHIP_NO_ERROR;
+    }
+    if ([paaCerts count] == 0) {
+        NSLog(@"Unable to find PAA certs");
+        return CHIP_ERROR_INTERNAL;
+    }
+    *paaCertsResult = paaCerts;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
 {
     if (IsInteractive()) {
         return CHIP_NO_ERROR;
     }
     NSData * ipk;
-    CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
+    gNocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     mOTADelegate = [[OTAProviderDelegate alloc] init];
@@ -76,19 +121,24 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     params.port = @(kListenPort);
     params.startServer = YES;
     params.otaProviderDelegate = mOTADelegate;
+    NSArray<NSData *> * paaCertResults;
+    ReturnLogErrorOnFailure(GetPAACertsFromFolder(&paaCertResults));
+    if ([paaCertResults count] > 0) {
+        params.paaCerts = paaCertResults;
+    }
 
     if ([factory startup:params] == NO) {
         ChipLogError(chipTool, "Controller factory startup failed");
         return CHIP_ERROR_INTERNAL;
     }
 
-    ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
+    ReturnLogErrorOnFailure([gNocSigner createOrLoadKeys:storage]);
 
-    ipk = [nocSigner getIPK];
+    ipk = [gNocSigner getIPK];
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
                                                                                         fabricId:(i + 1)
                                                                                              ipk:ipk];
 
@@ -134,12 +184,35 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
-void CHIPCommandBridge::ShutdownCommissioner()
+void CHIPCommandBridge::StopCommissioners()
 {
-    ChipLogProgress(chipTool, "Shutting down controller");
     for (auto & pair : mControllers) {
         [pair.second shutdown];
     }
+}
+
+void CHIPCommandBridge::RestartCommissioners()
+{
+    StopCommissioners();
+
+    auto factory = [MTRControllerFactory sharedInstance];
+    NSData * ipk = [gNocSigner getIPK];
+
+    constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
+    for (size_t i = 0; i < ArraySize(identities); ++i) {
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
+
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
+        mControllers[identities[i]] = controller;
+    }
+}
+
+void CHIPCommandBridge::ShutdownCommissioner()
+{
+    ChipLogProgress(chipTool, "Shutting down controller");
+    StopCommissioners();
     mControllers.clear();
     mCurrentController = nil;
 

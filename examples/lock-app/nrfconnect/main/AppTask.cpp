@@ -504,10 +504,7 @@ void AppTask::LockStateChanged(BoltLockManager::State state, BoltLockManager::Op
         break;
     }
 
-    if (source != BoltLockManager::OperationSource::kRemote)
-    {
-        sAppTask.UpdateClusterState(state, source);
-    }
+    sAppTask.UpdateClusterState(state, source);
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)

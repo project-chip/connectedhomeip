@@ -230,7 +230,9 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
         return;
     }
 
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     ChipLogError(Discovery, "Insufficient parsers to process all SRV entries.");
+#endif
 }
 
 void PacketParser::ParseSrvRecords(const BytesRange & packet)

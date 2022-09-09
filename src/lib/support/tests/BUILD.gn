@@ -60,7 +60,12 @@ chip_test_suite("tests") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+
+    # TODO(#21255): work-around for SimpleStateMachine constructor issue.
+    "-Wno-error=uninitialized",
+  ]
 
   public_deps = [
     "${chip_root}/src/credentials",

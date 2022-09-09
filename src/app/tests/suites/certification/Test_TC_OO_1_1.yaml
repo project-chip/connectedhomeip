@@ -42,20 +42,20 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: OO.S.F00
+      PICS: " !OO.S.F00 "
       response:
           value: 1
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Given OO.S.F00(LT) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: " !OO.S.F00 "
+      PICS: OO.S.F00
       response:
-          value: 0
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

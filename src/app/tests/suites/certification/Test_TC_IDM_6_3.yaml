@@ -32,18 +32,15 @@ tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+      disabled: true
 
-
-          Please  run this test in chip tool interactive mode ./chip-tool interactive start
-
+    - label: "DUT sends Read Request Message to the TH for a supported event."
+      verification: |
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
            On TH(Reference app) verify  the Read Request Message received has these fields
            EventRequests, EventFilters and FabricFiltered
 
           If the DUT has to provision to verify the logs,   verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
-
-
-
           [1655210591.986723][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1655210591.986748][4218:4223] CHIP:TOO:          Event number: 65536
           [1655210591.986771][4218:4223] CHIP:TOO:          Priority: Critical

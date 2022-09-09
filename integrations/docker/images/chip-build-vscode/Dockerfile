@@ -45,7 +45,7 @@ COPY --from=k32w /opt/sdk /opt/k32w_sdk
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
+COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
 
 COPY --from=zap /opt/zap /opt/zap
 
@@ -78,7 +78,7 @@ ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 ENV EFR32_BOARD=BRD4161A
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
-ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.15-kirkstone/
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV NXP_K32W0_SDK_ROOT=/opt/k32w_sdk
 ENV OPENOCD_PATH=/opt/openocd/
@@ -88,7 +88,7 @@ ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.11.0
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 

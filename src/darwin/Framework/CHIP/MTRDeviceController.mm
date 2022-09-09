@@ -60,6 +60,7 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -106,6 +107,11 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             return nil;
         }
 
+        _partialDACVerifier = new chip::Credentials::PartialDACVerifier();
+        if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kErrorPartialDacVerifierInit]) {
+            return nil;
+        }
+
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate();
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
@@ -145,6 +151,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         _cppCommissioner->Shutdown();
         delete _cppCommissioner;
         _cppCommissioner = nullptr;
+        if (_operationalCredentialsDelegate != nil) {
+            _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
+        }
     }
 }
 
@@ -158,6 +167,11 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     if (_operationalCredentialsDelegate) {
         delete _operationalCredentialsDelegate;
         _operationalCredentialsDelegate = nullptr;
+    }
+
+    if (_partialDACVerifier) {
+        delete _partialDACVerifier;
+        _partialDACVerifier = nullptr;
     }
 
     if (_pairingDelegateBridge) {
@@ -445,8 +459,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                 timeoutSecs
                     = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
             }
+            BOOL shouldWaitAfterDeviceAttestation = NO;
+            if ([commissioningParams.deviceAttestationDelegate
+                    respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
+                shouldWaitAfterDeviceAttestation = YES;
+            }
             _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
-                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
+                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 
@@ -472,7 +491,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             : chip::Credentials::AttestationVerificationResult::kSuccess;
 
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
-        auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceProxy,
+        auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -677,35 +696,27 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     });
 }
 
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
++ (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
 {
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+    chip::Spake2pVerifier verifier;
+    CHIP_ERROR err = verifier.Generate(iterations, AsByteSpan(salt), setupPincode);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("computePaseVerifier generation failed: %s", chip::ErrorStr(err));
         return nil;
     }
 
-    __block NSData * result;
-    __block chip::Spake2pVerifier paseVerifier;
-    __block chip::ByteSpan saltByteSpan = chip::ByteSpan(static_cast<const uint8_t *>(salt.bytes), salt.length);
+    uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
+    chip::MutableByteSpan serializedBytes(serializedBuffer);
+    err = verifier.Serialize(serializedBytes);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("computePaseVerifier serialization failed: %s", chip::ErrorStr(err));
+        return nil;
+    }
 
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->ComputePASEVerifier(iterations, setupPincode, saltByteSpan, paseVerifier);
-            MTR_LOG_ERROR("ComputePaseVerifier: %s", chip::ErrorStr(errorCode));
-
-            uint8_t serializedVerifier[sizeof(paseVerifier.mW0) + sizeof(paseVerifier.mL)];
-            memcpy(serializedVerifier, paseVerifier.mW0, chip::kSpake2p_WS_Length);
-            memcpy(&serializedVerifier[sizeof(paseVerifier.mW0)], paseVerifier.mL, sizeof(paseVerifier.mL));
-
-            result = [NSData dataWithBytes:serializedVerifier length:sizeof(serializedVerifier)];
-        }
-    });
-
-    return result;
+    return AsData(serializedBytes);
 }
 
-- (nullable NSData *)generateAttestationChallengeForDeviceId:(uint64_t)deviceId
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 

@@ -28,13 +28,19 @@
 #pragma once
 
 constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityBeta[] = "beta";
 constexpr const char kIdentityGamma[] = "gamma";
 
-class CHIPCommandBridge : public Command
-{
+class CHIPCommandBridge : public Command {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
+    CHIPCommandBridge(const char * commandName)
+        : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
+            "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
+            "directory.");
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -95,9 +101,13 @@ protected:
 
     static std::set<CHIPCommandBridge *> sDeferredCleanups;
 
+    void StopCommissioners();
+
+    void RestartCommissioners();
+
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                      const chip::Credentials::AttestationTrustStore * trustStore);
+    CHIP_ERROR InitializeCommissioner(
+        std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);
     void ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
@@ -109,6 +119,8 @@ private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();
 
+    CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
+
     // Our three controllers: alpha, beta, gamma.
     static std::map<std::string, MTRDeviceController *> mControllers;
 
@@ -118,6 +130,7 @@ private:
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
-    bool mWaitingForResponse{ true };
+    bool mWaitingForResponse { true };
     static dispatch_queue_t mOTAProviderCallbackQueue;
+    chip::Optional<char *> mPaaTrustStorePath;
 };

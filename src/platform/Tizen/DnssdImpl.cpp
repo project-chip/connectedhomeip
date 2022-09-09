@@ -124,7 +124,7 @@ gboolean OnBrowseTimeout(void * userData)
     auto * bCtx = reinterpret_cast<BrowseContext *>(userData);
 
     bCtx->MainLoopQuit();
-    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
+    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), true, CHIP_NO_ERROR);
 
     // After this point the context might be no longer valid
     bCtx->mInstance->RemoveContext(bCtx);
@@ -215,7 +215,7 @@ exit:
 
     if (ret != DNSSD_ERROR_NONE)
     {
-        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, GetChipError(ret));
+        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, true, GetChipError(ret));
         // After this point the context might be no longer valid
         bCtx->mInstance->RemoveContext(bCtx);
     }
@@ -614,7 +614,7 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, 0, err);
+        callback(context, nullptr, 0, true, err);
         RemoveContext(browseCtx);
     }
     return err;

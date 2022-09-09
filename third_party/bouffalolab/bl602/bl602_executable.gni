@@ -22,7 +22,7 @@ template("bl602_executable") {
 
   objcopy_image_name = output_base_name + ".bin"
   objcopy_image_format = "binary"
-  objcopy = "${root_build_dir}/../../third_party/bouffalolab/bl602_sdk/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
+  objcopy = "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
 
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably

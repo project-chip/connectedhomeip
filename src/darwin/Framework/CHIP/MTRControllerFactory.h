@@ -52,6 +52,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts;
 /*
+ * The Certificate Declaration certificates that are trusted to sign
+ * device attestation information.  Defaults to nil.
+ *
+ */
+@property (nonatomic, copy, nullable) NSArray<NSData *> * cdCerts;
+/*
  * The network port to bind to.  If not specified, an ephemeral port will be
  * used.
  */

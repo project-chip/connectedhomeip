@@ -151,7 +151,6 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     header.ClearDestinationNodeId();
     header.SetSessionType(Header::SessionType::kGroupSession);
-    header.SetFlags(Header::SecFlagValues::kPrivacyFlag);
     header.SetSecureSessionControlMsg(false);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
@@ -165,7 +164,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.IsValidGroupMsg());
 
     // Verify MCSP state
-    header.ClearDestinationGroupId().SetDestinationNodeId(42).SetFlags(Header::SecFlagValues::kPrivacyFlag);
+    header.ClearDestinationGroupId().SetDestinationNodeId(42);
     header.SetSecureSessionControlMsg(true);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
@@ -174,7 +173,6 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(42ull));
     NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
-    NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
     NL_TEST_ASSERT(inSuite, header.IsValidMCSPMsg());
 }
 

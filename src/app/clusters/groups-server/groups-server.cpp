@@ -90,17 +90,16 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 
     auto it    = provider->IterateGroupKeys(fabricIndex);
     bool found = false;
-    while (it->Next(entry) && !found)
+    while (!found && it->Next(entry))
     {
-        found = (entry.group_id == groupId);
+        if (entry.group_id == groupId)
+        {
+            GroupDataProvider::KeySet keys;
+            found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
+        }
     }
     it->Release();
 
-    if (found)
-    {
-        GroupDataProvider::KeySet keys;
-        found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
-    }
     return found;
 }
 
