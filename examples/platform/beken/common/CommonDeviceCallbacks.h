@@ -15,29 +15,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file DeviceCallbacks.h
- *
- * Implementations for the DeviceManager callbacks for this application
- *
- **/
-
 #pragma once
 
 #include <app/util/af-types.h>
 #include <common/CHIPDeviceManager.h>
-#include <common/CommonDeviceCallbacks.h>
 #include <platform/CHIPDeviceLayer.h>
 
-class AppDeviceCallbacks : public CommonDeviceCallbacks
+class CommonDeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
-    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
+    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) override;
 
 private:
-    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-    void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-    void OnLevelControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
+    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+};
+
+class DeviceCallbacksDelegate
+{
+public:
+    static DeviceCallbacksDelegate & Instance()
+    {
+        static DeviceCallbacksDelegate instance;
+        return instance;
+    }
+    virtual void OnIPv4ConnectivityEstablished() {}
+    virtual void OnIPv4ConnectivityLost() {}
+    void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
+    DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
+
+private:
+    DeviceCallbacksDelegate * mDelegate = nullptr;
 };
