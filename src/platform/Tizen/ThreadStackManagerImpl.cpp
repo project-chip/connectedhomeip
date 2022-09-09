@@ -532,7 +532,20 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
 
     int threadErr;
 
-    threadErr = thread_srp_client_register_service(mThreadInstance, aInstanceName, aName, aPort);
+    std::vector<thread_dns_txt_entry_s> entries;
+    entries.reserve(aTxtEntries.size());
+
+    thread_dns_txt_entry_s * ee = entries.data();
+    for (auto & entry : aTxtEntries)
+    {
+        ee->key       = entry.mKey;
+        ee->value     = entry.mData;
+        ee->value_len = entry.mDataSize;
+        ee++;
+    }
+
+    threadErr =
+        thread_srp_client_register_service_full(mThreadInstance, aInstanceName, aName, aPort, 0, 0, entries.data(), entries.size());
     VerifyOrReturnError(
         threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE,
         (ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
