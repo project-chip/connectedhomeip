@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
@@ -40,6 +42,7 @@ import java.util.Map;
  */
 public class AppPlatformService {
 
+  private static final String TAG = "AppPlatformService";
   private static final String MATTER_APPPLATFORM_ENDPOINTS = "matter.appplatform.endpoints";
   private AppPlatform mAppPlatform;
   private BroadcastReceiver mBroadcastReceiver;
@@ -143,6 +146,8 @@ public class AppPlatformService {
     if (retEndpointId > 0) {
       app.setEndpointId(retEndpointId);
       discoveredEndpoints.edit().putInt(app.getAppName(), app.getEndpointId()).apply();
+    } else {
+      Log.e(TAG, "Could not add content app as endpoint. App Name " + app.getAppName());
     }
   }
 

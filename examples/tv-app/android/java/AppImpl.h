@@ -31,6 +31,7 @@
 #include <lib/support/JniReferences.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <lib/core/DataModelTypes.h>
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
@@ -115,6 +116,7 @@ protected:
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
+
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
@@ -132,9 +134,11 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
-    EndpointId AddContentApp(ContentAppImpl * app);
+    EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager);
 
-    EndpointId AddContentApp(ContentAppImpl * app, EndpointId desiredEndpointId);
+    EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager, EndpointId desiredEndpointId);
 
     EndpointId RemoveContentApp(EndpointId epId);
 
@@ -160,6 +164,7 @@ protected:
         new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
         new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
     };
+    std::vector<DataVersion*> mDataVersions{};
 
     std::vector<uint16_t> mAdminVendorIds{};
 };

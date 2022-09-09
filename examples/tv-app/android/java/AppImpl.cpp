@@ -35,7 +35,6 @@
 #include <inttypes.h>
 #include <jni.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/DataModelTypes.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
@@ -320,26 +319,34 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
+EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager)
 {
-    DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
-    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+    DataVersion* dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    ContentAppImpl * app =
+        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
                                                                       Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
+    mDataVersions.push_back(dataVersionBuf);
     return epId;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, EndpointId desiredEndpointId)
+EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, jobject manager, EndpointId desiredEndpointId)
 {
-    DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
+    DataVersion* dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    ContentAppImpl * app =
+        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     EndpointId epId =
-        ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+        ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
                                                         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);
+    mDataVersions.push_back(dataVersionBuf);
     return epId;
 }
 
@@ -352,14 +359,20 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);
             EndpointId removedEndpointID = ContentAppPlatform::GetInstance().RemoveContentApp(app);
-            if (removedEndpointID != 0)
+            // Only remove the app from the set of content apps if they were dynamically added and not part of the static list of apps
+            if (removedEndpointID != 0 && i > APP_LIBRARY_SIZE)
             {
                 mContentApps.erase(mContentApps.begin() + static_cast<int>(i));
+                DataVersion* dataVersionBuf = mDataVersions.at(i - APP_LIBRARY_SIZE);
+                mDataVersions.erase(mDataVersions.begin() + static_cast<int>(i - APP_LIBRARY_SIZE));
+                // deallocate memory for objects that were created when adding the content app dynamically.
+                delete [] dataVersionBuf;
+                delete app;
             }
             return removedEndpointID;
         }
     }
-    return 0;
+    return kInvalidEndpointId;
 }
 
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
@@ -413,24 +426,22 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
                          const char * szApplicationVersion, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentAppImpl * app =
-        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(app);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId,
+                         szApplicationVersion, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    return 0;
+    return kInvalidEndpointId;
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, EndpointId endpointId, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentAppImpl * app =
-        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(app, endpointId);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId,
+                         szApplicationVersion, manager, endpointId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    return 0;
+    return kInvalidEndpointId;
 }
 
 EndpointId RemoveContentApp(EndpointId epId)
@@ -439,5 +450,5 @@ EndpointId RemoveContentApp(EndpointId epId)
     ChipLogProgress(DeviceLayer, "AppImpl: RemoveContentApp endpointId=%d ", epId);
     return gFactory.RemoveContentApp(epId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    return 0;
+    return kInvalidEndpointId;
 }
