@@ -154,13 +154,8 @@ tests:
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
-          Verify in DUT as commissioner side
-          Performing next commissioning step "ConfigRegulatory"
-          [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
-          [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
-
           Verify in TH as commissionee side
-           NVS set: chip-config/regulatory-location = 0 (0x0)
+          NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
     - label:
@@ -183,19 +178,9 @@ tests:
           "Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
-          Verify in DUT as commissioner side:
-
-          OpCreds: Received an AddTrustedRootCertificate command
-
           Verify in TH as commissionee side:
 
-          Sending root certificate to the device
-          CHIP:DMG: ICR moving to [AddingComm]
-          CHIP:DMG: ICR moving to [AddedComma]
-          CHIP:IN: Prepared secure message 0xffffa4cdf8c8 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 23999i with MessageCounter:211812.
-          CHIP:IN: Sending encrypted msg 0xffffa4cdf8c8 with MessageCounter:211812 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000010D06BD msec
-          CHIP:DMG: ICR moving to [CommandSen]
-          CHIP:CTL: Sent root certificate to the device
+          OpCreds: Received an AddTrustedRootCertificate command
       disabled: true
 
     - label:
@@ -265,46 +250,21 @@ tests:
           "Commissioner configures operational network on TH if TH both supports
           and requires"
       verification: |
-          Verify in DUT as commissioner side after commissioning:
-          [1646909537.345068][3145:3150] CHIP:CTL: Received certificate signing request from the device
-
           Verifiy on TH as commissionee side:
           [1660151567834] [99153:10411339] CHIP: [CTL] Received certificate signing request from the device
-          [1660151567834] [99153:10411339] CHIP: [CTL] Successfully finished commissioning step "SendOpCertSigningRequest"
+          [1660151567834] [99153:10411339] CHIP: [CTL] Successfully finished commissioning step 'SendOpCertSigningRequest'
       disabled: true
 
     - label:
           "Commissioner instructs Commissionee to connect to operational network
           if not already connected"
       verification: |
-          Verify in DUT as commissioner side after commissioning:
-          [1646909537.976592][3145:3150] CHIP:CTL: Operational credentials provisioned on device 0xffffac001730
-          [1646909537.976664][3145:3150] CHIP:TOO: Secure Pairing Success
-
           Verifiy on TH as commissionee side:
           [1660152735.835717][648909:648909] CHIP:ZCL: OpCreds: successfully created fabric index 0x1 via AddNOC
       disabled: true
 
     - label: "Commissioner starts discovery of TH using Operational Discovery"
       verification: |
-          Verify in DUT as commissioner side:
-
-          Commissioning stage next step: "WiFiNetworkEnable" -> "FindOperational"
-          [1653471976.344532][30157:30162] CHIP:CTL: Performing next commissioning step "FindOperational"
-          [1653471976.344586][30157:30162] CHIP:CSM: FindOrEstablishSession: PeerId = CCCB8A2597E4538B:0000000000000001
-          [1653471976.344642][30157:30162] CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
-          [1653471976.344715][30157:30162] CHIP:CTL: OperationalDeviceProxy[CCCB8A2597E4538B:0000000000000001]: State change 1 --> 2
-          [1653471976.344783][30157:30162] CHIP:DIS: Resolving CCCB8A2597E4538B:0000000000000001 ...
-          [1653471976.346864][30157:30162] CHIP:DIS: Operational node lookup already in progress. Will NOT start a new one.
-          [1653471976.347000][30157:30162] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653471976.348514][30157:30162] CHIP:DL: Avahi resolve found
-          [1653471976.348597][30157:30162] CHIP:DIS: Node ID resolved for CCCB8A2597E4538B:0000000000000001
-          [1653471976.348633][30157:30162] CHIP:DIS:         Hostname: E45F010F27530000        [1653471976.348670][30157:30162] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2753
-          [1653471976.348702][30157:30162] CHIP:DIS:         Port: 5540
-          [1653471976.348732][30157:30162] CHIP:DIS:         Mrp Interval idle: 5000 ms
-          [1653471976.348762][30157:30162] CHIP:DIS:         Mrp Interval active: 300 ms
-          [1653471976.349059][30157:30162] CHIP:DIS: UDP:[fe80::e65f:1ff:fe0f:2753%eth0]:5540: new best score: 3
-
           Verifiy on TH as commissionee side:
           [1660152735.835315][648909:648909] CHIP:DIS: Broadcasting mDns reply for query from fe80::808c:7ff:fefd:3b1
           [1660152735.835522][648909:648909] CHIP:DIS: mDNS service published: _matter._tcp
@@ -315,9 +275,9 @@ tests:
     - label:
           "Commissioner opens a CASE session with TH over operational network"
       verification: |
-          Verify in DUT as commissioner side:
+          Verify in TH as commissionee side:
 
-           CASE Server enabling CASE session setups
+          CASE Server enabling CASE session setups
           [1653471957.713139][10713:10713] CHIP:SVR: Joining Multicast groups
           [1653471957.713654][10713:10713] CHIP:ZCL: Emitting StartUp event
           [1653471957.714762][10713:10713] CHIP:EVL: LogEvent event number: 0x0000000000000000 priority: 2, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x0 Sys timestamp: 0x000000000059AC88
@@ -326,9 +286,6 @@ tests:
 
     - label: "Commissioner sends CommissioningComplete command"
       verification: |
-          Verify in DUT as commissioner side:
-          CHIP:CTL: Received CommissioningComplete response
-
           Verifiy on TH as commissionee side:
           [1660154248.898113][7143:7143] CHIP:SVR: Commissioning completed successfully
       disabled: true
@@ -337,23 +294,8 @@ tests:
           "Commissioning channel between the Commissioner and Commissionee is
           terminated."
       verification: |
-          Verify in DUT as commissioner side:
-
-          CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          CHIP:CTL: Performing next commissioning step "Cleanup"
-          CHIP:CTL: Successfully finished commissioning step "Cleanup"
-          CHIP:TOO: Device commissioning completed with success
-          CHIP:CTL: Performing next commissioning step "Cleanup"
-          CHIP:DIS: Closing all BLE connections
-          CHIP:IN: Clearing BLE pending packets.
-          CHIP:BLE: Auto-closing end point"s BLE connection.
-          CHIP:DL: Closing BLE GATT connection (con 0xffff9c04df70)
-          CHIP:CTL: Successfully finished commissioning step "Cleanup"
-          CHIP:TOO: Device commissioning completed with success
-
           Verify on TH as commissionee side:
           [1660154249.008047][7143:7143] CHIP:IN: Expiring all PASE sessions
           [1660154249.008069][7143:7143] CHIP:IN: SecureSession[0xaaab09155000]: MarkForEviction Type:1 LSID:5786
-          [1660154249.008090][7143:7143] CHIP:SC: SecureSession[0xaaab09155000]: Moving from state "kActive" --> "kPendingEviction"
+          [1660154249.008090][7143:7143] CHIP:SC: SecureSession[0xaaab09155000]: Moving from state 'kActive' --> 'kPendingEviction'
       disabled: true

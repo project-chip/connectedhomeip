@@ -27,12 +27,12 @@ config:
 tests:
     - label: "Factory reset the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -100,7 +100,7 @@ tests:
           "TH saves the MaxNetworks attribute value as MaxNetworksValue for
           future use"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the Networks attribute list from the DUT"

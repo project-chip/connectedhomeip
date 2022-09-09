@@ -33,7 +33,7 @@ tests:
 
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads OccupancySensorType attribute from TH"

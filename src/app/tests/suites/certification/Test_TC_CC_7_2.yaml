@@ -149,7 +149,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 30000
+              minValue: 29750
               maxValue: 40250
 
     - label: "Wait 2s"
@@ -167,7 +167,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: 30000
+              minValue: 29750
               maxValue: 40250
 
     - label:

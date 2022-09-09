@@ -142,9 +142,9 @@ tests:
           $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111613912] [95856:65679504] CHIP: [CTL] Received CommissioningComplete response
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651111613912] [95856:65679504] CHIP: [TOO] Device commissioning completed with success
       disabled: true

@@ -115,8 +115,8 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 19500
-              maxValue: 26400
+              minValue: 13107
+              maxValue: 32768
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
@@ -124,8 +124,8 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 13900
-              maxValue: 18900
+              minValue: 13107
+              maxValue: 19660
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -141,7 +141,7 @@ tests:
       attribute: "CurrentX"
       response:
           constraints:
-              minValue: 13107
+              minValue: 11141
               maxValue: 15073
 
     - label: "TH reads CurrentY attribute from DUT"
@@ -150,7 +150,7 @@ tests:
       attribute: "CurrentY"
       response:
           constraints:
-              minValue: 13107
+              minValue: 11141
               maxValue: 15073
 
     - label: "Wait 5s"
