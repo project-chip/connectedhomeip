@@ -103,7 +103,7 @@ Current supported develop boards:
         folder. Such as chip-bl702-lighting-example.flash.py for lighting-app
         example. Please check `help` option of script for more detail.
 
-        -   Hold BOOT pin and reset board, let it be in download mode.
+        -   Hold BOOT pin and reset chip, let it be in download mode.
         -   Download image as following execution under build output folder:
 
             ```shell
@@ -122,12 +122,10 @@ Current supported develop boards:
             compressed with hash verification with
             `chip-bl702-lighting-example.bin`.
 
-        > Note, `chip-bl702-lighting-example.flash.py` uses `bflb-iot-tool`
-        > download image. Please make sure current terminal is under matter
-        > build environment, or `bflb-iot-tool` is installed.
+        > Note, `chip-bl702-lighting-example.flash.py` uses Python module `bflb-iot-tool` to flash device. Please make sure current terminal is under matter build environment, otherwise, Python module `bflb-iot-tool` should be installed with default Python.
 
     -   Using `Bouffalo Lab` flash tool`BLDevCube`
-        -   Hold BOOT pin and reset board, let it be in download mode.
+        -   Hold BOOT pin and reset chip, let it be in download mode.
         -   Select `DTS` file
             `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts`;
         -   Select Partition Table
@@ -136,6 +134,7 @@ Current supported develop boards:
         -   Select Chip Erase if need;
         -   Choose Target COM port.
         -   Then click Create & Download.
+        > Where `connectedhomeip_repo_path` is the root path of repo connectedhomeip.
 
 -   Firmware Behavior
 
@@ -149,13 +148,8 @@ Current supported develop boards:
 
 -   UART baudrate for log and shell command
     -   By default, UART baudrate is 2000000
-    -   Please run script `gn_bouffalolab_example.sh` with
-        `baudrate=[uart baudrate]` followed, such as
+    -   To change UART baudrate, please run script `gn_bouffalolab_example.sh` with `baudrate=[uart baudrate]` followed, such as
         `./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT module_type="BL702" baudrate=115200`
-        > Note, some UART tools, such as minicom and screen, are not good
-        > support with baudrate 2000000. For these users, please change UART
-        > baudrate to 115200; Currently, only build script
-        > gn_bouffalolab_example.sh is supported to change uart baudrate.
 
 ## Test with chip-tool
 
@@ -203,8 +197,7 @@ which `<identify_duration>` is how many seconds to execute identify command.
 
     ```
 
--   lighting-app.ota should have greater software version which is defined by
-    macro CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in CHIPProjectConfig.h
+-   lighting-app.ota should have greater software version which is defined by macro CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in CHIPProjectConfig.h
 
 ### Start ota-provider-app
 
