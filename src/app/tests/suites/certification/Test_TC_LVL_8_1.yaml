@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verifaction: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "TH prompts the operator to make the DUT send one or more supported
           commands from the Level Control cluster"

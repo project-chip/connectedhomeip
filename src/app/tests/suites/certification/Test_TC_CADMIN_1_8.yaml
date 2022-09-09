@@ -52,24 +52,14 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
-          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
-          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
-
-          Verify success response On DUT_CR1(chip-tool) Log
-
-
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -126,19 +116,9 @@ tests:
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
-          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
-          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
-
-          Verify success response On TH1(all-clusters-app) Log
-
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
@@ -150,21 +130,11 @@ tests:
 
           /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify success response On DUT_CR1(CHIP-TOOL) Log
-
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
-
-          [1660901039.590962][3045:3045] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0002
-          [1660901039.591036][3045:3045] CHIP:ZCL: Received command to close commissioning window
-          [1660901039.591094][3045:3045] CHIP:SVR: Closing pairing window
-          [1660901039.591169][3045:3045] CHIP:IN: SecureSession[0xaaaab010d400]: Released - Type:1 LSID:14411
+          [1661485834.635244][6993:6993] CHIP:DIS: mDNS service published: _matter._tcp
+          [1661485834.635293][6993:6993] CHIP:ZCL: Commissioning window is now closed
+          [1661485834.635328][6993:6993] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with TH_CE"
@@ -192,27 +162,12 @@ tests:
 
           /chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify success response On TH1(all-clusters-app) Log
-
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
 
-          [1660901039.590962][3045:3045] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0002
-          [1660901039.591036][3045:3045] CHIP:ZCL: Received command to close commissioning window
-          [1660901039.591094][3045:3045] CHIP:SVR: Closing pairing window
-          [1660901039.591169][3045:3045] CHIP:IN: SecureSession[0xaaaab010d400]: Released - Type:1 LSID:14411
-
-          Verify cluster-status code 3 On DUT_CR1(CHIP-TOOL) Log
-
-
-          [1650524034.112345][15422:15427] CHIP:DMG:                                 },
-          [1650524034.112456][15422:15427] CHIP:DMG:
-          [1650524034.112543][15422:15427] CHIP:DMG:                                 StatusIB =
-          [1650524034.112632][15422:15427] CHIP:DMG:                                 {
-          [1650524034.112727][15422:15427] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1650524034.112825][15422:15427] CHIP:DMG:                                         cluster-status = 0x3,
-          [1650524034.112914][15422:15427] CHIP:DMG:                                 },
-          [1650524034.113005][15422:15427] CHIP:DMG:
+          [1661485921.687243][6993:6993] CHIP:ZCL: Received command to close commissioning window
+          [1661485921.687265][6993:6993] CHIP:ZCL: Commissioning window is currently not open
+          [1661485921.687298][6993:6993] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -224,7 +179,7 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool basic write node-label te5new 1 0
 
           Verify Write request on TH_CE(all-clusters-app) Log
 
@@ -249,7 +204,7 @@ tests:
           [1660894021.902912][2871:2871] CHIP:DMG:                         Data = "te5new" (6 chars),
           [1660894021.902985][2871:2871] CHIP:DMG:                 },
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool basic read node-label 1 0
 
           Verify read request on TH_CE(all-clusters-app) Log
 
@@ -279,24 +234,13 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
           [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
           [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
-
-          Verify Manual pairing code on DUT_CR1(chip-tool) Log
-
-
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with TH_CE"

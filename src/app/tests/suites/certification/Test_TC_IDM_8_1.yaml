@@ -110,7 +110,7 @@ tests:
       verification: |
           By sending the command mentioned below, change attribute values on DUT to create events multiple times.Send a fabric-filtered Read Request Message from each of RC1 and RC2
 
-           ./chip-tool accesscontrol read acl 1 0
+          ./chip-tool accesscontrol read acl 1 0
           On RC1, verify that acl atrribute reading an entries from DUT
           [1660736093.612611][8743:8748] CHIP:DMG: }
           [1660736093.612923][8743:8748] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1094083523
@@ -124,11 +124,10 @@ tests:
           [1660736093.613294][8743:8748] CHIP:TOO:       FabricIndex: 1
           [1660736093.613323][8743:8748] CHIP:TOO:      }
           [1660736093.613424][8743:8748] CHIP:EM: Sending Standalone Ack for MessageCounter:107756092 on exchange 62143i
-          i
 
 
-           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta
-           On RC2, verify that acl atrribute reading an entries from DUT
+          ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta
+          On RC2, verify that acl atrribute reading an entries from DUT
           [1660736154.632572][16573:16579] CHIP:DMG: }
           [1660736154.632618][16573:16579] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1094083523
           [1660736154.632629][16573:16579] CHIP:TOO:   ACL: 1 entries
@@ -146,7 +145,7 @@ tests:
 
           From RC1 send a Write Request message to the DUT to write to an entry in the fabric scoped list associated with its own fabric.
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
           On RC1, Verify the success response from DUT
 
@@ -196,7 +195,7 @@ tests:
 
 
 
-           Send fabric-filtered Read Request Message from each of RC1 and RC2 to read the fabric scoped list from the DUT.
+          Send fabric-filtered Read Request Message from each of RC1 and RC2 to read the fabric scoped list from the DUT.
 
           ./chip-tool accesscontrol read acl 1 0
 
@@ -222,7 +221,7 @@ tests:
 
 
 
-           ./chip-tool accesscontrol read acl 2 0  --commissioner-name beta
+          ./chip-tool accesscontrol read acl 2 0  --commissioner-name beta
           On RC2, Verify that the data received from DUT is same as the data received in first read request
           [1660736551.755490][16621:16626] CHIP:DMG: }
           [1660736551.755536][16621:16626] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1094083525
@@ -242,7 +241,7 @@ tests:
 
           With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to  send below mentioned command to Grant access to all clusters again.
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]' 1 0
       disabled: true
 
     - label:
@@ -301,7 +300,7 @@ tests:
 
 
 
-           RC1 sends an Invoke command(UpdateFabricLabel) to update the label of its fabric.
+          RC1 sends an Invoke command(UpdateFabricLabel) to update the label of its fabric.
 
           ./chip-tool operationalcredentials update-fabric-label 1 1 0
           [1657780486.902409][2687:2692] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
