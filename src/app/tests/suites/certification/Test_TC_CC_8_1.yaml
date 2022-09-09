@@ -237,9 +237,8 @@ tests:
               maxValue: 65279
 
     - label:
-          "TH sends MoveToColorTemperature command to DUT with
-          ColorTemperature= ColorTempPhysicalMaxMireds / 2 and
-          TransitionTime=0 (immediately)."
+          "TH sends MoveToColorTemperature command to DUT with ColorTemperature=
+          ColorTempPhysicalMaxMireds / 2 and TransitionTime=0 (immediately)."
       PICS: CC.S.C0a.Rsp
       command: "MoveToColorTemperature"
       arguments:
