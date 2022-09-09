@@ -522,9 +522,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             memcpy(mAttestationElements, elements.data(), elements.size());
             mAttestationElementsLen = static_cast<uint16_t>(elements.size());
             mParams.SetAttestationElements(ByteSpan(mAttestationElements, elements.size()));
-            ChipLogError(Controller, "AutoCommissioner setting attestationElements buffer size %u/%u",
-                         static_cast<unsigned>(elements.size()),
-                         static_cast<unsigned>(mParams.GetAttestationElements().Value().size()));
+            ChipLogDetail(Controller, "AutoCommissioner setting attestationElements buffer size %u/%u",
+                          static_cast<unsigned>(elements.size()),
+                          static_cast<unsigned>(mParams.GetAttestationElements().Value().size()));
 
             if (signature.size() > sizeof(mAttestationSignature))
             {

@@ -183,6 +183,11 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
 
     params.defaultCommissioner = &gAutoCommissioner;
 
+    // assign prefered feature settings
+    CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
+    commissioningParams.SetCheckForMatchingFabric(true);
+    gAutoCommissioner.SetCommissioningParameters(commissioningParams);
+
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));

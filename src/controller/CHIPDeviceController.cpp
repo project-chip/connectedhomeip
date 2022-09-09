@@ -1737,24 +1737,18 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = (err == CHIP_NO_ERROR) ? return_err : err;
 
-    err = mAttributeCache->ForEachAttribute(
-        app::Clusters::OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            if (path.mAttributeId != app::Clusters::OperationalCredentials::Attributes::Fabrics::Id)
-            {
-                // Continue on
-                return CHIP_NO_ERROR;
-            }
-
+    err =
+        mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
             // this code is checking if the device is already on the commissioner's fabric.
             // if a matching fabric is found, then remember the nodeId so that the commissioner
-            // can cancel commissioning (before it fails in AddNoc) and know it's nodeId.
+            // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
+            // the device's nodeId on its fabric.
             switch (path.mAttributeId)
             {
-            case app::Clusters::OperationalCredentials::Attributes::Fabrics::Id: {
-                app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
+            case OperationalCredentials::Attributes::Fabrics::Id: {
+                OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(path,
-                                                                                                                     fabrics));
+                    this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
                 auto iter = fabrics.begin();
                 while (iter.Next())
                 {
@@ -1764,10 +1758,24 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                                     " fabric.nodeId=0x" ChipLogFormatX64,
                                     fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
                                     ChipLogValueX64(fabricDescriptor.nodeId));
+                    // need to add check for root public key
                     if (GetFabricId() == fabricDescriptor.fabricId)
                     {
-                        ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - found a matching fabric");
-                        info.nodeId = fabricDescriptor.nodeId;
+                        ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - found a matching fabric id");
+                        chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
+                        P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
+                        Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
+
+                        Crypto::P256PublicKey commissionerRootPublicKey;
+                        if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
+                        {
+                            ChipLogError(AppServer, "DeviceCommissioner::OnDone - error reading commissioner root public key");
+                        }
+                        else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
+                        {
+                            ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - fabric root keys match");
+                            info.nodeId = fabricDescriptor.nodeId;
+                        }
                     }
                 }
 
@@ -2042,6 +2050,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
 
+        // NOTE: this array cannot have more than 9 entries, since 9 is what the spec requires as a minimum on servers
         app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
@@ -2064,11 +2073,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
         // Read the current fabrics
-        readPaths[8] = app::AttributePathParams(app::Clusters::OperationalCredentials::Id,
-                                                app::Clusters::OperationalCredentials::Attributes::Fabrics::Id);
+        if (params.GetCheckForMatchingFabric().ValueOr(false))
+        {
+            readPaths[8] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        }
 
         readParams.mpAttributePathParamsList    = readPaths;
-        readParams.mAttributePathParamsListSize = 9;
+        readParams.mAttributePathParamsListSize = 8 + (params.GetCheckForMatchingFabric().ValueOr(false) ? 1 : 0);
         readParams.mIsFabricFiltered            = false;
         if (timeout.HasValue())
         {
