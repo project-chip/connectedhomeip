@@ -148,9 +148,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 - (void)shutDownCppController
 {
     if (_cppCommissioner) {
-        _cppCommissioner->Shutdown();
-        delete _cppCommissioner;
+        auto * commissionerToShutDown = _cppCommissioner;
+        // Flag ourselves as not running before we start shutting down
+        // _cppCommissioner, so we're not in a state where we claim to be
+        // running but are actually partially shut down.
         _cppCommissioner = nullptr;
+        commissionerToShutDown->Shutdown();
+        delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }

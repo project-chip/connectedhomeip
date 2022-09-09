@@ -1,36 +1,22 @@
-name: "\U0001F680 1.0 Issue"
-description: Create an issue that is required for Matter 1.0 release
-title: "[1.0] "
+name: "\U0001F9F0 Platform Fix"
+description: Create an issue for a platform specific fix
+title: "[Platform] "
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for reporting an issue against the Matter SDK! We need information about the bug report to follow up, so please help us out by filling out this information.
+              Thanks for taking the time to submit a an issue for a platform, can you please please help us understand this change in this quick form?
     - type: textarea
       id: repro
       attributes:
           label: Reproduction steps
-          description: "How do you trigger this bug? Please walk us through it step by step."
+          description: "How do you trigger this issue? Please walk us through it step by step."
           value: |
               1.
               2.
               3.
               ...
           render: bash
-      validations:
-          required: true
-    - type: input
-      id: prevalence
-      attributes:
-          label: Bug prevalence
-          description: "How often do you or others encounter this bug?"
-          placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
-      validations:
-          required: true
-    - type: input
-      attributes:
-          label: GitHub hash of the SDK that was being used
-          description: Hash of the GitHub SDK used
       validations:
           required: true
     - type: dropdown
@@ -55,7 +41,7 @@ body:
               - vscode
               - windows
               - other
-              - core
+              - core (please add to version below)
       validations:
           required: true
     - type: input
@@ -67,29 +53,33 @@ body:
     - type: dropdown
       attributes:
           label: Type
-          description: What type of issue is this?
+          description: How was this tested?
           multiple: true
           options:
-              - Test Improvement
-              - Common Cluster Logic
-              - Spec Compliance Issue
-              - Security Issue
-              - Platform Issue
-              - Core SDK Memory Issue
-              - Core SDK Crash
-              - Core SDK Performance Improvement
-              - Core SDK Interopability Issue
+              - Unit tested
+              - YAML tested
+              - Manually tested with SDK
+              - CI tested
+              - Hardware validated
+              - Platform validated
       validations:
           required: true
     - type: textarea
       attributes:
+          label: (Optional) If manually tested please explain why this is only manually tested
+          description: |
+              Please explain how you tested it
+      validations:
+          required: false
+    - type: textarea
+      attributes:
           label: Anything else?
           description: |
-              Links? References? Anything that will give us more context about the issue you are encountering!
+              Links? References? Anything that will give us more context about this!
 
               Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
       validations:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for helping us get to 1.0!"
+          value: "Thanks for submitting a platform issue!"

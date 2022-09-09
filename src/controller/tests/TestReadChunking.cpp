@@ -68,10 +68,10 @@ constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute =
     7; // Reading this attribute will return CHIP_ERROR_NO_MEMORY but nothing is actually encoded.
 
-class TestCommandInteraction
+class TestReadChunking
 {
 public:
-    TestCommandInteraction() {}
+    TestReadChunking() {}
     static void TestChunking(nlTestSuite * apSuite, void * apContext);
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
@@ -359,7 +359,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
  * as we can possibly cover.
  *
  */
-void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContext)
+void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -424,7 +424,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 }
 
 // Similar to the test above, but for the list chunking feature.
-void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apContext)
+void TestReadChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -488,7 +488,7 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
 }
 
 // Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
-void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apContext)
+void TestReadChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -540,7 +540,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
 /*
  * This test contains two parts, one is to enable a new endpoint on the fly, another is to disable it and re-enable it.
  */
-void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext)
+void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
@@ -565,16 +565,16 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
 
         app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Subscribe);
+        // Enable the new endpoint
+        emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
 
-        // We should not receive any reports in initial reports, so check mOnSubscriptionEstablished instead.
         NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
         readCallback.mAttributeCount = 0;
 
-        // Enable the new endpoint
         emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
 
         ctx.DrainAndServiceIO();
@@ -623,7 +623,6 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
 
     emberAfClearDynamicEndpoint(0);
 }
-
 /*
  * The tests below are for testing deatiled bwhavior when the attributes are modified between two chunks. In this test, we only care
  * above whether we will receive correct attribute values in reasonable messages with reduced reporting traffic.
@@ -737,7 +736,7 @@ void DoTest(TestMutableReadCallback * callback, Instruction instruction)
 
 }; // namespace TestSetDirtyBetweenChunksUtil
 
-void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext)
+void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext)
 {
     using namespace TestSetDirtyBetweenChunksUtil;
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
@@ -895,11 +894,11 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
-    NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
-    NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
-    NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),
-    NL_TEST_DEF("TestSetDirtyBetweenChunks", TestCommandInteraction::TestSetDirtyBetweenChunks),
+    NL_TEST_DEF("TestChunking", TestReadChunking::TestChunking),
+    NL_TEST_DEF("TestListChunking", TestReadChunking::TestListChunking),
+    NL_TEST_DEF("TestBadChunking", TestReadChunking::TestBadChunking),
+    NL_TEST_DEF("TestDynamicEndpoint", TestReadChunking::TestDynamicEndpoint),
+    NL_TEST_DEF("TestSetDirtyBetweenChunks", TestReadChunking::TestSetDirtyBetweenChunks),
     NL_TEST_SENTINEL()
 };
 

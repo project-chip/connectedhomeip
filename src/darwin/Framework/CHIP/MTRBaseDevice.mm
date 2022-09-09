@@ -1218,7 +1218,11 @@ exit:
             auto readClient = Platform::New<app::ReadClient>(
                 engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-            err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                err = readClient->SendRequest(readParams);
+            } else {
+                err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            }
 
             if (err != CHIP_NO_ERROR) {
                 if (reportHandler) {
@@ -1227,6 +1231,8 @@ exit:
                     });
                 }
                 Platform::Delete(readClient);
+                Platform::Delete(container.pathParams);
+                container.pathParams = nullptr;
                 return;
             }
 

@@ -44,6 +44,14 @@ overrides:
       explanation: "Style must be inline before reviewing can be complete"
 
     ############################################################
+    #  Require Issues
+    ############################################################
+# disabling until we have PRs up to date
+#     - if: "'*issue*' not in statuses.successful"
+#       status: failure
+#       explanation: "An issue is required for all PRs"
+
+    ############################################################
     #  Fast tracking
     ############################################################
     - if: "'fast track' in labels"

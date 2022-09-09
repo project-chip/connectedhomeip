@@ -21,6 +21,7 @@
  *
  */
 
+#include <errno.h>
 #include <inttypes.h>
 
 #include <messaging/ReliableMessageMgr.h>
