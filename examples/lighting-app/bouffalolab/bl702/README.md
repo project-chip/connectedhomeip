@@ -122,7 +122,10 @@ Current supported develop boards:
             compressed with hash verification with
             `chip-bl702-lighting-example.bin`.
 
-        > Note, `chip-bl702-lighting-example.flash.py` uses Python module `bflb-iot-tool` to flash device. Please make sure current terminal is under matter build environment, otherwise, Python module `bflb-iot-tool` should be installed with default Python.
+        > Note, `chip-bl702-lighting-example.flash.py` uses Python module
+        > `bflb-iot-tool` to flash device. Please make sure current terminal is
+        > under matter build environment, otherwise, Python module
+        > `bflb-iot-tool` should be installed with default Python.
 
     -   Using `Bouffalo Lab` flash tool`BLDevCube`
         -   Hold BOOT pin and reset chip, let it be in download mode.
@@ -134,7 +137,8 @@ Current supported develop boards:
         -   Select Chip Erase if need;
         -   Choose Target COM port.
         -   Then click Create & Download.
-        > Where `connectedhomeip_repo_path` is the root path of repo connectedhomeip.
+            > Where `connectedhomeip_repo_path` is the root path of repo
+            > connectedhomeip.
 
 -   Firmware Behavior
 
@@ -148,7 +152,8 @@ Current supported develop boards:
 
 -   UART baudrate for log and shell command
     -   By default, UART baudrate is 2000000
-    -   To change UART baudrate, please run script `gn_bouffalolab_example.sh` with `baudrate=[uart baudrate]` followed, such as
+    -   To change UART baudrate, please run script `gn_bouffalolab_example.sh`
+        with `baudrate=[uart baudrate]` followed, such as
         `./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT module_type="BL702" baudrate=115200`
 
 ## Test with chip-tool
@@ -197,7 +202,8 @@ which `<identify_duration>` is how many seconds to execute identify command.
 
     ```
 
--   lighting-app.ota should have greater software version which is defined by macro CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in CHIPProjectConfig.h
+-   lighting-app.ota should have greater software version which is defined by
+    macro CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in CHIPProjectConfig.h
 
 ### Start ota-provider-app
 
