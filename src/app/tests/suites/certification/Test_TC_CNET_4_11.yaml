@@ -18,7 +18,7 @@ name:
     [DUT-Server]
 
 PICS:
-    - CNET.S.S.F00
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
