@@ -198,10 +198,10 @@ public:
         params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
 
         [device subscribeWithQueue:callbackQueue
-            minInterval:mMinInterval
-            maxInterval:mMaxInterval
+            minInterval:@(mMinInterval)
+            maxInterval:@(mMaxInterval)
             params:params
-            cacheContainer:nil
+            attributeCacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
                 SetCommandExitStatus(CHIP_NO_ERROR);
             }

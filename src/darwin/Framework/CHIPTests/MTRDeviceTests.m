@@ -157,7 +157,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
+                                                                                   fabricId:@(1)
+                                                                                        ipk:testKeys.ipk];
     params.vendorId = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -757,10 +759,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Subscribing...");
     __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
     [device subscribeWithQueue:queue
-        minInterval:2
-        maxInterval:60
+        minInterval:@(2)
+        maxInterval:@(60)
         params:nil
-        cacheContainer:attributeCacheContainer
+        attributeCacheContainer:attributeCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Received report: %@", value);
             if (reportHandler) {
@@ -786,7 +788,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
-    MTRBaseClusterOnOff * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterOnOff * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:device endpoint:@(1) queue:queue];
     XCTAssertNotNil(cluster);
 
     NSLog(@"Invoking command...");
@@ -1119,7 +1121,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:@(1) queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletionHandler:^(NSError * err) {

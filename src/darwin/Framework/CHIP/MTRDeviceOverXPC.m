@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceOverXPC ()
 
 @property (nonatomic, strong, readonly) id<NSCopying> controller;
-@property (nonatomic, readonly) uint64_t nodeId;
+@property (nonatomic, readonly) NSNumber * nodeId;
 @property (nonatomic, strong, readonly) MTRDeviceControllerXPCConnection * xpcConnection;
 
 @end
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRDeviceOverXPC
 
 - (instancetype)initWithController:(id<NSCopying>)controller
-                          deviceId:(uint64_t)deviceId
+                          deviceId:(NSNumber *)deviceId
                      xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
     _controller = controller;
@@ -47,10 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
+                minInterval:(NSNumber *)minInterval
+                maxInterval:(NSNumber *)maxInterval
                      params:(nullable MTRSubscribeParams *)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
          eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
@@ -67,8 +67,8 @@ NS_ASSUME_NONNULL_BEGIN
             if (handle) {
                 [handle.proxy subscribeWithController:self.controller
                                                nodeId:self.nodeId
-                                          minInterval:@(minInterval)
-                                          maxInterval:@(maxInterval)
+                                          minInterval:minInterval
+                                          maxInterval:maxInterval
                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
                                           shouldCache:(attributeCacheContainer != nil)
                                            completion:^(NSError * _Nullable error) {

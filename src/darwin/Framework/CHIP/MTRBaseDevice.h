@@ -171,10 +171,10 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
+                minInterval:(NSNumber *)minInterval
+                maxInterval:(NSNumber *)maxInterval
                      params:(MTRSubscribeParams * _Nullable)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(MTRDeviceErrorHandler)errorHandler
@@ -243,7 +243,7 @@ extern NSString * const MTRArrayValueType;
                                   params:(MTRSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -252,7 +252,7 @@ extern NSString * const MTRArrayValueType;
  * There could be multiple clients accessing a node through a remote controller object and hence it is not appropriate
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(dispatch_block_t)completion;
 
 /**
  * Open a commissioning window on the device.

@@ -274,7 +274,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
             if (commissionerParams.operationalKeypair != nullptr) {
                 errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
-                    startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
+                    [startupParams.fabricId unsignedLongLongValue], chip::kUndefinedCATs,
+                    commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -294,8 +295,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(
-                    [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
+                errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
+                    [startupParams.fabricId unsignedLongLongValue], chip::kUndefinedCATs, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -567,13 +568,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                  }];
 }
 
-- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[@(nodeID)];
+    MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithNodeID:@(nodeID) controller:self];
-        self.nodeIDToDeviceMap[@(nodeID)] = deviceToReturn;
+        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+        self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 

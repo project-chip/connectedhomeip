@@ -83,8 +83,7 @@
     return [[MTRDeviceControllerXPCConnection alloc] initWithWorkQueue:workQueue connectBlock:connectBlock];
 }
 
-- (void)getProxyHandleWithCompletion:(void (^)(
-                                         dispatch_queue_t queue, MTRDeviceControllerXPCProxyHandle * _Nullable container))completion
+- (void)getProxyHandleWithCompletion:(MTRGetProxyHandleHandler)completion
 {
     dispatch_async(_workQueue, ^{
         MTRDeviceControllerXPCProxyHandle * container = self.proxyHandle;
@@ -119,9 +118,7 @@
     });
 }
 
-- (void)registerReportHandlerWithController:(id<NSCopying>)controller
-                                     nodeId:(NSUInteger)nodeId
-                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler
+- (void)registerReportHandlerWithController:(id<NSCopying>)controller nodeId:(NSNumber *)nodeId handler:(MTRXPCReportHandler)handler
 {
     dispatch_async(_workQueue, ^{
         BOOL shouldRetainProxyForReport = ([self.reportRegistry count] == 0);
@@ -130,11 +127,10 @@
             controllerDictionary = [[NSMutableDictionary alloc] init];
             [self.reportRegistry setObject:controllerDictionary forKey:controller];
         }
-        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
-        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+        NSMutableArray * nodeArray = controllerDictionary[nodeId];
         if (!nodeArray) {
             nodeArray = [[NSMutableArray alloc] init];
-            [controllerDictionary setObject:nodeArray forKey:nodeIdKey];
+            [controllerDictionary setObject:nodeArray forKey:nodeId];
         }
         [nodeArray addObject:handler];
         if (shouldRetainProxyForReport) {
@@ -144,8 +140,8 @@
 }
 
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
-                                        nodeId:(NSUInteger)nodeId
-                                    completion:(void (^)(void))completion
+                                        nodeId:(NSNumber *)nodeId
+                                    completion:(dispatch_block_t)completion
 {
     dispatch_async(_workQueue, ^{
         __auto_type clearRegistry = ^{
@@ -154,13 +150,12 @@
                 completion();
                 return;
             }
-            NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
-            NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+            NSMutableArray * nodeArray = controllerDictionary[nodeId];
             if (!nodeArray) {
                 completion();
                 return;
             }
-            [controllerDictionary removeObjectForKey:nodeIdKey];
+            [controllerDictionary removeObjectForKey:nodeId];
             if ([controllerDictionary count] == 0) {
                 // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
                 self.proxyRetainerForReports = nil;
@@ -187,7 +182,7 @@
 }
 
 - (void)handleReportWithController:(id)controller
-                            nodeId:(NSUInteger)nodeId
+                            nodeId:(NSNumber *)nodeId
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
@@ -196,8 +191,7 @@
         if (!controllerDictionary) {
             return;
         }
-        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
-        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+        NSMutableArray * nodeArray = controllerDictionary[nodeId];
         if (!nodeArray) {
             return;
         }

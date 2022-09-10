@@ -221,7 +221,7 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:0
+                                                                        endpoint:@(0)
                                                                            queue:dispatch_get_main_queue()];
                 [cluster
                     readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -270,7 +270,7 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:0
+                                                                        endpoint:@(0)
                                                                            queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 MTRReadParams * params = [[MTRReadParams alloc] init];
@@ -332,7 +332,7 @@
 
                             MTRBaseClusterOperationalCredentials * opCredsCluster =
                                 [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                                    endpoint:0
+                                                                                    endpoint:@(0)
                                                                                        queue:dispatch_get_main_queue()];
 
                             dispatch_group_t removeGroup = dispatch_group_create();
@@ -404,7 +404,7 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:0
+                                                                        endpoint:@(0)
                                                                            queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
                 __auto_type * params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
@@ -460,7 +460,7 @@
                            isError:NO];
                 MTRBaseClusterOperationalCredentials * opCredsCluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:0
+                                                                        endpoint:@(0)
                                                                            queue:dispatch_get_main_queue()];
                 MTROperationalCredentialsClusterRemoveFabricParams * params =
                     [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];

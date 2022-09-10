@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRBaseCluster{{asUpperCamelCase name}} : MTRCluster
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
+                               endpoint:(NSNumber *)endpoint
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}

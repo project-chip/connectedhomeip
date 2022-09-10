@@ -44,7 +44,7 @@ using namespace chip;
 
 - (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
             controllerId:(id<NSCopying>)controllerId
-                deviceId:(uint64_t)deviceId
+                deviceId:(NSNumber *)deviceId
 {
     self.xpcConnection = xpcConnection;
     self.xpcControllerId = controllerId;
@@ -82,8 +82,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
                           clusterId:(NSNumber * _Nullable)clusterId
                         attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                        NSError * _Nullable error))completion
+                         completion:(MTRDeviceResponseHandler)completion
 {
     __auto_type completionHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
         dispatch_async(clientQueue, ^{
@@ -99,7 +98,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
             return;
         }
         __auto_type controllerId = self.xpcControllerId;
-        uint64_t nodeId = self.deviceId;
+        NSNumber * nodeId = self.deviceId;
         [xpcConnection
             getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
                 if (handle) {

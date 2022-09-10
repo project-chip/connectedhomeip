@@ -158,7 +158,7 @@ private:
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID controller:(MTRDeviceController *)controller
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     return [controller deviceForNodeID:nodeID];
 }

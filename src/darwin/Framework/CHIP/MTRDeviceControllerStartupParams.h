@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, assign, readonly) uint64_t fabricId;
+@property (nonatomic, copy, readonly) NSNumber * fabricId;
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -196,7 +196,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk;
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(NSNumber *)fabricId ipk:(NSData *)ipk;
 
 /**
  * Prepare to initialize a controller with a complete operational certificate

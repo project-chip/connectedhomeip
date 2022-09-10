@@ -299,14 +299,14 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
+                minInterval:(NSNumber *)minInterval
+                maxInterval:(NSNumber *)maxInterval
                      params:(nullable MTRSubscribeParams *)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
-         eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     if (self.isPASEDevice) {
@@ -335,8 +335,8 @@ public:
             auto attributePath = std::make_unique<AttributePathParams>();
             auto eventPath = std::make_unique<EventPathParams>();
             ReadPrepareParams readParams(session.Value());
-            readParams.mMinIntervalFloorSeconds = minInterval;
-            readParams.mMaxIntervalCeilingSeconds = maxInterval;
+            readParams.mMinIntervalFloorSeconds = [minInterval unsignedShortValue];
+            readParams.mMaxIntervalCeilingSeconds = [maxInterval unsignedShortValue];
             readParams.mpAttributePathParamsList = attributePath.get();
             readParams.mAttributePathParamsListSize = 1;
             readParams.mpEventPathParamsList = eventPath.get();
@@ -1254,7 +1254,7 @@ exit:
         }];
 }
 
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(dispatch_block_t)completion
 {
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");

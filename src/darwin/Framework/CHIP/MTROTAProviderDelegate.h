@@ -20,6 +20,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^MTRQueryImageCompletionHandler)(
+    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
+
+typedef void (^MTRApplyUpdateRequestCompletionHandler)(
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
+
+typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
+
 /**
  * The protocol definition for the MTROTAProviderDelegate
  *
@@ -39,8 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler;
+                completionHandler:(MTRQueryImageCompletionHandler)completionHandler;
 
 /**
  * Notify the delegate when the apply update request command is received from
@@ -54,8 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
+                        completionHandler:(MTRApplyUpdateRequestCompletionHandler)completionHandler;
 
 /**
  * Notify the delegate when the notify update applied command is received from
@@ -79,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     controller:(MTRDeviceController *)controller
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
-                             completionHandler:(void (^)(NSError * error))completionHandler;
+                             completionHandler:(StatusCompletion)completionHandler;
 
 /**
  * Notify the delegate when a BDX Session ends for some node.  The controller
@@ -100,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
                       blockSize:(NSNumber *)blockSize
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
-              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
+              completionHandler:(MTRBDXQueryCompletionHandler)completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

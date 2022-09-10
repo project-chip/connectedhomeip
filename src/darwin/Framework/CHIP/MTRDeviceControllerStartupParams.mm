@@ -30,20 +30,20 @@ using namespace chip;
 
 @implementation MTRDeviceControllerStartupParams
 
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(NSNumber *)fabricId ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    if (!IsValidFabricId(fabricId)) {
-        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
+    if (!IsValidFabricId([fabricId unsignedLongLongValue])) {
+        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", [fabricId unsignedLongLongValue]);
         return nil;
     }
 
     _nocSigner = nocSigner;
-    _fabricId = fabricId;
-    _ipk = ipk;
+    _fabricId = [fabricId copy];
+    _ipk = [ipk copy];
 
     return self;
 }
@@ -75,14 +75,14 @@ using namespace chip;
             MTR_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
             return nil;
         }
-        _fabricId = fabricId;
+        _fabricId = @(fabricId);
     }
 
     _operationalKeypair = operationalKeypair;
-    _operationalCertificate = operationalCertificate;
-    _intermediateCertificate = intermediateCertificate;
-    _rootCertificate = rootCertificate;
-    _ipk = ipk;
+    _operationalCertificate = [operationalCertificate copy];
+    _intermediateCertificate = [intermediateCertificate copy];
+    _rootCertificate = [rootCertificate copy];
+    _ipk = [ipk copy];
 
     return self;
 }
@@ -181,7 +181,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         NSError * error;
         self.rootCertificate = [MTRCertificates generateRootCertificate:self.nocSigner
                                                                issuerId:nil
-                                                               fabricId:@(self.fabricId)
+                                                               fabricId:self.fabricId
                                                                   error:&error];
         if (error != nil || self.rootCertificate == nil) {
             MTR_LOG_ERROR("Failed to generate root certificate: %@", error);

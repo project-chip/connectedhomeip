@@ -240,7 +240,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
                     [onOff onWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
@@ -269,7 +269,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
                     [onOff offWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
@@ -298,7 +298,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
                     [onOff toggleWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)

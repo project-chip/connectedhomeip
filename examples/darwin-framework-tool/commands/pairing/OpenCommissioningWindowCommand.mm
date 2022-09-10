@@ -29,7 +29,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 
     auto * self = this;
     if (mCommissioningWindowOption == 0) {
-        auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device endpoint:0 queue:mWorkQueue];
+        auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device endpoint:@(0) queue:mWorkQueue];
         auto * params = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
         params.commissioningTimeout = @(mCommissioningWindowTimeoutMs);
         params.timedInvokeTimeoutMs = @(10000);
