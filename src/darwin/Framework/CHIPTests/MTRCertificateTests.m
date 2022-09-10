@@ -32,7 +32,7 @@
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * rootCert = [MTRCertificates generateRootCertificate:testKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:testKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
 }
 
@@ -41,7 +41,7 @@
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -50,8 +50,8 @@
     __auto_type * intermediateCert = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                       rootCertificate:rootCert
                                                                 intermediatePublicKey:intermediateKeys.publicKey
-                                                                             issuerId:nil
-                                                                             fabricId:nil
+                                                                             issuerID:nil
+                                                                             fabricID:nil
                                                                                 error:nil];
     XCTAssertNotNil(intermediateCert);
 }
@@ -61,7 +61,7 @@
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
@@ -76,8 +76,8 @@
     __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                                  signingCertificate:rootCert
                                                                operationalPublicKey:operationalKeys.publicKey
-                                                                           fabricId:@1
-                                                                             nodeId:@1
+                                                                           fabricID:@1
+                                                                             nodeID:@1
                                                               caseAuthenticatedTags:cats
                                                                               error:nil];
     XCTAssertNotNil(operationalCert);
@@ -88,7 +88,7 @@
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -97,8 +97,8 @@
     __auto_type * intermediateCert = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                       rootCertificate:rootCert
                                                                 intermediatePublicKey:intermediateKeys.publicKey
-                                                                             issuerId:nil
-                                                                             fabricId:nil
+                                                                             issuerID:nil
+                                                                             fabricID:nil
                                                                                 error:nil];
     XCTAssertNotNil(intermediateCert);
 
@@ -108,8 +108,8 @@
     __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:intermediateKeys
                                                                  signingCertificate:intermediateCert
                                                                operationalPublicKey:operationalKeys.publicKey
-                                                                           fabricId:@1
-                                                                             nodeId:@1
+                                                                           fabricID:@1
+                                                                             nodeID:@1
                                                               caseAuthenticatedTags:nil
                                                                               error:nil];
     XCTAssertNotNil(operationalCert);
@@ -120,7 +120,7 @@
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
@@ -153,8 +153,8 @@
     __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                                  signingCertificate:rootCert
                                                                operationalPublicKey:operationalKeys.publicKey
-                                                                           fabricId:@1
-                                                                             nodeId:@1
+                                                                           fabricID:@1
+                                                                             nodeID:@1
                                                               caseAuthenticatedTags:nil
                                                                               error:nil];
     XCTAssertNotNil(operationalCert);
@@ -163,8 +163,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@1
+                                                             fabricID:@1
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:longCats
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -173,8 +173,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@1
+                                                             fabricID:@1
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:catsWithSameIdentifier
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -183,8 +183,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@1
+                                                             fabricID:@1
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:catsWithDuplicatedCAT
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -193,8 +193,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@1
+                                                             fabricID:@1
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:catsWithInvalidVersion
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -203,8 +203,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:operationalKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@1
+                                                             fabricID:@1
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:nil
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -213,8 +213,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@0
-                                                               nodeId:@1
+                                                             fabricID:@0
+                                                               nodeID:@1
                                                 caseAuthenticatedTags:nil
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -223,8 +223,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@0
+                                                             fabricID:@1
+                                                               nodeID:@0
                                                 caseAuthenticatedTags:nil
                                                                 error:nil];
     XCTAssertNil(operationalCert);
@@ -233,8 +233,8 @@
     operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                    signingCertificate:rootCert
                                                  operationalPublicKey:operationalKeys.publicKey
-                                                             fabricId:@1
-                                                               nodeId:@(0xFFFFFFFFFFFFFFFFLLU)
+                                                             fabricID:@1
+                                                               nodeID:@(0xFFFFFFFFFFFFFFFFLLU)
                                                 caseAuthenticatedTags:nil
                                                                 error:nil];
     XCTAssertNil(operationalCert);

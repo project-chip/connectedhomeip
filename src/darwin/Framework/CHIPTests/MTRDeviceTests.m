@@ -158,9 +158,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
@@ -229,9 +229,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    [device readAttributeWithEndpointId:nil
-                              clusterId:@29
-                            attributeId:@0
+    [device readAttributeWithEndpointID:nil
+                              clusterID:@29
+                            attributeID:@0
                                  params:nil
                             clientQueue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
@@ -271,9 +271,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
-    [device writeAttributeWithEndpointId:@1
-                               clusterId:@8
-                             attributeId:@17
+    [device writeAttributeWithEndpointID:@1
+                               clusterID:@8
+                             attributeID:@17
                                    value:writeValue
                        timedWriteTimeout:nil
                              clientQueue:queue
@@ -319,9 +319,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
             @{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
         ]
     };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@8
-                              commandId:@4
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@8
+                              commandID:@4
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -364,9 +364,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
         @"type" : @"Structure",
         @"value" : @[],
     };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@0
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@0
                           commandFields:fields
                      timedInvokeTimeout:@10000
                             clientQueue:queue
@@ -407,9 +407,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-    [device subscribeAttributeWithEndpointId:@1
-        clusterId:@6
-        attributeId:@0
+    [device subscribeAttributeWithEndpointID:@1
+        clusterID:@6
+        attributeID:@0
         minInterval:@1
         maxInterval:@10
         params:nil
@@ -451,9 +451,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Send commands to trigger attribute change
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
     NSDictionary * fields = @{ @"type" : @"Structure", @"value" : [NSArray array] };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@1
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -501,9 +501,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Send command to trigger attribute change
     fields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", [NSArray array], @"value", nil];
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@0
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@0
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -549,9 +549,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device
-        readAttributeWithEndpointId:@0
-                          clusterId:@10000
-                        attributeId:@0
+        readAttributeWithEndpointID:@0
+                          clusterID:@10000
+                        attributeID:@0
                              params:nil
                         clientQueue:queue
                          completion:^(id _Nullable values, NSError * _Nullable error) {
@@ -580,9 +580,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
     [device
-        writeAttributeWithEndpointId:@1
-                           clusterId:@8
-                         attributeId:@10000
+        writeAttributeWithEndpointID:@1
+                           clusterID:@8
+                         attributeID:@10000
                                value:writeValue
                    timedWriteTimeout:nil
                          clientQueue:queue
@@ -617,9 +617,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         ]
     };
     [device
-        invokeCommandWithEndpointId:@1
-                          clusterId:@8
-                          commandId:@40000
+        invokeCommandWithEndpointID:@1
+                          clusterID:@8
+                          commandID:@40000
                       commandFields:fields
                  timedInvokeTimeout:nil
                         clientQueue:queue
@@ -668,9 +668,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.autoResubscribe = @(NO);
-    [device subscribeAttributeWithEndpointId:@10000
-        clusterId:@6
-        attributeId:@0
+    [device subscribeAttributeWithEndpointID:@10000
+        clusterID:@6
+        attributeID:@0
         minInterval:@2
         maxInterval:@10
         params:params
@@ -705,9 +705,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    [device readAttributeWithEndpointId:@1
-                              clusterId:@29
-                            attributeId:nil
+    [device readAttributeWithEndpointID:@1
+                              clusterID:@29
+                            attributeID:nil
                                  params:nil
                             clientQueue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
@@ -886,9 +886,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache using generic path...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:@1
-                          clusterId:@6
-                        attributeId:@0
+        readAttributeWithEndpointID:@1
+                          clusterID:@6
+                        attributeID:@0
                         clientQueue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
@@ -909,9 +909,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache using wildcard endpoint...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:nil
-                          clusterId:@6
-                        attributeId:@0
+        readAttributeWithEndpointID:nil
+                          clusterID:@6
+                        attributeID:@0
                         clientQueue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
@@ -931,9 +931,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache using wildcard cluster ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:@1
-                          clusterId:nil
-                        attributeId:@0
+        readAttributeWithEndpointID:@1
+                          clusterID:nil
+                        attributeID:@0
                         clientQueue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
@@ -952,9 +952,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache using wildcard attribute ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:@1
-                          clusterId:@6
-                        attributeId:nil
+        readAttributeWithEndpointID:@1
+                          clusterID:@6
+                        attributeID:nil
                         clientQueue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
@@ -974,9 +974,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache using wildcard endpoint ID and cluster ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:nil
-                          clusterId:nil
-                        attributeId:@0
+        readAttributeWithEndpointID:nil
+                          clusterID:nil
+                        attributeID:@0
                         clientQueue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read attribute cache value: %@, error %@", values, error);
@@ -1005,9 +1005,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-    [device subscribeAttributeWithEndpointId:@1
-        clusterId:@6
-        attributeId:@0
+    [device subscribeAttributeWithEndpointID:@1
+        clusterID:@6
+        attributeID:@0
         minInterval:@1
         maxInterval:@10
         params:nil
@@ -1049,9 +1049,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Send commands to trigger attribute change
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
     NSDictionary * fields = @{ @"type" : @"Structure", @"value" : [NSArray array] };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@1
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -1162,9 +1162,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
     // KeySetReadAllIndices in the Group Key Management has id 4 and a data response with id 5
     [device
-        invokeCommandWithEndpointId:@0
-                          clusterId:@(0x003F)
-                          commandId:@4
+        invokeCommandWithEndpointID:@0
+                          clusterID:@(0x003F)
+                          commandID:@4
                       commandFields:fields
                  timedInvokeTimeout:nil
                         clientQueue:queue
@@ -1228,9 +1228,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
-    [device subscribeAttributeWithEndpointId:@1
-        clusterId:@6
-        attributeId:@0xffffffff
+    [device subscribeAttributeWithEndpointID:@1
+        clusterID:@6
+        attributeID:@0xffffffff
         minInterval:@2
         maxInterval:@10
         params:nil
@@ -1272,9 +1272,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Send commands to set attribute state to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"command responded"];
     NSDictionary * fields = @{ @"type" : @"Structure", @"value" : @[] };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@0
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@0
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -1302,9 +1302,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Send commands to trigger attribute change
     commandExpectation = [self expectationWithDescription:@"command responded"];
     fields = @{ @"type" : @"Structure", @"value" : @[] };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@1
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
@@ -1351,9 +1351,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Send command to trigger attribute change
     commandExpectation = [self expectationWithDescription:@"command responded"];
     fields = @{ @"type" : @"Structure", @"value" : @[] };
-    [device invokeCommandWithEndpointId:@1
-                              clusterId:@6
-                              commandId:@0
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@0
                           commandFields:fields
                      timedInvokeTimeout:nil
                             clientQueue:queue
