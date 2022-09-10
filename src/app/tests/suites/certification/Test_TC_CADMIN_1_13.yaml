@@ -95,23 +95,95 @@ tests:
       response:
           value: 2
 
-    - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
-      command: "readAttribute"
-      attribute: "AdminFabricIndex"
-      PICS: CADMIN.S.A0001
-      response:
-          constraints:
-              notValue: null
+    #Need YAML support to save FabricId value from Fabrics list attribute
+    #Issue https://github.com/project-chip/connectedhomeip/issues/13029
+    - label:
+          "TH_CR1 reads AdminFabricIndex attribute from DUT_CE and Verify TH_CR1
+          reads the AdminFabricIndex value successfully and verify the value to
+          be the same as the Fabric Index of the Fabrics attribute list entry in
+          TH_CR1"
+      PICS: CADMIN.S.A0001 && PICS_USER_PROMPT
+      verification: |
+          On TH_CR1 send the below command
 
-    - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
-      cluster: "AdministratorCommissioning"
-      command: "readAttribute"
-      attribute: "AdminVendorId"
-      PICS: CADMIN.S.A0002
-      response:
-          constraints:
-              notValue: null
+          ./chip-tool administratorcommissioning read admin-fabric-index  1 0
+
+          Verify on TH_CR1(chip-tool) log successfully reads the AdminFabricIndex
+
+          [1658838491.852418][9309:9314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 2423106591
+          [1658838491.852516][9309:9314] CHIP:TOO:   AdminFabricIndex: 1
+          [1658838491.852595][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:72459812 on exchange 35132i
+
+
+          Verify the AdminFabricIndex value above matches with the Fabric Index in the Fabrics list of TH_CR1
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify 1 entry in the Fabrics list attributeOn TH_CR1(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
+          [1649245801.244173][10091:10096] CHIP:TOO:   Fabrics: 1 entries
+          [1649245801.244305][10091:10096] CHIP:TOO:     [1]: {
+          [1649245801.244348][10091:10096] CHIP:TOO:       RootPublicKey: 045541017FCEFD0D83963C9ED7F21380C6B789EB989B5D20DC318FAE92D60D0F685666505E9C4F86C49ADC71AB3A8B9B44FD43214CF9BE2B6D47DE01F28FE1544F
+          [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
+          [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
+          [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
+          [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
+          [1649245801.244552][10091:10096] CHIP:TOO:      }
+          [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/13029
+    - label:
+          "TH_CR1 reads AdminVendorId attribute from DUT_CE and Verify TH_CR1
+          reads the AdminVendorId value successfully and verify this value to be
+          the same as the Vendor ID field of Fabrics attribute list entry in
+          TH_CR1"
+      PICS: CADMIN.S.A0002 && PICS_USER_PROMPT
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool administratorcommissioning read admin-vendor-id 1 0
+
+          Verify on TH_CR1(chip-tool) log successfully reads the AdminVendorId
+
+          [1659096764.946339][11666:11671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 1299585105
+          [1659096764.946483][11666:11671] CHIP:TOO:   AdminVendorId: 65521
+          [1659096764.946718][11666:11671] CHIP:EM: Sending Standalone Ack for MessageCounter:83111931 on exchange 26316i
+
+          Verify the AdminVendorId value above matches with the VendorId in the Fabrics list of TH_CR1
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify 1 entry in the Fabrics list attributeOn TH_CR1(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
+          [1649245801.244173][10091:10096] CHIP:TOO:   Fabrics: 1 entries
+          [1649245801.244305][10091:10096] CHIP:TOO:     [1]: {
+          [1649245801.244348][10091:10096] CHIP:TOO:       RootPublicKey: 045541017FCEFD0D83963C9ED7F21380C6B789EB989B5D20DC318FAE92D60D0F685666505E9C4F86C49ADC71AB3A8B9B44FD43214CF9BE2B6D47DE01F28FE1544F
+          [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
+          [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
+          [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
+          [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
+          [1649245801.244552][10091:10096] CHIP:TOO:      }
+          [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
@@ -218,7 +290,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -339,7 +411,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

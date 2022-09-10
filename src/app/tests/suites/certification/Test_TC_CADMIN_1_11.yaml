@@ -137,7 +137,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload  --commissioner-name beta
+                value: payload
 
     - label: "DUT_CE is commissioned to TH_CR2"
       PICS: CADMIN.S

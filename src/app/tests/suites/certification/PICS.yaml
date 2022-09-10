@@ -3077,9 +3077,6 @@ PICS:
     - label: "Is the device a barrier access device?"
       id: MCORE.DD.DEV_BARRIER
 
-    - label: "Does the device have a vendor specific information element (IE)?"
-      id: MCORE.DD.IE
-
     - label:
           "Does the device or device packaging have a QR code based onboarding
           payload?"
@@ -3724,10 +3721,10 @@ PICS:
       id: DGTHREAD.S.A0039
 
     - label: "Does the DUT-server support the Delay attribute?"
-      id: DGTHREAD.S.A003a
+      id: DGTHREAD.S.A003A
 
     - label: "Does the DUT-server support the SecurityPolicy attribute?"
-      id: DGTHREAD.S.A003b
+      id: DGTHREAD.S.A003B
 
     - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
       id: DGTHREAD.S.A003c
@@ -5568,4 +5565,4 @@ PICS:
       id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
 
     - label: "Does the device support the Factory Reset Method?"
-      id: MCORE.UI.FACTORYRESET
+      id: PICS_MCORE_UI_FACTORYRESET

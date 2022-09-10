@@ -46,14 +46,32 @@ tests:
           MCORE.DD.CHIP_DEV && !(MCORE.DD.CHIP_DEV) && MCORE.DD.DEV_LOCK &&
           MCORE.DD.DEV_BARRIER
       verification: |
-          If (PICS_CHIP_DEV) BLE discovery tool should discover the DUT else it should not
-          If !(PICS_CHIP_DEV) instruct DUT to start Advertising and scan again for commissionale devices using the BLE discovery tool
-          No applicable TH or DUT logs.
+          If (MCORE.DD.CHIP_DEV) IP/BLE discovery tool should discover the DUT else it should not
+          If !(MCORE.DD.CHIP_DEV) instruct DUT to start Advertising and scan again for commissionale devices using the IP/BLE discovery tool
 
+          Verify in TH as commissioner side:
+          For devices already on the network:
+          $  ./chip-tool discover commissionables
+
+          [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
+          [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769
+          [1651192893436] [15304:442604] CHIP: [DIS]         Long Discriminator: 3840
+          [1651192893436] [15304:442604] CHIP: [DIS]         Pairing Hint: 33
+          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000
+          [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
+          [1651192893436] [15304:442604] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Port: 5540
+          [1651192893436] [15304:442604] CHIP: [DIS]         Commissioning Mode: 1
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
+
+          For devices not on the network (i.e. BLE discovery):
           1. Discover commissionables over BLE using a BLE discovery tool of choice.
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          Observe the DUT advertising in a commissionable state
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
