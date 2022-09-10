@@ -189,6 +189,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceUnregistered");
           }
         };
+    if (registrationListeners.size() == 0) {
+      multicastLock.acquire();
+    }
     registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
@@ -198,6 +201,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   @Override
   public void removeServices() {
     Log.d(TAG, "removeServices: ");
+    if (registrationListeners.size() > 0) {
+      multicastLock.release();
+    }
     for (NsdManager.RegistrationListener l : registrationListeners) {
       Log.i(TAG, "Remove " + l);
       nsdManager.unregisterService(l);
