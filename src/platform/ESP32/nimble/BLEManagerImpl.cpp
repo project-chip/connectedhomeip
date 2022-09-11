@@ -833,7 +833,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
                     gapEvent->notify_tx.conn_handle, gapEvent->notify_tx.status);
 
     // Signal the BLE Layer that the outstanding indication is complete.
-    if (gapEvent->notify_tx.status == 0 || gapEvent->notify_tx.status == BLE_HS_EDONE)
+    if (gapEvent->notify_tx.status == BLE_HS_EDONE)
     {
         // Post an event to the Chip queue to process the indicate confirmation.
         ChipDeviceEvent event;
@@ -1012,8 +1012,11 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         break;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
-        err = sInstance.HandleTXComplete(event);
-        SuccessOrExit(err);
+        if (event->notify_tx.status != 0)
+        {
+            err = sInstance.HandleTXComplete(event);
+            SuccessOrExit(err);
+        }
         break;
 
     case BLE_GAP_EVENT_MTU:

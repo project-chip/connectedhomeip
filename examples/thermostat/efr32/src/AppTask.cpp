@@ -140,6 +140,10 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "Thermostat-App");
+#endif
+
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {

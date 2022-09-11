@@ -69,7 +69,7 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
           constraints:
               type: int16u
@@ -137,13 +137,10 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep2c
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMinMiredsValue +
-                  ColorTempPhysicalMaxMiredsValue ) / 2
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 10s"
@@ -157,11 +154,10 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep2d
           constraints:
-              minValue: ColorTemperatureMiredsStep2c
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
@@ -175,10 +171,11 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
+          value: ColorTempPhysicalMaxMiredsValue
           constraints:
-              minValue: ColorTemperatureMiredsStep2d
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
@@ -215,9 +212,8 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep3b
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
@@ -233,12 +229,11 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep3c
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
-              maxValue: ColorTemperatureMiredsStep3b
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -251,11 +246,12 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
+          value: ColorTempPhysicalMinMiredsValue
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
-              maxValue: ColorTemperatureMiredsStep3c
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
           "TH sends MoveColorTemperature command to DUT with MoveMode =
@@ -314,13 +310,11 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
           saveAs: ColorTemperatureMiredsStep4c
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMaxMiredsValue -
-                  ColorTempPhysicalMinMiredsValue ) / 20
+              minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Wait 2s"
@@ -334,7 +328,7 @@ tests:
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTemperatureMireds"
       response:
           value: ColorTemperatureMiredsStep4c
 
@@ -343,6 +337,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 2
           constraints:
               minValue: 0
               maxValue: 2
@@ -350,8 +345,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 2
           constraints:
               minValue: 0
               maxValue: 3

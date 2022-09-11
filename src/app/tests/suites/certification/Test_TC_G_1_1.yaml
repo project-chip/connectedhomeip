@@ -48,14 +48,14 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "TH reads the FeatureMap(G.S.F00) from DUT"
       PICS: G.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"

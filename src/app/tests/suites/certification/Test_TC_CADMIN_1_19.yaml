@@ -122,7 +122,7 @@ tests:
 
           Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR1(chip-tool) log
 
-          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+          ./chip-tool operationalcredentials read commissioned-fabrics 2 0 --commissioner-name beta
 
           [1660907933.677983][33780:33785] CHIP:TOO:   CommissionedFabrics: 15
       disabled: true

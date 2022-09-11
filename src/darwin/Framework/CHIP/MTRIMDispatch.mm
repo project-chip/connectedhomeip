@@ -121,6 +121,11 @@ namespace app {
         return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));
     }
 
+    bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+    {
+        return DetermineAttributeStatus(aPath, /* aIsWrite = */ false) == Status::UnsupportedAccess;
+    }
+
     Status ServerClusterCommandExists(const ConcreteCommandPath & aPath)
     {
         // TODO: Consider making this configurable for applications that are not

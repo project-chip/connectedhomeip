@@ -65,6 +65,9 @@ public:
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
+        AddArgument("cd-trust-store-path", &mCDTrustStorePath,
+                    "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
+                    "directory.");
         AddArgument("commissioner-name", &mCommissionerName,
                     "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
                     "4.  The default if not specified is \"alpha\".");
@@ -73,6 +76,9 @@ public:
         AddArgument("use-max-sized-certs", 0, 1, &mUseMaxSizedCerts,
                     "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
                     "certificates are generated.");
+        AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
+                    "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
+                    "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -122,6 +128,8 @@ protected:
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;
+    // TODO: It's pretty weird that we re-init mCommissionerStorage for every
+    // identity without shutting it down or something in between...
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
@@ -131,6 +139,7 @@ protected:
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
+    CHIP_ERROR GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
@@ -146,21 +155,38 @@ private:
 
     CHIP_ERROR EnsureCommissionerForIdentity(std::string identity);
 
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
-    void ShutdownCommissioner(std::string key);
+    // Commissioners are keyed by name and local node id.
+    struct CommissionerIdentity
+    {
+        bool operator<(const CommissionerIdentity & other) const
+        {
+            return mName < other.mName || (mName == other.mName && mLocalNodeId < other.mLocalNodeId);
+        }
+        std::string mName;
+        chip::NodeId mLocalNodeId;
+    };
+
+    // InitializeCommissioner uses various members, so can't be static.  This is
+    // obviously a little odd, since the commissioners are then shared across
+    // multiple commands in interactive mode...
+    CHIP_ERROR InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId);
+    void ShutdownCommissioner(const CommissionerIdentity & key);
     chip::FabricId CurrentCommissionerId();
-    static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+
+    static std::map<CommissionerIdentity, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;
 
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
+    chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
+    chip::Optional<bool> mOnlyAllowTrustedCdKeys;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.
-    static const chip::Credentials::AttestationTrustStore * sPaaTrustStore;
+    static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

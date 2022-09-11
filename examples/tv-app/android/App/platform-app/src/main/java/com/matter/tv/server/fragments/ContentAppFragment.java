@@ -5,21 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.matter.tv.server.R;
-import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
-import com.matter.tv.server.service.MatterServant;
 import java.util.ArrayList;
 
 /**
@@ -99,20 +95,6 @@ public class ContentAppFragment extends Fragment {
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.appName = convertView.findViewById(R.id.appNameTextView);
         viewHolder.appName.setText(getItem(position));
-        viewHolder.sendMessageButton = convertView.findViewById(R.id.sendMessageButton);
-        viewHolder.sendMessageButton.setText(R.string.send_command);
-        viewHolder.sendMessageButton.setOnClickListener(
-            view -> {
-              Log.i(TAG, "Button was clicked for " + position);
-              for (ContentApp app :
-                  ContentAppDiscoveryService.getReceiverInstance()
-                      .getDiscoveredContentApps()
-                      .values()) {
-                if (app.getAppName().equals(getItem(position))) {
-                  MatterServant.get().sendTestMessage(app.getEndpointId(), "My Native Message");
-                }
-              }
-            });
         convertView.setTag(viewHolder);
       } else {
         mainViewHolder = (ViewHolder) convertView.getTag();
@@ -128,9 +110,11 @@ public class ContentAppFragment extends Fragment {
           @Override
           public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            String packageName = intent.getStringExtra("com.matter.tv.server.appagent.add.pkg");
-            if (action.equals("com.matter.tv.server.appagent.add")
-                || action.equals("com.matter.tv.server.appagent.remove")) {
+            String packageName =
+                intent.getStringExtra(
+                    ContentAppDiscoveryService.DISCOVERY_APPAGENT_EXTRA_PACKAGENAME);
+            if (action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD)
+                || action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE)) {
               adapter.clear();
               adapter.addAll(
                   ContentAppDiscoveryService.getReceiverInstance()
@@ -141,14 +125,16 @@ public class ContentAppFragment extends Fragment {
           }
         };
     getContext()
-        .registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.add"));
+        .registerReceiver(
+            broadcastReceiver,
+            new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_ADD));
     getContext()
         .registerReceiver(
-            broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
+            broadcastReceiver,
+            new IntentFilter(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE));
   }
 
   public class ViewHolder {
     TextView appName;
-    Button sendMessageButton;
   }
 }

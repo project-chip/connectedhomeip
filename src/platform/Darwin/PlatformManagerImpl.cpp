@@ -52,8 +52,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
-    mRunLoopSem = dispatch_semaphore_create(0);
-
     // Ensure there is a dispatch queue available
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
@@ -121,6 +119,8 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
 void PlatformManagerImpl::_RunEventLoop()
 {
+    mRunLoopSem = dispatch_semaphore_create(0);
+
     _StartEventLoopTask();
 
     //
@@ -128,6 +128,8 @@ void PlatformManagerImpl::_RunEventLoop()
     // _StopEventLoopTask()
     //
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
+    dispatch_release(mRunLoopSem);
+    mRunLoopSem = nullptr;
 }
 
 void PlatformManagerImpl::_Shutdown()

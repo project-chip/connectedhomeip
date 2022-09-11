@@ -135,13 +135,24 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
 
 /**
+ * Return the attestation challenge for the secure session of the device being commissioned.
+ *
+ * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
+ * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
+ */
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId;
+
+/**
  * Compute a PASE verifier and passcode ID for the desired setup pincode.
  *
  * @param[in] setupPincode    The desired PIN code to use
  * @param[in] iterations      The number of iterations to use when generating the verifier
  * @param[in] salt            The 16-byte salt for verifier computation
+ *
+ * Returns nil on errors (e.g. salt has the wrong size), otherwise the computed
+ * verifier bytes.
  */
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt;
++ (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

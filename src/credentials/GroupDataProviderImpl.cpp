@@ -414,6 +414,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
         ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
         return writer.EndContainer(container);
     }
+
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
         ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
@@ -1420,7 +1421,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(fabric.map_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1603,7 +1604,10 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
         return keyset.Save(mStorage);
     }
 
-    // New keyset, insert first
+    // New keyset
+    VerifyOrReturnError(fabric.keyset_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+
+    // Insert first
     keyset.next = fabric.first_keyset;
     ReturnErrorOnFailure(keyset.Save(mStorage));
     // Update fabric
@@ -1856,13 +1860,15 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::MessageDecrypt(const ByteSpan
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, Crypto::kAES_CCM128_Key_Length, nonce.data(),
+                                 nonce.size(), output.data());
 }
 
 CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce,
                                                                   MutableByteSpan & output) const
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Crypto::AES_CTR_crypt(input.data(), input.size(), mPrivacyKey, Crypto::kAES_CCM128_Key_Length, nonce.data(),
+                                 nonce.size(), output.data());
 }
 
 GroupDataProviderImpl::GroupSessionIterator * GroupDataProviderImpl::IterateGroupSessions(uint16_t session_id)

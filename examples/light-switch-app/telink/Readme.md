@@ -202,3 +202,68 @@ To perform the unicast binding process, complete the following steps:
 
 To test the communication between the light switch device and the bound devices,
 use [light switch buttons](#buttons).
+
+### OTA with Linux OTA Provider
+
+OTA feature enabled by default only for ota-requestor-app example. To enable OTA
+feature for another Telink example:
+
+-   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
+    file.
+-   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
+
+After build application with enabled OTA feature, use next binary files:
+
+-   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr-ota.bin - binary for OTA Provider
+-   zephyr.bin - ignore this file.
+-   zephyr.signed.bin - ignore this file.
+
+Usage of OTA:
+
+-   Build the [Linux OTA Provider](../../ota-provider-app/linux)
+
+    ```
+    ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
+    ```
+
+-   Run the Linux OTA Provider with OTA image.
+
+    ```
+    ./chip-ota-provider-app -f zephyr-ota.bin
+    ```
+
+-   Provision the Linux OTA Provider using chip-tool
+
+    ```
+    ./chip-tool pairing onnetwork ${OTA_PROVIDER_NODE_ID} 20202021
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Configure the ACL of the ota-provider-app to allow access
+
+    ```
+    ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' ${OTA_PROVIDER_NODE_ID} 0
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Use the chip-tool to announce the ota-provider-app to start the OTA process
+
+    ```
+    ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+    -   \${DEVICE_NODE_ID} is the node id of paired device
+
+Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
+OTA provider for applying the image. Device will restart on successful
+application of OTA image.

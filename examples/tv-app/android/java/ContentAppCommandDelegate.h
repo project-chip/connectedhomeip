@@ -59,8 +59,6 @@ public:
 
     void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
 
-    const char * sendCommand(chip::EndpointId epID, std::string commandPayload);
-
 private:
     void InitializeJNIObjects(jobject manager)
     {

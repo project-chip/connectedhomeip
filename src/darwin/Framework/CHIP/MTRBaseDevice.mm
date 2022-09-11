@@ -18,11 +18,13 @@
 #import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
+#import "MTRBaseSubscriptionCallback.h"
 #import "MTRCallbackBridgeBase_internal.h"
 #import "MTRCluster.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging.h"
+
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
 #include "lib/core/CHIPError.h"
@@ -38,8 +40,6 @@
 #include <controller/WriteInteraction.h>
 
 #include <memory>
-
-typedef void (^SubscriptionEstablishedHandler)(void);
 
 using namespace chip;
 using namespace chip::app;
@@ -268,101 +268,21 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     [self.deviceController invalidateCASESessionForNode:self.deviceID];
 }
 
-typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
-typedef void (^DataReportCallback)(NSArray * value);
-typedef void (^ErrorCallback)(NSError * error);
-
 namespace {
 
-class SubscriptionCallback final : public ClusterStateCache::Callback {
+class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
 public:
     SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
-        ErrorCallback errorCallback, SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
-        : mQueue(queue)
-        , mAttributeReportCallback(attributeReportCallback)
-        , mEventReportCallback(eventReportCallback)
-        , mErrorCallback(errorCallback)
-        , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
-        , mBufferedReadAdapter(*this)
+        ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
+        : MTRBaseSubscriptionCallback(queue, attributeReportCallback, eventReportCallback, errorCallback,
+            resubscriptionScheduledHandler, subscriptionEstablishedHandler, onDoneHandler)
     {
     }
-
-    SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
-        ErrorCallback errorCallback, SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler,
-        void (^onDoneHandler)(void))
-        : mQueue(queue)
-        , mAttributeReportCallback(attributeReportCallback)
-        , mEventReportCallback(eventReportCallback)
-        , mErrorCallback(errorCallback)
-        , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
-        , mBufferedReadAdapter(*this)
-        , mOnDoneHandler(onDoneHandler)
-    {
-    }
-
-    ~SubscriptionCallback()
-    {
-        // Ensure we release the ReadClient before we tear down anything else,
-        // so it can call our OnDeallocatePaths properly.
-        mReadClient = nullptr;
-    }
-
-    BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
-
-    // We need to exist to get a ReadClient, so can't take this as a constructor argument.
-    void AdoptReadClient(std::unique_ptr<ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
-    void AdoptAttributeCache(std::unique_ptr<ClusterStateCache> aAttributeCache) { mAttributeCache = std::move(aAttributeCache); }
-
-private:
-    void OnReportBegin() override;
-
-    void OnReportEnd() override;
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-
-    void OnError(CHIP_ERROR aError) override;
-
-    void OnDone(ReadClient * aReadClient) override;
-
-    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
-
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
-
-    void ReportData();
-    void ReportError(CHIP_ERROR err);
-    void ReportError(const StatusIB & status);
-    void ReportError(NSError * _Nullable err);
-
-private:
-    dispatch_queue_t mQueue;
-    DataReportCallback _Nullable mAttributeReportCallback = nil;
-    DataReportCallback _Nullable mEventReportCallback = nil;
-    // We set mErrorCallback to nil when queueing error reports, so we
-    // make sure to only report one error.
-    ErrorCallback _Nullable mErrorCallback = nil;
-    SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler;
-    BufferedReadCallback mBufferedReadAdapter;
-    NSMutableArray * _Nullable mAttributeReports = nil;
-    NSMutableArray * _Nullable mEventReports = nil;
-
-    // Our lifetime management is a little complicated.  On error we
-    // attempt to delete the ReadClient, but asynchronously.  While
-    // that's pending, someone else (e.g. an error it runs into) could
-    // delete it too.  And if someone else does attempt to delete it, we want to
-    // make sure we delete ourselves as well.
-    //
-    // To handle this, enforce the following rules:
-    //
-    // 1) We guarantee that mErrorCallback is only invoked with an error once.
-    // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
-    //    error callback, but not both, by tracking whether we have a queued-up
-    //    deletion.
-    std::unique_ptr<ReadClient> mReadClient;
-    std::unique_ptr<ClusterStateCache> mAttributeCache;
-    bool mHaveQueuedDeletion = false;
-    void (^mOnDoneHandler)(void) = nil;
 };
 
 } // anonymous namespace
@@ -376,6 +296,7 @@ private:
          eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     if (self.paseDevice != nil) {
         // We don't support subscriptions over PASE.
@@ -388,78 +309,79 @@ private:
     // Copy params before going async.
     params = [params copy];
 
-    [self.deviceController getSessionForNode:self.nodeID
-                           completionHandler:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                               NSError * _Nullable error) {
-                               if (error != nil) {
-                                   dispatch_async(queue, ^{
-                                       errorHandler(error);
-                                   });
-                                   return;
-                               }
+    [self.deviceController
+        getSessionForNode:self.nodeID
+        completionHandler:^(
+            ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session, NSError * _Nullable error) {
+            if (error != nil) {
+                dispatch_async(queue, ^{
+                    errorHandler(error);
+                });
+                return;
+            }
 
-                               // Wildcard endpoint, cluster, attribute, event.
-                               auto attributePath = std::make_unique<AttributePathParams>();
-                               auto eventPath = std::make_unique<EventPathParams>();
-                               ReadPrepareParams readParams(session.Value());
-                               readParams.mMinIntervalFloorSeconds = minInterval;
-                               readParams.mMaxIntervalCeilingSeconds = maxInterval;
-                               readParams.mpAttributePathParamsList = attributePath.get();
-                               readParams.mAttributePathParamsListSize = 1;
-                               readParams.mpEventPathParamsList = eventPath.get();
-                               readParams.mEventPathParamsListSize = 1;
-                               readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
+            // Wildcard endpoint, cluster, attribute, event.
+            auto attributePath = std::make_unique<AttributePathParams>();
+            auto eventPath = std::make_unique<EventPathParams>();
+            ReadPrepareParams readParams(session.Value());
+            readParams.mMinIntervalFloorSeconds = minInterval;
+            readParams.mMaxIntervalCeilingSeconds = maxInterval;
+            readParams.mpAttributePathParamsList = attributePath.get();
+            readParams.mAttributePathParamsListSize = 1;
+            readParams.mpEventPathParamsList = eventPath.get();
+            readParams.mEventPathParamsListSize = 1;
+            readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
 
-                               std::unique_ptr<SubscriptionCallback> callback;
-                               std::unique_ptr<ReadClient> readClient;
-                               std::unique_ptr<ClusterStateCache> attributeCache;
-                               if (attributeCacheContainer) {
-                                   __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
-                                   callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler,
-                                       eventReportHandler, errorHandler, subscriptionEstablishedHandler, ^{
-                                           MTRAttributeCacheContainer * container = weakPtr;
-                                           if (container) {
-                                               container.cppAttributeCache = nullptr;
-                                           }
-                                       });
-                                   attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
-                                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                                       attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-                               } else {
-                                   callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler,
-                                       eventReportHandler, errorHandler, subscriptionEstablishedHandler);
-                                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                                       callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-                               }
+            std::unique_ptr<SubscriptionCallback> callback;
+            std::unique_ptr<ReadClient> readClient;
+            std::unique_ptr<ClusterStateCache> attributeCache;
+            if (attributeCacheContainer) {
+                __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
+                callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler, errorHandler,
+                    resubscriptionScheduledHandler, subscriptionEstablishedHandler, ^{
+                        MTRAttributeCacheContainer * container = weakPtr;
+                        if (container) {
+                            container.cppAttributeCache = nullptr;
+                        }
+                    });
+                attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
+                readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                    attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+            } else {
+                callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler, errorHandler,
+                    resubscriptionScheduledHandler, subscriptionEstablishedHandler, nil);
+                readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                    callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+            }
 
-                               CHIP_ERROR err;
-                               if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
-                                   err = readClient->SendRequest(readParams);
-                               } else {
-                                   // SendAutoResubscribeRequest cleans up the params, even on failure.
-                                   attributePath.release();
-                                   eventPath.release();
-                                   err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-                               }
+            CHIP_ERROR err;
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                err = readClient->SendRequest(readParams);
+            } else {
+                // SendAutoResubscribeRequest cleans up the params, even on failure.
+                attributePath.release();
+                eventPath.release();
+                err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            }
 
-                               if (err != CHIP_NO_ERROR) {
-                                   dispatch_async(queue, ^{
-                                       errorHandler([MTRError errorForCHIPErrorCode:err]);
-                                   });
+            if (err != CHIP_NO_ERROR) {
+                dispatch_async(queue, ^{
+                    errorHandler([MTRError errorForCHIPErrorCode:err]);
+                });
 
-                                   return;
-                               }
+                return;
+            }
 
-                               if (attributeCacheContainer) {
-                                   attributeCacheContainer.cppAttributeCache = attributeCache.get();
-                                   // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
-                                   callback->AdoptAttributeCache(std::move(attributeCache));
-                               }
-                               // Callback and ReadClient will be deleted when OnDone is called or an error is
-                               // encountered.
-                               callback->AdoptReadClient(std::move(readClient));
-                               callback.release();
-                           }];
+            if (attributeCacheContainer) {
+                attributeCacheContainer.cppAttributeCache = attributeCache.get();
+                // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
+                callback->AdoptAttributeCache(std::move(attributeCache));
+            }
+            // Callback and ReadClient will be deleted when OnDone is called or an error is
+            // encountered.
+            callback->AdoptReadClient(std::move(readClient));
+            callback.release();
+        }];
 }
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
@@ -1283,8 +1205,10 @@ exit:
                 = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
 
             auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                chip::Platform::Delete(callback);
                 [container onDone];
+                // Make sure we delete callback last, because doing that actually destroys our
+                // lambda, so we can't access captured values after that.
+                chip::Platform::Delete(callback);
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType>>(
@@ -1294,7 +1218,11 @@ exit:
             auto readClient = Platform::New<app::ReadClient>(
                 engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-            err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                err = readClient->SendRequest(readParams);
+            } else {
+                err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+            }
 
             if (err != CHIP_NO_ERROR) {
                 if (reportHandler) {
@@ -1303,6 +1231,8 @@ exit:
                     });
                 }
                 Platform::Delete(readClient);
+                Platform::Delete(container.pathParams);
+                container.pathParams = nullptr;
                 return;
             }
 
@@ -1496,37 +1426,6 @@ exit:
 @end
 
 namespace {
-void SubscriptionCallback::OnReportBegin()
-{
-    mAttributeReports = [NSMutableArray new];
-    mEventReports = [NSMutableArray new];
-}
-
-// Reports attribute and event data if any exists
-void SubscriptionCallback::ReportData()
-{
-    __block NSArray * attributeReports = mAttributeReports;
-    mAttributeReports = nil;
-    __block auto attributeCallback = mAttributeReportCallback;
-
-    __block NSArray * eventReports = mEventReports;
-    mEventReports = nil;
-    __block auto eventCallback = mEventReportCallback;
-
-    if (attributeCallback != nil && attributeReports.count) {
-        dispatch_async(mQueue, ^{
-            attributeCallback(attributeReports);
-        });
-    }
-    if (eventCallback != nil && eventReports.count) {
-        dispatch_async(mQueue, ^{
-            eventCallback(eventReports);
-        });
-    }
-}
-
-void SubscriptionCallback::OnReportEnd() { ReportData(); }
-
 void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     id _Nullable value = nil;
@@ -1600,90 +1499,4 @@ void SubscriptionCallback::OnAttributeData(
     [mAttributeReports addObject:[[MTRAttributeReport alloc] initWithPath:aPath value:value error:error]];
 }
 
-void SubscriptionCallback::OnError(CHIP_ERROR aError)
-{
-    // If OnError is called after OnReportBegin, we should report the collected data
-    ReportData();
-    ReportError([MTRError errorForCHIPErrorCode:aError]);
-}
-
-void SubscriptionCallback::OnDone(ReadClient *)
-{
-    if (mOnDoneHandler) {
-        mOnDoneHandler();
-        mOnDoneHandler = nil;
-    }
-    if (!mHaveQueuedDeletion) {
-        delete this;
-        return; // Make sure we touch nothing else.
-    }
-}
-
-void SubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams)
-{
-    VerifyOrDie((aReadPrepareParams.mAttributePathParamsListSize == 0 && aReadPrepareParams.mpAttributePathParamsList == nullptr)
-        || (aReadPrepareParams.mAttributePathParamsListSize == 1 && aReadPrepareParams.mpAttributePathParamsList != nullptr));
-    if (aReadPrepareParams.mpAttributePathParamsList) {
-        delete aReadPrepareParams.mpAttributePathParamsList;
-    }
-
-    VerifyOrDie((aReadPrepareParams.mDataVersionFilterListSize == 0 && aReadPrepareParams.mpDataVersionFilterList == nullptr)
-        || (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr));
-    if (aReadPrepareParams.mpDataVersionFilterList != nullptr) {
-        delete aReadPrepareParams.mpDataVersionFilterList;
-    }
-
-    VerifyOrDie((aReadPrepareParams.mEventPathParamsListSize == 0 && aReadPrepareParams.mpEventPathParamsList == nullptr)
-        || (aReadPrepareParams.mEventPathParamsListSize == 1 && aReadPrepareParams.mpEventPathParamsList != nullptr));
-    if (aReadPrepareParams.mpEventPathParamsList) {
-        delete aReadPrepareParams.mpEventPathParamsList;
-    }
-}
-
-void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
-{
-    if (mSubscriptionEstablishedHandler) {
-        dispatch_async(mQueue, mSubscriptionEstablishedHandler);
-    }
-}
-
-void SubscriptionCallback::ReportError(CHIP_ERROR err) { ReportError([MTRError errorForCHIPErrorCode:err]); }
-
-void SubscriptionCallback::ReportError(const StatusIB & status) { ReportError([MTRError errorForIMStatus:status]); }
-
-void SubscriptionCallback::ReportError(NSError * _Nullable err)
-{
-    if (!err) {
-        // Very strange... Someone tried to create a MTRError for a success status?
-        return;
-    }
-
-    if (mHaveQueuedDeletion) {
-        // Already have an error report pending which will delete us.
-        return;
-    }
-
-    __block ErrorCallback callback = mErrorCallback;
-    __block auto * myself = this;
-    mErrorCallback = nil;
-    mAttributeReportCallback = nil;
-    mEventReportCallback = nil;
-    __auto_type onDoneHandler = mOnDoneHandler;
-    mOnDoneHandler = nil;
-    dispatch_async(mQueue, ^{
-        callback(err);
-        if (onDoneHandler) {
-            onDoneHandler();
-        }
-
-        // Deletion of our ReadClient (and hence of ourselves, since the
-        // ReadClient has a pointer to us) needs to happen on the Matter work
-        // queue.
-        dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-            delete myself;
-        });
-    });
-
-    mHaveQueuedDeletion = true;
-}
 } // anonymous namespace

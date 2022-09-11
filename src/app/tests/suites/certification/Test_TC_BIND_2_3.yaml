@@ -202,6 +202,8 @@ tests:
           [1657719097.788418][4548:4554] CHIP:TOO:    }
 
 
+          Run this commands for both Ligh-switch-app and Lighting-app:
+
           ./chip-tool groupsettings add-group grp1 0x0001
 
           ./chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
@@ -224,6 +226,29 @@ tests:
           "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
           in the AddGroup command sent from TH1 to TH2"
       verification: |
+          Before write the binding entries run the ACL Commands:
+
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
+
+          On TH1(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 2 0
+
+          On TH1(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+
           Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
 
           ./chip-tool binding write binding "[{"group" : "0x0001"}]" 74 1
@@ -246,26 +271,6 @@ tests:
           entries"
       PICS: OO.C.C01.Tx
       verification: |
-          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
-
-           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
-          Run this cmmd for lighting app in chip-tool:
-
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 2 0
-
-          On TH1(Chip-tool), Verify the success response for Acl:
-
-          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
-          [1659075680.944052][2687:2692] CHIP:DMG:                         {
-          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-
           Press button no.2 on nrf52840 DK thread board
       disabled: true
 

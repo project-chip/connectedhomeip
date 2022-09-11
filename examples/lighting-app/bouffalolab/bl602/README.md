@@ -64,7 +64,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     commands:
 
     ```
-    cd third_party/bouffalolab/bl602_sdk/repo/tools/flash_tool
+    cd third_party/bouffalolab/repo/tools/flash_tool
 
     ./bflb_iot_tool-ubuntu18 --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../../out/bl602-light/chip-bl602-lighting-example.bin
     ```

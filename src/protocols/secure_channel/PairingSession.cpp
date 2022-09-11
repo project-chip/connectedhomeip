@@ -63,11 +63,15 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
+        // Make sure to null out mDelegate so we don't send it any other
+        // notifications.
+        auto * delegate = mDelegate;
+        mDelegate       = nullptr;
+        delegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
     }
     else
     {
-        mDelegate->OnSessionEstablishmentError(err);
+        NotifySessionEstablishmentError(err);
     }
 }
 
@@ -163,6 +167,19 @@ void PairingSession::Clear()
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
+}
+
+void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
+{
+    if (mDelegate == nullptr)
+    {
+        // Already notified success or error.
+        return;
+    }
+
+    auto * delegate = mDelegate;
+    mDelegate       = nullptr;
+    delegate->OnSessionEstablishmentError(error);
 }
 
 } // namespace chip

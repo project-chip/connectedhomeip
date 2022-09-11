@@ -31,6 +31,10 @@ chip_test_suite("tests") {
     "TestTimeSource.cpp",
   ]
 
+  if (chip_device_platform != "fake") {
+    test_sources += [ "TestSystemScheduleWork.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

@@ -33,16 +33,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute: MeasuredValue"
-      PICS: TMP.S.A0000
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: int16s
-              minValue: -27315
-              maxValue: 32767
-
     - label: "Read the mandatory attribute: MinMeasuredValue"
       PICS: TMP.S.A0001
       command: "readAttribute"
@@ -61,6 +51,16 @@ tests:
           constraints:
               type: int16s
               minValue: -27314
+              maxValue: 32767
+
+    - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: TMP.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27315
               maxValue: 32767
 
     - label: "Read the optional attribute: Tolerance"

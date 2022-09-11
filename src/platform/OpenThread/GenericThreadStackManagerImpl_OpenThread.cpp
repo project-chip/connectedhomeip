@@ -453,7 +453,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         // If Thread scanning was done before commissioning, turn off the IPv6 interface.
         if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
         {
-            otIp6SetEnabled(mOTInst, false);
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                Impl()->LockThreadStack();
+                otIp6SetEnabled(mOTInst, false);
+                Impl()->UnlockThreadStack();
+            });
         }
 
         if (mpScanCallback != nullptr)
@@ -2518,7 +2522,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowseEmpty(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, nullptr, 0, dnsResult->error);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, nullptr, 0, true, dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 
@@ -2526,7 +2530,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchBrowse(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, &dnsResult->mMdnsService, 1, dnsResult->error);
+    ThreadStackMgrImpl().mDnsBrowseCallback(dnsResult->context, &dnsResult->mMdnsService, 1, false, dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 
@@ -2543,8 +2547,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
-    uint16_t index          = 0;
-    bool wasAnythingBrowsed = false;
+    uint16_t index = 0;
 
     if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
     {
@@ -2570,18 +2573,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 
         VerifyOrExit(error == CHIP_NO_ERROR, );
 
-        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
+        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, CHIP_NO_ERROR);
         error = FromOtDnsResponseToMdnsData(serviceInfo, type, dnsResult->mMdnsService, dnsResult->mServiceTxtEntry);
         if (CHIP_NO_ERROR == error)
         {
-            // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
-            // allocate on
-            // stack.
+            // Invoke callback for every service one by one instead of for the whole
+            // list due to large memory size needed to allocate on stack.
             static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
-            wasAnythingBrowsed = true;
         }
         else
         {
@@ -2591,13 +2592,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     }
 
 exit:
-
-    // In case no service was found invoke callback to notify about failure. In other case it was already called before.
-    if (!wasAnythingBrowsed)
-    {
-        DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
-    }
+    // Invoke callback to notify about end-of-browse or failure
+    DnsResult * dnsResult = Platform::New<DnsResult>(aContext, error);
+    DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
 }
 
 template <class ImplClass>

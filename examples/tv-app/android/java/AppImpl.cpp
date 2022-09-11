@@ -374,48 +374,23 @@ EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, jobject co
     return epId;
 }
 
-/**
- * @brief Code for testing the message flow path.
- *
- */
-class TestCommandHandlerCallback : public app::CommandHandler::Callback
+EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
 {
-    void OnDone(app::CommandHandler & apCommandObj) {}
-
-    void DispatchCommand(app::CommandHandler & apCommandObj, const app::ConcreteCommandPath & aCommandPath,
-                         TLV::TLVReader & apPayload)
-    {}
-
-    Protocols::InteractionModel::Status CommandExists(const app::ConcreteCommandPath & aCommandPath)
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-};
-
-/**
- * @brief Code for testing the message flow path.
- *
- */
-void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * message)
-{
-    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage called with message %s & endpointId %d", message, epId);
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        ContentAppImpl * app = mContentApps.at(i);
-        ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl checking app with endpointId %d", app->GetEndpointId());
+        auto & app = mContentApps.at(i);
         if (app->GetEndpointId() == epId)
         {
-            ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage endpoint found");
-            app::ConcreteCommandPath commandPath(epId, app::Clusters::ContentLauncher::Id,
-                                                 app::Clusters::ContentLauncher::Commands::LaunchURL::Id);
-            chip::AppPlatform::TestCommandHandlerCallback callback;
-            app::CommandHandler commandHandler(&callback);
-            CommandResponseHelper<LaunchResponseType> helper(&commandHandler, commandPath);
-            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type branding;
-            app->GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
-                                                               CharSpan::fromCharString("Temp Display"), branding);
+            ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);
+            EndpointId removedEndpointID = ContentAppPlatform::GetInstance().RemoveContentApp(app);
+            if (removedEndpointID != 0)
+            {
+                mContentApps.erase(mContentApps.begin() + static_cast<int>(i));
+            }
+            return removedEndpointID;
         }
     }
+    return 0;
 }
 
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
@@ -480,19 +455,6 @@ CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PreServerInit()
-{
-    /**
-     * Apply any user-defined configurations prior to initializing Server.
-     *
-     * Ex.
-     *   DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(userTimeoutSecs);
-     *
-     */
-
-    return CHIP_NO_ERROR;
-}
-
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager)
 {
@@ -505,9 +467,11 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
     return 0;
 }
 
-void SendTestMessage(EndpointId epID, const char * message)
+EndpointId RemoveContentApp(EndpointId epId)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    gFactory.SendTestMessage(epID, message);
+    ChipLogProgress(DeviceLayer, "AppImpl: RemoveContentApp endpointId=%d ", epId);
+    return gFactory.RemoveContentApp(epId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    return 0;
 }

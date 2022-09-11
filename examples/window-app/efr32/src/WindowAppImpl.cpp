@@ -33,6 +33,8 @@
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #ifdef DISPLAY_ENABLED
@@ -51,6 +53,10 @@ using namespace chip::app::Clusters::WindowCovering;
 #define APP_STATE_LED &sl_led_led0
 #define APP_ACTION_LED &sl_led_led1
 
+#ifdef SL_WIFI
+chip::app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance()));
+#endif
 //------------------------------------------------------------------------------
 // Timers
 //------------------------------------------------------------------------------
@@ -145,6 +151,21 @@ WindowAppImpl::WindowAppImpl() {}
 
 void WindowAppImpl::OnTaskCallback(void * parameter)
 {
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
+    }
+    EFR32_LOG("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+    sWiFiNetworkCommissioningInstance.Init();
+    /* added for commisioning with wifi */
+#endif
+
     sInstance.Run();
 }
 
@@ -158,18 +179,6 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
-#ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    EFR32_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    EFR32_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-#endif
     WindowApp::Init();
 
     // Initialize App Task

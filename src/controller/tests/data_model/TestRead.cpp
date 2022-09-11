@@ -232,6 +232,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
+
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -275,6 +281,7 @@ public:
     static void TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -297,6 +304,11 @@ private:
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
     static void MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount);
+
+    // Helper for MultipleReadHelper that does not spin the event loop, so we
+    // don't end up with nested event loops.
+    static void MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                           uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls);
 
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
@@ -1545,9 +1557,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-
-        attributePathParams[0].mClusterId   = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId = app::Clusters::TestCluster::Attributes::Boolean::Id;
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
@@ -1621,6 +1633,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
@@ -2484,6 +2497,9 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
+    uint32_t numReadSuccessCalls = 0;
+    uint32_t numReadFailureCalls = 0;
+
     responseDirective = kSendDataResponse;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
@@ -2501,12 +2517,12 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount,
-                                        aReadCount](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount,
+                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
-            MultipleReadHelper(apSuite, aCtx, aReadCount);
+            MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
         }
     };
 
@@ -2522,40 +2538,50 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == aSubscribeCount);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == aSubscribeCount);
+    NL_TEST_ASSERT(apSuite, numReadSuccessCalls == aReadCount);
+    NL_TEST_ASSERT(apSuite, numReadFailureCalls == 0);
 }
 
-void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+// The guts of MultipleReadHelper which take references to the success/failure
+// counts to modify and assume the consumer will be spinning the event loop.
+void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                                     uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
 {
-    auto sessionHandle       = aCtx.GetSessionBobToAlice();
-    uint32_t numSuccessCalls = 0;
-    uint32_t numFailureCalls = 0;
+    NL_TEST_ASSERT(apSuite, aNumSuccessCalls == 0);
+    NL_TEST_ASSERT(apSuite, aNumFailureCalls == 0);
+
+    auto sessionHandle = aCtx.GetSessionBobToAlice();
 
     responseDirective = kSendDataResponse;
 
     uint16_t firstExpectedResponse = totalReadCount + 1;
 
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
+    auto onFailureCb = [apSuite, &aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        aNumFailureCalls++;
 
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
     for (size_t i = 0; i < aReadCount; ++i)
     {
-        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise,
-        // it's not safe to do so.
-        auto onSuccessCb = [&numSuccessCalls, &apSuite, firstExpectedResponse,
+        auto onSuccessCb = [&aNumSuccessCalls, apSuite, firstExpectedResponse,
                             i](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
             NL_TEST_ASSERT(apSuite, dataResponse == firstExpectedResponse + i);
-            numSuccessCalls++;
+            aNumSuccessCalls++;
         };
 
         NL_TEST_ASSERT(apSuite,
                        Controller::ReadAttribute<TestCluster::Attributes::Int16u::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
     }
+}
+
+void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+{
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numSuccessCalls, numFailureCalls);
 
     aCtx.DrainAndServiceIO();
 
@@ -2866,6 +2892,47 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
 }
 
 } // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        SubscriptionPathQuotaHelpers::TestReadCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
@@ -4418,6 +4485,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttribute_ManyDataValues", TestReadInteraction::TestReadAttribute_ManyDataValues),
     NL_TEST_DEF("TestReadAttribute_ManyDataValuesWrongPath", TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath),
     NL_TEST_DEF("TestReadAttribute_ManyErrors", TestReadInteraction::TestReadAttribute_ManyErrors),
+    NL_TEST_DEF("TestSubscribeAttributeDeniedNotExistPath", TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath),
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_SENTINEL()

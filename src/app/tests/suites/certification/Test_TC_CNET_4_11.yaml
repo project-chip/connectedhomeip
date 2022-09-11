@@ -18,7 +18,7 @@ name:
     [DUT-Server]
 
 PICS:
-    - CNET.S.S.F00
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
@@ -117,7 +117,7 @@ tests:
           "TH finds the index of the Networks list entry with NetworkID for
           PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as Userwifi_netidx"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -366,7 +366,7 @@ tests:
           "TH changes its  WiFi connection
           to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

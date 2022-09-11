@@ -22,42 +22,6 @@
 namespace chip {
 namespace Dnssd {
 
-namespace Internal {
-
-/// Checks if the current interface is powered on
-/// and not local loopback.
-template <typename T>
-bool IsCurrentInterfaceUsable(T & iterator)
-{
-    if (!iterator.IsUp())
-    {
-        return false; // not a usable interface
-    }
-    char name[chip::Inet::InterfaceId::kMaxIfNameLength];
-    if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get interface name.");
-        return false;
-    }
-
-    // TODO: need a better way to ignore local loopback interfaces/addresses
-    // We do not want to listen on local loopback even though they are up and
-    // support multicast
-    //
-    // Some way to detect 'is local looback' that is smarter (e.g. at least
-    // strict string compare on linux instead of substring) would be better.
-    //
-    // This would reject likely valid interfaces like 'lollipop' or 'lostinspace'
-    if (strncmp(name, "lo", 2) == 0)
-    {
-        /// local loopback interface is not usable by MDNS
-        return false;
-    }
-    return true;
-}
-
-} // namespace Internal
-
 /// Generic receive delegate for a MDNS packet
 class MdnsPacketDelegate
 {
@@ -76,7 +40,7 @@ public:
 
     using ServerType = mdns::Minimal::Server<kMaxEndPoints>;
 
-    GlobalMinimalMdnsServer() { mServer.SetDelegate(this); }
+    GlobalMinimalMdnsServer();
 
     static GlobalMinimalMdnsServer & Instance();
     static mdns::Minimal::ServerBase & Server()

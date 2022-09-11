@@ -140,7 +140,7 @@ class CHIPVirtualHome:
         for device_id in devices:
             # Wait for otbr-agent and CHIP server start
             self.assertTrue(self.wait_for_device_output(
-                device_id, "Border router agent started.", 10))
+                device_id, "Thread Border Router started on AIL", 10))
             self.assertTrue(self.wait_for_device_output(
                 device_id, "CHIP:SVR: Server Listening...", 15))
             # Clear default Thread network commissioning data

@@ -114,7 +114,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 215
+              minValue: 212
               maxValue: 254
 
     - label: "Wait 5s"
@@ -186,8 +186,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 60
-              maxValue: 80
+              minValue: 59
+              maxValue: 81
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -326,6 +326,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 2
@@ -333,8 +334,9 @@ tests:
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "ColorMode"
+      attribute: "EnhancedColorMode"
       response:
+          value: 0
           constraints:
               minValue: 0
               maxValue: 3

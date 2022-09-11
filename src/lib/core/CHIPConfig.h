@@ -978,7 +978,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -1282,6 +1282,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS 30
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
+/**
+ * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
+ *
+ * @brief Number of custom CD signing keys supported by default CD keystore
+ *
+ */
+#ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
+#define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
+#endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
 /**
  * @}
  */

@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.5.91
+            image: connectedhomeip/chip-build-telink:0.5.99
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -64,6 +64,11 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
 
+            - name: Build example Telink OTA Requestor App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-ota-requestor' build"
+
             - name: Get Lighting size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -76,6 +81,13 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d light-switch-app \
                     out/telink-tlsr9518adk80d-light-switch/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Get OTA Requestor size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d ota-requestor-app \
+                    out/telink-tlsr9518adk80d-ota-requestor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports

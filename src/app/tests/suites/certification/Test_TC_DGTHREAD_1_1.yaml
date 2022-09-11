@@ -41,15 +41,61 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
+      PICS:
+          " !DGTHREAD.S.F00 && !DGTHREAD.S.F01 && !DGTHREAD.S.F02 &&
+          !DGTHREAD.S.F03 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Given DGTHREAD.S.F00(PKTCNT) ensure featuremap has the correct bit
+          set"
+      PICS: DGTHREAD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
-              maxValue: 31
+              hasMasksSet: [0x1]
 
-    - label: "TH reads AttributeList from DUT"
+    - label:
+          "Given DGTHREAD.S.F01(ERRCNT) ensure featuremap has the correct bit
+          set"
+      PICS: DGTHREAD.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Given DGTHREAD.S.F02(MLECNT) ensure featuremap has the correct bit
+          set"
+      PICS: DGTHREAD.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "Given DGTHREAD.S.F03(MACCNT) ensure featuremap has the correct bit
+          set"
+      PICS: DGTHREAD.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label: "TH reads mandatory attributes in AttributeList from DUT"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -80,6 +126,44 @@ tests:
                       65532,
                       65533,
                   ]
+
+    - label:
+          "TH reads Feature dependent attribute(DGTHREAD.S.F01(ERRCNT)) in
+          attributeList"
+      PICS: DGTHREAD.C.A0006 && DGTHREAD.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "Read the optional attribute(ActiveTimestamp) in AttributeList"
+      PICS: DGTHREAD.S.A0039
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [56]
+
+    - label: "Read the optional attribute(PendingTimestamp) in AttributeList"
+      PICS: DGTHREAD.S.A003A
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [57]
+
+    - label: "Read the optional attribute(Delay) in AttributeList"
+      PICS: DGTHREAD.S.A003B
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [58]
 
     - label: "TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
