@@ -197,7 +197,6 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
                                 se05xSetCertificate(CD_ATTEST_NONCE_DATA_SE05X_ID, attest_nonce.data(), attest_nonce.size()),
                             CHIP_ERROR_INTERNAL);
 
-
         ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(3), tagReader));
         uint8_t tslen = tagReader.GetLength();
         /* Set time stamp length */
