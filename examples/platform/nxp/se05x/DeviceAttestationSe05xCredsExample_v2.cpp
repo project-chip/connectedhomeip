@@ -183,9 +183,8 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
 
     if (sign_cert_decl_attest)
     {
-        /* Get length and Skip certificate declaration tag */
+        /* Check if certificate declaration tag is present and Skip certificate declaration tag */
         ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(1), tagReader));
-        uint8_t cdlen = tagReader.GetLength();
 
         ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(2), tagReader));
         uint8_t attlen = tagReader.GetLength();
@@ -213,10 +212,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
                                 CHIP_ERROR_INTERNAL);
         }
 
-
-        if (message_to_sign.size() -
-                (cdlen + attlen + tslen + 9 /* Tag + control byte + len */ + 2 /* start and end containers*/) >=
-            16)
+        if ((tagReader.GetRemainingLength() + 1 /* End container */) >= 16)
         {
             /* Set attestation challenge */
             VerifyOrReturnError(CHIP_NO_ERROR ==
@@ -250,7 +246,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
                                 se05xSetCertificate(NOCSR_CSR_NONCE_DATA_SE05X_ID, nocsr_nonce.data(), nocsr_nonce.size()),
                             CHIP_ERROR_INTERNAL);
 
-        if (message_to_sign.size() - (csrlen + noncelen + 6 /* Tag + control byte + len */ + 2 /* start and end containers*/) >= 16)
+        if ((tagReader.GetRemainingLength() + 1 /* End container */) >= 16)
         {
             /* Set attestation challenge */
             VerifyOrReturnError(CHIP_NO_ERROR ==
