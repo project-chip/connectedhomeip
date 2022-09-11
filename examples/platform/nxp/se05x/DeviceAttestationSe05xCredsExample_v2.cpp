@@ -199,8 +199,6 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
 
         ReturnErrorOnFailure(TLV::Utilities::Find(msg_reader, TLV::ContextTag(3), tagReader));
         uint8_t tslen = tagReader.GetLength();
-        /* Set time stamp length */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_LEN_SE05X_ID, &tslen, 1), CHIP_ERROR_INTERNAL);
         if (tslen > 0)
         {
             ByteSpan time_stamp;
@@ -210,6 +208,8 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
                                     se05xSetCertificate(CD_TIME_STAMP_DATA_SE05X_ID, time_stamp.data(), time_stamp.size()),
                                 CHIP_ERROR_INTERNAL);
         }
+        /* Set time stamp length */
+        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(CD_TIME_STAMP_LEN_SE05X_ID, &tslen, 1), CHIP_ERROR_INTERNAL);
 
         if ((tagReader.GetRemainingLength() + 1 /* End container */) >= 16)
         {
