@@ -23,21 +23,21 @@
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(MTRQueryImageCompletionHandler)completionHandler
+                       completion:(MTRQueryImageCompletionHandler)completion
 {
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(MTRApplyUpdateRequestCompletionHandler)completionHandler
+                               completion:(MTRApplyUpdateRequestCompletionHandler)completion
 {
 }
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
                                     params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                         completionHandler:(StatusCompletion)completionHandler
+                                completion:(MTRStatusCompletion)completion
 {
 }
 
@@ -45,7 +45,7 @@
                                     controller:(MTRDeviceController * _Nonnull)controller
                                 fileDesignator:(NSString * _Nonnull)fileDesignator
                                         offset:(NSNumber * _Nonnull)offset
-                             completionHandler:(StatusCompletion)completionHandler
+                                    completion:(MTRStatusCompletion)completion
 {
 }
 
@@ -60,7 +60,7 @@
                       blockSize:(NSNumber * _Nonnull)blockSize
                      blockIndex:(NSNumber * _Nonnull)blockIndex
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-              completionHandler:(MTRBDXQueryCompletionHandler)completionHandler
+                     completion:(MTRBDXQueryCompletionHandler)completion
 {
 }
 

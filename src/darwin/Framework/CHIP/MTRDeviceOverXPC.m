@@ -95,12 +95,12 @@ NS_ASSUME_NONNULL_BEGIN
                           clusterID:(NSNumber * _Nullable)clusterID
                         attributeID:(NSNumber * _Nullable)attributeID
                              params:(MTRReadParams * _Nullable)params
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Reading attribute ...");
     [_xpcConnection
-        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy readAttributeWithController:self.controller
                                                    nodeID:self.nodeID
@@ -109,7 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
                                               attributeID:attributeID
                                                    params:[MTRDeviceController encodeXPCReadParams:params]
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
-                                                   dispatch_async(clientQueue, ^{
+                                                   dispatch_async(queue, ^{
                                                        MTR_LOG_DEBUG("Attribute read");
                                                        completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                        // The following captures the proxy handle in the closure so that the
@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                    });
                                                }];
             } else {
-                dispatch_async(clientQueue, ^{
+                dispatch_async(queue, ^{
                     MTR_LOG_ERROR("Failed to obtain XPC connection to read attribute");
                     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
                 });
@@ -132,12 +132,12 @@ NS_ASSUME_NONNULL_BEGIN
                          attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                         clientQueue:(dispatch_queue_t)clientQueue
+                               queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Writing attribute ...");
     [_xpcConnection
-        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy writeAttributeWithController:self.controller
                                                     nodeID:self.nodeID
@@ -147,7 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                      value:value
                                          timedWriteTimeout:timeoutMs
                                                 completion:^(id _Nullable values, NSError * _Nullable error) {
-                                                    dispatch_async(clientQueue, ^{
+                                                    dispatch_async(queue, ^{
                                                         MTR_LOG_DEBUG("Attribute written");
                                                         completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                         // The following captures the proxy handle in the closure so that the
@@ -157,7 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                     });
                                                 }];
             } else {
-                dispatch_async(clientQueue, ^{
+                dispatch_async(queue, ^{
                     MTR_LOG_ERROR("Failed to obtain XPC connection to write attribute");
                     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
                 });
@@ -170,12 +170,12 @@ NS_ASSUME_NONNULL_BEGIN
                           commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Invoking command ...");
     [_xpcConnection
-        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy invokeCommandWithController:self.controller
                                                    nodeID:self.nodeID
@@ -185,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                    fields:commandFields
                                        timedInvokeTimeout:timeoutMs
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
-                                                   dispatch_async(clientQueue, ^{
+                                                   dispatch_async(queue, ^{
                                                        MTR_LOG_DEBUG("Command invoked");
                                                        completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                        // The following captures the proxy handle in the closure so that the
@@ -195,7 +195,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                    });
                                                }];
             } else {
-                dispatch_async(clientQueue, ^{
+                dispatch_async(queue, ^{
                     MTR_LOG_ERROR("Failed to obtain XPC connection to invoke command");
                     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
                 });
@@ -209,13 +209,13 @@ NS_ASSUME_NONNULL_BEGIN
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
-                             clientQueue:(dispatch_queue_t)clientQueue
+                                   queue:(dispatch_queue_t)queue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
 {
     MTR_LOG_DEBUG("Subscribing attribute ...");
     [_xpcConnection getProxyHandleWithCompletion:^(
-        dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+        dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
         if (handle) {
             MTR_LOG_DEBUG("Setup report handler");
             [self.xpcConnection
@@ -228,7 +228,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                 }
                                                 if (!values) {
                                                     MTR_LOG_DEBUG("Error report received");
-                                                    dispatch_async(clientQueue, ^{
+                                                    dispatch_async(queue, ^{
                                                         reportHandler(values, error);
                                                     });
                                                     return;
@@ -247,7 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                 }
                                                 if ([filteredValues count] > 0) {
                                                     MTR_LOG_DEBUG("Report received");
-                                                    dispatch_async(clientQueue, ^{
+                                                    dispatch_async(queue, ^{
                                                         reportHandler(filteredValues, error);
                                                     });
                                                 }
@@ -261,7 +261,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                maxInterval:maxInterval
                                                     params:[MTRDeviceController encodeXPCSubscribeParams:params]
                                         establishedHandler:^{
-                                            dispatch_async(clientQueue, ^{
+                                            dispatch_async(queue, ^{
                                                 MTR_LOG_DEBUG("Subscription established");
                                                 subscriptionEstablishedHandler();
                                                 // The following captures the proxy handle in the closure so that the handle
@@ -271,7 +271,7 @@ NS_ASSUME_NONNULL_BEGIN
                                             });
                                         }];
         } else {
-            dispatch_async(clientQueue, ^{
+            dispatch_async(queue, ^{
                 MTR_LOG_ERROR("Failed to obtain XPC connection to subscribe to attribute");
                 subscriptionEstablishedHandler();
                 reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -280,24 +280,24 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 }
 
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
+- (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(void (^)(void))completion
 {
     MTR_LOG_DEBUG("Deregistering report handlers");
     [_xpcConnection deregisterReportHandlersWithController:self.controller
                                                     nodeID:self.nodeID
                                                 completion:^{
-                                                    dispatch_async(clientQueue, completion);
+                                                    dispatch_async(queue, completion);
                                                 }];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
-                                     clientQueue:(dispatch_queue_t)clientQueue
+                                           queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
     MTR_LOG_ERROR("MTRDevice doesn't support openCommissioningWindowWithSetupPasscode over XPC");
-    dispatch_async(clientQueue, ^{
+    dispatch_async(queue, ^{
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
     });
 }

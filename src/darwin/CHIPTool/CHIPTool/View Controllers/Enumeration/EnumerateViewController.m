@@ -119,7 +119,7 @@
                                                                                                endpoint:@(0)
                                                                                                   queue:dispatch_get_main_queue()];
         NSLog(@"Reading parts list to get list of endpoints in use...");
-        [descriptorCluster readAttributePartsListWithCompletionHandler:^(
+        [descriptorCluster readAttributePartsListWithCompletion:^(
             NSArray<NSNumber *> * _Nullable endpointsInUse, NSError * _Nullable error) {
             if (error) {
                 NSString * resultLog = [[NSString alloc] initWithFormat:@"Unable to read parts list: Error: %@", error];
@@ -133,7 +133,7 @@
             for (NSNumber * endpoint in endpointsInUse) {
                 MTRBaseClusterDescriptor * descriptorCluster =
                     [[MTRBaseClusterDescriptor alloc] initWithDevice:device endpoint:endpoint queue:dispatch_get_main_queue()];
-                [descriptorCluster readAttributeDeviceTypeListWithCompletionHandler:^(
+                [descriptorCluster readAttributeDeviceTypeListWithCompletion:^(
                     NSArray * _Nullable value, NSError * _Nullable error) {
                     if (error) {
                         NSString * resultLog = [[NSString alloc]
@@ -146,7 +146,7 @@
                     [self updateResult:resultLog];
 
                     [descriptorCluster
-                        readAttributeServerListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                        readAttributeServerListWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
                             if (error) {
                                 NSString * resultLog = [[NSString alloc]
                                     initWithFormat:@"Unable to read server list for Endpoint:%@ Error: %@", endpoint, error];

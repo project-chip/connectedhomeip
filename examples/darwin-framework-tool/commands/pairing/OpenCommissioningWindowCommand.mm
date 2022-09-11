@@ -34,19 +34,19 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
         params.commissioningTimeout = @(mCommissioningWindowTimeoutMs);
         params.timedInvokeTimeoutMs = @(10000);
         [cluster openBasicCommissioningWindowWithParams:params
-                                      completionHandler:^(NSError * _Nullable error) {
-                                          if (error == nil) {
-                                              self->SetCommandExitStatus(CHIP_NO_ERROR);
-                                          } else {
-                                              self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
-                                          }
-                                      }];
+                                             completion:^(NSError * _Nullable error) {
+                                                 if (error == nil) {
+                                                     self->SetCommandExitStatus(CHIP_NO_ERROR);
+                                                 } else {
+                                                     self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
+                                                 }
+                                             }];
     } else {
         [device
             openCommissioningWindowWithSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]
                                        discriminator:@(mDiscriminator)
                                             duration:@(mCommissioningWindowTimeoutMs)
-                                         clientQueue:mWorkQueue
+                                               queue:mWorkQueue
                                           completion:^(MTRSetupPayload * _Nullable payload, NSError * error) {
                                               if (error != nil) {
                                                   self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));

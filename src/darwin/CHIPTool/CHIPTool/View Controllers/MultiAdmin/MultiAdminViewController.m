@@ -220,7 +220,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                             openCommissioningWindowWithSetupPasscode:setupPasscode
                                                        discriminator:@(discriminator)
                                                             duration:@(timeout)
-                                                         clientQueue:dispatch_get_main_queue()
+                                                               queue:dispatch_get_main_queue()
                                                           completion:^(
                                                               MTRSetupPayload * _Nullable payload, NSError * _Nullable error) {
                                                               NSString * _Nullable code = nil;
@@ -253,15 +253,15 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                         params.commissioningTimeout = @(timeout);
                         params.timedInvokeTimeoutMs = @(10000);
                         [cluster openBasicCommissioningWindowWithParams:params
-                                                      completionHandler:^(NSError * _Nullable error) {
-                                                          if (error == nil) {
-                                                              [self updateResult:@"Scan the QR code on the device"];
-                                                          } else {
-                                                              NSString * errorString =
-                                                                  [@"Error: " stringByAppendingString:error.localizedDescription];
-                                                              [self updateResult:errorString];
-                                                          }
-                                                      }];
+                                                             completion:^(NSError * _Nullable error) {
+                                                                 if (error == nil) {
+                                                                     [self updateResult:@"Scan the QR code on the device"];
+                                                                 } else {
+                                                                     NSString * errorString = [@"Error: "
+                                                                         stringByAppendingString:error.localizedDescription];
+                                                                     [self updateResult:errorString];
+                                                                 }
+                                                             }];
                     }
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];

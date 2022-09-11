@@ -134,7 +134,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion;
 
 /**
@@ -154,7 +154,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
-                                     clientQueue:(dispatch_queue_t)clientQueue
+                                           queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end

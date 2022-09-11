@@ -153,7 +153,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                     maxInterval:(NSNumber *)maxInterval
                          params:(NSDictionary<NSString *, id> * _Nullable)params
                     shouldCache:(BOOL)shouldCache
-                     completion:(StatusCompletion)completion;
+                     completion:(MTRStatusCompletion)completion;
 
 /**
  * Requests reading attribute cache
