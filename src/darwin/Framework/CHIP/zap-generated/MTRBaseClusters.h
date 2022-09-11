@@ -30,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterIdentify : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params completion:(MTRStatusCompletion)completion;
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params completion:(MTRStatusCompletion)completion;
@@ -165,9 +165,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterGroups : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
                 completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion;
@@ -293,9 +293,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterScenes : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
                 completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
@@ -510,9 +510,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOnOff : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params completion:(MTRStatusCompletion)completion;
 - (void)offWithCompletion:(MTRStatusCompletion)completion;
@@ -708,9 +708,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOnOffSwitchConfiguration : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeSwitchTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -839,9 +839,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterLevelControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params completion:(MTRStatusCompletion)completion;
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params completion:(MTRStatusCompletion)completion;
@@ -1198,9 +1198,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBinaryInputBasic : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeActiveTextWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeActiveTextWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -1457,9 +1457,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterDescriptor : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeDeviceTypeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -1614,9 +1614,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBinding : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params
                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -1730,9 +1730,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterAccessControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -1923,9 +1923,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterActions : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params completion:(MTRStatusCompletion)completion;
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
@@ -2083,9 +2083,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBasic : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
                        completion:(MTRStatusCompletion)completion;
@@ -2514,9 +2514,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOtaSoftwareUpdateProvider : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
                   completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
@@ -2619,9 +2619,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                            completion:(MTRStatusCompletion)completion;
@@ -2788,9 +2788,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterLocalizationConfiguration : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeActiveLocaleWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -2920,9 +2920,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterTimeFormatLocalization : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeHourFormatWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -3074,9 +3074,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterUnitLocalization : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeTemperatureUnitWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeTemperatureUnitWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -3190,9 +3190,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterPowerSourceConfiguration : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeSourcesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -3301,9 +3301,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterPowerSource : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -3911,9 +3911,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterGeneralCommissioning : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
                    completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
@@ -4114,9 +4114,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterNetworkCommissioning : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
                     completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
@@ -4364,9 +4364,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterDiagnosticLogs : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
                            completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
@@ -4464,9 +4464,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterGeneralDiagnostics : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
                         completion:(MTRStatusCompletion)completion;
@@ -4711,9 +4711,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterSoftwareDiagnostics : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
                        completion:(MTRStatusCompletion)completion;
@@ -4878,9 +4878,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterThreadNetworkDiagnostics : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                    completion:(MTRStatusCompletion)completion;
@@ -6027,9 +6027,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterWiFiNetworkDiagnostics : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                    completion:(MTRStatusCompletion)completion;
@@ -6338,9 +6338,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterEthernetNetworkDiagnostics : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                    completion:(MTRStatusCompletion)completion;
@@ -6579,9 +6579,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -6916,9 +6916,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterSwitch : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeNumberOfPositionsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -7061,9 +7061,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterAdministratorCommissioning : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
                                completion:(MTRStatusCompletion)completion;
@@ -7213,9 +7213,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOperationalCredentials : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
                           completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
@@ -7434,9 +7434,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterGroupKeyManagement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params completion:(MTRStatusCompletion)completion;
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
@@ -7610,9 +7610,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterFixedLabel : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeLabelListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -7721,9 +7721,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterUserLabel : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeLabelListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -7836,9 +7836,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBooleanState : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeStateValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -7947,9 +7947,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterModeSelect : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params completion:(MTRStatusCompletion)completion;
 
@@ -8146,9 +8146,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterDoorLock : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params completion:(MTRStatusCompletion)completion;
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params completion:(MTRStatusCompletion)completion;
@@ -8973,9 +8973,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterWindowCovering : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params completion:(MTRStatusCompletion)completion;
 - (void)upOrOpenWithCompletion:(MTRStatusCompletion)completion;
@@ -9479,9 +9479,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBarrierControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
                                  completion:(MTRStatusCompletion)completion;
@@ -9778,9 +9778,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterPumpConfigurationAndControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMaxPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -10256,9 +10256,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterThermostat : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
                           completion:(MTRStatusCompletion)completion;
@@ -11322,9 +11322,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterFanControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeFanModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -11612,9 +11612,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterThermostatUserInterfaceConfiguration : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeTemperatureDisplayModeWithCompletion:(void (^)(
                                                               NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -11773,9 +11773,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterColorControl : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params completion:(MTRStatusCompletion)completion;
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params completion:(MTRStatusCompletion)completion;
@@ -12797,9 +12797,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterBallastConfiguration : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributePhysicalMinLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13161,9 +13161,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterIlluminanceMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13336,9 +13336,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterTemperatureMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13495,9 +13495,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterPressureMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13732,9 +13732,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterFlowMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13891,9 +13891,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterRelativeHumidityMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -14050,9 +14050,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterOccupancySensing : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeOccupancyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -14414,9 +14414,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterWakeOnLan : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMACAddressWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -14525,9 +14525,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterChannel : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
                      completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
@@ -14679,9 +14679,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterTargetNavigator : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
                       completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
@@ -14810,9 +14810,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterMediaPlayback : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
             completion:
@@ -15068,9 +15068,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterMediaInput : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params completion:(MTRStatusCompletion)completion;
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
@@ -15204,9 +15204,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterLowPower : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params completion:(MTRStatusCompletion)completion;
 - (void)sleepWithCompletion:(MTRStatusCompletion)completion;
@@ -15303,9 +15303,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterKeypadInput : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
                completion:
@@ -15403,9 +15403,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterContentLauncher : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
                      completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
@@ -15544,9 +15544,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterAudioOutput : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params completion:(MTRStatusCompletion)completion;
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params completion:(MTRStatusCompletion)completion;
@@ -15674,9 +15674,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterApplicationLauncher : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -15818,9 +15818,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterApplicationBasic : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -16043,9 +16043,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterAccountLogin : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
                    completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
@@ -16146,9 +16146,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterElectricalMeasurement : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion;
@@ -18487,9 +18487,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseClusterTestCluster : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params completion:(MTRStatusCompletion)completion;
 - (void)testWithCompletion:(MTRStatusCompletion)completion;

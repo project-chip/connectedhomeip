@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull attributeValue;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRScenesClusterExtensionFieldSet : NSObject <NSCopying>
@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull revision;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBindingClusterTargetStruct : NSObject <NSCopying>
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterTarget : NSObject <NSCopying>
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable deviceType;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlEntry : NSObject <NSCopying>
@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterExtensionEntry : NSObject <NSCopying>
@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlEntryChangedEvent : NSObject <NSCopying>
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlExtensionChangedEvent : NSObject <NSCopying>
@@ -101,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterActionStruct : NSObject <NSCopying>
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull state;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterEndpointListStruct : NSObject <NSCopying>
@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull endpoints;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterStateChangedEvent : NSObject <NSCopying>
@@ -132,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterActionFailedEvent : NSObject <NSCopying>
@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull error;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterCapabilityMinimaStruct : NSObject <NSCopying>
@@ -150,34 +150,34 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull subscriptionsPerFabric;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterStartUpEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterShutDownEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterLeaveEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterReachableChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
@@ -186,7 +186,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
@@ -196,7 +196,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable targetSoftwareVersion;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
@@ -204,7 +204,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull productID;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
@@ -214,7 +214,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable platformCode;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPowerSourceClusterBatChargeFaultChangeType : NSObject <NSCopying>
@@ -222,7 +222,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPowerSourceClusterBatFaultChangeType : NSObject <NSCopying>
@@ -230,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPowerSourceClusterWiredFaultChangeType : NSObject <NSCopying>
@@ -238,7 +238,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralCommissioningClusterBasicCommissioningInfo : NSObject <NSCopying>
@@ -246,7 +246,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull maxCumulativeFailsafeSeconds;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterNetworkInfo : NSObject <NSCopying>
@@ -254,7 +254,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull connected;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterThreadInterfaceScanResult : NSObject <NSCopying>
@@ -268,7 +268,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull lqi;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterWiFiInterfaceScanResult : NSObject <NSCopying>
@@ -280,7 +280,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull rssi;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterNetworkInterfaceType : NSObject <NSCopying>
@@ -294,7 +294,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent : NSObject <NSCopying>
@@ -302,7 +302,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterRadioFaultChangeEvent : NSObject <NSCopying>
@@ -310,7 +310,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent : NSObject <NSCopying>
@@ -318,14 +318,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterBootReasonEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull bootReason;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSoftwareDiagnosticsClusterThreadMetrics : NSObject <NSCopying>
@@ -336,7 +336,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable stackSize;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject <NSCopying>
@@ -345,7 +345,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSData * _Nullable faultRecording;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterNeighborTable : NSObject <NSCopying>
@@ -365,7 +365,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull isChild;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents : NSObject <NSCopying>
@@ -383,7 +383,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull channelMaskPresent;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterRouteTable : NSObject <NSCopying>
@@ -399,7 +399,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull linkEstablished;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterSecurityPolicy : NSObject <NSCopying>
@@ -407,14 +407,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull flags;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull connectionStatus;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent : NSObject <NSCopying>
@@ -422,14 +422,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull previous;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reasonCode;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent : NSObject <NSCopying>
@@ -437,14 +437,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull status;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull connectionStatus;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTimeSynchronizationClusterDstOffsetType : NSObject <NSCopying>
@@ -453,7 +453,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull validUntil;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTimeSynchronizationClusterTimeZoneType : NSObject <NSCopying>
@@ -462,68 +462,68 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nullable name;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterShutDownEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterLeaveEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterSwitchLatchedEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterInitialPressEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterLongPressEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterShortReleaseEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousPosition;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterLongReleaseEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousPosition;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterMultiPressOngoingEvent : NSObject <NSCopying>
@@ -531,7 +531,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull currentNumberOfPressesCounted;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterMultiPressCompleteEvent : NSObject <NSCopying>
@@ -539,7 +539,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull totalNumberOfPressesCounted;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROperationalCredentialsClusterFabricDescriptor : NSObject <NSCopying>
@@ -551,7 +551,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROperationalCredentialsClusterNOCStruct : NSObject <NSCopying>
@@ -560,7 +560,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupInfoMapStruct : NSObject <NSCopying>
@@ -570,7 +570,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupKeyMapStruct : NSObject <NSCopying>
@@ -579,7 +579,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupKeySetStruct : NSObject <NSCopying>
@@ -593,7 +593,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable epochStartTime2;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRFixedLabelClusterLabelStruct : NSObject <NSCopying>
@@ -601,7 +601,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull value;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRUserLabelClusterLabelStruct : NSObject <NSCopying>
@@ -609,14 +609,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull value;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBooleanStateClusterStateChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull stateValue;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRModeSelectClusterSemanticTag : NSObject <NSCopying>
@@ -624,7 +624,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull value;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRModeSelectClusterModeOptionStruct : NSObject <NSCopying>
@@ -633,7 +633,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDlCredential : NSObject <NSCopying>
@@ -641,21 +641,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull credentialIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDoorLockAlarmEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull alarmCode;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDoorStateChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull doorState;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockOperationEvent : NSObject <NSCopying>
@@ -667,7 +667,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nullable credentials;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockOperationErrorEvent : NSObject <NSCopying>
@@ -680,7 +680,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nullable credentials;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockUserChangeEvent : NSObject <NSCopying>
@@ -693,109 +693,109 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable dataIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSystemPressureLowEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSystemPressureHighEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterDryRunningEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPumpBlockedEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSensorFailureEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterGeneralFaultEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterLeakageEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterAirDetectionEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThermostatClusterThermostatScheduleTransition : NSObject <NSCopying>
@@ -804,7 +804,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable coolSetpoint;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRChannelClusterChannelInfo : NSObject <NSCopying>
@@ -815,7 +815,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nullable affiliateCallSign;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRChannelClusterLineupInfo : NSObject <NSCopying>
@@ -825,7 +825,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull lineupInfoType;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTargetNavigatorClusterTargetInfo : NSObject <NSCopying>
@@ -833,7 +833,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull name;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRMediaPlaybackClusterPlaybackPosition : NSObject <NSCopying>
@@ -841,7 +841,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable position;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRMediaInputClusterInputInfo : NSObject <NSCopying>
@@ -851,7 +851,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull descriptionString;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterDimension : NSObject <NSCopying>
@@ -860,7 +860,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull metric;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterAdditionalInfo : NSObject <NSCopying>
@@ -868,7 +868,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull value;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterParameter : NSObject <NSCopying>
@@ -877,14 +877,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nullable externalIDList;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterContentSearch : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull parameterList;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterStyleInformation : NSObject <NSCopying>
@@ -893,7 +893,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) MTRContentLauncherClusterDimension * _Nullable size;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterBrandingInformation : NSObject <NSCopying>
@@ -905,7 +905,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformation * _Nullable waterMark;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAudioOutputClusterOutputInfo : NSObject <NSCopying>
@@ -914,7 +914,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull name;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationLauncherClusterApplication : NSObject <NSCopying>
@@ -922,7 +922,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationLauncherClusterApplicationEP : NSObject <NSCopying>
@@ -930,7 +930,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nullable endpoint;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationBasicClusterApplicationBasicApplication : NSObject <NSCopying>
@@ -938,7 +938,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterSimpleStruct : NSObject <NSCopying>
@@ -952,7 +952,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull h;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterTestFabricScoped : NSObject <NSCopying>
@@ -966,7 +966,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterNullablesAndOptionalsStruct : NSObject <NSCopying>
@@ -984,7 +984,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterNestedStruct : NSObject <NSCopying>
@@ -993,7 +993,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull c;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterNestedStructList : NSObject <NSCopying>
@@ -1006,14 +1006,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull g;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterDoubleNestedStructList : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull a;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterTestListStructOctet : NSObject <NSCopying>
@@ -1021,7 +1021,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSData * _Nonnull member2;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterTestEventEvent : NSObject <NSCopying>
@@ -1033,14 +1033,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * _Nonnull arg6;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTestClusterClusterTestFabricScopedEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -18,9 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRBaseCluster{{asUpperCamelCase name}} : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(NSNumber *)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion;

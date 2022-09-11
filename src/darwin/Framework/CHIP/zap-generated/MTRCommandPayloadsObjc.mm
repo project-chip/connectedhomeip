@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRIdentifyClusterIdentifyParams alloc] init];
 
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRIdentifyClusterTriggerEffectParams alloc] init];
 
@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterAddGroupParams alloc] init];
 
@@ -125,7 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterAddGroupResponseParams alloc] init];
 
@@ -155,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterViewGroupParams alloc] init];
 
@@ -187,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterViewGroupResponseParams alloc] init];
 
@@ -218,7 +218,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterGetGroupMembershipParams alloc] init];
 
@@ -248,7 +248,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterGetGroupMembershipResponseParams alloc] init];
 
@@ -278,7 +278,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterRemoveGroupParams alloc] init];
 
@@ -308,7 +308,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterRemoveGroupResponseParams alloc] init];
 
@@ -336,7 +336,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterRemoveAllGroupsParams alloc] init];
 
@@ -365,7 +365,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupsClusterAddGroupIfIdentifyingParams alloc] init];
 
@@ -403,7 +403,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterAddSceneParams alloc] init];
 
@@ -441,7 +441,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterAddSceneResponseParams alloc] init];
 
@@ -474,7 +474,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterViewSceneParams alloc] init];
 
@@ -514,7 +514,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterViewSceneResponseParams alloc] init];
 
@@ -551,7 +551,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterRemoveSceneParams alloc] init];
 
@@ -585,7 +585,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterRemoveSceneResponseParams alloc] init];
 
@@ -616,7 +616,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterRemoveAllScenesParams alloc] init];
 
@@ -646,7 +646,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterRemoveAllScenesResponseParams alloc] init];
 
@@ -678,7 +678,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterStoreSceneParams alloc] init];
 
@@ -712,7 +712,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterStoreSceneResponseParams alloc] init];
 
@@ -747,7 +747,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterRecallSceneParams alloc] init];
 
@@ -778,7 +778,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterGetSceneMembershipParams alloc] init];
 
@@ -812,7 +812,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterGetSceneMembershipResponseParams alloc] init];
 
@@ -852,7 +852,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterEnhancedAddSceneParams alloc] init];
 
@@ -890,7 +890,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterEnhancedAddSceneResponseParams alloc] init];
 
@@ -923,7 +923,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterEnhancedViewSceneParams alloc] init];
 
@@ -963,7 +963,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterEnhancedViewSceneResponseParams alloc] init];
 
@@ -1006,7 +1006,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterCopySceneParams alloc] init];
 
@@ -1044,7 +1044,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRScenesClusterCopySceneResponseParams alloc] init];
 
@@ -1073,7 +1073,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterOffParams alloc] init];
 
@@ -1098,7 +1098,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterOnParams alloc] init];
 
@@ -1123,7 +1123,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterToggleParams alloc] init];
 
@@ -1152,7 +1152,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterOffWithEffectParams alloc] init];
 
@@ -1180,7 +1180,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterOnWithRecallGlobalSceneParams alloc] init];
 
@@ -1211,7 +1211,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROnOffClusterOnWithTimedOffParams alloc] init];
 
@@ -1248,7 +1248,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterMoveToLevelParams alloc] init];
 
@@ -1287,7 +1287,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterMoveParams alloc] init];
 
@@ -1327,7 +1327,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterStepParams alloc] init];
 
@@ -1363,7 +1363,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterStopParams alloc] init];
 
@@ -1399,7 +1399,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterMoveToLevelWithOnOffParams alloc] init];
 
@@ -1438,7 +1438,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterMoveWithOnOffParams alloc] init];
 
@@ -1478,7 +1478,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterStepWithOnOffParams alloc] init];
 
@@ -1514,7 +1514,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterStopWithOnOffParams alloc] init];
 
@@ -1544,7 +1544,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLevelControlClusterMoveToClosestFrequencyParams alloc] init];
 
@@ -1574,7 +1574,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterInstantActionParams alloc] init];
 
@@ -1608,7 +1608,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterInstantActionWithTransitionParams alloc] init];
 
@@ -1641,7 +1641,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterStartActionParams alloc] init];
 
@@ -1675,7 +1675,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterStartActionWithDurationParams alloc] init];
 
@@ -1708,7 +1708,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterStopActionParams alloc] init];
 
@@ -1740,7 +1740,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterPauseActionParams alloc] init];
 
@@ -1774,7 +1774,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterPauseActionWithDurationParams alloc] init];
 
@@ -1807,7 +1807,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterResumeActionParams alloc] init];
 
@@ -1839,7 +1839,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterEnableActionParams alloc] init];
 
@@ -1873,7 +1873,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterEnableActionWithDurationParams alloc] init];
 
@@ -1906,7 +1906,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterDisableActionParams alloc] init];
 
@@ -1940,7 +1940,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActionsClusterDisableActionWithDurationParams alloc] init];
 
@@ -1969,7 +1969,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRBasicClusterMfgSpecificPingParams alloc] init];
 
@@ -2010,7 +2010,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
 
@@ -2063,7 +2063,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
 
@@ -2105,7 +2105,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
 
@@ -2138,7 +2138,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
 
@@ -2170,7 +2170,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
 
@@ -2209,7 +2209,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
 
@@ -2246,7 +2246,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterArmFailSafeParams alloc] init];
 
@@ -2278,7 +2278,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterArmFailSafeResponseParams alloc] init];
 
@@ -2312,7 +2312,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterSetRegulatoryConfigParams alloc] init];
 
@@ -2345,7 +2345,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams alloc] init];
 
@@ -2373,7 +2373,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterCommissioningCompleteParams alloc] init];
 
@@ -2402,7 +2402,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralCommissioningClusterCommissioningCompleteResponseParams alloc] init];
 
@@ -2434,7 +2434,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterScanNetworksParams alloc] init];
 
@@ -2470,7 +2470,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterScanNetworksResponseParams alloc] init];
 
@@ -2507,7 +2507,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
 
@@ -2541,7 +2541,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
 
@@ -2574,7 +2574,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterRemoveNetworkParams alloc] init];
 
@@ -2609,7 +2609,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterNetworkConfigResponseParams alloc] init];
 
@@ -2642,7 +2642,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterConnectNetworkParams alloc] init];
 
@@ -2677,7 +2677,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterConnectNetworkResponseParams alloc] init];
 
@@ -2712,7 +2712,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRNetworkCommissioningClusterReorderNetworkParams alloc] init];
 
@@ -2748,7 +2748,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
 
@@ -2786,7 +2786,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDiagnosticLogsClusterRetrieveLogsResponseParams alloc] init];
 
@@ -2821,7 +2821,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGeneralDiagnosticsClusterTestEventTriggerParams alloc] init];
 
@@ -2850,7 +2850,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRSoftwareDiagnosticsClusterResetWatermarksParams alloc] init];
 
@@ -2875,7 +2875,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
@@ -2900,7 +2900,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
@@ -2925,7 +2925,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTREthernetNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
@@ -2956,7 +2956,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTimeSynchronizationClusterSetUtcTimeParams alloc] init];
 
@@ -2995,7 +2995,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams alloc] init];
 
@@ -3030,7 +3030,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
 
@@ -3057,7 +3057,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAdministratorCommissioningClusterRevokeCommissioningParams alloc] init];
 
@@ -3084,7 +3084,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterAttestationRequestParams alloc] init];
 
@@ -3115,7 +3115,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] init];
 
@@ -3146,7 +3146,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
 
@@ -3175,7 +3175,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterCertificateChainResponseParams alloc] init];
 
@@ -3206,7 +3206,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterCSRRequestParams alloc] init];
 
@@ -3239,7 +3239,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterCSRResponseParams alloc] init];
 
@@ -3278,7 +3278,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterAddNOCParams alloc] init];
 
@@ -3316,7 +3316,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterUpdateNOCParams alloc] init];
 
@@ -3351,7 +3351,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterNOCResponseParams alloc] init];
 
@@ -3382,7 +3382,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
 
@@ -3410,7 +3410,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
 
@@ -3439,7 +3439,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams alloc] init];
 
@@ -3468,7 +3468,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetWriteParams alloc] init];
 
@@ -3497,7 +3497,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadParams alloc] init];
 
@@ -3526,7 +3526,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadResponseParams alloc] init];
 
@@ -3555,7 +3555,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetRemoveParams alloc] init];
 
@@ -3584,7 +3584,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
 
@@ -3613,7 +3613,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc] init];
 
@@ -3642,7 +3642,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRModeSelectClusterChangeToModeParams alloc] init];
 
@@ -3670,7 +3670,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterLockDoorParams alloc] init];
 
@@ -3699,7 +3699,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterUnlockDoorParams alloc] init];
 
@@ -3730,7 +3730,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterUnlockWithTimeoutParams alloc] init];
 
@@ -3772,7 +3772,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetWeekDayScheduleParams alloc] init];
 
@@ -3811,7 +3811,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetWeekDayScheduleParams alloc] init];
 
@@ -3855,7 +3855,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetWeekDayScheduleResponseParams alloc] init];
 
@@ -3895,7 +3895,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterClearWeekDayScheduleParams alloc] init];
 
@@ -3931,7 +3931,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetYearDayScheduleParams alloc] init];
 
@@ -3966,7 +3966,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetYearDayScheduleParams alloc] init];
 
@@ -4004,7 +4004,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetYearDayScheduleResponseParams alloc] init];
 
@@ -4040,7 +4040,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterClearYearDayScheduleParams alloc] init];
 
@@ -4076,7 +4076,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetHolidayScheduleParams alloc] init];
 
@@ -4109,7 +4109,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetHolidayScheduleParams alloc] init];
 
@@ -4146,7 +4146,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetHolidayScheduleResponseParams alloc] init];
 
@@ -4180,7 +4180,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterClearHolidayScheduleParams alloc] init];
 
@@ -4221,7 +4221,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetUserParams alloc] init];
 
@@ -4259,7 +4259,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetUserParams alloc] init];
 
@@ -4305,7 +4305,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetUserResponseParams alloc] init];
 
@@ -4346,7 +4346,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterClearUserParams alloc] init];
 
@@ -4384,7 +4384,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetCredentialParams alloc] init];
 
@@ -4424,7 +4424,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterSetCredentialResponseParams alloc] init];
 
@@ -4455,7 +4455,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetCredentialStatusParams alloc] init];
 
@@ -4492,7 +4492,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterGetCredentialStatusResponseParams alloc] init];
 
@@ -4528,7 +4528,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRDoorLockClusterClearCredentialParams alloc] init];
 
@@ -4555,7 +4555,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterUpOrOpenParams alloc] init];
 
@@ -4580,7 +4580,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterDownOrCloseParams alloc] init];
 
@@ -4605,7 +4605,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterStopMotionParams alloc] init];
 
@@ -4632,7 +4632,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterGoToLiftValueParams alloc] init];
 
@@ -4660,7 +4660,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterGoToLiftPercentageParams alloc] init];
 
@@ -4689,7 +4689,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterGoToTiltValueParams alloc] init];
 
@@ -4717,7 +4717,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRWindowCoveringClusterGoToTiltPercentageParams alloc] init];
 
@@ -4746,7 +4746,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRBarrierControlClusterBarrierControlGoToPercentParams alloc] init];
 
@@ -4773,7 +4773,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRBarrierControlClusterBarrierControlStopParams alloc] init];
 
@@ -4802,7 +4802,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThermostatClusterSetpointRaiseLowerParams alloc] init];
 
@@ -4838,7 +4838,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThermostatClusterGetWeeklyScheduleResponseParams alloc] init];
 
@@ -4877,7 +4877,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThermostatClusterSetWeeklyScheduleParams alloc] init];
 
@@ -4912,7 +4912,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThermostatClusterGetWeeklyScheduleParams alloc] init];
 
@@ -4940,7 +4940,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRThermostatClusterClearWeeklyScheduleParams alloc] init];
 
@@ -4975,7 +4975,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveToHueParams alloc] init];
 
@@ -5015,7 +5015,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveHueParams alloc] init];
 
@@ -5055,7 +5055,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterStepHueParams alloc] init];
 
@@ -5095,7 +5095,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveToSaturationParams alloc] init];
 
@@ -5134,7 +5134,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveSaturationParams alloc] init];
 
@@ -5174,7 +5174,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterStepSaturationParams alloc] init];
 
@@ -5216,7 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveToHueAndSaturationParams alloc] init];
 
@@ -5258,7 +5258,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveToColorParams alloc] init];
 
@@ -5298,7 +5298,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveColorParams alloc] init];
 
@@ -5338,7 +5338,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterStepColorParams alloc] init];
 
@@ -5378,7 +5378,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveToColorTemperatureParams alloc] init];
 
@@ -5419,7 +5419,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterEnhancedMoveToHueParams alloc] init];
 
@@ -5459,7 +5459,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterEnhancedMoveHueParams alloc] init];
 
@@ -5499,7 +5499,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterEnhancedStepHueParams alloc] init];
 
@@ -5541,7 +5541,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterEnhancedMoveToHueAndSaturationParams alloc] init];
 
@@ -5587,7 +5587,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterColorLoopSetParams alloc] init];
 
@@ -5626,7 +5626,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterStopMoveStepParams alloc] init];
 
@@ -5666,7 +5666,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterMoveColorTemperatureParams alloc] init];
 
@@ -5715,7 +5715,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRColorControlClusterStepColorTemperatureParams alloc] init];
 
@@ -5753,7 +5753,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRChannelClusterChangeChannelParams alloc] init];
 
@@ -5783,7 +5783,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRChannelClusterChangeChannelResponseParams alloc] init];
 
@@ -5815,7 +5815,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRChannelClusterChangeChannelByNumberParams alloc] init];
 
@@ -5845,7 +5845,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRChannelClusterSkipChannelParams alloc] init];
 
@@ -5875,7 +5875,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTargetNavigatorClusterNavigateTargetParams alloc] init];
 
@@ -5907,7 +5907,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTargetNavigatorClusterNavigateTargetResponseParams alloc] init];
 
@@ -5935,7 +5935,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterPlayParams alloc] init];
 
@@ -5960,7 +5960,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterPauseParams alloc] init];
 
@@ -5985,7 +5985,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterStopPlaybackParams alloc] init];
 
@@ -6010,7 +6010,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterStartOverParams alloc] init];
 
@@ -6035,7 +6035,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterPreviousParams alloc] init];
 
@@ -6060,7 +6060,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterNextParams alloc] init];
 
@@ -6085,7 +6085,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterRewindParams alloc] init];
 
@@ -6110,7 +6110,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterFastForwardParams alloc] init];
 
@@ -6137,7 +6137,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterSkipForwardParams alloc] init];
 
@@ -6166,7 +6166,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterSkipBackwardParams alloc] init];
 
@@ -6197,7 +6197,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterPlaybackResponseParams alloc] init];
 
@@ -6227,7 +6227,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaPlaybackClusterSeekParams alloc] init];
 
@@ -6255,7 +6255,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaInputClusterSelectInputParams alloc] init];
 
@@ -6281,7 +6281,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaInputClusterShowInputStatusParams alloc] init];
 
@@ -6306,7 +6306,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaInputClusterHideInputStatusParams alloc] init];
 
@@ -6335,7 +6335,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRMediaInputClusterRenameInputParams alloc] init];
 
@@ -6363,7 +6363,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRLowPowerClusterSleepParams alloc] init];
 
@@ -6390,7 +6390,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRKeypadInputClusterSendKeyParams alloc] init];
 
@@ -6418,7 +6418,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRKeypadInputClusterSendKeyResponseParams alloc] init];
 
@@ -6450,7 +6450,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRContentLauncherClusterLaunchContentParams alloc] init];
 
@@ -6485,7 +6485,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRContentLauncherClusterLaunchURLParams alloc] init];
 
@@ -6518,7 +6518,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRContentLauncherClusterLaunchResponseParams alloc] init];
 
@@ -6548,7 +6548,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAudioOutputClusterSelectOutputParams alloc] init];
 
@@ -6578,7 +6578,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAudioOutputClusterRenameOutputParams alloc] init];
 
@@ -6610,7 +6610,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRApplicationLauncherClusterLaunchAppParams alloc] init];
 
@@ -6640,7 +6640,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRApplicationLauncherClusterStopAppParams alloc] init];
 
@@ -6669,7 +6669,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRApplicationLauncherClusterHideAppParams alloc] init];
 
@@ -6700,7 +6700,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRApplicationLauncherClusterLauncherResponseParams alloc] init];
 
@@ -6730,7 +6730,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAccountLoginClusterGetSetupPINParams alloc] init];
 
@@ -6759,7 +6759,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAccountLoginClusterGetSetupPINResponseParams alloc] init];
 
@@ -6789,7 +6789,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAccountLoginClusterLoginParams alloc] init];
 
@@ -6817,7 +6817,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRAccountLoginClusterLogoutParams alloc] init];
 
@@ -6850,7 +6850,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams alloc] init];
 
@@ -6881,7 +6881,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams alloc] init];
 
@@ -6918,7 +6918,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams alloc] init];
 
@@ -6958,7 +6958,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams alloc] init];
 
@@ -6987,7 +6987,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestParams alloc] init];
 
@@ -7014,7 +7014,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestSpecificResponseParams alloc] init];
 
@@ -7041,7 +7041,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestNotHandledParams alloc] init];
 
@@ -7068,7 +7068,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestAddArgumentsResponseParams alloc] init];
 
@@ -7095,7 +7095,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestSpecificParams alloc] init];
 
@@ -7122,7 +7122,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestSimpleArgumentResponseParams alloc] init];
 
@@ -7149,7 +7149,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestUnknownCommandParams alloc] init];
 
@@ -7186,7 +7186,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestStructArrayArgumentResponseParams alloc] init];
 
@@ -7222,7 +7222,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestAddArgumentsParams alloc] init];
 
@@ -7252,7 +7252,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestListInt8UReverseResponseParams alloc] init];
 
@@ -7280,7 +7280,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestSimpleArgumentRequestParams alloc] init];
 
@@ -7310,7 +7310,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEnumsResponseParams alloc] init];
 
@@ -7350,7 +7350,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestStructArrayArgumentRequestParams alloc] init];
 
@@ -7390,7 +7390,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestNullableOptionalResponseParams alloc] init];
 
@@ -7422,7 +7422,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestStructArgumentRequestParams alloc] init];
 
@@ -7504,7 +7504,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestComplexNullableOptionalResponseParams alloc] init];
 
@@ -7574,7 +7574,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestNestedStructArgumentRequestParams alloc] init];
 
@@ -7602,7 +7602,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterBooleanResponseParams alloc] init];
 
@@ -7630,7 +7630,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestListStructArgumentRequestParams alloc] init];
 
@@ -7658,7 +7658,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterSimpleStructResponseParams alloc] init];
 
@@ -7686,7 +7686,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestListInt8UArgumentRequestParams alloc] init];
 
@@ -7714,7 +7714,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEmitTestEventResponseParams alloc] init];
 
@@ -7742,7 +7742,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestNestedStructListArgumentRequestParams alloc] init];
 
@@ -7770,7 +7770,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams alloc] init];
 
@@ -7798,7 +7798,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestListNestedStructListArgumentRequestParams alloc] init];
 
@@ -7826,7 +7826,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestListInt8UReverseRequestParams alloc] init];
 
@@ -7856,7 +7856,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEnumsRequestParams alloc] init];
 
@@ -7886,7 +7886,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestNullableOptionalRequestParams alloc] init];
 
@@ -7936,7 +7936,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestComplexNullableOptionalRequestParams alloc] init];
 
@@ -7981,7 +7981,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterSimpleStructEchoRequestParams alloc] init];
 
@@ -8007,7 +8007,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTimedInvokeRequestParams alloc] init];
 
@@ -8034,7 +8034,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
 
@@ -8066,7 +8066,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEmitTestEventRequestParams alloc] init];
 
@@ -8097,7 +8097,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams alloc] init];
 
@@ -8133,7 +8133,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRFaultInjectionClusterFailAtFaultParams alloc] init];
 
@@ -8171,7 +8171,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRFaultInjectionClusterFailRandomlyAtFaultParams alloc] init];
 

@@ -77,7 +77,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
 @property (nonatomic, copy) NSNumber * setupPasscode;
 
 @property (nonatomic, copy, nullable) NSString * serialNumber;
-- (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
+- (NSArray<MTROptionalQRCodeInfo *> * _Nullable)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
  * Generate a random Matter-valid setup passcode.
@@ -93,7 +93,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
                                                            error:(NSError * __autoreleasing *)error;
 
 /** Get 11 digit manual entry code from the setup payload. */
-- (nullable NSString *)manualEntryCode;
+- (NSString * _Nullable)manualEntryCode;
 
 @end
 

@@ -49,9 +49,9 @@ using namespace chip;
 }
 
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(NSData *)operationalCertificate
-                   intermediateCertificate:(nullable NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
+                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
                                        ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {
@@ -179,10 +179,10 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     if (self.rootCertificate == nil) {
         NSError * error;
-        self.rootCertificate = [MTRCertificates generateRootCertificate:self.nocSigner
-                                                               issuerID:nil
-                                                               fabricID:self.fabricID
-                                                                  error:&error];
+        self.rootCertificate = [MTRCertificates createRootCertificate:self.nocSigner
+                                                             issuerID:nil
+                                                             fabricID:self.fabricID
+                                                                error:&error];
         if (error != nil || self.rootCertificate == nil) {
             MTR_LOG_ERROR("Failed to generate root certificate: %@", error);
             return nil;

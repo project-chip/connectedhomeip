@@ -16,6 +16,8 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NSData MTRCertificateDERBytes;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRKeypair;
@@ -130,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   2) The subject DN must match the subject DN of the existing root
  *      certificate.
  */
-@property (nonatomic, copy, nullable) NSData * rootCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes * rootCertificate;
 
 /**
  * Intermediate certificate, in X.509 DER form, to use.
@@ -162,7 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
  *     allows switching from using an intermediate CA to not using one.
  *
  */
-@property (nonatomic, copy, nullable) NSData * intermediateCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes * intermediateCertificate;
 
 /**
  * Operational certificate, in X.509 DER form, to use.
@@ -173,7 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If nil, an operational certificate will be determined as described in the
  * documentation for nodeID.
  */
-@property (nonatomic, copy, readonly, nullable) NSData * operationalCertificate;
+@property (nonatomic, copy, readonly, nullable) MTRCertificateDERBytes * operationalCertificate;
 
 /**
  * Operational keypair to use.  If operationalCertificate is not nil, the public
@@ -212,9 +214,9 @@ NS_ASSUME_NONNULL_BEGIN
  * ipk must be 16 bytes in length.
  */
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(NSData *)operationalCertificate
-                   intermediateCertificate:(nullable NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
+                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
                                        ipk:(NSData *)ipk;
 
 @end
