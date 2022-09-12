@@ -18,7 +18,9 @@ public class SetupPayloadParser {
    *
    * @param qrCodeString the QRCode for commissioning device.
    * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
-   *     element validation is not checked. Consider saying that the payload must still parse correctly, but this skips validation of the content past parsing (i.e. it does not validate ranges for individual elements). Refer to {@link SetupPayload} for the description of the
+   *     element validation is not checked. Consider saying that the payload must still parse
+   *     correctly, but this skips validation of the content past parsing (i.e. it does not validate
+   *     ranges for individual elements). Refer to {@link SetupPayload} for the description of the
    *     invalid element.
    */
   public SetupPayload parseQrCode(String qrCodeString, boolean allowInvalidPayload)
@@ -41,7 +43,9 @@ public class SetupPayloadParser {
    *
    * @param entryCodeString the manual Pairing Code for commissioning device.
    * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
-   *     element validation is not checked. Consider saying that the payload must still parse correctly, but this skips validation of the content past parsing (i.e. it does not validate ranges for individual elements). Refer to {@link SetupPayload} for the description of the
+   *     element validation is not checked. Consider saying that the payload must still parse
+   *     correctly, but this skips validation of the content past parsing (i.e. it does not validate
+   *     ranges for individual elements). Refer to {@link SetupPayload} for the description of the
    *     invalid element.
    */
   public SetupPayload parseManualEntryCode(String entryCodeString, boolean allowInvalidPayload)
