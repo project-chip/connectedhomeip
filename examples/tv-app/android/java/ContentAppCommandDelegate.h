@@ -57,6 +57,13 @@ public:
         InitializeJNIObjects(manager);
     };
 
+    ~ContentAppCommandDelegate()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
+        env->DeleteGlobalRef(mContentAppEndpointManager);
+    }
+
     void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
 
 private:

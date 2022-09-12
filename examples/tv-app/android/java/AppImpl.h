@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <functional>
 #include <jni.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -52,9 +53,11 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
-CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager);
+CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager);
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                         const char * szApplicationVersion, EndpointId endpointId, jobject manager);
 EndpointId RemoveContentApp(EndpointId epId);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -130,7 +133,11 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
-    EndpointId AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager);
+    EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                             const char * szApplicationVersion, jobject manager);
+
+    EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                             const char * szApplicationVersion, jobject manager, EndpointId desiredEndpointId);
 
     EndpointId RemoveContentApp(EndpointId epId);
 
@@ -156,6 +163,7 @@ protected:
         new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
         new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
     };
+    std::vector<DataVersion *> mDataVersions{};
 
     std::vector<uint16_t> mAdminVendorIds{};
 };
