@@ -81,6 +81,9 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD2703A") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B020F1536IM48"
+} else if (silabs_board == "BRD4316A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB22VNA"
 } else if (silabs_board == "BRD4317A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"

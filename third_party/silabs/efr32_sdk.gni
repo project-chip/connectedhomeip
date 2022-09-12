@@ -42,7 +42,7 @@ if (silabs_board == "BRD2703A") {
 use_wstk_leds = true
 
 # Board does not support LEDs and Buttons at the same time
-if (silabs_board == "BRD4317A") {
+if (silabs_board == "BRD4317A" || silabs_board == "BRD4316A") {
   use_wstk_leds = false
 }
 
@@ -320,6 +320,8 @@ template("efr32_sdk") {
 
       if (silabs_mcu == "MGM240PB32VNA") {
         libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
+      } else if (silabs_mcu == "MGM240PB22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
       }
 
       defines += [
