@@ -430,7 +430,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         return nil;
     }
 
-    if (startupParams.vendorId == nil) {
+    if (startupParams.vendorID == nil) {
         MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
         return nil;
     }

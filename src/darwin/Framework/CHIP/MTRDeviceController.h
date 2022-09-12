@@ -34,10 +34,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @property (readonly, nonatomic) BOOL isRunning;
 
 /**
- * Return the Node Id assigned to the controller.  Will return nil if the
+ * Return the Node ID assigned to the controller.  Will return nil if the
  * controller is not running (and hence does not know its node id).
  */
-@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId;
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeID MTR_NEWLY_AVAILABLE;
 
 /**
  * Set up a commissioning session for a device, using the provided setup payload
@@ -173,7 +173,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
  * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
  */
-- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId;
+- (nullable NSData *)fetchAttestationChallengeForDeviceID:(uint64_t)deviceID MTR_NEWLY_AVAILABLE;
 
 /**
  * Compute a PASE verifier and passcode ID for the desired setup pincode.
@@ -191,6 +191,15 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
  */
 - (void)shutdown;
+
+@end
+
+@interface MTRDeviceController (Deprecated)
+
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_NEWLY_DEPRECATED("Please use controllerNodeID");
+
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
+    MTR_NEWLY_DEPRECATED("Please use fetchAttestationChallengeForDeviceID");
 
 @end
 

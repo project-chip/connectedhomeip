@@ -74,9 +74,9 @@ public:
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         [device
-            writeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                               clusterId:[NSNumber numberWithUnsignedInteger:clusterId]
-                             attributeId:[NSNumber numberWithUnsignedInteger:attributeId]
+            writeAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                               clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
+                             attributeID:[NSNumber numberWithUnsignedInteger:attributeId]
                                    value:value
                        timedWriteTimeout:mTimedInteractionTimeoutMs.HasValue()
                            ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]

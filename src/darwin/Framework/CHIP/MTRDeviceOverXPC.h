@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler NS_UNAVAILABLE;
 
 - (instancetype)initWithController:(id<NSCopying>)controller
-                          deviceId:(NSNumber *)deviceId
+                          deviceID:(NSNumber *)deviceID
                      xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
 
 @end

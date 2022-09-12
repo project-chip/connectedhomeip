@@ -176,12 +176,12 @@ extern NSString * const MTRArrayValueType;
 /**
  * Read attribute in a designated attribute path
  */
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Write to attribute in a designated attribute path
@@ -194,15 +194,15 @@ extern NSString * const MTRArrayValueType;
  * @param completion  response handler will receive either values or error.
  *
  *                    Received values are an NSArray object with response-value element as described in
- *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
+ *                    readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion:.
  */
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
-                          completion:(MTRDeviceResponseHandler)completion;
+                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Invoke a command with a designated command path
@@ -216,26 +216,26 @@ extern NSString * const MTRArrayValueType;
  *
  * @param completion  response handler will receive either values or error.
  */
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Subscribe an attribute in a designated attribute path
  */
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
+                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler MTR_NEWLY_AVAILABLE;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -288,6 +288,47 @@ extern NSString * const MTRArrayValueType;
                          "subscribeWithQueue:params:attributeCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
                          "subscriptionEstablished:resubscriptionScheduled:");
 
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(MTRReadParams * _Nullable)params
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use readAttributeWithEndpointID:clusterID:attributeID:params:clientQueue:completion:");
+
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
+                               value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                         clientQueue:(dispatch_queue_t)clientQueue
+                          completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED(
+        "Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:clientQueue:completion:");
+
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
+                      commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED(
+        "Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:clientQueue:completion");
+
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(MTRSubscribeParams * _Nullable)params
+                             clientQueue:(dispatch_queue_t)clientQueue
+                           reportHandler:(MTRDeviceResponseHandler)reportHandler
+                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use "
+        "subscribeAttributeWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:clientQueue:reportHandler:");
+
 @end
 
 @interface MTRAttributePath : NSObject <NSCopying>
@@ -295,12 +336,21 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
 
-+ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
-                                  clusterId:(NSNumber *)clusterId
-                                attributeId:(NSNumber *)attributeId;
++ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                attributeID:(NSNumber *)attributeID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTRAttributePath (Deprecated)
+
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpointId
+                                  clusterId:(NSNumber *)clusterId
+                                attributeId:(NSNumber *)attributeId
+    MTR_NEWLY_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:");
+
 @end
 
 @interface MTREventPath : NSObject
@@ -308,10 +358,21 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId;
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
+                              clusterID:(NSNumber *)clusterID
+                                eventID:(NSNumber *)eventID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTREventPath (Deprecated)
+
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpointId
+                              clusterId:(NSNumber *)clusterId
+                                eventId:(NSNumber *)eventId
+    MTR_NEWLY_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:");
+
 @end
 
 @interface MTRCommandPath : NSObject
@@ -319,10 +380,21 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * command;
 
-+ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId;
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTRCommandPath (Deprecated)
+
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpointId
+                                clusterId:(NSNumber *)clusterId
+                                commandId:(NSNumber *)commandId
+    MTR_NEWLY_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:");
+
 @end
 
 @interface MTRAttributeReport : NSObject

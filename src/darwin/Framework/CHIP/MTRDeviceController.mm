@@ -201,13 +201,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             return;
         }
 
-        if (startupParams.vendorId == nil || [startupParams.vendorId unsignedShortValue] == chip::VendorId::Common) {
+        if (startupParams.vendorID == nil || [startupParams.vendorID unsignedShortValue] == chip::VendorId::Common) {
             // Shouldn't be using the "standard" vendor ID for actual devices.
-            MTR_LOG_ERROR("%@ is not a valid vendorId to initialize a device controller with", startupParams.vendorId);
+            MTR_LOG_ERROR("%@ is not a valid vendorID to initialize a device controller with", startupParams.vendorID);
             return;
         }
 
-        if (startupParams.operationalCertificate == nil && startupParams.nodeId == nil) {
+        if (startupParams.operationalCertificate == nil && startupParams.nodeID == nil) {
             MTR_LOG_ERROR("Can't start a controller if we don't know what node id it is");
             return;
         }
@@ -278,7 +278,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             chip::MutableByteSpan noc(nocBuffer);
 
             if (commissionerParams.operationalKeypair != nullptr) {
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeId.unsignedLongLongValue,
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
                     startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs,
                     commissionerParams.operationalKeypair->Pubkey(), noc);
 
@@ -300,7 +300,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeId.unsignedLongLongValue,
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
                     startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
@@ -309,7 +309,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             }
             commissionerParams.controllerNOC = noc;
         }
-        commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorId unsignedShortValue]);
+        commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
@@ -344,7 +344,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return commissionerInitialized;
 }
 
-- (NSNumber *)controllerNodeId
+- (NSNumber *)controllerNodeID
 {
     if (![self isRunning]) {
         MTR_LOG_ERROR("A controller has no node id if it has not been started");
@@ -461,7 +461,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return success;
 }
 
-- (BOOL)commissionDevice:(uint64_t)deviceId
+- (BOOL)commissionDevice:(uint64_t)deviceID
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error
 {
@@ -508,8 +508,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 
-        _operationalCredentialsDelegate->SetDeviceID(deviceId);
-        auto errorCode = self.cppCommissioner->Commission(deviceId, params);
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        auto errorCode = self.cppCommissioner->Commission(deviceID, params);
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
     return success;
@@ -760,7 +760,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return AsData(serializedBytes);
 }
 
-- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
+- (nullable NSData *)fetchAttestationChallengeForDeviceID:(uint64_t)deviceID
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 
@@ -769,7 +769,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning]);
 
         chip::CommissioneeDeviceProxy * deviceProxy;
-        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
         auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
         VerifyOrReturn(success);
 
@@ -851,12 +851,12 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return NO;
 }
 
-- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId
+- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceID
 {
     VerifyOrReturnValue([self checkIsRunning], NO);
 
     chip::CommissioneeDeviceProxy * deviceProxy;
-    auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+    auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
     VerifyOrReturnValue(errorCode == CHIP_NO_ERROR, NO);
 
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
@@ -998,4 +998,18 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     });
 }
+@end
+
+@implementation MTRDeviceController (Deprecated)
+
+- (NSNumber *)controllerNodeId
+{
+    return self.controllerNodeID;
+}
+
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
+{
+    return [self fetchAttestationChallengeForDeviceID:deviceId];
+}
+
 @end
