@@ -108,12 +108,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                    completionHandler(error);
                    return;
                }
+               __auto_type * subscriptionParams
+                   = (params == nil) ? [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(43200)] : params;
                __auto_type established = [NSMutableArray arrayWithCapacity:1];
                [established addObject:@NO];
                [device subscribeWithQueue:queue
-                   minInterval:@(1)
-                   maxInterval:@(43200)
-                   params:params
+                   params:subscriptionParams
                    attributeCacheContainer:self
                    attributeReportHandler:^(NSArray * value) {
                        NSLog(@"Report received for attribute cache: %@", value);
@@ -161,12 +161,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 @property (readwrite, strong) void (^handleInvokeCommand)
     (id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id fields,
         NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleSubscribeAttribute)(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId,
-    NSNumber * _Nullable clusterId, NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval,
-    MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void));
+@property (readwrite, strong) void (^handleSubscribeAttribute)
+    (id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void));
 @property (readwrite, strong) void (^handleStopReports)(id controller, NSNumber * nodeId, void (^completion)(void));
-@property (readwrite, strong) void (^handleSubscribeAll)(id controller, NSNumber * nodeId, NSNumber * minInterval,
-    NSNumber * maxInterval, MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error));
+@property (readwrite, strong) void (^handleSubscribeAll)(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params,
+    BOOL shouldCache, void (^completion)(NSError * _Nullable error));
 @property (readwrite, strong) void (^handleReadAttributeCache)
     (id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
@@ -263,14 +263,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               endpointID:(NSNumber * _Nullable)endpointID
                                clusterID:(NSNumber * _Nullable)clusterID
                              attributeID:(NSNumber * _Nullable)attributeID
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(NSDictionary<NSString *, id> * _Nullable)params
+                                  params:(NSDictionary<NSString *, id> *)params
                       establishedHandler:(dispatch_block_t)establishedHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAttribute);
-        self.handleSubscribeAttribute(controller, nodeID, endpointID, clusterID, attributeID, minInterval, maxInterval,
+        self.handleSubscribeAttribute(controller, nodeID, endpointID, clusterID, attributeID,
             [MTRDeviceController decodeXPCSubscribeParams:params], establishedHandler);
     });
 }
@@ -285,16 +283,13 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
 - (void)subscribeWithController:(id _Nullable)controller
                          nodeID:(NSNumber *)nodeID
-                    minInterval:(NSNumber *)minInterval
-                    maxInterval:(NSNumber *)maxInterval
-                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                         params:(NSDictionary<NSString *, id> *)params
                     shouldCache:(BOOL)shouldCache
                      completion:(MTRStatusCompletion)completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAll);
-        self.handleSubscribeAll(controller, nodeID, minInterval, maxInterval, [MTRDeviceController decodeXPCSubscribeParams:params],
-            shouldCache, completion);
+        self.handleSubscribeAll(controller, nodeID, [MTRDeviceController decodeXPCSubscribeParams:params], shouldCache, completion);
     });
 }
 
@@ -408,7 +403,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     MTRReadParams * myParams = [[MTRReadParams alloc] init];
-    myParams.fabricFiltered = @NO;
+    myParams.fabricFiltered = NO;
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
@@ -423,7 +418,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+        XCTAssertEqual(params.fabricFiltered, myParams.fabricFiltered);
         [callExpectation fulfill];
         completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
     };
@@ -890,16 +885,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -913,12 +906,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -993,9 +985,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] init];
-    myParams.fabricFiltered = @NO;
-    myParams.keepPreviousSubscriptions = @NO;
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    myParams.fabricFiltered = NO;
+    myParams.keepPreviousSubscriptions = NO;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
                                                                clusterID:myClusterId
@@ -1008,18 +1000,16 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
-        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertEqual(params.fabricFiltered, myParams.fabricFiltered);
+        XCTAssertEqual(params.keepPreviousSubscriptions, myParams.keepPreviousSubscriptions);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1036,8 +1026,6 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
                    params:myParams
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -1125,16 +1113,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1148,12 +1134,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1239,16 +1224,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1262,12 +1245,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1355,16 +1337,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1378,12 +1358,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1471,16 +1450,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1494,12 +1471,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1587,16 +1563,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1610,12 +1584,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1702,16 +1675,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertNil(endpointId);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1725,12 +1696,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:nil
                    clusterID:myClusterId
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1817,16 +1787,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertNil(clusterId);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1840,12 +1808,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:nil
                    attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -1932,16 +1899,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertNil(attributeId);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -1955,12 +1920,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
+               __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                [device subscribeAttributePathWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:nil
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
+                   params:params
                    queue:dispatch_get_main_queue()
                    reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                        NSLog(@"Report value: %@", values);
@@ -2048,16 +2012,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -2081,12 +2043,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                    XCTAssertNotNil(device);
                    XCTAssertNil(error);
                    NSLog(@"Device acquired. Subscribing...");
+                   __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
                    [device subscribeAttributePathWithEndpointID:myEndpointId
                        clusterID:myClusterId
                        attributeID:myAttributeId
-                       minInterval:myMinInterval
-                       maxInterval:myMaxInterval
-                       params:nil
+                       params:params
                        queue:dispatch_get_main_queue()
                        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                            NSLog(@"Subscriber [%d] report value: %@", i, values);
@@ -2297,12 +2258,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         [callExpectation fulfill];
         completion(nil);
     };
@@ -2325,22 +2285,21 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 - (void)testSubscribeAttributeCacheWithParamsSuccess
 {
     uint64_t myNodeId = 9876543210;
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] init];
-    myParams.fabricFiltered = @YES;
-    myParams.keepPreviousSubscriptions = @YES;
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(43200)];
+    myParams.fabricFiltered = YES;
+    myParams.keepPreviousSubscriptions = YES;
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
-        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+        XCTAssertEqual(params.fabricFiltered, myParams.fabricFiltered);
+        XCTAssertEqual(params.keepPreviousSubscriptions, myParams.keepPreviousSubscriptions);
         [callExpectation fulfill];
         completion(nil);
     };
@@ -2369,12 +2328,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         [callExpectation fulfill];
         completion(myError);
     };
@@ -2413,12 +2371,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         completion(nil);
     };
 
@@ -2475,12 +2432,11 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         completion(nil);
     };
 

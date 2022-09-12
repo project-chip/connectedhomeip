@@ -114,7 +114,9 @@ public:
         MTRBaseCluster{{asUpperCamelCase parent.name}} * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:@(endpointId) queue:callbackQueue];
         {{#if_is_fabric_scoped_struct type}}
         MTRReadParams * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        if (mFabricFiltered.HasValue()) {
+          params.fabricFiltered = mFabricFiltered.Value();
+        }
         {{/if_is_fabric_scoped_struct}}
         [cluster readAttribute{{asUpperCamelCase name}}With
         {{~#if_is_fabric_scoped_struct type~}}
@@ -216,12 +218,14 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         MTRBaseCluster{{asUpperCamelCase parent.name}} * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:@(endpointId) queue:callbackQueue];
-        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-        params.keepPreviousSubscriptions = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
-        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
-        [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                 params:params
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+          params.keepPreviousSubscriptions = mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+          params.fabricFiltered = mFabricFiltered.Value();
+        }
+        [cluster subscribe{{>attribute}}WithParams:params
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);

@@ -128,7 +128,7 @@ using chip::SessionHandle;
           chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
           return cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
           {{~#if_is_fabric_scoped_struct type~}}
-          , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
+          , params.fabricFiltered
           {{~/if_is_fabric_scoped_struct~}}
           );
       });
@@ -182,14 +182,11 @@ using chip::SessionHandle;
 
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
-       params:(MTRSubscribeParams * _Nullable)params
+- (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams * _Nonnull)params
 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished 
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     // Make a copy of params before we go async.
-    minInterval = [minInterval copy];
-    maxInterval = [maxInterval copy];
     params = [params copy];
     new MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       self.device,
@@ -197,7 +194,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
           not great from a type-safety perspective, of course. }}
       reportHandler,
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-          if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+          if (!params.autoResubscribe) {
               // We don't support disabling auto-resubscribe.
               return CHIP_ERROR_INVALID_ARGUMENT;
           }
@@ -206,9 +203,9 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
           auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
 
           chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-          return cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
-              params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
-              params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
+          return cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [params.minInterval unsignedShortValue], [params.maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
+              params.fabricFiltered,
+              params.keepPreviousSubscriptions
           );
       }, subscriptionEstablished);
 }

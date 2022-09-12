@@ -173,9 +173,7 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -254,9 +252,7 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
                                    clusterID:(NSNumber * _Nullable)clusterID
                                  attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
+                                      params:(MTRSubscribeParams *)params
                                        queue:(dispatch_queue_t)queue
                                reportHandler:(MTRDeviceResponseHandler)reportHandler
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;

@@ -222,10 +222,10 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 // Use a wildcard subscription
+                __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalSeconds)
+                                                                           maxInterval:@(maxIntervalSeconds)];
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
-                    minInterval:@(minIntervalSeconds)
-                    maxInterval:@(maxIntervalSeconds)
-                    params:nil
+                    params:params
                     attributeCacheContainer:nil
                     attributeReportHandler:^(NSArray * _Nullable reports) {
                         if (!reports)

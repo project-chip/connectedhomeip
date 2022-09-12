@@ -299,9 +299,7 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -335,13 +333,14 @@ public:
                    auto attributePath = std::make_unique<AttributePathParams>();
                    auto eventPath = std::make_unique<EventPathParams>();
                    ReadPrepareParams readParams(session.Value());
-                   readParams.mMinIntervalFloorSeconds = [minInterval unsignedShortValue];
-                   readParams.mMaxIntervalCeilingSeconds = [maxInterval unsignedShortValue];
+                   readParams.mMinIntervalFloorSeconds = [params.minInterval unsignedShortValue];
+                   readParams.mMaxIntervalCeilingSeconds = [params.maxInterval unsignedShortValue];
                    readParams.mpAttributePathParamsList = attributePath.get();
                    readParams.mAttributePathParamsListSize = 1;
                    readParams.mpEventPathParamsList = eventPath.get();
                    readParams.mEventPathParamsListSize = 1;
-                   readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
+                   readParams.mIsFabricFiltered = params.fabricFiltered;
+                   readParams.mKeepSubscriptions = params.keepPreviousSubscriptions;
 
                    std::unique_ptr<SubscriptionCallback> callback;
                    std::unique_ptr<ReadClient> readClient;
@@ -366,7 +365,7 @@ public:
                    }
 
                    CHIP_ERROR err;
-                   if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                   if (!params.autoResubscribe) {
                        err = readClient->SendRequest(readParams);
                    } else {
                        // SendAutoResubscribeRequest cleans up the params, even on failure.
@@ -831,7 +830,7 @@ private:
             chip::app::ReadPrepareParams readParams(session);
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
-            readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
+            readParams.mIsFabricFiltered = params.fabricFiltered;
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
@@ -1117,9 +1116,7 @@ exit:
 - (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
                                    clusterID:(NSNumber * _Nullable)clusterID
                                  attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
+                                      params:(MTRSubscribeParams *)params
                                        queue:(dispatch_queue_t)queue
                                reportHandler:(MTRDeviceResponseHandler)reportHandler
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
@@ -1136,8 +1133,6 @@ exit:
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     attributeID = (attributeID == nil) ? nil : [attributeID copy];
-    minInterval = (minInterval == nil) ? nil : [minInterval copy];
-    maxInterval = (maxInterval == nil) ? nil : [maxInterval copy];
     params = (params == nil) ? nil : [params copy];
 
     [self.deviceController
@@ -1211,12 +1206,10 @@ exit:
                    chip::app::ReadPrepareParams readParams(session.Value());
                    readParams.mpAttributePathParamsList = container.pathParams;
                    readParams.mAttributePathParamsListSize = 1;
-                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
-                   readParams.mIsFabricFiltered
-                       = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
-                   readParams.mKeepSubscriptions
-                       = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([params.minInterval unsignedShortValue]);
+                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([params.maxInterval unsignedShortValue]);
+                   readParams.mIsFabricFiltered = params.fabricFiltered;
+                   readParams.mKeepSubscriptions = params.keepPreviousSubscriptions;
 
                    auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
@@ -1232,7 +1225,7 @@ exit:
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-                   if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                   if (!params.autoResubscribe) {
                        err = readClient->SendRequest(readParams);
                    } else {
                        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
