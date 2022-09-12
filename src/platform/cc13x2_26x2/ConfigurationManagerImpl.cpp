@@ -66,7 +66,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<CC13X2_26X2Config>::Init();
+    SuccessOrExit(err);
 
+    IncreaseBootCount();
+exit:
     return err;
 }
 
@@ -79,6 +82,46 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
+{
+    CHIP_ERROR ret;
+    uint32_t bootCount = 0;
+
+    ret = ReadConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, bootCount);
+
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == ret || CHIP_NO_ERROR == ret)
+    {
+        ret = WriteConfigValue(CC13X2_26X2Config::kConfigKey_BootCount, bootCount + 1);
+    }
+
+    return ret;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    CHIP_ERROR ret;
+
+    ret = ReadConfigValue(CC13X2_26X2Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
+
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == ret)
+    {
+        totalOperationalHours = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    return ret;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(CC13X2_26X2Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
