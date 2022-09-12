@@ -133,7 +133,7 @@
             for (NSNumber * endpoint in endpointsInUse) {
                 MTRBaseClusterDescriptor * descriptorCluster =
                     [[MTRBaseClusterDescriptor alloc] initWithDevice:device endpoint:endpoint queue:dispatch_get_main_queue()];
-                [descriptorCluster readAttributeDeviceListWithCompletionHandler:^(
+                [descriptorCluster readAttributeDeviceTypeListWithCompletionHandler:^(
                     NSArray * _Nullable value, NSError * _Nullable error) {
                     if (error) {
                         NSString * resultLog = [[NSString alloc]

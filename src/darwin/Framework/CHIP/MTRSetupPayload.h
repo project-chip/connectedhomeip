@@ -19,8 +19,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRDiscoveryCapabilities) {
-    MTRDiscoveryCapabilitiesNone = 0, // Device does not support any method for rendezvous
+typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
+    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilties are not known (e.g. all we have is a manual pairing code).
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
@@ -36,19 +36,26 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
     MTRCommissioningFlowInvalid = 3,
 };
 
-typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
-    MTROptionalQRCodeInfoTypeUnknown,
-    MTROptionalQRCodeInfoTypeString,
-    MTROptionalQRCodeInfoTypeInt32
-};
+typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTypeString, MTROptionalQRCodeInfoTypeInt32 };
 
+/**
+ * An optional information item present in the QR code the setup payload was
+ * initialized from.
+ */
 @interface MTROptionalQRCodeInfo : NSObject
-@property (nonatomic, copy) NSNumber * infoType;
+@property (nonatomic, assign) MTROptionalQRCodeInfoType infoType;
+// The numeric value of the TLV tag for this information item.
 @property (nonatomic, copy) NSNumber * tag;
-@property (nonatomic, copy) NSNumber * integerValue;
-@property (nonatomic, copy) NSString * stringValue;
+// Exactly one of integerValue and stringValue will be non-nil, depending on the
+// the value of "infoType".
+@property (nonatomic, copy, nullable) NSNumber * integerValue;
+@property (nonatomic, copy, nullable) NSString * stringValue;
 @end
 
+/**
+ * A setup payload that can be created from a pairing code and serialized to a
+ * pairing code.
+ */
 @interface MTRSetupPayload : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSNumber * version;
@@ -56,23 +63,34 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
 /**
- * rendezvousInformation is nil when the discovery capabilities bitmask is
- * unknown.
- *
- * Otherwise its value is made up of the MTRDiscoveryCapabilities flags.
+ * The value of discoveryCapabilities is made up of the various MTRDiscoveryCapabilities flags.
  */
-@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation;
+@property (nonatomic, assign) MTRDiscoveryCapabilities discoveryCapabilities;
 @property (nonatomic, copy) NSNumber * discriminator;
+/**
+ * If hasShortDiscriminator is true, the discriminator value contains just the
+ * high 4 bits of the full discriminator.  For example, if
+ * hasShortDiscriminator is true and discriminator is 0xA, then the full
+ * discriminator can be anything in the range 0xA00 t0 0xAFF.
+ */
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
-@property (nonatomic, copy) NSNumber * setUpPINCode;
+@property (nonatomic, copy) NSNumber * setupPasscode;
 
-@property (nonatomic, copy) NSString * serialNumber;
+@property (nonatomic, copy, nullable) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
  * Generate a random Matter-valid setup passcode.
  */
 + (NSNumber *)generateRandomSetupPasscode;
+
+/**
+ * Create an MTRSetupPayload with the given onboarding payload.
+ *
+ * Will return nil on errors (e.g. if the onboarding payload cannot be parsed).
+ */
++ (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
+                                                           error:(NSError * __autoreleasing *)error;
 
 /** Get 11 digit manual entry code from the setup payload. */
 - (nullable NSString *)manualEntryCode;

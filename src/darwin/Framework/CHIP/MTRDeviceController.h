@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRNOCChainIssuer.h>
-#import <Matter/MTROnboardingPayloadParser.h>
 
 @class MTRBaseDevice;
 
