@@ -274,6 +274,9 @@ CHIP_ERROR UDPEndPointImplSockets::ListenImpl()
 
 CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
 {
+    // Ensure packet buffer is not null
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
     // Make sure we have the appropriate type of socket based on the
     // destination address.
     ReturnErrorOnFailure(GetSocket(aPktInfo->DestAddress.Type()));
