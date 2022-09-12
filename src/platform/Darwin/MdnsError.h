@@ -25,6 +25,8 @@ namespace Error {
 
 const char * ToString(DNSServiceErrorType errorCode);
 
+CHIP_ERROR ToChipError(DNSServiceErrorType errorCode);
+
 } // namespace Error
 } // namespace Dnssd
 } // namespace chip
