@@ -118,13 +118,13 @@
 		AF1CB8702874B04C00865A96 /* MTROTAProviderDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86F2874B04C00865A96 /* MTROTAProviderDelegateBridge.h */; };
 		AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF5F90FE2878D351005503FA /* MTROTAProviderDelegateBridge.mm */; };
 		B20252972459E34F00F97062 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* Matter.framework */; };
-		B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B289D41F2639C0D300D4E314 /* MTROnboardingPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B289D41F2639C0D300D4E314 /* MTROnboardingPayloadParser.h */; };
 		B289D4222639C0D300D4E314 /* MTROnboardingPayloadParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B289D4202639C0D300D4E314 /* MTROnboardingPayloadParser.m */; };
 		B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A8245B0B5C003C5B48 /* Matter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h */; };
 		B2E0D7B3245B0B5C003C5B48 /* MTRError.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AA245B0B5C003C5B48 /* MTRError.mm */; };
 		B2E0D7B4245B0B5C003C5B48 /* MTRError_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AB245B0B5C003C5B48 /* MTRError_Internal.h */; };
-		B2E0D7B5245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AC245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B2E0D7B5245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AC245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h */; };
 		B2E0D7B6245B0B5C003C5B48 /* MTRManualSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AD245B0B5C003C5B48 /* MTRManualSetupPayloadParser.mm */; };
 		B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */; };
 		B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -511,7 +511,6 @@
 				515C1C70284F9FFB00A48F0C /* MTRMemory.h in Headers */,
 				7534F12928BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h in Headers */,
 				D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */,
-				B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* MTRDevicePairingDelegate.h in Headers */,
 				88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */,
@@ -522,10 +521,12 @@
 				754F3DF427FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h in Headers */,
 				3CF134AF289D90FF0017A19E /* MTRNOCChainIssuer.h in Headers */,
 				3CF134AB289D8DF70017A19E /* MTRAttestationInfo.h in Headers */,
-				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
 				7596A84428762729004DAE0E /* MTRDevice.h in Headers */,
+				B2E0D7B5245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h in Headers */,
+				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
+				B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */,
 				7596A84D287782EF004DAE0E /* MTRAsyncCallbackWorkQueue_Internal.h in Headers */,
 				7596A83E28751220004DAE0E /* MTRBaseClusters_internal.h in Headers */,
@@ -543,7 +544,6 @@
 				5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* MTRPersistentStorageDelegate.h in Headers */,
 				AF1CB8702874B04C00865A96 /* MTROTAProviderDelegateBridge.h in Headers */,
-				B2E0D7B5245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h in Headers */,
 				1EC4CE6425CC276600D7304F /* MTRBaseClusters.h in Headers */,
 				2C5EEEF6268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h in Headers */,
 				2C8C8FC0253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.h in Headers */,

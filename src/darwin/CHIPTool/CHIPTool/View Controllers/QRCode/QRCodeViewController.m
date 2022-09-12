@@ -706,10 +706,10 @@
     } else {
         _manualCodeLabel.hidden = YES;
         _versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
-        if (payload.rendezvousInformation == nil) {
+        if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
             _rendezVousInformation.text = NOT_APPLICABLE_STRING;
         } else {
-            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", [payload.rendezvousInformation unsignedLongValue]];
+            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.discoveryCapabilities];
         }
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
@@ -719,7 +719,7 @@
     }
 
     _discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
-    _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
+    _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setupPasscode];
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
@@ -747,7 +747,7 @@
             continue;
         }
 
-        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:MTROptionalQRCodeInfoTypeString]];
+        BOOL isTypeString = (info.infoType == MTROptionalQRCodeInfoTypeString);
         if (!isTypeString) {
             return;
         }
@@ -767,26 +767,29 @@
 
 - (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
-    if (payload.rendezvousInformation == nil) {
+    if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         return;
     }
 
-    // TODO: This is a pretty broken way to handle a bitmask.
-    switch ([payload.rendezvousInformation unsignedLongValue]) {
-    case MTRDiscoveryCapabilitiesNone:
-    case MTRDiscoveryCapabilitiesOnNetwork:
-    case MTRDiscoveryCapabilitiesBLE:
-    case MTRDiscoveryCapabilitiesAllMask:
+    // Avoid SoftAP if we have other options.
+    if ((payload.discoveryCapabilities & MTRDiscoveryCapabilitiesOnNetwork)
+        || (payload.discoveryCapabilities & MTRDiscoveryCapabilitiesBLE)) {
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
-        break;
-    case MTRDiscoveryCapabilitiesSoftAP:
+        return;
+    }
+
+    if (payload.discoveryCapabilities & MTRDiscoveryCapabilitiesSoftAP) {
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
-        break;
+        return;
     }
+
+    // Just fall back on the default.
+    NSLog(@"Rendezvous Default");
+    [self handleRendezVousDefault:rawPayload];
 }
 
 - (NSString *)getNetworkName:(NSNumber *)discriminator
@@ -879,9 +882,8 @@
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
-    MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
-    _setupPayload = [parser populatePayload:&error];
+    _setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:qrCode error:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
 
@@ -952,9 +954,8 @@
     NSString * decimalString = _manualCodeTextField.text;
     [self manualCodeEnteredStartState];
 
-    MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
-    _setupPayload = [parser populatePayload:&error];
+    _setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:decimalString error:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
         [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
