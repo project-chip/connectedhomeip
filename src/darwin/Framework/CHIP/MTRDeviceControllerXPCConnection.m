@@ -118,7 +118,7 @@
     });
 }
 
-- (void)registerReportHandlerWithController:(id<NSCopying>)controller nodeId:(NSNumber *)nodeId handler:(MTRXPCReportHandler)handler
+- (void)registerReportHandlerWithController:(id<NSCopying>)controller nodeID:(NSNumber *)nodeID handler:(MTRXPCReportHandler)handler
 {
     dispatch_async(_workQueue, ^{
         BOOL shouldRetainProxyForReport = ([self.reportRegistry count] == 0);
@@ -127,10 +127,10 @@
             controllerDictionary = [[NSMutableDictionary alloc] init];
             [self.reportRegistry setObject:controllerDictionary forKey:controller];
         }
-        NSMutableArray * nodeArray = controllerDictionary[nodeId];
+        NSMutableArray * nodeArray = controllerDictionary[nodeID];
         if (!nodeArray) {
             nodeArray = [[NSMutableArray alloc] init];
-            [controllerDictionary setObject:nodeArray forKey:nodeId];
+            [controllerDictionary setObject:nodeArray forKey:nodeID];
         }
         [nodeArray addObject:handler];
         if (shouldRetainProxyForReport) {
@@ -140,7 +140,7 @@
 }
 
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
-                                        nodeId:(NSNumber *)nodeId
+                                        nodeID:(NSNumber *)nodeID
                                     completion:(dispatch_block_t)completion
 {
     dispatch_async(_workQueue, ^{
@@ -150,12 +150,12 @@
                 completion();
                 return;
             }
-            NSMutableArray * nodeArray = controllerDictionary[nodeId];
+            NSMutableArray * nodeArray = controllerDictionary[nodeID];
             if (!nodeArray) {
                 completion();
                 return;
             }
-            [controllerDictionary removeObjectForKey:nodeId];
+            [controllerDictionary removeObjectForKey:nodeID];
             if ([controllerDictionary count] == 0) {
                 // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
                 self.proxyRetainerForReports = nil;
@@ -167,7 +167,7 @@
                 if (handle) {
                     MTR_LOG_DEBUG("CHIP XPC connection requests to stop reports");
                     [handle.proxy stopReportsWithController:controller
-                                                     nodeId:nodeId
+                                                     nodeID:nodeID
                                                  completion:^{
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;
@@ -182,7 +182,7 @@
 }
 
 - (void)handleReportWithController:(id)controller
-                            nodeId:(NSNumber *)nodeId
+                            nodeID:(NSNumber *)nodeID
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
@@ -191,7 +191,7 @@
         if (!controllerDictionary) {
             return;
         }
-        NSMutableArray * nodeArray = controllerDictionary[nodeId];
+        NSMutableArray * nodeArray = controllerDictionary[nodeID];
         if (!nodeArray) {
             return;
         }

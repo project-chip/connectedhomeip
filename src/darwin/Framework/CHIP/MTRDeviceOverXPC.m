@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceOverXPC ()
 
 @property (nonatomic, strong, readonly) id<NSCopying> controller;
-@property (nonatomic, readonly) NSNumber * nodeId;
+@property (nonatomic, readonly) NSNumber * nodeID;
 @property (nonatomic, strong, readonly) MTRDeviceControllerXPCConnection * xpcConnection;
 
 @end
@@ -37,11 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRDeviceOverXPC
 
 - (instancetype)initWithController:(id<NSCopying>)controller
-                          deviceId:(NSNumber *)deviceId
+                          deviceID:(NSNumber *)deviceID
                      xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
     _controller = controller;
-    _nodeId = deviceId;
+    _nodeID = deviceID;
     _xpcConnection = xpcConnection;
     return self;
 }
@@ -60,13 +60,13 @@ NS_ASSUME_NONNULL_BEGIN
     MTR_LOG_DEBUG("Subscribing all attributes... Note that attributeReportHandler, eventReportHandler, and resubscriptionScheduled "
                   "are not supported.");
     if (attributeCacheContainer) {
-        [attributeCacheContainer setXPCConnection:_xpcConnection controllerId:self.controller deviceId:self.nodeId];
+        [attributeCacheContainer setXPCConnection:_xpcConnection controllerID:self.controller deviceID:self.nodeID];
     }
     [_xpcConnection
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy subscribeWithController:self.controller
-                                               nodeId:self.nodeId
+                                               nodeID:self.nodeID
                                           minInterval:minInterval
                                           maxInterval:maxInterval
                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
@@ -91,9 +91,9 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
@@ -103,10 +103,10 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy readAttributeWithController:self.controller
-                                                   nodeId:self.nodeId
-                                               endpointId:endpointId
-                                                clusterId:clusterId
-                                              attributeId:attributeId
+                                                   nodeID:self.nodeID
+                                               endpointID:endpointID
+                                                clusterID:clusterID
+                                              attributeID:attributeID
                                                    params:[MTRDeviceController encodeXPCReadParams:params]
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
                                                    dispatch_async(clientQueue, ^{
@@ -127,9 +127,9 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
@@ -140,10 +140,10 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy writeAttributeWithController:self.controller
-                                                    nodeId:self.nodeId
-                                                endpointId:endpointId
-                                                 clusterId:clusterId
-                                               attributeId:attributeId
+                                                    nodeID:self.nodeID
+                                                endpointID:endpointID
+                                                 clusterID:clusterID
+                                               attributeID:attributeID
                                                      value:value
                                          timedWriteTimeout:timeoutMs
                                                 completion:^(id _Nullable values, NSError * _Nullable error) {
@@ -165,9 +165,9 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
@@ -178,10 +178,10 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy invokeCommandWithController:self.controller
-                                                   nodeId:self.nodeId
-                                               endpointId:endpointId
-                                                clusterId:clusterId
-                                                commandId:commandId
+                                                   nodeID:self.nodeID
+                                               endpointID:endpointID
+                                                clusterID:clusterID
+                                                commandID:commandID
                                                    fields:commandFields
                                        timedInvokeTimeout:timeoutMs
                                                completion:^(id _Nullable values, NSError * _Nullable error) {
@@ -203,9 +203,9 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
@@ -220,7 +220,7 @@ NS_ASSUME_NONNULL_BEGIN
             MTR_LOG_DEBUG("Setup report handler");
             [self.xpcConnection
                 registerReportHandlerWithController:self.controller
-                                             nodeId:self.nodeId
+                                             nodeID:self.nodeID
                                             handler:^(id _Nullable values, NSError * _Nullable error) {
                                                 if (values && ![values isKindOfClass:[NSArray class]]) {
                                                     MTR_LOG_ERROR("Unsupported report format");
@@ -238,10 +238,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                     [NSMutableArray arrayWithCapacity:[decodedValues count]];
                                                 for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
                                                     MTRAttributePath * attributePath = decodedValue[MTRAttributePathKey];
-                                                    if ((endpointId == nil || [attributePath.endpoint isEqualToNumber:endpointId])
-                                                        && (clusterId == nil || [attributePath.cluster isEqualToNumber:clusterId])
-                                                        && (attributeId == nil ||
-                                                            [attributePath.attribute isEqualToNumber:attributeId])) {
+                                                    if ((endpointID == nil || [attributePath.endpoint isEqualToNumber:endpointID])
+                                                        && (clusterID == nil || [attributePath.cluster isEqualToNumber:clusterID])
+                                                        && (attributeID == nil ||
+                                                            [attributePath.attribute isEqualToNumber:attributeID])) {
                                                         [filteredValues addObject:decodedValue];
                                                     }
                                                 }
@@ -253,10 +253,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                 }
                                             }];
             [handle.proxy subscribeAttributeWithController:self.controller
-                                                    nodeId:self.nodeId
-                                                endpointId:endpointId
-                                                 clusterId:clusterId
-                                               attributeId:attributeId
+                                                    nodeID:self.nodeID
+                                                endpointID:endpointID
+                                                 clusterID:clusterID
+                                               attributeID:attributeID
                                                minInterval:minInterval
                                                maxInterval:maxInterval
                                                     params:[MTRDeviceController encodeXPCSubscribeParams:params]
@@ -284,7 +284,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     MTR_LOG_DEBUG("Deregistering report handlers");
     [_xpcConnection deregisterReportHandlersWithController:self.controller
-                                                    nodeId:self.nodeId
+                                                    nodeID:self.nodeID
                                                 completion:^{
                                                     dispatch_async(clientQueue, completion);
                                                 }];

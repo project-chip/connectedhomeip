@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, copy, readonly) NSNumber * fabricId;
+@property (nonatomic, copy, readonly) NSNumber * fabricID;
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorId;
+@property (nonatomic, copy, nullable) NSNumber * vendorID;
 
 /**
  * Node id for this controller.
@@ -75,27 +75,27 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be a valid Matter operational node id.
  *
- * If operationalCertificate is nil, nodeId and operationalKeypair are used to
+ * If operationalCertificate is nil, nodeID and operationalKeypair are used to
  * determine an operational certificate, as follows:
  *
  * * When creating a new fabric:
  *
- * ** nodeId is allowed to be nil to indicate that a random node id should be
+ * ** nodeID is allowed to be nil to indicate that a random node id should be
  *    generated.
  *
  * * When using an existing fabric:
  *
- * ** nodeId is allowed to be nil to indicate that the existing operational node
+ * ** nodeID is allowed to be nil to indicate that the existing operational node
  *    id should be used.  The existing operational keys will also be used,
  *    unless operationalKeypair is provided.
  *
- * ** If nodeId is not nil, a new operational certificate will be generated for
+ * ** If nodeID is not nil, a new operational certificate will be generated for
  *    the provided node id (even if that matches the existing node id), using
  *    either the operationalKeypair if that is provided or a new randomly
  *    generated operational key.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeId;
+@property (nonatomic, copy, nullable) NSNumber * nodeID;
 
 // TODO: Add something here for CATs?
 
@@ -114,7 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * May be nil if nocSigner is not nil and an intermediate CA is not being
  *   used.  In that case the nocSigner keypair, which is the keypair for the
  *   root certificate, will be used to generate and sign a root certificate,
- *   with a random issuer id.  In this case, the fabricId will be included in
+ *   with a random issuer id.  In this case, the fabricID will be included in
  *   the root certificate's subject DN.
  *
  * When using an existing fabric:
@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  * operationalKeypair must not be nil.
  *
  * If nil, an operational certificate will be determined as described in the
- * documentation for nodeId.
+ * documentation for nodeID.
  */
 @property (nonatomic, copy, readonly, nullable) NSData * operationalCertificate;
 
@@ -182,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, and if operationalCertificate is nil, a new operational
  * certificate will be generated for the given operationalKeypair.  The node id
  * will for that certificated will be determined as described in the
- * documentation for nodeId.
+ * documentation for nodeID.
  */
 @property (nonatomic, strong, nullable) id<MTRKeypair> operationalKeypair;
 
@@ -192,11 +192,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Prepare to initialize a controller given a keypair to use for signing
  * operational certificates.
  *
- * fabricId must be set to a valid (i.e. nonzero) value.
+ * fabricID must be set to a valid (i.e. nonzero) value.
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(NSNumber *)fabricId ipk:(NSData *)ipk;
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk;
 
 /**
  * Prepare to initialize a controller with a complete operational certificate

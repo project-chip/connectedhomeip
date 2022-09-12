@@ -71,11 +71,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
@@ -93,7 +93,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 
     // now try to restart the controller without providing a vendor id.
-    params.vendorId = nil;
+    params.vendorID = nil;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
@@ -119,11 +119,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
@@ -148,11 +148,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
@@ -181,11 +181,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     [controller shutdown];
@@ -199,11 +199,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Check that a new controller can be started on a different fabric too.
     __auto_type * params2 = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                    fabricId:@(2)
+                                                                                    fabricID:@(2)
                                                                                          ipk:testKeys.ipk];
     XCTAssertNotNil(params2);
 
-    params2.vendorId = @(kTestVendorId);
+    params2.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller3 = [factory startControllerOnNewFabric:params2];
     XCTAssertTrue([controller3 isRunning]);
@@ -239,11 +239,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
@@ -274,11 +274,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
@@ -311,11 +311,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
@@ -347,11 +347,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(testKeys);
 
     __auto_type * params1 = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                    fabricId:@(1)
+                                                                                    fabricID:@(1)
                                                                                          ipk:testKeys.ipk];
     XCTAssertNotNil(params1);
 
-    params1.vendorId = @(kTestVendorId);
+    params1.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller1 = [factory startControllerOnNewFabric:params1];
     XCTAssertNotNil(controller1);
@@ -360,11 +360,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // Now try to start a new controller with the same root but a
     // different fabric id.
     __auto_type * params2 = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                    fabricId:@(2)
+                                                                                    fabricID:@(2)
                                                                                          ipk:testKeys.ipk];
     XCTAssertNotNil(params2);
 
-    params2.vendorId = @(kTestVendorId);
+    params2.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller2 = [factory startControllerOnNewFabric:params2];
     XCTAssertNotNil(controller2);
@@ -395,21 +395,21 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerId:@1 fabricId:@1 error:nil];
+    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root1);
 
-    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerId:@1 fabricId:@1 error:nil];
+    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root2);
 
-    __auto_type * root3 = [MTRCertificates generateRootCertificate:testKeys issuerId:@2 fabricId:@1 error:nil];
+    __auto_type * root3 = [MTRCertificates generateRootCertificate:testKeys issuerID:@2 fabricID:@1 error:nil];
     XCTAssertNotNil(root3);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root1;
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -426,7 +426,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller controllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -444,7 +444,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // operational certificate.  This should fail because our root of trust for
     // the fabric would change if we allowed this.
     params.rootCertificate = root3;
-    params.nodeId = nodeId;
+    params.nodeID = nodeId;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNil(controller);
 
@@ -465,18 +465,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerId:@1 fabricId:@1 error:nil];
+    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root1);
 
-    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerId:@1 fabricId:@2 error:nil];
+    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@2 error:nil];
     XCTAssertNotNil(root2);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:testKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Try to start controller when fabric id in root cert subject does not match provided fabric id.
     params.rootCertificate = root2;
@@ -526,15 +526,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * signerKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(signerKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:signerKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root;
 
     // Try to start controller when there is no ICA and root cert does not match signing key.
@@ -559,7 +559,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -568,17 +568,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:nil
+                                                                         issuerID:nil
+                                                                         fabricID:nil
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Try to start controller when there is an ICA and the ICA cert does not match signing key.
     params.rootCertificate = root;
@@ -587,8 +587,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNil(controller);
 
     // Now start controller with the signing key matching the intermediate cert.
-    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricId:@(1) ipk:rootKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricID:@(1) ipk:rootKeys.ipk];
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
     controller = [factory startControllerOnNewFabric:params];
@@ -617,7 +617,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Invalid fabric ID.
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(0)
+                                                                                   fabricID:@(0)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNil(params);
 
@@ -639,12 +639,12 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(rootKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     // Invalid vendor ID ("standard").
-    params.vendorId = @(0);
+    params.vendorID = @(0);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
@@ -667,17 +667,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(rootKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller controllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -686,7 +686,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -709,41 +709,41 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(rootKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Bring up with node id 17.
-    params.nodeId = @17;
+    params.nodeID = @17;
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @17);
+    XCTAssertEqualObjects([controller controllerNodeID], @17);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Bring up with a different node id (18).
-    params.nodeId = @18;
+    params.nodeID = @18;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @18);
+    XCTAssertEqualObjects([controller controllerNodeID], @18);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Verify the new node id has been stored.
-    params.nodeId = nil;
+    params.nodeID = nil;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @18);
+    XCTAssertEqualObjects([controller controllerNodeID], @18);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -766,29 +766,29 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(rootKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Try to bring up with node id 0.
-    params.nodeId = @0;
+    params.nodeID = @0;
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     // Try to bring up with node id that is outside of the operational range.
-    params.nodeId = @(0xFFFFFFFF00000000ULL);
+    params.nodeID = @(0xFFFFFFFF00000000ULL);
     controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     // Verify that we can indeed bring up a controller for this fabric, with a valid node id.
-    params.nodeId = @17;
+    params.nodeID = @17;
     controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @17);
+    XCTAssertEqualObjects([controller controllerNodeID], @17);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -811,7 +811,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -820,17 +820,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:nil
+                                                                         issuerID:nil
+                                                                         fabricID:nil
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Create a new fabric without the ICA.
     params.rootCertificate = root;
@@ -838,21 +838,21 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller controllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but using the ICA.
-    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricId:@(1) ipk:rootKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricID:@(1) ipk:rootKeys.ipk];
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -875,7 +875,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -884,17 +884,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:nil
+                                                                         issuerID:nil
+                                                                         fabricID:nil
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Create a new fabric without the ICA.
     params.rootCertificate = root;
@@ -903,20 +903,20 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller controllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but without using the ICA.
-    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:@(1) ipk:rootKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricID:@(1) ipk:rootKeys.ipk];
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -939,7 +939,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys1 = [[MTRTestKeys alloc] init];
@@ -948,8 +948,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate1 = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                    rootCertificate:root
                                                              intermediatePublicKey:intermediateKeys1.publicKey
-                                                                          issuerId:nil
-                                                                          fabricId:nil
+                                                                          issuerID:nil
+                                                                          fabricID:nil
                                                                              error:nil];
     XCTAssertNotNil(intermediate1);
 
@@ -959,17 +959,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate2 = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                    rootCertificate:root
                                                              intermediatePublicKey:intermediateKeys2.publicKey
-                                                                          issuerId:nil
-                                                                          fabricId:nil
+                                                                          issuerID:nil
+                                                                          fabricID:nil
                                                                              error:nil];
     XCTAssertNotNil(intermediate2);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys1
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Create a new fabric without the first ICA.
     params.rootCertificate = root;
@@ -978,21 +978,21 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller controllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but using the second ICA.
-    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys2 fabricId:@(1) ipk:rootKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys2 fabricID:@(1) ipk:rootKeys.ipk];
+    params.vendorID = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate2;
     controller = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1014,7 +1014,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -1023,17 +1023,17 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:nil
+                                                                         issuerID:nil
+                                                                         fabricID:nil
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     // Pass in an intermediate but no root.  Should fail.
     params.intermediateCertificate = intermediate;
@@ -1057,7 +1057,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -1066,8 +1066,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:nil
+                                                                         issuerID:nil
+                                                                         fabricID:nil
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
@@ -1077,8 +1077,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
                                                              signingCertificate:intermediate
                                                            operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricId:@123
-                                                                         nodeId:@456
+                                                                       fabricID:@123
+                                                                         nodeID:@456
                                                           caseAuthenticatedTags:nil
                                                                           error:nil];
     XCTAssertNotNil(operational);
@@ -1090,13 +1090,13 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                                             ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @456);
+    XCTAssertEqualObjects([controller controllerNodeID], @456);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1110,7 +1110,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @456);
+    XCTAssertEqualObjects([controller controllerNodeID], @456);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1132,7 +1132,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
@@ -1141,8 +1141,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
                                                              signingCertificate:root
                                                            operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricId:@123
-                                                                         nodeId:@456
+                                                                       fabricID:@123
+                                                                         nodeID:@456
                                                           caseAuthenticatedTags:nil
                                                                           error:nil];
     XCTAssertNotNil(operational);
@@ -1154,13 +1154,13 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                                             ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], @456);
+    XCTAssertEqualObjects([controller controllerNodeID], @456);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1182,7 +1182,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:@111 error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:@111 error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
@@ -1191,8 +1191,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
                                                              signingCertificate:root
                                                            operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricId:@123
-                                                                         nodeId:@456
+                                                                       fabricID:@123
+                                                                         nodeID:@456
                                                           caseAuthenticatedTags:nil
                                                                           error:nil];
     XCTAssertNotNil(operational);
@@ -1204,7 +1204,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                                             ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
@@ -1226,7 +1226,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:@123 error:nil];
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:@123 error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
@@ -1235,8 +1235,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
                                                                   rootCertificate:root
                                                             intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerId:nil
-                                                                         fabricId:@111
+                                                                         issuerID:nil
+                                                                         fabricID:@111
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
@@ -1246,8 +1246,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
                                                              signingCertificate:intermediate
                                                            operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricId:@123
-                                                                         nodeId:@456
+                                                                       fabricID:@123
+                                                                         nodeID:@456
                                                           caseAuthenticatedTags:nil
                                                                           error:nil];
     XCTAssertNotNil(operational);
@@ -1259,7 +1259,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                                             ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
@@ -1285,18 +1285,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operationalKeys);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
-                                                                                   fabricId:@(1)
+                                                                                   fabricID:@(1)
                                                                                         ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
-    params.vendorId = @(kTestVendorId);
+    params.vendorID = @(kTestVendorId);
     params.operationalKeypair = operationalKeys;
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    __auto_type nodeId = [controller controllerNodeId];
+    __auto_type nodeId = [controller controllerNodeID];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1315,7 +1315,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1330,7 +1330,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeID], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

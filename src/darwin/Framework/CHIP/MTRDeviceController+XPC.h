@@ -36,11 +36,11 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns a shared device controller proxy for the controller object over XPC connection.
  *
- * @param controllerId    an implementation specific id in case multiple shared device controllers are available over XPC connection
+ * @param controllerID    an implementation specific id in case multiple shared device controllers are available over XPC connection
  * @param xpcConnectBlock block to connect to an XPC listener serving the shared device controllers in an implementation specific
  * way
  */
-+ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
++ (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
                                 xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock;
 
 /**
@@ -82,9 +82,9 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 @protocol MTRDeviceControllerServerProtocol <NSObject>
 
 /**
- * Gets device controller ID corresponding to a specific fabric Id
+ * Gets device controller ID corresponding to a specific fabric ID
  */
-- (void)getDeviceControllerWithFabricId:(NSNumber *)fabricId completion:(MTRDeviceControllerGetterHandler)completion;
+- (void)getDeviceControllerWithFabricID:(NSNumber *)fabricID completion:(MTRDeviceControllerGetterHandler)completion;
 
 /**
  * Gets any available device controller ID
@@ -95,10 +95,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests reading attribute
  */
 - (void)readAttributeWithController:(id _Nullable)controller
-                             nodeId:(NSNumber *)nodeId
-                         endpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+                             nodeID:(NSNumber *)nodeID
+                         endpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
                              params:(NSDictionary<NSString *, id> * _Nullable)params
                          completion:(MTRValuesHandler)completion;
 
@@ -106,10 +106,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests writing attribute
  */
 - (void)writeAttributeWithController:(id _Nullable)controller
-                              nodeId:(NSNumber *)nodeId
-                          endpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+                              nodeID:(NSNumber *)nodeID
+                          endpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                           completion:(MTRValuesHandler)completion;
@@ -118,10 +118,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests invoking command
  */
 - (void)invokeCommandWithController:(id _Nullable)controller
-                             nodeId:(NSNumber *)nodeId
-                         endpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+                             nodeID:(NSNumber *)nodeID
+                         endpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                              fields:(id)fields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                          completion:(MTRValuesHandler)completion;
@@ -130,10 +130,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests subscribing attribute
  */
 - (void)subscribeAttributeWithController:(id _Nullable)controller
-                                  nodeId:(NSNumber *)nodeId
-                              endpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+                                  nodeID:(NSNumber *)nodeID
+                              endpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(NSDictionary<NSString *, id> * _Nullable)params
@@ -142,13 +142,13 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Requests to stop reporting
  */
-- (void)stopReportsWithController:(id _Nullable)controller nodeId:(NSNumber *)nodeId completion:(dispatch_block_t)completion;
+- (void)stopReportsWithController:(id _Nullable)controller nodeID:(NSNumber *)nodeID completion:(dispatch_block_t)completion;
 
 /**
  * Requests subscription of all attributes.
  */
 - (void)subscribeWithController:(id _Nullable)controller
-                         nodeId:(NSNumber *)nodeId
+                         nodeID:(NSNumber *)nodeID
                     minInterval:(NSNumber *)minInterval
                     maxInterval:(NSNumber *)maxInterval
                          params:(NSDictionary<NSString *, id> * _Nullable)params
@@ -159,10 +159,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests reading attribute cache
  */
 - (void)readAttributeCacheWithController:(id _Nullable)controller
-                                  nodeId:(NSNumber *)nodeId
-                              endpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+                                  nodeID:(NSNumber *)nodeID
+                              endpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                               completion:(MTRValuesHandler)completion;
 
 @end
@@ -176,7 +176,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Handles a report received by a device controller
  */
 - (void)handleReportWithController:(id _Nullable)controller
-                            nodeId:(NSNumber *)nodeId
+                            nodeID:(NSNumber *)nodeID
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error;
 

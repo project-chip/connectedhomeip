@@ -29,17 +29,17 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Reads an attribute with specific attribute path
  *
- * @param endpointId  endpoint ID of the attribute
- * @param clusterId  cluster ID of the attribute
- * @param attributeId  attribute ID of the attribute
+ * @param endpointID  endpoint ID of the attribute
+ * @param clusterID  cluster ID of the attribute
+ * @param attributeID  attribute ID of the attribute
  * @param clientQueue  client queue to dispatch the completion handler through
  * @param completion  block to receive the result.
  *                   "values" received by the block will have the same format of object as the one received by completion block
- *                   of CHIPDevice readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion method.
+ *                   of CHIPDevice readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion method.
  */
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion;
 

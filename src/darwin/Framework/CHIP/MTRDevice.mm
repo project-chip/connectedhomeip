@@ -372,9 +372,9 @@ private:
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
 
         [baseDevice
-            readAttributeWithEndpointId:endpointID
-                              clusterId:clusterID
-                            attributeId:attributeID
+            readAttributeWithEndpointID:endpointID
+                              clusterID:clusterID
+                            attributeID:attributeID
                                  params:params
                             clientQueue:self.queue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -396,9 +396,9 @@ private:
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     // Return current known / expected value right away
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointId:endpointID
-                                                                           clusterId:clusterID
-                                                                         attributeId:attributeID];
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     return attributeValueToReturn;
@@ -414,9 +414,9 @@ private:
     // Start the asynchronous operation
     MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
-        writeAttributeWithEndpointId:endpointID
-                           clusterId:clusterID
-                         attributeId:attributeID
+        writeAttributeWithEndpointID:endpointID
+                           clusterID:clusterID
+                         attributeID:attributeID
                                value:value
                    timedWriteTimeout:timeout
                          clientQueue:self.queue
@@ -427,9 +427,9 @@ private:
                           }];
 
     // Commit change into expected value cache
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointId:endpointID
-                                                                           clusterId:clusterID
-                                                                         attributeId:attributeID];
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
     NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
 
     [self setExpectedValues:@[ newExpectedValueDictionary ] expectedValueInterval:expectedValueInterval];
@@ -448,9 +448,9 @@ private:
     // Perform this operation
     MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
-        invokeCommandWithEndpointId:endpointID
-                          clusterId:clusterID
-                          commandId:commandID
+        invokeCommandWithEndpointID:endpointID
+                          clusterID:clusterID
+                          commandID:commandID
                       commandFields:commandFields
                  timedInvokeTimeout:timeout
                         clientQueue:self.queue

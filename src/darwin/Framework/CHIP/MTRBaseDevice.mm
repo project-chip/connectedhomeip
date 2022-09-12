@@ -86,7 +86,7 @@ class MTRDataValueDictionaryCallbackBridge;
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
-@property (nonatomic, readwrite) uint64_t deviceId;
+@property (nonatomic, readwrite) uint64_t deviceID;
 - (void)onDone;
 @end
 
@@ -202,7 +202,7 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
         Platform::Delete(_pathParams);
         _pathParams = nullptr;
     }
-    PurgeCompletedReadClientContainers(_deviceId);
+    PurgeCompletedReadClientContainers(_deviceID);
 }
 
 - (void)dealloc
@@ -771,16 +771,16 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                        attributeId:(NSNumber *)attributeId
+- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                        attributeID:(NSNumber *)attributeID
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    endpointId = (endpointId == nil) ? nil : [endpointId copy];
-    clusterId = (clusterId == nil) ? nil : [clusterId copy];
-    attributeId = (attributeId == nil) ? nil : [attributeId copy];
+    endpointID = (endpointID == nil) ? nil : [endpointID copy];
+    clusterID = (clusterID == nil) ? nil : [clusterID copy];
+    attributeID = (attributeID == nil) ? nil : [attributeID copy];
     params = (params == nil) ? nil : [params copy];
     new MTRDataValueDictionaryCallbackBridge(clientQueue, self, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, chip::Callback::Cancelable * success,
@@ -816,14 +816,14 @@ private:
             };
 
             app::AttributePathParams attributePath;
-            if (endpointId) {
-                attributePath.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            if (endpointID) {
+                attributePath.mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
             }
-            if (clusterId) {
-                attributePath.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+            if (clusterID) {
+                attributePath.mClusterId = static_cast<chip::ClusterId>([clusterID unsignedLongValue]);
             }
-            if (attributeId) {
-                attributePath.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+            if (attributeID) {
+                attributePath.mAttributeId = static_cast<chip::AttributeId>([attributeID unsignedLongValue]);
             }
             app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -880,9 +880,9 @@ private:
         });
 }
 
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
@@ -941,9 +941,9 @@ private:
                   };
 
             return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
-                static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
-                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
-                static_cast<chip::AttributeId>([attributeId unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+                static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+                static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
                 onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
                 onDoneCb, NullOptional);
         });
@@ -1020,17 +1020,17 @@ exit:
     }
 }
 
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    endpointId = (endpointId == nil) ? nil : [endpointId copy];
-    clusterId = (clusterId == nil) ? nil : [clusterId copy];
-    commandId = (commandId == nil) ? nil : [commandId copy];
+    endpointID = (endpointID == nil) ? nil : [endpointID copy];
+    clusterID = (clusterID == nil) ? nil : [clusterID copy];
+    commandID = (commandID == nil) ? nil : [commandID copy];
     // TODO: This is not going to deep-copy the NSArray instances in
     // commandFields.  We need to do something smarter here.
     commandFields = (commandFields == nil) ? nil : [commandFields copy];
@@ -1068,9 +1068,9 @@ exit:
                 }
             };
 
-            app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([endpointId unsignedShortValue]), 0,
-                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
-                static_cast<chip::CommandId>([commandId unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([endpointID unsignedShortValue]), 0,
+                static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+                static_cast<chip::CommandId>([commandID unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
 
             auto decoder = chip::Platform::MakeUnique<NSObjectCommandCallback>(
                 commandPath.mClusterId, commandPath.mCommandId, onSuccessCb, onFailureCb);
@@ -1114,9 +1114,9 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
@@ -1133,9 +1133,9 @@ exit:
     }
 
     // Copy params before going async.
-    endpointId = (endpointId == nil) ? nil : [endpointId copy];
-    clusterId = (clusterId == nil) ? nil : [clusterId copy];
-    attributeId = (attributeId == nil) ? nil : [attributeId copy];
+    endpointID = (endpointID == nil) ? nil : [endpointID copy];
+    clusterID = (clusterID == nil) ? nil : [clusterID copy];
+    attributeID = (attributeID == nil) ? nil : [attributeID copy];
     minInterval = (minInterval == nil) ? nil : [minInterval copy];
     maxInterval = (maxInterval == nil) ? nil : [maxInterval copy];
     params = (params == nil) ? nil : [params copy];
@@ -1191,16 +1191,16 @@ exit:
             };
 
             MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
-            container.deviceId = [self deviceID];
+            container.deviceID = [self deviceID];
             container.pathParams = Platform::New<app::AttributePathParams>();
-            if (endpointId) {
-                container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            if (endpointID) {
+                container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
             }
-            if (clusterId) {
-                container.pathParams->mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+            if (clusterID) {
+                container.pathParams->mClusterId = static_cast<chip::ClusterId>([clusterID unsignedLongValue]);
             }
-            if (attributeId) {
-                container.pathParams->mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+            if (attributeID) {
+                container.pathParams->mAttributeId = static_cast<chip::AttributeId>([attributeID unsignedLongValue]);
             }
 
             app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
@@ -1249,7 +1249,7 @@ exit:
 
             // Read clients will be purged when deregistered.
             container.readClientPtr = readClient;
-            AddReadClientContainer(container.deviceId, container);
+            AddReadClientContainer(container.deviceID, container);
             callback.release();
         }];
 }
@@ -1468,11 +1468,13 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                      (uint32_t) _attribute.unsignedLongValue];
 }
 
-+ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId attributeId:(NSNumber *)attributeId
++ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                attributeID:(NSNumber *)attributeID
 {
-    ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
-        static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
-        static_cast<chip::AttributeId>([attributeId unsignedLongValue]));
+    ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+        static_cast<chip::AttributeId>([attributeID unsignedLongValue]));
 
     return [[MTRAttributePath alloc] initWithPath:path];
 }
@@ -1498,7 +1500,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [MTRAttributePath attributePathWithEndpointId:_endpoint clusterId:_cluster attributeId:_attribute];
+    return [MTRAttributePath attributePathWithEndpointID:_endpoint clusterID:_cluster attributeID:_attribute];
 }
 @end
 
@@ -1513,10 +1515,10 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-+ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
-    ConcreteEventPath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
-        static_cast<chip::ClusterId>([clusterId unsignedLongValue]), static_cast<chip::EventId>([eventId unsignedLongValue]));
+    ConcreteEventPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
 
     return [[MTREventPath alloc] initWithPath:path];
 }
@@ -1533,10 +1535,10 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-+ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
 {
-    ConcreteCommandPath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
-        static_cast<chip::ClusterId>([clusterId unsignedLongValue]), static_cast<chip::CommandId>([commandId unsignedLongValue]));
+    ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));
 
     return [[MTRCommandPath alloc] initWithPath:path];
 }
