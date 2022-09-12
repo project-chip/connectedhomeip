@@ -64,6 +64,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     InitWiFi();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    InitEthernet();
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -74,6 +77,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     OnWiFiPlatformEvent(event);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    OnEthernetPlatformEvent(event);
 #endif
 }
 
