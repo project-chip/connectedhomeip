@@ -830,6 +830,15 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 {
 
                     // Start advertisement timeout timer
+                    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+                    {
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout, CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                    }
+                    else
+                    {
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout,
+                                             ADV_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                    }
                     Util_startClock(&sInstance.clkAdvTimeout);
 
                     sInstance.mFlags.Set(Flags::kAdvertising);
@@ -845,6 +854,9 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 sInstance.mFlags.Clear(Flags::kAdvertising);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
+
+                // reset fast advertising
+                sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
             }
         }
     }
@@ -1093,6 +1105,8 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
 
         /* Stop advertisement timeout timer */
         Util_stopClock(&sInstance.clkAdvTimeout);
+        // reset fast advertising
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         DriveBLEState();
 
@@ -1711,10 +1725,19 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
 
     if (sInstance.mFlags.Has(Flags::kAdvertisingEnabled))
     {
-        BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
+        if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+        {
+            BLEMGR_LOG("BLEMGR: Fast advertising timeout reached");
 
-        sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
+            sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+        }
+        else
+        {
+            BLEMGR_LOG("BLEMGR: Advertising timeout reached");
 
+            sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+        }
         /* Send event to process state change request */
         DriveBLEState();
     }

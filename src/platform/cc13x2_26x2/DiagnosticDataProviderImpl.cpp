@@ -28,6 +28,8 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/cc13x2_26x2/DiagnosticDataProviderImpl.h>
 
+#include <driverlib/sys_ctrl.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -114,6 +116,152 @@ void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetr
         ThreadMetrics * del = threadMetrics;
         threadMetrics       = threadMetrics->Next;
         vPortFree(del);
+    }
+}
+
+// General Diagnostics Getters
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
+
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    switch (SysCtrlResetSourceGet())
+    {
+    case RSTSRC_PWR_ON:
+    case RSTSRC_WAKEUP_FROM_SHUTDOWN:
+        bootReason = BootReasonType::kPowerOnReboot;
+        break;
+
+    case RSTSRC_PIN_RESET:
+    case RSTSRC_WAKEUP_FROM_TCK_NOISE:
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+        break;
+
+    case RSTSRC_VDDS_LOSS:
+    case RSTSRC_VDDR_LOSS:
+    case RSTSRC_CLK_LOSS:
+        bootReason = BootReasonType::kBrownOutReset;
+        break;
+
+    case RSTSRC_SYSRESET:
+    case RSTSRC_WARMRESET:
+        bootReason = BootReasonType::kSoftwareReset;
+        // We do not have a clean way to differentiate between a software reset
+        // and a completed software update.
+        // bootReason = kSoftwareUpdateCompleted;
+        break;
+
+    default:
+        bootReason = BootReasonType::kUnknownEnumValue;
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
+{
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp startTime   = PlatformMgrImpl().GetStartTime();
+
+    if (currentTime >= startTime)
+    {
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - startTime).count();
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    uint64_t upTime = 0;
+
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+#if CHIP_CONFIG_TEST
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+#if CHIP_CONFIG_TEST
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+#if CHIP_CONFIG_TEST
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    otExtAddress extAddr;
+    ThreadStackMgrImpl().GetExtAddress(extAddr);
+    ifp->hardwareAddress = ByteSpan(extAddr.m8, OT_EXT_ADDRESS_SIZE);
+
+    *netifpp = ifp;
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
     }
 }
 

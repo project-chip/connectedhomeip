@@ -68,6 +68,8 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_BootCount;
+    static const Key kConfigKey_TotalOperationalHours;
 
     static CHIP_ERROR Init(void);
 
