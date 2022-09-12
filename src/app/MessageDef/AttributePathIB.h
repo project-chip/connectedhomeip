@@ -153,6 +153,14 @@ public:
     CHIP_ERROR GetListIndex(ConcreteDataAttributePath & aAttributePath) const;
 
     // TODO(#14934) Add a function to get ConcreteDataAttributePath from AttributePathIB::Parser directly.
+
+    /**
+     * @brief Parse the attribute path into an AttributePathParams object. As part of parsing,
+     * validity checks for each path item will be done as well.
+     *
+     * If any errors are encountered, an IM error of 'InvalidAction' will be returned.
+     */
+    CHIP_ERROR ParsePath(AttributePathParams & attribute) const;
 };
 
 class Builder : public ListBuilder

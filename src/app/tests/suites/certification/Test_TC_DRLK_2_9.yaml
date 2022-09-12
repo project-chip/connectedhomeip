@@ -231,7 +231,9 @@ tests:
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 2 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 1 null null  1 1 --timedInteractionTimeoutMs 1000
+
+          Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
           [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
           [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
@@ -284,15 +286,17 @@ tests:
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 3 0 0 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123457 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
-          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
-          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
-          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
-          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
-          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
-          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 4
-          [1656506733.767871][27276:27281] CHIP:TOO:    }
+          Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
+
+          [1660216276.191641][71849:71854] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1660216276.191673][71849:71854] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1660216276.191725][71849:71854] CHIP:TOO:   SetCredentialResponse: {
+          [1660216276.191752][71849:71854] CHIP:TOO:     status: 3
+          [1660216276.191764][71849:71854] CHIP:TOO:     userIndex: null
+          [1660216276.191776][71849:71854] CHIP:TOO:     nextCredentialIndex: 2
+          [1660216276.191798][71849:71854] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -337,15 +341,20 @@ tests:
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 2 0 0 1 1 --timedInteractionTimeoutMs 1000
+          Mark as not applicable and proceed to next step
 
-          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
-          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
-          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
-          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
-          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
-          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 4
-          [1656506733.767871][27276:27281] CHIP:TOO:    }
+          ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+
+          Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
+
+          [1658473055.384297][2667:2672] CHIP:DMG: },
+          [1658473055.384374][2667:2672] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1658473055.384433][2667:2672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1658473055.384516][2667:2672] CHIP:TOO:   SetCredentialResponse: {
+          [1658473055.384571][2667:2672] CHIP:TOO:     status: 2
+          [1658473055.384602][2667:2672] CHIP:TOO:     userIndex: null
+          [1658473055.384632][2667:2672] CHIP:TOO:     nextCredentialIndex: 4
+          [1658473055.384660][2667:2672] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx

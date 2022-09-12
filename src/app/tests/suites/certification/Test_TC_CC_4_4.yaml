@@ -116,8 +116,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 165
-              maxValue: 195
+              minValue: 160
+              maxValue: 200
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
@@ -125,8 +125,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 55
-              maxValue: 75
+              minValue: 50
+              maxValue: 80
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -142,7 +142,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 160
+              minValue: 135
               maxValue: 185
 
     - label: "TH reads CurrentSaturation attribute from DUT"
@@ -153,7 +153,7 @@ tests:
           constraints:
               type: int8u
               minValue: 68
-              maxValue: 80
+              maxValue: 92
 
     - label: "Wait 5s"
       cluster: "DelayCommands"

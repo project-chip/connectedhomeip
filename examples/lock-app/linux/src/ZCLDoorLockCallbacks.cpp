@@ -88,16 +88,6 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
     return LockManager::Instance().SetSchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
-{
-    // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
-    if (attributePath.mClusterId == DoorLock::Id)
-    {
-        emberAfDoorLockClusterPrintln("Door Lock attribute changed");
-    }
-}
-
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     DoorLockServer::Instance().InitServer(endpoint);

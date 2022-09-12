@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -134,6 +135,33 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
 {
     return BytesToHex(src_bytes, src_size, dest_hex_str, dest_size_max, HexFlags::kNullTerminate);
 }
+
+/**
+ * @brief Dumps a binary buffer to log as hexadecimal
+ *
+ * Output is 32 bytes per line of uppercase hex, prepended with a given label.
+ *
+ * This function is useful to dump binary buffers such as certificates
+ * which may need to be extracted from logs during debugging.
+ *
+ * Format is organized to allow easy extraction by searching the regex
+ * `LABEL>>>[0-9A-F]+$` where LABEL is the `label` argument passed.
+ *
+ * Format looks like:
+ *
+ * ```
+ * label>>>A54A39294B28886E8BFC15B44105A3FD22745225983A753E6BB82DA7C62493BF
+ * label>>>02C3ED03D41B6F7874E7E887321DE7B4872CEB9F080B6ECE14A8ABFA260573A3
+ * label>>>8D759C
+ * ```
+ *
+ * If buffer is empty, at least one line with the `LABEL>>>` will be logged,
+ * with no data.
+ *
+ * @param label - label to prepend. If nullptr, no label will be prepended
+ * @param span - Span over buffer that needs to be dumped.
+ */
+void LogBufferAsHex(const char * label, const ByteSpan & span);
 
 /**
  * Convert a buffer of hexadecimal characters to bytes. Supports both lowercase

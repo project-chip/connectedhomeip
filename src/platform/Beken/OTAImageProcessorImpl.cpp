@@ -150,7 +150,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
+#if CONFIG_FLASH_ORIGIN_API
     partition_info = bk_flash_get_info(BK_PARTITION_OTA);
+#else
+    partition_info = bk_flash_partition_get_info(BK_PARTITION_OTA);
+#endif
     BK_CHECK_POINTER_NULL_TO_VOID(partition_info);
     dwFlagAddrOffset = partition_info->partition_length - (sizeof(ucFinishFlag) - 1);
 
@@ -223,7 +227,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         UINT32 dwFlagAddrOffset                 = 0;
         char ucflag[(sizeof(ucFinishFlag) - 1)] = { 0 };
 
+#if CONFIG_FLASH_ORIGIN_API
         partition_info = bk_flash_get_info(BK_PARTITION_OTA);
+#else
+        partition_info = bk_flash_partition_get_info(BK_PARTITION_OTA);
+#endif
         BK_CHECK_POINTER_NULL_TO_VOID(partition_info);
 
         dwFlagAddrOffset = partition_info->partition_length - (sizeof(ucFinishFlag) - 1);

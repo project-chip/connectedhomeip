@@ -17,6 +17,7 @@
  */
 
 #include "AppMain.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
@@ -78,4 +79,14 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
+    if (attributePath.mClusterId == Clusters::DoorLock::Id)
+    {
+        emberAfDoorLockClusterPrintln("Door Lock attribute changed");
+    }
 }

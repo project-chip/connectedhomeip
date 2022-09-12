@@ -39,7 +39,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool levelcontrol read current-level 1 1
+          ./chip-tool pairing onnetwork 1 20202021
           Verify DUT receives  current-level attribute response on the TH(all-clusters-app) Log:
           [1657279115.433005][4417:4417] CHIP:IM: Received Read request
           [1657279115.433184][4417:4417] CHIP:DMG: ReadRequestMessage =

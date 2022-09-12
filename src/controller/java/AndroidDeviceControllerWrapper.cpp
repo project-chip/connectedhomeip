@@ -209,8 +209,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
 
-    if (rootCertificate != nullptr && intermediateCertificate != nullptr && nodeOperationalCertificate != nullptr &&
-        keypairDelegate != nullptr)
+    if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
         nativeKeypairBridge->SetDelegate(keypairDelegate);
@@ -224,20 +223,19 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.hasExternallyOwnedOperationalKeypair = true;
 
         JniByteArray jniRcac(env, rootCertificate);
-        JniByteArray jniIcac(env, intermediateCertificate);
         JniByteArray jniNoc(env, nodeOperationalCertificate);
 
         // Make copies of the cert that outlive the scope so that future factor init does not
         // cause loss of scope from the JNI refs going away. Also, this keeps the certs
         // handy for debugging commissioner init.
         wrapper->mRcacCertificate = std::vector<uint8_t>(jniRcac.byteSpan().begin(), jniRcac.byteSpan().end());
-        if (!jniIcac.byteSpan().empty())
+
+        // Intermediate cert could be missing. Let's only copy it if present
+        wrapper->mIcacCertificate.clear();
+        if (intermediateCertificate != nullptr)
         {
+            JniByteArray jniIcac(env, intermediateCertificate);
             wrapper->mIcacCertificate = std::vector<uint8_t>(jniIcac.byteSpan().begin(), jniIcac.byteSpan().end());
-        }
-        else
-        {
-            wrapper->mIcacCertificate.clear();
         }
 
         wrapper->mNocCertificate = std::vector<uint8_t>(jniNoc.byteSpan().begin(), jniNoc.byteSpan().end());
@@ -248,6 +246,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     else
     {
+        ChipLogProgress(Controller,
+                        "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
+
         *errInfoOnFailure = ephemeralKey.Initialize();
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
@@ -289,7 +290,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+    ChipLogProgress(Controller, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
                     static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
