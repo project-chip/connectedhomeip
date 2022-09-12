@@ -365,7 +365,8 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             ///
             /// TODO: this wastes one copy of the data and that could be optimized away
             PacketBufferHandle tempBuf = data.CloneData();
-            if (tempBuf.IsNull()) {
+            if (tempBuf.IsNull())
+            {
                 // Not enough memory available to clone pbuf
                 err = CHIP_ERROR_NO_MEMORY;
             }
