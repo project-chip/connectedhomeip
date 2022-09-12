@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRSetupPayload;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -87,6 +89,11 @@ typedef void (^MTRDeviceErrorHandler)(NSError * error);
  */
 typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumber * resubscriptionDelay);
 
+/**
+ * Handler for openCommissioningWindow.
+ */
+typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
+
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
 extern NSString * const MTREventPathKey;
@@ -109,11 +116,20 @@ extern NSString * const MTRArrayValueType;
 @class MTRAttributeCacheContainer;
 @class MTRReadParams;
 @class MTRSubscribeParams;
+@class MTRDeviceController;
 
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Initialize the device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -237,6 +253,26 @@ extern NSString * const MTRArrayValueType;
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                     clientQueue:(dispatch_queue_t)clientQueue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end
 

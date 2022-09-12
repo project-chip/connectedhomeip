@@ -24,6 +24,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging.h"
+#import "MTRSetupPayload_Internal.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -36,8 +37,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/util/error-mapping.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <setup_payload/SetupPayload.h>
+#include <system/SystemClock.h>
 
 #include <memory>
 
@@ -75,6 +80,7 @@ class MTRDataValueDictionaryCallbackBridge;
 @property (nonatomic, readwrite) NSMutableDictionary * reportHandlerBridges;
 
 - (chip::NodeId)deviceID;
+- (BOOL)isPASEDevice;
 @end
 
 @interface MTRReadClientContainer : NSObject
@@ -235,11 +241,11 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return self;
 }
 
-- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _cppPASEDevice = nil;
-        _nodeID = nodeID;
+        _nodeID = [nodeID unsignedLongLongValue];
         _deviceController = controller;
     }
     return self;
@@ -259,9 +265,14 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return self.nodeID;
 }
 
+- (BOOL)isPASEDevice
+{
+    return _cppPASEDevice != nullptr;
+}
+
 - (void)invalidateCASESession
 {
-    if (self.paseDevice) {
+    if (self.isPASEDevice) {
         return;
     }
 
@@ -298,7 +309,7 @@ public:
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
-    if (self.paseDevice != nil) {
+    if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
         dispatch_async(queue, ^{
             errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
@@ -1113,7 +1124,7 @@ exit:
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
 {
-    if (self.paseDevice != nil) {
+    if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
         dispatch_async(clientQueue, ^{
             reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
@@ -1248,6 +1259,144 @@ exit:
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");
     PurgeReadClientContainers([self deviceID], clientQueue, completion);
+}
+
+namespace {
+class OpenCommissioningWindowHelper {
+    typedef void (^ResultCallback)(CHIP_ERROR status, const SetupPayload &);
+
+public:
+    static CHIP_ERROR OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
+        System::Clock::Seconds16 timeout, uint16_t discriminator, uint32_t setupPIN, ResultCallback callback);
+
+private:
+    OpenCommissioningWindowHelper(Controller::DeviceController * controller, ResultCallback callback);
+
+    static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
+
+    Controller::CommissioningWindowOpener mOpener;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
+    ResultCallback mResultCallback;
+};
+
+OpenCommissioningWindowHelper::OpenCommissioningWindowHelper(Controller::DeviceController * controller, ResultCallback callback)
+    : mOpener(controller)
+    , mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
+    , mResultCallback(callback)
+{
+}
+
+CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
+    System::Clock::Seconds16 timeout, uint16_t discriminator, uint32_t setupPIN, ResultCallback callback)
+{
+    auto * self = new (std::nothrow) OpenCommissioningWindowHelper(controller, callback);
+    if (self == nullptr) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    SetupPayload unused;
+    CHIP_ERROR err = self->mOpener.OpenCommissioningWindow(nodeID, timeout, Crypto::kSpake2p_Min_PBKDF_Iterations, discriminator,
+        MakeOptional(setupPIN), NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
+    if (err != CHIP_NO_ERROR) {
+        delete self;
+    }
+    // Else will clean up when the callback is called.
+    return err;
+}
+
+void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
+    void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload)
+{
+    auto * self = static_cast<OpenCommissioningWindowHelper *>(context);
+    self->mResultCallback(status, payload);
+    delete self;
+}
+
+} // anonymous namespace
+
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                     clientQueue:(dispatch_queue_t)clientQueue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    if (self.isPASEDevice) {
+        MTR_LOG_ERROR("Can't open a commissioning window over PASE");
+        dispatch_async(clientQueue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+
+    unsigned long long durationVal = [duration unsignedLongLongValue];
+    if (!CanCastTo<uint16_t>(durationVal)) {
+        MTR_LOG_ERROR("Error: Duration %llu is too large.", durationVal);
+        dispatch_async(clientQueue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
+        });
+        return;
+    }
+
+    unsigned long long discriminatorVal = [discriminator unsignedLongLongValue];
+
+    if (discriminatorVal > 0xFFF) {
+        MTR_LOG_ERROR("Error: Discriminator %llu is too large. Max value %d", discriminatorVal, 0xFFF);
+        dispatch_async(clientQueue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
+        });
+        return;
+    }
+
+    unsigned long long passcodeVal = [setupPasscode unsignedLongLongValue];
+    if (!CanCastTo<uint32_t>(passcodeVal) || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passcodeVal))) {
+        MTR_LOG_ERROR("Error: Setup passcode %llu is not valid", passcodeVal);
+        dispatch_async(clientQueue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
+        });
+        return;
+    }
+
+    [self.deviceController
+        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            auto resultCallback = ^(CHIP_ERROR status, const SetupPayload & payload) {
+                if (status != CHIP_NO_ERROR) {
+                    dispatch_async(clientQueue, ^{
+                        completion(nil, [MTRError errorForCHIPErrorCode:status]);
+                    });
+                    return;
+                }
+                auto * payloadObj = [[MTRSetupPayload alloc] initWithSetupPayload:payload];
+                if (payloadObj == nil) {
+                    dispatch_async(clientQueue, ^{
+                        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
+                    });
+                    return;
+                }
+
+                dispatch_async(clientQueue, ^{
+                    completion(payloadObj, nil);
+                });
+            };
+
+            SetupPayload setupPayload;
+            auto errorCode = OpenCommissioningWindowHelper::OpenCommissioningWindow(commissioner, self.nodeID,
+                chip::System::Clock::Seconds16(static_cast<uint16_t>(durationVal)), static_cast<uint16_t>(discriminatorVal),
+                static_cast<uint32_t>(passcodeVal), resultCallback);
+
+            if (errorCode != CHIP_NO_ERROR) {
+                dispatch_async(clientQueue, ^{
+                    completion(nil, [MTRError errorForCHIPErrorCode:errorCode]);
+                });
+                return;
+            }
+
+            // resultCallback will handle things now.
+        }
+        errorHandler:^(NSError * error) {
+            dispatch_async(clientQueue, ^{
+                completion(nil, error);
+            });
+        }];
 }
 
 #ifdef DEBUG

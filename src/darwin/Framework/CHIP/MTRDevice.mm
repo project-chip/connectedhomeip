@@ -142,12 +142,12 @@ private:
 
 @implementation MTRDevice
 
-- (instancetype)initWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = nodeID;
-        _deviceController = deviceController;
+        _nodeID = [nodeID unsignedLongLongValue];
+        _deviceController = controller;
         _queue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
         ;
         _readCache = [NSMutableDictionary dictionary];
@@ -158,9 +158,9 @@ private:
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID controller:(MTRDeviceController *)controller
 {
-    return [deviceController deviceForNodeID:nodeID];
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark Subscription and delegate handling
@@ -369,7 +369,7 @@ private:
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
 
         [baseDevice
             readAttributeWithEndpointId:endpointID
@@ -412,7 +412,7 @@ private:
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
     // Start the asynchronous operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
         writeAttributeWithEndpointId:endpointID
                            clusterId:clusterID
@@ -446,7 +446,7 @@ private:
                          completion:(MTRDeviceResponseHandler)completion
 {
     // Perform this operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
         invokeCommandWithEndpointId:endpointID
                           clusterId:clusterID
@@ -461,6 +461,20 @@ private:
                          }];
 
     [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
+}
+
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                     clientQueue:(dispatch_queue_t)clientQueue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+    [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
+                                           discriminator:discriminator
+                                                duration:duration
+                                             clientQueue:clientQueue
+                                              completion:completion];
 }
 
 #pragma mark - Cache management

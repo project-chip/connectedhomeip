@@ -119,13 +119,13 @@
     return allOptionalData;
 }
 
-+ (NSUInteger)generateRandomPIN
++ (NSNumber *)generateRandomSetupPasscode
 {
     do {
         // Make sure the thing we generate is in the right range.
         uint32_t setupPIN = arc4random_uniform(chip::kSetupPINCodeMaximumValue) + 1;
         if (chip::SetupPayload::IsValidSetupPIN(setupPIN)) {
-            return setupPIN;
+            return @(setupPIN);
         }
 
         // We got pretty unlikely with our random number generation.  Just try
@@ -135,7 +135,7 @@
     } while (1);
 
     // Not reached.
-    return chip::kSetupPINCodeUndefinedValue;
+    return @(chip::kSetupPINCodeUndefinedValue);
 }
 
 #pragma mark - NSSecureCoding
