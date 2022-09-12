@@ -138,22 +138,6 @@ static void SetupXPCQueue(void)
     return YES;
 }
 
-- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
-{
-    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
-    return NO;
-}
-
-- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                                       duration:(NSUInteger)duration
-                                  discriminator:(NSUInteger)discriminator
-                                       setupPIN:(NSUInteger)setupPIN
-                                          error:(NSError * __autoreleasing *)error
-{
-    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
-    return nil;
-}
-
 - (instancetype)initWithControllerId:(id)controllerId
                            workQueue:(dispatch_queue_t)queue
                        xpcConnection:(MTRDeviceControllerXPCConnection *)connection

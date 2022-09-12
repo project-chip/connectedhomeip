@@ -44,7 +44,6 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
@@ -559,7 +558,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                      dispatch_async(queue, ^{
                          MTRBaseDevice * device;
                          if (error == nil) {
-                             device = [[MTRBaseDevice alloc] initWithNodeID:deviceID controller:self];
+                             device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
                          } else {
                              device = nil;
                          }
@@ -573,7 +572,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     os_unfair_lock_lock(&_deviceMapLock);
     MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[@(nodeID)];
     if (!deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID deviceController:self];
+        deviceToReturn = [[MTRDevice alloc] initWithNodeID:@(nodeID) controller:self];
         self.nodeIDToDeviceMap[@(nodeID)] = deviceToReturn;
     }
     os_unfair_lock_unlock(&_deviceMapLock);
@@ -591,90 +590,6 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
-}
-
-- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return NO;
-    }
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
-            self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
-        success = ![self checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-    });
-
-    return success;
-}
-
-- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                              duration:(NSUInteger)duration
-                         discriminator:(NSUInteger)discriminator
-                              setupPIN:(NSUInteger)setupPIN
-                                 error:(NSError * __autoreleasing *)error
-{
-    __block NSString * rv = nil;
-
-    VerifyOrReturnValue([self checkIsRunning:error], rv);
-
-    if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
-        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", static_cast<unsigned long>(setupPIN));
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        chip::SetupPayload setupPayload;
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
-            chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
-            static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
-            setupPayload);
-
-        auto success = ![self checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-        VerifyOrReturn(success);
-
-        chip::ManualSetupPayloadGenerator generator(setupPayload);
-        std::string outCode;
-
-        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
-            rv = [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
-        } else {
-            MTR_LOG_ERROR("Failed to get decimal setup code");
-        }
-    });
-
-    return rv;
 }
 
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
@@ -845,6 +760,28 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return YES;
 }
 
+- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                      errorHandler:(void (^)(NSError *))errorHandler
+{
+    {
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            errorHandler(error);
+            return;
+        }
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            errorHandler(error);
+            return;
+        }
+
+        block(self.cppCommissioner);
+    });
+}
+
 @end
 
 @implementation MTRDeviceController (InternalMethods)
@@ -904,4 +841,5 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     });
 }
+
 @end

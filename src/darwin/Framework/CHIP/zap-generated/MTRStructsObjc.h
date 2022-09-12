@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(nullable NSZone *)zone;
 @end
 
-@interface MTRDescriptorClusterDeviceType : NSObject <NSCopying>
+@interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSNumber * _Nonnull revision;
 

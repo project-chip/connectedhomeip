@@ -335,13 +335,3 @@ tests:
           Verify in DUT Commissioner side:
           [1651187528666] [13631:367920] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true

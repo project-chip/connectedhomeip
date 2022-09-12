@@ -466,7 +466,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType & value)
+                                     const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4576,25 +4576,25 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Descriptor::Id: {
         switch (path.mAttributeId)
         {
-        case Descriptor::Attributes::DeviceList::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> value;
+        case Descriptor::Attributes::DeviceTypeList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("device list", 1, value);
+            return DataModelLogger::LogValue("DeviceTypeList", 1, value);
         }
         case Descriptor::Attributes::ServerList::Id: {
             chip::app::DataModel::DecodableList<chip::ClusterId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("server list", 1, value);
+            return DataModelLogger::LogValue("ServerList", 1, value);
         }
         case Descriptor::Attributes::ClientList::Id: {
             chip::app::DataModel::DecodableList<chip::ClusterId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("client list", 1, value);
+            return DataModelLogger::LogValue("ClientList", 1, value);
         }
         case Descriptor::Attributes::PartsList::Id: {
             chip::app::DataModel::DecodableList<chip::EndpointId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("parts list", 1, value);
+            return DataModelLogger::LogValue("PartsList", 1, value);
         }
         case Descriptor::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

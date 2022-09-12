@@ -2674,8 +2674,8 @@ void CHIPBinaryInputBasicAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorDeviceListAttributeCallback::CHIPDescriptorDeviceListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPDescriptorClusterDeviceListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPDescriptorDeviceTypeListAttributeCallback::CHIPDescriptorDeviceTypeListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDescriptorClusterDeviceTypeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2691,7 +2691,7 @@ CHIPDescriptorDeviceListAttributeCallback::CHIPDescriptorDeviceListAttributeCall
     }
 }
 
-CHIPDescriptorDeviceListAttributeCallback::~CHIPDescriptorDeviceListAttributeCallback()
+CHIPDescriptorDeviceTypeListAttributeCallback::~CHIPDescriptorDeviceTypeListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2702,9 +2702,9 @@ CHIPDescriptorDeviceListAttributeCallback::~CHIPDescriptorDeviceListAttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
+void CHIPDescriptorDeviceTypeListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2713,8 +2713,8 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPDescriptorDeviceListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPDescriptorDeviceListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPDescriptorDeviceTypeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorDeviceTypeListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -2745,23 +2745,24 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
                                                                        newElement_0_revisionCtorSignature.c_str(), entry_0.revision,
                                                                        newElement_0_revision);
 
-        jclass deviceTypeStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceType",
-                                                             deviceTypeStructClass_1);
+        jclass deviceTypeStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceTypeStruct", deviceTypeStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceType");
+            ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceTypeStruct");
             return;
         }
-        jmethodID deviceTypeStructCtor_1 =
-            env->GetMethodID(deviceTypeStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
-        if (deviceTypeStructCtor_1 == nullptr)
+        jmethodID deviceTypeStructStructCtor_1 =
+            env->GetMethodID(deviceTypeStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
+        if (deviceTypeStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceType constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceTypeStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(deviceTypeStructClass_1, deviceTypeStructCtor_1, newElement_0_type, newElement_0_revision);
+        newElement_0 =
+            env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_type, newElement_0_revision);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

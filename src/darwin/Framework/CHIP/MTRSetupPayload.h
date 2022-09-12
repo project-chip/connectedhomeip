@@ -70,9 +70,9 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
- * Generate a random Matter-valid setup PIN.
+ * Generate a random Matter-valid setup passcode.
  */
-+ (NSUInteger)generateRandomPIN;
++ (NSNumber *)generateRandomSetupPasscode;
 
 /** Get 11 digit manual entry code from the setup payload. */
 - (nullable NSString *)manualEntryCode;

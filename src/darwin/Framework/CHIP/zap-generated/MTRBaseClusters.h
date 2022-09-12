@@ -1609,21 +1609,23 @@ NS_ASSUME_NONNULL_BEGIN
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)readAttributeDeviceListWithCompletionHandler:(void (^)(
-                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeDeviceTypeListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeDeviceListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                             params:(MTRSubscribeParams * _Nullable)params
-                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeDeviceListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                         endpoint:(NSNumber *)endpoint
-                                            queue:(dispatch_queue_t)queue
-                                completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeDeviceTypeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(MTRSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeDeviceTypeListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeServerListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;

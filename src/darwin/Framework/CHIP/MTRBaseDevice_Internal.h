@@ -23,14 +23,11 @@
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 
-@class MTRDeviceController;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRBaseDevice ()
 
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * Only returns non-nil if the device is using a PASE session.  Otherwise, the
