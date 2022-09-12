@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# This file contains a script to to run all pre-commit scripts within this directoy.
+#
+# To set this script to run on each commit, you should locally symlink where
+# git looks for this file with this file via a command in project root directory:
+# ln -s ../../.githooks/run-all-pre-commit .git/hooks/pre-commit
+#
+# The commit will fail unless checks are passed; to bypass failure you have the
+# option to add '--no-verify' tag to your commit.
+
+here=${0%/*}
+CHIP_ROOT=$(cd "$here/../.." && pwd)
+
+for PRECOMMITSCRIPT in $CHIP_ROOT/.githooks/pre-commit*; do
+    $PRECOMMITSCRIPT
+done

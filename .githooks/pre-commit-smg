@@ -1,0 +1,135 @@
+#!/bin/sh
+
+# This file contains a script to check the modified files within a commit
+# against a list of 'untouchable' files that should only be changed within
+# the CSA repo.
+#
+# To set this script to run on each commit, you should locally symlink where
+# git looks for this file with this file via a command in project root directory:
+# ln -s ../../.githooks/pre-commit-smg .git/hooks/pre-commit
+#
+# The commit will fail unless checks are passed; to bypass failure you have the
+# option to add '--no-verify' tag to your commit.
+
+here=${0%/*}
+
+CHIP_ROOT=$(cd "$here/.." && pwd)
+
+SAVED_UNSTAGED=0
+SAVED_UNSTAGED_FILE=$(git rev-parse --short HEAD)-unstaged.diff
+
+save_unstaged() {
+    if [[ $SAVED_UNSTAGED -ne 0 ]]; then
+        git diff --output="$SAVED_UNSTAGED_FILE"
+        git apply -R "$SAVED_UNSTAGED_FILE"
+    fi
+}
+
+revert_unstaged() {
+    if [[ $SAVED_UNSTAGED -ne 0 ]]; then
+        git apply "$SAVED_UNSTAGED_FILE"
+        rm "$SAVED_UNSTAGED_FILE"
+    fi
+    SAVED_UNSTAGED=0
+}
+
+revert_if_needed() {
+    revert_unstaged
+}
+
+trap "revert_if_needed; exit 1" SIGINT SIGTERM SIGKILL
+
+git diff --quiet
+SAVED_UNSTAGED=$?
+
+# If there are unstaged files, save them for now
+save_unstaged
+revert_if_needed
+
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    against=HEAD
+else
+    # Initial commit: diff against an empty tree object
+    against=$(git hash-object -t tree /dev/null)
+fi
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Paths from the repo root of files/directories not to be touched within SMG
+MUST_NOT_CHANGE=('.devcontainer'
+    'build/'
+    'build_overrides/'
+    'config/'
+    'credentials/'
+    'examples/'
+    'integrations/'
+    'scripts/'
+    'src/'
+    'third_party/'
+    'zzz_generated/'
+    'REVIEWERS.md'
+    'LICENSE'
+    '.clang-format'
+    '.clang-tidy'
+    '.default-version.min'
+    '.dir-locals.el'
+    '.editorconfig'
+    '.flake8'
+    '.gitattributes'
+    '.gitignore'
+    '.gitmodules'
+    '.prettierrc.json'
+    '.pullapprove.yml'
+    '.restyles.yaml'
+    '.spellcheck_tree'
+    '.spellcheck.yml'
+    'BUILD.gn'
+    'CODE_OF_CONDUCT.md'
+    'CONTRIBUTING.md'
+    'export_examples.sh'
+    'gn_build.sh'
+    'lgtm.yml'
+    'docs/api/'
+    'docs/discussion/'
+    'docs/dots/'
+    'docs/examples/'
+    'docs/guides'
+    'docs/images/'
+    'docs/style/'
+    'docs/FileBUG_REPORT.md'
+    'docs/ChipDoxygenLayout.xml'
+    'docs/Doxyfile'
+    'docs/namespaces.dox'
+    'docs/PROJECT_FLOW.md'
+    'docs/QUICK_START.md'
+    'docs/README.md'
+    'docs/STYLE_GUIDE.md'
+    'docs/VSCODE_DEVELOPMENT.md')
+
+RED='\033[0;31m'
+NC='\033[0m'
+MATCHING_LIST=()
+CHANGED_FILES=$(git diff --cached --name-only $against)
+
+# Search the modified files for changes that should only be made in CSA
+# Save these files to be listed along with the commit message
+for i in "${MUST_NOT_CHANGE[@]}"; do
+    MATCH=$(echo "$CHANGED_FILES" | grep "^$i*")
+    if [[ $MATCH != "" ]]; then
+        MATCHING_LIST+=$MATCH'\n'
+    fi
+done
+
+# Allow or block commit and list problematic files with warning message
+if [ ${#MATCHING_LIST[@]} -eq 0 ]; then
+    echo "Commit looks good!"
+    exit 0
+else
+    echo $RED$MATCHING_LIST | tr " " "\n"
+    echo $NC"Commit failed: You made changes to the listed files which should not be touched within the SMG repo." \
+        "Are you sure you want to do this?\n"
+    echo "If so, add justification for making this change in the pull request so the reviewers are aware" \
+        "and continue with the '--no-verify' tag attached to your commit."
+    exit 1
+fi
