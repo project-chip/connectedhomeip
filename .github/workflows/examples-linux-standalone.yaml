@@ -76,7 +76,7 @@ jobs:
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target address-resolve-tool-platform-mdns-ipv6only build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target linux-x64-address-resolve-tool-platform-mdns-ipv6only build"
             - name: Build example Standalone Echo Client
               timeout-minutes: 10
               run: |
