@@ -116,27 +116,24 @@ struct MessageTypeNameLookup
     //
     // Constructor that takes an enumeration value for a specific message ID and its associated name.
     //
-    constexpr MessageTypeNameLookup(T id, const char * name)
-    {
-        mId   = chip::to_underlying(id);
-        mName = name;
-    }
+    constexpr MessageTypeNameLookup(T id, const char * name) : mId(chip::to_underlying(id)), mName(name)
+    {}
 
-    uint8_t mId        = 0;
-    const char * mName = nullptr;
+    const uint8_t mId;
+    const char * mName;
 };
 
 //
 // Given a protocol ID and a message type ID, retrieve the logical name of that message.
 //
-// Returns nullptr if one could not be found.
+// This will not return a nullptr.
 //
 const char * GetMessageTypeName(Id protocolId, uint8_t msgType);
 
 //
 // Given a protool ID, retrieve the logical name for that protocol.
 //
-// Returns nullptr if one could not be found.
+// This will not return a nullptr.
 //
 const char * GetProtocolName(Id protocolId);
 

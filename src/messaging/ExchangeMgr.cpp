@@ -206,7 +206,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 
     CompressedFabricId compressedFabricId = 0;
-    if (session->IsSecureSession())
+    if (session->IsSecureSession() && mSessionManager->GetFabricTable() != nullptr)
     {
         auto fabricInfo = mSessionManager->GetFabricTable()->FindFabricWithIndex(session->AsSecureSession()->GetFabricIndex());
         if (fabricInfo)
@@ -214,7 +214,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             compressedFabricId = fabricInfo->GetCompressedFabricId();
         }
     }
-#endif
 
     //
     // Legend that can be used to decode this log line can be found in README.md
@@ -228,6 +227,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     static_cast<uint16_t>(payloadHeader.GetProtocolID().GetProtocolId()),
                     static_cast<uint8_t>(payloadHeader.GetMessageType()), protocolName != nullptr ? protocolName : "---",
                     msgTypeName != nullptr ? msgTypeName : "---");
+#endif
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)

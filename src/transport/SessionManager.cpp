@@ -259,7 +259,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 #if CHIP_PROGRESS_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
 
-    if (fabricIndex != kUndefinedFabricIndex)
+    if (fabricIndex != kUndefinedFabricIndex && mFabricTable != nullptr)
     {
         auto fabricInfo = mFabricTable->FindFabricWithIndex(fabricIndex);
         if (fabricInfo)
@@ -280,7 +280,6 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     {
         snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
     }
-#endif
 
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
@@ -293,6 +292,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                     static_cast<uint16_t>(compressedFabricId), static_cast<uint16_t>(payloadHeader.GetProtocolID().GetProtocolId()),
                     static_cast<uint8_t>(payloadHeader.GetMessageType()), protocolName != nullptr ? protocolName : "---",
                     msgTypeName != nullptr ? msgTypeName : "---");
+#endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));

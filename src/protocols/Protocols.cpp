@@ -24,6 +24,8 @@
 namespace chip {
 namespace Protocols {
 
+static const char * sUnknownTypeName = "----";
+
 static const char * LookupMessageTypeName(const MessageTypeNameLookup * lookupTable, size_t tableSize, uint8_t msgType)
 {
     for (auto ptr = lookupTable; ptr != (lookupTable + tableSize); ptr++)
@@ -34,14 +36,14 @@ static const char * LookupMessageTypeName(const MessageTypeNameLookup * lookupTa
         }
     }
 
-    return nullptr;
+    return sUnknownTypeName;
 }
 
 const char * GetProtocolName(Id protocolId)
 {
     if (protocolId.GetVendorId() != VendorId::Common)
     {
-        return nullptr;
+        return sUnknownTypeName;
     }
 
     switch (protocolId.GetProtocolId())
@@ -67,7 +69,7 @@ const char * GetProtocolName(Id protocolId)
         break;
 
     default:
-        return nullptr;
+        return sUnknownTypeName;
     }
 }
 
@@ -75,7 +77,7 @@ const char * GetMessageTypeName(Id protocolId, uint8_t msgType)
 {
     if (protocolId.GetVendorId() != VendorId::Common)
     {
-        return nullptr;
+        return sUnknownTypeName;
     }
 
     const MessageTypeNameLookup * lookupTable = nullptr;
@@ -113,7 +115,7 @@ const char * GetMessageTypeName(Id protocolId, uint8_t msgType)
         // TODO: Add support at some point to let applications to route to custom protocols defined outside of the standard
         // namespace in the SDK.
         //
-        return nullptr;
+        return sUnknownTypeName;
     }
 
     return LookupMessageTypeName(lookupTable, lookupTableSize, msgType);
