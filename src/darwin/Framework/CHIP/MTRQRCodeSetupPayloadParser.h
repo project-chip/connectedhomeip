@@ -21,6 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_NEWLY_DEPRECATED("Please use [MTRSetupPayload setupPayloadWithOnboardingPayload")
 @interface MTRQRCodeSetupPayloadParser : NSObject
 - (instancetype)initWithBase38Representation:(NSString *)base38Representation;
 - (nullable MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error;

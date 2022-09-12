@@ -18,7 +18,7 @@
 
 #ifdef __cplusplus
 - (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-- (NSNumber *)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
+- (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
 - (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif
 
