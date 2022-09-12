@@ -35,7 +35,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     if (self = [super init]) {
         _selectedCandidate = [[DeviceSoftwareVersionModel alloc] init];
+        _action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed;
         _userConsentState = OTAProviderUserUnknown;
+        _delayedActionTime = nil;
+        _timedInvokeTimeoutMs = nil;
+        _userConsentNeeded = nil;
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
     }
     return self;
 }
@@ -63,35 +68,13 @@ constexpr uint8_t kUpdateTokenLen = 32;
     }
 
     _selectedCandidate.updateToken = [self generateUpdateToken];
-
-    if (params.requestorCanConsent.integerValue == 1) {
-        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
-        _selectedCandidate.userConsentNeeded
-            = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
-        NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
-        completionHandler(_selectedCandidate, nil);
-        return;
-    }
-
-    NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
-    switch (_userConsentState) {
-    case OTAProviderUserGranted:
-        NSLog(@"User Consent Granted");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
-        break;
-
-    case OTAProviderUserObtaining:
-        NSLog(@"User Consent Obtaining");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
-        break;
-
-    case OTAProviderUserDenied:
-    case OTAProviderUserUnknown:
-        NSLog(@"User Consent Denied or Uknown");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
-        break;
-    }
+    NSLog(@"Query Image Status: %hhu", _queryImageStatus);
     _selectedCandidate.status = @(_queryImageStatus);
+
+    if (params.requestorCanConsent.integerValue == 1 && _userConsentNeeded) {
+        _selectedCandidate.userConsentNeeded = _userConsentNeeded;
+        NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
+    }
     completionHandler(_selectedCandidate, nil);
 }
 
@@ -104,7 +87,14 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
-    applyUpdateResponseParams.action = @(MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed);
+    applyUpdateResponseParams.action = @(_action);
+    if (_delayedActionTime) {
+        applyUpdateResponseParams.delayedActionTime = _delayedActionTime;
+    }
+    if (_timedInvokeTimeoutMs) {
+        applyUpdateResponseParams.timedInvokeTimeoutMs = _timedInvokeTimeoutMs;
+    }
+
     completionHandler(applyUpdateResponseParams, nil);
 }
 
