@@ -162,7 +162,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     // Needs to match what startControllerOnExistingFabric calls elsewhere in
     // this file do.
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
+                                                                                   fabricID:@(1)
+                                                                                        ipk:testKeys.ipk];
     params.vendorId = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -766,10 +768,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // reportHandler returns TRUE if it got the things it was looking for or if there's an error.
     __block BOOL (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
     [device subscribeWithQueue:queue
-        minInterval:2
-        maxInterval:60
+        minInterval:@(2)
+        maxInterval:@(60)
         params:nil
-        cacheContainer:attributeCacheContainer
+        attributeCacheContainer:attributeCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Received report: %@", value);
             if (reportHandler) {
@@ -799,7 +801,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
-    MTRBaseClusterOnOff * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterOnOff * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
     XCTAssertNotNil(cluster);
 
     NSLog(@"Invoking command...");
@@ -1137,7 +1139,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpointID:@(1) queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletionHandler:^(NSError * err) {
@@ -1542,7 +1544,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Fabric index read"];
 
     __block NSNumber * fabricIndex;
-    __auto_type * opCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
+    __auto_type * opCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
     [opCredsCluster
         readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
             XCTAssertNil(readError);
@@ -1557,7 +1559,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * openCommissioningWindowExpectation = [self expectationWithDescription:@"Commissioning window opened"];
 
     __auto_type * adminCommissioningCluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device
-                                                                                                      endpoint:0
+                                                                                                    endpointID:@(0)
                                                                                                          queue:queue];
     __auto_type * openWindowParams = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
     openWindowParams.commissioningTimeout = @(900);

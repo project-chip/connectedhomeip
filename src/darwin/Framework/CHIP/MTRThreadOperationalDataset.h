@@ -49,9 +49,9 @@ extern size_t const MTRSizeThreadPSKc;
  */
 @property (nonatomic, nullable, copy, readonly) NSData * PSKc;
 /**
- *  The Thread network channel
+ *  The Thread network channel.  Always an unsigned 16-bit integer.
  */
-@property (nonatomic, readwrite) uint16_t channel;
+@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
 /**
  *  A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
  */
@@ -70,8 +70,8 @@ extern size_t const MTRSizeThreadPSKc;
                                extendedPANID:(NSData *)extendedPANID
                                    masterKey:(NSData *)masterKey
                                         PSKc:(NSData *)PSKc
-                                     channel:(uint16_t)channel
-                                       panID:(NSData *)panID;
+                               channelNumber:(NSNumber *)channelNumber
+                                       panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
 
 /**
  *  Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
@@ -83,6 +83,20 @@ extern size_t const MTRSizeThreadPSKc;
  * Get the underlying data that represents the Thread Active Operational Dataset
  */
 - (NSData *)data;
+
+@end
+
+@interface MTRThreadOperationalDataset (Deprecated)
+
+@property (nonatomic, readwrite) uint16_t channel MTR_NEWLY_DEPRECATED("Please use channelNumber");
+
+- (nullable instancetype)initWithNetworkName:(NSString *)networkName
+                               extendedPANID:(NSData *)extendedPANID
+                                   masterKey:(NSData *)masterKey
+                                        PSKc:(NSData *)PSKc
+                                     channel:(uint16_t)channel
+                                       panID:(NSData *)panID
+    MTR_NEWLY_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID");
 
 @end
 
