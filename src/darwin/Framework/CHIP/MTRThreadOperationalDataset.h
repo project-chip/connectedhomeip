@@ -49,7 +49,7 @@ extern size_t const MTRSizeThreadPSKc;
  */
 @property (nonatomic, nullable, copy, readonly) NSData * PSKc;
 /**
- *  The Thread network channel.  Always a 16-bit integer.
+ *  The Thread network channel.  Always an unsigned 16-bit integer.
  */
 @property (nonatomic, copy, readonly) NSNumber * channel;
 /**
