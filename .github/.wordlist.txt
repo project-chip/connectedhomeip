@@ -154,6 +154,7 @@ bootable
 Bootloader
 BorderRouterAP
 bouffalolab
+Bouffalolab
 BRD
 breakpoint
 bredr
