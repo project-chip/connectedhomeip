@@ -283,6 +283,8 @@ def HostTargets():
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
+    builder.AppendVariant(name="libnl", validator=AcceptNameWithSubstrings(
+        ['-minmdns']), minmdns_address_policy="libnl"),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(

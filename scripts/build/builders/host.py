@@ -215,6 +215,7 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
+                 minmdns_address_policy=None,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -279,6 +280,11 @@ class HostBuilder(GnBuilder):
                 # Fake uses "//build/toolchain/fake:fake_x64_gcc"
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
+
+        if minmdns_address_policy:
+            if use_platform_mdns:
+                raise Exception('Address policy applies to minmdns only')
+            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
