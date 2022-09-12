@@ -2052,11 +2052,6 @@ PICS:
       id: MEDIAPLAYBACK.S.VS
 
     - label:
-          "Does the DUT support the Media Input server cluster, Name Updates
-          feature?"
-      id: MEDIAINPUT.S.NU
-
-    - label:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
       id: TGTNAV.S.A0001
@@ -2130,11 +2125,6 @@ PICS:
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
       id: MEDIAINPUT.S.C03.Rsp
-
-    - label:
-          "Does the DUT support the Media Input server cluster Name Updates
-          feature?"
-      id: MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Media Input client cluster SelectInput
