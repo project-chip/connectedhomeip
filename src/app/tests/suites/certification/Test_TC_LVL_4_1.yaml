@@ -233,7 +233,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
-          value: 254
+          constraints:
+              minValue: 216
+              maxValue: 254
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"
