@@ -140,6 +140,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
                       errorHandler:(void (^)(NSError *))erroHandler;
 
+/**
+ * Get an MTRBaseDevice for the given node id.  This exists to allow subclasses
+ * of MTRDeviceController (e.g. MTRDeviceControllerOverXPC) to override what
+ * sort of MTRBaseDevice they return.
+ */
+- (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
+
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;

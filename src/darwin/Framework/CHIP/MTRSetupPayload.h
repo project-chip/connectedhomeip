@@ -92,8 +92,26 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error;
 
+/**
+ * Initialize an MTRSetupPayload with the given passcode and discriminator.
+ * This will pre-set version, product id, and vendor id to 0.
+ */
+- (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator;
+
 /** Get 11 digit manual entry code from the setup payload. */
 - (NSString * _Nullable)manualEntryCode;
+
+/**
+ * Get a QR code from the setup payload.
+ *
+ * Returns nil on failure (e.g. if the setup payload does not have all the
+ * information a QR code needs).
+ */
+- (NSString * _Nullable)qrCodeString;
+
+// A setup payload must have a passcode and a discriminator at the very least.
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

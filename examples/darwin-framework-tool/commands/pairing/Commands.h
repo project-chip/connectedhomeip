@@ -41,12 +41,6 @@ public:
     PairCodeThread() : PairingCommandBridge("code-thread", PairingMode::Code, PairingNetworkType::Thread) {}
 };
 
-class PairWithIPAddress : public PairingCommandBridge
-{
-public:
-    PairWithIPAddress() : PairingCommandBridge("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
-};
-
 class PairBleWiFi : public PairingCommandBridge
 {
 public:
@@ -70,10 +64,13 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<PairCode>(),     make_unique<PairWithIPAddress>(),
-        make_unique<PairCodeWifi>(), make_unique<PairCodeThread>(),
-        make_unique<PairBleWiFi>(),  make_unique<PairBleThread>(),
-        make_unique<Unpair>(),       make_unique<OpenCommissioningWindowCommand>(),
+        make_unique<PairCode>(),
+        make_unique<PairCodeWifi>(),
+        make_unique<PairCodeThread>(),
+        make_unique<PairBleWiFi>(),
+        make_unique<PairBleThread>(),
+        make_unique<Unpair>(),
+        make_unique<OpenCommissioningWindowCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

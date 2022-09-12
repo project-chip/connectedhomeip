@@ -251,6 +251,13 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return self;
 }
 
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    // Indirect through the controller to give it a chance to create an
+    // MTRBaseDeviceOverXPC instead of just an MTRBaseDevice.
+    return [controller baseDeviceForNodeID:nodeID];
+}
+
 - (chip::DeviceProxy * _Nullable)paseDevice
 {
     return _cppPASEDevice;

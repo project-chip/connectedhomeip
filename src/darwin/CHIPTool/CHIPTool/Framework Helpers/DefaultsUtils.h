@@ -25,6 +25,8 @@ extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
 
+typedef void (^DeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
+
 MTRDeviceController * _Nullable InitializeMTR(void);
 MTRDeviceController * _Nullable MTRRestartController(MTRDeviceController * controller);
 id _Nullable MTRGetDomainValueForKey(NSString * domain, NSString * key);
@@ -36,8 +38,8 @@ uint64_t MTRGetLastPairedDeviceId(void);
 void MTRSetNextAvailableDeviceID(uint64_t id);
 void MTRSetDevicePaired(uint64_t id, BOOL paired);
 BOOL MTRIsDevicePaired(uint64_t id);
-BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler);
-BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler);
+BOOL MTRGetConnectedDevice(DeviceConnectionCallback completionHandler);
+BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, DeviceConnectionCallback completionHandler);
 void MTRUnpairDeviceWithID(uint64_t deviceId);
 MTRBaseDevice * _Nullable MTRGetDeviceBeingCommissioned(void);
 
