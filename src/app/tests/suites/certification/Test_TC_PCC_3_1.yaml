@@ -334,28 +334,6 @@ tests:
           [1651564124.346826][8748:8748] CHIP:DMG: },
           [1651564124.346941][8748:8748] CHIP:DMG: IM RH moving to [GeneratingReports]"
 
-          ./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
-
-          verify on TH all-cluster-app receives the right ReadRequest for the data sent in the above command
-
-          [1651564163.319315][8748:8748] CHIP:IM: Received Read request
-          [1651564163.319399][8748:8748] CHIP:DMG: ReadRequestMessage =
-          [1651564163.319447][8748:8748] CHIP:DMG: {
-          [1651564163.319488][8748:8748] CHIP:DMG:         AttributePathIBs =
-          [1651564163.319539][8748:8748] CHIP:DMG:         [
-          [1651564163.319584][8748:8748] CHIP:DMG:                 AttributePathIB =
-          [1651564163.319639][8748:8748] CHIP:DMG:                 {
-          [1651564163.319694][8748:8748] CHIP:DMG:                         Endpoint = 0x1,
-          [1651564163.319758][8748:8748] CHIP:DMG:                         Cluster = 0x200,
-          [1651564163.319822][8748:8748] CHIP:DMG:                         Attribute = 0x0000_0009,
-          [1651564163.319875][8748:8748] CHIP:DMG:                 }
-          [1651564163.319925][8748:8748] CHIP:DMG:
-          [1651564163.319975][8748:8748] CHIP:DMG:         ],
-          [1651564163.320027][8748:8748] CHIP:DMG:
-          [1651564163.320075][8748:8748] CHIP:DMG:         isFabricFiltered = true,
-          [1651564163.320122][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564163.320165][8748:8748] CHIP:DMG: },
-          [1651564163.320291][8748:8748] CHIP:DMG: IM RH moving to [GeneratingReports]"
 
 
           ./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1

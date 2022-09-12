@@ -39,7 +39,7 @@ tests:
       command: "ResetCounts"
 
     - label: "Reads BeaconLostCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0005
       command: "readAttribute"
       attribute: "BeaconLostCount"
       response:
@@ -49,7 +49,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Reads BeaconRxCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0006
       command: "readAttribute"
       attribute: "BeaconRxCount"
       response:
@@ -59,7 +59,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Reads PacketMulticastRxCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0007
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
       response:
@@ -69,7 +69,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Reads PacketMulticastTxCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0008
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
       response:
@@ -79,7 +79,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Reads PacketUnicastRxCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0009
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
       response:
@@ -89,7 +89,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Reads PacketUnicastTxCount attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A000a
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"
       response:
