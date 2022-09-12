@@ -38,12 +38,12 @@ static void SetupXPCQueue(void)
 @implementation MTRDeviceControllerOverXPC
 
 + (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
+                                       xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
 {
     SetupXPCQueue();
     return [[MTRDeviceControllerOverXPC alloc] initWithControllerId:controllerId
                                                           workQueue:globalWorkQueue
-                                                       connectBlock:connectBlock];
+                                                       connectBlock:xpcConnectBlock];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -127,7 +127,7 @@ static void SetupXPCQueue(void)
         dispatch_group_notify(group, queue, ^{
             if (self.controllerId) {
                 MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerId
-                                                                                deviceId:deviceID
+                                                                                deviceId:@(deviceID)
                                                                            xpcConnection:self.xpcConnection];
                 completionHandler(device, nil);
             } else {
@@ -140,18 +140,18 @@ static void SetupXPCQueue(void)
 
 - (instancetype)initWithControllerId:(id)controllerId
                            workQueue:(dispatch_queue_t)queue
-                       xpcConnection:(MTRDeviceControllerXPCConnection *)connection
+                       xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
     _controllerId = controllerId;
     _workQueue = queue;
-    _xpcConnection = connection;
+    _xpcConnection = xpcConnection;
     return self;
 }
 
 // This is interface for unit testing
 - (instancetype)initWithControllerId:(id)controllerId
                            workQueue:(dispatch_queue_t)queue
-                        connectBlock:(NSXPCConnection * (^)(void) )connectBlock
+                        connectBlock:(MTRXPCConnectBlock)connectBlock
 {
     return [self initWithControllerId:controllerId
                             workQueue:queue

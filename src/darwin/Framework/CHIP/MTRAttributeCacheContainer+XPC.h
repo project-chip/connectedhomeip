@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRAttributeCacheContainer (XPC)
 - (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
             controllerId:(id<NSCopying>)controllerId
-                deviceId:(uint64_t)deviceId;
+                deviceId:(NSNumber *)deviceId;
 @end
 
 NS_ASSUME_NONNULL_END

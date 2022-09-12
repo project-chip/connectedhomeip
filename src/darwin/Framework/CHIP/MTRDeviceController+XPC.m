@@ -67,9 +67,9 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
 @implementation MTRDeviceController (XPC)
 
 + (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
 {
-    return [MTRDeviceControllerOverXPC sharedControllerWithId:controllerId xpcConnectBlock:connectBlock];
+    return [MTRDeviceControllerOverXPC sharedControllerWithId:controllerId xpcConnectBlock:xpcConnectBlock];
 }
 
 + (NSArray<NSDictionary<NSString *, id> *> * _Nullable)encodeXPCResponseValues:

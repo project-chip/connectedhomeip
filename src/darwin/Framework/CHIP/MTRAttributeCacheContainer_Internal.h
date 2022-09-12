@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRAttributeCacheContainer ()
 
 @property (atomic, readwrite, nullable) chip::app::ClusterStateCache * cppAttributeCache;
-@property (nonatomic, readwrite) uint64_t deviceId;
+@property (nonatomic, readwrite, copy) NSNumber * deviceId;
 @property (nonatomic, readwrite, weak, nullable) MTRDeviceControllerXPCConnection * xpcConnection;
 @property (nonatomic, readwrite, strong, nullable) id<NSCopying> xpcControllerId;
 @property (atomic, readwrite) BOOL shouldUseXPC;

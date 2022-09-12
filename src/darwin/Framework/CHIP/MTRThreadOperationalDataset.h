@@ -49,9 +49,9 @@ extern size_t const MTRSizeThreadPSKc;
  */
 @property (nonatomic, nullable, copy, readonly) NSData * PSKc;
 /**
- *  The Thread network channel
+ *  The Thread network channel.  Always an unsigned 16-bit integer.
  */
-@property (nonatomic, readwrite) uint16_t channel;
+@property (nonatomic, copy, readonly) NSNumber * channel;
 /**
  *  A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
  */
@@ -70,7 +70,7 @@ extern size_t const MTRSizeThreadPSKc;
                                extendedPANID:(NSData *)extendedPANID
                                    masterKey:(NSData *)masterKey
                                         PSKc:(NSData *)PSKc
-                                     channel:(uint16_t)channel
+                                     channel:(NSNumber *)channel
                                        panID:(NSData *)panID;
 
 /**

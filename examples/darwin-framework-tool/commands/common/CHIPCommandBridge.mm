@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
-                                                                                        fabricId:(i + 1)
+                                                                                        fabricId:@(i + 1)
                                                                                              ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
@@ -201,7 +201,7 @@ void CHIPCommandBridge::RestartCommissioners()
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
-                                                                                        fabricId:(i + 1)
+                                                                                        fabricId:@(i + 1)
                                                                                              ipk:ipk];
 
         auto controller = [factory startControllerOnExistingFabric:controllerParams];

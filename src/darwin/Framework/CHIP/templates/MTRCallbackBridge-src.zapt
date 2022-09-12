@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import "MTRCallbackBridge_internal.h"
 #import "MTRStructsObjc.h"

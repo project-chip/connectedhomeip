@@ -125,7 +125,7 @@ void PairingCommandBridge::Unpair()
                   } else {
                       ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
                       MTRBaseClusterOperationalCredentials * opCredsCluster =
-                          [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:callbackQueue];
+                          [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:@(0) queue:callbackQueue];
                       [opCredsCluster readAttributeCurrentFabricIndexWithCompletionHandler:^(
                           NSNumber * _Nullable value, NSError * _Nullable readError) {
                           if (readError) {

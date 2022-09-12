@@ -38,7 +38,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
                                extendedPANID:(NSData *)extendedPANID
                                    masterKey:(NSData *)masterKey
                                         PSKc:(NSData *)PSKc
-                                     channel:(uint16_t)channel
+                                     channel:(NSNumber *)channel
                                        panID:(NSData *)panID
 {
     if (self = [super init]) {
@@ -85,7 +85,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
     [self.PSKc getBytes:&PSKc length:chip::Thread::kSizePSKc];
     _cppThreadOperationalDataset.SetPSKc(PSKc);
 
-    _cppThreadOperationalDataset.SetChannel(self.channel);
+    _cppThreadOperationalDataset.SetChannel([self.channel unsignedShortValue]);
 
     // Thread's PAN ID is 2 bytes
     if (![self _checkDataLength:self.panID expectedLength:2]) {
@@ -139,7 +139,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
                        extendedPANID:[NSData dataWithBytes:extendedPANID length:MTRSizeThreadExtendedPanId]
                            masterKey:[NSData dataWithBytes:masterKey length:MTRSizeThreadMasterKey]
                                 PSKc:[NSData dataWithBytes:pskc length:MTRSizeThreadPSKc]
-                             channel:channel
+                             channel:@(channel)
                                panID:[NSData dataWithBytes:&panID length:sizeof(uint16_t)]];
 }
 

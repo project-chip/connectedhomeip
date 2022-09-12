@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,8 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
                           clusterId:(NSNumber * _Nullable)clusterId
                         attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                        NSError * _Nullable error))completion;
+                         completion:(MTRDeviceResponseHandler)completion;
 
 @end
 

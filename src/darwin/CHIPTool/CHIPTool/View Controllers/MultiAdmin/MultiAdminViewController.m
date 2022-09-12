@@ -246,7 +246,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                     } else {
                         __auto_type * cluster =
                             [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:chipDevice
-                                                                                    endpoint:0
+                                                                                    endpoint:@(0)
                                                                                        queue:dispatch_get_main_queue()];
                         __auto_type * params =
                             [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
