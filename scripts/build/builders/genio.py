@@ -18,9 +18,9 @@ class GenioApp(Enum):
 
     def AppNamePrefix(self):
         if self == GenioApp.LIGHT:
-            return 'chip-mt793x-lighting-app-example'
+            return 'chip-genio-lighting-app-example'
         elif self == GenioApp.SHELL:
-            return 'chip-mt793x-shell-example'
+            return 'chip-genio-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -33,7 +33,7 @@ class GenioApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
-        return os.path.join(root, 'examples', self.ExampleName(), 'mtk')
+        return os.path.join(root, 'examples', self.ExampleName(), 'genio')
 
 class GenioBuilder(GnBuilder):
 
@@ -45,7 +45,6 @@ class GenioBuilder(GnBuilder):
                 root = app.BuildRoot(root),
                 runner = runner)
         self.app = app
-        print(root)
 
     def build_outputs(self): 
         items = {}

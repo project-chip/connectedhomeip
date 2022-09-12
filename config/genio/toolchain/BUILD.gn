@@ -17,9 +17,9 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
-arm_toolchain("mt793x_shell_app") {
+arm_toolchain("genio_shell_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/shell/mt793x/args.gni")
+    import("${chip_root}/examples/shell/genio/args.gni")
   }
 }

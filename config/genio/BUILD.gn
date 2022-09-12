@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,20 +15,23 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-chip_ble_project_config_include = ""
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-mbedtls_target = "//mbedtls:mbedtls"
-lwip_platform = "external"
+import("${chip_root}/build/chip/tests.gni")
 
-chip_build_tests = true
+declare_args() {
+  chip_build_pw_rpc_lib = false
+}
 
-chip_inet_config_enable_tcp_endpoint = true
-chip_inet_config_enable_udp_endpoint = true
+group("genio") {
+  deps = [ "${chip_root}/src/lib" ]
 
-custom_toolchain =
-    "//third_party/connectedhomeip/config/mt793x/toolchain:mt793x"
+  if (chip_build_pw_rpc_lib) {
+    deps += [ "//lib/pw_rpc" ]
+  }
 
-pw_build_PIP_CONSTRAINTS =
-    [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+  if (chip_build_tests) {
+    deps += [ "${chip_root}/src:tests" ]
+  }
+}

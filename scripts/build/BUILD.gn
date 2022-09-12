@@ -39,6 +39,7 @@ pw_python_package("build_examples") {
     "builders/builder.py",
     "builders/efr32.py",
     "builders/esp32.py",
+    "builders/genio.py",
     "builders/gn.py",
     "builders/host.py",
     "builders/imx.py",
