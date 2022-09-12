@@ -2485,11 +2485,11 @@ using chip::SessionHandle;
     return self;
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeDeviceListID)
+                                        attributeID:@(MTRClusterDescriptorAttributeDeviceTypeListID)
                                              params:params];
 }
 

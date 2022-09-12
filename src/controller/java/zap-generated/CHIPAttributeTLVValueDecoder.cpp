@@ -1354,8 +1354,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::Descriptor;
         switch (aPath.mAttributeId)
         {
-        case Attributes::DeviceList::Id: {
-            using TypeInfo = Attributes::DeviceList::TypeInfo;
+        case Attributes::DeviceTypeList::Id: {
+            using TypeInfo = Attributes::DeviceTypeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1382,24 +1382,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_revisionCtorSignature.c_str(),
                                                                                entry_0.revision, newElement_0_revision);
 
-                jclass deviceTypeStructClass_1;
+                jclass deviceTypeStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceType", deviceTypeStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceTypeStruct", deviceTypeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceType");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceTypeStruct");
                     return nullptr;
                 }
-                jmethodID deviceTypeStructCtor_1 =
-                    env->GetMethodID(deviceTypeStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
-                if (deviceTypeStructCtor_1 == nullptr)
+                jmethodID deviceTypeStructStructCtor_1 =
+                    env->GetMethodID(deviceTypeStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
+                if (deviceTypeStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceType constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceTypeStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(deviceTypeStructClass_1, deviceTypeStructCtor_1, newElement_0_type, newElement_0_revision);
+                newElement_0 = env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_type,
+                                              newElement_0_revision);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

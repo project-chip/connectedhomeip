@@ -452,7 +452,7 @@ public final class ChipIdLookup {
     }
     if (clusterId == 29L) {
       if (attributeId == 0L) {
-        return "DeviceList";
+        return "DeviceTypeList";
       }
       if (attributeId == 1L) {
         return "ServerList";

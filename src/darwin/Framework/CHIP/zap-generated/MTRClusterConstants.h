@@ -202,7 +202,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterPulseWidthModulationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Descriptor attributes
-    MTRClusterDescriptorAttributeDeviceListID = 0x00000000,
+    MTRClusterDescriptorAttributeDeviceTypeListID = 0x00000000,
     MTRClusterDescriptorAttributeServerListID = 0x00000001,
     MTRClusterDescriptorAttributeClientListID = 0x00000002,
     MTRClusterDescriptorAttributePartsListID = 0x00000003,

@@ -264,12 +264,12 @@ typedef struct _ChannelInfo
     chip::CharSpan affiliateCallSign;
 } ChannelInfo;
 
-// Struct for DeviceType
-typedef struct _DeviceType
+// Struct for DeviceTypeStruct
+typedef struct _DeviceTypeStruct
 {
     chip::DeviceTypeId type;
     uint16_t revision;
-} DeviceType;
+} DeviceTypeStruct;
 
 // Struct for DlCredential
 typedef struct _DlCredential
