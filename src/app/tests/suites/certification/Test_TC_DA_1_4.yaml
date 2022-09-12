@@ -40,47 +40,110 @@ tests:
 
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          To perform Factory reset on TH1(all-clusters-app)  follow the below commands in RPI platform , Pls use equivalent command on the respective platform
+          sudo rm -rf /tmp/chip_*
 
-          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+          execute the below mentioned command to put TH(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app --trace_decode 1
 
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+          Once TH(All-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool) Pls use equivalent command on the respective DUT
+
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
       disabled: true
 
     - label: "DUT generates 32-byte AttestationNonce"
       verification: |
-          DUT generates 32-byte AttestationNonce on TH(all-clusters-app) log
+          During provision, DUT sends AttestationRequest Command with AttestationNonce
 
-          [1660832898.375011][2480:2485] CHIP:DMG:         }
-          [1660832898.375071][2480:2485] CHIP:DMG:         Device Type Id = 22
-          [1660832898.375136][2480:2485] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
-          [1660832898.375198][2480:2485] CHIP:DMG:         Security Level = 0
-          [1660832898.375257][2480:2485] CHIP:DMG:         Security Information = 0
-          [1660832898.375315][2480:2485] CHIP:DMG:         Version Number = 9876
-          [1660832898.375374][2480:2485] CHIP:DMG:         Certification Type = 0
-          [1660832898.375431][2480:2485] CHIP:DMG:     }
-          [1660832898.375496][2480:2485] CHIP:DMG:     Attestation Nonce (32) = 79C7156A8580C653945226CD5B5994EF4EC3D79CEAE6D32325CA2EA24B5201CB
-          [1660832898.375552][2480:2485] CHIP:DMG:     Timestamp = 0
-          [1660832898.375605][2480:2485] CHIP:DMG: }
-          [1660832898.375655][2480:2485] CHIP:DMG:
+
+          [1662449060.839956][31006:31006] CHIP:DMG:         }
+          [1662449060.839959][31006:31006] CHIP:DMG:         Device Type Id = 22
+          [1662449060.839963][31006:31006] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1662449060.839967][31006:31006] CHIP:DMG:         Security Level = 0
+          [1662449060.839970][31006:31006] CHIP:DMG:         Security Information = 0
+          [1662449060.839973][31006:31006] CHIP:DMG:         Version Number = 9876
+          [1662449060.839976][31006:31006] CHIP:DMG:         Certification Type = 0
+          [1662449060.839979][31006:31006] CHIP:DMG:     }
+          [1662449060.839984][31006:31006] CHIP:DMG:     Attestation Nonce (32) = 0DCBD6B7CE5AC2B7972D5350E2709C659E2222862BE8F204FE1E3D709FD959AD
+          [1662449060.839987][31006:31006] CHIP:DMG:     Timestamp = 0
+          [1662449060.839990][31006:31006] CHIP:DMG: }
+          [1662449060.839993][31006:31006] CHIP:DMG:
       disabled: true
 
     - label:
           "DUT sends AttestationRequest Command with AttestationNonce as field
           to the TH1."
       verification: |
-          DUT sends AttestationRequest Command with AttestationNonce as field to the TH1, verify attestation response is received on TH(all-clusters-app) log
+          During provision, DUT sends AttestationRequest Command with AttestationNonce as field to the TH. verify the below log in TH(all-clusters-app). As the current TH ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH ref app response message , as TH ref app use the same nonce value in the response message
 
-          ./chip-tool operationalcredentials attestation-request hex:79C7156A8580C653945226CD5B5994EF4EC3D79CEAE6D32325CA2EA24B5201CB 1 0
-
-
-          Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
-          [1660833399.901252][2506:2511] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0001
-          [1660833399.901498][2506:2511] CHIP:TOO:   AttestationResponse: {
-          [1660833399.901607][2506:2511] CHIP:TOO:     attestationElements: 1531011D023082021906092A864886F70D010702A082020A30820206020103310D300B06096086480165030402013082017106092A864886F70D010701A08201620482015E152400012501F1FF3602050080050180050280050380050480050580050680050780050880050980050A80050B80050C80050D80050E80050F80051080051180051280051380051480051580051680051780051880051980051A80051B80051C80051D80051E80051F80052080052180052280052380052480052580052680052780052880052980052A80052B80052C80052D80052E80052F80053080053180053280053380053480053580053680053780053880053980053A80053B80053C80053D80053E80053F80054080054180054280054380054480054580054680054780054880054980054A80054B80054C80054D80054E80054F80055080055180055280055380055480055580055680055780055880055980055A80055B80055C80055D80055E80055F80056080056180056280056380182403162C04135A494732303134325A423333303030332D3234240500240600250794
-          [1660833399.901733][2506:2511] CHIP:TOO:     ...................: 2624080018317D307B020103801462FA823359ACFAA9963E1CFA140ADDF504F37160300B0609608648016503040201300A06082A8648CE3D04030204473045022024E5D1F47A7D7B0D206A26EF699B7C9757B72D469089DE3192E678C745E7F60C022100F8AA2FA711FCB79B97E397CEDA667BAE464E2BD3FFDFC3CCED7AA8CA5F4C1A7C30022079C7156A8580C653945226CD5B5994EF4EC3D79CEAE6D32325CA2EA24B5201CB24030018
-          [1660833399.901816][2506:2511] CHIP:TOO:     signature: 920E22FE88765058D28A248636828BDBD612D24FFA4B27A06FFFB5D76061E0D0EE7FBCED7030026624A012B32F11596FB87CE147323B13F55A3654F27ED59FB3
-          [1660833399.901881][2506:2511] CHIP:TOO:    }
+          [1662449060.840902][31013:31018] CHIP:DMG:             Product Id = 32863
+          [1662449060.840904][31013:31018] CHIP:DMG:             Product Id = 32864
+          [1662449060.840905][31013:31018] CHIP:DMG:             Product Id = 32865
+          [1662449060.840907][31013:31018] CHIP:DMG:             Product Id = 32866
+          [1662449060.840909][31013:31018] CHIP:DMG:             Product Id = 32867
+          [1662449060.840911][31013:31018] CHIP:DMG:         }
+          [1662449060.840913][31013:31018] CHIP:DMG:         Device Type Id = 22
+          [1662449060.840916][31013:31018] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1662449060.840918][31013:31018] CHIP:DMG:         Security Level = 0
+          [1662449060.840921][31013:31018] CHIP:DMG:         Security Information = 0
+          [1662449060.840923][31013:31018] CHIP:DMG:         Version Number = 9876
+          [1662449060.840925][31013:31018] CHIP:DMG:         Certification Type = 0
+          [1662449060.840927][31013:31018] CHIP:DMG:     }
+          [1662449060.840930][31013:31018] CHIP:DMG:     Attestation Nonce (32) = 0DCBD6B7CE5AC2B7972D5350E2709C659E2222862BE8F204FE1E3D709FD959AD
+          [1662449060.840932][31013:31018] CHIP:DMG:     Timestamp = 0
+          [1662449060.840934][31013:31018] CHIP:DMG: }
+          [1662449060.840935][31013:31018] CHIP:DMG:
+          [1662449060.840938][31013:31018] CHIP:DMG:
+          [1662449060.840943][31013:31018] CHIP:DMG: Additional Fields =
+          [1662449060.840945][31013:31018] CHIP:DMG: {
+          [1662449060.840948][31013:31018] CHIP:DMG:     peer_address = UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540
+          [1662449060.840950][31013:31018] CHIP:DMG: }
+          [1662449060.840951][31013:31018] CHIP:DMG:
+          [1662449060.840955][31013:31018] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:160787812 on exchange 51916i
+          [1662449060.840959][31013:31018] CHIP:EM: Found matching exchange: 51916i, Delegate: 0x7fd35c0219d8
+          [1662449060.840962][31013:31018] CHIP:EM: CHIP MessageCounter:39600912 not in RetransTable on exchange 51916i
+          [1662449060.840969][31013:31018] CHIP:DMG: ICR moving to [ResponseRe]
+          [1662449060.840974][31013:31018] CHIP:DMG: InvokeResponseMessage =
+          [1662449060.840976][31013:31018] CHIP:DMG: {
+          [1662449060.840979][31013:31018] CHIP:DMG:         suppressResponse = false,
+          [1662449060.840981][31013:31018] CHIP:DMG:         InvokeResponseIBs =
+          [1662449060.840984][31013:31018] CHIP:DMG:         [
+          [1662449060.840986][31013:31018] CHIP:DMG:                 InvokeResponseIB =
+          [1662449060.840990][31013:31018] CHIP:DMG:                 {
+          [1662449060.840992][31013:31018] CHIP:DMG:                         CommandDataIB =
+          [1662449060.840994][31013:31018] CHIP:DMG:                         {
+          [1662449060.840996][31013:31018] CHIP:DMG:                                 CommandPathIB =
+          [1662449060.840999][31013:31018] CHIP:DMG:                                 {
+          [1662449060.841001][31013:31018] CHIP:DMG:                                         EndpointId = 0x0,
+          [1662449060.841004][31013:31018] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1662449060.841006][31013:31018] CHIP:DMG:                                         CommandId = 0x1,
+          [1662449060.841008][31013:31018] CHIP:DMG:                                 },
+          [1662449060.841011][31013:31018] CHIP:DMG:
+          [1662449060.841013][31013:31018] CHIP:DMG:                                 CommandFields =
+          [1662449060.841016][31013:31018] CHIP:DMG:                                 {
+          [1662449060.841018][31013:31018] CHIP:DMG:                                         0x0 = [
+          [1662449060.841037][31013:31018] CHIP:DMG:                                                         0x15, 0x31, 0x1, 0x1d, 0x2, 0x30, 0x82, 0x2, 0x19, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x2, 0xa0, 0x82, 0x2, 0xa, 0x30, 0x82, 0x2, 0x6, 0x2, 0x1, 0x3, 0x31, 0xd, 0x30, 0xb, 0x6, 0x9, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, 0x30, 0x82, 0x1, 0x71, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x1, 0xa0, 0x82, 0x1, 0x62, 0x4, 0x82, 0x1, 0x5e, 0x15, 0x24, 0x0, 0x1, 0x25, 0x1, 0xf1, 0xff, 0x36, 0x2, 0x5, 0x0, 0x80, 0x5, 0x1, 0x80, 0x5, 0x2, 0x80, 0x5, 0x3, 0x80, 0x5, 0x4, 0x80, 0x5, 0x5, 0x80, 0x5, 0x6, 0x80, 0x5, 0x7, 0x80, 0x5, 0x8, 0x80, 0x5, 0x9, 0x80, 0x5, 0xa, 0x80, 0x5, 0xb, 0x80, 0x5, 0xc, 0x80, 0x5, 0xd, 0x80, 0x5, 0xe, 0x80, 0x5, 0xf, 0x80, 0x5, 0x10, 0x80, 0x5, 0x11, 0x80, 0x5, 0x12, 0x80, 0x5, 0x13, 0x80, 0x5, 0x14, 0x80, 0x5, 0x15, 0x80, 0x5, 0x16, 0x80, 0x5, 0x17, 0x80, 0x5, 0x18, 0x80, 0x5, 0x19, 0x80, 0x5, 0x1a, 0x80, 0x5, 0x1b, 0x80, 0x5, 0x1c, 0x80, 0x5, 0x1d, 0x80, 0x5, 0x1e, 0x80, 0x5, 0x1f, 0x80, 0x5, 0x20, 0x80, 0x5, 0x21, 0x80, 0x5, 0x22, 0x80, 0x5, 0x23, 0x80, 0x5, 0x24, 0x80, 0x5, 0x25, 0x80, 0x5, 0x26, 0x80, 0x5, 0x27, 0x80, 0x5, 0x28, 0x80, 0x5, 0x29, 0x80, 0x5, 0x2a, 0x80, 0x5, 0x2b, 0x80, 0x5, 0x2c, 0x80, 0x5, 0x2d, 0x80, 0x5, 0x2e, 0x80, 0x5, 0x2f, 0x80, 0x5, 0x30, 0x80, 0x5, 0x31, 0x80, 0x5, 0x32, 0x80, 0x5, 0x33, 0x80, 0x5, 0x34, 0x80, 0x5, 0x35, 0x80, 0x5, 0x36, 0x80, 0x5, 0x37, 0x80, 0x5, 0x38, 0x80, 0x5, 0x39, 0x80, 0x5, 0x3a, 0x80, 0x5, 0x3b, 0x80, 0x5, 0x3c, 0x80, 0x5, 0x3d, 0x80, 0x5, 0x3e, 0x80, 0x5, 0x3f, 0x80, 0x5, 0x40, 0x80, 0x5, 0x41, 0x80, 0x5, 0x42, 0x80, 0x5, 0x43, 0x80, 0x5, 0x44, 0x80, 0x5, 0x45, 0x80, 0x5, 0x46, 0x80, 0x5, 0x47, 0x80, 0x5, 0x48, 0x80, 0x5, 0x49, 0x80, 0x5, 0x4a, 0x80, 0x5, 0
+          [1662449060.841046][31013:31018] CHIP:DMG:                                         ] (585 bytes)
+          [1662449060.841048][31013:31018] CHIP:DMG:                                         0x1 = [
+          [1662449060.841053][31013:31018] CHIP:DMG:                                                         0x97, 0x2, 0x34, 0x3f, 0x85, 0xad, 0xe8, 0xd0, 0x4, 0x0, 0xfa, 0x8b, 0x3e, 0x91, 0xed, 0x34, 0x77, 0x3, 0x55, 0x89, 0xd5, 0xe, 0xe0, 0x9d, 0x32, 0x5d, 0x9f, 0x30, 0x20, 0x12, 0xf0, 0x25, 0x63, 0x62, 0xc7, 0x47, 0x7e, 0xd1, 0x9f, 0x89, 0x30, 0x84, 0x49, 0x7c, 0xbd, 0xc, 0xab, 0x38, 0xfe, 0xb5, 0x31, 0x24, 0x8e, 0x28, 0xc7, 0x7e, 0x1, 0xab, 0x34, 0x18, 0xe5, 0x78, 0x9c, 0x97,
+          [1662449060.841058][31013:31018] CHIP:DMG:                                         ] (64 bytes)
+          [1662449060.841060][31013:31018] CHIP:DMG:                                 },
+          [1662449060.841062][31013:31018] CHIP:DMG:                         },
+          [1662449060.841065][31013:31018] CHIP:DMG:
+          [1662449060.841067][31013:31018] CHIP:DMG:                 },
+          [1662449060.841070][31013:31018] CHIP:DMG:
+          [1662449060.841072][31013:31018] CHIP:DMG:         ],
+          [1662449060.841076][31013:31018] CHIP:DMG:
+          [1662449060.841078][31013:31018] CHIP:DMG:         InteractionModelRevision = 1
+          [1662449060.841080][31013:31018] CHIP:DMG: },
+          [1662449060.841088][31013:31018] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662449060.841093][31013:31018] CHIP:CTL: Received Attestation Information from the device
+          [1662449060.841103][31013:31018] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662449060.841111][31013:31018] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662449060.841115][31013:31018] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662449060.841117][31013:31018] CHIP:CTL: Verifying attestation
+          [1662449060.841974][31013:31018] CHIP:CTL: Successfully validated "Attestation Information" command received from the device.
+          [1662449060.841981][31013:31018] CHIP:CTL: Successfully finished commissioning step "AttestationVerification"
       disabled: true
 
     - label:
@@ -88,73 +151,25 @@ tests:
           by setting the following error condition: Commissionee is not yet
           certified"
       verification: |
-          To Execute this step follow the following
-
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -C credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --out dec_message.txt -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
-
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message.txt
-          3082021906092a864886f70d010702a082020a30820206020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f1ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317d307b0201038014fa92cf095efa42e11430651632fefe1b2c77a7c8300b0609608648016503040201300a06082a8648ce3d04030204473045022100e18616664a44b34b0d79ec61d58bdb19e2c3ac271f1867afdb567c7528ee01ce02201abc5baac73c7efb8034284e4234df1a23bc3e6801504b8bcee07ce57eb5f294
-
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
-
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
-
-          ------>sudo ./chip-all-clusters-app --dac_provide /dec_message.json
-
-          [1658320787.328879][4550:4550] CHIP:SVR: Failsafe timer expired
-          [1658320787.328962][4550:4550] CHIP:IN: SecureSession[0xaaaadef5bb00]: MarkForEviction Type:1 LSID:30683
-          [1658320787.329015][4550:4550] CHIP:SC: SecureSession[0xaaaadef5bb00]: Moving from state "kActive" --> "kPendingEviction"
-          [1658320787.329073][4550:4550] CHIP:IN: SecureSession[0xaaaadef5bb00]: Released - Type:1 LSID:30683
-          [1658320787.329147][4550:4550] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:71: CHIP Error 0x00000032: Timeout
-
-
-
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
-
-          [1658320787.287039][4152:4157] CHIP:CTL: Verifying attestation
-          [1658320787.292504][4152:4157] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1658320787.292594][4152:4157] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320787.292627][4152:4157] CHIP:CTL: Failed to perform commissioning step 8
-          [1658320787.292662][4152:4157] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1658320787.292707][4152:4157] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320787.292739][4152:4157] CHIP:CTL: Expiring failsafe on proxy 0xffff7c000b60
+          "The all-cluster-app in the sample application is not a certified commissionee (Certification Declaration has certification_type 0). Launch all-cluster-app on TH raspi and provision the app using the DUT
+          "
       disabled: true
 
-    - label: ""
+    - label:
+          "Verify that DUT notifies a warning stating that Commissionee is not a
+          fully trusted device.Verify that the warning contains the information
+          about the reason for error condition If the warning message indicates
+          that Commissioning is allowed then confirm that CSRRequest Command is
+          sent from DUT to TH1"
       PICS: MCORE.DA.ATTEST_WARNING
       verification: |
-          ------>sudo ./chip-all-clusters-app --dac_provide /dec_message.json
-
-          [1658320787.328879][4550:4550] CHIP:SVR: Failsafe timer expired
-          [1658320787.328962][4550:4550] CHIP:IN: SecureSession[0xaaaadef5bb00]: MarkForEviction Type:1 LSID:30683
-          [1658320787.329015][4550:4550] CHIP:SC: SecureSession[0xaaaadef5bb00]: Moving from state "kActive" --> "kPendingEviction"
-          [1658320787.329073][4550:4550] CHIP:IN: SecureSession[0xaaaadef5bb00]: Released - Type:1 LSID:30683
-          [1658320787.329147][4550:4550] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:71: CHIP Error 0x00000032: Timeout
-
-
-
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
-
-          [1658320787.287039][4152:4157] CHIP:CTL: Verifying attestation
-          [1658320787.292504][4152:4157] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1658320787.292594][4152:4157] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320787.292627][4152:4157] CHIP:CTL: Failed to perform commissioning step 8
-          [1658320787.292662][4152:4157] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1658320787.292707][4152:4157] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320787.292739][4152:4157] CHIP:CTL: Expiring failsafe on proxy 0xffff7c000b60
+          Verify if DUT reports any warning stating that the commissionee is not a fully trusted device. However per Matter spec, Commissioners SHOULD warn the user (its not a SHALL requirement) and commissioners choose their implementation and May give the user a choice to authorize or deny commissioning
       disabled: true
 
     - label: "Factory Reset TH1 so that it is commissionable again"
       verification: |
+          To perform Factory reset on TH1(all-clusters-app)  follow the below step in RPI platform , Pls use equivalent command on the respective platform
           sudo rm -rf /tmp/chip_*
-          sudo ./chip-all-clusters-app --wifi
-
-          DUT as commissioner side:
-          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
-
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 
     - label:
@@ -165,116 +180,101 @@ tests:
           Commissionee provides DAC with validity period that is not in range of
           PAA/PAI"
       verification: |
-          To Execute ths step for error condition 1 follow the following
+          For each error scenario  Factory reset on TH1(all-clusters-app)  as explained in step 6
 
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -C credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/dac-Cert.pem -K credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/dac-Key.pem --out dec_message_3 -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
+          1. For error scenario 1 i.e. Commissionee’s PAA is not in the Commissioner’s trusted set.
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message_3
-          3082021806092a864886f70d010702a082020930820205020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f1ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317c307a02010380146f4b2077c703a3d97e2c7d0f7c309c9db12abbb3300b0609608648016503040201300a06082a8648ce3d04030204463044022065ce44afabe7ad98eba7f382825be984fd4da28a5b00904acaf9f904e12bfd93022037b92fc4343578c5305d0ef0fb85dd2105f8b665bfe97687e24834d7a27c5096
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1
 
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1 --paa-trust-store-path  ~/Aug30_cntr/connectedhomeip/credentials/development/attestation
 
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
-
-          sudo rm -rf /tmp/chip_*
-          ./all-cluster-app --wifi --dac_provider /dec_3.json
-
-          [1658320256.356438][4486:4486] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1658320256.356502][4486:4486] CHIP:SVR: Failsafe timer expired
-          [1658320256.356555][4486:4486] CHIP:IN: SecureSession[0xaaaaf9556b00]: MarkForEviction Type:1 LSID:62352
-          [1658320256.356611][4486:4486] CHIP:SC: SecureSession[0xaaaaf9556b00]: Moving from state "kActive" --> "kPendingEviction"
-          [1658320256.356675][4486:4486] CHIP:IN: SecureSession[0xaaaaf9556b00]: Released - Type:1 LSID:62352
-          [1658320256.356758][4486:4486] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:71: CHIP Error 0x00000032: Timeout
-
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
-
-          [1658320256.309769][4098:4103] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
-          [1658320256.309810][4098:4103] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1658320256.309839][4098:4103] CHIP:CTL: Verifying attestation
-          [1658320256.315382][4098:4103] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1658320256.315464][4098:4103] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320256.315499][4098:4103] CHIP:CTL: Failed to perform commissioning step 8
-          [1658320256.315534][4098:4103] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1658320256.315578][4098:4103] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320256.315610][4098:4103] CHIP:CTL: Expiring failsafe on proxy 0xffff6c000b60
-          [1658320256.315707][4098:4103] CHIP:DMG: ICR moving to [AddingComm]
-          [1658320256.315748][4098:4103] CHIP:DMG: ICR moving to [AddedComma]
-
-
-          Similarly for condition 2 follow below steps
-
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -E vid-mismatch -C credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/dac-Cert.der -K credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/dac-Key.der  --out dec_message_6.txt -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
-
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message_6.txt
-          3082021906092a864886f70d010702a082020a30820206020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f1ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317d307b02010380146f4b2077c703a3d97e2c7d0f7c309c9db12abbb3300b0609608648016503040201300a06082a8648ce3d040302044730450221009bc4c8759ff98a68fb1b42f2d7b2300a856f7830982a4876ff54855dcc25e773022060c17079368bc8e33171c52d9c73a09d690614c28303c119d1bdc1f9b4be869e
-
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
-
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
-
-          sudo rm -rf /tmp/chip_*
-          ./all-cluster-app --wifi --dac_provider /dec_3.json
-
-          [1660836160.681814][4884:4884] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1660836160.681873][4884:4884] CHIP:SVR: Failsafe timer expired
-          [1660836160.681923][4884:4884] CHIP:IN: SecureSession[0xaaaad5440e10]: MarkForEviction Type:1 LSID:22448
-          [1660836160.681975][4884:4884] CHIP:SC: SecureSession[0xaaaad5440e10]: Moving from state "kActive" --> "kPendingEviction"
-          [1660836160.682126][4884:4884] CHIP:IN: SecureSession[0xaaaad5440e10]: Released - Type:1 LSID:22448
-          [1660836160.682202][4884:4884] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:73: CHIP Error 0x00000032: Timeout
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662455580.725445][31980:31985] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662455580.725450][31980:31985] CHIP:CTL: Received Attestation Information from the device
+          [1662455580.725454][31980:31985] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662455580.725461][31980:31985] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662455580.725465][31980:31985] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662455580.725468][31980:31985] CHIP:CTL: Verifying attestation
+          [1662455580.725944][31980:31985] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 101. Look at AttestationVerificationResult enum to understand the errors
+          [1662455580.725956][31980:31985] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662455580.725958][31980:31985] CHIP:CTL: Failed to perform commissioning step 8
+          [1662455580.725961][31980:31985] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
+          [1662455580.725966][31980:31985] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662455580.725979][31980:31985] CHIP:CTL: Expiring failsafe on proxy 0x7fe3b40236a0
 
 
 
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
+          2. To Execute this step for error condition 2 Commissionee provides an invalid DAC and PAI chain ,  follow the below steps,
 
-          [1660836160.627772][2653:2658] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1660836160.627826][2653:2658] CHIP:CTL: Verifying attestation
-          [1660836160.686379][2653:2658] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1660836160.686579][2653:2658] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660836160.686648][2653:2658] CHIP:CTL: Failed to perform commissioning step 8
-          [1660836160.686714][2653:2658] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1660836160.686806][2653:2658] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660836160.686869][2653:2658] CHIP:CTL: Expiring failsafe on proxy 0xffffa4032330
+          All  sample error scenario certificates has generated and present in ~/connectedhomeip/credentials/development/commissioner_dut/
+
+          Commissionee provides an invalid DAC and PAI - Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1 & use the sample json test_case_vector.json
 
 
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+           ./chip-all-clusters-app  --trace_decode 1   --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha1/test_case_vector.json
 
-          Similarly for condition 3 follow below steps
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-att-cert --type a --subject-cn "Matter Development PAA 01" --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-PAA-Key.pem --out Chip-PAA-Cert.pem
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662456484.492166][32193:32198] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662456484.492170][32193:32198] CHIP:CTL: Received Attestation Information from the device
+          [1662456484.492173][32193:32198] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662456484.492179][32193:32198] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662456484.492181][32193:32198] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662456484.492183][32193:32198] CHIP:CTL: Verifying attestation
+          [1662456484.492990][32193:32198] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 605. Look at AttestationVerificationResult enum to understand the errors
+          [1662456484.493000][32193:32198] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662456484.493005][32193:32198] CHIP:CTL: Failed to perform commissioning step 8
+          [1662456484.493007][32193:32198] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
+          [1662456484.493011][32193:32198] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662456484.493013][32193:32198] CHIP:CTL: Expiring failsafe on proxy 0x7fd0a40236a0
+          [1662456484.493022][32193:32198] CHIP:DMG: ICR moving to [AddingComm]
+          [1662456484.493026][32193:32198] CHIP:DMG: ICR moving to [AddedComma]
+          [1662456484.493070][32193:32198] CHIP:IN: Prepared secure message 0x7fd0a4031c78 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 58630i with MessageCounter:1810755.
+          [1662456484.493076][32193:32198] CHIP:IN: Sending encrypted msg 0x7fd0a4031c78 with MessageCounter:1810755 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000039222AD msec
+          [1662456484.493127][32193:32198] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540 | 1810755 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 29920 / Exchange = 58630]
+          [1662456484.493132][32193:32198] CHIP:DMG: Header Flags =
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 Chip-PAA-Cert.pem
-          2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a4d49494270444343415571674177494241674949636769574a6f6e394f653477436759494b6f5a497a6a3045417749774a4445694d434147413155454177775a0a54574630644756794945526c646d5673623342745a57353049464242515341774d544165467730794d4445774d5455784e44497a4e444e61467730304d4445770a4d5455784e44497a4e444a614d435178496a416742674e5642414d4d475531686448526c636942455a585a6c624739776257567564434251515545674d4445770a5754415442676371686b6a4f5051494242676771686b6a4f50514d4242774e4341415461314478507a5873473870372f6d755231686f5631783042797072516a0a58672b77536e742b5a6c45542b78424745373252624b4c6c474f2f54694d427776354972633534664d316e697067483546435078536258736f3259775a4441530a42674e5648524d4241663845434441474151482f416745424d41344741315564447745422f77514541774942426a416442674e564851344546675155307551580a4a6b4c73533667487174717875384a6e5a69487946343077487759445652306a42426777466f4155307551584a6b4c73533667487174717875384a6e5a6948790a46343077436759494b6f5a497a6a30454177494453414177525149674a703546485a545739617958334e575777774870543933677434614f7679424c555937500a74423875397038434951446c4e38375755324c6b6c68313339377a63517942565351345833634e6d4d426f336b5a4853584f475843673d3d0a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0
-
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
-
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
-
-          sudo rm -rf /tmp/chip_*
-          ./all-cluster-app --wifi --dac_provider /dec_7.json
-
-          [1660894197.335249][5005:5005] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1660894197.335308][5005:5005] CHIP:SVR: Failsafe timer expired
-          [1660894197.335357][5005:5005] CHIP:IN: SecureSession[0xaaaae7002e10]: MarkForEviction Type:1 LSID:31514
-          [1660894197.335430][5005:5005] CHIP:SC: SecureSession[0xaaaae7002e10]: Moving from state "kActive" --> "kPendingEviction"
-          [1660894197.335607][5005:5005] CHIP:IN: SecureSession[0xaaaae7002e10]: Released - Type:1 LSID:31514
-          [1660894197.335686][5005:5005] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:73: CHIP Error 0x00000032: Timeout
 
 
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
 
-          [1660894197.296303][4561:4566] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1660894197.296356][4561:4566] CHIP:CTL: Verifying attestation
-          [1660894197.350259][4561:4566] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 600. Look at AttestationVerificationResult enum to understand the errors
-          [1660894197.350444][4561:4566] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660894197.350508][4561:4566] CHIP:CTL: Failed to perform commissioning step 8
-          [1660894197.350574][4561:4566] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1660894197.350659][4561:4566] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660894197.350718][4561:4566] CHIP:CTL: Expiring failsafe on proxy 0xffff6c032330
+          3. Similarly for condition 3 Commissionee provides DAC with validity period that is not in range of PAA/PAI follow below steps
+
+          Commissionee provides DAC with validity period that is not in range of PAA/PAI
+           Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past & use the sample json test_case_vector.json
+
+          Commission TH to DUT by using --dac_provider parameter
+
+
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past/test_case_vector.json
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662459474.547436][32792:32797] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662459474.547441][32792:32797] CHIP:CTL: Received Attestation Information from the device
+          [1662459474.547445][32792:32797] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662459474.547452][32792:32797] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662459474.547456][32792:32797] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662459474.547458][32792:32797] CHIP:CTL: Verifying attestation
+          [1662459474.548034][32792:32797] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 301. Look at AttestationVerificationResult enum to understand the errors
+          [1662459474.548043][32792:32797] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662459474.548047][32792:32797] CHIP:CTL: Failed to perform commissioning step 8
+          [1662459474.548051][32792:32797] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
+          [1662459474.548055][32792:32797] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662459474.548059][32792:32797] CHIP:CTL: Expiring failsafe on proxy 0x7f71200236a0
+          [1662459474.548073][32792:32797] CHIP:DMG: ICR moving to [AddingComm]
+          [1662459474.548077][32792:32797] CHIP:DMG: ICR moving to [AddedComma]
+          [1662459474.548122][32792:32797] CHIP:IN: Prepared secure message 0x7f7120031f38 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 51350i with MessageCounter:196537634.
+          [1662459474.548128][32792:32797] CHIP:IN: Sending encrypted msg 0x7f7120031f38 with MessageCounter:196537634 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000003BFC294 msec
+          [1662459474.548181][32792:32797] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540 | 196537634 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 10880 / Exchange = 51350]
       disabled: true
 
     - label:
@@ -287,144 +287,120 @@ tests:
           Product ID (PID) the DAC is not present in the product_id_array field
           in the Certification Declaration"
       verification: |
-          To Execute ths step for error condition 1 follow the following steps
+          For each error scenario  Factory reset on TH1(all-clusters-app)  as explained in step 6
 
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -I -E dac-origin-vid-present -C credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --out cd_vid_present_pid_missing.txt -o 0x8000 -r 0xFFF1 -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
+          1. To Execute ths step for error condition 1 Certification Declaration has only one of the following fields dac_origin_vendor_id dac_origin_product_id follow the below steps
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 cd_vid_present_pid_missing.txt
-          3082010506092a864886f70d010702a081f73081f4020103310d300b0609608648016503040201306106092a864886f70d010701a0540452152000012501f1ff3602050080182403162c04135a494732303134325a423333303030332d32342405002406002507942624080025090080360b10140b44cabbc5016577aa8b44ffb90fcca140fe66201818317d307b020103801462fa823359acfaa9963e1cfa140addf504f37160300b0609608648016503040201300a06082a8648ce3d0403020447304502205adea20956fcdce1213f2878da4a5f4a35907eaafa70efe367edc9cec23eb2f80221009b2482360c8713ccd2738150874f9b811ec2149c3ec1f579357219985ecc765a
+          All  sample error scenario certificate has generated and presented in ~/connectedhomeip/credentials/development/commissioner_dut/
+          Use the appropriate folder to test different scenarios.
 
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_cd_dac_origin_vid_missing_pid_present/test_case_vector.json
 
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
-          sudo rm -rf /tmp/chip_*
-          sudo ./chip-all-clusters-app  --dac_provider /cd.json
-
-          [1658320561.405436][4521:4521] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1658320561.405489][4521:4521] CHIP:SVR: Failsafe timer expired
-          [1658320561.405546][4521:4521] CHIP:IN: SecureSession[0xaaaaec7c9e10]: MarkForEviction Type:1 LSID:27478
-          [1658320561.405600][4521:4521] CHIP:SC: SecureSession[0xaaaaec7c9e10]: Moving from state "kActive" --> "kPendingEviction"
-          [1658320561.405663][4521:4521] CHIP:IN: SecureSession[0xaaaaec7c9e10]: Released - Type:1 LSID:27478
-          [1658320561.405748][4521:4521] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:71: CHIP Error 0x00000032: Timeout
-          [1658320561.405815][4521:4521] CHIP:IN: Clearing BLE pending packets.
-
-
-          --->./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 --trace_decode 1
-
-          [1658320561.366298][4126:4132] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
-          [1658320561.366382][4126:4132] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320561.366413][4126:4132] CHIP:CTL: Failed to perform commissioning step 8
-          [1658320561.366481][4126:4132] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1658320561.366524][4126:4132] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1011: CHIP Error 0x000000AC: Internal error"
-          [1658320561.366554][4126:4132] CHIP:CTL: Expiring failsafe on proxy 0xffff84000b60
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662459904.540345][32873:32878] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662459904.540349][32873:32878] CHIP:CTL: Received Attestation Information from the device
+          [1662459904.540352][32873:32878] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662459904.540358][32873:32878] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662459904.540361][32873:32878] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662459904.540363][32873:32878] CHIP:CTL: Verifying attestation
+          [1662459904.541210][32873:32878] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
+          [1662459904.541219][32873:32878] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662459904.541221][32873:32878] CHIP:CTL: Failed to perform commissioning step 8
+          [1662459904.541223][32873:32878] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
+          [1662459904.541229][32873:32878] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662459904.541231][32873:32878] CHIP:CTL: Expiring failsafe on proxy 0x7f1b8c023460
+          [1662459904.541240][32873:32878] CHIP:DMG: ICR moving to [AddingComm]
+          [1662459904.541244][32873:32878] CHIP:DMG: ICR moving to [AddedComma]
+          [1662459904.541289][32873:32878] CHIP:IN: Prepared secure message 0x7f1b8c02d208 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 3056i with MessageCounter:44223388.
+          [1662459904.541294][32873:32878] CHIP:IN: Sending encrypted msg 0x7f1b8c02d208 with MessageCounter:44223388 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000003C6523D msec
+          [1662459904.541346][32873:32878] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:5540 | 44223388 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 16788 / Exchange = 3056]
 
 
-          Similarly for 2nd error condition follow the below steps
 
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -E vid-mismatch -C credentials/development/commissioner_dut/struct_cd_vid_mismatch/dac-Cert.der -K credentials/development/commissioner_dut/struct_cd_vid_mismatch/dac-Key.der  --out dec_message_3.txt -f 1 -V FFF5 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
+          2. Similarly for 2nd error condition i.e. vendor_id field in the Certification Declaration does not match with the VendorID attribute found in the Basic Information cluster , follow the below steps
 
+          All  sample error scenario certificate has generated and present in ~/connectedhomeip/credentials/development/commissioner_dut/
+          Use the appropriate folder to test different scenario.
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message_3.txt
-          3082021906092a864886f70d010702a082020a30820206020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f5ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317d307b02010380140b36c601086c7232d905bd8b1eb2ce75d9aa8eee300b0609608648016503040201300a06082a8648ce3d04030204473045022100afdf19ccdf9ebb227554c11b066d70d648d030cf49c9b16bfbb82f922af325da02201ea59fcb3fb51b99f40283b736486c141f4f136fec63983d72811b5804221d9f
+          vendor_id field in the Certification Declaration does not match with the VendorID attribute found in the Basic Information cluster
+          connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch
+          & use the sample json test_case_vector.json
 
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch/test_case_vector.json
 
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
-
-          ./chip-all-clusters-app --dac_provider dec.json
-
-          [1660834197.222084][4765:4765] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1660834197.222142][4765:4765] CHIP:SVR: Failsafe timer expired
-          [1660834197.222191][4765:4765] CHIP:IN: SecureSession[0xaaaad7a03e10]: MarkForEviction Type:1 LSID:52084
-          [1660834197.222242][4765:4765] CHIP:SC: SecureSession[0xaaaad7a03e10]: Moving from state "kActive" --> "kPendingEviction"
-          [1660834197.222392][4765:4765] CHIP:IN: SecureSession[0xaaaad7a03e10]: Released - Type:1 LSID:52084
-          [1660834197.222468][4765:4765] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:73: CHIP Error 0x00000032: Timeout
-
-          ./chip-tool pairing ethernet  1 20202021 3840 fe80::e65f:1ff:fe0f:2753 5540 --trace_decode 1
-
-          [1660834197.161864][2546:2551] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1660834197.161918][2546:2551] CHIP:CTL: Verifying attestation
-          [1660834197.217691][2546:2551] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1660834197.218073][2546:2551] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834197.218139][2546:2551] CHIP:CTL: Failed to perform commissioning step 8
-          [1660834197.218207][2546:2551] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1660834197.218295][2546:2551] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834197.218358][2546:2551] CHIP:CTL: Expiring failsafe on proxy 0xffff80032330
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662460172.864493][32929:32934] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662460172.864502][32929:32934] CHIP:CTL: Received Attestation Information from the device
+          [1662460172.864510][32929:32934] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662460172.864522][32929:32934] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662460172.864526][32929:32934] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662460172.864528][32929:32934] CHIP:CTL: Verifying attestation
+          [1662460172.865422][32929:32934] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
+          [1662460172.865435][32929:32934] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662460172.865439][32929:32934] CHIP:CTL: Failed to perform commissioning step 8
+          [1662460172.865442][32929:32934] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
+          [1662460172.865447][32929:32934] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662460172.865449][32929:32934] CHIP:CTL: Expiring failsafe on proxy 0x7fa380023460
 
 
-          Similary for 3rd error condition follow the below steps
-
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -E vid-mismatch -C credentials/development/commissioner_dut/struct_cd_vid_mismatch/dac-Cert.der -K credentials/development/commissioner_dut/struct_cd_vid_mismatch/dac-Key.der  --out dec_message_3.txt -f 1 -V FFF5 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
 
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message_3.txt
-          3082021906092a864886f70d010702a082020a30820206020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f5ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317d307b02010380140b36c601086c7232d905bd8b1eb2ce75d9aa8eee300b0609608648016503040201300a06082a8648ce3d04030204473045022100afdf19ccdf9ebb227554c11b066d70d648d030cf49c9b16bfbb82f922af325da02201ea59fcb3fb51b99f40283b736486c141f4f136fec63983d72811b5804221d9f
+          3. Similary for 3rd error condition follow the below steps
+          All  sample error scenario certificate has generated and present in ~/connectedhomeip/credentials/development/commissioner_dut/
+          Use the appropriate folder to test different scenario.
 
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
+          vendor_id field in the Certification Declaration does not match with the VendorID attribute found in the Basic Information cluster
+          connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch
+          & use the sample json test_case_vector.json
 
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+           ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_cd_vid_mismatch/test_case_vector.json
 
-          ./chip-all-clusters-app --dac_provider dec.json
-
-          [1660834197.222084][4765:4765] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1660834197.222142][4765:4765] CHIP:SVR: Failsafe timer expired
-          [1660834197.222191][4765:4765] CHIP:IN: SecureSession[0xaaaad7a03e10]: MarkForEviction Type:1 LSID:52084
-          [1660834197.222242][4765:4765] CHIP:SC: SecureSession[0xaaaad7a03e10]: Moving from state "kActive" --> "kPendingEviction"
-          [1660834197.222392][4765:4765] CHIP:IN: SecureSession[0xaaaad7a03e10]: Released - Type:1 LSID:52084
-          [1660834197.222468][4765:4765] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:73: CHIP Error 0x00000032: Timeout
-
-          ./chip-tool pairing ethernet  1 20202021 3840 fe80::e65f:1ff:fe0f:2753 5540 --trace_decode 1
-
-          [1660834197.161864][2546:2551] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1660834197.161918][2546:2551] CHIP:CTL: Verifying attestation
-          [1660834197.217691][2546:2551] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1660834197.218073][2546:2551] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834197.218139][2546:2551] CHIP:CTL: Failed to perform commissioning step 8
-          [1660834197.218207][2546:2551] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1660834197.218295][2546:2551] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834197.218358][2546:2551] CHIP:CTL: Expiring failsafe on proxy 0xffff80032330
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662460606.271896][33030:33035] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1662460606.271904][33030:33035] CHIP:CTL: Received Attestation Information from the device
+          [1662460606.271914][33030:33035] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1662460606.271930][33030:33035] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662460606.271938][33030:33035] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662460606.271942][33030:33035] CHIP:CTL: Verifying attestation
+          [1662460606.272912][33030:33035] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
+          [1662460606.272924][33030:33035] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662460606.272927][33030:33035] CHIP:CTL: Failed to perform commissioning step 8
+          [1662460606.272932][33030:33035] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
 
 
-          Similary for 4th error condition follow the below steps
 
-          1. To generate the CD use the below command
-          ./out/debug/chip-cert gen-cd -E vid-mismatch -C credentials/development/commissioner_dut/struct_cd_pid_array_missing/dac-Cert.der -K credentials/development/commissioner_dut/struct_cd_pid_array_missing/dac-Key.der  --out dec_message_5.txt -f 1 -V FFF1 -p 8000 -p 8001 -p 8002 -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800A -p 800B -p 800C -p 800D -p 800E -p 800F -p 8010 -p 8011 -p 8012 -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801A -p 801B -p 801C -p 801D -p 801E -p 801F -p 8020 -p 8021 -p 8022 -p 8023 -p 8024 -p 8025 -p 8026 -p 8027 -p 8028 -p 8029 -p 802A -p 802B -p 802C -p 802D -p 802E -p 802F -p 8030 -p 8031 -p 8032 -p 8033 -p 8034 -p 8035 -p 8036 -p 8037 -p 8038 -p 8039 -p 803A -p 803B -p 803C -p 803D -p 803E -p 803F -p 8040 -p 8041 -p 8042 -p 8043 -p 8044 -p 8045 -p 8046 -p 8047 -p 8048 -p 8049 -p 804A -p 804B -p 804C -p 804D -p 804E -p 804F -p 8050 -p 8051 -p 8052 -p 8053 -p 8054 -p 8055 -p 8056 -p 8057 -p 8058 -p 8059 -p 805A -p 805B -p 805C -p 805D -p 805E -p 805F -p 8060 -p 8061 -p 8062 -p 8063 -d 0016 -c "ZIG20142ZB330003-24" -l 0 -i 0 -n 2694 -t 0
+          4. Similary for 4th error condition follow the below steps
 
+          All  sample error scenario certificate has generated and present in ~/connectedhomeip/credentials/development/commissioner_dut/
+          Use the appropriate folder to test different scenario.
 
-          2. Use the below command to see the generated CD
-          xxd -p -c 1024 dec_message_5.txt
-          3082021906092a864886f70d010702a082020a30820206020103310d300b06096086480165030402013082017106092a864886f70d010701a08201620482015e152400012501f1ff3602050080050180050280050380050480050580050680050780050880050980050a80050b80050c80050d80050e80050f80051080051180051280051380051480051580051680051780051880051980051a80051b80051c80051d80051e80051f80052080052180052280052380052480052580052680052780052880052980052a80052b80052c80052d80052e80052f80053080053180053280053380053480053580053680053780053880053980053a80053b80053c80053d80053e80053f80054080054180054280054380054480054580054680054780054880054980054a80054b80054c80054d80054e80054f80055080055180055280055380055480055580055680055780055880055980055a80055b80055c80055d80055e80055f80056080056180056280056380182403162c04135a494732303134325a423333303030332d32342405002406002507942624080018317d307b0201038014e84b969e3104277c0a25ec2fd2e014cf6cabbc50300b0609608648016503040201300a06082a8648ce3d04030204473045022005a46eb5d9ba996c44abcad5498a65898a8a7711bc91b25b24949b154949b046022100873aaac936ef14cf795c59629603d6d9ffa193f3e6d13082b47b0d018b21d60f
+          The Vendor ID in the DAC does not match the vendor_id field in the Certification Declaration.
+          connectedhomeip/credentials/development/commissioner_dut/struct_cd_pid_array_count01_mismatch
+          & use the sample json test_case_vector.json
 
-          3. Copy the result from step 2 in json file and transfer the json file to Raspi That will be running chip-all-clusters-app
+          Commission TH to DUT by using --dac_provider parameter
 
-          4. Commission TH to DUT using the above generated CD by using dac_provider parameter
+          execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app  --trace_decode 1 --dac_provider ~/Aug30_cntr/connectedhomeip/credentials/development/commissioner_dut/struct_cd_pid_array_count10_mismatch/test_case_vector.json
 
-          ./chip-all-clusters-app --dac_provider dec_1.json
-
-          [1660834938.999182][4811:4811] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1660834938.999232][4811:4811] CHIP:SVR: Failsafe timer expired
-          [1660834938.999276][4811:4811] CHIP:IN: SecureSession[0xaaaae51efe10]: MarkForEviction Type:1 LSID:59289
-          [1660834938.999321][4811:4811] CHIP:SC: SecureSession[0xaaaae51efe10]: Moving from state "kActive" --> "kPendingEviction"
-          [1660834938.999452][4811:4811] CHIP:IN: SecureSession[0xaaaae51efe10]: Released - Type:1 LSID:59289
-          [1660834938.999519][4811:4811] CHIP:SVR: Commissioning failed (attempt 1): ../../third_party/connectedhomeip/src/app/server/CommissioningWindowManager.cpp:73: CHIP Error 0x00000032: Timeout
-
-
-          ./chip-tool pairing ethernet  1 20202021 3840 fe80::e65f:1ff:fe0f:2753 5540 --trace_decode 1
-
-          [1660834938.937220][2589:2594] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
-          [1660834938.937294][2589:2594] CHIP:CTL: Performing next commissioning step "AttestationVerification"
-          [1660834938.937346][2589:2594] CHIP:CTL: Verifying attestation
-          [1660834938.995809][2589:2594] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 601. Look at AttestationVerificationResult enum to understand the errors
-          [1660834938.996010][2589:2594] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834938.996077][2589:2594] CHIP:CTL: Failed to perform commissioning step 8
-          [1660834938.996145][2589:2594] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error" -> "Cleanup"
-          [1660834938.996234][2589:2594] CHIP:CTL: Performing next commissioning step "Cleanup" with completion status = "../../src/controller/CHIPDeviceController.cpp:1018: CHIP Error 0x000000AC: Internal error"
-          [1660834938.996293][2589:2594] CHIP:CTL: Expiring failsafe on proxy 0xffff84032330
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+          If the DUT(chip-tool) has to provision to verify the logs:- verify the below mentioned same behaviour log on the DUT (chip-tool):
+          [1662460943.774883][33107:33112] CHIP:CTL: Commissioning stage next step: "SendAttestationRequest" -> "AttestationVerification"
+          [1662460943.774887][33107:33112] CHIP:CTL: Performing next commissioning step "AttestationVerification"
+          [1662460943.774889][33107:33112] CHIP:CTL: Verifying attestation
+          [1662460943.775749][33107:33112] CHIP:CTL: Failed in verifying "Attestation Information" command received from the device: err 603. Look at AttestationVerificationResult enum to understand the errors
+          [1662460943.775757][33107:33112] CHIP:CTL: Error on commissioning step "AttestationVerification": "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error"
+          [1662460943.775760][33107:33112] CHIP:CTL: Failed to perform commissioning step 8
+          [1662460943.775763][33107:33112] CHIP:CTL: Going from commissioning step "AttestationVerification" with lastErr = "../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1027: CHIP Error 0x000000AC: Internal error" -> "Cleanup
       disabled: true

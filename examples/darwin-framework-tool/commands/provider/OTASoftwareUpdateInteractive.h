@@ -28,7 +28,10 @@ public:
     {
     }
     CHIP_ERROR SetCandidatesFromFilePath(char * _Nonnull filePath);
-    CHIP_ERROR SetUserConsentStatus(char * _Nonnull status);
+    CHIP_ERROR SetActionReplyStatus(uint16_t action);
+    CHIP_ERROR SetReplyStatus(uint16_t status);
+    CHIP_ERROR SetUserConsentStatus(uint16_t status);
+    CHIP_ERROR SetUserConsentNeeded(uint16_t status);
     static constexpr size_t kFilepathBufLen = 256;
 
     CHIP_ERROR Run() override;
@@ -56,17 +59,31 @@ private:
     char * _Nonnull mOTACandidatesFilePath;
 };
 
-class OTASoftwareUpdateSetStatus : public OTASoftwareUpdateBase {
+class OTASoftwareUpdateSetParams : public OTASoftwareUpdateBase {
 public:
-    OTASoftwareUpdateSetStatus()
-        : OTASoftwareUpdateBase("set-consent-status")
+    OTASoftwareUpdateSetParams()
+        : OTASoftwareUpdateBase("set-reply-params")
     {
-        AddArgument("status", &mUserConsentStatus);
+        AddArgument("action", 0, UINT16_MAX, &mAction);
+        AddArgument("status", 0, UINT16_MAX, &mStatus);
+        AddArgument("consent", 0, UINT16_MAX, &mUserConsentStatus);
+        AddArgument("consentNeeded", 0, UINT16_MAX, &mUserConsentNeeded);
+        AddArgument("delayedActionTime", 0, UINT64_MAX, &mDelayedActionTime);
+        AddArgument("timedInvokeTimeoutMs", 0, UINT64_MAX, &mTimedInvokeTimeoutMs);
     }
 
     /////////// CHIPCommandBridge Interface /////////
     CHIP_ERROR RunCommand() override;
 
+    CHIP_ERROR SetParams(chip::Optional<uint16_t> action, chip::Optional<uint16_t> status, chip::Optional<uint16_t> consent,
+        chip::Optional<uint16_t> userConsentNeeded, chip::Optional<uint64_t> delayedActionTime,
+        chip::Optional<uint64_t> timedInvokeTimeoutMs);
+
 private:
-    char * _Nonnull mUserConsentStatus;
+    chip::Optional<uint16_t> mAction;
+    chip::Optional<uint16_t> mStatus;
+    chip::Optional<uint16_t> mUserConsentStatus;
+    chip::Optional<uint16_t> mUserConsentNeeded;
+    chip::Optional<uint64_t> mDelayedActionTime;
+    chip::Optional<uint64_t> mTimedInvokeTimeoutMs;
 };

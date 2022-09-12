@@ -17,6 +17,7 @@
  */
 package com.matter.tv.server.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import com.matter.tv.server.MatterCommissioningPrompter;
 import com.matter.tv.server.tvapp.ChannelManagerStub;
 import com.matter.tv.server.tvapp.Clusters;
 import com.matter.tv.server.tvapp.ContentLaunchManagerStub;
@@ -65,6 +67,7 @@ public class MatterServant {
   }
 
   private Context context;
+  private Activity activity;
 
   public void init(@NonNull Context context) {
 
@@ -140,6 +143,10 @@ public class MatterServant {
     chipAppServer.startApp();
   }
 
+  public void initCommissioner() {
+    mTvApp.initializeCommissioner(new MatterCommissioningPrompter(activity));
+  }
+
   public void restart() {
     chipAppServer.stopApp();
     chipAppServer.startApp();
@@ -148,6 +155,10 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
+  }
+
+  public void setActivity(Activity activity) {
+    this.activity = activity;
   }
 
   public void sendCustomCommand(String customCommand) {

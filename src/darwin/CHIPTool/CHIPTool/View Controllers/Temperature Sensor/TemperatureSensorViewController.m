@@ -192,7 +192,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
             if (chipDevice) {
                 MTRBaseClusterTemperatureMeasurement * cluster =
                     [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
-                                                                        endpoint:1
+                                                                        endpoint:@(1)
                                                                            queue:dispatch_get_main_queue()];
 
                 [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -223,10 +223,10 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
             if (chipDevice) {
                 // Use a wildcard subscription
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
-                    minInterval:minIntervalSeconds
-                    maxInterval:maxIntervalSeconds
+                    minInterval:@(minIntervalSeconds)
+                    maxInterval:@(maxIntervalSeconds)
                     params:nil
-                    cacheContainer:nil
+                    attributeCacheContainer:nil
                     attributeReportHandler:^(NSArray * _Nullable reports) {
                         if (!reports)
                             return;

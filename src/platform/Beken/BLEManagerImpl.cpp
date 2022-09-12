@@ -621,7 +621,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     int ret;
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    ret = bk_ble_send_noti_value(data->DataLength(), data->Start(), 0, SVR_FFF6_TX_VALUE);
+    ret = bk_ble_send_noti_value(conId, data->DataLength(), data->Start(), 0, SVR_FFF6_TX_VALUE);
     err = MapBLEError(ret);
 exit:
     if (err != CHIP_NO_ERROR)

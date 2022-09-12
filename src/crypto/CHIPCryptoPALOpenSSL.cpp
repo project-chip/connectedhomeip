@@ -1619,8 +1619,6 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
     VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0 && CanCastTo<long>(rootCertificateLen),
                         (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0 && CanCastTo<long>(caCertificateLen),
-                        (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0 && CanCastTo<long>(leafCertificateLen),
                         (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
 
@@ -1633,6 +1631,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     chain = sk_X509_new_null();
     VerifyOrExit(chain != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
+    VerifyOrExit(CanCastTo<long>(rootCertificateLen),
+                 (result = CertificateChainValidationResult::kRootArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
     x509RootCertificate = d2i_X509(nullptr, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr,
                  (result = CertificateChainValidationResult::kRootFormatInvalid, err = CHIP_ERROR_INTERNAL));
@@ -1640,13 +1640,20 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     status = X509_STORE_add_cert(store, x509RootCertificate);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    x509CACertificate = d2i_X509(nullptr, &caCertificate, static_cast<long>(caCertificateLen));
-    VerifyOrExit(x509CACertificate != nullptr,
-                 (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
+    if (caCertificate != nullptr && caCertificateLen > 0)
+    {
+        VerifyOrExit(CanCastTo<long>(caCertificateLen),
+                     (result = CertificateChainValidationResult::kICAArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
+        x509CACertificate = d2i_X509(nullptr, &caCertificate, static_cast<long>(caCertificateLen));
+        VerifyOrExit(x509CACertificate != nullptr,
+                     (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = static_cast<int>(sk_X509_push(chain, x509CACertificate));
-    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
+        status = static_cast<int>(sk_X509_push(chain, x509CACertificate));
+        VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
+    }
 
+    VerifyOrExit(CanCastTo<long>(leafCertificateLen),
+                 (result = CertificateChainValidationResult::kLeafArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
     x509LeafCertificate = d2i_X509(nullptr, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr,
                  (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));

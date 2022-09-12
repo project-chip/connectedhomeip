@@ -23,16 +23,14 @@
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler
+                completionHandler:(MTRQueryImageCompletionHandler)completionHandler
 {
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler
+                        completionHandler:(MTRApplyUpdateRequestCompletionHandler)completionHandler
 {
 }
 
@@ -47,7 +45,7 @@
                                     controller:(MTRDeviceController * _Nonnull)controller
                                 fileDesignator:(NSString * _Nonnull)fileDesignator
                                         offset:(NSNumber * _Nonnull)offset
-                             completionHandler:(void (^)(NSError * error))completionHandler
+                             completionHandler:(StatusCompletion)completionHandler
 {
 }
 
@@ -62,7 +60,7 @@
                       blockSize:(NSNumber * _Nonnull)blockSize
                      blockIndex:(NSNumber * _Nonnull)blockIndex
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+              completionHandler:(MTRBDXQueryCompletionHandler)completionHandler
 {
 }
 

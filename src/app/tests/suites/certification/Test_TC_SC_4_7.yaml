@@ -17,6 +17,7 @@ name: 15.4.7. [TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.COMM_DISCOVERY
 
 config:
     nodeId: 0x12344321

@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,18 +18,9 @@
 
 #pragma once
 
-#include <jni.h>
+// ==================== Platform Adaptations ====================
 
-class AppPlatformJNI
-{
-
-private:
-    friend AppPlatformJNI & AppPlatformJNIMgr();
-
-    static AppPlatformJNI sInstance;
-};
-
-inline class AppPlatformJNI & AppPlatformJNIMgr()
-{
-    return AppPlatformJNI::sInstance;
-}
+struct bt_conn;
+#define BLE_CONNECTION_OBJECT bt_conn *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
+#define BLE_MAX_RECEIVE_WINDOW_SIZE 5

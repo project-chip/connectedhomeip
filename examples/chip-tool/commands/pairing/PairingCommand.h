@@ -81,6 +81,7 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
+            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
@@ -163,6 +164,7 @@ private:
     NodeId mNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
+    chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;

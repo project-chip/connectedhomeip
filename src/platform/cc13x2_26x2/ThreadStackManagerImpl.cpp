@@ -158,6 +158,16 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
     }
 }
 
+void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
+{
+    const otExtAddress * extAddr;
+    LockThreadStack();
+    extAddr = otLinkGetExtendedAddress(OTInstance());
+    UnlockThreadStack();
+
+    memcpy(aExtAddr.m8, extAddr->m8, OT_EXT_ADDRESS_SIZE);
+}
+
 } // namespace DeviceLayer
 } // namespace chip
 

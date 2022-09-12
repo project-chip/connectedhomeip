@@ -223,6 +223,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_BL602=1",
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/BL602",
       ]
+    } else if (chip_device_platform == "bl702") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_BL702=1",
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/BL702",
+      ]
     } else if (chip_device_platform == "fake") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_FAKE=1",
@@ -429,6 +434,8 @@ if (chip_device_platform != "none") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
       _platform_target = "bouffalolab/BL602"
+    } else if (chip_device_platform == "bl702") {
+      _platform_target = "bouffalolab/BL702"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {

@@ -283,6 +283,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Set this to true to enable bl602 builds by default.
     enable_bl602_builds = false
 
+    # Set this to true to enable bl702 builds by default.
+    enable_bl702_builds = false
+
     # Set this to true to enable mw320 builds by default.
     enable_mw320_builds = false
   }
@@ -387,6 +390,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the bl602 lighting app example.
     enable_bl602_lighting_app_build = enable_bl602_builds
+
+    # Build the bl702 lighting app example.
+    enable_bl702_lighting_app_build = enable_bl702_builds
 
     # Build the mw320 shell app example.
     enable_mw320_shell_build = enable_mw320_builds
@@ -680,6 +686,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":mw320_shell" ]
+  }
+
+  if (enable_bl702_lighting_app_build) {
+    group("bl702_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/bl702(${chip_root}/config/bl702/toolchain:bl702_lighting_app)" ]
+    }
+
+    extra_build_deps += [ ":bl702_shell" ]
   }
 
   group("default") {

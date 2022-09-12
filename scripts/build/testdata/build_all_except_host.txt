@@ -149,7 +149,22 @@ gn gen --check --fail-on-unused-args {out}/android-x86-tv-server '--args=target_
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating bouffalolab-BL702-IoT-DVK-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL702-IoT-DVK" module_type="BL702"' {out}/bouffalolab-BL702-IoT-DVK-light
+
+# Generating bouffalolab-BL702-IoT-DVK-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL702-IoT-DVK" module_type="BL702" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL702-IoT-DVK-light-rpc
+
+# Generating bouffalolab-BL706-IoT-DVK-BL706C-22-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22"' {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light
+
+# Generating bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+
+# Generating bouffalolab-BL706-NIGHT-LIGHT-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-NIGHT-LIGHT" module_type="BL702"' {out}/bouffalolab-BL706-NIGHT-LIGHT-light
 
 # Generating cc13x2x7_26x2x7-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
@@ -1540,6 +1555,21 @@ cp {out}/android-x86-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 
 # Building bl602-light
 ninja -C {out}/bl602-light
+
+# Building bouffalolab-BL702-IoT-DVK-light
+ninja -C {out}/bouffalolab-BL702-IoT-DVK-light
+
+# Building bouffalolab-BL702-IoT-DVK-light-rpc
+ninja -C {out}/bouffalolab-BL702-IoT-DVK-light-rpc
+
+# Building bouffalolab-BL706-IoT-DVK-BL706C-22-light
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light
+
+# Building bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+
+# Building bouffalolab-BL706-NIGHT-LIGHT-light
+ninja -C {out}/bouffalolab-BL706-NIGHT-LIGHT-light
 
 # Building cc13x2x7_26x2x7-all-clusters
 ninja -C {out}/cc13x2x7_26x2x7-all-clusters

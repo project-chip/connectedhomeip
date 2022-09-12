@@ -3071,7 +3071,7 @@ struct TypeInfo
 } // namespace PulseWidthModulation
 namespace Descriptor {
 namespace Structs {
-namespace DeviceType {
+namespace DeviceTypeStruct {
 enum class Fields
 {
     kType     = 0,
@@ -3093,24 +3093,25 @@ public:
 
 using DecodableType = Type;
 
-} // namespace DeviceType
+} // namespace DeviceTypeStruct
 } // namespace Structs
 
 namespace Attributes {
 
-namespace DeviceList {
+namespace DeviceTypeList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::DeviceType::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTypeList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DeviceList
+} // namespace DeviceTypeList
 namespace ServerList {
 struct TypeInfo
 {
@@ -3186,7 +3187,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DeviceList::TypeInfo::DecodableType deviceList;
+        Attributes::DeviceTypeList::TypeInfo::DecodableType deviceTypeList;
         Attributes::ServerList::TypeInfo::DecodableType serverList;
         Attributes::ClientList::TypeInfo::DecodableType clientList;
         Attributes::PartsList::TypeInfo::DecodableType partsList;

@@ -109,7 +109,7 @@ tests:
           valid. ICAC is signed by the original key for trusted_root_original.
           Save as icac_update1"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -118,35 +118,35 @@ tests:
           ICACValue is to set icac_update1"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the NOCs attribute from the Node Operational Credentials
           cluster using a fabric-filtered read"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
           field set to 0"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the NOCs attribute from the Node Operational Credentials
           cluster using a fabric-filtered read"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
           field set to 900"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -154,7 +154,7 @@ tests:
           true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -167,7 +167,7 @@ tests:
           certificate must be valid. ICAC is signed by the original key for
           trusted_root_original. Save as icac_update2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -176,21 +176,21 @@ tests:
           ICACValue is to set icac_update2"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the NOCs attribute from the Node Operational Credentials
           cluster using a fabric-filtered read"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 sends the CommissioningComplete command to the General
           Commissioning cluster"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -198,12 +198,12 @@ tests:
           field set to 0 to verify that the CommissioningComplete command
           successfully persisted the failsafe context."
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the NOCs attribute from the Node Operational Credentials
           cluster using a fabric-filtered read"
       verification: |
-          verification step to be updated.
+
       disabled: true

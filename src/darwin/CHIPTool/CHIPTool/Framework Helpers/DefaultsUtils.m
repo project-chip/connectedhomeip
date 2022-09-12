@@ -87,8 +87,8 @@ MTRDeviceController * InitializeMTR(void)
             return;
         }
 
-        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
-        params.vendorId = @(kTestVendorId);
+        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricID:@(1) ipk:keys.ipk];
+        params.vendorID = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
@@ -113,7 +113,7 @@ MTRDeviceController * MTRRestartController(MTRDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricID:@(1) ipk:keys.ipk];
 
     sController = [[MTRControllerFactory sharedInstance] startControllerOnExistingFabric:params];
 
@@ -180,7 +180,7 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
         MTRBaseClusterOperationalCredentials * opCredsCluster =
-            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
+            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:@(0) queue:dispatch_get_main_queue()];
         [opCredsCluster
             readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                 if (error) {

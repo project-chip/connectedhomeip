@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRSetupPayload;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -87,6 +89,11 @@ typedef void (^MTRDeviceErrorHandler)(NSError * error);
  */
 typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumber * resubscriptionDelay);
 
+/**
+ * Handler for openCommissioningWindow.
+ */
+typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
+
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
 extern NSString * const MTREventPathKey;
@@ -109,11 +116,20 @@ extern NSString * const MTRArrayValueType;
 @class MTRAttributeCacheContainer;
 @class MTRReadParams;
 @class MTRSubscribeParams;
+@class MTRDeviceController;
 
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Initialize the device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -155,10 +171,10 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
+                minInterval:(NSNumber *)minInterval
+                maxInterval:(NSNumber *)maxInterval
                      params:(MTRSubscribeParams * _Nullable)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(MTRDeviceErrorHandler)errorHandler
@@ -168,9 +184,9 @@ extern NSString * const MTRArrayValueType;
 /**
  * Read attribute in a designated attribute path
  */
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion;
@@ -186,11 +202,11 @@ extern NSString * const MTRArrayValueType;
  * @param completion  response handler will receive either values or error.
  *
  *                    Received values are an NSArray object with response-value element as described in
- *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
+ *                    readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion:.
  */
-- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
@@ -208,9 +224,9 @@ extern NSString * const MTRArrayValueType;
  *
  * @param completion  response handler will receive either values or error.
  */
-- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
@@ -219,15 +235,15 @@ extern NSString * const MTRArrayValueType;
 /**
  * Subscribe an attribute in a designated attribute path
  */
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                               clusterID:(NSNumber * _Nullable)clusterID
+                             attributeID:(NSNumber * _Nullable)attributeID
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -236,7 +252,27 @@ extern NSString * const MTRArrayValueType;
  * There could be multiple clients accessing a node through a remote controller object and hence it is not appropriate
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(dispatch_block_t)completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                     clientQueue:(dispatch_queue_t)clientQueue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end
 
@@ -245,9 +281,9 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
 
-+ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
-                                  clusterId:(NSNumber *)clusterId
-                                attributeId:(NSNumber *)attributeId;
++ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                attributeID:(NSNumber *)attributeID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -258,7 +294,7 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId;
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -269,7 +305,7 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * command;
 
-+ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId;
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

@@ -15,14 +15,17 @@ There are following Apps on Android
 
 <hr>
 
--   [Source files](#source)
--   [Requirements for building](#requirements)
-    -   [ABIs and TARGET_CPU](#abi)
-    -   [Gradle & JDK Version](#jdk)
--   [Preparing for build](#preparing)
--   [Building Android CHIPTool from scripts](#building-scripts)
--   [Building Android CHIPTool from Android Studio](#building-studio)
--   [Building Android CHIPTest from scripts](#building-chiptest-scripts)
+-   [Building Android](#building-android)
+    -   [Source files](#source-files)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+        -   [MacOS](#macos)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle & JDK Version](#gradle--jdk-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+    -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+    -   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
@@ -39,10 +42,42 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK downloaded to your machine. Set the
+You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
+
+1. Install [Android Studio](https://developer.android.com/studio)
+2. Install NDK:
+    1. Tools -> SDK Manager -> SDK Tools Tab
+    2. Click [x] Show Package Details
+    3. Select NDK (Side by Side) -> 21.4.7075529
+    4. Apply
+3. Install Command Line Tools:
+    1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
+       (latest)
+    2. Apply
+4. Install SDK 21:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 5.0 (Lollipop) SDK
+       Level 21
+    2. Apply
+5. Install Emulator:
+    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
+       -> Download
+
+### Linux
+
+```
+export ANDROID_HOME=~/Android/Sdk
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/21.4.7075529
+```
+
+### MacOS
+
+```
+export ANDROID_HOME=~/Library/Android/sdk
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.4.7075529
+```
 
 <a name="abi"></a>
 
@@ -136,7 +171,7 @@ which allows us to directly edit core Matter code in-IDE.
    and `matterSourceBuildAbiFilters` to the desired ABIs in
    [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
-3) Open the project in Android Studio and run **Sync Project with Gradle
+3) Open the project in Android Studio and run **File -> Sync Project with Gradle
    Files**.
 
 4) Use one of the following options to build an Android package:

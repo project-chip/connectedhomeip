@@ -40,7 +40,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     return JNI_VERSION_1_6;
 }
 
-JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj)
+JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     const char * qrString = NULL;
@@ -50,6 +50,13 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
 
     err = QRCodeSetupPayloadParser(qrString).populatePayload(payload);
     env->ReleaseStringUTFChars(qrCodeObj, qrString);
+
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload())
+    {
+        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
+        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return nullptr;
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -64,16 +71,23 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     return TransformSetupPayload(env, payload);
 }
 
-JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode)
+JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     const char * entryCodeString = NULL;
     SetupPayload payload;
 
     entryCodeString = env->GetStringUTFChars(entryCode, 0);
-    env->ReleaseStringUTFChars(entryCode, entryCodeString);
 
     err = ManualSetupPayloadParser(entryCodeString).populatePayload(payload);
+    env->ReleaseStringUTFChars(entryCode, entryCodeString);
+
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidManualCode())
+    {
+        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
+        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return nullptr;
+    }
 
     if (err != CHIP_NO_ERROR)
     {
