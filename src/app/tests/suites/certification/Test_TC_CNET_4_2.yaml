@@ -28,12 +28,12 @@ config:
 tests:
     - label: "Factory reset the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commmission TH and DUT on Thread setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

@@ -290,6 +290,18 @@ NS_ASSUME_NONNULL_BEGIN
                                                 }];
 }
 
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                     clientQueue:(dispatch_queue_t)clientQueue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support openCommissioningWindowWithSetupPasscode over XPC");
+    dispatch_async(clientQueue, ^{
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
+    });
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

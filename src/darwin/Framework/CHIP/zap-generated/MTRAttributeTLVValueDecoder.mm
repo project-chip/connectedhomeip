@@ -1261,8 +1261,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
     case Clusters::Descriptor::Id: {
         using namespace Clusters::Descriptor;
         switch (aPath.mAttributeId) {
-        case Attributes::DeviceList::Id: {
-            using TypeInfo = Attributes::DeviceList::TypeInfo;
+        case Attributes::DeviceTypeList::Id: {
+            using TypeInfo = Attributes::DeviceTypeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -1274,8 +1274,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRDescriptorClusterDeviceType * newElement_0;
-                    newElement_0 = [MTRDescriptorClusterDeviceType new];
+                    MTRDescriptorClusterDeviceTypeStruct * newElement_0;
+                    newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
                     newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
                     newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
                     [array_0 addObject:newElement_0];

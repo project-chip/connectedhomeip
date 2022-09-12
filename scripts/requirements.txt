@@ -8,6 +8,9 @@ virtualenv
 # mbed-os
 -r requirements.mbed.txt
 
+# bouffalolab
+-r requirements.bouffalolab.txt
+
 # cirque tests
 requests>=2.24.0
 

@@ -102,6 +102,8 @@ chip_test_suite("tests") {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
+  test_sources += [ "TestAclAttribute.cpp" ]
+
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.

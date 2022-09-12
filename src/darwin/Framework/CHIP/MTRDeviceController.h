@@ -98,13 +98,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                 queue:(dispatch_queue_t)queue
     completionHandler:(MTRDeviceConnectionCallback)completionHandler;
 
-- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
-- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                                       duration:(NSUInteger)duration
-                                  discriminator:(NSUInteger)discriminator
-                                       setupPIN:(NSUInteger)setupPIN
-                                          error:(NSError * __autoreleasing *)error;
-
 /**
  * Controllers are created via the MTRControllerFactory object.
  */

@@ -201,17 +201,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
         PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
     }
 
-    {
-        // For testing of manual pairing code with custom commissioning flow
-        ChipLogProgress(NotSpecified, "==== Onboarding payload for Custom Commissioning Flows ====");
-        err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-        SuccessOrExit(err);
-
-        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-
-        PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-    }
-
 #if defined(PW_RPC_ENABLED)
     rpc::Init();
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");

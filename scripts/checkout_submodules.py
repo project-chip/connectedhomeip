@@ -28,6 +28,7 @@ ALL_PLATFORMS = set([
     'ameba',
     'android',
     'bl602',
+    'bouffalolab',
     'cc13x2_26x2',
     'cc32xx',
     'darwin',

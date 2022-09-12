@@ -36,7 +36,7 @@ tests:
           "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"
       command: "readAttribute"
       cluster: "Descriptor"
-      attribute: "server list"
+      attribute: "ServerList"
       response:
           constraints:
               type: list
@@ -48,7 +48,7 @@ tests:
       command: "readAttribute"
       cluster: "Descriptor"
       endpoint: 1
-      attribute: "server list"
+      attribute: "ServerList"
       response:
           constraints:
               type: list

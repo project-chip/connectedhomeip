@@ -643,10 +643,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
     // Set up expectation for report
-    XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
+    XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive subscription error"];
     reportHandler = ^(id _Nullable value, NSError * _Nullable error) {
+        // Because our subscription has no existent paths, it gets an
+        // InvalidAction response, which is EMBER_ZCL_STATUS_MALFORMED_COMMAND.
         XCTAssertNil(value);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         [errorReportExpectation fulfill];
     };
 
@@ -662,12 +664,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                          }];
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
+    __auto_type * params = [[MTRSubscribeParams alloc] init];
+    params.autoResubscribe = @(NO);
     [device subscribeAttributeWithEndpointId:@10000
         clusterId:@6
         attributeId:@0
         minInterval:@2
         maxInterval:@10
-        params:nil
+        params:params
         clientQueue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);

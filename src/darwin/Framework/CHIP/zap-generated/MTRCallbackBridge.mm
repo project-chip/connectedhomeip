@@ -1554,8 +1554,8 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
+void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1563,8 +1563,8 @@ void MTRDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * cont
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRDescriptorClusterDeviceType * newElement_0;
-            newElement_0 = [MTRDescriptorClusterDeviceType new];
+            MTRDescriptorClusterDeviceTypeStruct * newElement_0;
+            newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
             newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
             newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
             [array_0 addObject:newElement_0];
@@ -1579,9 +1579,9 @@ void MTRDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * cont
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

@@ -48,6 +48,36 @@ OptionDef gCmdOptionDefs[] =
     { "subject-fab-id",      kArgumentRequired, 'f' },
     { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
+    { "subject-cn-p",        kArgumentRequired, 'b' },
+    { "subject-su-u",        kArgumentRequired, 'd' },
+    { "subject-su-p",        kArgumentRequired, 'e' },
+    { "subject-sn-u",        kArgumentRequired, 'g' },
+    { "subject-sn-p",        kArgumentRequired, 'j' },
+    { "subject-co-u",        kArgumentRequired, 'm' },
+    { "subject-co-p",        kArgumentRequired, 'n' },
+    { "subject-ln-u",        kArgumentRequired, 'q' },
+    { "subject-ln-p",        kArgumentRequired, 'r' },
+    { "subject-pn-u",        kArgumentRequired, 's' },
+    { "subject-pn-p",        kArgumentRequired, 'u' },
+    { "subject-on-u",        kArgumentRequired, 'w' },
+    { "subject-on-p",        kArgumentRequired, 'y' },
+    { "subject-un-u",        kArgumentRequired, 'z' },
+    { "subject-un-p",        kArgumentRequired, 'U' },
+    { "subject-ti-u",        kArgumentRequired, 'W' },
+    { "subject-ti-p",        kArgumentRequired, 'S' },
+    { "subject-na-u",        kArgumentRequired, 'T' },
+    { "subject-na-p",        kArgumentRequired, 'A' },
+    { "subject-gn-u",        kArgumentRequired, 'B' },
+    { "subject-gn-p",        kArgumentRequired, 'D' },
+    { "subject-in-u",        kArgumentRequired, 'G' },
+    { "subject-in-p",        kArgumentRequired, 'H' },
+    { "subject-gq-u",        kArgumentRequired, 'J' },
+    { "subject-gq-p",        kArgumentRequired, 'L' },
+    { "subject-dq-u",        kArgumentRequired, 'M' },
+    { "subject-dq-p",        kArgumentRequired, 'N' },
+    { "subject-ps-u",        kArgumentRequired, 'P' },
+    { "subject-ps-p",        kArgumentRequired, 'Q' },
+    { "subject-dc-i",        kArgumentRequired, 'R' },
     { "path-len-constraint", kArgumentRequired, 'p' },
     { "future-ext-sub",      kArgumentRequired, 'x' },
     { "future-ext-info",     kArgumentRequired, '2' },
@@ -93,7 +123,25 @@ const char * const gCmdOptionHelp =
     "       Subject DN CHIP CASE Authentication Tag in hexadecimal format with upto 4 octets with or without '0x' prefix.\n"
     "       The version subfield (lower 16 bits) should be different from 0.\n"
     "\n"
-    "   -c, --subject-cn-u <string>\n"
+    "   Variety of DN attributes are also supported and can be added to the subject DN of the certificate.\n"
+    "   These attributes can be encoded as UTF8String, PrintableString or IA5String as specified below:\n"
+    "\n"
+    "   -<c/b>, --subject-cn-<u/p> <string>  - commonName attribute             <UTF8String/PrintableString>\n"
+    "   -<d/e>, --subject-su-<u/p> <string>  - surname attribute                <UTF8String/PrintableString>\n"
+    "   -<g/j>, --subject-sn-<u/p> <string>  - serialNumber attribute           <UTF8String/PrintableString>\n"
+    "   -<m/n>, --subject-co-<u/p> <string>  - countryName attribute            <UTF8String/PrintableString>\n"
+    "   -<q/r>, --subject-ln-<u/p> <string>  - localityName attribute           <UTF8String/PrintableString>\n"
+    "   -<s/u>, --subject-pn-<u/p> <string>  - stateOrProvinceName attribute    <UTF8String/PrintableString>\n"
+    "   -<w/y>, --subject-on-<u/p> <string>  - organizationName attribute       <UTF8String/PrintableString>\n"
+    "   -<z/U>, --subject-un-<u/p> <string>  - organizationalUnitName attribute <UTF8String/PrintableString>\n"
+    "   -<V/S>, --subject-ti-<u/p> <string>  - title attribute                  <UTF8String/PrintableString>\n"
+    "   -<T/A>, --subject-na-<u/p> <string>  - name attribute                   <UTF8String/PrintableString>\n"
+    "   -<B/D>, --subject-gn-<u/p> <string>  - givenName attribute              <UTF8String/PrintableString>\n"
+    "   -<G/H>, --subject-in-<u/p> <string>  - initials attribute               <UTF8String/PrintableString>\n"
+    "   -<J/L>, --subject-gq-<u/p> <string>  - generationQualifier attribute    <UTF8String/PrintableString>\n"
+    "   -<M/N>, --subject-dq-<u/p> <string>  - dnQualifier attribute            <UTF8String/PrintableString>\n"
+    "   -<P/Q>, --subject-ps-<u/p> <string>  - pseudonym attribute              <UTF8String/PrintableString>\n"
+    "   -R,     --subject-dc-i     <string>  - domainComponent attribute        <IA5String>\n"
     "\n"
     "       Subject DN Common Name attribute encoded as UTF8String.\n"
     "\n"
@@ -414,6 +462,246 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'b':
+        err = gSubjectDN.AddAttribute_CommonName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'd':
+        err = gSubjectDN.AddAttribute_Surname(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Surname attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'e':
+        err = gSubjectDN.AddAttribute_Surname(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Surname attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'g':
+        err = gSubjectDN.AddAttribute_SerialNumber(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Serial Number attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'j':
+        err = gSubjectDN.AddAttribute_SerialNumber(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Serial Number attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'm':
+        err = gSubjectDN.AddAttribute_CountryName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Country Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'n':
+        err = gSubjectDN.AddAttribute_CountryName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Country Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'q':
+        err = gSubjectDN.AddAttribute_LocalityName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Locality Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'r':
+        err = gSubjectDN.AddAttribute_LocalityName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Locality Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 's':
+        err = gSubjectDN.AddAttribute_StateOrProvinceName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add stateOrProvinceName attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'u':
+        err = gSubjectDN.AddAttribute_StateOrProvinceName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add stateOrProvinceName attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'w':
+        err = gSubjectDN.AddAttribute_OrganizationName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organization Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'y':
+        err = gSubjectDN.AddAttribute_OrganizationName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organization Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'z':
+        err = gSubjectDN.AddAttribute_OrganizationalUnitName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organizational Unit Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'U':
+        err = gSubjectDN.AddAttribute_OrganizationalUnitName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organizational Unit Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'W':
+        err = gSubjectDN.AddAttribute_Title(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Title attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'S':
+        err = gSubjectDN.AddAttribute_Title(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Title attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'T':
+        err = gSubjectDN.AddAttribute_Name(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'A':
+        err = gSubjectDN.AddAttribute_Name(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'B':
+        err = gSubjectDN.AddAttribute_GivenName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Given Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'D':
+        err = gSubjectDN.AddAttribute_GivenName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Given Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'G':
+        err = gSubjectDN.AddAttribute_Initials(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Initials attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'H':
+        err = gSubjectDN.AddAttribute_Initials(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Initials attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'J':
+        err = gSubjectDN.AddAttribute_GenerationQualifier(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Generation Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'L':
+        err = gSubjectDN.AddAttribute_GenerationQualifier(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Generation Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'M':
+        err = gSubjectDN.AddAttribute_DNQualifier(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add DN Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'N':
+        err = gSubjectDN.AddAttribute_DNQualifier(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add DN Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'P':
+        err = gSubjectDN.AddAttribute_Pseudonym(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Pseudonym attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'Q':
+        err = gSubjectDN.AddAttribute_Pseudonym(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Pseudonym attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'R':
+        err = gSubjectDN.AddAttribute_DomainComponent(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Domain Component attribute to the subject DN: %s\n", chip::ErrorStr(err));
             return false;
         }
         break;

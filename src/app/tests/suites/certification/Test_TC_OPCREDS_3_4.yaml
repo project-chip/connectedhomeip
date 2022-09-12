@@ -170,7 +170,7 @@ tests:
           ICAC must be signed by the original key for trusted_root_original.
           Save as icac_not_for_update"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -179,7 +179,7 @@ tests:
           noc_not_for_update ICACValue is to set icac_not_for_update"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -187,7 +187,7 @@ tests:
           true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -196,7 +196,7 @@ tests:
           ICACValue is to set icac_original"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -204,7 +204,7 @@ tests:
           saves as new_root_cert and new_root_key so that TH can generate an NOC
           for UpdateNOC that doesnt chain to the original root"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -213,7 +213,7 @@ tests:
           by new ICA. Save as noc_update_new_root new ICAC is generated and
           signed by new_root_key. Save as icac_update_new_root"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -222,7 +222,7 @@ tests:
           noc_update_new_root ICACValue is to set icac_update_new_root"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -234,7 +234,7 @@ tests:
           original key for trusted_root_original. Save as
           icac_update_bad_fabric_on_noc"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -244,7 +244,7 @@ tests:
           icac_update_bad_fabric_on_noc"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -256,7 +256,7 @@ tests:
           value than noc_original. ICAC is signed by the original key for
           trusted_root_original. Save as icac_update_bad_fabric_on_icac"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -266,7 +266,7 @@ tests:
           icac_update_bad_fabric_on_icac"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -274,7 +274,7 @@ tests:
           RootCACertificate field set to new_root_cert"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -283,19 +283,19 @@ tests:
           noc_update_new_root ICACValue is to set icac_update_new_root"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
           field set to 0"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 sends an OpenCommissioningWindow command to the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -303,7 +303,7 @@ tests:
           the DUT with the ExpiryLengthSeconds field set to 900. Steps 24-26 are
           all performed over the PASE connection."
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -311,7 +311,7 @@ tests:
           set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -320,7 +320,7 @@ tests:
           and is signed by ICA. Save as noc_pase ICAC must be signed by the
           original key for trusted_root_original. Save as icac_pase"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -329,10 +329,10 @@ tests:
           noc_pase ICACValue is to set icac_pase"
       PICS: OPCREDS.S.C07.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: ""
       verification: |
-          verification step to be updated.
+
       disabled: true

@@ -232,6 +232,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
+
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -275,6 +281,7 @@ public:
     static void TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -1550,9 +1557,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-
-        attributePathParams[0].mClusterId   = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId = app::Clusters::TestCluster::Attributes::Boolean::Id;
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
@@ -1626,6 +1633,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
@@ -2884,6 +2892,47 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
 }
 
 } // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        SubscriptionPathQuotaHelpers::TestReadCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
@@ -4436,6 +4485,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttribute_ManyDataValues", TestReadInteraction::TestReadAttribute_ManyDataValues),
     NL_TEST_DEF("TestReadAttribute_ManyDataValuesWrongPath", TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath),
     NL_TEST_DEF("TestReadAttribute_ManyErrors", TestReadInteraction::TestReadAttribute_ManyErrors),
+    NL_TEST_DEF("TestSubscribeAttributeDeniedNotExistPath", TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath),
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_SENTINEL()

@@ -313,7 +313,7 @@ tests:
           "TH1 generates Invalid NOCSR Information and sends the CSRResponse
           Command. Refer Steps 6.1 to 6.8"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Factory Reset DUT so that it is commissionable again"
@@ -332,22 +332,22 @@ tests:
           "Repeat Step1 to Step 4 multiple times. For each time in Step 3 TH1
           generates the following error:"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "CSRNonce is OCTET string of length > 32"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "CSRNonce value does not match the value CSR Nonce field in the
           corresponding CSRRequest Command"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "NOCSRElement size is greater than RESP_MAX"
       verification: |
-          verification step to be updated.
+
       disabled: true

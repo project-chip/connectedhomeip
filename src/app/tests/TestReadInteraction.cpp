@@ -338,6 +338,7 @@ public:
     static void TestReadHandlerInvalidSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidateFabric(nlTestSuite * apSuite, void * apContext);
     static void TestShutdownSubscription(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerMalformedSubscribeRequest(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -3521,6 +3522,51 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
     ctx.CreateSessionBobToAlice();
 }
 
+// Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status
+// report to client, and client is closed.
+void TestReadInteraction::TestReadHandlerMalformedSubscribeRequest(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Subscribe);
+        System::PacketBufferHandle msgBuf;
+        ReadRequestMessage::Builder request;
+        System::PacketBufferTLVWriter writer;
+
+        chip::app::InitWriterWithSpaceReserved(writer, 0);
+        err = request.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = writer.Finalize(&msgBuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        auto exchange = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        NL_TEST_ASSERT(apSuite, exchange != nullptr);
+        readClient.mExchange.Grab(exchange);
+        readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
+        err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // Read Client sends a malformed read request, interaction model engine fails to parse the request and generates a status report to
 // client, and client is closed.
 void TestReadInteraction::TestReadHandlerMalformedReadRequest1(nlTestSuite * apSuite, void * apContext)
@@ -3953,6 +3999,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadChunkingInvalidSubscriptionId", chip::app::TestReadInteraction::TestReadChunkingInvalidSubscriptionId),
     NL_TEST_DEF("TestReadHandlerMalformedReadRequest1", chip::app::TestReadInteraction::TestReadHandlerMalformedReadRequest1),
     NL_TEST_DEF("TestReadHandlerMalformedReadRequest2", chip::app::TestReadInteraction::TestReadHandlerMalformedReadRequest2),
+    NL_TEST_DEF("TestReadHandlerMalformedSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerMalformedSubscribeRequest),
     NL_TEST_DEF("TestSubscribeSendUnknownMessage", chip::app::TestReadInteraction::TestSubscribeSendUnknownMessage),
     NL_TEST_DEF("TestSubscribeSendInvalidStatusReport", chip::app::TestReadInteraction::TestSubscribeSendInvalidStatusReport),
     NL_TEST_DEF("TestReadHandlerInvalidSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerInvalidSubscribeRequest),

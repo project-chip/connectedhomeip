@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for bl602 SDK.
-  bl602_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/bouffalolab/bl602"
-}
+import("bl702_board.gni")
+
+riscv_arch = "rv32imfc"
+riscv_abi = "ilp32f"
+#  riscv_cpu = ""
+#  riscv_float_abi = "hard"
+#  riscv_fpu = ""

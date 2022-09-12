@@ -272,4 +272,4 @@
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk.git
 	branch = master
-	platforms = bl602
+	platforms = bouffalolab,bl602

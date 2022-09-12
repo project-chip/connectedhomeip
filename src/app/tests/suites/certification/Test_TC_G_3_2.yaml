@@ -34,7 +34,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool groups get-group-membership "[33]" 1 1
+          ./chip-tool groups get-group-membership "[0002]" 1 1
 
           Verify the "GetGroupMembership command response" on the TH(Allcluster-app)  Log:
 
@@ -49,7 +49,7 @@ tests:
     - label: "DUT sends RemoveGroup command to TH"
       PICS: G.C.C03.Tx
       verification: |
-          ./chip-tool groups remove-group 0x0021 1 1
+          ./chip-tool groups remove-group 0x0002 1 1
 
           Verify the "RemoveGroup command response" on the TH(Allcluster-app)  Log:
           [1659609128.634829][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
@@ -78,7 +78,17 @@ tests:
     - label: "DUT sends AddGroupIfIdentifying command to TH"
       PICS: G.C.C05.Tx
       verification: |
-          ./chip-tool groups  add-group-if-identifying 0x0052 gp54 1 0
+          ./chip-tool identify identify 0x0078 1 1
+
+          Verify the "status is success" on the TH(Chip-tool)  Log:
+
+          [1658306666.592846][3044:3049] CHIP:DMG:                                StatusIB =
+          [1658306666.592889][3044:3049] CHIP:DMG:                                {
+          [1658306666.592962][3044:3049] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658306666.593007][3044:3049] CHIP:DMG:                                },
+
+
+          ./chip-tool groups  add-group-if-identifying 0x0004 gp4 1 0
 
           Verify the "AddGroupIfIdentifying command response" on the TH(Allcluster-app)  Log:
 

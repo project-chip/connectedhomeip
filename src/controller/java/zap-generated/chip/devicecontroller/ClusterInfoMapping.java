@@ -1011,8 +1011,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDescriptorClusterDeviceListAttributeCallback
-      implements ChipClusters.DescriptorCluster.DeviceListAttributeCallback,
+  public static class DelegatedDescriptorClusterDeviceTypeListAttributeCallback
+      implements ChipClusters.DescriptorCluster.DeviceTypeListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1022,10 +1022,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.DescriptorClusterDeviceType> valueList) {
+    public void onSuccess(List<ChipStructs.DescriptorClusterDeviceTypeStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.DescriptorClusterDeviceType>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.DescriptorClusterDeviceTypeStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

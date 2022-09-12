@@ -15,4 +15,10 @@
 declare_args() {
   # Root directory for bl602 SDK build files.
   bl602_sdk_build_root = "//third_party/bouffalolab/bl602"
+
+  # Root directory for bl702 SDK build files.
+  bl702_sdk_build_root = "//third_party/bouffalolab/bl702"
+
+  # Root directory of toolchain of Bouffalolab chips
+  bouffalolab_toolchain = "//third_party/bouffalolab/repo/toolchain/riscv"
 }

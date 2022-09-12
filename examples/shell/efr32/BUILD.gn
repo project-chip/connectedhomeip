@@ -62,7 +62,7 @@ efr32_executable("shell_app") {
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200) {
+      use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 

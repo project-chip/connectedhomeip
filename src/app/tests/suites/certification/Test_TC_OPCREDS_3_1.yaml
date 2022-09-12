@@ -345,7 +345,7 @@ tests:
 
     - label: "TH1 validates the attestation response"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -358,7 +358,7 @@ tests:
           NOC as Node_Operational_Certificate_TH1 Save IPK as IPK_TH1 Extract
           the RCAC public key and save as Root_Public_Key_TH1"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -368,14 +368,14 @@ tests:
           Intermediate_Certificate_TH1_2 Save NOC as
           Node_Operational_Certificate_TH1_2 Save IPK as IPK_TH1_2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 generates an INVALID Root Certificate where the signature does
           not match the public key and saves it as Root_CA_Malformed"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -383,7 +383,7 @@ tests:
           Root_CA_Malformed"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -391,7 +391,7 @@ tests:
           RootCACertificate set to Root_CA_Certificate_TH1"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -399,7 +399,7 @@ tests:
           RootCACertificate field set to Root_CA_Certificate_TH1"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -407,7 +407,7 @@ tests:
           RootCACertificate field set to Root_CA_Certificate_TH1_2"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -415,7 +415,7 @@ tests:
           TrustedRootsList"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -423,13 +423,13 @@ tests:
           the TrustedRootCertificates attribute with that value"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -439,7 +439,7 @@ tests:
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -450,7 +450,7 @@ tests:
           Tag - ex. 0) AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -460,12 +460,12 @@ tests:
           the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 saves the FabricIndex as FabricIndex_TH1 for future use"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -475,7 +475,7 @@ tests:
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -483,7 +483,7 @@ tests:
           read and saves the list as NOClist"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -491,7 +491,7 @@ tests:
           the NOCs attribute"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -499,7 +499,7 @@ tests:
           read"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -507,7 +507,7 @@ tests:
           DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -515,7 +515,7 @@ tests:
           read and gets the FabricDescriptorStruct for which the FabricIndex
           field equals FabricIndex_TH1"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -523,18 +523,18 @@ tests:
           field set to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reconnects to the DUT over PASE"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -542,7 +542,7 @@ tests:
           read"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -550,7 +550,7 @@ tests:
           non-fabric-filtered read"
       PICS: OPCREDS.S.A0001
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -559,13 +559,13 @@ tests:
           This will update the value of FabricIndex_TH1 so that it references
           the fabric the DUT was just commissioned onto"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -573,7 +573,7 @@ tests:
           read"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -581,7 +581,7 @@ tests:
           DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -590,26 +590,26 @@ tests:
           field equals FabricIndex_TH1"
       PICS: OPCREDS.S.A0001
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads the ACL attribute from the Access Control cluster"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 issues a KeySetRead command to the DUT for GroupKeySetID 0"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 sends an OpenCommissioningWindow command to the Administrator
           Commissioning cluster"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -622,7 +622,7 @@ tests:
           Save NOC as Node_Operational_Certificate_TH2 Save IPK as IPK_TH2
           Extract the RCAC public key and save as Root_Public_Key_TH2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -639,7 +639,7 @@ tests:
     - label: "TH2 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -647,7 +647,7 @@ tests:
           read"
       PICS: OPCREDS.S.A0000
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -655,7 +655,7 @@ tests:
           DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -663,13 +663,13 @@ tests:
           DUT"
       PICS: OPCREDS.S.C09.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Read the Fabrics List from DUT using a non-fabric-filtered read"
       PICS: OPCREDS.S.A0001
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -677,7 +677,7 @@ tests:
           field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -685,7 +685,7 @@ tests:
           RootCACertificate set to Root_CA_Certificate_TH1_2"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -695,13 +695,13 @@ tests:
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -711,7 +711,7 @@ tests:
           as the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -721,7 +721,7 @@ tests:
           Node_Operational_Certificates_TH1_fabric_conflict and
           Intermediate_Certificate_TH1_fabric_conflict"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -731,7 +731,7 @@ tests:
           the NodeID of TH1 AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -739,13 +739,13 @@ tests:
           to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads the TrustedRootCertificates list from DUT"
       PICS: OPCREDS.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -753,7 +753,7 @@ tests:
           field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -761,7 +761,7 @@ tests:
           IsForUpdateNOC field set to true"
       PICS: OPCREDS.S.C04.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -770,7 +770,7 @@ tests:
           Root_CA_Certificate_TH1_3 Save ICAC as Intermediate_Certificate_TH1_3
           Save NOC as Node_Operational_Certificate_TH1_3"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -778,7 +778,7 @@ tests:
           RootCACertificate set to Root_CA_Certificate_TH1_3"
       PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -788,7 +788,7 @@ tests:
           AdminVendorId as the Vendor ID of TH1"
       PICS: OPCREDS.S.C06.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -796,7 +796,7 @@ tests:
           to 0"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -804,7 +804,7 @@ tests:
           field set to 900"
       PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -812,14 +812,14 @@ tests:
           5 (Invalid Fabric Index) to DUT"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH2 reads the Fabrics List from DUT using a non-fabric-filtered read"
       PICS: OPCREDS.S.A0001
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -827,7 +827,7 @@ tests:
           (Valid Fabric Index) to DUT"
       PICS: OPCREDS.S.C0a.Rsp
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -835,26 +835,26 @@ tests:
           read"
       PICS: OPCREDS.S.A0001
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH2 sends a CommissioningComplete command to the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH2 sends an OpenCommissioningWindow command to the Administrator
           Commissioning cluster"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 fully commissions the DUT using subject-padded, 400 byte
           certificates"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -862,39 +862,39 @@ tests:
           test harnesses (TH3 through TH NumSupportedFabrics). Each test harness
           should commission the DUT using subject-padded, 400-byte certificates"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH1 reads CommissionedFabrics attribute"
       PICS: OPCREDS.S.A0003
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Repeat steps 73 and 74 with TH NumSupportedFabrics + 1"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the SubjectsPerAccessControlEntry attribute from the Access
           Control Cluster and saves the value as maxSubjects"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the TargetsPerAccessControlEntry attribute from the Access
           Control Cluster and saves the value as maxTargets"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "TH1 reads the AccessControlEntriesPerFabric attribute from the Access
           Control Cluster and saves the value as maxEntries"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -903,12 +903,12 @@ tests:
           and maxTargets targets. TH1 writes this list to the AccessControl
           cluster ACL attribute"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "Repeat step 81 for TH2 through TH NumSupportedFabrics to fill the ACL
           table"
       verification: |
-          verification step to be updated.
+
       disabled: true

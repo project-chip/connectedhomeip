@@ -128,6 +128,8 @@ protected:
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;
+    // TODO: It's pretty weird that we re-init mCommissionerStorage for every
+    // identity without shutting it down or something in between...
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
@@ -137,6 +139,7 @@ protected:
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
+    CHIP_ERROR GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
@@ -152,10 +155,25 @@ private:
 
     CHIP_ERROR EnsureCommissionerForIdentity(std::string identity);
 
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
-    void ShutdownCommissioner(std::string key);
+    // Commissioners are keyed by name and local node id.
+    struct CommissionerIdentity
+    {
+        bool operator<(const CommissionerIdentity & other) const
+        {
+            return mName < other.mName || (mName == other.mName && mLocalNodeId < other.mLocalNodeId);
+        }
+        std::string mName;
+        chip::NodeId mLocalNodeId;
+    };
+
+    // InitializeCommissioner uses various members, so can't be static.  This is
+    // obviously a little odd, since the commissioners are then shared across
+    // multiple commands in interactive mode...
+    CHIP_ERROR InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId);
+    void ShutdownCommissioner(const CommissionerIdentity & key);
     chip::FabricId CurrentCommissionerId();
-    static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+
+    static std::map<CommissionerIdentity, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;
 
     chip::Optional<char *> mCommissionerName;
