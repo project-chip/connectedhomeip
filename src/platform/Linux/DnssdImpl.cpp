@@ -616,7 +616,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     switch (event)
     {
     case AVAHI_BROWSER_FAILURE:
-        context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, 0, true, CHIP_ERROR_INTERNAL);
         avahi_service_browser_free(browser);
         chip::Platform::Delete(context);
         break;
