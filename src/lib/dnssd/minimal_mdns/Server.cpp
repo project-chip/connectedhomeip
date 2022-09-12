@@ -372,12 +372,12 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             }
             else if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
             {
-                err = udp->SendTo(mIpv6BroadcastAddress, port, tempBuf, udp->GetBoundInterface());
+                err = udp->SendTo(mIpv6BroadcastAddress, port, std::move(tempBuf), udp->GetBoundInterface());
             }
 #if INET_CONFIG_ENABLE_IPV4
             else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
             {
-                err = udp->SendTo(mIpv4BroadcastAddress, port, tempBuf, udp->GetBoundInterface());
+                err = udp->SendTo(mIpv4BroadcastAddress, port, std::move(tempBuf), udp->GetBoundInterface());
             }
 #endif
             else
