@@ -944,6 +944,41 @@ def main():
         # Generate Test Case Data Container in JSON Format
         generate_test_case_vector_json(test_case_out_dir, 'cd', test_case)
 
+    # Test case: Generate {DAC, PAI, PAA} chain with random (invalid) PAA
+    test_case_out_dir = args.outdir + '/invalid_paa'
+    paapath = test_case_out_dir + '/paa-'
+
+    if not os.path.exists(test_case_out_dir):
+        os.mkdir(test_case_out_dir)
+
+    # Generate PAA Cert/Key
+    cmd = chipcert + ' gen-att-cert -t a -c "Invalid (Not Registered in the DCL) Matter PAA" -f "' + VALID_IN_PAST + \
+        '" -l 4294967295 -o ' + paapath + 'Cert.pem -O ' + paapath + 'Key.pem'
+    subprocess.run(cmd, shell=True)
+
+    vid = 0xFFF1
+    pid = 0x8000
+
+    # Generate PAI Cert/Key
+    builder = DevCertBuilder(CertType.PAI, 'no-error', paapath, test_case_out_dir,
+                             chipcert, vid, PID_NOT_PRESENT, '', VALID_IN_PAST)
+    builder.make_certs_and_keys()
+
+    # Generate DAC Cert/Key
+    builder = DevCertBuilder(CertType.DAC, 'no-error', paapath, test_case_out_dir,
+                             chipcert, vid, pid, '', VALID_IN_PAST)
+    builder.make_certs_and_keys()
+
+    # Generate Certification Declaration (CD)
+    vid_flag = ' -V 0x{:X}'.format(vid)
+    pid_flag = ' -p 0x{:X}'.format(pid)
+    cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
+        ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+    subprocess.run(cmd, shell=True)
+
+    # Generate Test Case Data Container in JSON Format
+    generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+
 
 if __name__ == '__main__':
     sys.exit(main())
