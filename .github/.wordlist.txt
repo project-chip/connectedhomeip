@@ -1379,6 +1379,7 @@ unfocus
 Unicast
 UniFlash
 UnitLocalization
+Unencrypted
 unpair
 unprovisioned
 untrusted

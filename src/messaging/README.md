@@ -71,7 +71,7 @@ source's node identifier and `$fabric_index` is the index on the recipient.
 
 #### Examples
 
-_Unsecure Unicast:_
+_Unencrypted Unicast:_
 
 ```
 >>> [E:26341i M: 264589322] (U) Msg RX from 0:0FDE2AE2EAF5D74D [0000] --- Type 0000:30 (SecureChannel:CASE_Sigma1)
