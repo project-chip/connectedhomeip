@@ -68,6 +68,25 @@ public class ChipClusters {
       chipClusterPtr = initWithDevice(devicePtr, endpointId);
     }
 
+    /**
+     * Sets the timeout, in milliseconds, after which commands sent through this cluster will fail
+     * with a timeout (regardless of whether or not a response has been received). If set to an
+     * empty optional, the default timeout will be used.
+     */
+    public void setCommandTimeout(Optional<Long> timeoutMillis) {
+      setCommandTimeout(chipClusterPtr, timeoutMillis);
+    }
+
+    private native void setCommandTimeout(long clusterPtr, Optional<Long> timeoutMillis);
+
+    /** Returns the current timeout (in milliseconds) for commands sent through this cluster. */
+    public Optional<Long> getCommandTimeout() {
+      Optional<Long> timeout = getCommandTimeout(chipClusterPtr);
+      return timeout == null ? Optional.empty() : timeout;
+    }
+
+    private native Optional<Long> getCommandTimeout(long clusterPtr);
+
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     public native void deleteCluster(long chipClusterPtr);
