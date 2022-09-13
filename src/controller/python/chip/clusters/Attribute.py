@@ -408,9 +408,14 @@ class AttributeCache:
             endpointCache = attributeCache[endpoint]
 
             for cluster in tlvCache[endpoint]:
+                if cluster not in _ClusterIndex:
+                    #
+                    # #22599 tracks dealing with unknown clusters more
+                    # gracefully so that clients can still access this data.
+                    #
+                    continue
+
                 clusterType = _ClusterIndex[cluster]
-                if (clusterType is None):
-                    raise Exception("Cannot find cluster in cluster index")
 
                 if (clusterType not in endpointCache):
                     endpointCache[clusterType] = {}
@@ -427,9 +432,6 @@ class AttributeCache:
                         endpointCache[clusterType].SetDataVersion(
                             clusterDataVersion)
                     except Exception as ex:
-                        logging.error(
-                            f"Error converting TLV to Cluster Object for path: Endpoint = {endpoint}, cluster = {str(clusterType)}")
-                        logging.error(f"|-- Exception: {repr(ex)}")
                         decodedValue = ValueDecodeFailure(
                             tlvCache[endpoint][cluster], ex)
                         endpointCache[clusterType] = decodedValue
@@ -438,27 +440,26 @@ class AttributeCache:
                     for attribute in tlvCache[endpoint][cluster]:
                         value = tlvCache[endpoint][cluster][attribute]
 
+                        if (cluster, attribute) not in _AttributeIndex:
+                            #
+                            # #22599 tracks dealing with unknown clusters more
+                            # gracefully so that clients can still access this data.
+                            #
+                            continue
+
                         attributeType = _AttributeIndex[(
                             cluster, attribute)][0]
-                        if (attributeType is None):
-                            raise Exception(
-                                "Cannot find attribute in attribute index")
 
                         if (attributeType not in clusterCache):
                             clusterCache[attributeType] = {}
 
                         if (type(value) is ValueDecodeFailure):
-                            logging.error(
-                                f"For path: Endpoint = {endpoint}, Attribute = {str(attributeType)}, got IM Error: {str(value.Reason)}")
                             clusterCache[attributeType] = value
                         else:
                             try:
                                 decodedValue = attributeType.FromTagDictOrRawValue(
                                     tlvCache[endpoint][cluster][attribute])
                             except Exception as ex:
-                                logging.error(
-                                    f"Error converting TLV to Cluster Object for path: Endpoint = {endpoint}, Attribute = {str(attributeType)}")
-                                logging.error(f"|-- Exception: {repr(ex)}")
                                 decodedValue = ValueDecodeFailure(value, ex)
 
                             clusterCache[attributeType] = decodedValue
