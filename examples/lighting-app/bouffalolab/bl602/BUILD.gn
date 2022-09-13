@@ -42,7 +42,7 @@ declare_args() {
   enable_heap_monitoring = false
 
   # OTA periodic query timeout in seconds
-  ota_periodic_query_timeout = 86400
+  ota_periodic_query_timeout = 300
 }
 
 show_qr_code = false

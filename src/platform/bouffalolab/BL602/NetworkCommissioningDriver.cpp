@@ -121,6 +121,9 @@ bool BLWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                         uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
+
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
@@ -136,6 +139,9 @@ Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mut
 
 Status BLWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
+
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -145,6 +151,8 @@ Status BLWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebu
 
 Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
+
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -157,12 +165,18 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     char wifi_ssid[64] = { 0 };
     char passwd[64]    = { 0 };
+
     // Set the wifi configuration
+    wifi_mgmr_sta_disconnect();
+    vTaskDelay(500);
+    wifi_mgmr_sta_disable(NULL);
+    vTaskDelay(500);
+
     memcpy(wifi_ssid, ssid, ssidLen);
     memcpy(passwd, key, keyLen);
     wifi_interface_t wifi_interface;
     wifi_interface = wifi_mgmr_sta_enable();
-    wifi_mgmr_sta_connect(wifi_interface, ssid, passwd, NULL, NULL, 0, 0);
+    wifi_mgmr_sta_connect(wifi_interface, wifi_ssid, passwd, NULL, NULL, 0, 0);
 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
@@ -280,6 +294,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
                 }
             }))
         {
+            vPortFree(ScanResult);
             ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
         }
     }
