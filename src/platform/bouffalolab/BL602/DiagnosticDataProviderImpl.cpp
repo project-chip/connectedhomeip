@@ -178,7 +178,7 @@ static int bl_netif_get_all_ip6(struct netif* netif, ip6_addr_t if_ip6[])
             memcpy(&if_ip6[addr_count++], &netif->ip6_addr[i], sizeof(ip6_addr_t));
         }
     }
-    
+
     return addr_count;
 }
 
