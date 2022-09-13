@@ -5,9 +5,7 @@
  * some are skipped due to link order.
  */
 
-
 /****************************************************************************/
-
 
 #include <stdio.h>
 
@@ -18,20 +16,19 @@ int __wrap__write(int file, char * ptr, int len)
     return log_write(ptr, len);
 }
 
-
 /****************************************************************************/
-
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include <sys/time.h>
 #include <sys/times.h>
 
-int __wrap__gettimeofday(struct timeval *tv, void *ptz)
+int __wrap__gettimeofday(struct timeval * tv, void * ptz)
 {
     int ticks = xTaskGetTickCount();
-    if (tv != NULL) {
-        tv->tv_sec = (ticks / 1000);
+    if (tv != NULL)
+    {
+        tv->tv_sec  = (ticks / 1000);
         tv->tv_usec = (ticks % 1000) * 1000;
         return 0;
     }
@@ -39,9 +36,7 @@ int __wrap__gettimeofday(struct timeval *tv, void *ptz)
     return -1;
 }
 
-
 /****************************************************************************/
-
 
 #include <assert.h>
 #include <stdio.h>
@@ -56,9 +51,7 @@ void __assert_func(const char * file, int line, const char * func, const char * 
         ;
 }
 
-
 /****************************************************************************/
-
 
 #include <FreeRTOS.h>
 
@@ -86,9 +79,7 @@ void * __wrap__realloc_r(void * REENT, void * ptr, size_t size)
     return p;
 }
 
-
 /****************************************************************************/
-
 
 #include <FreeRTOS.h>
 #include <stdlib.h>
@@ -110,6 +101,5 @@ void __wrap__wlan_printf(int skip, int level, const char * fmt, ...)
 
     va_end(ap);
 }
-
 
 /****************************************************************************/

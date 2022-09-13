@@ -33,28 +33,28 @@
 #define __ARCH_CC_H__
 
 /* Include some files for defining library routines */
-#include <stdio.h> /* printf, fflush, FILE */
-#include <string.h>
-#include <stdlib.h> /* abort */
 #include <errno.h>
+#include <stdio.h>  /* printf, fflush, FILE */
+#include <stdlib.h> /* abort */
+#include <string.h>
 #if (!defined(__CC_ARM)) && (!defined(__ICCARM__))
 #include <sys/time.h>
 #endif
 #include "syslog.h"
 
 #ifndef BYTE_ORDER
-#define BYTE_ORDER  LITTLE_ENDIAN
+#define BYTE_ORDER LITTLE_ENDIAN
 #endif
 #define LWIP_PLATFORM_BYTESWAP 0
 
 /** @todo fix some warnings: don't use #pragma if compiling with cygwin gcc */
 //#ifndef __GNUC__
 #if (!defined(__ICCARM__)) && (!defined(__GNUC__)) && (!defined(__CC_ARM))
-	#include <limits.h>
-	#pragma warning (disable: 4244) /* disable conversion warning (implicit integer promotion!) */
-	#pragma warning (disable: 4127) /* conditional expression is constant */
-	#pragma warning (disable: 4996) /* 'strncpy' was declared deprecated */
-	#pragma warning (disable: 4103) /* structure packing changed by including file */
+#include <limits.h>
+#pragma warning(disable : 4244) /* disable conversion warning (implicit integer promotion!) */
+#pragma warning(disable : 4127) /* conditional expression is constant */
+#pragma warning(disable : 4996) /* 'strncpy' was declared deprecated */
+#pragma warning(disable : 4103) /* structure packing changed by including file */
 #endif
 
 //#define LWIP_PROVIDE_ERRNO
@@ -64,18 +64,18 @@
 #endif
 
 /* Define generic types used in lwIP */
-typedef unsigned   char    u8_t;
-typedef signed     char    s8_t;
-typedef unsigned   short   u16_t;
-typedef signed     short   s16_t;
-typedef unsigned   long    u32_t;
-typedef signed     long    s32_t;
+typedef unsigned char u8_t;
+typedef signed char s8_t;
+typedef unsigned short u16_t;
+typedef signed short s16_t;
+typedef unsigned long u32_t;
+typedef signed long s32_t;
 
 typedef size_t mem_ptr_t;
 typedef u32_t sys_prot_t;
 
 /* Define (sn)printf formatters for these lwIP types */
-#define X8_F  "02x"
+#define X8_F "02x"
 #define U16_F "hu"
 #define S16_F "hd"
 #define X16_F "hx"
@@ -88,48 +88,75 @@ typedef u32_t sys_prot_t;
 #if defined(__ICCARM__)
 #define PACK_STRUCT_STRUCT __packed
 #else
-#define PACK_STRUCT_STRUCT __attribute__( (packed) )
+#define PACK_STRUCT_STRUCT __attribute__((packed))
 #endif
 
 //#define LWIP_DEBUG_USE_PRINTF
 
 #ifdef LWIP_DEBUG_USE_PRINTF
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x)   do { printf x; } while(0)
+#define LWIP_PLATFORM_DIAG(x)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        printf x;                                                                                                                  \
+    } while (0)
 #else
 //#define LWIP_PLATFORM_DIAG(x)   do { LWIP_LOGI x; } while(0)
-void filogic_log_print(const char *fmt, ...);
-#define LWIP_PLATFORM_DIAG(x)   do { filogic_log_print x; } while(0)
+void filogic_log_print(const char * fmt, ...);
+#define LWIP_PLATFORM_DIAG(x)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        filogic_log_print x;                                                                                                       \
+    } while (0)
 #endif
 
 #if 0
-#define LWIP_PLATFORM_ASSERT(x) do { printf("Assertion \"%s\" failed at line %d in %s\n", \
-                                     x, __LINE__, __FILE__); fflush(NULL); abort(); } while(0)
+#define LWIP_PLATFORM_ASSERT(x)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        printf("Assertion \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__);                                               \
+        fflush(NULL);                                                                                                              \
+        abort();                                                                                                                   \
+    } while (0)
 #else
-
 
 #ifdef MTK_DEBUG_LEVEL_NONE
 #define LWIP_NOASSERT 1
 #endif
 
-
 #ifndef MTK_DEBUG_LEVEL_NONE
-#define LWIP_PLATFORM_ASSERT(x) do { printf("Assertion \"%s\" failed at line %d in %s\n", \
-                                     x, __LINE__, __FILE__); } while(0)
+#define LWIP_PLATFORM_ASSERT(x)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        printf("Assertion \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__);                                               \
+    } while (0)
 #else
 #define LWIP_PLATFORM_ASSERT(x)
 #endif
 #endif
 
 #if 0
-#define LWIP_ERROR(message, expression, handler) do { if (!(expression)) { \
-  printf("Assertion \"%s\" failed at line %d in %s\n", message, __LINE__, __FILE__); \
-  fflush(NULL);handler;} } while(0)
+#define LWIP_ERROR(message, expression, handler)                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expression))                                                                                                         \
+        {                                                                                                                          \
+            printf("Assertion \"%s\" failed at line %d in %s\n", message, __LINE__, __FILE__);                                     \
+            fflush(NULL);                                                                                                          \
+            handler;                                                                                                               \
+        }                                                                                                                          \
+    } while (0)
 #else
 #ifndef MTK_DEBUG_LEVEL_NONE
-#define LWIP_ERROR(message, expression, handler) do { if (!(expression)) { \
-  printf("Assertion \"%s\" failed at line %d in %s\n", message, __LINE__, __FILE__); \
-  handler;} } while(0)
+#define LWIP_ERROR(message, expression, handler)                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expression))                                                                                                         \
+        {                                                                                                                          \
+            printf("Assertion \"%s\" failed at line %d in %s\n", message, __LINE__, __FILE__);                                     \
+            handler;                                                                                                               \
+        }                                                                                                                          \
+    } while (0)
 #else
 #define LWIP_ERROR(message, expression, handler)
 #endif
@@ -138,8 +165,8 @@ void filogic_log_print(const char *fmt, ...);
 /* C runtime functions redefined */
 //#define snprintf _snprintf //2015-07-22 Cheng Liu @132663
 
-u32_t dns_lookup_external_hosts_file(const char *name);
+u32_t dns_lookup_external_hosts_file(const char * name);
 
-#define LWIP_RAND() ((u32_t)rand())
+#define LWIP_RAND() ((u32_t) rand())
 
 #endif /* __ARCH_CC_H__ */
