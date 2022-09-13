@@ -38,7 +38,7 @@
     const uint16_t panID = 0x28f4;
     MTRThreadOperationalDataset * dataset = [[MTRThreadOperationalDataset alloc]
         initWithNetworkName:@"TestNetwork"
-              extendedPANID:[NSData dataWithBytes:&extendedPANID length:MTRSizeThreadExtendedPanId]
+              extendedPANID:[NSData dataWithBytes:&extendedPANID length:MTRSizeThreadExtendedPANID]
                   masterKey:[NSData dataWithBytes:&masterKey length:MTRSizeThreadMasterKey]
                        PSKc:[NSData dataWithBytes:&PKSc length:MTRSizeThreadPSKc]
                     channel:@(25)
