@@ -28,12 +28,13 @@ config:
 tests:
     - label: "Commission DUT to TH1s Fabric"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+           ./chip-all-clusters-app
 
-          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+          Once DUT reach the  commissionable state pls send below mentioned command on TH2. Pls use equivalent command on the respective DUT
 
-          Verify in TH log:
-
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH1(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 

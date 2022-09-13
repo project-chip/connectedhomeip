@@ -84,7 +84,7 @@ tests:
           "TH2 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       verification: |
-          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name-beta
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta
 
           On TH2(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
           [1657186956.724761][3910:3915] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3161849734
@@ -203,7 +203,7 @@ tests:
           [1657187433.621369][10890:10895] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 3415499944
           [1657187433.621422][10890:10895] CHIP:TOO:   Extension: 1 entries
           [1657187433.621470][10890:10895] CHIP:TOO:     [1]: {
-          [1657187433.621498][10890:10895] CHIP:TOO:       Data: 1000110010001100
+          [1657187433.621498][10890:10895] CHIP:TOO:       Data: 1718
           [1657187433.621534][10890:10895] CHIP:TOO:       FabricIndex: 1
           [1657187433.621557][10890:10895] CHIP:TOO:      }
       disabled: true
@@ -252,7 +252,7 @@ tests:
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol read-event access-control-extension-changed  2 --commissioner-name beta
+          ./chip-tool accesscontrol read-event access-control-extension-changed  2 0 --commissioner-name beta
           On TH2(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327551.622018][4295:4300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1658327551.622043][4295:4300] CHIP:TOO:          Event number: 6
