@@ -49,23 +49,23 @@ const char * GetProtocolName(Id protocolId)
     switch (protocolId.GetProtocolId())
     {
     case InteractionModel::Id.GetProtocolId():
-        return InteractionModel::kName;
+        return InteractionModel::kProtocolName;
         break;
 
     case SecureChannel::Id.GetProtocolId():
-        return SecureChannel::kName;
+        return SecureChannel::kProtocolName;
         break;
 
     case BDX::Id.GetProtocolId():
-        return bdx::kName;
+        return bdx::kProtocolName;
         break;
 
     case Echo::Id.GetProtocolId():
-        return Echo::kName;
+        return Echo::kProtocolName;
         break;
 
     case UserDirectedCommissioning::Id.GetProtocolId():
-        return UserDirectedCommissioning::kName;
+        return UserDirectedCommissioning::kProtocolName;
         break;
 
     default:

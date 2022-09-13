@@ -35,7 +35,7 @@ namespace bdx {
 
 constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
 
-constexpr const char * kName = "BDX";
+constexpr const char * kProtocolName = "BDX";
 
 enum class MessageType : uint8_t
 {

@@ -222,11 +222,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
                     " [%04X] --- Type %04x:%02x (%s:%s)",
                     ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
-                    session->GetSessionTypeString(), static_cast<uint16_t>(session->GetFabricIndex()),
+                    Transport::GetSessionTypeString(session), session->GetFabricIndex(),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
-                    static_cast<uint16_t>(payloadHeader.GetProtocolID().GetProtocolId()),
-                    static_cast<uint8_t>(payloadHeader.GetMessageType()), protocolName != nullptr ? protocolName : "---",
-                    msgTypeName != nullptr ? msgTypeName : "---");
+                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
 #endif
 
     MessageFlags msgFlags;

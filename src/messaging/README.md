@@ -35,7 +35,7 @@ Unless specified, numerical values are represented in decimal notation.
 
 #### Examples:
 
-_Unsecure Unicast:_
+_Unencrypted Unicast:_
 
 ```
 <<< [E:26341i M: 264589322] (U) Msg TX to 0:0000000000000000 [0000] --- Type 0000:30 (SecureChannel:CASE_Sigma1)
@@ -66,8 +66,8 @@ Unless specified, numerical values are represented in decimal notation.
 >>> [E:$exchange_id M: $msg_id (Ack: $ack_msg_id)] ($msg_category) Msg RX from $fabric_index:$source [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
 ```
 
-This has a similar legend to that for transmission except `$source` denoting the
-source's node identifier.
+This has a similar legend to that for transmission except `$source` denotes the
+source's node identifier and `$fabric_index` is the index on the recipient.
 
 #### Examples
 

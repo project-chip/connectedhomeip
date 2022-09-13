@@ -288,10 +288,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                     "<<< [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
                     " [%04X] --- Type %04X:%02X (%s:%s)",
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
-                    sessionHandle->GetSessionTypeString(), static_cast<uint16_t>(fabricIndex), ChipLogValueX64(destination),
-                    static_cast<uint16_t>(compressedFabricId), static_cast<uint16_t>(payloadHeader.GetProtocolID().GetProtocolId()),
-                    static_cast<uint8_t>(payloadHeader.GetMessageType()), protocolName != nullptr ? protocolName : "---",
-                    msgTypeName != nullptr ? msgTypeName : "---");
+                    Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    static_cast<uint16_t>(compressedFabricId), payloadHeader.GetProtocolID().GetProtocolId(),
+                    payloadHeader.GetMessageType(), protocolName, msgTypeName);
 #endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
@@ -344,11 +343,13 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
 
+#if CHIP_PROGRESS_LOGGING
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
-        destination->ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
+        destination->ToString(addressStr);
 
         ChipLogProgress(Inet, "(U) Sending msg " ChipLogFormatMessageCounter " to IP address '%s'",
                         preparedMessage.GetMessageCounter(), addressStr);
+#endif
     }
     break;
     default:

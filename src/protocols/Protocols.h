@@ -100,8 +100,8 @@ static constexpr Id NotSpecified(VendorId::NotSpecified, 0xFFFF); // The profile
 //
 // It should then define MessageTypeTraits as a template specialization of that enumeration containing two methods:
 //      1. static constexpr const Protocols::Id & ProtocolId() that returns the Protocol ID
-//      2. static auto GetTypeToNameTable() that returns a std::array<MessageTypeNameLookup, N> where N = number of messages in
-//      protocol.
+//      2. static auto GetTypeToNameTable() that returns a pointer to std::array<MessageTypeNameLookup, N> where N = number of
+//      messages in protocol.
 //
 template <typename T>
 struct MessageTypeTraits;
@@ -111,12 +111,11 @@ struct MessageTypeTraits;
 //
 struct MessageTypeNameLookup
 {
-    template <typename T>
-
     //
     // Constructor that takes an enumeration value for a specific message ID and its associated name.
     //
-    constexpr MessageTypeNameLookup(T id, const char * name) : mId(chip::to_underlying(id)), mName(name)
+    template <typename T>
+    constexpr MessageTypeNameLookup(T id, const char * name) : mId(to_underlying(id)), mName(name)
     {}
 
     const uint8_t mId;
