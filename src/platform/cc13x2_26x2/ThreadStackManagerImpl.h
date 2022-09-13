@@ -95,6 +95,7 @@ public:
     CHIP_ERROR InitThreadStack(otInstance * otInst);
     void _SendProcMessage(procQueueMsg & procMsg);
     void _ProcMessage(otInstance * aInstance);
+    void GetExtAddress(otExtAddress & aExtAddr);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
