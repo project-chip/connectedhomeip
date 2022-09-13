@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRScenesClusterAttributeValuePair alloc] init];
 
@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRScenesClusterExtensionFieldSet alloc] init];
 
@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDescriptorClusterDeviceTypeStruct alloc] init];
 
@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDescriptorClusterDeviceType alloc] init];
 
@@ -161,7 +161,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBindingClusterTargetStruct alloc] init];
 
@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAccessControlClusterTarget alloc] init];
 
@@ -235,7 +235,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAccessControlClusterAccessControlEntry alloc] init];
 
@@ -270,7 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAccessControlClusterExtensionEntry alloc] init];
 
@@ -307,7 +307,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAccessControlClusterAccessControlEntryChangedEvent alloc] init];
 
@@ -348,7 +348,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAccessControlClusterAccessControlExtensionChangedEvent alloc] init];
 
@@ -391,7 +391,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActionsClusterActionStruct alloc] init];
 
@@ -431,7 +431,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActionsClusterEndpointListStruct alloc] init];
 
@@ -466,7 +466,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActionsClusterStateChangedEvent alloc] init];
 
@@ -502,7 +502,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActionsClusterActionFailedEvent alloc] init];
 
@@ -535,7 +535,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBasicClusterCapabilityMinimaStruct alloc] init];
 
@@ -564,7 +564,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBasicClusterStartUpEvent alloc] init];
 
@@ -590,7 +590,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBasicClusterShutDownEvent alloc] init];
 
@@ -615,7 +615,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBasicClusterLeaveEvent alloc] init];
 
@@ -643,7 +643,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBasicClusterReachableChangedEvent alloc] init];
 
@@ -675,7 +675,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
 
@@ -711,7 +711,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
 
@@ -745,7 +745,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
 
@@ -780,7 +780,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
 
@@ -814,7 +814,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPowerSourceClusterBatChargeFaultChangeType alloc] init];
 
@@ -845,7 +845,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPowerSourceClusterBatFaultChangeType alloc] init];
 
@@ -876,7 +876,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPowerSourceClusterWiredFaultChangeType alloc] init];
 
@@ -907,7 +907,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralCommissioningClusterBasicCommissioningInfo alloc] init];
 
@@ -939,7 +939,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRNetworkCommissioningClusterNetworkInfo alloc] init];
 
@@ -983,7 +983,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResult alloc] init];
 
@@ -1031,7 +1031,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResult alloc] init];
 
@@ -1080,7 +1080,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralDiagnosticsClusterNetworkInterfaceType alloc] init];
 
@@ -1120,7 +1120,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent alloc] init];
 
@@ -1151,7 +1151,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralDiagnosticsClusterRadioFaultChangeEvent alloc] init];
 
@@ -1182,7 +1182,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent alloc] init];
 
@@ -1211,7 +1211,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGeneralDiagnosticsClusterBootReasonEvent alloc] init];
 
@@ -1247,7 +1247,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSoftwareDiagnosticsClusterThreadMetrics alloc] init];
 
@@ -1284,7 +1284,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSoftwareDiagnosticsClusterSoftwareFaultEvent alloc] init];
 
@@ -1341,7 +1341,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterNeighborTable alloc] init];
 
@@ -1408,7 +1408,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents alloc] init];
 
@@ -1470,7 +1470,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterRouteTable alloc] init];
 
@@ -1512,7 +1512,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterSecurityPolicy alloc] init];
 
@@ -1541,7 +1541,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent alloc] init];
 
@@ -1571,7 +1571,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent alloc] init];
 
@@ -1600,7 +1600,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent alloc] init];
 
@@ -1630,7 +1630,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent alloc] init];
 
@@ -1659,7 +1659,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent alloc] init];
 
@@ -1691,7 +1691,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTimeSynchronizationClusterDstOffsetType alloc] init];
 
@@ -1725,7 +1725,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTimeSynchronizationClusterTimeZoneType alloc] init];
 
@@ -1755,7 +1755,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBridgedDeviceBasicClusterStartUpEvent alloc] init];
 
@@ -1781,7 +1781,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBridgedDeviceBasicClusterShutDownEvent alloc] init];
 
@@ -1804,7 +1804,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBridgedDeviceBasicClusterLeaveEvent alloc] init];
 
@@ -1829,7 +1829,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBridgedDeviceBasicClusterReachableChangedEvent alloc] init];
 
@@ -1857,7 +1857,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterSwitchLatchedEvent alloc] init];
 
@@ -1885,7 +1885,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterInitialPressEvent alloc] init];
 
@@ -1913,7 +1913,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterLongPressEvent alloc] init];
 
@@ -1941,7 +1941,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterShortReleaseEvent alloc] init];
 
@@ -1969,7 +1969,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterLongReleaseEvent alloc] init];
 
@@ -1999,7 +1999,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterMultiPressOngoingEvent alloc] init];
 
@@ -2030,7 +2030,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSwitchClusterMultiPressCompleteEvent alloc] init];
 
@@ -2069,7 +2069,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROperationalCredentialsClusterFabricDescriptor alloc] init];
 
@@ -2108,7 +2108,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROperationalCredentialsClusterNOCStruct alloc] init];
 
@@ -2145,7 +2145,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGroupKeyManagementClusterGroupInfoMapStruct alloc] init];
 
@@ -2180,7 +2180,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
 
@@ -2224,7 +2224,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRGroupKeyManagementClusterGroupKeySetStruct alloc] init];
 
@@ -2265,7 +2265,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRFixedLabelClusterLabelStruct alloc] init];
 
@@ -2296,7 +2296,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRUserLabelClusterLabelStruct alloc] init];
 
@@ -2325,7 +2325,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRBooleanStateClusterStateChangeEvent alloc] init];
 
@@ -2355,7 +2355,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRModeSelectClusterSemanticTag alloc] init];
 
@@ -2388,7 +2388,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRModeSelectClusterModeOptionStruct alloc] init];
 
@@ -2420,7 +2420,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterDlCredential alloc] init];
 
@@ -2449,7 +2449,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterDoorLockAlarmEvent alloc] init];
 
@@ -2476,7 +2476,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterDoorStateChangeEvent alloc] init];
 
@@ -2513,7 +2513,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterLockOperationEvent alloc] init];
 
@@ -2560,7 +2560,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterLockOperationErrorEvent alloc] init];
 
@@ -2608,7 +2608,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRDoorLockClusterLockUserChangeEvent alloc] init];
 
@@ -2642,7 +2642,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent alloc] init];
 
@@ -2665,7 +2665,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent alloc] init];
 
@@ -2688,7 +2688,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent alloc] init];
 
@@ -2711,7 +2711,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterSystemPressureLowEvent alloc] init];
 
@@ -2734,7 +2734,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterSystemPressureHighEvent alloc] init];
 
@@ -2757,7 +2757,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterDryRunningEvent alloc] init];
 
@@ -2780,7 +2780,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent alloc] init];
 
@@ -2803,7 +2803,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent alloc] init];
 
@@ -2826,7 +2826,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent alloc] init];
 
@@ -2849,7 +2849,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterPumpBlockedEvent alloc] init];
 
@@ -2872,7 +2872,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterSensorFailureEvent alloc] init];
 
@@ -2895,7 +2895,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent alloc] init];
 
@@ -2918,7 +2918,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent alloc] init];
 
@@ -2941,7 +2941,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterGeneralFaultEvent alloc] init];
 
@@ -2964,7 +2964,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterLeakageEvent alloc] init];
 
@@ -2987,7 +2987,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterAirDetectionEvent alloc] init];
 
@@ -3010,7 +3010,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPumpConfigurationAndControlClusterTurbineOperationEvent alloc] init];
 
@@ -3039,7 +3039,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRThermostatClusterThermostatScheduleTransition alloc] init];
 
@@ -3077,7 +3077,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRChannelClusterChannelInfo alloc] init];
 
@@ -3116,7 +3116,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRChannelClusterLineupInfo alloc] init];
 
@@ -3150,7 +3150,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTargetNavigatorClusterTargetInfo alloc] init];
 
@@ -3181,7 +3181,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRMediaPlaybackClusterPlaybackPosition alloc] init];
 
@@ -3216,7 +3216,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRMediaInputClusterInputInfo alloc] init];
 
@@ -3251,7 +3251,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterDimension alloc] init];
 
@@ -3283,7 +3283,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterAdditionalInfo alloc] init];
 
@@ -3316,7 +3316,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterParameter alloc] init];
 
@@ -3346,7 +3346,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterContentSearch alloc] init];
 
@@ -3378,7 +3378,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterStyleInformation alloc] init];
 
@@ -3418,7 +3418,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentLauncherClusterBrandingInformation alloc] init];
 
@@ -3456,7 +3456,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRAudioOutputClusterOutputInfo alloc] init];
 
@@ -3488,7 +3488,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRApplicationLauncherClusterApplication alloc] init];
 
@@ -3519,7 +3519,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRApplicationLauncherClusterApplicationEP alloc] init];
 
@@ -3550,7 +3550,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRApplicationBasicClusterApplicationBasicApplication alloc] init];
 
@@ -3593,7 +3593,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterSimpleStruct alloc] init];
 
@@ -3643,7 +3643,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterTestFabricScoped alloc] init];
 
@@ -3705,7 +3705,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterNullablesAndOptionalsStruct alloc] init];
 
@@ -3753,7 +3753,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterNestedStruct alloc] init];
 
@@ -3795,7 +3795,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterNestedStructList alloc] init];
 
@@ -3829,7 +3829,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterDoubleNestedStructList alloc] init];
 
@@ -3858,7 +3858,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterTestListStructOctet alloc] init];
 
@@ -3897,7 +3897,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterTestEventEvent alloc] init];
 
@@ -3930,7 +3930,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRTestClusterClusterTestFabricScopedEventEvent alloc] init];
 

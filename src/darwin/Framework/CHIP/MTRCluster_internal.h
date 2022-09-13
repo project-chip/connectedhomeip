@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-- (nullable instancetype)initWithQueue:(dispatch_queue_t)queue;
+- (instancetype _Nullable)initWithQueue:(dispatch_queue_t)queue;
 - (chip::ByteSpan)asByteSpan:(NSData *)value;
 - (chip::CharSpan)asCharSpan:(NSString *)value;
 @end

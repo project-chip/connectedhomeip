@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceControllerStartupParams ()
 // We want to be able to write to operationalCertificate in
 // MTRDeviceControllerStartupParamsInternal.
-@property (nonatomic, copy, nullable) NSData * operationalCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes * operationalCertificate;
 
 // Init method that just copies the values of all our ivars.
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
@@ -85,9 +85,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk NS_UNAVAILABLE;
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(NSData *)operationalCertificate
-                   intermediateCertificate:(nullable NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
+                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
                                        ipk:(NSData *)ipk NS_UNAVAILABLE;
 @end
 
