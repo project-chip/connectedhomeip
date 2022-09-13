@@ -18,8 +18,28 @@
 
 set -e
 
+_install_lcov() {
+    if ! lcov --version >/dev/null 2>&1; then
+        echo "lcov not installed. Installing..."
+        case "$(uname)" in
+            "Darwin")
+                brew install lcov
+                ;;
+            "Linux")
+                sudo apt-get update
+                sudo apt-get install -y lcov
+                ;;
+            *)
+                die
+                ;;
+        esac
+    fi
+}
+
+_install_lcov
+
 _normpath() {
-    python -c "import os.path; print(os.path.normpath('$@'))"
+    python3 -c "import os.path; print(os.path.normpath('$@'))"
 }
 
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
