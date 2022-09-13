@@ -707,7 +707,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [ "${chip_root}/examples/shell/genio(${chip_root}/config/genio/toolchain:genio_shell_app)" ]
     }
 
-    extra_build_deps += [":genio_shell_app"]
+    extra_build_deps += [ ":genio_shell_app" ]
   }
 
   group("default") {

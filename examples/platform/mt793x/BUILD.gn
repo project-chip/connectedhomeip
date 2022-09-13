@@ -38,7 +38,7 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
     "-Wl,--wrap=_write",
-    
+
     "-Wl,--wrap=__assert_function",
     "-Wl,--wrap=wlan_printf",
     "-Wl,--wrap=_gettimeofday",
@@ -50,8 +50,8 @@ source_set("genio-matter-shell") {
     defines = [ "ENABLE_CHIP_SHELL" ]
 
     sources = [
-      "matter_shell.cpp",
       "link_wrapper.c",
+      "matter_shell.cpp",
     ]
     include_dirs = [ "." ]
 
