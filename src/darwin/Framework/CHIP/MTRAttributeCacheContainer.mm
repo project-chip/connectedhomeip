@@ -81,11 +81,11 @@ static CHIP_ERROR AppendAttibuteValueToArray(
 - (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
                           clusterID:(NSNumber * _Nullable)clusterID
                         attributeID:(NSNumber * _Nullable)attributeID
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     __auto_type completionHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        dispatch_async(clientQueue, ^{
+        dispatch_async(queue, ^{
             completion(values, error);
         });
     };

@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRCluster.h>
+
 @class MTRSetupPayload;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -178,8 +180,8 @@ extern NSString * const MTRArrayValueType;
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(MTRDeviceErrorHandler)errorHandler
-    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
-    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler;
+    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled;
 
 /**
  * Read attribute in a designated attribute path
@@ -188,7 +190,7 @@ extern NSString * const MTRArrayValueType;
                           clusterID:(NSNumber * _Nullable)clusterID
                         attributeID:(NSNumber * _Nullable)attributeID
                              params:(MTRReadParams * _Nullable)params
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion;
 
 /**
@@ -202,14 +204,14 @@ extern NSString * const MTRArrayValueType;
  * @param completion  response handler will receive either values or error.
  *
  *                    Received values are an NSArray object with response-value element as described in
- *                    readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion:.
+ *                    readAttributeWithEndpointID:clusterID:attributeID:queue:completion:.
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                          attributeID:(NSNumber *)attributeID
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                         clientQueue:(dispatch_queue_t)clientQueue
+                               queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion;
 
 /**
@@ -229,7 +231,7 @@ extern NSString * const MTRArrayValueType;
                           commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion;
 
 /**
@@ -241,9 +243,9 @@ extern NSString * const MTRArrayValueType;
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(MTRSubscribeParams * _Nullable)params
-                             clientQueue:(dispatch_queue_t)clientQueue
+                                   queue:(dispatch_queue_t)queue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
+                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -252,7 +254,7 @@ extern NSString * const MTRArrayValueType;
  * There could be multiple clients accessing a node through a remote controller object and hence it is not appropriate
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(dispatch_block_t)completion;
+- (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion;
 
 /**
  * Open a commissioning window on the device.
@@ -271,7 +273,7 @@ extern NSString * const MTRArrayValueType;
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
-                                     clientQueue:(dispatch_queue_t)clientQueue
+                                           queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end

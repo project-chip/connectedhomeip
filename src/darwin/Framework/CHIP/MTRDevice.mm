@@ -287,77 +287,77 @@ private:
     _subscriptionActive = YES;
 
     [_deviceController getSessionForNode:_nodeID
-                       completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                           const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                           if (error != nil) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:error];
-                               });
-                               return;
-                           }
+                              completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:error];
+                                      });
+                                      return;
+                                  }
 
-                           // Wildcard endpoint, cluster, attribute, event.
-                           auto attributePath = std::make_unique<AttributePathParams>();
-                           auto eventPath = std::make_unique<EventPathParams>();
-                           ReadPrepareParams readParams(session.Value());
-                           readParams.mMinIntervalFloorSeconds = minInterval;
-                           readParams.mMaxIntervalCeilingSeconds = maxInterval;
-                           readParams.mpAttributePathParamsList = attributePath.get();
-                           readParams.mAttributePathParamsListSize = 1;
-                           readParams.mpEventPathParamsList = eventPath.get();
-                           readParams.mEventPathParamsListSize = 1;
-                           readParams.mKeepSubscriptions = true;
-                           attributePath.release();
-                           eventPath.release();
+                                  // Wildcard endpoint, cluster, attribute, event.
+                                  auto attributePath = std::make_unique<AttributePathParams>();
+                                  auto eventPath = std::make_unique<EventPathParams>();
+                                  ReadPrepareParams readParams(session.Value());
+                                  readParams.mMinIntervalFloorSeconds = minInterval;
+                                  readParams.mMaxIntervalCeilingSeconds = maxInterval;
+                                  readParams.mpAttributePathParamsList = attributePath.get();
+                                  readParams.mAttributePathParamsListSize = 1;
+                                  readParams.mpEventPathParamsList = eventPath.get();
+                                  readParams.mEventPathParamsListSize = 1;
+                                  readParams.mKeepSubscriptions = true;
+                                  attributePath.release();
+                                  eventPath.release();
 
-                           std::unique_ptr<SubscriptionCallback> callback;
-                           std::unique_ptr<ReadClient> readClient;
-                           std::unique_ptr<ClusterStateCache> attributeCache;
-                           callback = std::make_unique<SubscriptionCallback>(
-                               self.queue,
-                               ^(NSArray * value) {
-                                   // OnAttributeData (after OnReportEnd)
-                                   [self _handleAttributeReport:value];
-                               },
-                               ^(NSArray * value) {
-                                   // OnEventReport (after OnReportEnd)
-                                   [self _handleEventReport:value];
-                               },
-                               ^(NSError * error) {
-                                   // OnError
-                                   [self _handleSubscriptionError:error];
-                               },
-                               ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                   // OnResubscriptionNeeded
-                                   [self _handleResubscriptionNeeded];
-                               },
-                               ^(void) {
-                                   // OnSubscriptionEstablished
-                                   [self _handleSubscriptionEstablished];
-                               },
-                               ^(void) {
-                                   // OnDone
-                                   [self _handleSubscriptionReset];
-                               });
-                           readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                               callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                                  std::unique_ptr<SubscriptionCallback> callback;
+                                  std::unique_ptr<ReadClient> readClient;
+                                  std::unique_ptr<ClusterStateCache> attributeCache;
+                                  callback = std::make_unique<SubscriptionCallback>(
+                                      self.queue,
+                                      ^(NSArray * value) {
+                                          // OnAttributeData (after OnReportEnd)
+                                          [self _handleAttributeReport:value];
+                                      },
+                                      ^(NSArray * value) {
+                                          // OnEventReport (after OnReportEnd)
+                                          [self _handleEventReport:value];
+                                      },
+                                      ^(NSError * error) {
+                                          // OnError
+                                          [self _handleSubscriptionError:error];
+                                      },
+                                      ^(NSError * error, NSNumber * resubscriptionDelay) {
+                                          // OnResubscriptionNeeded
+                                          [self _handleResubscriptionNeeded];
+                                      },
+                                      ^(void) {
+                                          // OnSubscriptionEstablished
+                                          [self _handleSubscriptionEstablished];
+                                      },
+                                      ^(void) {
+                                          // OnDone
+                                          [self _handleSubscriptionReset];
+                                      });
+                                  readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                                      callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                           // SendAutoResubscribeRequest cleans up the params, even on failure.
-                           CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                                  // SendAutoResubscribeRequest cleans up the params, even on failure.
+                                  CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
-                           if (err != CHIP_NO_ERROR) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
-                               });
+                                  if (err != CHIP_NO_ERROR) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
+                                      });
 
-                               return;
-                           }
+                                      return;
+                                  }
 
-                           // Callback and ReadClient will be deleted when OnDone is called or an error is
-                           // encountered.
-                           callback->AdoptReadClient(std::move(readClient));
-                           callback.release();
-                       }];
+                                  // Callback and ReadClient will be deleted when OnDone is called or an error is
+                                  // encountered.
+                                  callback->AdoptReadClient(std::move(readClient));
+                                  callback.release();
+                              }];
 }
 
 #pragma mark Device Interactions
@@ -376,7 +376,7 @@ private:
                               clusterID:clusterID
                             attributeID:attributeID
                                  params:params
-                            clientQueue:self.queue
+                                  queue:self.queue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                  if (values) {
                                      // Since the format is the same data-value dictionary, this looks like an attribute
@@ -419,7 +419,7 @@ private:
                          attributeID:attributeID
                                value:value
                    timedWriteTimeout:timeout
-                         clientQueue:self.queue
+                               queue:self.queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               if (values) {
                                   [self _handleAttributeReport:values];
@@ -442,7 +442,7 @@ private:
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     // Perform this operation
@@ -453,9 +453,9 @@ private:
                           commandID:commandID
                       commandFields:commandFields
                  timedInvokeTimeout:timeout
-                        clientQueue:self.queue
+                              queue:self.queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             dispatch_async(clientQueue, ^{
+                             dispatch_async(queue, ^{
                                  completion(values, error);
                              });
                          }];
@@ -466,14 +466,14 @@ private:
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
-                                     clientQueue:(dispatch_queue_t)clientQueue
+                                           queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
     auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
                                            discriminator:discriminator
                                                 duration:duration
-                                             clientQueue:clientQueue
+                                                   queue:queue
                                               completion:completion];
 }
 

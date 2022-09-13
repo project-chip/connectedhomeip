@@ -135,7 +135,7 @@ BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
 
     // Let's use the last device that was paired
     uint64_t deviceId = MTRGetLastPairedDeviceId();
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completion:completionHandler];
 }
 
 MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
@@ -154,7 +154,7 @@ BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback 
 {
     MTRDeviceController * controller = InitializeMTR();
 
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completion:completionHandler];
 }
 
 BOOL MTRIsDevicePaired(uint64_t deviceId)
@@ -181,26 +181,25 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
         NSLog(@"Attempting to unpair device %llu", deviceId);
         MTRBaseClusterOperationalCredentials * opCredsCluster =
             [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:@(0) queue:dispatch_get_main_queue()];
-        [opCredsCluster
-            readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                if (error) {
-                    NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
-                    return;
-                }
-                MTROperationalCredentialsClusterRemoveFabricParams * params =
-                    [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
-                params.fabricIndex = value;
-                [opCredsCluster removeFabricWithParams:params
-                                     completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                         NSError * _Nullable error) {
-                                         if (error) {
-                                             NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
-                                                 params.fabricIndex, deviceId, error);
-                                             return;
-                                         }
-                                         NSLog(@"Successfully unpaired deviceId %llu", deviceId);
-                                     }];
-            }];
+        [opCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
+                return;
+            }
+            MTROperationalCredentialsClusterRemoveFabricParams * params =
+                [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+            params.fabricIndex = value;
+            [opCredsCluster removeFabricWithParams:params
+                                        completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                            NSError * _Nullable error) {
+                                            if (error) {
+                                                NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
+                                                    params.fabricIndex, deviceId, error);
+                                                return;
+                                            }
+                                            NSLog(@"Successfully unpaired deviceId %llu", deviceId);
+                                        }];
+        }];
     });
 }
 

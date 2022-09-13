@@ -97,9 +97,7 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
-- (BOOL)getBaseDevice:(uint64_t)deviceID
-                queue:(dispatch_queue_t)queue
-    completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completion:(MTRDeviceConnectionCallback)completion
 {
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
@@ -129,9 +127,9 @@ static void SetupXPCQueue(void)
                 MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerID
                                                                                 deviceID:@(deviceID)
                                                                            xpcConnection:self.xpcConnection];
-                completionHandler(device, nil);
+                completion(device, nil);
             } else {
-                completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             }
         });
     });

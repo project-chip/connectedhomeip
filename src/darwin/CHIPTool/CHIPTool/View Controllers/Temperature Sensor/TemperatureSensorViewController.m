@@ -195,7 +195,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                                                         endpoint:@(1)
                                                                            queue:dispatch_get_main_queue()];
 
-                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                [cluster readAttributeMeasuredValueWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)
                         return;
                     [self updateTempInUI:value.shortValue];

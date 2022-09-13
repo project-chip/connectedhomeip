@@ -43,27 +43,27 @@ using chip::SessionHandle;
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
-  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       self.device,
       {{#if hasSpecificResponse}}
-        {{! This treats completionHandler as taking an id for the data.  This is
+        {{! This treats completion as taking an id for the data.  This is
             not great from a type-safety perspective, of course. }}
-        completionHandler,
+        completion,
       {{else}}
         {{! For now, don't change the bridge API; instead just use an adapter
             to invoke our completion handler. This is not great from a
             type-safety perspective, of course. }}
         ^(id _Nullable value, NSError * _Nullable error) {
-          completionHandler(error);
+          completion(error);
         },
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -106,11 +106,11 @@ using chip::SessionHandle;
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
-  Params:(MTRReadParams * _Nullable)params completionHandler:
+  Params:(MTRReadParams * _Nullable)params completion:
 {{~else~}}
-  CompletionHandler:
+  Completion:
 {{~/if_is_fabric_scoped_struct~}}
-(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     {{~#if_is_fabric_scoped_struct type}}
     // Make a copy of params before we go async.
@@ -118,9 +118,9 @@ using chip::SessionHandle;
     {{/if_is_fabric_scoped_struct~}}
     new MTR{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       self.device,
-      {{! This treats completionHandler as taking an id for the data.  This is
+      {{! This treats completion as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
-      completionHandler,
+      completion,
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
@@ -136,11 +136,11 @@ using chip::SessionHandle;
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
 {
-  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completionHandler:completionHandler];
+  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
 }
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -152,7 +152,7 @@ using chip::SessionHandle;
           to invoke our completion handler. This is not great from a
           type-safety perspective, of course. }}
       ^(id _Nullable ignored, NSError * _Nullable error) {
-        completionHandler(error);
+        completion(error);
       },
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
         chip::Optional<uint16_t> timedWriteTimeout;
@@ -184,7 +184,8 @@ using chip::SessionHandle;
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(MTRSubscribeParams * _Nullable)params
-subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished 
+reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     // Make a copy of params before we go async.
     minInterval = [minInterval copy];
@@ -209,13 +210,13 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
-      }, subscriptionEstablishedHandler);
+      }, subscriptionEstablished);
 }
 
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     new MTR{{>attribute_data_callback_name}}CallbackBridge(queue,
-      completionHandler,
+      completion,
       ^(Cancelable * success, Cancelable * failure) {
           if (attributeCacheContainer.cppAttributeCache) {
               chip::app::ConcreteAttributePath path;

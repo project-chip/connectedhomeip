@@ -56,7 +56,7 @@ public:
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--)
         {
-            [cluster {{asLowerCamelCase name}}WithParams:params completionHandler:
+            [cluster {{asLowerCamelCase name}}WithParams:params completion:
             {{#if hasSpecificResponse}}
                 ^(MTR{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
@@ -118,9 +118,9 @@ public:
         {{/if_is_fabric_scoped_struct}}
         [cluster readAttribute{{asUpperCamelCase name}}With
         {{~#if_is_fabric_scoped_struct type~}}
-        Params:params completionHandler:
+        Params:params completion:
         {{~else~}}
-        CompletionHandler:
+        Completion:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
@@ -176,7 +176,7 @@ public:
         {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
         {{/if_chip_complex}}
 
-        [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completionHandler:^(NSError * _Nullable error) {
+        [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
               LogNSError("{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} write Error", error);
             }

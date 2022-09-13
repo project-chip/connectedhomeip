@@ -105,11 +105,11 @@ NS_ASSUME_NONNULL_BEGIN
  * dispatch to the Matter queue).
  *
  * If the controller is not running when this function is called, will return NO
- * and never invoke the completionHandler.  If the controller is not running
- * when the async dispatch on the Matter queue would happen, an error will be
- * dispatched to the completion handler.
+ * and never invoke the completion.  If the controller is not running when the
+ * async dispatch on the Matter queue would happen, an error will be dispatched
+ * to the completion handler.
  */
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing

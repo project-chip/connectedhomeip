@@ -81,7 +81,7 @@ public:
                              timedInvokeTimeout:mTimedInteractionTimeoutMs.HasValue()
                                  ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                                  : nil
-                                    clientQueue:callbackQueue
+                                          queue:callbackQueue
                                      completion:^(
                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                          responsesNeeded--;
