@@ -4,6 +4,7 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class GenioApp(Enum):
     LIGHT = auto()
     SHELL = auto()
@@ -35,6 +36,7 @@ class GenioApp(Enum):
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'genio')
 
+
 class GenioBuilder(GnBuilder):
 
     def __init__(self,
@@ -42,11 +44,11 @@ class GenioBuilder(GnBuilder):
                  runner,
                  app: GenioApp = GenioApp.LIGHT):
         super(GenioBuilder, self).__init__(
-                root = app.BuildRoot(root),
-                runner = runner)
+            root=app.BuildRoot(root),
+            runner=runner)
         self.app = app
 
-    def build_outputs(self): 
+    def build_outputs(self):
         items = {}
         for extension in ['out', 'out.map', 'bin']:
             name = '%s.%s' % (self.app.AppNamePrefix(), extension)

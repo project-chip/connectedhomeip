@@ -649,10 +649,12 @@ def MW320Targets():
 
     yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
 
+
 def GenioTargets():
     target = Target('genio', GenioBuilder)
 
     yield target.Extend('lighting-app', app=GenioApp.LIGHT)
+
 
 ALL = []
 
