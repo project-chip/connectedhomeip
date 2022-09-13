@@ -173,11 +173,7 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     ChipLogDetail(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, name, type, domain, flags);
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
-    VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
-
-    // Once a service has been properly published it is normally unreachable because the hostname has not been yet
-    // registered against the dns daemon. Register the records mapping the hostname to our IP.
-    sdCtx->mHostNameRegistrar.Register(sdCtx);
+    sdCtx->Finalize(err);
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
@@ -197,8 +193,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     sdCtx = chip::Platform::New<RegisterContext>(type, name, callback, context);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    VerifyOrReturnError(sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId),
-                        sdCtx->Finalize(kDNSServiceErr_BadInterfaceIndex));
+    sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
 
     DNSServiceRef sdRef;
     auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, ntohs(port), record.size(),
@@ -394,15 +389,6 @@ CHIP_ERROR ChipDnssdRemoveServices()
     {
         err = CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(err);
-
-    err = MdnsContexts::GetInstance().RemoveAllOfType(ContextType::RegisterRecord);
-    if (CHIP_ERROR_KEY_NOT_FOUND == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
-
     return err;
 }
 

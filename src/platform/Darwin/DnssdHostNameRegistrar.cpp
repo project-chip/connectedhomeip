@@ -17,12 +17,17 @@
 
 #include "DnssdHostNameRegistrar.h"
 #include "DnssdImpl.h"
+#include "MdnsError.h"
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/ethernet.h>
 #include <net/if_dl.h>
 #include <netdb.h>
+
+#include <set>
+
+#include <platform/CHIPDeviceLayer.h>
 
 constexpr DNSServiceFlags kRegisterRecordFlags = kDNSServiceFlagsShared;
 
@@ -31,172 +36,352 @@ namespace Dnssd {
 
 namespace {
 
+#if CHIP_DETAIL_LOGGING
+constexpr const char * kPathStatusInvalid     = "Invalid";
+constexpr const char * kPathStatusUnsatisfied = "Unsatisfied";
+constexpr const char * kPathStatusSatisfied   = "Satisfied";
+constexpr const char * kPathStatusSatisfiable = "Satisfiable";
+constexpr const char * kPathStatusUnknown     = "Unknown";
+
+constexpr const char * kInterfaceTypeCellular = "Cellular";
+constexpr const char * kInterfaceTypeWiFi     = "WiFi";
+constexpr const char * kInterfaceTypeWired    = "Wired";
+constexpr const char * kInterfaceTypeLoopback = "Loopback";
+constexpr const char * kInterfaceTypeOther    = "Other";
+constexpr const char * kInterfaceTypeUnknown  = "Unknown";
+
+const char * GetPathStatusString(nw_path_status_t status)
+{
+    const char * str = nullptr;
+
+    if (status == nw_path_status_invalid)
+    {
+        str = kPathStatusInvalid;
+    }
+    else if (status == nw_path_status_unsatisfied)
+    {
+        str = kPathStatusUnsatisfied;
+    }
+    else if (status == nw_path_status_satisfied)
+    {
+        str = kPathStatusSatisfied;
+    }
+    else if (status == nw_path_status_satisfiable)
+    {
+        str = kPathStatusSatisfiable;
+    }
+    else
+    {
+        str = kPathStatusUnknown;
+    }
+
+    return str;
+}
+
+const char * GetInterfaceTypeString(nw_interface_type_t type)
+{
+    const char * str = nullptr;
+
+    if (type == nw_interface_type_cellular)
+    {
+        str = kInterfaceTypeCellular;
+    }
+    else if (type == nw_interface_type_wifi)
+    {
+        str = kInterfaceTypeWiFi;
+    }
+    else if (type == nw_interface_type_wired)
+    {
+        str = kInterfaceTypeWired;
+    }
+    else if (type == nw_interface_type_loopback)
+    {
+        str = kInterfaceTypeLoopback;
+    }
+    else if (type == nw_interface_type_other)
+    {
+        str = kInterfaceTypeOther;
+    }
+    else
+    {
+        str = kInterfaceTypeUnknown;
+    }
+
+    return str;
+}
+
+void LogDetails(uint32_t interfaceId, InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
+{
+    for (auto & inetInterface : inetInterfaces)
+    {
+        if (interfaceId == inetInterface.first)
+        {
+            char addr[INET_ADDRSTRLEN] = {};
+            inet_ntop(AF_INET, &inetInterface.second, addr, sizeof(addr));
+            ChipLogDetail(Discovery, "\t\t* ipv4: %s", addr);
+        }
+    }
+
+    for (auto & inet6Interface : inet6Interfaces)
+    {
+        if (interfaceId == inet6Interface.first)
+        {
+            char addr[INET6_ADDRSTRLEN] = {};
+            inet_ntop(AF_INET6, &inet6Interface.second, addr, sizeof(addr));
+            ChipLogDetail(Discovery, "\t\t* ipv6: %s", addr);
+        }
+    }
+}
+
+void LogDetails(nw_path_t path)
+{
+    auto status = nw_path_get_status(path);
+    ChipLogDetail(Discovery, "Status: %s", GetPathStatusString(status));
+}
+
+void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
+{
+    std::set<uint32_t> interfaceIds;
+    for (auto & inetInterface : inetInterfaces)
+    {
+        interfaceIds.insert(inetInterface.first);
+    }
+
+    for (auto & inet6Interface : inet6Interfaces)
+    {
+        interfaceIds.insert(inet6Interface.first);
+    }
+
+    for (auto interfaceId : interfaceIds)
+    {
+        char interfaceName[IFNAMSIZ] = {};
+        if_indextoname(interfaceId, interfaceName);
+        ChipLogDetail(Discovery, "\t%s (%u)", interfaceName, interfaceId);
+        LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
+    }
+}
+
+void LogDetails(nw_interface_t interface, InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces)
+{
+    auto interfaceId   = nw_interface_get_index(interface);
+    auto interfaceName = nw_interface_get_name(interface);
+    auto interfaceType = nw_interface_get_type(interface);
+    ChipLogDetail(Discovery, "\t%s (%u / %s)", interfaceName, interfaceId, GetInterfaceTypeString(interfaceType));
+    LogDetails(interfaceId, inetInterfaces, inet6Interfaces);
+}
+#endif // CHIP_DETAIL_LOGGING
+
+bool HasValidFlags(unsigned int flags, bool allowLoopbackOnly)
+{
+    VerifyOrReturnValue(!allowLoopbackOnly || (flags & IFF_LOOPBACK), false);
+    VerifyOrReturnValue(!(flags & IFF_POINTOPOINT), false);
+    VerifyOrReturnValue((flags & IFF_RUNNING), false);
+    VerifyOrReturnValue((flags & IFF_MULTICAST), false);
+    return true;
+}
+
+bool HasValidNetworkType(nw_interface_t interface)
+{
+    auto interfaceType = nw_interface_get_type(interface);
+    return interfaceType == nw_interface_type_wifi || interfaceType == nw_interface_type_wired;
+}
+
+bool IsValidInterfaceId(uint32_t targetInterfaceId, nw_interface_t interface)
+{
+    auto currentInterfaceId = nw_interface_get_index(interface);
+    return targetInterfaceId == kDNSServiceInterfaceIndexAny || targetInterfaceId == currentInterfaceId;
+}
+
+void ShouldUseVersion(chip::Inet::IPAddressType addressType, bool & shouldUseIPv4, bool & shouldUseIPv6)
+{
+#if INET_CONFIG_ENABLE_IPV4
+    shouldUseIPv4 = addressType == Inet::IPAddressType::kIPv4 || addressType == Inet::IPAddressType::kAny;
+#else
+    shouldUseIPv4 = false;
+#endif // INET_CONFIG_ENABLE_IPV4
+    shouldUseIPv6 = addressType == Inet::IPAddressType::kIPv6 || addressType == Inet::IPAddressType::kAny;
+}
+
 static void OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err,
                              void * context)
 {
     ChipLogDetail(Discovery, "Mdns: %s flags: %d", __func__, flags);
-
-    auto sdCtx = reinterpret_cast<RegisterRecordContext *>(context);
-
-    auto & registrar = sdCtx->mRegisterContext->mHostNameRegistrar;
-    if (!registrar.IncrementRegistrationCount(err))
+    if (kDNSServiceErr_NoError != err)
     {
-        sdCtx->Finalize(registrar.HasRegisteredRegistrant() ? kDNSServiceErr_NoError : kDNSServiceErr_Unknown);
+        ChipLogError(Discovery, "%s (%s)", __func__, Error::ToString(err));
     }
 }
 
-} // namespace
-
-bool InterfaceRegistrant::Init(const struct ifaddrs * ifa, Inet::IPAddressType addressType, uint32_t interfaceId)
+void GetInterfaceAddresses(uint32_t interfaceId, chip::Inet::IPAddressType addressType, InetInterfacesVector & inetInterfaces,
+                           Inet6InterfacesVector & inet6Interfaces, bool searchLoopbackOnly = false)
 {
-    VerifyOrReturnValue(ifa != nullptr, false);
-    VerifyOrReturnValue(ifa->ifa_addr != nullptr, false);
-    VerifyOrReturnValue(HasValidFlags(ifa->ifa_flags), false);
-    VerifyOrReturnValue(IsValidInterfaceId(interfaceId, if_nametoindex(ifa->ifa_name)), false);
-    VerifyOrReturnValue(HasValidType(addressType, ifa->ifa_addr->sa_family), false);
+    bool shouldUseIPv4, shouldUseIPv6;
+    ShouldUseVersion(addressType, shouldUseIPv4, shouldUseIPv6);
 
-    // The incoming interface id can be kDNSServiceInterfaceIndexAny, but here what needs to be done is to
-    // associate a given ip with a specific interface id, so the incoming interface id is used as a hint
-    // to validate if the current interface is of interest or not, but it is not what is stored internally.
-    mInterfaceId          = if_nametoindex(ifa->ifa_name);
-    mInterfaceAddressType = ifa->ifa_addr->sa_family;
+    ifaddrs * ifap;
+    VerifyOrReturn(getifaddrs(&ifap) >= 0);
 
-    if (IsIPv4())
+    for (struct ifaddrs * ifa = ifap; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        mInterfaceAddress.ipv4 = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr)->sin_addr;
-    }
-    else
-    {
-        mInterfaceAddress.ipv6 = reinterpret_cast<struct sockaddr_in6 *>(ifa->ifa_addr)->sin6_addr;
-    }
-
-    return true;
-}
-
-DNSServiceErrorType InterfaceRegistrant::Register(DNSServiceRef sdRef, RegisterRecordContext * sdCtx, const char * hostname) const
-{
-    LogDetail();
-
-    uint16_t rrtype    = IsIPv4() ? kDNSServiceType_A : kDNSServiceType_AAAA;
-    uint16_t rdlen     = IsIPv4() ? sizeof(in_addr) : sizeof(in6_addr);
-    const void * rdata = IsIPv4() ? static_cast<const void *>(GetIPv4()) : static_cast<const void *>(GetIPv6());
-
-    DNSRecordRef dnsRecordRef;
-    return DNSServiceRegisterRecord(sdRef, &dnsRecordRef, kRegisterRecordFlags, mInterfaceId, hostname, rrtype, kDNSServiceClass_IN,
-                                    rdlen, rdata, 0, OnRegisterRecord, sdCtx);
-}
-
-bool InterfaceRegistrant::HasValidFlags(unsigned int flags)
-{
-    return !(flags & IFF_POINTOPOINT) && (flags & IFF_RUNNING) && (flags & IFF_MULTICAST);
-}
-
-bool InterfaceRegistrant::HasValidType(Inet::IPAddressType addressType, const sa_family_t addressFamily)
-{
-    bool useIPv4 = addressType == Inet::IPAddressType::kIPv4 || addressType == Inet::IPAddressType::kAny;
-    bool useIPv6 = addressType == Inet::IPAddressType::kIPv6 || addressType == Inet::IPAddressType::kAny;
-
-    return (useIPv6 && addressFamily == AF_INET6) || (useIPv4 && addressFamily == AF_INET);
-}
-
-bool InterfaceRegistrant::IsValidInterfaceId(uint32_t targetInterfaceId, unsigned int currentInterfaceId)
-{
-    return targetInterfaceId == kDNSServiceInterfaceIndexAny || targetInterfaceId == currentInterfaceId;
-}
-
-void InterfaceRegistrant::LogDetail() const
-{
-    char interfaceName[IFNAMSIZ] = {};
-    VerifyOrReturn(if_indextoname(mInterfaceId, interfaceName) != nullptr);
-
-    if (IsIPv4())
-    {
-        char addr[INET_ADDRSTRLEN] = {};
-        inet_ntop(AF_INET, GetIPv4(), addr, sizeof(addr));
-        ChipLogDetail(Discovery, "\tInterface: %s (%u) ipv4: %s", interfaceName, mInterfaceId, addr);
-    }
-    else
-    {
-        char addr[INET6_ADDRSTRLEN] = {};
-        inet_ntop(AF_INET6, GetIPv6(), addr, sizeof(addr));
-        ChipLogDetail(Discovery, "\tInterface: %s (%u) ipv6: %s", interfaceName, mInterfaceId, addr);
-    }
-}
-
-bool HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
-{
-    mHostName = hostname;
-
-    // When the target interface is kDNSServiceInterfaceIndexLocalOnly, there is no need to map the hostname to
-    // an IP address.
-    VerifyOrReturnValue(interfaceId != kDNSServiceInterfaceIndexLocalOnly, true);
-
-    struct ifaddrs * ifap;
-    VerifyOrReturnValue(getifaddrs(&ifap) >= 0, false);
-
-    for (struct ifaddrs * ifa = ifap; ifa; ifa = ifa->ifa_next)
-    {
-        InterfaceRegistrant registrant;
-        if (registrant.Init(ifa, addressType, interfaceId))
+        auto interfaceAddress = ifa->ifa_addr;
+        if (interfaceAddress == nullptr)
         {
-            mRegistry.push_back(registrant);
+            continue;
+        }
+
+        if (!HasValidFlags(ifa->ifa_flags, searchLoopbackOnly))
+        {
+            continue;
+        }
+
+        auto currentInterfaceId = if_nametoindex(ifa->ifa_name);
+        if (interfaceId != kDNSServiceInterfaceIndexAny && interfaceId != currentInterfaceId)
+        {
+            continue;
+        }
+
+        if (shouldUseIPv4 && (AF_INET == interfaceAddress->sa_family))
+        {
+            auto inetAddress = reinterpret_cast<struct sockaddr_in *>(interfaceAddress)->sin_addr;
+            inetInterfaces.push_back(InetInterface(currentInterfaceId, inetAddress));
+        }
+        else if (shouldUseIPv6 && (AF_INET6 == interfaceAddress->sa_family))
+        {
+            auto inet6Address = reinterpret_cast<struct sockaddr_in6 *>(interfaceAddress)->sin6_addr;
+            inet6Interfaces.push_back(Inet6Interface(currentInterfaceId, inet6Address));
         }
     }
 
     freeifaddrs(ifap);
+}
+} // namespace
 
-    return mRegistry.size() != 0;
+void HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
+{
+    mHostname         = hostname;
+    mInterfaceId      = interfaceId;
+    mAddressType      = addressType;
+    mServiceRef       = nullptr;
+    mInterfaceMonitor = nullptr;
 }
 
-CHIP_ERROR HostNameRegistrar::Register(RegisterContext * registerCtx)
+CHIP_ERROR HostNameRegistrar::Register()
 {
     // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
     // the dns daemon.
-    if (mRegistry.size() == 0)
-    {
-        return registerCtx->Finalize();
-    }
+    VerifyOrReturnError(!IsLocalOnly(), CHIP_NO_ERROR);
 
-    DNSServiceRef sdRef;
-    auto err = DNSServiceCreateConnection(&sdRef);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, CHIP_ERROR_INTERNAL);
-
-    RegisterRecordContext * sdCtx = Platform::New<RegisterRecordContext>(registerCtx);
-    VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
-
-    ChipLogDetail(Discovery, "Mdns: Mapping %s to:", mHostName.c_str());
-
-    for (auto & registrant : mRegistry)
-    {
-        err = registrant.Register(sdRef, sdCtx, mHostName.c_str());
-
-        // An error to register a particular registrant is not fatal unless all registrants have failed.
-        // Otherwise, if there is an errror, it indicates that this registrant will not trigger a callback
-        // with its registration status. So we take the registration failure into account here.
-        if (kDNSServiceErr_NoError != err)
-        {
-            VerifyOrReturnError(IncrementRegistrationCount(err), sdCtx->Finalize(err));
-        }
-    }
-
-    return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
+    return StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
+        ReturnOnFailure(StartSharedConnection());
+        RegisterInterfaces(inetInterfaces, kDNSServiceType_A);
+        RegisterInterfaces(inet6Interfaces, kDNSServiceType_AAAA);
+    });
 }
 
-bool HostNameRegistrar::IncrementRegistrationCount(DNSServiceErrorType err)
+CHIP_ERROR HostNameRegistrar::RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen)
 {
-    mRegistrationCount++;
-    VerifyOrDie(mRegistrationCount <= mRegistry.size());
+    DNSRecordRef dnsRecordRef;
+    auto err = DNSServiceRegisterRecord(mServiceRef, &dnsRecordRef, kRegisterRecordFlags, interfaceId, mHostname.c_str(), rtype,
+                                        kDNSServiceClass_IN, rdlen, rdata, 0, OnRegisterRecord, nullptr);
+    return Error::ToChipError(err);
+}
 
-    // A single registration success is enough to consider the whole process a success.
-    // This is very permissive in the sense that the interface that has succeeded may not be
-    // enough to do anything useful, but on the other hand, the failure of a single interface
-    // to successfuly registered does not makes it obvious that it won't work.
-    if (kDNSServiceErr_NoError == err)
+void HostNameRegistrar::Unregister()
+{
+    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
+    // the dns daemon.
+    VerifyOrReturn(!IsLocalOnly());
+
+    StopMonitorInterfaces();
+    StopSharedConnection();
+}
+
+CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock)
+{
+    mInterfaceMonitor = nw_path_monitor_create();
+    VerifyOrReturnError(mInterfaceMonitor != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    nw_path_monitor_set_queue(mInterfaceMonitor, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+
+    nw_path_monitor_set_update_handler(mInterfaceMonitor, ^(nw_path_t path) {
+#if CHIP_DETAIL_LOGGING
+        LogDetails(path);
+#endif // CHIP_DETAIL_LOGGING
+
+        __block InetInterfacesVector inet;
+        __block Inet6InterfacesVector inet6;
+
+        // The loopback interfaces needs to be manually added. While lo0 is usually 1, this is not guaranteed. So search for a
+        // loopback interface with the specified interface id. If the specified interface id is kDNSServiceInterfaceIndexAny, it
+        // will look for all available loopback interfaces.
+        GetInterfaceAddresses(mInterfaceId, mAddressType, inet, inet6, true /* searchLoopbackOnly */);
+#if CHIP_DETAIL_LOGGING
+        LogDetails(inet, inet6);
+#endif // CHIP_DETAIL_LOGGING
+
+        auto status = nw_path_get_status(path);
+        if (status == nw_path_status_satisfied)
+        {
+            nw_path_enumerate_interfaces(path, ^(nw_interface_t interface) {
+                VerifyOrReturnValue(HasValidNetworkType(interface), true);
+                VerifyOrReturnValue(IsValidInterfaceId(mInterfaceId, interface), true);
+
+                auto targetInterfaceId = nw_interface_get_index(interface);
+                GetInterfaceAddresses(targetInterfaceId, mAddressType, inet, inet6);
+#if CHIP_DETAIL_LOGGING
+                LogDetails(interface, inet, inet6);
+#endif // CHIP_DETAIL_LOGGING
+                return true;
+            });
+        }
+
+        interfaceChangesBlock(inet, inet6);
+    });
+
+    nw_path_monitor_start(mInterfaceMonitor);
+
+    return CHIP_NO_ERROR;
+}
+
+void HostNameRegistrar::StopMonitorInterfaces()
+{
+    if (mInterfaceMonitor != nullptr)
     {
-        mRegistrationSuccess = true;
+        nw_path_monitor_cancel(mInterfaceMonitor);
+        nw_release(mInterfaceMonitor);
+        mInterfaceMonitor = nullptr;
+    }
+}
+
+CHIP_ERROR HostNameRegistrar::StartSharedConnection()
+{
+    auto err = DNSServiceCreateConnection(&mServiceRef);
+    VerifyOrReturnValue(kDNSServiceErr_NoError == err, Error::ToChipError(err));
+
+    err = DNSServiceSetDispatchQueue(mServiceRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    if (kDNSServiceErr_NoError != err)
+    {
+        StopSharedConnection();
     }
 
-    return mRegistrationCount != mRegistry.size();
+    return Error::ToChipError(err);
+}
+
+void HostNameRegistrar::StopSharedConnection()
+{
+    if (mServiceRef != nullptr)
+    {
+        // All the DNSRecordRefs registered to the shared DNSServiceRef will be deallocated.
+        DNSServiceRefDeallocate(mServiceRef);
+        mServiceRef = nullptr;
+    }
+}
+
+CHIP_ERROR HostNameRegistrar::ResetSharedConnection()
+{
+    StopSharedConnection();
+    ReturnLogErrorOnFailure(StartSharedConnection());
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Dnssd
