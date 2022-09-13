@@ -1087,6 +1087,9 @@ bool ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, uint
     {
         colorHueTransitionState->initialEnhancedHue = currentHue;
         colorHueTransitionState->currentEnhancedHue = currentHue;
+        Attributes::ColorMode::Set(endpoint, CurrentHueandCurrentSaturation);
+        Attributes::EnhancedColorMode::Set(endpoint, EnhancedCurrentHueandCurrentSaturation);
+
         colorHueTransitionState->finalEnhancedHue   = hue;
     }
     else
