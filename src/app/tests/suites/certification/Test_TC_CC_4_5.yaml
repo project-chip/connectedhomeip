@@ -39,7 +39,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToSaturation command to TH"
-      PICS: CC.C.C03.Rsp
+      PICS: CC.C.C03.Tx
       verification: |
           ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
 
@@ -82,7 +82,7 @@ tests:
     - label:
           "DUT reads CurrentSaturation attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C03.Rsp && CC.C.A0001
+      PICS: CC.C.C03.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
@@ -116,7 +116,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveSaturation command to TH"
-      PICS: CC.C.C04.Rsp
+      PICS: CC.C.C04.Tx
       verification: |
           ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
 
@@ -159,7 +159,7 @@ tests:
 
     - label:
           "DUT reads CurrentSaturation attribute (potentially multiple times)"
-      PICS: CC.C.C04.Rsp && CC.C.A0001
+      PICS: CC.C.C04.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
@@ -193,7 +193,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepSaturation command to TH"
-      PICS: CC.C.C05.Rsp
+      PICS: CC.C.C05.Tx
       verification: |
           ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
 
@@ -236,7 +236,7 @@ tests:
     - label:
           "DUT reads CurrentSaturation attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C05.Rsp && CC.C.A0001
+      PICS: CC.C.C05.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
@@ -268,7 +268,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToHueAndSaturation command to TH"
-      PICS: CC.C.C06.Rsp
+      PICS: CC.C.C06.Tx
       verification: |
           ./chip-tool colorcontrol move-to-hue-and-saturation 100 200 200 0 0 1 1
 
@@ -312,7 +312,7 @@ tests:
     - label:
           "DUT reads CurrentHue and CurrentSaturation attributes from TH
           (potentially multiple times)"
-      PICS: CC.C.C06.Rsp && CC.C.A0000 && CC.C.A0001
+      PICS: CC.C.C06.Tx && CC.C.A0000 && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
 
@@ -377,7 +377,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
@@ -416,7 +416,7 @@ tests:
 
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
-      PICS: CC.C.C47.Rsp && CC.C.A0001
+      PICS: CC.C.C47.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 

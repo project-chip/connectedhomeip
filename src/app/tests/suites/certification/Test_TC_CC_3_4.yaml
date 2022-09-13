@@ -39,7 +39,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToHue command to TH"
-      PICS: CC.C.C00.Rsp
+      PICS: CC.C.C00.Tx
       verification: |
           ./chip-tool colorcontrol move-to-hue 1 0 300 0 0 1 1
 
@@ -81,7 +81,7 @@ tests:
 
     - label:
           "DUT reads CurrentHue attribute from TH (potentially multiple times)"
-      PICS: CC.C.C00.Rsp && CC.C.A0000
+      PICS: CC.C.C00.Tx && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
@@ -113,7 +113,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveHue command to TH"
-      PICS: CC.C.C01.Rsp
+      PICS: CC.C.C01.Tx
       verification: |
           ./chip-tool colorcontrol move-hue 1 10 0 0 1 1
 
@@ -153,7 +153,7 @@ tests:
       disabled: true
 
     - label: "DUT reads CurrentHue attribute (potentially multiple times)"
-      PICS: CC.C.C01.Rsp && CC.C.A0000
+      PICS: CC.C.C01.Tx && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
@@ -187,7 +187,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepHue command to TH"
-      PICS: CC.C.C02.Rsp
+      PICS: CC.C.C02.Tx
       verification: |
           ./chip-tool colorcontrol step-hue 1 10 200 0 0 1 1
 
@@ -230,7 +230,7 @@ tests:
 
     - label:
           "DUT reads CurrentHue attribute from TH (potentially multiple times)"
-      PICS: CC.C.C02.Rsp && CC.C.A0000
+      PICS: CC.C.C02.Tx && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
@@ -263,7 +263,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
@@ -301,7 +301,7 @@ tests:
       disabled: true
 
     - label: "Over TransitionTime, DUT reads CurrentHue attribute from TH."
-      PICS: CC.C.C47.Rsp && CC.C.A0000
+      PICS: CC.C.C47.Tx && CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
 
