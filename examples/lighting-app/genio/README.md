@@ -32,7 +32,6 @@ The lighting example is intended to serve both as a means to explore the
 workings of CHIP as well as a template for creating real products based on the
 MediaTek platform.
 
-
 <a name="building"></a>
 
 ## Building
@@ -45,7 +44,7 @@ MediaTek platform.
 
     `Genio` 130A (MT7931) board:
 
-    - `EK-AI7931LD KIT`
+    -   `EK-AI7931LD KIT`
 
 *   Build the example application:
 
@@ -72,12 +71,13 @@ MediaTek platform.
 
 ## Flashing the Application
 
--   Copy the GUI based [Flash Tool](https://github.com/MediaTek-Labs/genio-matter-bsp/tree/main/flash_tool/FlashBurningTool_V2.83).
+-   Copy the GUI based
+    [Flash Tool](https://github.com/MediaTek-Labs/genio-matter-bsp/tree/main/flash_tool/FlashBurningTool_V2.83).
     from the Linux Host that the example was build to a Windows PC.
 
     Flash Tool can be found in this source tree under this directory
 
-      `third_party/mt793x_sdk/filogic/flash_tool`
+    `third_party/mt793x_sdk/filogic/flash_tool`
 
 -   On the Windows PC, run the Flash Tool
 
@@ -88,10 +88,11 @@ MediaTek platform.
 
 ## Running the Complete Example
 
-*   You can provision and control the Chip device using the python controller,
+-   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [CHIP Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md)
+    [CHIP
+    Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md)
 
     Here is an example with the CHIP Tool controller:
 
