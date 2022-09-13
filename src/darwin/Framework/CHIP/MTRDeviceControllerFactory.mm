@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#import "MTRControllerFactory.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRCertificates.h"
@@ -24,6 +24,7 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRError_Internal.h"
 #import "MTRLogging.h"
 #import "MTRMemory.h"
 #import "MTROTAProviderDelegateBridge.h"
@@ -57,7 +58,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 
-@interface MTRControllerFactory ()
+@interface MTRDeviceControllerFactory ()
 
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
@@ -81,15 +82,15 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 - (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
 @end
 
-@implementation MTRControllerFactory
+@implementation MTRDeviceControllerFactory
 
 + (instancetype)sharedInstance
 {
-    static MTRControllerFactory * factory = nil;
+    static MTRDeviceControllerFactory * factory = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // initialize the factory.
-        factory = [[MTRControllerFactory alloc] init];
+        factory = [[MTRDeviceControllerFactory alloc] init];
     });
     return factory;
 }
@@ -100,7 +101,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         return nil;
     }
 
-    _isRunning = NO;
+    _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
     [MTRMemory ensureInit];
@@ -132,8 +133,21 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 - (void)dealloc
 {
-    [self shutdown];
+    [self stopControllerFactory];
     [self cleanupInitObjects];
+}
+
+- (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
+{
+    if ([self isRunning]) {
+        return YES;
+    }
+
+    if (error != nil) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+    }
+
+    return NO;
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
@@ -200,7 +214,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     }
 }
 
-- (BOOL)startup:(MTRControllerFactoryParams *)startupParams
+- (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error;
 {
     if ([self isRunning]) {
         MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
@@ -209,6 +223,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             return;
@@ -219,6 +234,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storage);
         if (_persistentStorageDelegateBridge == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
+            errorCode = CHIP_ERROR_NO_MEMORY;
             return;
         }
 
@@ -226,6 +242,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
             if (_otaProviderDelegateBridge == nil) {
                 MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
+                errorCode = CHIP_ERROR_NO_MEMORY;
                 return;
             }
         }
@@ -234,10 +251,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         _keystore = new PersistentStorageOperationalKeystore();
         if (_keystore == nullptr) {
             MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            errorCode = CHIP_ERROR_NO_MEMORY;
             return;
         }
 
-        CHIP_ERROR errorCode = _keystore->Init(_persistentStorageDelegateBridge);
+        errorCode = _keystore->Init(_persistentStorageDelegateBridge);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
             return;
@@ -247,6 +265,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
         if (_opCertStore == nullptr) {
             MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
+            errorCode = CHIP_ERROR_NO_MEMORY;
             return;
         }
 
@@ -262,6 +281,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
+                errorCode = CHIP_ERROR_NO_MEMORY;
                 return;
             }
             trustStore = _attestationTrustStoreBridge;
@@ -272,6 +292,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         _deviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
         if (_deviceAttestationVerifier == nullptr) {
             MTR_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
+            errorCode = CHIP_ERROR_NO_MEMORY;
             return;
         }
 
@@ -279,6 +300,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
             if (cdTrustStore == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
+                errorCode = CHIP_ERROR_INCORRECT_STATE;
                 return;
             }
 
@@ -295,7 +317,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         if (startupParams.port != nil) {
             params.listenPort = [startupParams.port unsignedShortValue];
         }
-        if (startupParams.startServer == YES) {
+        if (startupParams.shouldStartServer == YES) {
             params.enableServerInteractions = true;
         }
 
@@ -309,7 +331,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
-        self->_isRunning = YES;
+        self->_running = YES;
     });
 
     // Make sure to stop the event loop again before returning, so we are not running it while we don't have any controllers.
@@ -317,12 +339,15 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     if (![self isRunning]) {
         [self cleanupStartupObjects];
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:errorCode];
+        }
     }
 
     return [self isRunning];
 }
 
-- (void)shutdown
+- (void)stopControllerFactory
 {
     if (![self isRunning]) {
         return;
@@ -341,12 +366,13 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     // that does not re-create the objects that we create inside init.
     // Maybe we should be creating them in startup?
 
-    _isRunning = NO;
+    _running = NO;
 }
 
-- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+- (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                              error:(NSError * __autoreleasing *)error
 {
-    if (![self isRunning]) {
+    if (![self checkIsRunning:error]) {
         MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
     }
@@ -355,10 +381,14 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     // our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+        }
         return nil;
     }
 
     __block MTRDeviceControllerStartupParamsInternal * params = nil;
+    __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
     // We want the block to end up with just a pointer to the fabric table,
     // since we know our on-stack instance will outlive the block.
     FabricTable fabricTableInstance;
@@ -368,11 +398,13 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             MTR_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
+            fabricError = CHIP_ERROR_INTERNAL;
             return;
         }
 
         if (fabric == nullptr) {
             MTR_LOG_ERROR("Can't start on existing fabric: fabric not found");
+            fabricError = CHIP_ERROR_NOT_FOUND;
             return;
         }
 
@@ -381,11 +413,13 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
                 != CHIP_NO_ERROR) {
                 MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
+                fabricError = CHIP_ERROR_INTERNAL;
                 return;
             }
 
             if (isRunning) {
                 MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
+                fabricError = CHIP_ERROR_INCORRECT_STATE;
                 return;
             }
         }
@@ -394,22 +428,39 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
                                                                              fabricIndex:fabric->GetFabricIndex()
                                                                                 keystore:_keystore
                                                                                   params:startupParams];
+        if (params == nil) {
+            fabricError = CHIP_ERROR_NO_MEMORY;
+        }
     });
 
     if (params == nil) {
         [self controllerShuttingDown:controller];
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:fabricError];
+        }
         return nil;
     }
 
     BOOL ok = [controller startup:params];
     if (ok == NO) {
+        // TODO: get error from controller's startup.
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
+        }
         return nil;
     }
 
-    return [self maybeInitializeOTAProvider:controller];
+    controller = [self maybeInitializeOTAProvider:controller];
+    if (controller == nil) {
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
+        }
+    }
+    return controller;
 }
 
-- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+- (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+                                                         error:(NSError * __autoreleasing *)error
 {
     if (![self isRunning]) {
         MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
@@ -430,10 +481,14 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     // our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+        }
         return nil;
     }
 
     __block MTRDeviceControllerStartupParamsInternal * params = nil;
+    __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
     // We want the block to end up with just a pointer to the fabric table,
     // since we know our on-stack instance will outlive the block.
     FabricTable fabricTableInstance;
@@ -443,30 +498,49 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             MTR_LOG_ERROR("Can't start on new fabric: fabric matching failed");
+            fabricError = CHIP_ERROR_INTERNAL;
             return;
         }
 
         if (fabric != nullptr) {
             MTR_LOG_ERROR("Can't start on new fabric that matches existing fabric");
+            fabricError = CHIP_ERROR_INCORRECT_STATE;
             return;
         }
 
         params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                            keystore:_keystore
                                                                              params:startupParams];
+        if (params == nil) {
+            fabricError = CHIP_ERROR_NO_MEMORY;
+        }
     });
 
     if (params == nil) {
         [self controllerShuttingDown:controller];
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:fabricError];
+        }
         return nil;
     }
 
     BOOL ok = [controller startup:params];
     if (ok == NO) {
+        // TODO: get error from controller's startup.
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
+        }
         return nil;
     }
 
-    return [self maybeInitializeOTAProvider:controller];
+    // TODO: Need better error propagation.
+    controller = [self maybeInitializeOTAProvider:controller];
+    if (controller == nil) {
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL];
+        }
+    }
+    return controller;
 }
 
 - (MTRDeviceController * _Nullable)createController
@@ -553,7 +627,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @end
 
-@implementation MTRControllerFactory (InternalMethods)
+@implementation MTRDeviceControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
@@ -593,6 +667,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             [controller shutDownCppController];
         });
     }
+
+    [controller deinitFromFactory];
 }
 
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
@@ -618,7 +694,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @end
 
-@implementation MTRControllerFactoryParams
+@implementation MTRDeviceControllerFactoryParams
 
 - (instancetype)initWithStorage:(id<MTRStorage>)storage
 {
@@ -631,7 +707,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _paaCerts = nil;
     _cdCerts = nil;
     _port = nil;
-    _startServer = NO;
+    _shouldStartServer = NO;
 
     return self;
 }

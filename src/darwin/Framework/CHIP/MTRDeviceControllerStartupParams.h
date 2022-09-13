@@ -28,9 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
  *
  * Allowed to be nil if this controller will not be issuing operational
- * certificates.  In that case, the MTRDeviceControllerStartupParams object
- * must be initialized using initWithOperationalKeypair (to provide the
- * operational credentials for the controller itself).
+ * certificates.  In that case, the MTRDeviceControllerStartupParams object must
+ * be initialized using
+ * initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:
+ * (to provide the operational credentials for the controller itself).
  */
 @property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
 /**
@@ -98,8 +99,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * nodeID;
-
-// TODO: Add something here for CATs?
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -198,14 +197,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk;
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner;
 
 /**
  * Prepare to initialize a controller with a complete operational certificate
  * chain.  This initialization method should be used when none of the
  * certificate-signing private keys are available locally.
  *
- * The fabric id and node if to use will be derived from the provided
+ * The fabric id and node id to use will be derived from the provided
  * operationalCertificate.
  *
  * intermediateCertificate may be nil if operationalCertificate is signed by
@@ -213,11 +212,11 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length.
  */
-- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
-                                       ipk:(NSData *)ipk;
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes *)rootCertificate;
 
 @end
 

@@ -76,9 +76,9 @@ MTRDeviceController * InitializeMTR(void)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        __auto_type * factory = [MTRControllerFactory sharedInstance];
-        __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
-        if (![factory startup:factoryParams]) {
+        __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startControllerFactory:factoryParams error:nil]) {
             return;
         }
 
@@ -87,14 +87,14 @@ MTRDeviceController * InitializeMTR(void)
             return;
         }
 
-        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricID:@(1) ipk:keys.ipk];
+        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:keys.ipk fabricID:@(1) nocSigner:keys];
         params.vendorID = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
-        sController = [factory startControllerOnExistingFabric:params];
+        sController = [factory createControllerOnExistingFabric:params error:nil];
         if (sController == nil) {
-            sController = [factory startControllerOnNewFabric:params];
+            sController = [factory createControllerOnNewFabric:params error:nil];
         }
     });
 
@@ -113,9 +113,9 @@ MTRDeviceController * MTRRestartController(MTRDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricID:@(1) ipk:keys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:keys.ipk fabricID:@(1) nocSigner:keys];
 
-    sController = [[MTRControllerFactory sharedInstance] startControllerOnExistingFabric:params];
+    sController = [[MTRDeviceControllerFactory sharedInstance] createControllerOnExistingFabric:params error:nil];
 
     return sController;
 }
