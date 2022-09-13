@@ -408,7 +408,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(uint16_t handle, void * data, uint16_
     app_bt_connection_cb_t * bleConnState;
     bool isDisabled;
     ChipDeviceEvent event;
-    bleConnState = find_conneciton_info_by_handle(handle);
+    bleConnState = find_connection_info_by_handle(handle);
     VerifyOrExit(bleConnState != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     VerifyOrExit(size == sizeof(uint16_t), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
