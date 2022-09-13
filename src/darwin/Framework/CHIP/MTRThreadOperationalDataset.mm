@@ -35,12 +35,12 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 
 @implementation MTRThreadOperationalDataset
 
-- (nullable instancetype)initWithNetworkName:(NSString *)networkName
-                               extendedPANID:(NSData *)extendedPANID
-                                   masterKey:(NSData *)masterKey
-                                        PSKc:(NSData *)PSKc
-                                     channel:(NSNumber *)channel
-                                       panID:(NSData *)panID
+- (instancetype _Nullable)initWithNetworkName:(NSString *)networkName
+                                extendedPANID:(NSData *)extendedPANID
+                                    masterKey:(NSData *)masterKey
+                                         PSKc:(NSData *)PSKc
+                                      channel:(NSNumber *)channel
+                                        panID:(NSData *)panID
 {
     if (self = [super init]) {
         _networkName = networkName;
@@ -110,7 +110,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     return YES;
 }
 
-- (nullable instancetype)initWithData:(NSData *)data
+- (instancetype _Nullable)initWithData:(NSData *)data
 {
     chip::ByteSpan span = chip::ByteSpan((uint8_t *) data.bytes, data.length);
     auto dataset = chip::Thread::OperationalDataset();

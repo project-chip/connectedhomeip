@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRIdentifyClusterTriggerEffectParams : NSObject <NSCopying>
 
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupParams : NSObject <NSCopying>
 
@@ -88,7 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupResponseParams : NSObject <NSCopying>
 
@@ -112,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterViewGroupParams : NSObject <NSCopying>
 
@@ -134,7 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterViewGroupResponseParams : NSObject <NSCopying>
 
@@ -160,7 +160,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterGetGroupMembershipParams : NSObject <NSCopying>
 
@@ -182,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterGetGroupMembershipResponseParams : NSObject <NSCopying>
 
@@ -206,7 +206,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveGroupParams : NSObject <NSCopying>
 
@@ -228,7 +228,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveGroupResponseParams : NSObject <NSCopying>
 
@@ -252,7 +252,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveAllGroupsParams : NSObject <NSCopying>
 /**
@@ -272,7 +272,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject <NSCopying>
 
@@ -296,7 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterAddSceneParams : NSObject <NSCopying>
 
@@ -326,7 +326,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterAddSceneResponseParams : NSObject <NSCopying>
 
@@ -352,7 +352,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterViewSceneParams : NSObject <NSCopying>
 
@@ -376,7 +376,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterViewSceneResponseParams : NSObject <NSCopying>
 
@@ -408,7 +408,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveSceneParams : NSObject <NSCopying>
 
@@ -432,7 +432,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveSceneResponseParams : NSObject <NSCopying>
 
@@ -458,7 +458,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveAllScenesParams : NSObject <NSCopying>
 
@@ -480,7 +480,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
 
@@ -504,7 +504,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterStoreSceneParams : NSObject <NSCopying>
 
@@ -528,7 +528,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterStoreSceneResponseParams : NSObject <NSCopying>
 
@@ -554,7 +554,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRecallSceneParams : NSObject <NSCopying>
 
@@ -580,7 +580,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterGetSceneMembershipParams : NSObject <NSCopying>
 
@@ -602,7 +602,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
 
@@ -630,7 +630,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedAddSceneParams : NSObject <NSCopying>
 
@@ -660,7 +660,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
 
@@ -686,7 +686,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedViewSceneParams : NSObject <NSCopying>
 
@@ -710,7 +710,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
 
@@ -742,7 +742,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterCopySceneParams : NSObject <NSCopying>
 
@@ -772,7 +772,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterCopySceneResponseParams : NSObject <NSCopying>
 
@@ -798,7 +798,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOffParams : NSObject <NSCopying>
 /**
@@ -818,7 +818,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnParams : NSObject <NSCopying>
 /**
@@ -838,7 +838,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterToggleParams : NSObject <NSCopying>
 /**
@@ -858,7 +858,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOffWithEffectParams : NSObject <NSCopying>
 
@@ -882,7 +882,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnWithRecallGlobalSceneParams : NSObject <NSCopying>
 /**
@@ -902,7 +902,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnWithTimedOffParams : NSObject <NSCopying>
 
@@ -928,7 +928,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToLevelParams : NSObject <NSCopying>
 
@@ -956,7 +956,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveParams : NSObject <NSCopying>
 
@@ -984,7 +984,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStepParams : NSObject <NSCopying>
 
@@ -1014,7 +1014,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStopParams : NSObject <NSCopying>
 
@@ -1038,7 +1038,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToLevelWithOnOffParams : NSObject <NSCopying>
 
@@ -1066,7 +1066,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveWithOnOffParams : NSObject <NSCopying>
 
@@ -1094,7 +1094,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStepWithOnOffParams : NSObject <NSCopying>
 
@@ -1124,7 +1124,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStopWithOnOffParams : NSObject <NSCopying>
 
@@ -1148,7 +1148,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToClosestFrequencyParams : NSObject <NSCopying>
 
@@ -1170,7 +1170,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterInstantActionParams : NSObject <NSCopying>
 
@@ -1194,7 +1194,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterInstantActionWithTransitionParams : NSObject <NSCopying>
 
@@ -1220,7 +1220,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStartActionParams : NSObject <NSCopying>
 
@@ -1244,7 +1244,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStartActionWithDurationParams : NSObject <NSCopying>
 
@@ -1270,7 +1270,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStopActionParams : NSObject <NSCopying>
 
@@ -1294,7 +1294,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterPauseActionParams : NSObject <NSCopying>
 
@@ -1318,7 +1318,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterPauseActionWithDurationParams : NSObject <NSCopying>
 
@@ -1344,7 +1344,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterResumeActionParams : NSObject <NSCopying>
 
@@ -1368,7 +1368,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterEnableActionParams : NSObject <NSCopying>
 
@@ -1392,7 +1392,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterEnableActionWithDurationParams : NSObject <NSCopying>
 
@@ -1418,7 +1418,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterDisableActionParams : NSObject <NSCopying>
 
@@ -1442,7 +1442,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterDisableActionWithDurationParams : NSObject <NSCopying>
 
@@ -1468,7 +1468,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
@@ -1488,7 +1488,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
@@ -1524,7 +1524,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
@@ -1560,7 +1560,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
@@ -1584,7 +1584,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
@@ -1608,7 +1608,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
 
@@ -1632,7 +1632,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
@@ -1662,7 +1662,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterArmFailSafeParams : NSObject <NSCopying>
 
@@ -1686,7 +1686,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterArmFailSafeResponseParams : NSObject <NSCopying>
 
@@ -1710,7 +1710,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject <NSCopying>
 
@@ -1736,7 +1736,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject <NSCopying>
 
@@ -1760,7 +1760,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterCommissioningCompleteParams : NSObject <NSCopying>
 /**
@@ -1780,7 +1780,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject <NSCopying>
 
@@ -1804,7 +1804,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterScanNetworksParams : NSObject <NSCopying>
 
@@ -1828,7 +1828,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterScanNetworksResponseParams : NSObject <NSCopying>
 
@@ -1856,7 +1856,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject <NSCopying>
 
@@ -1882,7 +1882,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject <NSCopying>
 
@@ -1906,7 +1906,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterRemoveNetworkParams : NSObject <NSCopying>
 
@@ -1930,7 +1930,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterNetworkConfigResponseParams : NSObject <NSCopying>
 
@@ -1956,7 +1956,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterConnectNetworkParams : NSObject <NSCopying>
 
@@ -1980,7 +1980,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterConnectNetworkResponseParams : NSObject <NSCopying>
 
@@ -2006,7 +2006,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterReorderNetworkParams : NSObject <NSCopying>
 
@@ -2032,7 +2032,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject <NSCopying>
 
@@ -2058,7 +2058,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject <NSCopying>
 
@@ -2086,7 +2086,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralDiagnosticsClusterTestEventTriggerParams : NSObject <NSCopying>
 
@@ -2110,7 +2110,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRSoftwareDiagnosticsClusterResetWatermarksParams : NSObject <NSCopying>
 /**
@@ -2130,7 +2130,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThreadNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2150,7 +2150,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2170,7 +2170,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTREthernetNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2190,7 +2190,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTimeSynchronizationClusterSetUtcTimeParams : NSObject <NSCopying>
 
@@ -2216,7 +2216,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject <NSCopying>
 
@@ -2246,7 +2246,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject <NSCopying>
 
@@ -2268,7 +2268,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterRevokeCommissioningParams : NSObject <NSCopying>
 /**
@@ -2288,7 +2288,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAttestationRequestParams : NSObject <NSCopying>
 
@@ -2310,7 +2310,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAttestationResponseParams : NSObject <NSCopying>
 
@@ -2334,7 +2334,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject <NSCopying>
 
@@ -2356,7 +2356,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject <NSCopying>
 
@@ -2378,7 +2378,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCSRRequestParams : NSObject <NSCopying>
 
@@ -2402,7 +2402,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCSRResponseParams : NSObject <NSCopying>
 
@@ -2426,7 +2426,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAddNOCParams : NSObject <NSCopying>
 
@@ -2456,7 +2456,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterUpdateNOCParams : NSObject <NSCopying>
 
@@ -2480,7 +2480,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterNOCResponseParams : NSObject <NSCopying>
 
@@ -2506,7 +2506,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterUpdateFabricLabelParams : NSObject <NSCopying>
 
@@ -2528,7 +2528,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterRemoveFabricParams : NSObject <NSCopying>
 
@@ -2550,7 +2550,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject <NSCopying>
 
@@ -2572,7 +2572,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetWriteParams : NSObject <NSCopying>
 
@@ -2594,7 +2594,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadParams : NSObject <NSCopying>
 
@@ -2616,7 +2616,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadResponseParams : NSObject <NSCopying>
 
@@ -2638,7 +2638,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetRemoveParams : NSObject <NSCopying>
 
@@ -2660,7 +2660,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject <NSCopying>
 
@@ -2682,7 +2682,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject <NSCopying>
 
@@ -2704,7 +2704,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
@@ -2726,7 +2726,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterLockDoorParams : NSObject <NSCopying>
 
@@ -2748,7 +2748,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterUnlockDoorParams : NSObject <NSCopying>
 
@@ -2770,7 +2770,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterUnlockWithTimeoutParams : NSObject <NSCopying>
 
@@ -2794,7 +2794,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2828,7 +2828,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2852,7 +2852,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetWeekDayScheduleResponseParams : NSObject <NSCopying>
 
@@ -2888,7 +2888,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2912,7 +2912,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetYearDayScheduleParams : NSObject <NSCopying>
 
@@ -2940,7 +2940,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetYearDayScheduleParams : NSObject <NSCopying>
 
@@ -2964,7 +2964,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetYearDayScheduleResponseParams : NSObject <NSCopying>
 
@@ -2994,7 +2994,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearYearDayScheduleParams : NSObject <NSCopying>
 
@@ -3018,7 +3018,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3046,7 +3046,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3068,7 +3068,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetHolidayScheduleResponseParams : NSObject <NSCopying>
 
@@ -3098,7 +3098,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3120,7 +3120,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetUserParams : NSObject <NSCopying>
 
@@ -3154,7 +3154,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetUserParams : NSObject <NSCopying>
 
@@ -3176,7 +3176,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetUserResponseParams : NSObject <NSCopying>
 
@@ -3216,7 +3216,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearUserParams : NSObject <NSCopying>
 
@@ -3238,7 +3238,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetCredentialParams : NSObject <NSCopying>
 
@@ -3270,7 +3270,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetCredentialResponseParams : NSObject <NSCopying>
 
@@ -3296,7 +3296,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetCredentialStatusParams : NSObject <NSCopying>
 
@@ -3318,7 +3318,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetCredentialStatusResponseParams : NSObject <NSCopying>
 
@@ -3348,7 +3348,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearCredentialParams : NSObject <NSCopying>
 
@@ -3370,7 +3370,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterUpOrOpenParams : NSObject <NSCopying>
 /**
@@ -3390,7 +3390,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterDownOrCloseParams : NSObject <NSCopying>
 /**
@@ -3410,7 +3410,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterStopMotionParams : NSObject <NSCopying>
 /**
@@ -3430,7 +3430,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToLiftValueParams : NSObject <NSCopying>
 
@@ -3452,7 +3452,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToLiftPercentageParams : NSObject <NSCopying>
 
@@ -3474,7 +3474,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToTiltValueParams : NSObject <NSCopying>
 
@@ -3496,7 +3496,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToTiltPercentageParams : NSObject <NSCopying>
 
@@ -3518,7 +3518,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBarrierControlClusterBarrierControlGoToPercentParams : NSObject <NSCopying>
 
@@ -3540,7 +3540,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBarrierControlClusterBarrierControlStopParams : NSObject <NSCopying>
 /**
@@ -3560,7 +3560,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterSetpointRaiseLowerParams : NSObject <NSCopying>
 
@@ -3584,7 +3584,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterGetWeeklyScheduleResponseParams : NSObject <NSCopying>
 
@@ -3612,7 +3612,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterSetWeeklyScheduleParams : NSObject <NSCopying>
 
@@ -3640,7 +3640,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterGetWeeklyScheduleParams : NSObject <NSCopying>
 
@@ -3664,7 +3664,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterClearWeeklyScheduleParams : NSObject <NSCopying>
 /**
@@ -3684,7 +3684,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToHueParams : NSObject <NSCopying>
 
@@ -3714,7 +3714,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveHueParams : NSObject <NSCopying>
 
@@ -3742,7 +3742,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepHueParams : NSObject <NSCopying>
 
@@ -3772,7 +3772,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToSaturationParams : NSObject <NSCopying>
 
@@ -3800,7 +3800,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveSaturationParams : NSObject <NSCopying>
 
@@ -3828,7 +3828,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepSaturationParams : NSObject <NSCopying>
 
@@ -3858,7 +3858,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToHueAndSaturationParams : NSObject <NSCopying>
 
@@ -3888,7 +3888,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToColorParams : NSObject <NSCopying>
 
@@ -3918,7 +3918,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveColorParams : NSObject <NSCopying>
 
@@ -3946,7 +3946,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepColorParams : NSObject <NSCopying>
 
@@ -3976,7 +3976,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject <NSCopying>
 
@@ -4004,7 +4004,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveToHueParams : NSObject <NSCopying>
 
@@ -4034,7 +4034,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveHueParams : NSObject <NSCopying>
 
@@ -4062,7 +4062,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedStepHueParams : NSObject <NSCopying>
 
@@ -4092,7 +4092,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject <NSCopying>
 
@@ -4122,7 +4122,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterColorLoopSetParams : NSObject <NSCopying>
 
@@ -4156,7 +4156,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStopMoveStepParams : NSObject <NSCopying>
 
@@ -4180,7 +4180,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveColorTemperatureParams : NSObject <NSCopying>
 
@@ -4212,7 +4212,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepColorTemperatureParams : NSObject <NSCopying>
 
@@ -4246,7 +4246,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelParams : NSObject <NSCopying>
 
@@ -4268,7 +4268,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelResponseParams : NSObject <NSCopying>
 
@@ -4292,7 +4292,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelByNumberParams : NSObject <NSCopying>
 
@@ -4316,7 +4316,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterSkipChannelParams : NSObject <NSCopying>
 
@@ -4338,7 +4338,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTargetNavigatorClusterNavigateTargetParams : NSObject <NSCopying>
 
@@ -4362,7 +4362,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTargetNavigatorClusterNavigateTargetResponseParams : NSObject <NSCopying>
 
@@ -4386,7 +4386,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPlayParams : NSObject <NSCopying>
 /**
@@ -4406,7 +4406,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPauseParams : NSObject <NSCopying>
 /**
@@ -4426,7 +4426,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject <NSCopying>
 /**
@@ -4446,7 +4446,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterStartOverParams : NSObject <NSCopying>
 /**
@@ -4466,7 +4466,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPreviousParams : NSObject <NSCopying>
 /**
@@ -4486,7 +4486,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterNextParams : NSObject <NSCopying>
 /**
@@ -4506,7 +4506,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterRewindParams : NSObject <NSCopying>
 /**
@@ -4526,7 +4526,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterFastForwardParams : NSObject <NSCopying>
 /**
@@ -4546,7 +4546,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSkipForwardParams : NSObject <NSCopying>
 
@@ -4568,7 +4568,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSkipBackwardParams : NSObject <NSCopying>
 
@@ -4590,7 +4590,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPlaybackResponseParams : NSObject <NSCopying>
 
@@ -4614,7 +4614,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSeekParams : NSObject <NSCopying>
 
@@ -4636,7 +4636,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterSelectInputParams : NSObject <NSCopying>
 
@@ -4658,7 +4658,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterShowInputStatusParams : NSObject <NSCopying>
 /**
@@ -4678,7 +4678,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterHideInputStatusParams : NSObject <NSCopying>
 /**
@@ -4698,7 +4698,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterRenameInputParams : NSObject <NSCopying>
 
@@ -4722,7 +4722,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLowPowerClusterSleepParams : NSObject <NSCopying>
 /**
@@ -4742,7 +4742,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRKeypadInputClusterSendKeyParams : NSObject <NSCopying>
 
@@ -4764,7 +4764,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRKeypadInputClusterSendKeyResponseParams : NSObject <NSCopying>
 
@@ -4786,7 +4786,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchContentParams : NSObject <NSCopying>
 
@@ -4812,7 +4812,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchURLParams : NSObject <NSCopying>
 
@@ -4838,7 +4838,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchResponseParams : NSObject <NSCopying>
 
@@ -4862,7 +4862,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAudioOutputClusterSelectOutputParams : NSObject <NSCopying>
 
@@ -4884,7 +4884,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAudioOutputClusterRenameOutputParams : NSObject <NSCopying>
 
@@ -4908,7 +4908,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterLaunchAppParams : NSObject <NSCopying>
 
@@ -4932,7 +4932,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterStopAppParams : NSObject <NSCopying>
 
@@ -4954,7 +4954,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterHideAppParams : NSObject <NSCopying>
 
@@ -4976,7 +4976,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterLauncherResponseParams : NSObject <NSCopying>
 
@@ -5000,7 +5000,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterGetSetupPINParams : NSObject <NSCopying>
 
@@ -5022,7 +5022,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject <NSCopying>
 
@@ -5044,7 +5044,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterLoginParams : NSObject <NSCopying>
 
@@ -5068,7 +5068,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterLogoutParams : NSObject <NSCopying>
 /**
@@ -5088,7 +5088,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject <NSCopying>
 
@@ -5116,7 +5116,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject <NSCopying>
 /**
@@ -5136,7 +5136,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject <NSCopying>
 
@@ -5168,7 +5168,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject <NSCopying>
 
@@ -5194,7 +5194,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestParams : NSObject <NSCopying>
 /**
@@ -5214,7 +5214,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestSpecificResponseParams : NSObject <NSCopying>
 
@@ -5236,7 +5236,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestNotHandledParams : NSObject <NSCopying>
 /**
@@ -5256,7 +5256,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
@@ -5278,7 +5278,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestSpecificParams : NSObject <NSCopying>
 /**
@@ -5298,7 +5298,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
@@ -5320,7 +5320,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestUnknownCommandParams : NSObject <NSCopying>
 /**
@@ -5340,7 +5340,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
@@ -5372,7 +5372,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestAddArgumentsParams : NSObject <NSCopying>
 
@@ -5396,7 +5396,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
@@ -5418,7 +5418,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
@@ -5440,7 +5440,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEnumsResponseParams : NSObject <NSCopying>
 
@@ -5464,7 +5464,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
@@ -5496,7 +5496,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
@@ -5524,7 +5524,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
@@ -5546,7 +5546,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
@@ -5622,7 +5622,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
@@ -5644,7 +5644,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterBooleanResponseParams : NSObject <NSCopying>
 
@@ -5666,7 +5666,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
@@ -5688,7 +5688,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterSimpleStructResponseParams : NSObject <NSCopying>
 
@@ -5710,7 +5710,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
@@ -5732,7 +5732,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
@@ -5754,7 +5754,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
@@ -5776,7 +5776,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
@@ -5798,7 +5798,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
@@ -5820,7 +5820,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
@@ -5842,7 +5842,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEnumsRequestParams : NSObject <NSCopying>
 
@@ -5866,7 +5866,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
@@ -5888,7 +5888,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
@@ -5932,7 +5932,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
@@ -5954,7 +5954,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTimedInvokeRequestParams : NSObject <NSCopying>
 /**
@@ -5974,7 +5974,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
@@ -5996,7 +5996,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
@@ -6022,7 +6022,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
@@ -6044,7 +6044,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRFaultInjectionClusterFailAtFaultParams : NSObject <NSCopying>
 
@@ -6074,7 +6074,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRFaultInjectionClusterFailRandomlyAtFaultParams : NSObject <NSCopying>
 
@@ -6100,7 +6100,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 NS_ASSUME_NONNULL_END

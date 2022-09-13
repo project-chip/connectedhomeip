@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Get the data for the given key.  Returns nil if there is no data for the
  * key.
  */
-- (nullable NSData *)storageDataForKey:(NSString *)key;
+- (NSData * _Nullable)storageDataForKey:(NSString *)key;
 
 /**
  * Set the data for the viven key to the given value.  Returns YES if the key

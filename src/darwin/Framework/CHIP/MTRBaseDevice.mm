@@ -301,7 +301,7 @@ public:
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(NSNumber *)minInterval
                 maxInterval:(NSNumber *)maxInterval
-                     params:(nullable MTRSubscribeParams *)params
+                     params:(MTRSubscribeParams * _Nullable)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -771,12 +771,12 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                        attributeID:(NSNumber *)attributeID
-                             params:(MTRReadParams * _Nullable)params
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
+- (void)readAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
+                              clusterID:(NSNumber * _Nullable)clusterID
+                            attributeID:(NSNumber * _Nullable)attributeID
+                                 params:(MTRReadParams * _Nullable)params
+                                  queue:(dispatch_queue_t)queue
+                             completion:(MTRDeviceResponseHandler)completion
 {
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
@@ -1114,15 +1114,15 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
-                               clusterID:(NSNumber * _Nullable)clusterID
-                             attributeID:(NSNumber * _Nullable)attributeID
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(MTRSubscribeParams * _Nullable)params
-                                   queue:(dispatch_queue_t)queue
-                           reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
+- (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                   clusterID:(NSNumber * _Nullable)clusterID
+                                 attributeID:(NSNumber * _Nullable)attributeID
+                                 minInterval:(NSNumber *)minInterval
+                                 maxInterval:(NSNumber *)maxInterval
+                                      params:(MTRSubscribeParams * _Nullable)params
+                                       queue:(dispatch_queue_t)queue
+                               reportHandler:(MTRDeviceResponseHandler)reportHandler
+                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
@@ -1525,6 +1525,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
     return [[MTREventPath alloc] initWithPath:path];
 }
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTREventPath eventPathWithEndpointID:_endpoint clusterID:_cluster eventID:_event];
+}
 @end
 
 @implementation MTRCommandPath
@@ -1545,10 +1550,15 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
     return [[MTRCommandPath alloc] initWithPath:path];
 }
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRCommandPath commandPathWithEndpointID:_endpoint clusterID:_cluster commandID:_command];
+}
 @end
 
 @implementation MTRAttributeReport
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(id _Nullable)value error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTRAttributePath alloc] initWithPath:path];
@@ -1564,8 +1574,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
                    timestamp:(NSNumber *)timestamp
-                       value:(nullable id)value
-                       error:(nullable NSError *)error
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];

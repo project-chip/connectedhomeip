@@ -506,7 +506,7 @@
         } else {
             MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
             params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
-            params.failSafeExpiryTimeoutSecs = @600;
+            params.failSafeExpiryTimeout = @600;
             NSError * error;
             if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
                 NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
@@ -674,7 +674,7 @@
     params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
     params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
-    params.failSafeExpiryTimeoutSecs = @600;
+    params.failSafeExpiryTimeout = @600;
 
     uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
 

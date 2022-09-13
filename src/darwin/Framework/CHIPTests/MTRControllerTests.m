@@ -395,13 +395,13 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
+    __auto_type * root1 = [MTRCertificates createRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root1);
 
-    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
+    __auto_type * root2 = [MTRCertificates createRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root2);
 
-    __auto_type * root3 = [MTRCertificates generateRootCertificate:testKeys issuerID:@2 fabricID:@1 error:nil];
+    __auto_type * root3 = [MTRCertificates createRootCertificate:testKeys issuerID:@2 fabricID:@1 error:nil];
     XCTAssertNotNil(root3);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
@@ -465,10 +465,10 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * root1 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
+    __auto_type * root1 = [MTRCertificates createRootCertificate:testKeys issuerID:@1 fabricID:@1 error:nil];
     XCTAssertNotNil(root1);
 
-    __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerID:@1 fabricID:@2 error:nil];
+    __auto_type * root2 = [MTRCertificates createRootCertificate:testKeys issuerID:@1 fabricID:@2 error:nil];
     XCTAssertNotNil(root2);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
@@ -526,7 +526,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * signerKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(signerKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:signerKeys
@@ -559,18 +559,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:nil
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
@@ -811,18 +811,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:nil
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys
@@ -875,18 +875,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:nil
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
@@ -939,29 +939,29 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys1 = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys1);
 
-    __auto_type * intermediate1 = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                   rootCertificate:root
-                                                             intermediatePublicKey:intermediateKeys1.publicKey
-                                                                          issuerID:nil
-                                                                          fabricID:nil
-                                                                             error:nil];
+    __auto_type * intermediate1 = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                 rootCertificate:root
+                                                           intermediatePublicKey:intermediateKeys1.publicKey
+                                                                        issuerID:nil
+                                                                        fabricID:nil
+                                                                           error:nil];
     XCTAssertNotNil(intermediate1);
 
     __auto_type * intermediateKeys2 = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys2);
 
-    __auto_type * intermediate2 = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                   rootCertificate:root
-                                                             intermediatePublicKey:intermediateKeys2.publicKey
-                                                                          issuerID:nil
-                                                                          fabricID:nil
-                                                                             error:nil];
+    __auto_type * intermediate2 = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                 rootCertificate:root
+                                                           intermediatePublicKey:intermediateKeys2.publicKey
+                                                                        issuerID:nil
+                                                                        fabricID:nil
+                                                                           error:nil];
     XCTAssertNotNil(intermediate2);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys1
@@ -1014,18 +1014,18 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:nil
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
@@ -1057,30 +1057,30 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:nil
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:nil
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
-                                                             signingCertificate:intermediate
-                                                           operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricID:@123
-                                                                         nodeID:@456
-                                                          caseAuthenticatedTags:nil
-                                                                          error:nil];
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
+                                                           signingCertificate:intermediate
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@123
+                                                                       nodeID:@456
+                                                        caseAuthenticatedTags:nil
+                                                                        error:nil];
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
@@ -1132,19 +1132,19 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
-                                                             signingCertificate:root
-                                                           operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricID:@123
-                                                                         nodeID:@456
-                                                          caseAuthenticatedTags:nil
-                                                                          error:nil];
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
+                                                           signingCertificate:root
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@123
+                                                                       nodeID:@456
+                                                        caseAuthenticatedTags:nil
+                                                                        error:nil];
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
@@ -1182,19 +1182,19 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:@111 error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:@111 error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
-                                                             signingCertificate:root
-                                                           operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricID:@123
-                                                                         nodeID:@456
-                                                          caseAuthenticatedTags:nil
-                                                                          error:nil];
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
+                                                           signingCertificate:root
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@123
+                                                                       nodeID:@456
+                                                        caseAuthenticatedTags:nil
+                                                                        error:nil];
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
@@ -1226,30 +1226,30 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerID:nil fabricID:@123 error:nil];
+    __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:@123 error:nil];
     XCTAssertNotNil(root);
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
-                                                                  rootCertificate:root
-                                                            intermediatePublicKey:intermediateKeys.publicKey
-                                                                         issuerID:nil
-                                                                         fabricID:@111
-                                                                            error:nil];
+    __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                rootCertificate:root
+                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                                       issuerID:nil
+                                                                       fabricID:@111
+                                                                          error:nil];
     XCTAssertNotNil(intermediate);
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
-                                                             signingCertificate:intermediate
-                                                           operationalPublicKey:operationalKeys.publicKey
-                                                                       fabricID:@123
-                                                                         nodeID:@456
-                                                          caseAuthenticatedTags:nil
-                                                                          error:nil];
+    __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
+                                                           signingCertificate:intermediate
+                                                         operationalPublicKey:operationalKeys.publicKey
+                                                                     fabricID:@123
+                                                                       nodeID:@456
+                                                        caseAuthenticatedTags:nil
+                                                                        error:nil];
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys

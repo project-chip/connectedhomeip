@@ -43,19 +43,19 @@ typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
  * Notify the delegate when pairing is completed
  *
  */
-- (void)onPairingComplete:(nullable NSError *)error;
+- (void)onPairingComplete:(NSError * _Nullable)error;
 
 /**
  * Notify the delegate when commissioning is completed
  *
  */
-- (void)onCommissioningComplete:(nullable NSError *)error;
+- (void)onCommissioningComplete:(NSError * _Nullable)error;
 
 /**
  * Notify the delegate when pairing is deleted
  *
  */
-- (void)onPairingDeleted:(nullable NSError *)error;
+- (void)onPairingDeleted:(NSError * _Nullable)error;
 
 @end
 

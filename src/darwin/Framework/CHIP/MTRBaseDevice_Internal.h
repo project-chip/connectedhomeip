@@ -75,8 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRAttributeReport ()
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path
-                       value:(nullable id)value
-                       error:(nullable NSError *)error;
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error;
 @end
 
 @interface MTREventReport ()
@@ -84,8 +84,8 @@ NS_ASSUME_NONNULL_BEGIN
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
                    timestamp:(NSNumber *)timestamp
-                       value:(nullable id)value
-                       error:(nullable NSError *)error;
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error;
 @end
 
 // Exported utility function

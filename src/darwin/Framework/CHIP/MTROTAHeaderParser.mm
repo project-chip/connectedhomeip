@@ -28,7 +28,7 @@
 @end
 
 @implementation MTROTAHeaderParser
-+ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
++ (MTROTAHeader * _Nullable)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
 {
     chip::OTAImageHeaderParser parser;
 
