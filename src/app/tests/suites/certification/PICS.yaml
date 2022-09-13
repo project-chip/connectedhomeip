@@ -466,74 +466,74 @@ PICS:
       id: CC.C.A003c
 
     - label: "Does the device implement receiving the MoveToHue command?"
-      id: CC.C.C00.Rsp
+      id: CC.C.C00.Tx
 
     - label: "Does the device implement receiving the MoveHue command?"
-      id: CC.C.C01.Rsp
+      id: CC.C.C01.Tx
 
     - label: "Does the device implement receiving the MoveToHue command?"
-      id: CC.C.C02.Rsp
+      id: CC.C.C02.Tx
 
     - label: "Does the device implement receiving the MoveToSaturation command?"
-      id: CC.C.C03.Rsp
+      id: CC.C.C03.Tx
 
     - label: "Does the device implement receiving the MoveSaturation command?"
-      id: CC.C.C04.Rsp
+      id: CC.C.C04.Tx
 
     - label: "Does the device implement receiving the StepSaturation command?"
-      id: CC.C.C05.Rsp
+      id: CC.C.C05.Tx
 
     - label:
           "Does the device implement receiving the MoveToHueAndSaturation
           command?"
-      id: CC.C.C06.Rsp
+      id: CC.C.C06.Tx
 
     - label: "Does the device implement receiving the MoveToColor command?"
-      id: CC.C.C07.Rsp
+      id: CC.C.C07.Tx
 
     - label: "Does the device implement receiving the MoveColor command?"
-      id: CC.C.C08.Rsp
+      id: CC.C.C08.Tx
 
     - label: "Does the device implement receiving the StopMoveStep command?"
-      id: CC.C.C47.Rsp
+      id: CC.C.C47.Tx
 
     - label: "Does the device implement receiving the StepColor command?"
-      id: CC.C.C09.Rsp
+      id: CC.C.C09.Tx
 
     - label:
           "Does the device implement receiving the MoveToColorTemperature
           command?"
-      id: CC.C.C0a.Rsp
+      id: CC.C.C0a.Tx
 
     - label:
           "Does the device implement receiving the MoveColorTemperature command?"
-      id: CC.C.C4b.Rsp
+      id: CC.C.C4b.Tx
 
     - label:
           "Does the device implement receiving the StepColorTemperature command?"
-      id: CC.C.C4c.Rsp
+      id: CC.C.C4c.Tx
 
     - label:
           "Does the device implement receiving the EnhancedMoveToHue command?"
-      id: CC.C.C40.Rsp
+      id: CC.C.C40.Tx
 
     - label: "Does the device implement receiving the EnhancedMoveHue command?"
-      id: CC.C.C41.Rsp
+      id: CC.C.C41.Tx
 
     - label: "Does the device implement receiving the EnhancedStepHue command?"
-      id: CC.C.C42.Rsp
+      id: CC.C.C42.Tx
 
     - label:
           "Does the device implement receiving the
           EnhancedMoveToHueAndSaturation command?"
-      id: CC.C.C43.Rsp
+      id: CC.C.C43.Tx
 
     - label: "Does the device implement receiving the ColorLoopSet command?"
-      id: CC.C.C44.Rsp
+      id: CC.C.C44.Tx
 
     - label:
           "Does the device implement sending the MoveToColorTemperature command?"
-      id: CC.C.C0a.Rsp
+      id: CC.C.C0a.Tx
 
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"

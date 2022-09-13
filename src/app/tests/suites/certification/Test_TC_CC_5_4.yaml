@@ -39,7 +39,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToColor command to TH"
-      PICS: CC.C.C07.Rsp
+      PICS: CC.C.C07.Tx
       verification: |
           ./chip-tool colorcontrol move-to-color 400 500 300 0 0 1 1
 
@@ -82,7 +82,7 @@ tests:
     - label:
           "DUT reads CurrentX and CurrentY attributes from TH (potentially
           multiple times)"
-      PICS: CC.C.C07.Rsp && CC.C.A0003 && CC.C.A0004
+      PICS: CC.C.C07.Tx && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -144,7 +144,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveColor command to TH"
-      PICS: CC.C.C08.Rsp
+      PICS: CC.C.C08.Tx
       verification: |
           ./chip-tool colorcontrol move-color 10 20 0 0 1 1
           Verify success response in TH(all-clusters-app) Log:
@@ -185,7 +185,7 @@ tests:
     - label:
           "DUT reads CurrentX and CurrentY attributes from TH (potentially
           multiple times)"
-      PICS: CC.C.C08.Rsp && CC.C.A0003 && CC.C.A0004
+      PICS: CC.C.C08.Tx && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -247,7 +247,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepColor command to TH"
-      PICS: CC.C.C09.Rsp
+      PICS: CC.C.C09.Tx
       verification: |
           ./chip-tool colorcontrol step-color 100 100 200 0 0 1 1
 
@@ -289,7 +289,7 @@ tests:
     - label:
           "DUT reads CurrentX and CurrentY attributes from TH (potentially
           multiple times)"
-      PICS: CC.C.C09.Rsp && CC.C.A0003 && CC.C.A0004
+      PICS: CC.C.C09.Tx && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
@@ -353,7 +353,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
@@ -393,7 +393,7 @@ tests:
     - label:
           "DUT reads CurrentX and CurrentY attributes from TH (potentially
           multiple times)"
-      PICS: CC.C.C47.Rsp && CC.C.A0003 && CC.C.A0004
+      PICS: CC.C.C47.Tx && CC.C.A0003 && CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
