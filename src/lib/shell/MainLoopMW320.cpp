@@ -147,6 +147,7 @@ exit:
 } // namespace
 
 extern const char* mw320_get_verstr(void);
+extern void save_network(char * ssid, char * pwd);
 namespace chip {
 namespace Shell {
 
@@ -185,12 +186,22 @@ static CHIP_ERROR SetPinCodeHandler(int argc, char **argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR SetDefAPHandler(int argc, char **argv)
+{
+    VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
+    PRINTF("[%s], [%s] \r\n", argv[0], argv[1]);
+    save_network(argv[0], argv[1]);
+
+    return CHIP_NO_ERROR;
+}
+
 static void RegisterMetaCommands(void)
 {
     static shell_command_t sCmds[] = {
         { &ShutdownHandler, "shutdown", "Exit the shell application" },
         { &VersionHandler, "version", "Output the software version" },
         { &SetPinCodeHandler, "pincode", "Set the pin code" },
+        { &SetDefAPHandler, "set_defap", "Set default AP SSID/PWD" },
     };
 
     std::atexit(AtExitShell);

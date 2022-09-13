@@ -181,6 +181,27 @@ const char* mw320_get_verstr(void)
 {
     return VERSION_STR;
 }
+
+void save_network(char * ssid, char * pwd);
+void save_network(char * ssid, char * pwd)
+{
+    int ret;
+
+    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write ssid to flash failed\r\n");
+    }
+
+    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write psk to flash failed\r\n");
+    }
+
+    return;
+}
+
 // ota --
 
 namespace {
@@ -289,7 +310,6 @@ bool is_connected = false;
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void save_network(char * ssid, char * pwd);
 static void load_network(char * ssid, char * pwd);
 
 /*
@@ -338,25 +358,6 @@ static status_t APP_AES_Lock(void)
 static void APP_AES_Unlock(void)
 {
     xSemaphoreGiveRecursive(aesLock);
-}
-
-static void save_network(char * ssid, char * pwd)
-{
-    int ret;
-
-    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: write ssid to flash failed\r\n");
-    }
-
-    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: write psk to flash failed\r\n");
-    }
-
-    return;
 }
 
 static void load_network(char * ssid, char * pwd)
