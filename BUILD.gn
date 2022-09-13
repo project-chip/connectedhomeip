@@ -288,6 +288,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable mw320 builds by default.
     enable_mw320_builds = false
+
+    # Set this to true to enable genio builds by default.
+    enable_genio_builds = false
   }
 
   declare_args() {
@@ -396,6 +399,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the mw320 shell app example.
     enable_mw320_shell_build = enable_mw320_builds
+
+    # Build the genio shell app example.
+    enable_genio_shell_app_build = enable_genio_builds
 
     enable_fake_tests = enable_default_builds && host_os == "linux"
 
@@ -694,6 +700,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":bl702_shell" ]
+  }
+
+  if (enable_genio_shell_app_build) {
+    group("genio_shell_app") {
+      deps = [ "${chip_root}/examples/shell/genio(${chip_root}/config/genio/toolchain:genio_shell_app)" ]
+    }
+
+    extra_build_deps += [ ":genio_shell_app" ]
   }
 
   group("default") {

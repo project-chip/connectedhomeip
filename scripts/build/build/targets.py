@@ -34,6 +34,7 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
+from builders.genio import GenioApp, GenioBuilder
 
 
 class Target:
@@ -649,6 +650,12 @@ def MW320Targets():
     yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
 
 
+def GenioTargets():
+    target = Target('genio', GenioBuilder)
+
+    yield target.Extend('lighting-app', app=GenioApp.LIGHT)
+
+
 ALL = []
 
 target_generators = [
@@ -669,6 +676,7 @@ target_generators = [
     BouffalolabTargets(),
     IMXTargets(),
     MW320Targets(),
+    GenioTargets(),
 ]
 
 for generator in target_generators:

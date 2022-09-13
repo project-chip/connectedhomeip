@@ -271,6 +271,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_BEKEN=1",
         "CHIP_DEVICE_LAYER_TARGET=Beken",
+      ]
+    } else if (chip_device_platform == "mt793x") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_MT793X=1",
+        "CHIP_DEVICE_LAYER_TARGET=mt793x",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     }
@@ -446,6 +451,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Zephyr"
     } else if (chip_device_platform == "beken") {
       _platform_target = "Beken"
+    } else if (chip_device_platform == "mt793x") {
+      _platform_target = "mt793x"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
