@@ -444,6 +444,8 @@ public:
         this->FabricRemoved(fabricIndex);
     }
 
+    FabricTable * GetFabricTable() const { return mFabricTable; }
+
 private:
     /**
      *    The State of a secure transport object.

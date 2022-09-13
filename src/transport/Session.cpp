@@ -55,5 +55,21 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
     return GetAckTimeout() + upperlayerProcessingTimeout;
 }
 
+const char * GetSessionTypeString(const SessionHandle & session)
+{
+    switch (session->GetSessionType())
+    {
+    case Session::SessionType::kGroupIncoming:
+    case Session::SessionType::kGroupOutgoing:
+        return "G";
+    case Session::SessionType::kSecure:
+        return "S";
+    case Session::SessionType::kUnauthenticated:
+        return "U";
+    default:
+        return "?";
+    }
+}
+
 } // namespace Transport
 } // namespace chip

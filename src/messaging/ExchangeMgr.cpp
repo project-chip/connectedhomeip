@@ -191,11 +191,41 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
+#if CHIP_PROGRESS_LOGGING
+    auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
+    auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
+
+    //
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
+    //
+    char ackBuf[20];
+    ackBuf[0] = '\0';
+    if (payloadHeader.GetAckMessageCounter().HasValue())
+    {
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+    }
+
+    CompressedFabricId compressedFabricId = 0;
+    if (session->IsSecureSession() && mSessionManager->GetFabricTable() != nullptr)
+    {
+        auto fabricInfo = mSessionManager->GetFabricTable()->FindFabricWithIndex(session->AsSecureSession()->GetFabricIndex());
+        if (fabricInfo)
+        {
+            compressedFabricId = fabricInfo->GetCompressedFabricId();
+        }
+    }
+
+    //
+    // Legend that can be used to decode this log line can be found in README.md
+    //
     ChipLogProgress(ExchangeManager,
-                    "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
-                    " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchangeId,
-                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
-                    packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
+                    ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
+                    " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    Transport::GetSessionTypeString(session), session->GetFabricIndex(),
+                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
+                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+#endif
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
@@ -230,8 +260,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
     else
     {
-        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
-                        packetHeader.GetDestinationGroupId().Value());
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
+                        packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
     }
 
     // Do not handle messages that don't match an existing exchange on an

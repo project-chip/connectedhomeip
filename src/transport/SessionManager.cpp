@@ -32,18 +32,18 @@
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
+#include <inttypes.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
-
-#include <inttypes.h>
 
 // Global object
 chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
@@ -190,7 +190,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         ReturnErrorOnFailure(err);
 
 #if CHIP_PROGRESS_LOGGING
-        destination = kUndefinedNodeId;
+        destination = NodeIdFromGroupId(groupSession->GetGroupId());
         fabricIndex = groupSession->GetFabricIndex();
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -256,13 +256,42 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipLogProgress(Inet,
-                    "Prepared %s message %p to 0x" ChipLogFormatX64 " (%u)  of type " ChipLogFormatMessageType
-                    " and protocolId " ChipLogFormatProtocolId " on exchange " ChipLogFormatExchangeId
-                    " with MessageCounter:" ChipLogFormatMessageCounter ".",
-                    sessionHandle->GetSessionTypeString(), &preparedMessage, ChipLogValueX64(destination), fabricIndex,
-                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
-                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+    CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
+
+    if (fabricIndex != kUndefinedFabricIndex && mFabricTable != nullptr)
+    {
+        auto fabricInfo = mFabricTable->FindFabricWithIndex(fabricIndex);
+        if (fabricInfo)
+        {
+            compressedFabricId = fabricInfo->GetCompressedFabricId();
+        }
+    }
+
+    auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
+    auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
+
+    //
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
+    //
+    char ackBuf[20];
+    ackBuf[0] = '\0';
+    if (payloadHeader.GetAckMessageCounter().HasValue())
+    {
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+    }
+
+    //
+    // Legend that can be used to decode this log line can be found in messaging/README.md
+    //
+    ChipLogProgress(ExchangeManager,
+                    "<<< [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
+                    " [%04X] --- Type %04X:%02X (%s:%s)",
+                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    static_cast<uint16_t>(compressedFabricId), payloadHeader.GetProtocolID().GetProtocolId(),
+                    payloadHeader.GetMessageType(), protocolName, msgTypeName);
+#endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
@@ -292,13 +321,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
-                        " at monotonic time: " ChipLogFormatX64
-                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric index of %x",
-                        "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
-                        groupSession->GetGroupId(), groupSession->GetFabricIndex());
+        ChipLogProgress(Inet, "(G) Sending msg " ChipLogFormatMessageCounter " to Multicast IPV6 address '%s'",
+                        preparedMessage.GetMessageCounter(), addressStr);
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -310,12 +334,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         destination = &secure->GetPeerAddress();
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " (%u) at monotonic time: " ChipLogFormatX64 " msec",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(secure->GetPeerNodeId()), secure->GetFabricIndex(),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
+        ChipLogProgress(Inet, "(S) Sending msg " ChipLogFormatMessageCounter " on secure session with LSID: %u",
+                        preparedMessage.GetMessageCounter(), secure->GetLocalSessionId());
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
@@ -323,12 +343,13 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at monotonic time: " ChipLogFormatX64 " msec",
-                        sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(kUndefinedNodeId),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
+#if CHIP_PROGRESS_LOGGING
+        char addressStr[Transport::PeerAddress::kMaxToStringSize];
+        destination->ToString(addressStr);
+
+        ChipLogProgress(Inet, "(U) Sending msg " ChipLogFormatMessageCounter " to IP address '%s'",
+                        preparedMessage.GetMessageCounter(), addressStr);
+#endif
     }
     break;
     default:

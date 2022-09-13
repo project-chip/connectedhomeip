@@ -19,6 +19,8 @@ AccessControlEntry
 accessor
 AccountLogin
 acdbc
+ack
+ACK
 ACKed
 ACL
 ACLs
@@ -596,6 +598,7 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+Groupcast
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
@@ -649,6 +652,7 @@ ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
+IsInitiator
 imager
 imagetool
 imageUri
@@ -1376,6 +1380,7 @@ unfocus
 Unicast
 UniFlash
 UnitLocalization
+Unencrypted
 unpair
 unprovisioned
 untrusted
@@ -1395,6 +1400,7 @@ userConsentState
 userguide
 USERINTERFACE
 UserLabel
+Unsecure
 usermod
 usr
 UTF

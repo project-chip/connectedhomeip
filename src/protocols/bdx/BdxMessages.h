@@ -29,10 +29,13 @@
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+
 namespace chip {
 namespace bdx {
 
 constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
+
+constexpr const char * kProtocolName = "BDX";
 
 enum class MessageType : uint8_t
 {
@@ -312,6 +315,26 @@ template <>
 struct MessageTypeTraits<bdx::MessageType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return BDX::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 10> typeToNameTable = {
+            {
+                { bdx::MessageType::SendInit, "SendInit" },
+                { bdx::MessageType::SendAccept, "SendAccept" },
+                { bdx::MessageType::ReceiveInit, "ReceiveInit" },
+                { bdx::MessageType::ReceiveAccept, "ReceiveAccept" },
+                { bdx::MessageType::BlockQuery, "BlockQuery" },
+                { bdx::MessageType::Block, "Block" },
+                { bdx::MessageType::BlockEOF, "BlockEOF" },
+                { bdx::MessageType::BlockAck, "BlockAck" },
+                { bdx::MessageType::BlockAckEOF, "BlockAckEOF" },
+                { bdx::MessageType::BlockQueryWithSkip, "BlockQueryWithSkip" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 } // namespace Protocols
 
