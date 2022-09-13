@@ -50,8 +50,7 @@ JNI_METHOD(void, BaseChipCluster, setCommandTimeout)
     if (boxedLong != nullptr)
     {
         jlong timeoutMillis = chip::JniReferences::GetInstance().LongToPrimitive(boxedLong);
-        cluster->SetCommandTimeout(chip::Optional<chip::System::Clock::Timeout>(
-            chip::System::Clock::Milliseconds32(static_cast<uint64_t>(timeoutMillis))));
+        cluster->SetCommandTimeout(MakeOptional(chip::System::Clock::Milliseconds32(static_cast<uint64_t>(timeoutMillis))));
     }
     else
     {
