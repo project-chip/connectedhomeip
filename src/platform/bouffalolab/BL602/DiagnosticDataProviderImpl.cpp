@@ -163,7 +163,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     return CHIP_NO_ERROR;
 }
 
-static int bl_netif_get_all_ip6(struct netif* netif, ip6_addr_t if_ip6[])
+static int bl_netif_get_all_ip6(struct netif * netif, ip6_addr_t if_ip6[])
 {
     if (netif == NULL || if_ip6 == NULL)
     {
@@ -208,7 +208,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         memcpy(ifp->Ipv4AddressesBuffer[0], &ip, kMaxIPv4AddrSize);
         ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
         ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-        ipv6_addr_count = bl_netif_get_all_ip6(netif, ip6_addr);
+        ipv6_addr_count          = bl_netif_get_all_ip6(netif, ip6_addr);
         for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
         {
             memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
