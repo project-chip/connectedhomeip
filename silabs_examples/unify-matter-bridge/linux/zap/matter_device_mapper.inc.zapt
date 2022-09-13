@@ -1,0 +1,112 @@
+/******************************************************************************
+ * # License
+ * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ ******************************************************************************
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ *****************************************************************************/
+
+// This file is generated automatically. Don't try to change something here.
+// To add support for new clusters, modify addon-helper.js in uic/applications/matter_bridge/src/zap
+
+// Component include
+#include <matter_device_translator.hpp>
+
+// Standard library 
+#include <string>
+#include <optional>
+#include <unordered_map>
+
+// Matter includes
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Commands.h>
+
+// Cluster mapping Unify->Matter conversion
+namespace chip {
+namespace app {
+namespace Clusters {
+
+static const std::unordered_map<std::string, chip::ClusterId> unify_cluster_id_map {
+    {{#zcl_clusters}}
+    {{#if (chipSupportedCluster label)}}
+    { "{{asUpperCamelCase label}}", {{chipClusterConversion label}}::Id}{{listComma this}}
+    {{/if}}
+    {{/zcl_clusters}}
+};
+
+// Attribute mapping Unify->Matter conversion
+// Attribute structure for each cluster
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#if (chipSupportedCluster parent.label)}}
+{{#first}}
+namespace {{chipClusterConversion parent.label}} {
+namespace Attributes {
+static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
+{{/first}}
+{{#if (chipSupportedAttribute parent.label label)}}
+    { "{{asUpperCamelCase label}}", {{chipAttributeConversion label}}::Id }{{listComma this}}
+{{/if}}
+{{#last}}
+};
+} // namespace Attributes
+} // namespace {{asUpperCamelCase parent.label false}}
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+// Global map of each clusters attributes
+static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> unify_to_matter_attribute_id_map {
+{{#zcl_clusters}}
+{{#if (chipSupportedCluster label)}}
+    { "{{asUpperCamelCase label}}",  {{chipClusterConversion label}}::Attributes::unify_to_matter_attribute_id_cluster_map }{{listComma this}}
+{{/if}}
+{{#last}}
+};
+{{/last}}
+{{/zcl_clusters}}
+
+
+// Command mapping Unify->Matter conversion
+// Command structure for each cluster
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#if (chipSupportedCluster parent.label)}}
+{{#first}}
+namespace {{chipClusterConversion parent.label}} {
+namespace Commands {
+static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
+{{/first}}
+{{#if (chipSupportedCommands parent.label label)}}
+    { "{{asUpperCamelCase label}}", {{chipCommandsConversion label}}::Id }{{listComma this}}
+{{/if}}
+{{#last}}
+};
+} // namespace Commands
+} // namespace {{asUpperCamelCase parent.label false}}
+{{/last}}
+{{/if}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+// Global map of each clusters commands
+static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> unify_to_matter_command_id_map {
+{{#zcl_clusters}}
+{{#if (chipSupportedClusterWithCommands label)}}
+    { "{{asUpperCamelCase label}}",  {{chipClusterConversion label}}::Commands::unify_to_matter_command_id_cluster_map }{{listComma this}}
+{{/if}}
+{{#last}}
+};
+{{/last}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

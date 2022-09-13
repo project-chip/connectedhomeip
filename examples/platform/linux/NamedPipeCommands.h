@@ -21,6 +21,8 @@
 #include <lib/core/CHIPError.h>
 #include <pthread.h>
 #include <string>
+#include <pthread.h>
+#include <errno.h>
 
 class NamedPipeCommandDelegate
 {
