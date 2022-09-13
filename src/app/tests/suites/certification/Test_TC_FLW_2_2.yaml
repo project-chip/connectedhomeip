@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MeasuredValue"
+    - label: "Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -53,7 +53,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "read the mandatory attribute: MeasuredValue"
+    - label: "Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"

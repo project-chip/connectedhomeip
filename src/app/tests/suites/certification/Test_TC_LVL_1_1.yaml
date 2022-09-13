@@ -168,8 +168,7 @@ tests:
               contains: [0, 1, 2, 3, 4, 5, 6, 7]
 
     - label:
-          "Read the Feature-dependent(LVL.S.F02) attribute in
-          AcceptedCommandList"
+          "Read the Feature-dependent(LVL.S.F02) command in AcceptedCommandList"
       PICS: LVL.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"

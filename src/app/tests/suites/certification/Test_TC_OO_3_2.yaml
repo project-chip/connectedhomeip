@@ -163,7 +163,7 @@ tests:
       PICS: OO.C.C40.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received OffWithEffect command with f.e. 1 for EffectIdentifier and 0 for EffectVariant  looks like this:
-          ./chip-tool onoff off-with-effect 1 2 1 1
+          ./chip-tool onoff off-with-effect 1 0 1 1
 
 
           verify the " OffWithEffect command response" on the TH (all-cluster-app) log:

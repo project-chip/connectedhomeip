@@ -33,21 +33,24 @@ tests:
 
     - label: "Commission TH1 to DUTs Fabric"
       verification: |
-          1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use the instructions)
-
+          1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use the instructions), Pls use appropriate commands that the DUT (commissioner) supports. DUT can provision the TH (all-cluster-app) on raspi either via IP transport or on BLE transport.
+          In case of chip-tool provisioning over IP transport can be done using below command
           ./chip-tool pairing onnetwork 2 20202021
+          In case of chip-tool provisioning over BLE transport can be done using below command, use appropriate descriminator, passcode, nodeID
+          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
+          Once the TH is provisioned run the below command on the raspi to know the TH (all-cluster-app) fabricID
 
-          avahi-browse _matter._tcp -rt
+          $avahi-browse _matter._tcp -rt
 
-          Verify Compressed Fabric ID on the TH Log:
+          Filter the node ID and identify the Compressed Fabric ID from the above command.
 
           eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
 
     - label: "Commission TH2 to DUTs Fabric"
       verification: |
-          Using your DUT Controller connect to the accessory.
+          Using your DUT Controller provision the 2nd to the accessory (all-cluster-app). Follow the above steps
 
           Below is the example when using chip tool as controller
 
@@ -65,18 +68,45 @@ tests:
 
     - label: "Send RemoveFabric from DUT to TH1 and comission DUT to TH1 again"
       verification: |
+          In the case of chip-tool as commissioner, we use the below commands to remove the fabric, Use the appropriate command in the DUT to remove the fabric
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           Verify in TH all-clusters-app log
 
+          [1662499501.072571][34849:34849] CHIP:DMG: InvokeRequestMessage =
+          [1662499501.072631][34849:34849] CHIP:DMG: {
+          [1662499501.072653][34849:34849] CHIP:DMG:         suppressResponse = false,
+          [1662499501.072679][34849:34849] CHIP:DMG:         timedRequest = false,
+          [1662499501.072702][34849:34849] CHIP:DMG:         InvokeRequests =
+          [1662499501.072770][34849:34849] CHIP:DMG:         [
+          [1662499501.072794][34849:34849] CHIP:DMG:                 CommandDataIB =
+          [1662499501.072859][34849:34849] CHIP:DMG:                 {
+          [1662499501.072903][34849:34849] CHIP:DMG:                         CommandPathIB =
+          [1662499501.072952][34849:34849] CHIP:DMG:                         {
+          [1662499501.073122][34849:34849] CHIP:DMG:                                 EndpointId = 0x0,
+          [1662499501.073177][34849:34849] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1662499501.073266][34849:34849] CHIP:DMG:                                 CommandId = 0xa,
+          [1662499501.073357][34849:34849] CHIP:DMG:                         },
+          [1662499501.073404][34849:34849] CHIP:DMG:
+          [1662499501.073474][34849:34849] CHIP:DMG:                         CommandFields =
+          [1662499501.073523][34849:34849] CHIP:DMG:                         {
+          [1662499501.073600][34849:34849] CHIP:DMG:                                 0x0 = 1,
+          [1662499501.073698][34849:34849] CHIP:DMG:                         },
+          [1662499501.073745][34849:34849] CHIP:DMG:                 },
+          [1662499501.073824][34849:34849] CHIP:DMG:
+          [1662499501.073893][34849:34849] CHIP:DMG:         ],
+          [1662499501.073977][34849:34849] CHIP:DMG:
+          [1662499501.074058][34849:34849] CHIP:DMG:         InteractionModelRevision = 1
+          [1662499501.074097][34849:34849] CHIP:DMG: },
+          [1662499501.074235][34849:34849] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1662499501.074329][34849:34849] CHIP:DMG: AccessControl: allowed
+          [1662499501.074409][34849:34849] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000A
+          [1662499501.074459][34849:34849] CHIP:ZCL: OpCreds: Received a RemoveFabric Command for FabricIndex 0x1
+          [1662499501.074496][34849:34849] CHIP:EM: Sending Standalone Ack for MessageCounter:249094434 on exchange 36677r
+          [1662499501.074988][34849:34849] CHIP:IN: Prepared secure message 0xffffcfc04af8 to 0x000000000001B669 (1)  of type 0x10 and protocolId (0, 0) on exchange 36677r with MessageCounter:483
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
-          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
-          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 1
-          [1651571274.155215][10562:10567] CHIP:TOO:    }
 
+          Kill the all-cluster-app (rm -rf /tmp/chip* files) and relaunch the all-cluster-app again to put the device in commissionable state and follow instructions in step1 to provision the device
 
           ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
@@ -85,29 +115,13 @@ tests:
           Verify Compressed Fabric ID on the TH Log:
 
           +   eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
+
+          Verify Compressed FabricID matches to the one saved in Step1
       disabled: true
 
     - label: "Send RemoveFabric from DUT to TH2 and comission DUT to TH2 again"
       verification: |
-          ./chip-tool operationalcredentials remove-fabric 1 2 0
+          Repeat above step with TH2 i.e. 2nd all-cluster-app.
 
-          Verify in TH all-clusters-app log
-
-          [1657628679275] [78509:912135] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1657628679275] [78509:912135] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1657628679275] [78509:912135] CHIP: [TOO]   NOCResponse: {
-          [1657628679275] [78509:912135] CHIP: [TOO]     statusCode: 0
-          [1657628679275] [78509:912135] CHIP: [TOO]     fabricIndex: 1
-          [1657628679275] [78509:912135] CHIP: [TOO]    }
-          [1657628679275] [78509:912135] CHIP: [DMG] ICR mov
-
-
-
-          ./chip-tool pairing onnetwork 2 20202021
-
-          avahi-browse _matter._tcp -rt
-
-          VerifyCompressed Fabric ID on the TH Log:
-
-          +   eth0 IPv6 8840D142C33AB653-0000000000000002
+          Verify the compressed Fabric ID is the same as what is obtained in Step2
       disabled: true

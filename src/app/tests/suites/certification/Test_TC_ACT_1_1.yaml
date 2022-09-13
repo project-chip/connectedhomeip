@@ -64,7 +64,7 @@ tests:
               type: list
               contains: [2]
 
-    # Checking only type check all attributes are optional
+    # Checking only type check all commands are optional
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
