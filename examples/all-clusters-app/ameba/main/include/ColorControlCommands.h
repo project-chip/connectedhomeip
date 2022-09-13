@@ -388,7 +388,7 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
         moveToSaturationCommand.saturation = static_cast<uint8_t>(data->args[0]);
-        moveToSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[1]);
+        moveToSaturationCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
@@ -446,9 +446,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::ColorControl::Commands::StepColor::Id:
         stepColorCommand.stepX = static_cast<uint16_t>(data->args[0]);
         stepColorCommand.stepY = static_cast<uint16_t>(data->args[1]);
-        stepColorCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
-        stepColorCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
-        stepColorCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        stepColorCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        stepColorCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        stepColorCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stepColorCommand, onSuccess, onFailure);
         break;
@@ -599,7 +599,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
         moveToSaturationCommand.saturation = static_cast<uint8_t>(data->args[0]);
-        moveToSaturationCommand.transitionTime = static_cast<uint8_t>(data->args[1]);
+        moveToSaturationCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand);
@@ -651,9 +651,9 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
     case Clusters::ColorControl::Commands::StepColor::Id:
         stepColorCommand.stepX = static_cast<uint16_t>(data->args[0]);
         stepColorCommand.stepY = static_cast<uint16_t>(data->args[1]);
-        stepColorCommand.transitionTime = static_cast<uint16_t>(data->args[1]);
-        stepColorCommand.optionsMask = static_cast<uint8_t>(data->args[2]);
-        stepColorCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        stepColorCommand.transitionTime = static_cast<uint16_t>(data->args[2]);
+        stepColorCommand.optionsMask = static_cast<uint8_t>(data->args[3]);
+        stepColorCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand);
         break;
  
