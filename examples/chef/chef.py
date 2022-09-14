@@ -676,7 +676,12 @@ def main() -> int:
                 shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
                 with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
                     f.write(textwrap.dedent(f"""\
-                        SAMPLE_NAME = {options.sample_device_type_name}"""
+                        SAMPLE_NAME = {options.sample_device_type_name}
+                        CHEF_FLAGS =
+                        CHEF_FLAGS += -DCONFIG_DEVICE_VENDOR_ID={options.vid}
+                        CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
+                        CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
+                        """
                     ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
