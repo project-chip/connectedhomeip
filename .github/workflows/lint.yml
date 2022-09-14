@@ -70,13 +70,13 @@ jobs:
                      #       https://github.com/project-chip/connectedhomeip/issues/19173
                      #       https://github.com/project-chip/connectedhomeip/issues/19169
                      if [ "$idl_file" == './examples/window-app/common/window-app.matter' ]; then continue; fi
-                     if [ "$idl_file" == './examples/log-source-app/log-source-common/log-source-app.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/placeholder/linux/apps/app1/config.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/placeholder/linux/apps/app2/config.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/thermostat/thermostat-common/thermostat.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/lighting-app/lighting-common/lighting-app.matter']; then continue; fi
-                     if [ "$idl_file" == './examples/log-source-app/log-source-common/log-source-app.matter']; then continue; fi
+                     if [ "$idl_file" == './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/lighting-app/lighting-common/lighting-app.matter' ]; then continue; fi
+                     if [ "$idl_file" == './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
 
                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                  done
