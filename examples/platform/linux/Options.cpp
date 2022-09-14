@@ -72,6 +72,7 @@ enum
     kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
     kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
+    kCommissionerOption_FabricID                        = 0x1020,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -117,6 +118,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
+    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
     {}
 };
 
@@ -181,6 +183,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
+    "\n"
+    "  --commissioner-fabric-id <fabricid>\n"
+    "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
     "\n"
     "  --command <command-name>\n"
     "       A name for a command to execute during startup.\n"
@@ -458,6 +463,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
 
+        break;
+    }
+    case kCommissionerOption_FabricID: {
+        char * eptr;
+        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
         break;
     }
 

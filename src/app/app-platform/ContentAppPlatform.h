@@ -138,6 +138,11 @@ public:
      *   Add ACLs on this device for the given client,
      *   and create bindings on the given client so that it knows what it has access to.
      *
+     * The default implementation follows the device library Video Player Architecture spec
+     * for a typical video player given assumptions like video player endpoint id is 1 and
+     * speaker endpoint id is 2. Some devices may need to override this implementation when
+     * these assumptions are not correct.
+     *
      * @param[in] exchangeMgr     Exchange manager to be used to get an exchange context.
      * @param[in] sessionHandle   Reference to an established session.
      * @param[in] targetVendorId  Vendor ID for the target device.
@@ -155,6 +160,7 @@ protected:
     // requires vendorApp to be in the catalog of the platform
     ContentApp * LoadContentAppInternal(const CatalogVendorApp & vendorApp);
     ContentApp * GetContentAppInternal(const CatalogVendorApp & vendorApp);
+    CHIP_ERROR GetACLEntryIndex(size_t * foundIndex, FabricIndex fabricIndex, NodeId subjectNodeId);
 
     static const int kNoCurrentEndpointId = 0;
     EndpointId mCurrentAppEndpointId      = kNoCurrentEndpointId;
