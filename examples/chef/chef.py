@@ -786,9 +786,12 @@ def main() -> int:
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
         elif (options.build_target == "ameba"):
-            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
-            shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
-            shell.run_cmd(f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
+                shell.run_cmd(f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
+            else:
+                flush_print("Ameba Z2 currently does not support flashing image through script, stil WIP")
 
     #
     # Terminal interaction
@@ -825,8 +828,11 @@ def main() -> int:
             if config['ameba']['TTY'] is None:
                 flush_print('The path for the serial enumeration for ameba is not set. Make sure ameba.TTY is set on your config.yaml file')
                 exit(1)
-            shell.run_cmd("killall screen")
-            shell.run_cmd(f"screen {config['ameba']['TTY']} 115200")
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd("killall screen")
+                shell.run_cmd(f"screen {config['ameba']['TTY']} 115200")
+            else:
+                flush_print("Ameba Z2 image has not been flashed yet")
 
     #
     # RPC Console
