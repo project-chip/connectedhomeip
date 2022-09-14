@@ -508,7 +508,7 @@
             params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
             params.failSafeExpiryTimeout = @600;
             NSError * error;
-            if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
+            if (![controller commissionNodeWithID:@(deviceId) commissioningParams:params error:&error]) {
                 NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
             }
         }
@@ -678,7 +678,7 @@
 
     uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
 
-    if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
+    if (![controller commissionNodeWithID:@(deviceId) commissioningParams:params error:&error]) {
         NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
     }
 }
@@ -814,9 +814,18 @@
     // restart the Matter Stack before pairing (for reliability + testing restarts)
     [self _restartMatterStack];
 
-    if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
+    __auto_type * setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
+    if (setupPayload == nil) {
+        NSLog(@"Could not parse setup payload: %@", [error localizedDescription]);
+        return;
+    }
+
+    ;
+    if ([self.chipController setupCommissioningSessionWithPayload:setupPayload newNodeID:@(deviceID) error:&error]) {
         deviceID++;
         MTRSetNextAvailableDeviceID(deviceID);
+    } else {
+        NSLog(@"Could not start commissioning session setup: %@", [error localizedDescription]);
     }
 }
 

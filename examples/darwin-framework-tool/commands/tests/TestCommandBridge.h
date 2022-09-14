@@ -156,9 +156,10 @@ public:
 
         SetIdentity(identity);
 
-        // Invalidate our existing CASE session; otherwise getConnectedDevice
-        // will just hand it right back to us without establishing a new CASE
-        // session when a reboot is done on the server.
+        // Invalidate our existing CASE session; otherwise trying to work with
+        // our device will just reuse it without establishing a new CASE
+        // session when a reboot is done on the server, and then our next
+        // interaction will time out.
         if (value.expireExistingSession.ValueOr(true)) {
             if (GetDevice(identity) != nil) {
                 [GetDevice(identity) invalidateCASESession];
@@ -166,17 +167,10 @@ public:
             }
         }
 
-        [controller getBaseDevice:value.nodeId
-                            queue:mCallbackQueue
-                       completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                           if (error != nil) {
-                               SetCommandExitStatus(error);
-                               return;
-                           }
-
-                           mConnectedDevices[identity] = device;
-                           NextTest();
-                       }];
+        mConnectedDevices[identity] = [MTRBaseDevice deviceWithNodeID:@(value.nodeId) controller:controller];
+        dispatch_async(mCallbackQueue, ^{
+            NextTest();
+        });
         return CHIP_NO_ERROR;
     }
 
@@ -197,7 +191,11 @@ public:
                                                          length:value.payload.size()
                                                        encoding:NSUTF8StringEncoding];
         NSError * err;
-        BOOL ok = [controller pairDevice:value.nodeId onboardingPayload:payloadStr error:&err];
+        auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadStr error:&err];
+        if (err != nil) {
+            return MTRErrorToCHIPErrorCode(err);
+        }
+        BOOL ok = [controller setupCommissioningSessionWithPayload:payload newNodeID:@(value.nodeId) error:&err];
         if (ok == YES) {
             return CHIP_NO_ERROR;
         }
@@ -234,7 +232,9 @@ public:
         VerifyOrReturn(commissioner != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
-        [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+        [commissioner commissionNodeWithID:@(nodeId)
+                       commissioningParams:[[MTRCommissioningParameters alloc] init]
+                                     error:&commissionError];
         CHIP_ERROR err = MTRErrorToCHIPErrorCode(commissionError);
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);

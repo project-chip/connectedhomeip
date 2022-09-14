@@ -19,16 +19,5 @@ leak:drbg_bytes
 # TODO: OpenSSL ERR_get_state seems to leak.
 leak:ERR_get_state
 
-# TODO: BLE initialization allocates some UUIDs and strings that seem to leak.
-leak:[BleConnection initWithDiscriminator:]
-leak:[CBXpcConnection initWithDelegate:queue:options:sessionType:]
-
-# TODO: Figure out how we are managing to leak NSData while using ARC!
-leak:[CHIPToolKeypair signMessageECDSA_RAW:]
-
-# TODO: Figure out how we are managing to leak NSData while using ARC, though
-# this may just be a leak deep inside the CFPreferences stuff somewhere.
-leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]
-
 # TODO: https://github.com/project-chip/connectedhomeip/issues/22333
 leak:[MTRBaseCluster* subscribeAttribute*WithParams:subscriptionEstablished:reportHandler:]

@@ -129,20 +129,21 @@ uint64_t MTRGetLastPairedDeviceId(void)
     return deviceId;
 }
 
-BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDevice(DeviceConnectionCallback completionHandler)
 {
-    MTRDeviceController * controller = InitializeMTR();
+    InitializeMTR();
 
     // Let's use the last device that was paired
     uint64_t deviceId = MTRGetLastPairedDeviceId();
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completion:completionHandler];
+
+    return MTRGetConnectedDeviceWithID(deviceId, completionHandler);
 }
 
 MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
 {
     NSError * error;
     MTRDeviceController * controller = InitializeMTR();
-    MTRBaseDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
+    MTRBaseDevice * device = [controller deviceBeingCommissionedWithNodeID:@(MTRGetLastPairedDeviceId()) error:&error];
     if (error) {
         NSLog(@"Error retrieving device being commissioned for deviceId %llu", MTRGetLastPairedDeviceId());
         return nil;
@@ -150,11 +151,16 @@ MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
     return device;
 }
 
-BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, DeviceConnectionCallback completionHandler)
 {
     MTRDeviceController * controller = InitializeMTR();
 
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completion:completionHandler];
+    // We can simplify this now that devices can be gotten sync, but for now just do the async dispatch.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(deviceId) controller:controller];
+        completionHandler(device, nil);
+    });
+    return YES;
 }
 
 BOOL MTRIsDevicePaired(uint64_t deviceId)

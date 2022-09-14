@@ -170,7 +170,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         [device readAttributePathWithEndpointID:endpointID
                                       clusterID:clusterID
                                     attributeID:attributeID
@@ -198,7 +198,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         [device
             writeAttributeWithEndpointID:endpointID
                                clusterID:clusterID
@@ -227,7 +227,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         [device
             invokeCommandWithEndpointID:endpointID
                               clusterID:clusterID
@@ -254,7 +254,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         [device subscribeAttributePathWithEndpointID:endpointID
                                            clusterID:clusterID
                                          attributeID:attributeID
@@ -286,7 +286,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         [device deregisterReportHandlersWithQueue:dispatch_get_main_queue() completion:completion];
     } else {
         NSLog(@"Failed to get shared controller");
@@ -307,7 +307,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
             attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
         }
 
-        __auto_type device = [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:sharedController];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
         NSMutableArray * established = [NSMutableArray arrayWithCapacity:1];
         [established addObject:@NO];
         [device subscribeWithQueue:dispatch_get_main_queue()
@@ -367,13 +367,10 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 @end
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static const uint32_t kSetupPINCode = 20202021;
-static const uint16_t kRemotePort = 5540;
+static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kLocalPort = 5541;
-static NSString * kAddress = @"::1";
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
@@ -405,7 +402,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertEqual(error.code, 0);
     NSError * commissionError = nil;
-    [sController commissionDevice:kDeviceId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId)
+                  commissioningParams:[[MTRCommissioningParameters alloc] init]
+                                error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for onCommissioningComplete
@@ -480,20 +479,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
-    XCTAssertEqual(error.code, 0);
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
+    XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
-
-    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getBaseDevice:kDeviceId
-                        queue:dispatch_get_main_queue()
-                   completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                       XCTAssertEqual(error.code, 0);
-                       [connectionExpectation fulfill];
-                       connectionExpectation = nil;
-                   }];
-    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 
     mSampleListener = [[MTRXPCListenerSample alloc] init];
     [mSampleListener start];
@@ -517,9 +510,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 - (void)waitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
     __auto_type remoteController = [MTRDeviceController
         sharedControllerWithID:MTRDeviceControllerId
                xpcConnectBlock:^NSXPCConnection * _Nonnull {
@@ -529,13 +519,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                    NSLog(@"Listener is not active");
                    return nil;
                }];
-    [remoteController getBaseDevice:kDeviceId
-                              queue:queue
-                         completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                             mConnectedDevice = device;
-                             [expectation fulfill];
-                         }];
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    mConnectedDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:remoteController];
     mDeviceController = remoteController;
 }
 
@@ -890,11 +874,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for report
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        // Because our subscription has no existent paths, it gets an
+        // InvalidAction response, which is EMBER_ZCL_STATUS_MALFORMED_COMMAND.
         XCTAssertNil(values);
         // Error is copied over XPC and hence cannot use MTRErrorTestUtils utility which checks against a local domain string
         // object.
         XCTAssertTrue([error.domain isEqualToString:MTRInteractionErrorDomain]);
-        XCTAssertEqual(error.code, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+        XCTAssertEqual(error.code, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         [errorReportExpectation fulfill];
     };
 
@@ -902,6 +888,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    params.autoResubscribe = NO;
     [device subscribeAttributePathWithEndpointID:@10000
         clusterID:@6
         attributeID:@0
