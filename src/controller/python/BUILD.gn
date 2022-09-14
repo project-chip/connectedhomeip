@@ -295,7 +295,7 @@ chip_python_wheel_action("chip-core") {
     py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
   } else if (current_os == "linux") {
     py_package_reqs += [
-      "dbus-python",
+      "dbus-python==1.2.18",
       "pygobject",
     ]
   }
