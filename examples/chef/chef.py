@@ -681,6 +681,7 @@ def main() -> int:
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
+                shell.run_cmd("make is")
 
 
         elif options.build_target == "linux":
