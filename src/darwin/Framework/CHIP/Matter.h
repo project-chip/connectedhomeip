@@ -48,7 +48,7 @@
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
 #import <Matter/MTRNOCChainIssuer.h>
-#import <Matter/MTROTAHeaderParser.h>
+#import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTRPersistentStorageDelegate.h>
