@@ -21,6 +21,7 @@ public class MatterServantService extends Service {
     super.onCreate();
     // Start Matter Server
     MatterServant.get().init(this.getApplicationContext());
+    MatterServant.get().initCommissioner();
 
     AppPlatformService.get().init(this.getApplicationContext());
   }

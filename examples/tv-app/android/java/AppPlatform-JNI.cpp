@@ -16,7 +16,6 @@
  *
  */
 
-#include "AppPlatform-JNI.h"
 #include "AppImpl.h"
 
 #include "MyUserPrompter-JNI.h"
@@ -32,15 +31,18 @@ using namespace chip::app;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
 
+/*
+ * This file provides the native implementation of methods of the
+ * com.matter.tv.server.tvapp.AppPlatform class.
+ */
+
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_AppPlatform_##METHOD_NAME
 
-AppPlatformJNI AppPlatformJNI::sInstance;
-
-JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app, jobject prompter, jobject contentAppEndpointManager)
+JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
-    InitVideoPlayerPlatform(new JNIMyUserPrompter(prompter), contentAppEndpointManager);
+    InitVideoPlayerPlatform(contentAppEndpointManager);
 }
 
 JNI_METHOD(jint, addContentApp)
@@ -54,6 +56,21 @@ JNI_METHOD(jint, addContentApp)
     JniUtfString aVersion(env, appVersion);
     EndpointId epId = AddContentApp(vName.c_str(), static_cast<uint16_t>(vendorId), aName.c_str(), static_cast<uint16_t>(productId),
                                     aVersion.c_str(), manager);
+    return static_cast<uint16_t>(epId);
+}
+
+JNI_METHOD(jint, addContentAppAtEndpoint)
+(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jint endpointId,
+ jobject manager)
+{
+    chip::DeviceLayer::StackLock lock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    JniUtfString vName(env, vendorName);
+    JniUtfString aName(env, appName);
+    JniUtfString aVersion(env, appVersion);
+    EndpointId epId = AddContentApp(vName.c_str(), static_cast<uint16_t>(vendorId), aName.c_str(), static_cast<uint16_t>(productId),
+                                    aVersion.c_str(), static_cast<EndpointId>(endpointId), manager);
     return static_cast<uint16_t>(epId);
 }
 

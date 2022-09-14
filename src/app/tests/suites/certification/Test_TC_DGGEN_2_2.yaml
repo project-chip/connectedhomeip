@@ -27,7 +27,7 @@ config:
 tests:
     - label: "Note"
       verification: |
-          "NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          "https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
            Events to be executed as following
            1. Compile app using below command in connectedhomeip folder
            a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
@@ -54,7 +54,7 @@ tests:
           Optional attribute so its not compulsory to get the expected outcome
 
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-          "echo "{"Name":"HardwareFaultChange"}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of all-clusters-app)"
+          echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
 
           ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
 
@@ -83,7 +83,7 @@ tests:
           Optional attribute so its not compulsory to get the expected outcome
 
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-           "echo "{"Name":"RadioFaultChange"}" > /tmp/chip_all_clusters_fifo-<PID>   (PID of all-clusters-app)"
+          echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
 
           ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
 
@@ -109,7 +109,7 @@ tests:
       PICS: DGGEN.S.E02
       verification: |
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-           "echo "{"Name":"NetworkFaultChange"}" > /tmp/chip_all_clusters_fifo-<PID>   (PID of all-clusters-app)"
+          echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
 
            ./chip-tool generaldiagnostics read-event network-fault-change 1 0
           On TH(chip-tool) verify that read  response  of NetworkFault event is shown
@@ -132,7 +132,7 @@ tests:
           Optional attribute so its not compulsory to get the expected outcome
 
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-           "echo "{"Name":"<BootReason>"}" > /tmp/chip_all_clusters_fifo-<PID>  (PID of all-clusters-app)"
+          echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
 
           ./chip-tool generaldiagnostics read-event boot-reason 1 0
 

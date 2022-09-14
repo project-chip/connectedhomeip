@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
-                                                                                        fabricId:(i + 1)
+                                                                                        fabricID:@(i + 1)
                                                                                              ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
@@ -147,7 +147,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         auto controller = [factory startControllerOnExistingFabric:controllerParams];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
-            controllerParams.vendorId = @(chip::VendorId::TestVendor1);
+            controllerParams.vendorID = @(chip::VendorId::TestVendor1);
             controller = [factory startControllerOnNewFabric:controllerParams];
         }
         if (controller == nil) {
@@ -201,7 +201,7 @@ void CHIPCommandBridge::RestartCommissioners()
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
-                                                                                        fabricId:(i + 1)
+                                                                                        fabricID:@(i + 1)
                                                                                              ipk:ipk];
 
         auto controller = [factory startControllerOnExistingFabric:controllerParams];

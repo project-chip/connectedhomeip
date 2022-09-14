@@ -128,7 +128,7 @@ private:
 
         auto fileDesignator = [[NSString alloc] initWithBytes:fd length:fdl encoding:NSUTF8StringEncoding];
         auto offset = @(mTransfer.GetStartOffset());
-        auto completionHandler = ^(NSError * error) {
+        auto completionHandler = ^(NSError * _Nullable error) {
             dispatch_async(mWorkQueue, ^{
                 if (error != nil) {
                     LogErrorOnFailure([MTRError errorToCHIPErrorCode:error]);
@@ -159,7 +159,7 @@ private:
                                                         controller:controller
                                                     fileDesignator:fileDesignator
                                                             offset:offset
-                                                 completionHandler:completionHandler];
+                                                        completion:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -238,7 +238,7 @@ private:
                                           blockSize:blockSize
                                          blockIndex:blockIndex
                                         bytesToSkip:bytesToSkip
-                                  completionHandler:completionHandler];
+                                         completion:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -509,7 +509,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         [strongDelegate handleQueryImageForNodeID:@(nodeId)
                                        controller:controller
                                            params:commandParams
-                                completionHandler:completionHandler];
+                                       completion:completionHandler];
     });
 }
 
@@ -550,7 +550,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
         [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
                                                controller:controller
                                                    params:commandParams
-                                        completionHandler:completionHandler];
+                                               completion:completionHandler];
     });
 }
 
@@ -585,7 +585,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
         [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
                                                 controller:controller
                                                     params:commandParams
-                                         completionHandler:completionHandler];
+                                                completion:completionHandler];
     });
 }
 

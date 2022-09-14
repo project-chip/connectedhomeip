@@ -29,12 +29,22 @@ tests:
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Pre-Condition"
+      verification: |
+          1. Commission DUT to TH
+
+          2. Set DUT OnOff to On
+
+          3. DUT supports CC.C.F00(HS)
+      disabled: true
+
     - label: "DUT sends MoveToSaturation command to TH"
-      PICS: CC.C.C03.Rsp
+      PICS: CC.C.C03.Tx
       verification: |
           ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
 
-          Verify in TH(all-clusters-app) Log:
+
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911500.672151][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911500.672204][2977:2977] CHIP:DMG: {
@@ -72,12 +82,13 @@ tests:
     - label:
           "DUT reads CurrentSaturation attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C03.Rsp && CC.C.A0001
+      PICS: CC.C.C03.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in TH(all-clusters-app) Log:
 
+
+          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
           [1657911521.672771][2977:2977] CHIP:IM: Received Read request
           [1657911521.672849][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911521.672876][2977:2977] CHIP:DMG: {
@@ -105,11 +116,12 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveSaturation command to TH"
-      PICS: CC.C.C04.Rsp
+      PICS: CC.C.C04.Tx
       verification: |
           ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
 
-          Verify in TH(all-clusters-app) Log:
+
+          Verify success response in TH(all-clusters-app) Log:
 
 
           [1657911543.960120][2977:2977] CHIP:DMG: InvokeRequestMessage =
@@ -147,11 +159,12 @@ tests:
 
     - label:
           "DUT reads CurrentSaturation attribute (potentially multiple times)"
-      PICS: CC.C.C04.Rsp && CC.C.A0001
+      PICS: CC.C.C04.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in TH(all-clusters-app) Log:
+
+          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
 
           [1657911563.694872][2977:2977] CHIP:IM: Received Read request
           [1657911563.694955][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -180,11 +193,11 @@ tests:
       disabled: true
 
     - label: "DUT sends StepSaturation command to TH"
-      PICS: CC.C.C05.Rsp
+      PICS: CC.C.C05.Tx
       verification: |
           ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911581.077515][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911581.077553][2977:2977] CHIP:DMG: {
@@ -223,11 +236,11 @@ tests:
     - label:
           "DUT reads CurrentSaturation attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C05.Rsp && CC.C.A0001
+      PICS: CC.C.C05.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
           [1657911602.223413][2977:2977] CHIP:IM: Received Read request
           [1657911602.223554][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911602.223609][2977:2977] CHIP:DMG: {
@@ -255,11 +268,12 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToHueAndSaturation command to TH"
-      PICS: CC.C.C06.Rsp
+      PICS: CC.C.C06.Tx
       verification: |
           ./chip-tool colorcontrol move-to-hue-and-saturation 100 200 200 0 0 1 1
 
-          Verify in TH(all-clusters-app) Log:
+
+          Verify success response in TH(all-clusters-app) Log:
 
           [1657911631.586168][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911631.586198][2977:2977] CHIP:DMG: {
@@ -298,10 +312,11 @@ tests:
     - label:
           "DUT reads CurrentHue and CurrentSaturation attributes from TH
           (potentially multiple times)"
-      PICS: CC.C.C06.Rsp && CC.C.A0000 && CC.C.A0001
+      PICS: CC.C.C06.Tx && CC.C.A0000 && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
-          Verify in TH(all-clusters-app) Log:
+
+          Verify response contains an CurrentHue value in  TH(all-clusters-app)  Logs:
 
           [1657911655.180421][2977:2977] CHIP:IM: Received Read request
           [1657911655.180507][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -331,7 +346,7 @@ tests:
 
           "./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
 
           [1657911674.594218][2977:2977] CHIP:IM: Received Read request
           [1657911674.594301][2977:2977] CHIP:DMG: ReadRequestMessage =
@@ -362,11 +377,12 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
-          Verify in TH(all-clusters-app) Log:
+
+          Verify success response in TH(all-clusters-app) Log:
           [1657911698.270231][2977:2977] CHIP:DMG: InvokeRequestMessage =
           [1657911698.270280][2977:2977] CHIP:DMG: {
           [1657911698.270321][2977:2977] CHIP:DMG:        suppressResponse = false,
@@ -400,11 +416,11 @@ tests:
 
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
-      PICS: CC.C.C47.Rsp && CC.C.A0001
+      PICS: CC.C.C47.Tx && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify in TH(all-clusters-app) Log:
+          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
           [1657911602.223413][2977:2977] CHIP:IM: Received Read request
           [1657911602.223554][2977:2977] CHIP:DMG: ReadRequestMessage =
           [1657911602.223609][2977:2977] CHIP:DMG: {

@@ -46,12 +46,12 @@ public:
 class MTR{{> @partial-block}}SubscriptionBridge : public MTR{{> @partial-block}}Bridge
 {
 public:
-    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler)
+    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
       : MTR{{> @partial-block}}Bridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
       {}
 
-    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler)
+    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
       : MTR{{> @partial-block}}Bridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
       {}
@@ -59,7 +59,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 {{/unless}}
 

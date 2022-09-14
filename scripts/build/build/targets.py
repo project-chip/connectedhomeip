@@ -32,7 +32,9 @@ from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
+from builders.genio import GenioApp, GenioBuilder
 
 
 class Target:
@@ -282,6 +284,8 @@ def HostTargets():
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
+    builder.AppendVariant(name="libnl", validator=AcceptNameWithSubstrings(
+        ['-minmdns']), minmdns_address_policy="libnl"),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
@@ -613,6 +617,16 @@ def Bl602Targets():
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
 
 
+def BouffalolabTargets():
+    target = Target('bouffalolab', BouffalolabBuilder)
+
+    yield target.Extend('BL706-IoT-DVK-BL706C-22-light', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
+    yield target.Extend('BL702-IoT-DVK-light', board=BouffalolabBoard.BL702_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
+    yield target.Extend('BL706-IoT-DVK-BL706C-22-light-rpc', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL706C-22")
+    yield target.Extend('BL702-IoT-DVK-light-rpc', board=BouffalolabBoard.BL702_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL702")
+    yield target.Extend('BL706-NIGHT-LIGHT-light', board=BouffalolabBoard.BL706_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
+
+
 def IMXTargets():
     target = Target('imx', IMXBuilder)
 
@@ -636,6 +650,12 @@ def MW320Targets():
     yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
 
 
+def GenioTargets():
+    target = Target('genio', GenioBuilder)
+
+    yield target.Extend('lighting-app', app=GenioApp.LIGHT)
+
+
 ALL = []
 
 target_generators = [
@@ -653,8 +673,10 @@ target_generators = [
     QorvoTargets(),
     TizenTargets(),
     Bl602Targets(),
+    BouffalolabTargets(),
     IMXTargets(),
     MW320Targets(),
+    GenioTargets(),
 ]
 
 for generator in target_generators:

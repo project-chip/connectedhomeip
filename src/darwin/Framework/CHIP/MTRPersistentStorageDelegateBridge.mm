@@ -17,7 +17,7 @@
 
 #import "MTRPersistentStorageDelegateBridge.h"
 
-MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRPersistentStorageDelegate> delegate)
+MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRStorage> delegate)
     : mDelegate(delegate)
     , mWorkQueue(dispatch_queue_create("com.csa.matter.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
 {

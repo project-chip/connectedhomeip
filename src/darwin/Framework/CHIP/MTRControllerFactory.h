@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MTRPersistentStorageDelegate;
+@protocol MTRStorage;
 @protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * controllers.  It is used to store persistent information for the fabrics the
  * controllers ends up interacting with.
  */
-@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate;
+@property (nonatomic, strong, readonly) id<MTRStorage> storage;
 
 /*
  * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL startServer;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithStorage:(id<MTRPersistentStorageDelegate>)storageDelegate;
+- (instancetype)initWithStorage:(id<MTRStorage>)storage;
 @end
 
 @interface MTRControllerFactory : NSObject

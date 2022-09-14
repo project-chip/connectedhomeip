@@ -22,7 +22,7 @@ BL602_BOARD=BL-HWC-G1
 
 # Build script for GN examples GitHub workflow.
 
-MATTER_ROOT=$(dirname "$0")/../../
+MATTER_ROOT=$(dirname "$(readlink -f "$0")")/../../
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
@@ -37,14 +37,6 @@ EXAMPLE_DIR=examples/$1/bouffalolab/bl602/
 shift
 OUTPUT_DIR=$1
 shift
-
-export BL_IOT_SDK_PATH="$MATTER_ROOT"/third_party/bouffalolab/repo
-
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Linux/bin:$PATH"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Darwin/bin:$PATH"
-fi
 
 GN_ARGS=()
 
@@ -68,6 +60,6 @@ for arg; do
     esac
 done
 
-gn gen --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
+gn gen --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]} custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:riscv_gcc\""
 
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"

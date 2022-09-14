@@ -742,7 +742,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "DeviceList",
+                    "attributeName": "DeviceTypeList",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,

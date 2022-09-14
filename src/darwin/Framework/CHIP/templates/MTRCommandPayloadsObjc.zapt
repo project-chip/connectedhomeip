@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRStructsObjc.h>
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 {{/zcl_commands}}
 {{/zcl_clusters}}

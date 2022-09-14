@@ -1177,7 +1177,7 @@ tests:
           basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
 
-          On TH(chip-tool) verify that the Report Data Message with empty EventReports from DUT
+          On TH(chip-tool) verify that the Report Data Message with empty EventReports from DUT and  Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events.
           [1655980488.281744][4665:4671] CHIP:EM: Removed CHIP MessageCounter:255017723 from RetransTable on exchange 3120i
           [1655980488.281823][4665:4671] CHIP:DMG: ReportDataMessage =
           [1655980488.281891][4665:4671] CHIP:DMG: {
@@ -1186,6 +1186,10 @@ tests:
           [1655980488.282046][4665:4671] CHIP:DMG: }
           [1655980488.282129][4665:4671] CHIP:DMG: MoveToState ReadClient[0xffff94006ea0]: Moving to [AwaitingSu]
           [1655980488.282222][4665:4671] CHIP:EM: Piggybacking Ack for MessageCounter:7910071 on exchange: 3120i
+
+
+          Note:-
+          While sending  --event-min  parameter in TH pls make sure event number is less than the EventMin field
       disabled: true
 
     - label:

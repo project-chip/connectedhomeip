@@ -240,9 +240,9 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
-                    [onOff onWithCompletionHandler:^(NSError * error) {
+                    [onOff onWithCompletion:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"On command success";
@@ -269,9 +269,9 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
-                    [onOff offWithCompletionHandler:^(NSError * error) {
+                    [onOff offWithCompletion:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"Off command success";
@@ -298,9 +298,9 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
+                                                                                     endpoint:@(endpoint)
                                                                                         queue:dispatch_get_main_queue()];
-                    [onOff toggleWithCompletionHandler:^(NSError * error) {
+                    [onOff toggleWithCompletion:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"Toggle command success";

@@ -306,29 +306,45 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads the UserCodeTemporaryDisableTime attribute from the DUT"
-      PICS: DRLK.S.A0031
-      command: "readAttribute"
-      attribute: "UserCodeTemporaryDisableTime"
-      response:
-          value: 10
+    - label:
+          "Wait for PIXIT.DRLK.UserCodeTemporaryDisableTime.TH then sends an
+          Unlock Door Command from User1 to the DUT with the valid PINCode."
+      verification: |
+          ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
-    - label: "Wait 15000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
+          Verify "UserCodeTemporaryDisable" on the TH(Chip-tool) Log:
+
+          [1661767967.006958][131055:131060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 683420143
+          [1661767967.006988][131055:131060] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
+
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+
+          Verify " DUT sends success response" on the TH(Chip-tool) Log:
+
+          [1659517972.769737][33910:33915] CHIP:DMG:
+          [1659517972.769774][33910:33915] CHIP:DMG:                              StatusIB =
+          [1659517972.769815][33910:33915] CHIP:DMG:                              {
+          [1659517972.769856][33910:33915] CHIP:DMG:                                      status = 0x00 (SUCCESS),
+          [1659517972.769899][33910:33915] CHIP:DMG:                              },
+          [1659517972.769939][33910:33915] CHIP:DMG:
+          [1659517972.769974][33910:33915] CHIP:DMG:                      },
+          [1659517972.770015][33910:33915] CHIP:DMG:
+          [1659517972.770045][33910:33915] CHIP:DMG:              },
+          [1659517972.770080][33910:33915] CHIP:DMG:
+          [1659517972.770109][33910:33915] CHIP:DMG:      ],
+          [1659517972.770144][33910:33915] CHIP:DMG:
+          [1659517972.770172][33910:33915] CHIP:DMG:      InteractionModelRevision = 1
+          [1659517972.770200][33910:33915] CHIP:DMG: },
+          [1659517972.770267][33910:33915] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.A0030
       arguments:
           values:
-              - name: "ms"
-                value: 15000
-
-    - label: "TH sends the unlock Door command to the DUT with valid PINCode"
-      PICS: DRLK.S.A0030
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "PINCode"
-                value: "123456"
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH writes WrongCodeEntryLimit attribute value as between 1 and 255 on

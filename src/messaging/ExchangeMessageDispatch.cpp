@@ -55,16 +55,6 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
     if (reliableMessageContext->HasPiggybackAckPending())
     {
         payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
-
-#if !defined(NDEBUG)
-        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
-        {
-            ChipLogDetail(ExchangeManager,
-                          "Piggybacking Ack for MessageCounter:" ChipLogFormatMessageCounter
-                          " on exchange: " ChipLogFormatExchangeId,
-                          payloadHeader.GetAckMessageCounter().Value(), ChipLogValueExchangeId(exchangeId, isInitiator));
-        }
-#endif
     }
 
     if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&

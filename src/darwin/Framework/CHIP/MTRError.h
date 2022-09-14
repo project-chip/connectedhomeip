@@ -75,35 +75,26 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
 // clang-format off
 typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     // These values come from the general status code table in the Matter
-    // Interaction Model specification.  Do not change these values unless the
-    // specification changes.
+    // Interaction Model specification.
     MTRInteractionErrorCodeFailure                = 0x01,
     MTRInteractionErrorCodeInvalidSubscription    = 0x7d,
     MTRInteractionErrorCodeUnsupportedAccess      = 0x7e,
     MTRInteractionErrorCodeUnsupportedEndpoint    = 0x7f,
     MTRInteractionErrorCodeInvalidAction          = 0x80,
     MTRInteractionErrorCodeUnsupportedCommand     = 0x81,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeInvalidCommand         = 0x85,
     MTRInteractionErrorCodeUnsupportedAttribute   = 0x86,
     MTRInteractionErrorCodeConstraintError        = 0x87,
     MTRInteractionErrorCodeUnsupportedWrite       = 0x88,
     MTRInteractionErrorCodeResourceExhausted      = 0x89,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeNotFound               = 0x8b,
     MTRInteractionErrorCodeUnreportableAttribute  = 0x8c,
     MTRInteractionErrorCodeInvalidDataType        = 0x8d,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeUnsupportedRead        = 0x8f,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeDataVersionMismatch    = 0x92,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeTimeout                = 0x94,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeBusy                   = 0x9c,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeUnsupportedCluster     = 0xc3,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeNoUpstreamSubscription = 0xc5,
     MTRInteractionErrorCodeNeedsTimedInteraction  = 0xc6,
     MTRInteractionErrorCodeUnsupportedEvent       = 0xc7,

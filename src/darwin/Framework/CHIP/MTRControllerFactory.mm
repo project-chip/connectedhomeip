@@ -216,7 +216,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         [MTRControllerAccessControl init];
 
-        _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storageDelegate);
+        _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storage);
         if (_persistentStorageDelegateBridge == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             return;
@@ -416,7 +416,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         return nil;
     }
 
-    if (startupParams.vendorId == nil) {
+    if (startupParams.vendorID == nil) {
         MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
         return nil;
     }
@@ -526,7 +526,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
     }
 
-    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, [params.fabricID unsignedLongLongValue]);
     return YES;
 }
 
@@ -620,13 +620,13 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @implementation MTRControllerFactoryParams
 
-- (instancetype)initWithStorage:(id<MTRPersistentStorageDelegate>)storageDelegate
+- (instancetype)initWithStorage:(id<MTRStorage>)storage
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    _storageDelegate = storageDelegate;
+    _storage = storage;
     _otaProviderDelegate = nil;
     _paaCerts = nil;
     _cdCerts = nil;

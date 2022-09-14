@@ -29,8 +29,17 @@ tests:
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
+    - label: "Pre-Condition"
+      verification: |
+          1. Commission DUT to TH
+
+          2. Set DUT OnOff to On
+
+          3. DUT supports CC.C.F01(EHUE)
+      disabled: true
+
     - label: "DUT sends EnhancedMoveToHue command to TH"
-      PICS: CC.C.C40.Rsp
+      PICS: CC.C.C40.Tx
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue 1000 3 200 0 0 1 1
 
@@ -72,7 +81,7 @@ tests:
     - label:
           "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C40.Rsp && CC.C.A4000
+      PICS: CC.C.C40.Tx && CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
@@ -105,7 +114,7 @@ tests:
       disabled: true
 
     - label: "DUT sends EnhancedMoveHue command to TH"
-      PICS: CC.C.C41.Rsp
+      PICS: CC.C.C41.Tx
       verification: |
           ./chip-tool colorcontrol enhanced-move-hue 0 100 0 0 1 1
 
@@ -147,7 +156,7 @@ tests:
 
     - label:
           "DUT reads EnhancedCurrentHue attribute (potentially multiple times)"
-      PICS: CC.C.C41.Rsp && CC.C.A4000
+      PICS: CC.C.C41.Tx && CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
@@ -179,7 +188,7 @@ tests:
       disabled: true
 
     - label: "DUT sends EnhancedStepHue command to TH"
-      PICS: CC.C.C42.Rsp
+      PICS: CC.C.C42.Tx
       verification: |
           ./chip-tool colorcontrol enhanced-step-hue 1 1000 200 0 0 1 1
 
@@ -221,7 +230,7 @@ tests:
     - label:
           "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
           times)"
-      PICS: CC.C.C42.Rsp && CC.C.A4000
+      PICS: CC.C.C42.Tx && CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
@@ -253,7 +262,7 @@ tests:
       disabled: true
 
     - label: "DUT sends EnhancedMoveToHueAndSaturation command to TH"
-      PICS: CC.C.C43.Rsp
+      PICS: CC.C.C43.Tx
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue-and-saturation 2500 100 200 0 0 1 1
 
@@ -296,7 +305,7 @@ tests:
     - label:
           "DUT reads EnhancedCurrentHue and CurrentSaturation attributes from TH
           (potentially multiple times)"
-      PICS: CC.C.C43.Rsp && CC.C.A4000 && CC.C.A0001
+      PICS: CC.C.C43.Tx && CC.C.A4000 && CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
@@ -329,7 +338,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
@@ -368,7 +377,7 @@ tests:
 
     - label:
           "Over TransitionTime, DUT reads EnhancedCurrentHue attribute from TH."
-      PICS: CC.C.C47.Rsp && CC.C.A4000
+      PICS: CC.C.C47.Tx && CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 

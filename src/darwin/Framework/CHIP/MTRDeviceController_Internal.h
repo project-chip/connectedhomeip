@@ -36,6 +36,10 @@
 
 namespace chip {
 class FabricTable;
+
+namespace Controller {
+    class DeviceCommissioner;
+}
 } // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
@@ -101,11 +105,11 @@ NS_ASSUME_NONNULL_BEGIN
  * dispatch to the Matter queue).
  *
  * If the controller is not running when this function is called, will return NO
- * and never invoke the completionHandler.  If the controller is not running
- * when the async dispatch on the Matter queue would happen, an error will be
- * dispatched to the completion handler.
+ * and never invoke the completion.  If the controller is not running when the
+ * async dispatch on the Matter queue would happen, an error will be dispatched
+ * to the completion handler.
  */
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
@@ -114,9 +118,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
 
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * The DeviceCommissioner pointer passed to the callback should only be used
+ * synchronously during the callback invocation.
+ */
+- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                      errorHandler:(void (^)(NSError *))erroHandler;
+
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
-- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID;
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
 
 @end

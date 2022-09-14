@@ -149,7 +149,22 @@ gn gen --check --fail-on-unused-args {out}/android-x86-tv-server '--args=target_
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating bouffalolab-BL702-IoT-DVK-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL702-IoT-DVK" module_type="BL702"' {out}/bouffalolab-BL702-IoT-DVK-light
+
+# Generating bouffalolab-BL702-IoT-DVK-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL702-IoT-DVK" module_type="BL702" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL702-IoT-DVK-light-rpc
+
+# Generating bouffalolab-BL706-IoT-DVK-BL706C-22-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22"' {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light
+
+# Generating bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+
+# Generating bouffalolab-BL706-NIGHT-LIGHT-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-NIGHT-LIGHT" module_type="BL702"' {out}/bouffalolab-BL706-NIGHT-LIGHT-light
 
 # Generating cc13x2x7_26x2x7-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
@@ -817,6 +832,9 @@ rm -f src/test_driver/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
+
+# Generating genio-lighting-app
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/genio {out}/genio-lighting-app
 
 # Generating imx-all-clusters-app
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=treat_warnings_as_errors=false target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" optimize_debug=true' {out}/imx-all-clusters-app
@@ -1541,6 +1559,21 @@ cp {out}/android-x86-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 # Building bl602-light
 ninja -C {out}/bl602-light
 
+# Building bouffalolab-BL702-IoT-DVK-light
+ninja -C {out}/bouffalolab-BL702-IoT-DVK-light
+
+# Building bouffalolab-BL702-IoT-DVK-light-rpc
+ninja -C {out}/bouffalolab-BL702-IoT-DVK-light-rpc
+
+# Building bouffalolab-BL706-IoT-DVK-BL706C-22-light
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light
+
+# Building bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+
+# Building bouffalolab-BL706-NIGHT-LIGHT-light
+ninja -C {out}/bouffalolab-BL706-NIGHT-LIGHT-light
+
 # Building cc13x2x7_26x2x7-all-clusters
 ninja -C {out}/cc13x2x7_26x2x7-all-clusters
 
@@ -2091,6 +2124,9 @@ rm -f src/test_driver/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
+
+# Building genio-lighting-app
+ninja -C {out}/genio-lighting-app
 
 # Building imx-all-clusters-app
 ninja -C {out}/imx-all-clusters-app

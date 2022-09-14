@@ -516,6 +516,18 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
 
 } // anonymous namespace
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == aPath.mAttributeId)
+        {
+            return (emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER) != nullptr);
+        }
+    }
+    return (emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != nullptr);
+}
+
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)

@@ -16,6 +16,7 @@
  */
 
 #import "MTRBaseDevice.h"
+#import "MTRCluster.h" // For MTRSubscriptionEstablishedHandler
 #import "MTRDeviceControllerXPCConnection.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,14 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-- (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
-              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler NS_UNAVAILABLE;
 
 - (instancetype)initWithController:(id<NSCopying>)controller
-                          deviceId:(uint64_t)deviceId
+                          deviceID:(NSNumber *)deviceID
                      xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
 
 @end

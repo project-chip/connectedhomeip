@@ -59,11 +59,12 @@ private:
 
     struct KeyStorage
     {
-        KeyStorage(const char * key = nullptr, size_t keyLength = 0);
+        KeyStorage(const char * key = nullptr);
 
+        constexpr size_t GetSize() const { return sizeof(mValueSize) + strnlen(mKey, sizeof(mKey)); }
         bool IsMatchKey(const char * key) const;
 
-        size_t mValueSize;
+        uint16_t mValueSize;
         char mKey[PersistentStorageDelegate::kKeyLengthMax];
     };
 
@@ -81,14 +82,14 @@ private:
         }
         constexpr KeyConfigIdEntry * Next() const { return static_cast<KeyConfigIdEntry *>(next); }
         constexpr uint8_t NextConfigID() const { return mConfigID + 1; }
-        constexpr size_t GetValueSize() const { return mStorage.mValueSize; }
-        constexpr void SetValueSize(size_t valueSize) { mStorage.mValueSize = valueSize; }
+        constexpr uint16_t GetValueSize() const { return mStorage.mValueSize; }
+        constexpr void SetValueSize(uint16_t valueSize) { mStorage.mValueSize = valueSize; }
 
         uint8_t mConfigID;
         KeyStorage mStorage;
     };
 
-    KeyConfigIdEntry * AllocateEntry(const char * key, size_t keyLength);
+    KeyConfigIdEntry * AllocateEntry(const char * key);
     KeyConfigIdEntry * FindEntry(const char * key, Optional<uint8_t> * freeConfigID = nullptr);
 
     // ===== Members for internal use by the following friends.

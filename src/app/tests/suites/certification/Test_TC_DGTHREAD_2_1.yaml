@@ -414,7 +414,7 @@ tests:
               type: int64u
 
     - label: "TH reads Delay attribute value from DUT"
-      PICS: DGTHREAD.S.A003a
+      PICS: DGTHREAD.S.A003A
       command: "readAttribute"
       attribute: "Delay"
       response:
@@ -441,7 +441,7 @@ tests:
           [1649825860.867921][3472:3477] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003b
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003B
       arguments:
           values:
               - name: "message"

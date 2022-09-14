@@ -32,7 +32,7 @@ tests:
 
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends the ScanNetwork command to the TH"

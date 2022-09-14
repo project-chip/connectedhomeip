@@ -142,12 +142,12 @@ private:
 
 @implementation MTRDevice
 
-- (instancetype)initWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = nodeID;
-        _deviceController = deviceController;
+        _nodeID = [nodeID unsignedLongLongValue];
+        _deviceController = controller;
         _queue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
         ;
         _readCache = [NSMutableDictionary dictionary];
@@ -158,9 +158,9 @@ private:
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    return [deviceController deviceForNodeID:nodeID];
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark Subscription and delegate handling
@@ -287,77 +287,77 @@ private:
     _subscriptionActive = YES;
 
     [_deviceController getSessionForNode:_nodeID
-                       completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                           const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                           if (error != nil) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:error];
-                               });
-                               return;
-                           }
+                              completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:error];
+                                      });
+                                      return;
+                                  }
 
-                           // Wildcard endpoint, cluster, attribute, event.
-                           auto attributePath = std::make_unique<AttributePathParams>();
-                           auto eventPath = std::make_unique<EventPathParams>();
-                           ReadPrepareParams readParams(session.Value());
-                           readParams.mMinIntervalFloorSeconds = minInterval;
-                           readParams.mMaxIntervalCeilingSeconds = maxInterval;
-                           readParams.mpAttributePathParamsList = attributePath.get();
-                           readParams.mAttributePathParamsListSize = 1;
-                           readParams.mpEventPathParamsList = eventPath.get();
-                           readParams.mEventPathParamsListSize = 1;
-                           readParams.mKeepSubscriptions = true;
-                           attributePath.release();
-                           eventPath.release();
+                                  // Wildcard endpoint, cluster, attribute, event.
+                                  auto attributePath = std::make_unique<AttributePathParams>();
+                                  auto eventPath = std::make_unique<EventPathParams>();
+                                  ReadPrepareParams readParams(session.Value());
+                                  readParams.mMinIntervalFloorSeconds = minInterval;
+                                  readParams.mMaxIntervalCeilingSeconds = maxInterval;
+                                  readParams.mpAttributePathParamsList = attributePath.get();
+                                  readParams.mAttributePathParamsListSize = 1;
+                                  readParams.mpEventPathParamsList = eventPath.get();
+                                  readParams.mEventPathParamsListSize = 1;
+                                  readParams.mKeepSubscriptions = true;
+                                  attributePath.release();
+                                  eventPath.release();
 
-                           std::unique_ptr<SubscriptionCallback> callback;
-                           std::unique_ptr<ReadClient> readClient;
-                           std::unique_ptr<ClusterStateCache> attributeCache;
-                           callback = std::make_unique<SubscriptionCallback>(
-                               self.queue,
-                               ^(NSArray * value) {
-                                   // OnAttributeData (after OnReportEnd)
-                                   [self _handleAttributeReport:value];
-                               },
-                               ^(NSArray * value) {
-                                   // OnEventReport (after OnReportEnd)
-                                   [self _handleEventReport:value];
-                               },
-                               ^(NSError * error) {
-                                   // OnError
-                                   [self _handleSubscriptionError:error];
-                               },
-                               ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                   // OnResubscriptionNeeded
-                                   [self _handleResubscriptionNeeded];
-                               },
-                               ^(void) {
-                                   // OnSubscriptionEstablished
-                                   [self _handleSubscriptionEstablished];
-                               },
-                               ^(void) {
-                                   // OnDone
-                                   [self _handleSubscriptionReset];
-                               });
-                           readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                               callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                                  std::unique_ptr<SubscriptionCallback> callback;
+                                  std::unique_ptr<ReadClient> readClient;
+                                  std::unique_ptr<ClusterStateCache> attributeCache;
+                                  callback = std::make_unique<SubscriptionCallback>(
+                                      self.queue,
+                                      ^(NSArray * value) {
+                                          // OnAttributeData (after OnReportEnd)
+                                          [self _handleAttributeReport:value];
+                                      },
+                                      ^(NSArray * value) {
+                                          // OnEventReport (after OnReportEnd)
+                                          [self _handleEventReport:value];
+                                      },
+                                      ^(NSError * error) {
+                                          // OnError
+                                          [self _handleSubscriptionError:error];
+                                      },
+                                      ^(NSError * error, NSNumber * resubscriptionDelay) {
+                                          // OnResubscriptionNeeded
+                                          [self _handleResubscriptionNeeded];
+                                      },
+                                      ^(void) {
+                                          // OnSubscriptionEstablished
+                                          [self _handleSubscriptionEstablished];
+                                      },
+                                      ^(void) {
+                                          // OnDone
+                                          [self _handleSubscriptionReset];
+                                      });
+                                  readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                                      callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                           // SendAutoResubscribeRequest cleans up the params, even on failure.
-                           CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                                  // SendAutoResubscribeRequest cleans up the params, even on failure.
+                                  CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
-                           if (err != CHIP_NO_ERROR) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
-                               });
+                                  if (err != CHIP_NO_ERROR) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
+                                      });
 
-                               return;
-                           }
+                                      return;
+                                  }
 
-                           // Callback and ReadClient will be deleted when OnDone is called or an error is
-                           // encountered.
-                           callback->AdoptReadClient(std::move(readClient));
-                           callback.release();
-                       }];
+                                  // Callback and ReadClient will be deleted when OnDone is called or an error is
+                                  // encountered.
+                                  callback->AdoptReadClient(std::move(readClient));
+                                  callback.release();
+                              }];
 }
 
 #pragma mark Device Interactions
@@ -369,36 +369,36 @@ private:
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
 
-        [baseDevice
-            readAttributeWithEndpointId:endpointID
-                              clusterId:clusterID
-                            attributeId:attributeID
-                                 params:params
-                            clientQueue:self.queue
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 if (values) {
-                                     // Since the format is the same data-value dictionary, this looks like an attribute
-                                     // report
-                                     [self _handleAttributeReport:values];
-                                 }
+        [baseDevice readAttributePathWithEndpointID:endpointID
+                                          clusterID:clusterID
+                                        attributeID:attributeID
+                                             params:params
+                                              queue:self.queue
+                                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                             NSError * _Nullable error) {
+                                             if (values) {
+                                                 // Since the format is the same data-value dictionary, this looks like an attribute
+                                                 // report
+                                                 [self _handleAttributeReport:values];
+                                             }
 
-                                 // TODO: better retry logic
-                                 if (retryCount < 2) {
-                                     [workItem retryWork];
-                                 } else {
-                                     [workItem endWork];
-                                 }
-                             }];
+                                             // TODO: better retry logic
+                                             if (retryCount < 2) {
+                                                 [workItem retryWork];
+                                             } else {
+                                                 [workItem endWork];
+                                             }
+                                         }];
     };
     workItem.readyHandler = readyHandler;
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     // Return current known / expected value right away
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointId:endpointID
-                                                                           clusterId:clusterID
-                                                                         attributeId:attributeID];
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     return attributeValueToReturn;
@@ -412,14 +412,14 @@ private:
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
     // Start the asynchronous operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
-        writeAttributeWithEndpointId:endpointID
-                           clusterId:clusterID
-                         attributeId:attributeID
+        writeAttributeWithEndpointID:endpointID
+                           clusterID:clusterID
+                         attributeID:attributeID
                                value:value
                    timedWriteTimeout:timeout
-                         clientQueue:self.queue
+                               queue:self.queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               if (values) {
                                   [self _handleAttributeReport:values];
@@ -427,9 +427,9 @@ private:
                           }];
 
     // Commit change into expected value cache
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointId:endpointID
-                                                                           clusterId:clusterID
-                                                                         attributeId:attributeID];
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
     NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
 
     [self setExpectedValues:@[ newExpectedValueDictionary ] expectedValueInterval:expectedValueInterval];
@@ -442,25 +442,39 @@ private:
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     // Perform this operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
     [baseDevice
-        invokeCommandWithEndpointId:endpointID
-                          clusterId:clusterID
-                          commandId:commandID
+        invokeCommandWithEndpointID:endpointID
+                          clusterID:clusterID
+                          commandID:commandID
                       commandFields:commandFields
                  timedInvokeTimeout:timeout
-                        clientQueue:self.queue
+                              queue:self.queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             dispatch_async(clientQueue, ^{
+                             dispatch_async(queue, ^{
                                  completion(values, error);
                              });
                          }];
 
     [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
+}
+
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+    [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
+                                           discriminator:discriminator
+                                                duration:duration
+                                                   queue:queue
+                                              completion:completion];
 }
 
 #pragma mark - Cache management

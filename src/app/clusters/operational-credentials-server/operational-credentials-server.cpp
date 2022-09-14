@@ -848,7 +848,7 @@ exit:
     else
     {
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;

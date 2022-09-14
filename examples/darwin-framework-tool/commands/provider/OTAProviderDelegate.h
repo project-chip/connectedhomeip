@@ -41,25 +41,29 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 - (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
                        controller:(MTRDeviceController * _Nonnull)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler;
+                       completion:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion;
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
                                controller:(MTRDeviceController * _Nonnull)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
-                        completionHandler:
-                            (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler;
+                               completion:
+                                   (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion;
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
                                 controller:(MTRDeviceController * _Nonnull)controller
                                     params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
-                         completionHandler:(StatusCompletion _Nonnull)completionHandler;
+                                completion:(MTRStatusCompletion _Nonnull)completion;
 
 @property (strong, nonatomic, nullable) NSArray<DeviceSoftwareVersionModel *> * candidates;
 @property (strong, nonatomic, nullable) DeviceSoftwareVersionModel * selectedCandidate;
 @property (strong, nonatomic, nullable) NSNumber * nodeID;
 @property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAQueryStatus queryImageStatus;
 @property (nonatomic, readwrite) UserConsentState userConsentState;
+@property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAApplyUpdateAction action;
+@property (nonatomic, readwrite, nullable) NSNumber * delayedActionTime;
+@property (nonatomic, readwrite, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, readwrite, nullable) NSNumber * userConsentNeeded;
 
 @end

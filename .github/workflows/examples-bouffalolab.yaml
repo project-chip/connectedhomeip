@@ -1,0 +1,77 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - Bouffalolab BL702
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  bl702:
+    name: BL702
+    timeout-minutes: 90
+
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+
+    container:
+      image: connectedhomeip/chip-build:latest
+      volumes:
+        - "/tmp/bloat_reports:/tmp/bloat_reports"
+    steps:
+      - uses: Wandalen/wretry.action@v1.0.15
+        name: Checkout
+        with:
+          action: actions/checkout@v3
+          with: |
+            token: ${{ github.token }}
+          attempt_limit: 3
+          attempt_delay: 2000
+      - name: Checkout submodules
+        run: scripts/checkout_submodules.py --shallow --platform bouffalolab
+
+      - name: Set up environment for size reports
+        if: ${{ !env.ACT }}
+        env:
+          GH_CONTEXT: ${{ toJson(github) }}
+        run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
+      - name: Build example BL702 Lighting App
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build"
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702 lighting-app \
+            out/bouffalolab-BL706-IoT-DVK-BL706C-22-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
+
+      - name: Build example BL702 Lighting App with RPCs
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc build"
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702+rpc lighting-app \
+            out/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
+
+      - name: Uploading Size Reports
+        uses: actions/upload-artifact@v2
+        if: ${{ !env.ACT }}
+        with:
+          name: Size,BL702-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+          path: |
+            /tmp/bloat_reports/

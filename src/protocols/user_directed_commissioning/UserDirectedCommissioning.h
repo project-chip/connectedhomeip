@@ -41,6 +41,8 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
+constexpr const char * kProtocolName = "UserDirectedCommissioning";
+
 // Cache contains 16 clients. This may need to be tweaked.
 constexpr uint8_t kMaxUDCClients = 16;
 
@@ -206,6 +208,17 @@ template <>
 struct MessageTypeTraits<UserDirectedCommissioning::MsgType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return UserDirectedCommissioning::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 1> typeToNameTable = {
+            {
+                { UserDirectedCommissioning::MsgType::IdentificationDeclaration, "IdentificationDeclaration" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 
 } // namespace Protocols

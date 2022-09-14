@@ -466,74 +466,74 @@ PICS:
       id: CC.C.A003c
 
     - label: "Does the device implement receiving the MoveToHue command?"
-      id: CC.C.C00.Rsp
+      id: CC.C.C00.Tx
 
     - label: "Does the device implement receiving the MoveHue command?"
-      id: CC.C.C01.Rsp
+      id: CC.C.C01.Tx
 
     - label: "Does the device implement receiving the MoveToHue command?"
-      id: CC.C.C02.Rsp
+      id: CC.C.C02.Tx
 
     - label: "Does the device implement receiving the MoveToSaturation command?"
-      id: CC.C.C03.Rsp
+      id: CC.C.C03.Tx
 
     - label: "Does the device implement receiving the MoveSaturation command?"
-      id: CC.C.C04.Rsp
+      id: CC.C.C04.Tx
 
     - label: "Does the device implement receiving the StepSaturation command?"
-      id: CC.C.C05.Rsp
+      id: CC.C.C05.Tx
 
     - label:
           "Does the device implement receiving the MoveToHueAndSaturation
           command?"
-      id: CC.C.C06.Rsp
+      id: CC.C.C06.Tx
 
     - label: "Does the device implement receiving the MoveToColor command?"
-      id: CC.C.C07.Rsp
+      id: CC.C.C07.Tx
 
     - label: "Does the device implement receiving the MoveColor command?"
-      id: CC.C.C08.Rsp
+      id: CC.C.C08.Tx
 
     - label: "Does the device implement receiving the StopMoveStep command?"
-      id: CC.C.C47.Rsp
+      id: CC.C.C47.Tx
 
     - label: "Does the device implement receiving the StepColor command?"
-      id: CC.C.C09.Rsp
+      id: CC.C.C09.Tx
 
     - label:
           "Does the device implement receiving the MoveToColorTemperature
           command?"
-      id: CC.C.C0a.Rsp
+      id: CC.C.C0a.Tx
 
     - label:
           "Does the device implement receiving the MoveColorTemperature command?"
-      id: CC.C.C4b.Rsp
+      id: CC.C.C4b.Tx
 
     - label:
           "Does the device implement receiving the StepColorTemperature command?"
-      id: CC.C.C4c.Rsp
+      id: CC.C.C4c.Tx
 
     - label:
           "Does the device implement receiving the EnhancedMoveToHue command?"
-      id: CC.C.C40.Rsp
+      id: CC.C.C40.Tx
 
     - label: "Does the device implement receiving the EnhancedMoveHue command?"
-      id: CC.C.C41.Rsp
+      id: CC.C.C41.Tx
 
     - label: "Does the device implement receiving the EnhancedStepHue command?"
-      id: CC.C.C42.Rsp
+      id: CC.C.C42.Tx
 
     - label:
           "Does the device implement receiving the
           EnhancedMoveToHueAndSaturation command?"
-      id: CC.C.C43.Rsp
+      id: CC.C.C43.Tx
 
     - label: "Does the device implement receiving the ColorLoopSet command?"
-      id: CC.C.C44.Rsp
+      id: CC.C.C44.Tx
 
     - label:
           "Does the device implement sending the MoveToColorTemperature command?"
-      id: CC.C.C0a.Rsp
+      id: CC.C.C0a.Tx
 
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
@@ -2052,11 +2052,6 @@ PICS:
       id: MEDIAPLAYBACK.S.VS
 
     - label:
-          "Does the DUT support the Media Input server cluster, Name Updates
-          feature?"
-      id: MEDIAINPUT.S.NU
-
-    - label:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
       id: TGTNAV.S.A0001
@@ -2130,11 +2125,6 @@ PICS:
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
       id: MEDIAINPUT.S.C03.Rsp
-
-    - label:
-          "Does the DUT support the Media Input server cluster Name Updates
-          feature?"
-      id: MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Media Input client cluster SelectInput
@@ -3077,9 +3067,6 @@ PICS:
     - label: "Is the device a barrier access device?"
       id: MCORE.DD.DEV_BARRIER
 
-    - label: "Does the device have a vendor specific information element (IE)?"
-      id: MCORE.DD.IE
-
     - label:
           "Does the device or device packaging have a QR code based onboarding
           payload?"
@@ -3724,10 +3711,10 @@ PICS:
       id: DGTHREAD.S.A0039
 
     - label: "Does the DUT-server support the Delay attribute?"
-      id: DGTHREAD.S.A003a
+      id: DGTHREAD.S.A003A
 
     - label: "Does the DUT-server support the SecurityPolicy attribute?"
-      id: DGTHREAD.S.A003b
+      id: DGTHREAD.S.A003B
 
     - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
       id: DGTHREAD.S.A003c
@@ -5568,4 +5555,4 @@ PICS:
       id: MCORE.IDM.C.SubscribeRequest.MultipleAttributes
 
     - label: "Does the device support the Factory Reset Method?"
-      id: MCORE.UI.FACTORYRESET
+      id: PICS_MCORE_UI_FACTORYRESET

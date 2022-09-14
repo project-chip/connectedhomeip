@@ -23,8 +23,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRError : NSObject
-+ (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
-+ (nullable NSError *)errorForIMStatus:(const chip::app::StatusIB &)status;
++ (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
++ (NSError * _Nullable)errorForIMStatus:(const chip::app::StatusIB &)status;
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;
 @end
 

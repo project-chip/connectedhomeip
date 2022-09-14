@@ -38,6 +38,8 @@ namespace chip {
 namespace Protocols {
 namespace Echo {
 
+constexpr const char * kProtocolName = "Echo";
+
 /**
  * Echo Protocol Message Types
  */
@@ -159,6 +161,18 @@ template <>
 struct MessageTypeTraits<Echo::MsgType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return Echo::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 2> typeToNameTable = {
+            {
+                { Echo::MsgType::EchoRequest, "EchoRequest" },
+                { Echo::MsgType::EchoResponse, "EchoResponse" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 
 } // namespace Protocols
