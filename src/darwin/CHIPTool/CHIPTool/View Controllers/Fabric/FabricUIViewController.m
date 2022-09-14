@@ -272,7 +272,7 @@
                                                                            queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 MTRReadParams * params = [[MTRReadParams alloc] init];
-                params.fabricFiltered = @NO;
+                params.fabricFiltered = NO;
                 [cluster
                     readAttributeFabricsWithParams:params
                                         completion:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {

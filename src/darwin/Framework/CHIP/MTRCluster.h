@@ -77,8 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRReadParams : NSObject <NSCopying>
 
 /**
- * Whether the read/subscribe is fabric-filtered. nil (the default value) is
- * treated as YES.
+ * Whether the read/subscribe is fabric-filtered. The default is YES.
  *
  * If YES, the read/subscribe is fabric-filtered and will only see things
  * associated with the fabric of the reader/subscriber.
@@ -86,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If NO, the read/subscribe is not fabric-filtered and will see all
  * non-fabric-sensitive data for the given attribute path.
  */
-@property (nonatomic, copy, nullable) NSNumber * fabricFiltered;
+@property (nonatomic, assign) BOOL fabricFiltered;
 
 @end
 
@@ -100,18 +99,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Whether the subscribe should allow previous subscriptions to stay in
- * place. nil (the default value) is treated as NO.
+ * place. The default value is NO.
  *
  * If NO, the subscribe will cancel any existing subscriptions to the target
  * node when it sets up the new one.
  *
  * If YES, the subscribe will allow any previous subscriptions to remain.
  */
-@property (nonatomic, copy, nullable) NSNumber * keepPreviousSubscriptions;
+@property (nonatomic, assign) BOOL keepPreviousSubscriptions;
 
 /**
  * Whether the subscription should automatically try to re-establish if it
- * drops.  nil (the default value) is treated as YES.
+ * drops.  The default value is YES.
  *
  * If NO, loss of subscription will simply lead to an error report.  Some
  * subscription APIs do not support this value.
@@ -121,11 +120,31 @@ NS_ASSUME_NONNULL_BEGIN
  * called again.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * autoResubscribe;
+@property (nonatomic, assign) BOOL autoResubscribe;
 
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+/**
+ * The minimum time, in seconds, between consecutive reports a server will send
+ * for this subscription.  This can be used to rate-limit the subscription
+ * traffic.  Any non-negative value is allowed, including 0.
+ */
+@property (nonatomic, copy) NSNumber * minInterval;
 
+/**
+ * The suggested maximum time, in seconds, during which the server is allowed to
+ * send no reports at all for this subscription.  Must be at least as large as
+ * minInterval.  The server is allowed to use a larger time than this as the
+ * maxInterval it selects if it needs to (e.g. to meet its power budget).
+ */
+@property (nonatomic, copy) NSNumber * maxInterval;
+
+/**
+ * Initialize an MTRSubscribeParams.  Must provide a minInterval and
+ * maxInterval; there are no default values for those.
+ */
+- (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

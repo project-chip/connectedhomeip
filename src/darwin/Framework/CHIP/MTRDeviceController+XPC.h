@@ -68,12 +68,12 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns a serialized subscribe parameter object to send over XPC
  */
-+ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams *)params;
++ (NSDictionary<NSString *, id> *)encodeXPCSubscribeParams:(MTRSubscribeParams *)params;
 
 /**
  * Returns a deserialized subscribe parameter object from an object received over XPC
  */
-+ (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params;
++ (MTRSubscribeParams *)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> *)params;
 
 @end
 /**
@@ -134,9 +134,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                               endpointID:(NSNumber * _Nullable)endpointID
                                clusterID:(NSNumber * _Nullable)clusterID
                              attributeID:(NSNumber * _Nullable)attributeID
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(NSDictionary<NSString *, id> * _Nullable)params
+                                  params:(NSDictionary<NSString *, id> *)params
                       establishedHandler:(dispatch_block_t)establishedHandler;
 
 /**
@@ -149,9 +147,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  */
 - (void)subscribeWithController:(id _Nullable)controller
                          nodeID:(NSNumber *)nodeID
-                    minInterval:(NSNumber *)minInterval
-                    maxInterval:(NSNumber *)maxInterval
-                         params:(NSDictionary<NSString *, id> * _Nullable)params
+                         params:(NSDictionary<NSString *, id> *)params
                     shouldCache:(BOOL)shouldCache
                      completion:(MTRStatusCompletion)completion;
 

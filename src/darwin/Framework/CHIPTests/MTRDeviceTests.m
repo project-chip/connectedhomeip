@@ -407,12 +407,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
     [device subscribeAttributePathWithEndpointID:@1
         clusterID:@6
         attributeID:@0
-        minInterval:@1
-        maxInterval:@10
-        params:nil
+        params:params
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
@@ -666,13 +665,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                    }];
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
-    __auto_type * params = [[MTRSubscribeParams alloc] init];
-    params.autoResubscribe = @(NO);
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    params.autoResubscribe = NO;
     [device subscribeAttributePathWithEndpointID:@10000
         clusterID:@6
         attributeID:@0
-        minInterval:@2
-        maxInterval:@10
         params:params
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
@@ -758,10 +755,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSLog(@"Subscribing...");
     __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
     [device subscribeWithQueue:queue
-        minInterval:@(2)
-        maxInterval:@(60)
-        params:nil
+        params:params
         attributeCacheContainer:attributeCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Received report: %@", value);
@@ -820,11 +816,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
     NSLog(@"New subscription...");
     XCTestExpectation * newSubscriptionEstablished = [self expectationWithDescription:@"New subscription established"];
-    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-    params.keepPreviousSubscriptions = [NSNumber numberWithBool:YES];
-    [cluster subscribeAttributeOnOffWithMinInterval:[NSNumber numberWithUnsignedShort:2]
-        maxInterval:[NSNumber numberWithUnsignedShort:60]
-        params:params
+    MTRSubscribeParams * newParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
+    newParams.keepPreviousSubscriptions = YES;
+    [cluster subscribeAttributeOnOffWithParams:newParams
         subscriptionEstablished:^{
             NSLog(@"New subscription was established");
             [newSubscriptionEstablished fulfill];
@@ -1005,12 +999,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
     [device subscribeAttributePathWithEndpointID:@1
         clusterID:@6
         attributeID:@0
-        minInterval:@1
-        maxInterval:@10
-        params:nil
+        params:params
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
@@ -1228,12 +1221,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
     [device subscribeAttributePathWithEndpointID:@1
         clusterID:@6
         attributeID:@0xffffffff
-        minInterval:@2
-        maxInterval:@10
-        params:nil
+        params:params
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"Subscribe all - report attribute values: %@, error: %@, report handler: %d", values, error,

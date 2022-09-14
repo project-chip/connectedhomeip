@@ -154,10 +154,8 @@ class {{filename}}: public TestCommandBridge
           {{#chip_tests_item_parameters}}
             {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
           {{/chip_tests_item_parameters}}
-          MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-          [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:minIntervalArgument]
-                                                                   maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
-                                                                   params:params
+          MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalArgument) maxInterval:@(maxIntervalArgument)];
+          [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithParams:params
                                                                    subscriptionEstablished:^{
               VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
               NextTest();
@@ -168,7 +166,7 @@ class {{filename}}: public TestCommandBridge
         {{else if isReadAttribute}}
         {{#if_is_fabric_scoped_struct attributeObject.type}}
         MTRReadParams * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = [NSNumber numberWithBool:{{fabricFiltered}}];
+        params.fabricFiltered = {{fabricFiltered}};
         {{/if_is_fabric_scoped_struct}}
         [cluster readAttribute{{asUpperCamelCase attribute}}With
         {{~#if_is_fabric_scoped_struct attributeObject.type~}}

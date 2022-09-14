@@ -31,4 +31,4 @@ leak:[CHIPToolKeypair signMessageECDSA_RAW:]
 leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]
 
 # TODO: https://github.com/project-chip/connectedhomeip/issues/22333
-leak:[MTRBaseCluster* subscribeAttribute*WithMinInterval:maxInterval:params:subscriptionEstablished:reportHandler:]
+leak:[MTRBaseCluster* subscribeAttribute*WithParams:subscriptionEstablished:reportHandler:]
