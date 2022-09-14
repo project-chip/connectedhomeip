@@ -39,7 +39,7 @@
 #import <Matter/MTRError.h>
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRNOCChainIssuer.h>
-#import <Matter/MTROTAHeaderParser.h>
+#import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
