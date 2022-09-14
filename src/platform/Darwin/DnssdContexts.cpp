@@ -273,7 +273,7 @@ void RegisterContext::DispatchSuccess()
     std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
     callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
 
-    // Once a service has been properly published it is normally unreachable because the hostname has not been yet
+    // Once a service has been properly published it is normally unreachable because the hostname has not yet been
     // registered against the dns daemon. Register the records mapping the hostname to our IP.
     mHostNameRegistrar.Register();
 }
