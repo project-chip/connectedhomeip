@@ -54,6 +54,6 @@ JNI_METHOD(void, BaseChipCluster, setCommandTimeout)
     }
     else
     {
-        cluster->SetCommandTimeout(chip::Optional<chip::System::Clock::Timeout>());
+        cluster->SetCommandTimeout(chip::NullOptional);
     }
 }
