@@ -123,10 +123,7 @@ static void SetupXPCQueue(void)
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
 {
-    return [[MTRDeviceOverXPC alloc] initWithControllerID:self.controllerID
-                                               controller:self
-                                                 deviceID:nodeID
-                                            xpcConnection:self.xpcConnection];
+    return [[MTRDeviceOverXPC alloc] initWithControllerOverXPC:self deviceID:nodeID xpcConnection:self.xpcConnection];
 }
 
 - (instancetype)initWithControllerID:(id)controllerID

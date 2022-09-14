@@ -28,10 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-- (instancetype)initWithControllerID:(id<NSCopying> _Nullable)controllerID
-                          controller:(MTRDeviceControllerOverXPC *)controller
-                            deviceID:(NSNumber *)deviceID
-                       xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
+- (instancetype)initWithControllerOverXPC:(MTRDeviceControllerOverXPC *)controllerOverXPC
+                                 deviceID:(NSNumber *)deviceID
+                            xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
 
 @end
 

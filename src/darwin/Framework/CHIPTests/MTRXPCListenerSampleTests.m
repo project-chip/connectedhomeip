@@ -519,6 +519,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                    NSLog(@"Listener is not active");
                    return nil;
                }];
+    mConnectedDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:remoteController];
     mDeviceController = remoteController;
 }
 

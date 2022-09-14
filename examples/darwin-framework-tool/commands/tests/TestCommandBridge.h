@@ -168,7 +168,9 @@ public:
         }
 
         mConnectedDevices[identity] = [MTRBaseDevice deviceWithNodeID:@(value.nodeId) controller:controller];
-        NextTest();
+        dispatch_async(mCallbackQueue, ^{
+            NextTest();
+        });
         return CHIP_NO_ERROR;
     }
 

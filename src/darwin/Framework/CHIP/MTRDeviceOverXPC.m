@@ -38,13 +38,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDeviceOverXPC
 
-- (instancetype)initWithControllerID:(id<NSCopying> _Nullable)controllerID
-                          controller:(MTRDeviceControllerOverXPC *)controller
-                            deviceID:(NSNumber *)deviceID
-                       xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
+- (instancetype)initWithControllerOverXPC:(MTRDeviceControllerOverXPC *)controllerOverXPC
+                                 deviceID:(NSNumber *)deviceID
+                            xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
-    _controllerID = controllerID;
-    _controller = controller;
+    _controllerID = controllerOverXPC.controllerID;
+    _controller = controllerOverXPC;
     _nodeID = deviceID;
     _xpcConnection = xpcConnection;
     return self;
