@@ -41,7 +41,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             # To use act like:
-            #   act -j full_android
+            #   act -j code-lints
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
