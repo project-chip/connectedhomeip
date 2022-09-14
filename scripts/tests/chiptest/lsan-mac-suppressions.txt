@@ -33,7 +33,7 @@ leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]
 # TODO: https://github.com/project-chip/connectedhomeip/issues/22333
 leak:[MTRBaseCluster* subscribeAttribute*WithParams:subscriptionEstablished:reportHandler:]
 
-#TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduce using:
+#TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduced using:
 # -- testFile.cpp
 #
 ##include <Network/Network.h>
