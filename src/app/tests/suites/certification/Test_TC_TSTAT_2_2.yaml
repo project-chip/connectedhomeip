@@ -256,7 +256,7 @@ tests:
           Optional attribute so its not compulsory to get the expected outcome
 
           ./chip-tool thermostat write occupied-cooling-setpoint 1600 1 1
-          On TH(chip-tool) verify that  DUT sends a success response 
+          On TH(chip-tool) verify that  DUT sends a success response
 
           [1658386056.238356][2906:2911] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1658386056.238389][2906:2911] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
@@ -444,12 +444,12 @@ tests:
           TSTAT.S.F05 && TSTAT.S.A0011 && TSTAT.S.A0012 && PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool thermostat write occupied-heating-setpoint 2200 1 1
-          On TH(chip-tool) verify that  DUT sends a success response 
+          On TH(chip-tool) verify that  DUT sends a success response
           [1661755950.285710][3540:3545] CHIP:DMG:                         StatusIB =
           [1661755950.285739][3540:3545] CHIP:DMG:                         {
           [1661755950.285769][3540:3545] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
           [1661755950.285799][3540:3545] CHIP:DMG:                         },
-          [1661755950.285831][3540:3545] CHIP:DMG:                         
+          [1661755950.285831][3540:3545] CHIP:DMG:
           [1661755950.285855][3540:3545] CHIP:DMG:                 },
 
           ./chip-tool thermostat read occupied-heating-setpoint 1 1
@@ -700,7 +700,7 @@ tests:
 
           ./chip-tool thermostat read unoccupied-heating-setpoint  1 1
           As its an optional attribute, we are not getting expected result
-          [1658389018.789254][3201:3206] CHIP:DMG:         SuppressResponse = true, 
+          [1658389018.789254][3201:3206] CHIP:DMG:         SuppressResponse = true,
           [1658389018.789288][3201:3206] CHIP:DMG:         InteractionModelRevision = 1
           [1658389018.789312][3201:3206] CHIP:DMG: }
           [1658389018.789426][3201:3206] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
@@ -796,8 +796,8 @@ tests:
 
           ./chip-tool thermostat read unoccupied-heating-setpoint  1 1
           As its an optional attribute, we are not getting expected result
-          [1658389070.439643][3209:3214] CHIP:DMG:         
-          [1658389070.439678][3209:3214] CHIP:DMG:         SuppressResponse = true, 
+          [1658389070.439643][3209:3214] CHIP:DMG:
+          [1658389070.439678][3209:3214] CHIP:DMG:         SuppressResponse = true,
           [1658389070.439715][3209:3214] CHIP:DMG:         InteractionModelRevision = 1
           [1658389070.439750][3209:3214] CHIP:DMG: }
           [1658389070.439896][3209:3214] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
@@ -965,17 +965,17 @@ tests:
       verification: |
           ./chip-tool thermostat write min-heat-setpoint-limit 1000  1 1
 
-          On TH(chip-tool) verify that  DUT sends a success response 
+          On TH(chip-tool) verify that  DUT sends a success response
           [1658389641.734245][3279:3284] CHIP:DMG:                                 Endpoint = 0x1,
           [1658389641.734285][3279:3284] CHIP:DMG:                                 Cluster = 0x201,
           [1658389641.734326][3279:3284] CHIP:DMG:                                 Attribute = 0x0000_0015,
           [1658389641.734360][3279:3284] CHIP:DMG:                         }
-          [1658389641.734402][3279:3284] CHIP:DMG:                                 
+          [1658389641.734402][3279:3284] CHIP:DMG:
           [1658389641.734438][3279:3284] CHIP:DMG:                         StatusIB =
           [1658389641.734475][3279:3284] CHIP:DMG:                         {
           [1658389641.734512][3279:3284] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658389641.734549][3279:3284] CHIP:DMG:                         },
-          [1658389641.734586][3279:3284] CHIP:DMG:                         
+          [1658389641.734586][3279:3284] CHIP:DMG:
           [1658389641.734617][3279:3284] CHIP:DMG:                 },
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -1069,14 +1069,14 @@ tests:
       PICS:
           TSTAT.S.F00  && TSTAT.S.A0016 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - 
+          Optional Attribute -
 
           ./chip-tool thermostat write  max-heat-setpoint-limit 7000 1 1
 
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
 
           [1658389771.305508][3310:3315] CHIP:DMG:         ],
-          [1658389771.305555][3310:3315] CHIP:DMG:         
+          [1658389771.305555][3310:3315] CHIP:DMG:
           [1658389771.305594][3310:3315] CHIP:DMG:         InteractionModelRevision = 1
           [1658389771.305632][3310:3315] CHIP:DMG: }
           [1658389771.305737][3310:3315] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -1085,7 +1085,7 @@ tests:
 
           ./chip-tool thermostat write  max-heat-setpoint-limit 100 1 1
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658389806.716013][3316:3321] CHIP:DMG:                                 
+          [1658389806.716013][3316:3321] CHIP:DMG:
           [1658389806.716046][3316:3321] CHIP:DMG:                         StatusIB =
           [1658389806.716084][3316:3321] CHIP:DMG:                         {
           [1658389806.716121][3316:3321] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
@@ -1167,19 +1167,19 @@ tests:
           PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool thermostat write  max-heat-setpoint-limit 2000 1 1
-          On TH(chip-tool) verify that  DUT sends a success response 
+          On TH(chip-tool) verify that  DUT sends a success response
           [1658389911.809423][3333:3338] CHIP:DMG:                                 Endpoint = 0x1,
           [1658389911.809492][3333:3338] CHIP:DMG:                                 Cluster = 0x201,
           [1658389911.809562][3333:3338] CHIP:DMG:                                 Attribute = 0x0000_0016,
           [1658389911.809627][3333:3338] CHIP:DMG:                         }
-          [1658389911.809698][3333:3338] CHIP:DMG:                                 
+          [1658389911.809698][3333:3338] CHIP:DMG:
           [1658389911.809761][3333:3338] CHIP:DMG:                         StatusIB =
           [1658389911.809827][3333:3338] CHIP:DMG:                         {
           [1658389911.809892][3333:3338] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658389911.809957][3333:3338] CHIP:DMG:                         },
-          [1658389911.809994][3333:3338] CHIP:DMG:                         
+          [1658389911.809994][3333:3338] CHIP:DMG:
           [1658389911.810021][3333:3338] CHIP:DMG:                 },
-          [1658389911.810051][3333:3338] CHIP:DMG:                 
+          [1658389911.810051][3333:3338] CHIP:DMG:
           [1658389911.810076][3333:3338] CHIP:DMG:         ],
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -1250,16 +1250,16 @@ tests:
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - 
+          Optional Attribute -
 
 
           ./chip-tool thermostat write max-heat-setpoint-limit 9000  1 1
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658390040.444407][3343:3348] CHIP:DMG:                         
+          [1658390040.444407][3343:3348] CHIP:DMG:
           [1658390040.444443][3343:3348] CHIP:DMG:                 },
-          [1658390040.444483][3343:3348] CHIP:DMG:                 
+          [1658390040.444483][3343:3348] CHIP:DMG:
           [1658390040.444515][3343:3348] CHIP:DMG:         ],
-          [1658390040.444553][3343:3348] CHIP:DMG:         
+          [1658390040.444553][3343:3348] CHIP:DMG:
           [1658390040.444585][3343:3348] CHIP:DMG:         InteractionModelRevision = 1
           [1658390040.444616][3343:3348] CHIP:DMG: }
           [1658390040.444703][3343:3348] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -1323,7 +1323,7 @@ tests:
           ./chip-tool thermostat write max-heat-setpoint-limit 2000 1 1
 
           Verify in TH(chip-tool) Log:
-          [1658390406.512865][3384:3389] CHIP:DMG:                                 
+          [1658390406.512865][3384:3389] CHIP:DMG:
           [1658390406.512895][3384:3389] CHIP:DMG:                         StatusIB =
           [1658390406.512927][3384:3389] CHIP:DMG:                         {
           [1658390406.512958][3384:3389] CHIP:DMG:                                 status = 0x00 (SUCCESS),
@@ -1420,7 +1420,7 @@ tests:
 
           ./chip-tool thermostat write max-cool-setpoint-limit 9100 1 1
           On TH(chip-tool)(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658396137.669807][3677:3682] CHIP:DMG:         
+          [1658396137.669807][3677:3682] CHIP:DMG:
           [1658396137.669832][3677:3682] CHIP:DMG:         InteractionModelRevision = 1
           [1658396137.669857][3677:3682] CHIP:DMG: }
           [1658396137.669929][3677:3682] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -1496,7 +1496,7 @@ tests:
           Optional attribute so its not compulsory to get the expected outcome
 
           ./chip-tool thermostat write max-cool-setpoint-limit 1600 1 1
-          On TH verify that  DUT sends a success response 
+          On TH verify that  DUT sends a success response
           [1661766260.648041][10448:10453] CHIP:DMG:                         StatusIB =
           [1661766260.648070][10448:10453] CHIP:DMG:                         {
           [1661766260.648100][10448:10453] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
