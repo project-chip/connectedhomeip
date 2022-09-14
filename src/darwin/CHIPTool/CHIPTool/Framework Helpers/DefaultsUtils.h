@@ -41,7 +41,7 @@ BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback 
 void MTRUnpairDeviceWithID(uint64_t deviceId);
 MTRBaseDevice * _Nullable MTRGetDeviceBeingCommissioned(void);
 
-@interface CHIPToolPersistentStorageDelegate : NSObject <MTRPersistentStorageDelegate>
+@interface CHIPToolPersistentStorageDelegate : NSObject <MTRStorage>
 - (nullable NSData *)storageDataForKey:(NSString *)key;
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 - (BOOL)removeStorageDataForKey:(NSString *)key;

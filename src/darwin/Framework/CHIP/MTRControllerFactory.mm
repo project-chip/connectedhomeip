@@ -216,7 +216,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         [MTRControllerAccessControl init];
 
-        _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storageDelegate);
+        _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storage);
         if (_persistentStorageDelegateBridge == nil) {
             MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             return;
@@ -620,13 +620,13 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @implementation MTRControllerFactoryParams
 
-- (instancetype)initWithStorage:(id<MTRPersistentStorageDelegate>)storageDelegate
+- (instancetype)initWithStorage:(id<MTRStorage>)storage
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    _storageDelegate = storageDelegate;
+    _storage = storage;
     _otaProviderDelegate = nil;
     _paaCerts = nil;
     _cdCerts = nil;

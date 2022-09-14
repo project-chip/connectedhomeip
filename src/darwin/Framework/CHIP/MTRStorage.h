@@ -20,11 +20,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * The protocol definition for the CHIPPersistenStorageDelegate
+ * This protocol is used by the Matter framework to read and write storage.
  *
- * All delegate methods will be called on the supplied Delegate Queue.
+ * All storage methods will be called on a single internal work queue (so the
+ * implementation does not need to worry about reads and writes racing).
  */
-@protocol MTRPersistentStorageDelegate <NSObject>
+@protocol MTRStorage <NSObject>
 @required
 
 /**
