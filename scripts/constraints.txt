@@ -62,7 +62,7 @@ cryptography==3.4.7
     #   -r requirements.txt
 cxxfilt==0.2.2
     # via -r requirements.txt
-dbus-python==1.2.16 ; sys_platform == "linux"
+dbus-python==1.2.18 ; sys_platform == "linux"
     # via -r requirements.txt
 decorator==5.0.9
     # via ipython

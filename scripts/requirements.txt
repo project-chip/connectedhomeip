@@ -13,7 +13,7 @@ requests>=2.24.0
 
 # device controller wheel package
 wheel
-dbus-python; sys_platform == 'linux'
+dbus-python==1.2.18; sys_platform == 'linux'
 pgi; sys_platform == 'linux'
 pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
