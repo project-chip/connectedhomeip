@@ -21,3 +21,26 @@ leak:ERR_get_state
 
 # TODO: https://github.com/project-chip/connectedhomeip/issues/22333
 leak:[MTRBaseCluster* subscribeAttribute*WithParams:subscriptionEstablished:reportHandler:]
+
+#TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduced using:
+# -- testFile.cpp
+#
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  auto monitor = nw_path_monitor_create();
+#  nw_release(monitor);
+#  return 0;
+#}
+#
+# -- testFile.mm (with -fobj-arc)
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  __auto_type monitor = nw_path_monitor_create();
+#  return 0;
+#}
+leak:nw_path_monitor_create
+
+# TODO: See the previous comment about nw_path_monitor_create, since it also applies to nw_path_monitor_start
+leak:nw_path_monitor_start

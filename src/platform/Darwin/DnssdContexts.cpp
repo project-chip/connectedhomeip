@@ -272,23 +272,10 @@ void RegisterContext::DispatchSuccess()
 {
     std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
     callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
-}
 
-RegisterRecordContext::RegisterRecordContext(RegisterContext * context)
-{
-    type             = ContextType::RegisterRecord;
-    mRegisterContext = context;
-}
-
-void RegisterRecordContext::DispatchFailure(DNSServiceErrorType err)
-{
-    mRegisterContext->Finalize(err);
-    MdnsContexts::GetInstance().Remove(this);
-}
-
-void RegisterRecordContext::DispatchSuccess()
-{
-    mRegisterContext->Finalize();
+    // Once a service has been properly published it is normally unreachable because the hostname has not yet been
+    // registered against the dns daemon. Register the records mapping the hostname to our IP.
+    mHostNameRegistrar.Register();
 }
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
