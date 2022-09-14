@@ -85,6 +85,7 @@ def load_config() -> None:
         config["silabs-thread"]["EFR32_BOARD"] = None
         config["ameba"]["AMEBA_SDK"] = None
         config["ameba"]["MATTER_SDK"] = None
+        config["ameba"]["MODEL"] = 'D'
         config["ameba"]["TTY"] = None
 
         flush_print(yaml.dump(config))
@@ -492,6 +493,9 @@ def main() -> int:
         if config['ameba']['MATTER_SDK'] is None:
             flush_print('Path for Matter SDK was not found. Make sure MATTER_SDK is set on your config.yaml file')
             exit(1)
+        if (config['ameba']['MODEL'] != 'D' and config['ameba']['MODEL'] != 'Z2'):
+            flush_print("Ameba Model is not recognized, please input D or Z2")
+            exit(1)
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -662,11 +666,22 @@ def main() -> int:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         elif options.build_target == "ameba":
-            shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE")
-            if options.do_clean:
-                shell.run_cmd(f"rm -rf out")
-            shell.run_cmd(f"./build.sh {config['ameba']['MATTER_SDK']} ninja {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out chef-app")
-            shell.run_cmd("ninja -C out")
+            if config['ameba']['MODEL'] == 'D':
+                shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE")
+                if options.do_clean:
+                    shell.run_cmd(f"rm -rf out")
+                shell.run_cmd(f"./build.sh {config['ameba']['MATTER_SDK']} ninja {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out chef-app")
+                shell.run_cmd("ninja -C out")
+            elif config['ameba']['MODEL'] == 'Z2':
+                shell.run_cmd(f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
+                with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
+                    f.write(textwrap.dedent(f"""\
+                        SAMPLE_NAME = {options.sample_device_type_name}"""
+                    ))
+                if options.do_clean:
+                    shell.run_cmd("make clean")
+                shell.run_cmd("make chef")
+
 
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
