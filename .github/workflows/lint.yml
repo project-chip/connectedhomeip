@@ -27,6 +27,9 @@ jobs:
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
+        container:
+            image: connectedhomeip/chip-build:0.5.99
+
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
               if: ${{ !env.ACT }}
