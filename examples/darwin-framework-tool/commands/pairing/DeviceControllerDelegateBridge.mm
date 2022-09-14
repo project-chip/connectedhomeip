@@ -23,22 +23,22 @@
 @end
 
 @implementation CHIPToolDeviceControllerDelegate
-- (void)onStatusUpdate:(MTRPairingStatus)status
+- (void)onStatusUpdate:(MTRCommissioningStatus)status
 {
     NSLog(@"Pairing Status Update: %lu", status);
     switch (status) {
-    case MTRPairingStatusSuccess:
+    case MTRCommissioningStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         ChipLogProgress(chipTool, "CASE establishment successful");
         break;
-    case MTRPairingStatusFailed:
+    case MTRCommissioningStatusFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         _commandBridge->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         break;
-    case MTRPairingStatusDiscoveringMoreDevices:
+    case MTRCommissioningStatusDiscoveringMoreDevices:
         ChipLogProgress(chipTool, "Secure Pairing Discovering More Devices");
         break;
-    case MTRPairingStatusUnknown:
+    case MTRCommissioningStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
         break;
     }

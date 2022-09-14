@@ -36,18 +36,18 @@ void MTRDeviceControllerDelegateBridge::setDelegate(id<MTRDeviceControllerDelega
     }
 }
 
-MTRPairingStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
+MTRCommissioningStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
 {
-    MTRPairingStatus rv = MTRPairingStatusUnknown;
+    MTRCommissioningStatus rv = MTRCommissioningStatusUnknown;
     switch (status) {
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingSuccess:
-        rv = MTRPairingStatusSuccess;
+        rv = MTRCommissioningStatusSuccess;
         break;
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
-        rv = MTRPairingStatusFailed;
+        rv = MTRCommissioningStatusFailed;
         break;
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
-        rv = MTRPairingStatusDiscoveringMoreDevices;
+        rv = MTRCommissioningStatusDiscoveringMoreDevices;
         break;
     }
     return rv;
@@ -60,9 +60,9 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onStatusUpdate:)]) {
         if (strongDelegate && mQueue) {
-            MTRPairingStatus pairingStatus = MapStatus(status);
+            MTRCommissioningStatus commissioningStatus = MapStatus(status);
             dispatch_async(mQueue, ^{
-                [strongDelegate onStatusUpdate:pairingStatus];
+                [strongDelegate onStatusUpdate:commissioningStatus];
             });
         }
     }

@@ -42,7 +42,7 @@ private:
     _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
 
-    MTRPairingStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
+    MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };
 
 NS_ASSUME_NONNULL_END

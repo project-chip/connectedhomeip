@@ -19,11 +19,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
-    MTRPairingStatusUnknown = 0,
-    MTRPairingStatusSuccess = 1,
-    MTRPairingStatusFailed = 2,
-    MTRPairingStatusDiscoveringMoreDevices = 3
+typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
+    MTRCommissioningStatusUnknown = 0,
+    MTRCommissioningStatusSuccess = 1,
+    MTRCommissioningStatusFailed = 2,
+    MTRCommissioningStatusDiscoveringMoreDevices = 3
 };
 
 /**
@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
  * Notify the delegate when pairing status gets updated
  *
  */
-- (void)onStatusUpdate:(MTRPairingStatus)status;
+- (void)onStatusUpdate:(MTRCommissioningStatus)status;
 
 /**
  * Notify the delegate when pairing is completed

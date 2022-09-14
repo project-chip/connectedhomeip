@@ -48,7 +48,7 @@ constexpr const char * kDefaultKey = "default";
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)onStatusUpdate:(MTRPairingStatus)status;
+- (void)onStatusUpdate:(MTRCommissioningStatus)status;
 - (void)onPairingComplete:(NSError * _Nullable)error;
 - (void)onPairingDeleted:(NSError * _Nullable)error;
 - (void)onCommissioningComplete:(NSError * _Nullable)error;
@@ -530,12 +530,12 @@ private:
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation TestDeviceControllerDelegate
-- (void)onStatusUpdate:(MTRPairingStatus)status
+- (void)onStatusUpdate:(MTRCommissioningStatus)status
 {
     if (_active) {
-        if (status == MTRPairingStatusSuccess) {
+        if (status == MTRCommissioningStatusSuccess) {
             NSLog(@"Secure pairing success");
-        } else if (status == MTRPairingStatusFailed) {
+        } else if (status == MTRCommissioningStatusFailed) {
             _active = NO;
             NSLog(@"Secure pairing failed");
             _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));
