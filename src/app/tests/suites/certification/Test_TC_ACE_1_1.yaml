@@ -44,7 +44,7 @@ tests:
           AuthMode field: CASE (2) Subjects field: [N1] Targets field:
           [{Endpoint: 0}]"
       verification: |
-          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
           On TH(Chiptool),Verify ACL attribute with a list of AccessControlEntryStruct entries containing 1 element.
           [1659419235.790198][3332:3337] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1659419235.790263][3332:3337] CHIP:DMG: WriteResponseMessage =
@@ -317,7 +317,7 @@ tests:
           0}] 2.struct Privilege field: Manage (4) AuthMode field: CASE (2)
           Subjects field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
-          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 4, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 4, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
           On TH(Chiptool),Verify ACL attribute with a list of AccessControlEntryStruct entries containing 2 elements
 
           1660288528.919407][3487:3493] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -614,7 +614,7 @@ tests:
           0}] 2. struct Privilege field: Operate (3) AuthMode field: CASE (2)
           Subjects field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
-          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 3, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 3, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
 
           On TH(Chiptool),Verify ACL attribute with a list of AccessControlEntryStruct entries containing 2 elements
           1660289539.245027][3576:3581] CHIP:DMG: WriteResponseMessage =
@@ -823,7 +823,7 @@ tests:
           cluster with the EnableKey set to 0 and the EventTrigger set to 0.
           (requires manage privilege)"
       verification: |
-          ./chip-tool basic write node-label TestNode 1 0
+          ./chip-tool generaldiagnostics test-event-trigger 0 0 1 0
 
           On TH(Chiptool),Verify TestEventTrigger command to the General Diagnostics cluster with the EnableKey set to 0 and the EventTrigger set to 0. (requires manage privilege) Returns UNSUPPORTED_ACCESS (0x7e)
           [1660290186.783158][3633:3638] CHIP:DMG: InvokeResponseMessage =
@@ -905,7 +905,7 @@ tests:
           2.struct Privilege field: View (1) AuthMode field: CASE (2) Subjects
           field: [N1] Targets field: [{Endpoint: 0}]"
       verification: |
-          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 1, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]},{ "privilege": 1, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]" 1 0
 
           On TH(Chiptool),Verify ACL attribute with a list of AccessControlEntryStruct entries containing 2 elements
 
@@ -1186,7 +1186,7 @@ tests:
       verification: |
           On TH(Chiptool)1,Verify ACL attribute with a list of AccessControlEntryStruct entries containing 1 element.
 
-           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]}]' 1 0
+           ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]}]" 1 0
 
                60291527.086023][3753:3758] CHIP:DMG:                                 Cluster = 0x1f,
           [1660291527.086060][3753:3758] CHIP:DMG:                                 Attribute = 0x0000_0000,

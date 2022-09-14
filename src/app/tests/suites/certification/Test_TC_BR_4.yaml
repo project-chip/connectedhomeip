@@ -1900,26 +1900,28 @@ tests:
 
           Verify on TH(bridge-app) Log:
 
-          [1659973227.630446][3652:3652] CHIP:IM: Received Read request
-          [1659973227.630527][3652:3652] CHIP:DMG: ReadRequestMessage =
-          [1659973227.630570][3652:3652] CHIP:DMG: {
-          [1659973227.630594][3652:3652] CHIP:DMG:         AttributePathIBs =
-          [1659973227.630633][3652:3652] CHIP:DMG:         [
-          [1659973227.630658][3652:3652] CHIP:DMG:                 AttributePathIB =
-          [1659973227.630699][3652:3652] CHIP:DMG:                 {
-          [1659973227.630728][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
-          [1659973227.630779][3652:3652] CHIP:DMG:                         Cluster = 0x402,
-          [1659973227.630821][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1659973227.630853][3652:3652] CHIP:DMG:                 }
-          [1659973227.630892][3652:3652] CHIP:DMG:
-          [1659973227.630919][3652:3652] CHIP:DMG:         ],
-          [1659973227.630957][3652:3652] CHIP:DMG:
-          [1659973227.630984][3652:3652] CHIP:DMG:         isFabricFiltered = true,
-          [1659973227.631020][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
-          [1659973227.631044][3652:3652] CHIP:DMG: },
-          [1659973227.631126][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1659973227.631231][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1659973227.631262][3652:3652] CHIP:DMG: <RE:Run> Cluster 402, Attribute 0 is dirty
+          [1663150444.546356][3294:3294] CHIP:IM: Received Read request
+          [1663150444.546475][3294:3294] CHIP:DMG: ReadRequestMessage =
+          [1663150444.546520][3294:3294] CHIP:DMG: {
+          [1663150444.546556][3294:3294] CHIP:DMG: 	AttributePathIBs =
+          [1663150444.546604][3294:3294] CHIP:DMG: 	[
+          [1663150444.546646][3294:3294] CHIP:DMG: 		AttributePathIB =
+          [1663150444.546784][3294:3294] CHIP:DMG: 		{
+          [1663150444.546836][3294:3294] CHIP:DMG: 			Endpoint = 0x9,
+          [1663150444.546890][3294:3294] CHIP:DMG: 			Cluster = 0x2f,
+          [1663150444.546945][3294:3294] CHIP:DMG: 			Attribute = 0x0000_000E,
+          [1663150444.546996][3294:3294] CHIP:DMG: 		}
+          [1663150444.547047][3294:3294] CHIP:DMG:
+          [1663150444.547094][3294:3294] CHIP:DMG: 	],
+          [1663150444.547142][3294:3294] CHIP:DMG:
+          [1663150444.547190][3294:3294] CHIP:DMG: 	isFabricFiltered = true,
+          [1663150444.547233][3294:3294] CHIP:DMG: 	InteractionModelRevision = 1
+          [1663150444.547273][3294:3294] CHIP:DMG: },
+          [1663150444.547388][3294:3294] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663150444.547520][3294:3294] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663150444.547568][3294:3294] CHIP:DMG: <RE:Run> Cluster 2f, Attribute e is dirty
+          [1663150444.547603][3294:3294] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=9 AttributeId=0x0000_000E (expanded=0)
+          [1663150444.547647][3294:3294
       disabled: true
 
     - label:
