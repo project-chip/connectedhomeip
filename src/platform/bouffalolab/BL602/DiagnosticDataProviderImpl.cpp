@@ -171,7 +171,7 @@ static int bl_netif_get_all_ip6(struct netif * netif, ip6_addr_t if_ip6[])
     }
 
     int addr_count = 0;
-    for (int i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
+    for (int i = 0; (i < LWIP_IPV6_NUM_ADDRESSES) && (i < kMaxIPv6AddrCount); i++)
     {
         if (!ip_addr_cmp(&netif->ip6_addr[i], IP6_ADDR_ANY))
         {
@@ -186,10 +186,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 {
     NetworkInterface * ifp = new NetworkInterface();
     struct netif * netif;
-    uint8_t mac_addr[6];
-    uint32_t ip, gw, mask;
-    ip6_addr_t ip6_addr[kMaxIPv6AddrCount];
-    uint8_t ipv6_addr_count = 0;
 
     netif = wifi_mgmr_sta_netif_get();
     if (netif)
@@ -204,10 +200,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         bl_efuse_read_mac(ifp->MacAddress);
         ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
 
+        uint32_t ip, gw, mask;
         wifi_mgmr_sta_ip_get(&ip, &gw, &mask);
         memcpy(ifp->Ipv4AddressesBuffer[0], &ip, kMaxIPv4AddrSize);
         ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
         ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+
+        uint8_t ipv6_addr_count = 0;
+        ip6_addr_t ip6_addr[kMaxIPv6AddrCount];
         ipv6_addr_count          = bl_netif_get_all_ip6(netif, ip6_addr);
         for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
         {

@@ -32,6 +32,8 @@
 #include <string>
 #include <utils_log.h>
 
+#define WIFI_STA_DISCONNECT_DELAY   (pdMS_TO_TICKS(200))
+
 using namespace ::chip;
 //#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace chip {
@@ -165,12 +167,18 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     char wifi_ssid[64] = { 0 };
     char passwd[64]    = { 0 };
+    int state = 0;
 
-    // Set the wifi configuration
     wifi_mgmr_sta_disconnect();
-    vTaskDelay(500);
+    vTaskDelay(WIFI_STA_DISCONNECT_DELAY);
+
     wifi_mgmr_sta_disable(NULL);
-    vTaskDelay(500);
+    wifi_mgmr_state_get(&state);
+    while (state != WIFI_STATE_IDLE)
+    {
+        wifi_mgmr_state_get(&state);
+        vTaskDelay(100);
+    }
 
     memcpy(wifi_ssid, ssid, ssidLen);
     memcpy(passwd, key, keyLen);
