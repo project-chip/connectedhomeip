@@ -27,7 +27,7 @@ using namespace chip::System::Clock::Literals;
 
 namespace {
 
-constexpr const System::Clock::Milliseconds32 kIncrementMovementTimeout = 500_ms32;
+constexpr const System::Clock::Milliseconds32 kIncrementMovementTimeout = 700_ms32;
 constexpr const uint16_t kDefaultMovementStep                           = 2000;
 
 } // namespace
