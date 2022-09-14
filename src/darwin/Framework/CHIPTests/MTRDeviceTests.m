@@ -39,7 +39,6 @@
 #define MANUAL_INDIVIDUAL_TEST 0
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -61,13 +60,12 @@ static void WaitForCommissionee(XCTestExpectation * expectation)
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    [controller getBaseDevice:kDeviceId
-                        queue:dispatch_get_main_queue()
-                   completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                       XCTAssertEqual(error.code, 0);
-                       [expectation fulfill];
-                       mConnectedDevice = device;
-                   }];
+    // For now keep the async dispatch, but could we just
+    // synchronously fulfill the expectation here?
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [expectation fulfill];
+        mConnectedDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:controller];
+    });
 }
 
 static MTRBaseDevice * GetConnectedDevice(void)
@@ -101,7 +99,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertEqual(error.code, 0);
 
     NSError * commissionError = nil;
-    [sController commissionDevice:kDeviceId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId)
+                  commissioningParams:[[MTRCommissioningParameters alloc] init]
+                                error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for onCommissioningComplete
@@ -200,16 +200,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
-
-    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getBaseDevice:kDeviceId
-                        queue:dispatch_get_main_queue()
-                   completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                       XCTAssertEqual(error.code, 0);
-                       [connectionExpectation fulfill];
-                       connectionExpectation = nil;
-                   }];
-    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
 - (void)shutdownStack
@@ -1131,17 +1121,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    __block MTRBaseDevice * device;
-    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getBaseDevice:kDeviceId
-                        queue:dispatch_get_main_queue()
-                   completion:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
-                       XCTAssertEqual(error.code, 0);
-                       [connectionExpectation fulfill];
-                       connectionExpectation = nil;
-                       device = retrievedDevice;
-                   }];
-    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
+    MTRBaseDevice * device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:controller];
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
