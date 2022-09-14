@@ -1344,7 +1344,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    callback attribute supportedLocales default = en-US;
+    callback attribute supportedLocales;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
