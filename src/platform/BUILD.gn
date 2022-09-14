@@ -271,6 +271,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_BEKEN=1",
         "CHIP_DEVICE_LAYER_TARGET=Beken",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "mt793x") {
       defines += [
