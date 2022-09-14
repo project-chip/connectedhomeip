@@ -30,7 +30,7 @@ using namespace chip;
 
 @implementation MTRDeviceControllerStartupParams
 
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner
 {
     if (!(self = [super init])) {
         return nil;
@@ -48,11 +48,11 @@ using namespace chip;
     return self;
 }
 
-- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
-                                       ipk:(NSData *)ipk
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes *)rootCertificate
 {
     if (!(self = [super init])) {
         return nil;

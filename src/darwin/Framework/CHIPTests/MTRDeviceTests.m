@@ -144,25 +144,23 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
     __auto_type * storage = [[MTRTestStorage alloc] init];
-    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
 
-    BOOL ok = [factory startup:factoryParams];
+    BOOL ok = [factory startControllerFactory:factoryParams error:nil];
     XCTAssertTrue(ok);
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricID:@(1)
-                                                                                        ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
     params.vendorID = @(kTestVendorId);
 
-    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
     XCTAssertNotNil(controller);
 
     sController = controller;
@@ -197,7 +195,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [[MTRControllerFactory sharedInstance] shutdown];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
 - (void)waitForCommissionee

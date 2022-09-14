@@ -450,26 +450,27 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
     __auto_type * storage = [[MTRTestStorage alloc] init];
-    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
 
-    BOOL ok = [factory startup:factoryParams];
+    NSError * error;
+    BOOL ok = [factory startControllerFactory:factoryParams error:&error];
     XCTAssertTrue(ok);
+    XCTAssertNil(error);
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricID:@(1)
-                                                                                        ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
     params.vendorID = @(kTestVendorId);
 
-    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:&error];
     XCTAssertNotNil(controller);
+    XCTAssertNil(error);
 
     sController = controller;
 
@@ -479,7 +480,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    NSError * error;
     [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
     XCTAssertEqual(error.code, 0);
 
@@ -510,7 +510,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [[MTRControllerFactory sharedInstance] shutdown];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 
     mDeviceController = nil;
 }

@@ -16,7 +16,7 @@
 
 /**
  * Parts of MTRDeviceController that are not part of the framework API.  Mostly
- * for use from MTRControllerFactory.
+ * for use from MTRDeviceControllerFactory.
  */
 
 #import <Foundation/Foundation.h>
@@ -31,7 +31,7 @@
 #import "MTRDeviceController.h"
 
 @class MTRDeviceControllerStartupParamsInternal;
-@class MTRControllerFactory;
+@class MTRDeviceControllerFactory;
 @class MTRDevice;
 
 namespace chip {
@@ -46,17 +46,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController (InternalMethods)
 
-#pragma mark - MTRControllerFactory methods
+#pragma mark - MTRDeviceControllerFactory methods
 
 /**
  * Start a new controller.  Returns whether startup succeeded.  If this fails,
  * it guarantees that it has called controllerShuttingDown on the
- * MTRControllerFactory.
+ * MTRDeviceControllerFactory.
  *
  * The return value will always match [controller isRunning] for this
  * controller.
  *
- * Only MTRControllerFactory should be calling this.
+ * Only MTRDeviceControllerFactory should be calling this.
  */
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
 
@@ -69,9 +69,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Init a newly created controller.
  *
- * Only MTRControllerFactory should be calling this.
+ * Only MTRDeviceControllerFactory should be calling this.
  */
-- (instancetype)initWithFactory:(MTRControllerFactory *)factory queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Might return failure, in which case we don't know whether it's running on the
  * given fabric.  Otherwise it will set *isRunning to the right boolean value.
  *
- * Only MTRControllerFactory should be calling this.
+ * Only MTRDeviceControllerFactory should be calling this.
  */
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
                     fabricIndex:(chip::FabricIndex)fabricIndex
@@ -92,9 +92,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Shut down the underlying C++ controller.  Must be called on the Matter work
  * queue or after the Matter work queue has been shut down.
  *
- * Only MTRControllerFactory should be calling this.
+ * Only MTRDeviceControllerFactory should be calling this.
  */
 - (void)shutDownCppController;
+
+/**
+ * Notification that the MTRDeviceControllerFactory has finished shutting down
+ * this controller and will not be touching it anymore.  This is guaranteed to
+ * be called after initWithFactory succeeds.
+ *
+ * Only MTRDeviceControllerFactory should be calling this.
+ */
+- (void)deinitFromFactory;
 
 /**
  * Ensure we have a CASE session to the given node ID and then call the provided
