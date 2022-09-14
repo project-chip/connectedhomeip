@@ -154,12 +154,12 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Requests reading attribute cache
  */
-- (void)readAttributeCacheWithController:(id _Nullable)controller
-                                  nodeID:(NSNumber *)nodeID
-                              endpointID:(NSNumber * _Nullable)endpointID
-                               clusterID:(NSNumber * _Nullable)clusterID
-                             attributeID:(NSNumber * _Nullable)attributeID
-                              completion:(MTRValuesHandler)completion;
+- (void)readClusterStateCacheWithController:(id _Nullable)controller
+                                     nodeID:(NSNumber *)nodeID
+                                 endpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                 completion:(MTRValuesHandler)completion;
 
 @end
 
