@@ -16,13 +16,13 @@
  *
  */
 
-#include "PairingDelegateBridge.h"
+#include "DeviceControllerDelegateBridge.h"
 #import <Matter/Matter.h>
 
-@interface CHIPToolPairingDelegate ()
+@interface CHIPToolDeviceControllerDelegate ()
 @end
 
-@implementation CHIPToolPairingDelegate
+@implementation CHIPToolDeviceControllerDelegate
 - (void)onStatusUpdate:(MTRPairingStatus)status
 {
     NSLog(@"Pairing Status Update: %lu", status);

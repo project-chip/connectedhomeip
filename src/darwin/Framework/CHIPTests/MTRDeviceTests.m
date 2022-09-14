@@ -77,11 +77,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @end
 #endif
 
-@interface MTRDeviceTestPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @end
 
-@implementation MTRDeviceTestPairingDelegate
+@implementation MTRDeviceTestDeviceControllerDelegate
 - (id)initWithExpectation:(XCTestExpectation *)expectation
 {
     self = [super init];
@@ -163,10 +163,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     sController = controller;
 
-    MTRDeviceTestPairingDelegate * pairing = [[MTRDeviceTestPairingDelegate alloc] initWithExpectation:expectation];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
+    MTRDeviceTestDeviceControllerDelegate * deviceControllerDelegate =
+        [[MTRDeviceTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
-    [controller setPairingDelegate:pairing queue:callbackQueue];
+    [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 
     NSError * error;
     __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];

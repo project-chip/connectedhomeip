@@ -43,7 +43,7 @@ const char * getScriptsFolder() { return basePath; }
 
 constexpr const char * kDefaultKey = "default";
 
-@interface TestPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
@@ -70,7 +70,7 @@ class TestCommandBridge : public CHIPCommandBridge,
 public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
-        , mPairingDelegate([[TestPairingDelegate alloc] initWithTestCommandBridge:this])
+        , mDeviceControllerDelegate([[TestDeviceControllerDelegate alloc] initWithTestCommandBridge:this])
     {
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
@@ -183,9 +183,9 @@ public:
 
         SetIdentity(identity);
 
-        [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
-        [mPairingDelegate setDeviceId:value.nodeId];
-        [mPairingDelegate setActive:YES];
+        [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
+        [mDeviceControllerDelegate setDeviceId:value.nodeId];
+        [mDeviceControllerDelegate setActive:YES];
 
         NSString * payloadStr = [[NSString alloc] initWithBytes:value.payload.data()
                                                          length:value.payload.size()
@@ -521,7 +521,7 @@ protected:
     }
 
 private:
-    TestPairingDelegate * _Nonnull mPairingDelegate;
+    TestDeviceControllerDelegate * _Nonnull mDeviceControllerDelegate;
 
     // Set of our connected devices, keyed by identity.
     std::map<std::string, MTRBaseDevice *> mConnectedDevices;
@@ -529,7 +529,7 @@ private:
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation TestPairingDelegate
+@implementation TestDeviceControllerDelegate
 - (void)onStatusUpdate:(MTRPairingStatus)status
 {
     if (_active) {

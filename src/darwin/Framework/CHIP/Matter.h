@@ -33,9 +33,9 @@
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceController+XPC.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerDelegate.h>
 #import <Matter/MTRDeviceControllerFactory.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
-#import <Matter/MTRDevicePairingDelegate.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRNOCChainIssuer.h>

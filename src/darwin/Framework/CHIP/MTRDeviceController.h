@@ -24,7 +24,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRCommissioningParameters;
-@protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
 @class MTRSetupPayload;
 
 @interface MTRDeviceController : NSObject
@@ -109,7 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an

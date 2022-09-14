@@ -489,7 +489,7 @@
     }
 }
 
-// MARK: MTRDevicePairingDelegate
+// MARK: MTRDeviceControllerDelegate
 - (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (error != nil) {

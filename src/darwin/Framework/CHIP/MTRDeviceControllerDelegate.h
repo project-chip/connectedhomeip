@@ -27,11 +27,11 @@ typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
 };
 
 /**
- * The protocol definition for the MTRDevicePairingDelegate
+ * The protocol definition for the MTRDeviceControllerDelegate
  *
  * All delegate methods will be called on the supplied Delegate Queue.
  */
-@protocol MTRDevicePairingDelegate <NSObject>
+@protocol MTRDeviceControllerDelegate <NSObject>
 @optional
 /**
  * Notify the delegate when pairing status gets updated

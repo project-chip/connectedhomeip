@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#import "MTRDevicePairingDelegateBridge.h"
+#import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRError_Internal.h"
 
-MTRDevicePairingDelegateBridge::MTRDevicePairingDelegateBridge(void)
+MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
 {
 }
 
-MTRDevicePairingDelegateBridge::~MTRDevicePairingDelegateBridge(void) {}
+MTRDeviceControllerDelegateBridge::~MTRDeviceControllerDelegateBridge(void) {}
 
-void MTRDevicePairingDelegateBridge::setDelegate(id<MTRDevicePairingDelegate> delegate, dispatch_queue_t queue)
+void MTRDeviceControllerDelegateBridge::setDelegate(id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue)
 {
     if (delegate && queue) {
         mDelegate = delegate;
@@ -36,7 +36,7 @@ void MTRDevicePairingDelegateBridge::setDelegate(id<MTRDevicePairingDelegate> de
     }
 }
 
-MTRPairingStatus MTRDevicePairingDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
+MTRPairingStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
 {
     MTRPairingStatus rv = MTRPairingStatusUnknown;
     switch (status) {
@@ -53,11 +53,11 @@ MTRPairingStatus MTRDevicePairingDelegateBridge::MapStatus(chip::Controller::Dev
     return rv;
 }
 
-void MTRDevicePairingDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
+void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    NSLog(@"DevicePairingDelegate status updated: %d", status);
+    NSLog(@"DeviceControllerDelegate status updated: %d", status);
 
-    id<MTRDevicePairingDelegate> strongDelegate = mDelegate;
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onStatusUpdate:)]) {
         if (strongDelegate && mQueue) {
             MTRPairingStatus pairingStatus = MapStatus(status);
@@ -68,11 +68,11 @@ void MTRDevicePairingDelegateBridge::OnStatusUpdate(chip::Controller::DevicePair
     }
 }
 
-void MTRDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing complete. Status %s", chip::ErrorStr(error));
+    NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
-    id<MTRDevicePairingDelegate> strongDelegate = mDelegate;
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
@@ -83,11 +83,11 @@ void MTRDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     }
 }
 
-void MTRDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
+    NSLog(@"DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
-    id<MTRDevicePairingDelegate> strongDelegate = mDelegate;
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
@@ -98,11 +98,11 @@ void MTRDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     }
 }
 
-void MTRDevicePairingDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+    NSLog(@"DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
 
-    id<MTRDevicePairingDelegate> strongDelegate = mDelegate;
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onCommissioningComplete:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
