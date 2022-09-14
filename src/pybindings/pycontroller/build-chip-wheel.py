@@ -123,7 +123,7 @@ try:
         requiredPackages.append('pyobjc-framework-corebluetooth')
 
     if platform.system() == 'Linux':
-        requiredPackages.append('dbus-python')
+        requiredPackages.append('dbus-python==1.2.18')
         requiredPackages.append('pygobject')
 
     #

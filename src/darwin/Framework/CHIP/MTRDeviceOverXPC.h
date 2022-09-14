@@ -19,6 +19,8 @@
 #import "MTRCluster.h" // For MTRSubscriptionEstablishedHandler
 #import "MTRDeviceControllerXPCConnection.h"
 
+@class MTRDeviceControllerOverXPC;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceOverXPC : MTRBaseDevice
@@ -26,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-- (instancetype)initWithController:(id<NSCopying>)controller
-                          deviceID:(NSNumber *)deviceID
-                     xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
+- (instancetype)initWithControllerOverXPC:(MTRDeviceControllerOverXPC *)controllerOverXPC
+                                 deviceID:(NSNumber *)deviceID
+                            xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection;
 
 @end
 

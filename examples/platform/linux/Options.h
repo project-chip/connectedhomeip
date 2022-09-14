@@ -60,6 +60,7 @@ struct LinuxDeviceOptions
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
     chip::CSRResponseOptions mCSRResponseOptions;
     uint8_t testEventTriggerEnableKey[16] = { 0 };
+    chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
 
     static LinuxDeviceOptions & GetInstance();
 };

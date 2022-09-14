@@ -29,11 +29,11 @@
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissioningParameters.h>
-#import <Matter/MTRControllerFactory.h>
 #import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceController+XPC.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerFactory.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDevicePairingDelegate.h>
 #import <Matter/MTRError.h>

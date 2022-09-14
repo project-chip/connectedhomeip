@@ -159,7 +159,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onNOCChainGenerationNeeded", "([B[B[B[B[B[B[B[B[B)V",
+
+    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onNOCChainGenerationNeeded",
+                                                  "(Lchip/devicecontroller/CSRInfo;Lchip/devicecontroller/AttestationInfo;)V",
                                                   &method);
     if (err != CHIP_NO_ERROR)
     {
@@ -219,17 +221,16 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
                                                javaAttestationChallenge);
 
-    const ByteSpan & attestationElements = mAutoCommissioner->GetCommissioningParameters().GetAttestationElements().Value();
+    const ByteSpan & attestationElements = mAutoCommissioner->GetAttestationElements();
     jbyteArray javaAttestationElements;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), attestationElements.size(),
                                                javaAttestationElements);
 
-    const ByteSpan & attestationNonce = mAutoCommissioner->GetCommissioningParameters().GetAttestationNonce().Value();
+    const ByteSpan & attestationNonce = mAutoCommissioner->GetAttestationNonce();
     jbyteArray javaAttestationNonce;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationNonce.data(), attestationNonce.size(), javaAttestationNonce);
 
-    const ByteSpan & attestationElementsSignature =
-        mAutoCommissioner->GetCommissioningParameters().GetAttestationSignature().Value();
+    const ByteSpan & attestationElementsSignature = mAutoCommissioner->GetAttestationSignature();
     jbyteArray javaAttestationElementsSignature;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElementsSignature.data(), attestationElementsSignature.size(),
                                                javaAttestationElementsSignature);

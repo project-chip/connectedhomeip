@@ -16,7 +16,7 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -149,7 +149,7 @@ private:
             });
         };
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -177,7 +177,7 @@ private:
             error = CHIP_ERROR_INTERNAL;
         }
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -227,7 +227,7 @@ private:
 
         // TODO Handle MaxLength
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -368,7 +368,7 @@ bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath 
     }
 
     auto * controller =
-        [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
+        [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
     if (controller == nil) {
         commandHandler->AddStatus(commandPath, Status::Failure);
         return false;

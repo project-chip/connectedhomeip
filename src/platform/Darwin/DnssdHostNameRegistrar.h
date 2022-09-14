@@ -23,80 +23,53 @@
 #include <string>
 #include <vector>
 
+#include <Network/Network.h>
+
 namespace chip {
 namespace Dnssd {
 
-struct RegisterContext;
-struct RegisterRecordContext;
+    typedef std::pair<uint32_t, in_addr> InetInterface;
+    typedef std::pair<uint32_t, in6_addr> Inet6Interface;
+    typedef std::vector<InetInterface> InetInterfacesVector;
+    typedef std::vector<std::pair<uint32_t, in6_addr>> Inet6InterfacesVector;
+    typedef void (^OnInterfaceChanges)(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces);
 
-class InterfaceRegistrant
-{
-public:
-    /**
-     * Initialize an interface if it match filtering arguments.
-     *
-     * @param[in] ifa         The interface to initialize from.
-     * @param[in] addressType An allowed address type.
-     *                        Passing in Inet::IPAddressType::kAny effectively allow all address types.
-     * @param[in] interfaceId An allowed interface id.
-     *                        Passing in kDNSServiceInterfaceIndexAny effectively allow all interface ids.
-     *
-     * @return A boolean indicating if the initialization from the data of the ifaddrs was allowed by the filtering parameters.
-     */
-    bool Init(const struct ifaddrs * ifa, Inet::IPAddressType addressType, uint32_t interfaceId);
+    class HostNameRegistrar {
+    public:
+        void Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
 
-    DNSServiceErrorType Register(DNSServiceRef sdRef, RegisterRecordContext * sdCtx, const char * hostname) const;
+        CHIP_ERROR Register();
+        void Unregister();
 
-private:
-    static bool HasValidFlags(unsigned int flags);
-    static bool HasValidType(Inet::IPAddressType addressType, const sa_family_t addressFamily);
-    static bool IsValidInterfaceId(uint32_t targetInterfaceId, unsigned int currentInterfaceId);
+    private:
+        bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
 
-    const struct in_addr * GetIPv4() const { return &mInterfaceAddress.ipv4; }
-    const struct in6_addr * GetIPv6() const { return &mInterfaceAddress.ipv6; }
+        template <typename T> void RegisterInterfaces(std::vector<std::pair<uint32_t, T>> interfaces, uint16_t type)
+        {
+            for (auto & interface : interfaces) {
+                auto interfaceId = interface.first;
+                auto interfaceAddress = static_cast<const void *>(&interface.second);
+                auto interfaceAddressLen = sizeof(interface.second);
 
-    bool IsIPv4() const { return mInterfaceAddressType == AF_INET; };
-    bool IsIPv6() const { return mInterfaceAddressType == AF_INET6; };
+                LogErrorOnFailure(RegisterInterface(interfaceId, type, interfaceAddress, interfaceAddressLen));
+            }
+        }
 
-    void LogDetail() const;
+        CHIP_ERROR RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen);
 
-    union InterfaceAddress
-    {
-        struct in_addr ipv4;
-        struct in6_addr ipv6;
+        CHIP_ERROR StartSharedConnection();
+        void StopSharedConnection();
+        CHIP_ERROR ResetSharedConnection();
+        DNSServiceRef mServiceRef;
+
+        CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
+        void StopMonitorInterfaces();
+        nw_path_monitor_t mInterfaceMonitor;
+
+        std::string mHostname;
+        uint32_t mInterfaceId;
+        Inet::IPAddressType mAddressType;
     };
-
-    uint32_t mInterfaceId;
-    InterfaceAddress mInterfaceAddress;
-    sa_family_t mInterfaceAddressType;
-};
-
-class HostNameRegistrar
-{
-public:
-    bool Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
-
-    CHIP_ERROR Register(RegisterContext * registerCtx);
-
-    /**
-     * IncrementRegistrationCount is used to indicate a registrant status.
-     * When all registrants status has been recovered, it returns false to indicate
-     * that the registration process is finished.
-     *
-     * @param[in] err   The registration status
-     *
-     * @return          A boolean indicating if the registration process needs to continue.
-     */
-    bool IncrementRegistrationCount(DNSServiceErrorType err);
-
-    bool HasRegisteredRegistrant() { return mRegistrationSuccess; }
-
-private:
-    std::string mHostName;
-    std::vector<InterfaceRegistrant> mRegistry;
-    uint8_t mRegistrationCount = 0;
-    bool mRegistrationSuccess  = false;
-};
 
 } // namespace Dnssd
 } // namespace chip
