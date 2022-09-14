@@ -260,9 +260,7 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -297,13 +295,14 @@ public:
                                       // We want to get event reports at the minInterval, not the maxInterval.
                                       eventPath->mIsUrgentEvent = true;
                                       ReadPrepareParams readParams(session.Value());
-                                      readParams.mMinIntervalFloorSeconds = [minInterval unsignedShortValue];
-                                      readParams.mMaxIntervalCeilingSeconds = [maxInterval unsignedShortValue];
+                                      readParams.mMinIntervalFloorSeconds = [params.minInterval unsignedShortValue];
+                                      readParams.mMaxIntervalCeilingSeconds = [params.maxInterval unsignedShortValue];
                                       readParams.mpAttributePathParamsList = attributePath.get();
                                       readParams.mAttributePathParamsListSize = 1;
                                       readParams.mpEventPathParamsList = eventPath.get();
                                       readParams.mEventPathParamsListSize = 1;
-                                      readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
+                                      readParams.mIsFabricFiltered = params.filterByFabric;
+                                      readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                                       std::unique_ptr<ClusterStateCache> attributeCache;
                                       ReadClient::Callback * callbackForReadClient = nullptr;
@@ -368,7 +367,7 @@ public:
                                           exchangeManager, *callbackForReadClient, ReadClient::InteractionType::Subscribe);
 
                                       CHIP_ERROR err;
-                                      if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                                      if (!params.resubscribeIfLost) {
                                           err = readClient->SendRequest(readParams);
                                       } else {
                                           // SendAutoResubscribeRequest cleans up the params, even on failure.
@@ -834,7 +833,7 @@ private:
             chip::app::ReadPrepareParams readParams(session);
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
-            readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
+            readParams.mIsFabricFiltered = params.filterByFabric;
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
@@ -1120,8 +1119,6 @@ exit:
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
                                 attributeID:(NSNumber * _Nullable)attributeID
-                                minInterval:(NSNumber *)minInterval
-                                maxInterval:(NSNumber *)maxInterval
                                      params:(MTRSubscribeParams * _Nullable)params
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -1139,8 +1136,6 @@ exit:
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     attributeID = (attributeID == nil) ? nil : [attributeID copy];
-    minInterval = (minInterval == nil) ? nil : [minInterval copy];
-    maxInterval = (maxInterval == nil) ? nil : [maxInterval copy];
     params = (params == nil) ? nil : [params copy];
 
     [self.deviceController
@@ -1214,12 +1209,10 @@ exit:
                    chip::app::ReadPrepareParams readParams(session.Value());
                    readParams.mpAttributePathParamsList = container.pathParams;
                    readParams.mAttributePathParamsListSize = 1;
-                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
-                   readParams.mIsFabricFiltered
-                       = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
-                   readParams.mKeepSubscriptions
-                       = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([params.minInterval unsignedShortValue]);
+                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([params.maxInterval unsignedShortValue]);
+                   readParams.mIsFabricFiltered = params.filterByFabric;
+                   readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                    auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
@@ -1235,7 +1228,7 @@ exit:
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-                   if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                   if (params.replaceExistingSubscriptions) {
                        err = readClient->SendRequest(readParams);
                    } else {
                        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
@@ -1469,10 +1462,15 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
+    MTRSubscribeParams * _Nullable subscribeParams = [params copy];
+    if (subscribeParams == nil) {
+        subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(minInterval) maxInterval:@(maxInterval)];
+    } else {
+        subscribeParams.minInterval = @(minInterval);
+        subscribeParams.maxInterval = @(maxInterval);
+    }
     [self subscribeWithQueue:queue
-                    minInterval:@(minInterval)
-                    maxInterval:@(maxInterval)
-                         params:params
+                         params:subscribeParams
         attributeCacheContainer:attributeCacheContainer
          attributeReportHandler:attributeReportHandler
              eventReportHandler:eventReportHandler
@@ -1540,12 +1538,17 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
 {
+    MTRSubscribeParams * _Nullable subscribeParams = [params copy];
+    if (subscribeParams == nil) {
+        subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+    } else {
+        subscribeParams.minInterval = minInterval;
+        subscribeParams.maxInterval = maxInterval;
+    }
     [self subscribeToAttributesWithEndpointID:endpointId
                                     clusterID:clusterId
                                   attributeID:attributeId
-                                  minInterval:minInterval
-                                  maxInterval:maxInterval
-                                       params:params
+                                       params:subscribeParams
                                         queue:clientQueue
                                 reportHandler:reportHandler
                       subscriptionEstablished:subscriptionEstablishedHandler];
