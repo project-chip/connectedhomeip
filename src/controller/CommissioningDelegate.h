@@ -399,10 +399,10 @@ public:
     // Check for matching fabric on target device by reading fabric list and looking for a
     // fabricId and RootCert match. If a match is detected, then use GetNodeId() to
     // access the nodeId for the device on the matching fabric.
-    Optional<bool> GetCheckForMatchingFabric() const { return mCheckForMatchingFabric; }
+    bool GetCheckForMatchingFabric() const { return mCheckForMatchingFabric; }
     CommissioningParameters & SetCheckForMatchingFabric(bool checkForMatchingFabric)
     {
-        mCheckForMatchingFabric = MakeOptional(checkForMatchingFabric);
+        mCheckForMatchingFabric = checkForMatchingFabric;
         return *this;
     }
 
@@ -437,7 +437,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    Optional<bool> mCheckForMatchingFabric;
+    bool mCheckForMatchingFabric = false;
 };
 
 struct RequestedCertificate

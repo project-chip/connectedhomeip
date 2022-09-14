@@ -1749,31 +1749,38 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(
                     this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
+                // this is a best effort attempt to find a matching fabric, so no error checking on iter
                 auto iter = fabrics.begin();
                 while (iter.Next())
                 {
                     auto & fabricDescriptor = iter.GetValue();
-                    ChipLogProgress(AppServer,
+                    ChipLogProgress(Controller,
                                     "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
                                     " fabric.nodeId=0x" ChipLogFormatX64,
                                     fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
                                     ChipLogValueX64(fabricDescriptor.nodeId));
-                    // need to add check for root public key
                     if (GetFabricId() == fabricDescriptor.fabricId)
                     {
-                        ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - found a matching fabric id");
+                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
                         chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
+                        if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
+                        {
+                            ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
+                                         static_cast<unsigned>(rootKeySpan.size()),
+                                         static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
+                            continue;
+                        }
                         P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
                         Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
 
                         Crypto::P256PublicKey commissionerRootPublicKey;
                         if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
                         {
-                            ChipLogError(AppServer, "DeviceCommissioner::OnDone - error reading commissioner root public key");
+                            ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
                         }
                         else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
                         {
-                            ChipLogProgress(AppServer, "DeviceCommissioner::OnDone - fabric root keys match");
+                            ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
                             info.nodeId = fabricDescriptor.nodeId;
                         }
                     }
@@ -2072,14 +2079,17 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Read the requested minimum connection times from all network commissioning clusters
         readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
+
+        readParams.mpAttributePathParamsList    = readPaths;
+        readParams.mAttributePathParamsListSize = 8;
+
         // Read the current fabrics
-        if (params.GetCheckForMatchingFabric().ValueOr(false))
+        if (params.GetCheckForMatchingFabric())
         {
+            readParams.mAttributePathParamsListSize = 9;
             readPaths[8] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         }
 
-        readParams.mpAttributePathParamsList    = readPaths;
-        readParams.mAttributePathParamsListSize = 8 + (params.GetCheckForMatchingFabric().ValueOr(false) ? 1 : 0);
         readParams.mIsFabricFiltered            = false;
         if (timeout.HasValue())
         {
