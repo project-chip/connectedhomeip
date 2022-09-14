@@ -27,7 +27,7 @@
 		2C5EEEF6268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C5EEEF4268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h */; };
 		2C5EEEF7268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C5EEEF5268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm */; };
 		2C8C8FC0253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBD253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.h */; };
-		2C8C8FC1253E0C2100797F05 /* MTRPersistentStorageDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBE253E0C2100797F05 /* MTRPersistentStorageDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C8C8FC1253E0C2100797F05 /* MTRStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBE253E0C2100797F05 /* MTRStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C8C8FBF253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm */; };
 		2CB7163B252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB71638252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.h */; };
 		2CB7163C252E8A7C0026E2BB /* MTRDevicePairingDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.mm */; };
@@ -166,7 +166,7 @@
 		2C5EEEF4268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceConnectionBridge.h; sourceTree = "<group>"; };
 		2C5EEEF5268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceConnectionBridge.mm; sourceTree = "<group>"; };
 		2C8C8FBD253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRPersistentStorageDelegateBridge.h; sourceTree = "<group>"; };
-		2C8C8FBE253E0C2100797F05 /* MTRPersistentStorageDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRPersistentStorageDelegate.h; sourceTree = "<group>"; };
+		2C8C8FBE253E0C2100797F05 /* MTRStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRStorage.h; sourceTree = "<group>"; };
 		2C8C8FBF253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRPersistentStorageDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB71638252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDevicePairingDelegateBridge.h; sourceTree = "<group>"; };
 		2CB71639252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevicePairingDelegateBridge.mm; sourceTree = "<group>"; };
@@ -387,7 +387,7 @@
 				7596A84C287782E8004DAE0E /* MTRAsyncCallbackWorkQueue_Internal.h */,
 				7596A84628762783004DAE0E /* MTRAsyncCallbackWorkQueue.h */,
 				7596A84728762783004DAE0E /* MTRAsyncCallbackWorkQueue.mm */,
-				2C8C8FBE253E0C2100797F05 /* MTRPersistentStorageDelegate.h */,
+				2C8C8FBE253E0C2100797F05 /* MTRStorage.h */,
 				5ACDDD7927CD129700EFD68A /* MTRAttributeCacheContainer.h */,
 				5A60370727EA1FF60020DB79 /* MTRAttributeCacheContainer+XPC.h */,
 				5ACDDD7B27CD14AF00EFD68A /* MTRAttributeCacheContainer_Internal.h */,
@@ -542,7 +542,7 @@
 				1ED276E426C5832500547A89 /* MTRCluster.h in Headers */,
 				5A6FEC9A27B5C89300F25F42 /* MTRDeviceControllerXPCConnection.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */,
-				2C8C8FC1253E0C2100797F05 /* MTRPersistentStorageDelegate.h in Headers */,
+				2C8C8FC1253E0C2100797F05 /* MTRStorage.h in Headers */,
 				AF1CB8702874B04C00865A96 /* MTROTAProviderDelegateBridge.h in Headers */,
 				1EC4CE6425CC276600D7304F /* MTRBaseClusters.h in Headers */,
 				2C5EEEF6268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h in Headers */,

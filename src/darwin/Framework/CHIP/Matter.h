@@ -41,7 +41,7 @@
 #import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROTAHeaderParser.h>
 #import <Matter/MTROTAProviderDelegate.h>
-#import <Matter/MTRPersistentStorageDelegate.h>
 #import <Matter/MTRSetupPayload.h>
+#import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>

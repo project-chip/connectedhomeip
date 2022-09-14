@@ -205,12 +205,12 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
 
 @implementation CHIPToolPersistentStorageDelegate
 
-// MARK: MTRPersistentStorageDelegate
+// MARK: MTRStorage
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
     NSData * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, key);
-    NSLog(@"MTRPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    NSLog(@"MTRStorage Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
