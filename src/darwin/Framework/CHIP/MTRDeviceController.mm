@@ -20,7 +20,7 @@
 
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevicePairingDelegateBridge.h"
@@ -87,14 +87,14 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
 @property (readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
-@property (readonly) MTRControllerFactory * factory;
+@property (readonly) MTRDeviceControllerFactory * factory;
 @property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
 @property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @end
 
 @implementation MTRDeviceController
 
-- (instancetype)initWithFactory:(MTRControllerFactory *)factory queue:(dispatch_queue_t)queue
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
         _chipWorkQueue = queue;
@@ -143,7 +143,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 }
 
 // Part of cleanupAfterStartup that has to interact with the Matter work queue
-// in a very specific way that only MTRControllerFactory knows about.
+// in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
     if (_cppCommissioner) {

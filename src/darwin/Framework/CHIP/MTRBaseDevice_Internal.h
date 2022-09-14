@@ -55,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
-/**
- * Controllers are created via the MTRControllerFactory object.
- */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
