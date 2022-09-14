@@ -118,7 +118,7 @@ static void InitServer(intptr_t context)
 
 extern "C" void ChipTest(void)
 {
-    ChipLogProgress(DeviceLayer, "All Clusters Demo!");
+    ChipLogProgress(DeviceLayer, "Chef App!");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CONFIG_ENABLE_PW_RPC

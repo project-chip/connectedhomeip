@@ -21,8 +21,8 @@
  *          Platform-specific key value storage implementation for Ameba
  */
 /* this file behaves like a config.h, comes first */
-#include "chip_porting.h"
 #include "FreeRTOS.h"
+#include "chip_porting.h"
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
 
