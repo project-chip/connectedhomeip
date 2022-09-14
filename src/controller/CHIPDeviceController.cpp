@@ -1737,61 +1737,59 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = (err == CHIP_NO_ERROR) ? return_err : err;
 
-    err =
-        mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            // this code is checking if the device is already on the commissioner's fabric.
-            // if a matching fabric is found, then remember the nodeId so that the commissioner
-            // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
-            // the device's nodeId on its fabric.
-            switch (path.mAttributeId)
+    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
+        // this code is checking if the device is already on the commissioner's fabric.
+        // if a matching fabric is found, then remember the nodeId so that the commissioner
+        // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
+        // the device's nodeId on its fabric.
+        switch (path.mAttributeId)
+        {
+        case OperationalCredentials::Attributes::Fabrics::Id: {
+            OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
+            ReturnErrorOnFailure(this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
+            // this is a best effort attempt to find a matching fabric, so no error checking on iter
+            auto iter = fabrics.begin();
+            while (iter.Next())
             {
-            case OperationalCredentials::Attributes::Fabrics::Id: {
-                OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
-                ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
-                // this is a best effort attempt to find a matching fabric, so no error checking on iter
-                auto iter = fabrics.begin();
-                while (iter.Next())
+                auto & fabricDescriptor = iter.GetValue();
+                ChipLogProgress(Controller,
+                                "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
+                                " fabric.nodeId=0x" ChipLogFormatX64,
+                                fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
+                                ChipLogValueX64(fabricDescriptor.nodeId));
+                if (GetFabricId() == fabricDescriptor.fabricId)
                 {
-                    auto & fabricDescriptor = iter.GetValue();
-                    ChipLogProgress(Controller,
-                                    "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
-                                    " fabric.nodeId=0x" ChipLogFormatX64,
-                                    fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
-                                    ChipLogValueX64(fabricDescriptor.nodeId));
-                    if (GetFabricId() == fabricDescriptor.fabricId)
+                    ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
+                    chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
+                    if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
                     {
-                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
-                        chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
-                        if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
-                        {
-                            ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
-                                         static_cast<unsigned>(rootKeySpan.size()),
-                                         static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
-                            continue;
-                        }
-                        P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
-                        Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
+                                     static_cast<unsigned>(rootKeySpan.size()),
+                                     static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
+                        continue;
+                    }
+                    P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
+                    Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
 
-                        Crypto::P256PublicKey commissionerRootPublicKey;
-                        if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
-                        {
-                            ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
-                        }
-                        else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
-                        {
-                            ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
-                            info.nodeId = fabricDescriptor.nodeId;
-                        }
+                    Crypto::P256PublicKey commissionerRootPublicKey;
+                    if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
+                    {
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
+                    }
+                    else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
+                    {
+                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
+                        info.nodeId = fabricDescriptor.nodeId;
                     }
                 }
+            }
 
-                return CHIP_NO_ERROR;
-            }
-            default:
-                return CHIP_NO_ERROR;
-            }
-        });
+            return CHIP_NO_ERROR;
+        }
+        default:
+            return CHIP_NO_ERROR;
+        }
+    });
 
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
@@ -2090,7 +2088,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             readPaths[8] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         }
 
-        readParams.mIsFabricFiltered            = false;
+        readParams.mIsFabricFiltered = false;
         if (timeout.HasValue())
         {
             readParams.mTimeout = timeout.Value();
