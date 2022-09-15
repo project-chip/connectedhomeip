@@ -30,6 +30,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 // #include <support/CHIPMem.h>
 // #include <support/ErrorStr.h>
 
@@ -181,7 +183,7 @@ void pychip_server_native_init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
-    // SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
     tmpErrno = errno;
