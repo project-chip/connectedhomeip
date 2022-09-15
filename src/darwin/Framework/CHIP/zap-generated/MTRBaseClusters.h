@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Identify
  *
+ * Attributes and commands for putting a device into Identification mode (e.g. flashing a light).
  */
 @interface MTRBaseClusterIdentify : MTRCluster
 
@@ -34,8 +35,19 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params completion:(MTRStatusCompletion)completion;
-- (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command Identify
+ *
+ * Command description for Identify
+ */
+-(void) identifyWithParams : (MTRIdentifyClusterIdentifyParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command TriggerEffect
+ *
+ * Command description for TriggerEffect
+ */
+-(void) triggerEffectWithParams : (MTRIdentifyClusterTriggerEffectParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeIdentifyTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -145,6 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Groups
  *
+ * Attributes and commands for group configuration and manipulation.
  */
 @interface MTRBaseClusterGroups : MTRCluster
 
@@ -152,22 +165,54 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
-                completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
-                 completion:
-                     (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
-                          completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
-                   completion:
-                       (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion;
+/**
+ * Command AddGroup
+ *
+ * Command description for AddGroup
+ */
+-(void) addGroupWithParams : (MTRGroupsClusterAddGroupParams *) params completion
+    : (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ViewGroup
+ *
+ * Command description for ViewGroup
+ */
+-(void) viewGroupWithParams : (MTRGroupsClusterViewGroupParams *) params completion
+    : (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command GetGroupMembership
+ *
+ * Command description for GetGroupMembership
+ */
+-(void) getGroupMembershipWithParams : (MTRGroupsClusterGetGroupMembershipParams *) params completion
+    : (void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveGroup
+ *
+ * Command description for RemoveGroup
+ */
+-(void) removeGroupWithParams : (MTRGroupsClusterRemoveGroupParams *) params completion
+    : (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveAllGroups
+ *
+ * Command description for RemoveAllGroups
+ */
+-(void) removeAllGroupsWithParams : (MTRGroupsClusterRemoveAllGroupsParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)removeAllGroupsWithCompletion:(MTRStatusCompletion)completion;
-- (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
-                             completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command AddGroupIfIdentifying
+ *
+ * Command description for AddGroupIfIdentifying
+ */
+-(void) addGroupIfIdentifyingWithParams : (MTRGroupsClusterAddGroupIfIdentifyingParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeNameSupportWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -260,6 +305,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Scenes
  *
+ * Attributes and commands for scene configuration and manipulation.
  */
 @interface MTRBaseClusterScenes : MTRCluster
 
@@ -267,33 +313,88 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
-                completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
-                 completion:
-                     (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
-                   completion:
-                       (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
-                       completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completion;
-- (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
-                  completion:
-                      (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params completion:(MTRStatusCompletion)completion;
-- (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
-                          completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
-                        completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completion;
-- (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
-                         completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completion;
-- (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
-                 completion:
-                     (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion;
+/**
+ * Command AddScene
+ *
+ * Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE,
+ * "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
+ */
+-(void) addSceneWithParams : (MTRScenesClusterAddSceneParams *) params completion
+    : (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ViewScene
+ *
+ * Retrieves the requested scene entry from its Scene table.
+ */
+-(void) viewSceneWithParams : (MTRScenesClusterViewSceneParams *) params completion
+    : (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveScene
+ *
+ * Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table
+ */
+-(void) removeSceneWithParams : (MTRScenesClusterRemoveSceneParams *) params completion
+    : (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveAllScenes
+ *
+ * Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table
+ */
+-(void) removeAllScenesWithParams : (MTRScenesClusterRemoveAllScenesParams *) params completion
+    : (void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command StoreScene
+ *
+ * Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other
+ * clusters on the same endpoint
+ */
+-(void) storeSceneWithParams : (MTRScenesClusterStoreSceneParams *) params completion
+    : (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RecallScene
+ *
+ * Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene
+ * entry in the Scene Table
+ */
+-(void) recallSceneWithParams : (MTRScenesClusterRecallSceneParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetSceneMembership
+ *
+ * Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene
+ * identifiers within a certain group
+ */
+-(void) getSceneMembershipWithParams : (MTRScenesClusterGetSceneMembershipParams *) params completion
+    : (void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command EnhancedAddScene
+ *
+ * Allows a scene to be added using a finer scene transition time than the AddScene command.
+ */
+-(void) enhancedAddSceneWithParams : (MTRScenesClusterEnhancedAddSceneParams *) params completion
+    : (void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command EnhancedViewScene
+ *
+ * Allows a scene to be retrieved using a finer scene transition time than the ViewScene command
+ */
+-(void) enhancedViewSceneWithParams : (MTRScenesClusterEnhancedViewSceneParams *) params completion
+    : (void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command CopyScene
+ *
+ * Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
+ */
+-(void) copySceneWithParams : (MTRScenesClusterCopySceneParams *) params completion
+    : (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeSceneCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -452,6 +553,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster On/Off
  *
+ * Attributes and commands for switching devices between 'On' and 'Off' states.
  */
 @interface MTRBaseClusterOnOff : MTRCluster
 
@@ -459,17 +561,60 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command Off
+ *
+ * On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it
+ * is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0.
+ */
+-(void) offWithParams : (MTROnOffClusterOffParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)offWithCompletion:(MTRStatusCompletion)completion;
-- (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command On
+ *
+ * On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is
+ * used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the
+ * device SHALL set the OffWaitTime attribute to 0.
+ */
+-(void) onWithParams : (MTROnOffClusterOnParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)onWithCompletion:(MTRStatusCompletion)completion;
-- (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command Toggle
+ *
+ * On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’
+ * state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and
+ * if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the
+ * OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0.
+ */
+-(void) toggleWithParams : (MTROnOffClusterToggleParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)toggleWithCompletion:(MTRStatusCompletion)completion;
-- (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params completion:(MTRStatusCompletion)completion;
-- (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
-                               completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command OffWithEffect
+ *
+ * The OffWithEffect command allows devices to be turned off using enhanced ways of fading.
+ */
+-(void) offWithEffectWithParams : (MTROnOffClusterOffWithEffectParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command OnWithRecallGlobalScene
+ *
+ * The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off.
+ */
+-(void) onWithRecallGlobalSceneWithParams : (MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)onWithRecallGlobalSceneWithCompletion:(MTRStatusCompletion)completion;
-- (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command OnWithTimedOff
+ *
+ * The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the
+ * device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the
+ * devices back on.
+ */
+-(void) onWithTimedOffWithParams : (MTROnOffClusterOnWithTimedOffParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeOnOffWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -628,6 +773,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster On/off Switch Configuration
  *
+ * Attributes and commands for configuring On/Off switching devices.
  */
 @interface MTRBaseClusterOnOffSwitchConfiguration : MTRCluster
 
@@ -743,6 +889,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Level Control
  *
+ * Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.'
  */
 @interface MTRBaseClusterLevelControl : MTRCluster
 
@@ -750,17 +897,74 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stepWithParams:(MTRLevelControlClusterStepParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stopWithParams:(MTRLevelControlClusterStopParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
-                            completion:(MTRStatusCompletion)completion;
-- (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
-                              completion:(MTRStatusCompletion)completion;
+/**
+ * Command MoveToLevel
+ *
+ * Command description for MoveToLevel
+ */
+-(void) moveToLevelWithParams : (MTRLevelControlClusterMoveToLevelParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command Move
+ *
+ * Command description for Move
+ */
+-(void) moveWithParams : (MTRLevelControlClusterMoveParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command Step
+ *
+ * Command description for Step
+ */
+-(void) stepWithParams : (MTRLevelControlClusterStepParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command Stop
+ *
+ * Command description for Stop
+ */
+-(void) stopWithParams : (MTRLevelControlClusterStopParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToLevelWithOnOff
+ *
+ * Command description for MoveToLevelWithOnOff
+ */
+-(void) moveToLevelWithOnOffWithParams : (MTRLevelControlClusterMoveToLevelWithOnOffParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveWithOnOff
+ *
+ * Command description for MoveWithOnOff
+ */
+-(void) moveWithOnOffWithParams : (MTRLevelControlClusterMoveWithOnOffParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StepWithOnOff
+ *
+ * Command description for StepWithOnOff
+ */
+-(void) stepWithOnOffWithParams : (MTRLevelControlClusterStepWithOnOffParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StopWithOnOff
+ *
+ * Command description for StopWithOnOff
+ */
+-(void) stopWithOnOffWithParams : (MTRLevelControlClusterStopWithOnOffParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToClosestFrequency
+ *
+ * Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible.
+ */
+-(void) moveToClosestFrequencyWithParams : (MTRLevelControlClusterMoveToClosestFrequencyParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeCurrentLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -1059,6 +1263,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Binary Input (Basic)
  *
+ * An interface for reading the value of a binary measurement and accessing various characteristics of that measurement.
  */
 @interface MTRBaseClusterBinaryInputBasic : MTRCluster
 
@@ -1286,6 +1491,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Descriptor
  *
+ * The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints
+ * and clusters.
  */
 @interface MTRBaseClusterDescriptor : MTRCluster
 
@@ -1423,6 +1630,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Binding
  *
+ * The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
  */
 @interface MTRBaseClusterBinding : MTRCluster
 
@@ -1526,6 +1734,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Access Control
  *
+ * The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances.
  */
 @interface MTRBaseClusterAccessControl : MTRCluster
 
@@ -1533,20 +1745,20 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+- (void)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
-- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion;
-- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value
+- (void)writeAttributeACLWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion;
+- (void)writeAttributeACLWithValue:(NSArray * _Nonnull)value
                             params:(MTRWriteParams * _Nullable)params
                         completion:(MTRStatusCompletion)completion;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeAclWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributeACLWithParams:(MTRSubscribeParams *)params
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeAclWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributeACLWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                      endpoint:(NSNumber *)endpoint
                                         queue:(dispatch_queue_t)queue
                                    completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -1698,6 +1910,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Actions
  *
+ * This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
  */
 @interface MTRBaseClusterActions : MTRCluster
 
@@ -1705,23 +1918,95 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
-                                   completion:(MTRStatusCompletion)completion;
-- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
-                               completion:(MTRStatusCompletion)completion;
-- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
-                               completion:(MTRStatusCompletion)completion;
-- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
-                                completion:(MTRStatusCompletion)completion;
-- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params completion:(MTRStatusCompletion)completion;
-- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
-                                 completion:(MTRStatusCompletion)completion;
+/**
+ * Command InstantAction
+ *
+ * This command triggers an action (state change) on the involved endpoints.
+ */
+-(void) instantActionWithParams : (MTRActionsClusterInstantActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command InstantActionWithTransition
+ *
+ * This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current
+ * state to the new state.
+ */
+-(void) instantActionWithTransitionWithParams : (MTRActionsClusterInstantActionWithTransitionParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StartAction
+ *
+ * This command triggers the commencement of an action on the involved endpoints.
+ */
+-(void) startActionWithParams : (MTRActionsClusterStartActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command StartActionWithDuration
+ *
+ * This command triggers the commencement of an action (with a duration) on the involved endpoints.
+ */
+-(void) startActionWithDurationWithParams : (MTRActionsClusterStartActionWithDurationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StopAction
+ *
+ * This command stops the ongoing action on the involved endpoints.
+ */
+-(void) stopActionWithParams : (MTRActionsClusterStopActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command PauseAction
+ *
+ * This command pauses an ongoing action.
+ */
+-(void) pauseActionWithParams : (MTRActionsClusterPauseActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command PauseActionWithDuration
+ *
+ * This command pauses an ongoing action with a duration.
+ */
+-(void) pauseActionWithDurationWithParams : (MTRActionsClusterPauseActionWithDurationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command ResumeAction
+ *
+ * This command resumes a previously paused action.
+ */
+-(void) resumeActionWithParams : (MTRActionsClusterResumeActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnableAction
+ *
+ * This command enables a certain action or automation.
+ */
+-(void) enableActionWithParams : (MTRActionsClusterEnableActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnableActionWithDuration
+ *
+ * This command enables a certain action or automation with a duration.
+ */
+-(void) enableActionWithDurationWithParams : (MTRActionsClusterEnableActionWithDurationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command DisableAction
+ *
+ * This command disables a certain action or automation.
+ */
+-(void) disableActionWithParams : (MTRActionsClusterDisableActionParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command DisableActionWithDuration
+ *
+ * This command disables a certain action or automation with a duration.
+ */
+-(void) disableActionWithDurationWithParams : (MTRActionsClusterDisableActionWithDurationParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeActionListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -1840,6 +2125,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Basic
  *
+ * This cluster provides attributes and events for determining basic information about Nodes, which supports both
+      Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
+      which apply to the whole Node. Also allows setting user device information such as location.
  */
 @interface MTRBaseClusterBasic : MTRCluster
 
@@ -1847,8 +2135,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion;
+/**
+ * Command MfgSpecificPing
+ *
+ *
+ */
+-(void) mfgSpecificPingWithParams : (MTRBasicClusterMfgSpecificPingParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)mfgSpecificPingWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeDataModelRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -2218,21 +2511,39 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster OTA Software Update Provider
  *
+ * Provides an interface for providing OTA software updates
  */
-@interface MTRBaseClusterOtaSoftwareUpdateProvider : MTRCluster
+@interface MTRBaseClusterOTASoftwareUpdateProvider : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completion;
-- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                           completion:(MTRStatusCompletion)completion;
+/**
+ * Command QueryImage
+ *
+ * Determine availability of a new Software Image
+ */
+-(void) queryImageWithParams : (MTROTASoftwareUpdateProviderClusterQueryImageParams *) params completion
+    : (void (^)(
+          MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ApplyUpdateRequest
+ *
+ * Determine next action to take for a downloaded Software Image
+ */
+-(void) applyUpdateRequestWithParams : (MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *) params completion
+    : (void (^)(
+          MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command NotifyUpdateApplied
+ *
+ * Notify OTA Provider that an update was applied
+ */
+-(void) notifyUpdateAppliedWithParams : (MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -2312,15 +2623,21 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster OTA Software Update Requestor
  *
+ * Provides an interface for downloading and applying OTA software updates
  */
-@interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRCluster
+@interface MTRBaseClusterOTASoftwareUpdateRequestor : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
-                           completion:(MTRStatusCompletion)completion;
+/**
+ * Command AnnounceOtaProvider
+ *
+ * Announce the presence of an OTA Provider
+ */
+-(void) announceOtaProviderWithParams : (MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
                                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -2462,6 +2779,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Localization Configuration
  *
+ * Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc
  */
 @interface MTRBaseClusterLocalizationConfiguration : MTRCluster
 
@@ -2578,6 +2899,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Time Format Localization
  *
+ * Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format.
  */
 @interface MTRBaseClusterTimeFormatLocalization : MTRCluster
 
@@ -2715,6 +3040,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Unit Localization
  *
+ * Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit.
  */
 @interface MTRBaseClusterUnitLocalization : MTRCluster
 
@@ -2818,6 +3147,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Power Source Configuration
  *
+ * This cluster is used to describe the configuration and capabilities of a Device's power system.
  */
 @interface MTRBaseClusterPowerSourceConfiguration : MTRCluster
 
@@ -2916,6 +3246,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Power Source
  *
+ * This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.
  */
 @interface MTRBaseClusterPowerSource : MTRCluster
 
@@ -3448,6 +3779,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster General Commissioning
  *
+ * This cluster is used to manage global aspects of the Commissioning flow.
  */
 @interface MTRBaseClusterGeneralCommissioning : MTRCluster
 
@@ -3455,16 +3787,32 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
-                   completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completion;
-- (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
-                           completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completion;
-- (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
-                             completion:
-                                 (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completion;
+/**
+ * Command ArmFailSafe
+ *
+ * Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock
+ */
+-(void) armFailSafeWithParams : (MTRGeneralCommissioningClusterArmFailSafeParams *) params completion
+    : (void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command SetRegulatoryConfig
+ *
+ * Set the regulatory configuration to be used during commissioning
+ */
+-(void) setRegulatoryConfigWithParams : (MTRGeneralCommissioningClusterSetRegulatoryConfigParams *) params completion
+    : (void (^)(
+          MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command CommissioningComplete
+ *
+ * Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe
+ * period.
+ */
+-(void) commissioningCompleteWithParams : (MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable) params completion
+    : (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+          NSError * _Nullable error)) completion;
 - (void)commissioningCompleteWithCompletion:(void (^)(
                                                 MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion;
@@ -3630,6 +3978,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Network Commissioning
  *
+ * Functionality to configure, enable, disable network credentials and access on a Matter device.
  */
 @interface MTRBaseClusterNetworkCommissioning : MTRCluster
 
@@ -3637,24 +3986,53 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
-                    completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion;
-- (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
-                              completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completion;
-- (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
-                                completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completion;
-- (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
-                     completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion;
-- (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
-                      completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completion;
-- (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
-                      completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completion;
+/**
+ * Command ScanNetworks
+ *
+ * Detemine the set of networks the device sees as available.
+ */
+-(void) scanNetworksWithParams : (MTRNetworkCommissioningClusterScanNetworksParams * _Nullable) params completion
+    : (void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command AddOrUpdateWiFiNetwork
+ *
+ * Add or update the credentials for a given Wi-Fi network.
+ */
+-(void) addOrUpdateWiFiNetworkWithParams : (MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *) params completion
+    : (void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command AddOrUpdateThreadNetwork
+ *
+ * Add or update the credentials for a given Thread network.
+ */
+-(void) addOrUpdateThreadNetworkWithParams : (MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *) params completion
+    : (void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveNetwork
+ *
+ * Remove the definition of a given network (including its credentials).
+ */
+-(void) removeNetworkWithParams : (MTRNetworkCommissioningClusterRemoveNetworkParams *) params completion
+    : (void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ConnectNetwork
+ *
+ * Connect to the specified network, using previously-defined credentials.
+ */
+-(void) connectNetworkWithParams : (MTRNetworkCommissioningClusterConnectNetworkParams *) params completion
+    : (void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ReorderNetwork
+ *
+ * Modify the order in which networks will be presented in the Networks attribute.
+ */
+-(void) reorderNetworkWithParams : (MTRNetworkCommissioningClusterReorderNetworkParams *) params completion
+    : (void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeMaxNetworksWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -3853,6 +4231,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Diagnostic Logs
  *
+ * The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
  */
 @interface MTRBaseClusterDiagnosticLogs : MTRCluster
 
@@ -3860,9 +4239,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
-                           completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completion;
+/**
+ * Command RetrieveLogsRequest
+ *
+ * Retrieving diagnostic logs from a Node
+ */
+-(void) retrieveLogsRequestWithParams : (MTRDiagnosticLogsClusterRetrieveLogsRequestParams *) params completion
+    : (void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -3942,6 +4325,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster General Diagnostics
  *
+ * The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics
+ * metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterGeneralDiagnostics : MTRCluster
 
@@ -3949,8 +4334,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
-                        completion:(MTRStatusCompletion)completion;
+/**
+ * Command TestEventTrigger
+ *
+ * Provide a means for certification tests to trigger some test-plan-specific events
+ */
+-(void) testEventTriggerWithParams : (MTRGeneralDiagnosticsClusterTestEventTriggerParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeNetworkInterfacesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -4159,6 +4549,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Software Diagnostics
  *
+ * The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
+ * assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterSoftwareDiagnostics : MTRCluster
 
@@ -4166,8 +4558,14 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion;
+/**
+ * Command ResetWatermarks
+ *
+ * Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute,
+ * CurrentHeapHighWaterMark attribute.
+ */
+-(void) resetWatermarksWithParams : (MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)resetWatermarksWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeThreadMetricsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -4305,6 +4703,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Thread Network Diagnostics
  *
+ * The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
+ * assist a user or Administrative Node in diagnosing potential problems
  */
 @interface MTRBaseClusterThreadNetworkDiagnostics : MTRCluster
 
@@ -4312,8 +4712,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-                   completion:(MTRStatusCompletion)completion;
+/**
+ * Command ResetCounts
+ *
+ * Reception of this command SHALL reset the OverrunCount attributes to 0
+ */
+-(void) resetCountsWithParams : (MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeChannelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -5297,6 +5702,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster WiFi Network Diagnostics
  *
+ * The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
+ * assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterWiFiNetworkDiagnostics : MTRCluster
 
@@ -5304,8 +5711,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-                   completion:(MTRStatusCompletion)completion;
+/**
+ * Command ResetCounts
+ *
+ * Reception of this command SHALL reset the Breacon and Packet related count attributes to 0
+ */
+-(void) resetCountsWithParams : (MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeBssidWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion;
@@ -5567,6 +5979,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Ethernet Network Diagnostics
  *
+ * The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
+ * to assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterEthernetNetworkDiagnostics : MTRCluster
 
@@ -5574,8 +5988,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
-                   completion:(MTRStatusCompletion)completion;
+/**
+ * Command ResetCounts
+ *
+ * Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0
+ */
+-(void) resetCountsWithParams : (MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)resetCountsWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributePHYRateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -5775,6 +6194,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Bridged Device Basic
  *
+ * This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
+          the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
+          collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
+          such as the vendor name, the model name, or user-assigned name.
  */
 @interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
 
@@ -6069,6 +6492,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Switch
  *
+ * This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button),
+distinguished with their feature flags. Interactions with the switch device are exposed as attributes (for the latching switch) and
+as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the
+interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a
+light or a window shade.
  */
 @interface MTRBaseClusterSwitch : MTRCluster
 
@@ -6196,6 +6625,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster AdministratorCommissioning
  *
+ * Commands to trigger a Node to allow a new Administrator to commission it.
  */
 @interface MTRBaseClusterAdministratorCommissioning : MTRCluster
 
@@ -6203,12 +6633,34 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
-                               completion:(MTRStatusCompletion)completion;
-- (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
-                                    completion:(MTRStatusCompletion)completion;
-- (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
-                           completion:(MTRStatusCompletion)completion;
+/**
+ * Command OpenCommissioningWindow
+ *
+ * This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning
+ * method.
+ */
+-(void) openCommissioningWindowWithParams : (MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command OpenBasicCommissioningWindow
+ *
+ * This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning
+ * method, if the node supports it.
+ */
+-(void) openBasicCommissioningWindowWithParams
+    : (MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command RevokeCommissioning
+ *
+ * This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic
+ * Commissioning Window command.
+ */
+-(void) revokeCommissioningWithParams
+    : (MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)revokeCommissioningWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeWindowStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -6329,6 +6781,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Operational Credentials
  *
+ * This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated
+ * Fabrics.
  */
 @interface MTRBaseClusterOperationalCredentials : MTRCluster
 
@@ -6336,29 +6790,71 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
-                          completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
-                               completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completion;
-- (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
-                  completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completion;
-- (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
-              completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                             NSError * _Nullable error))completion;
-- (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
-                 completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                NSError * _Nullable error))completion;
-- (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
-                         completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completion;
-- (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
-                    completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion;
-- (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
-                                 completion:(MTRStatusCompletion)completion;
+/**
+ * Command AttestationRequest
+ *
+ * Sender is requesting attestation information from the receiver.
+ */
+-(void) attestationRequestWithParams : (MTROperationalCredentialsClusterAttestationRequestParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command CertificateChainRequest
+ *
+ * Sender is requesting a device attestation certificate from the receiver.
+ */
+-(void) certificateChainRequestWithParams : (MTROperationalCredentialsClusterCertificateChainRequestParams *) params completion
+    : (void (^)(
+          MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command CSRRequest
+ *
+ * Sender is requesting a certificate signing request (CSR) from the receiver.
+ */
+-(void) CSRRequestWithParams : (MTROperationalCredentialsClusterCSRRequestParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command AddNOC
+ *
+ * Sender is requesting to add the new node operational certificates.
+ */
+-(void) addNOCWithParams : (MTROperationalCredentialsClusterAddNOCParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command UpdateNOC
+ *
+ * Sender is requesting to update the node operational certificates.
+ */
+-(void) updateNOCWithParams : (MTROperationalCredentialsClusterUpdateNOCParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command UpdateFabricLabel
+ *
+ * This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by
+ * entries in the Fabrics attribute.
+ */
+-(void) updateFabricLabelWithParams : (MTROperationalCredentialsClusterUpdateFabricLabelParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command RemoveFabric
+ *
+ * This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data.
+ */
+-(void) removeFabricWithParams : (MTROperationalCredentialsClusterRemoveFabricParams *) params completion
+    : (void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command AddTrustedRootCertificate
+ *
+ * This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation.
+ */
+-(void) addTrustedRootCertificateWithParams : (MTROperationalCredentialsClusterAddTrustedRootCertificateParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
                          completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -6526,6 +7022,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Group Key Management
  *
+ * The Group Key Management Cluster is the mechanism by which group keys are managed.
  */
 @interface MTRBaseClusterGroupKeyManagement : MTRCluster
 
@@ -6533,14 +7030,38 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params completion:(MTRStatusCompletion)completion;
-- (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
-                  completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completion;
-- (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params completion:(MTRStatusCompletion)completion;
-- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
-                            completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completion;
+/**
+ * Command KeySetWrite
+ *
+ * Revoke a Root Key from a Group
+ */
+-(void) keySetWriteWithParams : (MTRGroupKeyManagementClusterKeySetWriteParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command KeySetRead
+ *
+ * Revoke a Root Key from a Group
+ */
+-(void) keySetReadWithParams : (MTRGroupKeyManagementClusterKeySetReadParams *) params completion
+    : (void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command KeySetRemove
+ *
+ * Revoke a Root Key from a Group
+ */
+-(void) keySetRemoveWithParams : (MTRGroupKeyManagementClusterKeySetRemoveParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command KeySetReadAllIndices
+ *
+ * Return the list of Group Key Sets associated with the accessing fabric
+ */
+-(void) keySetReadAllIndicesWithParams : (MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *) params completion
+    : (void (^)(
+          MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params
                                 completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -6683,6 +7204,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Fixed Label
  *
+ * The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+labels.
  */
 @interface MTRBaseClusterFixedLabel : MTRCluster
 
@@ -6781,6 +7304,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster User Label
  *
+ * The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
  */
 @interface MTRBaseClusterUserLabel : MTRCluster
 
@@ -6883,6 +7407,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Boolean State
  *
+ * This cluster provides an interface to a boolean state called StateValue.
  */
 @interface MTRBaseClusterBooleanState : MTRCluster
 
@@ -6981,6 +7506,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Mode Select
  *
+ * Attributes and commands for selecting a mode from a list of supported options.
  */
 @interface MTRBaseClusterModeSelect : MTRCluster
 
@@ -6988,7 +7514,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command ChangeToMode
+ *
+ * On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL
+ * set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response.
+ */
+-(void) changeToModeWithParams : (MTRModeSelectClusterChangeToModeParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -7156,6 +7688,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Door Lock
  *
+ * An interface to a generic way to secure a door
  */
 @interface MTRBaseClusterDoorLock : MTRCluster
 
@@ -7163,41 +7696,146 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params completion:(MTRStatusCompletion)completion;
-- (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params completion:(MTRStatusCompletion)completion;
-- (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params completion:(MTRStatusCompletion)completion;
-- (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
-                          completion:(MTRStatusCompletion)completion;
-- (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
-                          completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
-                            completion:(MTRStatusCompletion)completion;
-- (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
-                          completion:(MTRStatusCompletion)completion;
-- (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
-                          completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
-                            completion:(MTRStatusCompletion)completion;
-- (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
-                          completion:(MTRStatusCompletion)completion;
-- (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
-                          completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completion;
-- (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
-                            completion:(MTRStatusCompletion)completion;
-- (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params completion:(MTRStatusCompletion)completion;
-- (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
-               completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion;
-- (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params completion:(MTRStatusCompletion)completion;
-- (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
-                     completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion;
-- (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
-                           completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completion;
-- (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command LockDoor
+ *
+ * This command causes the lock device to lock the door.
+ */
+-(void) lockDoorWithParams : (MTRDoorLockClusterLockDoorParams * _Nullable) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command UnlockDoor
+ *
+ * This command causes the lock device to unlock the door.
+ */
+-(void) unlockDoorWithParams : (MTRDoorLockClusterUnlockDoorParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command UnlockWithTimeout
+ *
+ * This command causes the lock device to unlock the door with a timeout parameter.
+ */
+-(void) unlockWithTimeoutWithParams : (MTRDoorLockClusterUnlockWithTimeoutParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetWeekDaySchedule
+ *
+ * Set a weekly repeating schedule for a specified user.
+ */
+-(void) setWeekDayScheduleWithParams : (MTRDoorLockClusterSetWeekDayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetWeekDaySchedule
+ *
+ * Retrieve the specific weekly schedule for the specific user.
+ */
+-(void) getWeekDayScheduleWithParams : (MTRDoorLockClusterGetWeekDayScheduleParams *) params completion
+    : (void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearWeekDaySchedule
+ *
+ * Clear the specific weekly schedule or all weekly schedules for the specific user.
+ */
+-(void) clearWeekDayScheduleWithParams : (MTRDoorLockClusterClearWeekDayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetYearDaySchedule
+ *
+ * Set a time-specific schedule ID for a specified user.
+ */
+-(void) setYearDayScheduleWithParams : (MTRDoorLockClusterSetYearDayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetYearDaySchedule
+ *
+ * Returns the year day schedule data for the specified schedule and user indexes.
+ */
+-(void) getYearDayScheduleWithParams : (MTRDoorLockClusterGetYearDayScheduleParams *) params completion
+    : (void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearYearDaySchedule
+ *
+ * Clears the specific year day schedule or all year day schedules for the specific user.
+ */
+-(void) clearYearDayScheduleWithParams : (MTRDoorLockClusterClearYearDayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetHolidaySchedule
+ *
+ * Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode.
+ */
+-(void) setHolidayScheduleWithParams : (MTRDoorLockClusterSetHolidayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetHolidaySchedule
+ *
+ * Get the holiday schedule for the specified index.
+ */
+-(void) getHolidayScheduleWithParams : (MTRDoorLockClusterGetHolidayScheduleParams *) params completion
+    : (void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearHolidaySchedule
+ *
+ * Clears the holiday schedule or all holiday schedules.
+ */
+-(void) clearHolidayScheduleWithParams : (MTRDoorLockClusterClearHolidayScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetUser
+ *
+ * Set User into the lock.
+ */
+-(void) setUserWithParams : (MTRDoorLockClusterSetUserParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetUser
+ *
+ * Retrieve User.
+ */
+-(void) getUserWithParams : (MTRDoorLockClusterGetUserParams *) params completion
+    : (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearUser
+ *
+ * Clears a User or all Users.
+ */
+-(void) clearUserWithParams : (MTRDoorLockClusterClearUserParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetCredential
+ *
+ * Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser.
+ */
+-(void) setCredentialWithParams : (MTRDoorLockClusterSetCredentialParams *) params completion
+    : (void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command GetCredentialStatus
+ *
+ * Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index.
+ */
+-(void) getCredentialStatusWithParams : (MTRDoorLockClusterGetCredentialStatusParams *) params completion
+    : (void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearCredential
+ *
+ * Clear one, one type, or all credentials except ProgrammingPIN credential.
+ */
+-(void) clearCredentialWithParams : (MTRDoorLockClusterClearCredentialParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeLockStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -7895,6 +8533,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Window Covering
  *
+ * Provides an interface for controlling and adjusting automatic window coverings.
  */
 @interface MTRBaseClusterWindowCovering : MTRCluster
 
@@ -7902,20 +8541,64 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command UpOrOpen
+ *
+ * Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt
+ */
+-(void) upOrOpenWithParams : (MTRWindowCoveringClusterUpOrOpenParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)upOrOpenWithCompletion:(MTRStatusCompletion)completion;
-- (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
-                   completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command DownOrClose
+ *
+ * Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt
+ */
+-(void) downOrCloseWithParams : (MTRWindowCoveringClusterDownOrCloseParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)downOrCloseWithCompletion:(MTRStatusCompletion)completion;
-- (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
-                  completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command StopMotion
+ *
+ * Stop any adjusting of window covering
+ */
+-(void) stopMotionWithParams : (MTRWindowCoveringClusterStopMotionParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)stopMotionWithCompletion:(MTRStatusCompletion)completion;
-- (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
-                          completion:(MTRStatusCompletion)completion;
-- (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
-                          completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command GoToLiftValue
+ *
+ * Go to lift value specified
+ */
+-(void) goToLiftValueWithParams : (MTRWindowCoveringClusterGoToLiftValueParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GoToLiftPercentage
+ *
+ * Go to lift percentage specified
+ */
+-(void) goToLiftPercentageWithParams : (MTRWindowCoveringClusterGoToLiftPercentageParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GoToTiltValue
+ *
+ * Go to tilt value specified
+ */
+-(void) goToTiltValueWithParams : (MTRWindowCoveringClusterGoToTiltValueParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GoToTiltPercentage
+ *
+ * Go to tilt percentage specified
+ */
+-(void) goToTiltPercentageWithParams : (MTRWindowCoveringClusterGoToTiltPercentageParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -8344,6 +9027,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Barrier Control
  *
+ * This cluster provides control of a barrier (garage door).
  */
 @interface MTRBaseClusterBarrierControl : MTRCluster
 
@@ -8351,10 +9035,21 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
-                                 completion:(MTRStatusCompletion)completion;
-- (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
-                          completion:(MTRStatusCompletion)completion;
+/**
+ * Command BarrierControlGoToPercent
+ *
+ * Command to instruct a barrier to go to a percent open state.
+ */
+-(void) barrierControlGoToPercentWithParams : (MTRBarrierControlClusterBarrierControlGoToPercentParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command BarrierControlStop
+ *
+ * Command that instructs the barrier to stop moving.
+ */
+-(void) barrierControlStopWithParams : (MTRBarrierControlClusterBarrierControlStopParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)barrierControlStopWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeBarrierMovingStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -8610,6 +9305,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Pump Configuration and Control
  *
+ * An interface for configuring and controlling pumps.
  */
 @interface MTRBaseClusterPumpConfigurationAndControl : MTRCluster
 
@@ -9024,6 +9720,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Thermostat
  *
+ * An interface for configuring and controlling the functionality of a thermostat.
  */
 @interface MTRBaseClusterThermostat : MTRCluster
 
@@ -9031,15 +9728,37 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
-                          completion:(MTRStatusCompletion)completion;
-- (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
-                         completion:(MTRStatusCompletion)completion;
-- (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
-                         completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completion;
-- (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
-                           completion:(MTRStatusCompletion)completion;
+/**
+ * Command SetpointRaiseLower
+ *
+ * Command description for SetpointRaiseLower
+ */
+-(void) setpointRaiseLowerWithParams : (MTRThermostatClusterSetpointRaiseLowerParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SetWeeklySchedule
+ *
+ * Command description for SetWeeklySchedule
+ */
+-(void) setWeeklyScheduleWithParams : (MTRThermostatClusterSetWeeklyScheduleParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command GetWeeklySchedule
+ *
+ * Command description for GetWeeklySchedule
+ */
+-(void) getWeeklyScheduleWithParams : (MTRThermostatClusterGetWeeklyScheduleParams *) params completion
+    : (void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ClearWeeklySchedule
+ *
+ * The Clear Weekly Schedule command is used to clear the weekly schedule.
+ */
+-(void) clearWeeklyScheduleWithParams : (MTRThermostatClusterClearWeeklyScheduleParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)clearWeeklyScheduleWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeLocalTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
@@ -9968,6 +10687,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Fan Control
  *
+ * An interface for controlling a fan in a heating/cooling system.
  */
 @interface MTRBaseClusterFanControl : MTRCluster
 
@@ -10223,6 +10943,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Thermostat User Interface Configuration
  *
+ * An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
  */
 @interface MTRBaseClusterThermostatUserInterfaceConfiguration : MTRCluster
 
@@ -10366,6 +11087,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Color Control
  *
+ * Attributes and commands for controlling the color properties of a color-capable light.
  */
 @interface MTRBaseClusterColorControl : MTRCluster
 
@@ -10373,32 +11095,149 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
-                        completion:(MTRStatusCompletion)completion;
-- (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
-                              completion:(MTRStatusCompletion)completion;
-- (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
-                              completion:(MTRStatusCompletion)completion;
-- (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
-                         completion:(MTRStatusCompletion)completion;
-- (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params completion:(MTRStatusCompletion)completion;
-- (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
-                                      completion:(MTRStatusCompletion)completion;
-- (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params completion:(MTRStatusCompletion)completion;
-- (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params completion:(MTRStatusCompletion)completion;
-- (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
-                            completion:(MTRStatusCompletion)completion;
-- (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
-                            completion:(MTRStatusCompletion)completion;
+/**
+ * Command MoveToHue
+ *
+ * Move to specified hue.
+ */
+-(void) moveToHueWithParams : (MTRColorControlClusterMoveToHueParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveHue
+ *
+ * Move hue up or down at specified rate.
+ */
+-(void) moveHueWithParams : (MTRColorControlClusterMoveHueParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command StepHue
+ *
+ * Step hue up or down by specified size at specified rate.
+ */
+-(void) stepHueWithParams : (MTRColorControlClusterStepHueParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToSaturation
+ *
+ * Move to specified saturation.
+ */
+-(void) moveToSaturationWithParams : (MTRColorControlClusterMoveToSaturationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveSaturation
+ *
+ * Move saturation up or down at specified rate.
+ */
+-(void) moveSaturationWithParams : (MTRColorControlClusterMoveSaturationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StepSaturation
+ *
+ * Step saturation up or down by specified size at specified rate.
+ */
+-(void) stepSaturationWithParams : (MTRColorControlClusterStepSaturationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToHueAndSaturation
+ *
+ * Move to hue and saturation.
+ */
+-(void) moveToHueAndSaturationWithParams : (MTRColorControlClusterMoveToHueAndSaturationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToColor
+ *
+ * Move to specified color.
+ */
+-(void) moveToColorWithParams : (MTRColorControlClusterMoveToColorParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveColor
+ *
+ * Moves the color.
+ */
+-(void) moveColorWithParams : (MTRColorControlClusterMoveColorParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command StepColor
+ *
+ * Steps the lighting to a specific color.
+ */
+-(void) stepColorWithParams : (MTRColorControlClusterStepColorParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveToColorTemperature
+ *
+ * Move to a specific color temperature.
+ */
+-(void) moveToColorTemperatureWithParams : (MTRColorControlClusterMoveToColorTemperatureParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnhancedMoveToHue
+ *
+ * Command description for EnhancedMoveToHue
+ */
+-(void) enhancedMoveToHueWithParams : (MTRColorControlClusterEnhancedMoveToHueParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnhancedMoveHue
+ *
+ * Command description for EnhancedMoveHue
+ */
+-(void) enhancedMoveHueWithParams : (MTRColorControlClusterEnhancedMoveHueParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnhancedStepHue
+ *
+ * Command description for EnhancedStepHue
+ */
+-(void) enhancedStepHueWithParams : (MTRColorControlClusterEnhancedStepHueParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command EnhancedMoveToHueAndSaturation
+ *
+ * Command description for EnhancedMoveToHueAndSaturation
+ */
+-(void) enhancedMoveToHueAndSaturationWithParams : (MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command ColorLoopSet
+ *
+ * Command description for ColorLoopSet
+ */
+-(void) colorLoopSetWithParams : (MTRColorControlClusterColorLoopSetParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command StopMoveStep
+ *
+ * Command description for StopMoveStep
+ */
+-(void) stopMoveStepWithParams : (MTRColorControlClusterStopMoveStepParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command MoveColorTemperature
+ *
+ * Command description for MoveColorTemperature
+ */
+-(void) moveColorTemperatureWithParams : (MTRColorControlClusterMoveColorTemperatureParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command StepColorTemperature
+ *
+ * Command description for StepColorTemperature
+ */
+-(void) stepColorTemperatureWithParams : (MTRColorControlClusterStepColorTemperatureParams *) params completion
+    : (MTRStatusCompletion) completion;
 
 - (void)readAttributeCurrentHueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -11264,6 +12103,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Ballast Configuration
  *
+ * Attributes and commands for configuring a lighting ballast.
  */
 @interface MTRBaseClusterBallastConfiguration : MTRCluster
 
@@ -11584,6 +12424,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Illuminance Measurement
  *
+ * Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
  */
 @interface MTRBaseClusterIlluminanceMeasurement : MTRCluster
 
@@ -11737,6 +12578,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Temperature Measurement
  *
+ * Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
  */
 @interface MTRBaseClusterTemperatureMeasurement : MTRCluster
 
@@ -11876,6 +12718,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Pressure Measurement
  *
+ * Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
  */
 @interface MTRBaseClusterPressureMeasurement : MTRCluster
 
@@ -12083,6 +12926,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Flow Measurement
  *
+ * Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
  */
 @interface MTRBaseClusterFlowMeasurement : MTRCluster
 
@@ -12222,6 +13066,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Relative Humidity Measurement
  *
+ * Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.
  */
 @interface MTRBaseClusterRelativeHumidityMeasurement : MTRCluster
 
@@ -12361,6 +13206,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Occupancy Sensing
  *
+ * Attributes and commands for configuring occupancy sensing, and reporting occupancy status.
  */
 @interface MTRBaseClusterOccupancySensing : MTRCluster
 
@@ -12412,65 +13258,65 @@ NS_ASSUME_NONNULL_BEGIN
                                                          completion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion;
 
-- (void)readAttributePirOccupiedToUnoccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIROccupiedToUnoccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler;
-+ (void)readAttributePirOccupiedToUnoccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributePIROccupiedToUnoccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                               endpoint:(NSNumber *)endpoint
                                                                  queue:(dispatch_queue_t)queue
                                                             completion:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))completion;
 
-- (void)readAttributePirUnoccupiedToOccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIRUnoccupiedToOccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler;
-+ (void)readAttributePirUnoccupiedToOccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributePIRUnoccupiedToOccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                               endpoint:(NSNumber *)endpoint
                                                                  queue:(dispatch_queue_t)queue
                                                             completion:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))completion;
 
-- (void)readAttributePirUnoccupiedToOccupiedThresholdWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIRUnoccupiedToOccupiedThresholdWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                      completion:(MTRStatusCompletion)completion;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                          params:(MTRWriteParams * _Nullable)params
                                                      completion:(MTRStatusCompletion)completion;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))reportHandler;
-+ (void)readAttributePirUnoccupiedToOccupiedThresholdWithClusterStateCache:
++ (void)readAttributePIRUnoccupiedToOccupiedThresholdWithClusterStateCache:
             (MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                                   endpoint:(NSNumber *)endpoint
                                                                      queue:(dispatch_queue_t)queue
@@ -12693,8 +13539,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Wake on LAN
  *
+ * This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
  */
-@interface MTRBaseClusterWakeOnLan : MTRCluster
+@interface MTRBaseClusterWakeOnLAN : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                                 endpoint:(NSNumber *)endpoint
@@ -12791,6 +13638,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Channel
  *
+ * This cluster provides an interface for controlling the current Channel on a device.
  */
 @interface MTRBaseClusterChannel : MTRCluster
 
@@ -12798,12 +13646,31 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
-                     completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion;
-- (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
-                             completion:(MTRStatusCompletion)completion;
-- (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command ChangeChannel
+ *
+ * Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument.
+ */
+-(void) changeChannelWithParams : (MTRChannelClusterChangeChannelParams *) params completion
+    : (void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command ChangeChannelByNumber
+ *
+ * Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.
+ */
+-(void) changeChannelByNumberWithParams : (MTRChannelClusterChangeChannelByNumberParams *) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command SkipChannel
+ *
+ * This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of
+ * the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to
+ * return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count
+ * value of -1 is given, then the current channel should change to the last channel.
+ */
+-(void) skipChannelWithParams : (MTRChannelClusterSkipChannelParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeChannelListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -12928,6 +13795,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Target Navigator
  *
+ * This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
  */
 @interface MTRBaseClusterTargetNavigator : MTRCluster
 
@@ -12935,9 +13803,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
-                      completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completion;
+/**
+ * Command NavigateTarget
+ *
+ * Upon receipt, this SHALL navigation the UX to the target identified.
+ */
+-(void) navigateTargetWithParams : (MTRTargetNavigatorClusterNavigateTargetParams *) params completion
+    : (void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeTargetListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13043,6 +13915,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Media Playback
  *
+ * This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.
  */
 @interface MTRBaseClusterMediaPlayback : MTRCluster
 
@@ -13050,55 +13923,114 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
-            completion:
-                (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+/**
+ * Command Play
+ *
+ * Upon receipt, this SHALL play media.
+ */
+-(void) playWithParams : (MTRMediaPlaybackClusterPlayParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)playWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                NSError * _Nullable error))completion;
-- (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
-             completion:
-                 (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+
+/**
+ * Command Pause
+ *
+ * Upon receipt, this SHALL pause media.
+ */
+-(void) pauseWithParams : (MTRMediaPlaybackClusterPauseParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)pauseWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion;
-- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
-                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion;
+
+/**
+ * Command StopPlayback
+ *
+ * Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location
+ * where media was originally launched.
+ */
+-(void) stopPlaybackWithParams : (MTRMediaPlaybackClusterStopPlaybackParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)stopPlaybackWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion;
-- (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
-                 completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                NSError * _Nullable error))completion;
+
+/**
+ * Command StartOver
+ *
+ * Upon receipt, this SHALL Start Over with the current media playback item.
+ */
+-(void) startOverWithParams : (MTRMediaPlaybackClusterStartOverParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)startOverWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion;
-- (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
-                completion:
-                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+
+/**
+ * Command Previous
+ *
+ * Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go
+ * back to the previous media playback item.
+ */
+-(void) previousWithParams : (MTRMediaPlaybackClusterPreviousParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)previousWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion;
-- (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
-            completion:
-                (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+
+/**
+ * Command Next
+ *
+ * Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go
+ * forward to the next media playback item.
+ */
+-(void) nextWithParams : (MTRMediaPlaybackClusterNextParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)nextWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                NSError * _Nullable error))completion;
-- (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
-              completion:
-                  (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+
+/**
+ * Command Rewind
+ *
+ * Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential
+ * calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).
+ */
+-(void) rewindWithParams : (MTRMediaPlaybackClusterRewindParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)rewindWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion;
-- (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
-                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completion;
+
+/**
+ * Command FastForward
+ *
+ * Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential
+ * calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).
+ */
+-(void) fastForwardWithParams : (MTRMediaPlaybackClusterFastForwardParams * _Nullable) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)fastForwardWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion;
-- (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
-                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completion;
-- (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
-                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion;
-- (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
-            completion:
-                (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion;
+
+/**
+ * Command SkipForward
+ *
+ * Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:
+ */
+-(void) skipForwardWithParams : (MTRMediaPlaybackClusterSkipForwardParams *) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command SkipBackward
+ *
+ * Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
+ */
+-(void) skipBackwardWithParams : (MTRMediaPlaybackClusterSkipBackwardParams *) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command Seek
+ *
+ * Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
+ */
+-(void) seekWithParams : (MTRMediaPlaybackClusterSeekParams *) params completion
+    : (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeCurrentStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13273,6 +14205,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Media Input
  *
+ * This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
  */
 @interface MTRBaseClusterMediaInput : MTRCluster
 
@@ -13280,14 +14213,38 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params completion:(MTRStatusCompletion)completion;
-- (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion;
+/**
+ * Command SelectInput
+ *
+ * Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.
+ */
+-(void) selectInputWithParams : (MTRMediaInputClusterSelectInputParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command ShowInputStatus
+ *
+ * Upon receipt, this SHALL display the active status of the input list on screen.
+ */
+-(void) showInputStatusWithParams : (MTRMediaInputClusterShowInputStatusParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)showInputStatusWithCompletion:(MTRStatusCompletion)completion;
-- (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command HideInputStatus
+ *
+ * Upon receipt, this SHALL hide the input list from the screen.
+ */
+-(void) hideInputStatusWithParams : (MTRMediaInputClusterHideInputStatusParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)hideInputStatusWithCompletion:(MTRStatusCompletion)completion;
-- (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command RenameInput
+ *
+ * Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV
+ * settings menus.
+ */
+-(void) renameInputWithParams : (MTRMediaInputClusterRenameInputParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeInputListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13393,6 +14350,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Low Power
  *
+ * This cluster provides an interface for managing low power mode on a device.
  */
 @interface MTRBaseClusterLowPower : MTRCluster
 
@@ -13400,7 +14358,12 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command Sleep
+ *
+ * This command shall put the device into low power mode.
+ */
+-(void) sleepWithParams : (MTRLowPowerClusterSleepParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)sleepWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -13481,6 +14444,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Keypad Input
  *
+ * This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.
  */
 @interface MTRBaseClusterKeypadInput : MTRCluster
 
@@ -13488,9 +14452,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
-               completion:
-                   (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion;
+/**
+ * Command SendKey
+ *
+ * Upon receipt, this SHALL process a keycode as input to the media device.
+ */
+-(void) sendKeyWithParams : (MTRKeypadInputClusterSendKeyParams *) params completion
+    : (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13570,6 +14538,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Content Launcher
  *
+ * This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
  */
 @interface MTRBaseClusterContentLauncher : MTRCluster
 
@@ -13577,12 +14546,21 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
-                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion;
-- (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
-                 completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                NSError * _Nullable error))completion;
+/**
+ * Command LaunchContent
+ *
+ * Upon receipt, this SHALL launch the specified content with optional search criteria.
+ */
+-(void) launchContentWithParams : (MTRContentLauncherClusterLaunchContentParams *) params completion
+    : (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command LaunchURL
+ *
+ * Upon receipt, this SHALL launch content from the specified URL.
+ */
+-(void) launchURLWithParams : (MTRContentLauncherClusterLaunchURLParams *) params completion
+    : (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13695,6 +14673,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Audio Output
  *
+ * This cluster provides an interface for controlling the Output on a media device such as a TV.
  */
 @interface MTRBaseClusterAudioOutput : MTRCluster
 
@@ -13702,8 +14681,20 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params completion:(MTRStatusCompletion)completion;
-- (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command SelectOutput
+ *
+ * Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.
+ */
+-(void) selectOutputWithParams : (MTRAudioOutputClusterSelectOutputParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command RenameOutput
+ *
+ * Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the
+ * TV settings menus.
+ */
+-(void) renameOutputWithParams : (MTRAudioOutputClusterRenameOutputParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeOutputListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13809,6 +14800,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Application Launcher
  *
+ * This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
  */
 @interface MTRBaseClusterApplicationLauncher : MTRCluster
 
@@ -13816,15 +14808,32 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
-                 completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                NSError * _Nullable error))completion;
-- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
-               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion;
-- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
-               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion;
+/**
+ * Command LaunchApp
+ *
+ * Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the
+ * identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update
+ * state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns
+ * a Launch Response.
+ */
+-(void) launchAppWithParams : (MTRApplicationLauncherClusterLaunchAppParams *) params completion
+    : (void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command StopApp
+ *
+ * Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.
+ */
+-(void) stopAppWithParams : (MTRApplicationLauncherClusterStopAppParams *) params completion
+    : (void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command HideApp
+ *
+ * Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.
+ */
+-(void) hideAppWithParams : (MTRApplicationLauncherClusterHideAppParams *) params completion
+    : (void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeCatalogListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -13938,6 +14947,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Application Basic
  *
+ * This cluster provides information about an application running on a TV or media player device which is represented as an
+ * endpoint.
  */
 @interface MTRBaseClusterApplicationBasic : MTRCluster
 
@@ -14135,6 +15146,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Account Login
  *
+ * This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running
+ * on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user
+ * account on the Content App match the user account on the Client.
  */
 @interface MTRBaseClusterAccountLogin : MTRCluster
 
@@ -14142,11 +15156,32 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
-                   completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completion;
-- (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params completion:(MTRStatusCompletion)completion;
-- (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command GetSetupPIN
+ *
+ * Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same
+ * acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the
+ * GetSetupPIN Response.
+ */
+-(void) getSetupPINWithParams : (MTRAccountLoginClusterGetSetupPINParams *) params completion
+    : (void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command Login
+ *
+ * Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a
+ * current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account
+ * Identifier, then the Content App MAY make that user account active.
+ */
+-(void) loginWithParams : (MTRAccountLoginClusterLoginParams *) params completion : (MTRStatusCompletion) completion;
+
+/**
+ * Command Logout
+ *
+ * The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by
+ * clients of a Content App to indicate the end of a user session.
+ */
+-(void) logoutWithParams : (MTRAccountLoginClusterLogoutParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)logoutWithCompletion:(MTRStatusCompletion)completion;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
@@ -14227,6 +15262,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Electrical Measurement
  *
+ * Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to
+ * provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster..
  */
 @interface MTRBaseClusterElectricalMeasurement : MTRCluster
 
@@ -14234,11 +15271,23 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
-                             completion:(MTRStatusCompletion)completion;
+/**
+ * Command GetProfileInfoCommand
+ *
+ * A function which retrieves the power profiling information from the electrical measurement server.
+ */
+-(void) getProfileInfoCommandWithParams : (MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)getProfileInfoCommandWithCompletion:(MTRStatusCompletion)completion;
-- (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
-                                    completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command GetMeasurementProfileCommand
+ *
+ * A function which retrieves an electricity measurement profile from the electricity measurement server for a specific attribute Id
+ * requested.
+ */
+-(void) getMeasurementProfileCommandWithParams
+    : (MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *) params completion : (MTRStatusCompletion) completion;
 
 - (void)readAttributeMeasurementTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 /**
@@ -16289,6 +17338,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Cluster Test Cluster
  *
+ * The Test Cluster is meant to validate the generated code
  */
 @interface MTRBaseClusterTestCluster : MTRCluster
 
@@ -16296,79 +17346,217 @@ NS_ASSUME_NONNULL_BEGIN
                                 endpoint:(NSNumber *)endpoint
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
-- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params completion:(MTRStatusCompletion)completion;
+/**
+ * Command Test
+ *
+ * Simple command without any parameters and without a specific response
+ */
+-(void) testWithParams : (MTRTestClusterClusterTestParams * _Nullable) params completion : (MTRStatusCompletion) completion;
 - (void)testWithCompletion:(MTRStatusCompletion)completion;
-- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
-                      completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command TestNotHandled
+ *
+ * Simple command without any parameters and without a specific response not handled by the server
+ */
+-(void) testNotHandledWithParams : (MTRTestClusterClusterTestNotHandledParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)testNotHandledWithCompletion:(MTRStatusCompletion)completion;
-- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
-                    completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion;
+
+/**
+ * Command TestSpecific
+ *
+ * Simple command without any parameters and with a specific response
+ */
+-(void) testSpecificWithParams : (MTRTestClusterClusterTestSpecificParams * _Nullable) params completion
+    : (void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 - (void)testSpecificWithCompletion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion;
-- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
-                          completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command TestUnknownCommand
+ *
+ * Simple command that should not be added to the server.
+ */
+-(void) testUnknownCommandWithParams : (MTRTestClusterClusterTestUnknownCommandParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)testUnknownCommandWithCompletion:(MTRStatusCompletion)completion;
-- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
-                        completion:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completion;
-- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
-                                 completion:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completion;
-- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
-                                      completion:
-                                          (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completion;
-- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
-                                 completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completion;
-- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
-                                       completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                      NSError * _Nullable error))completion;
-- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
-                                     completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                    NSError * _Nullable error))completion;
-- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
-                                    completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                   NSError * _Nullable error))completion;
-- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
-                                           completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                          NSError * _Nullable error))completion;
-- (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
-                                               completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                              NSError * _Nullable error))completion;
-- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
-                                   completion:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completion;
-- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
-                        completion:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completion;
-- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
-                                   completion:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completion;
-- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
-                                          completion:
-                                              (void (^)(
-                                                  MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completion;
-- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
-                               completion:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completion;
-- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
-                          completion:(MTRStatusCompletion)completion;
+
+/**
+ * Command TestAddArguments
+ *
+ * Command that takes two arguments and returns their sum.
+ */
+-(void) testAddArgumentsWithParams : (MTRTestClusterClusterTestAddArgumentsParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestSimpleArgumentRequest
+ *
+ * Command that takes an argument which is bool
+ */
+-(void) testSimpleArgumentRequestWithParams : (MTRTestClusterClusterTestSimpleArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestStructArrayArgumentRequest
+ *
+ * Command that takes various arguments that are arrays, including an array of structs which have a list member.
+ */
+-(void) testStructArrayArgumentRequestWithParams : (MTRTestClusterClusterTestStructArrayArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestStructArgumentRequest
+ *
+ * Command that takes an argument which is struct.  The response echoes the
+        'b' field of the single arg.
+ */
+-(void) testStructArgumentRequestWithParams : (MTRTestClusterClusterTestStructArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestNestedStructArgumentRequest
+ *
+ * Command that takes an argument which is nested struct.  The response
+        echoes the 'b' field of ar1.c.
+ */
+-(void) testNestedStructArgumentRequestWithParams : (MTRTestClusterClusterTestNestedStructArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestListStructArgumentRequest
+ *
+ * Command that takes an argument which is a list of structs.  The response
+        returns false if there is some struct in the list whose 'b' field is
+        false, and true otherwise (including if the list is empty).
+ */
+-(void) testListStructArgumentRequestWithParams : (MTRTestClusterClusterTestListStructArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestListInt8UArgumentRequest
+ *
+ * Command that takes an argument which is a list of INT8U.  The response
+        returns false if the list contains a 0 in it, true otherwise (including
+        if the list is empty).
+ */
+-(void) testListInt8UArgumentRequestWithParams : (MTRTestClusterClusterTestListInt8UArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestNestedStructListArgumentRequest
+ *
+ * Command that takes an argument which is a Nested Struct List.  The
+        response returns false if there is some struct in arg1 (either directly
+        in arg1.c or in the arg1.d list) whose 'b' field is false, and true
+        otherwise.
+ */
+-(void) testNestedStructListArgumentRequestWithParams
+    : (MTRTestClusterClusterTestNestedStructListArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestListNestedStructListArgumentRequest
+ *
+ * Command that takes an argument which is a list of Nested Struct List.
+        The response returns false if there is some struct in arg1 (either
+        directly in as the 'c' field of an entry 'd' list of an entry) whose 'b'
+        field is false, and true otherwise (including if the list is empty).
+ */
+-(void) testListNestedStructListArgumentRequestWithParams
+    : (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestListInt8UReverseRequest
+ *
+ * Command that takes an argument which is a list of INT8U and expects a
+        response that reverses the list.
+ */
+-(void) testListInt8UReverseRequestWithParams : (MTRTestClusterClusterTestListInt8UReverseRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestEnumsRequest
+ *
+ * Command that sends a vendor id and an enum.  The server is expected to
+        echo them back.
+ */
+-(void) testEnumsRequestWithParams : (MTRTestClusterClusterTestEnumsRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestNullableOptionalRequest
+ *
+ * Command that takes an argument which is nullable and optional.  The
+        response returns a boolean indicating whether the argument was present,
+        if that's true a boolean indicating whether the argument was null, and
+        if that' false the argument it received.
+ */
+-(void) testNullableOptionalRequestWithParams
+    : (MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable) params completion
+    : (void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestComplexNullableOptionalRequest
+ *
+ * Command that takes various arguments which can be nullable and/or optional.  The
+        response returns information about which things were received and what
+        their state was.
+ */
+-(void) testComplexNullableOptionalRequestWithParams
+    : (MTRTestClusterClusterTestComplexNullableOptionalRequestParams *) params completion
+    : (void (^)(
+          MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command SimpleStructEchoRequest
+ *
+ * Command that takes an argument which is a struct.  The response echoes
+        the struct back.
+ */
+-(void) simpleStructEchoRequestWithParams : (MTRTestClusterClusterSimpleStructEchoRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TimedInvokeRequest
+ *
+ * Command that just responds with a success status if the timed invoke
+        conditions are met.
+ */
+-(void) timedInvokeRequestWithParams : (MTRTestClusterClusterTimedInvokeRequestParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
 - (void)timedInvokeRequestWithCompletion:(MTRStatusCompletion)completion;
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
-                                         completion:(MTRStatusCompletion)completion;
-- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
-                                completion:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completion;
-- (void)
-    testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
-                                        completion:
-                                            (void (^)(
-                                                MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completion;
+
+/**
+ * Command TestSimpleOptionalArgumentRequest
+ *
+ * Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value.
+ */
+-(void) testSimpleOptionalArgumentRequestWithParams
+    : (MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable) params completion
+    : (MTRStatusCompletion) completion;
+
+/**
+ * Command TestEmitTestEventRequest
+ *
+ * Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an
+ * event ID as the response.
+ */
+-(void) testEmitTestEventRequestWithParams : (MTRTestClusterClusterTestEmitTestEventRequestParams *) params completion
+    : (void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data, NSError * _Nullable error)) completion;
+
+/**
+ * Command TestEmitTestFabricScopedEventRequest
+ *
+ * Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the
+ * buffer.  Command returns an event ID as the response.
+ */
+-(void) testEmitTestFabricScopedEventRequestWithParams
+    : (MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *) params completion
+    : (void (^)(
+          MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data, NSError * _Nullable error)) completion;
 
 - (void)readAttributeBooleanWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
@@ -18046,50 +19234,50 @@ typedef NS_OPTIONS(uint16_t, MTRActionsCommandBits) {
     MTRActionsCommandBitsDisableActionWithDuration = 0x800,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAApplyUpdateAction) {
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTADownloadProtocol) {
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTADownloadProtocol) {
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAQueryStatus) {
-    MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAQueryStatus) {
+    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
+    MTROTASoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
+    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
+    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAAnnouncementReason) {
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAAnnouncementReason) {
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAChangeReason) {
+    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
 };
 
-typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAUpdateState) {
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
+    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
 };
 
 typedef NS_ENUM(uint8_t, MTRTimeFormatLocalizationCalendarType) {

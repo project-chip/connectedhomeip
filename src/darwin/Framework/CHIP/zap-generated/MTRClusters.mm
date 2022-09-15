@@ -2647,20 +2647,20 @@ using chip::SessionHandle;
     return self;
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeAccessControlID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID)
                                              params:params];
 }
 
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeAclWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeACLWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             params:(MTRWriteParams * _Nullable)params
 {
@@ -2668,7 +2668,7 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeAccessControlID)
-                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
+                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3627,7 +3627,7 @@ using chip::SessionHandle;
 
 @end
 
-@implementation MTRClusterOtaSoftwareUpdateProvider
+@implementation MTRClusterOTASoftwareUpdateProvider
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
@@ -3642,17 +3642,17 @@ using chip::SessionHandle;
     return self;
 }
 
-- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+- (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                  completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
     MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
                                                             controller:self.device.deviceController];
-    new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+    new MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
             ListFreer listFreer;
@@ -3705,7 +3705,7 @@ using chip::SessionHandle;
                 definedValue_0 = [self asByteSpan:params.metadataForProvider];
             }
 
-            auto successFn = Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
             chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
             return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
@@ -3714,17 +3714,17 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+- (void)applyUpdateRequestWithParams:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                          completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
     MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
                                                             controller:self.device.deviceController];
-    new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+    new MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
             ListFreer listFreer;
@@ -3737,7 +3737,7 @@ using chip::SessionHandle;
             request.updateToken = [self asByteSpan:params.updateToken];
             request.newVersion = params.newVersion.unsignedIntValue;
 
-            auto successFn = Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
             chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
             return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
@@ -3746,7 +3746,7 @@ using chip::SessionHandle;
     [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
 }
 
-- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+- (void)notifyUpdateAppliedWithParams:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
@@ -3785,8 +3785,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID)
                              params:params];
 }
 
@@ -3794,38 +3794,38 @@ using chip::SessionHandle;
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID)
+                                       clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID)
                                           params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID)
                                              params:params];
 }
 
 @end
 
-@implementation MTRClusterOtaSoftwareUpdateRequestor
+@implementation MTRClusterOTASoftwareUpdateRequestor
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
@@ -3840,7 +3840,7 @@ using chip::SessionHandle;
     return self;
 }
 
-- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
@@ -3886,8 +3886,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
                              params:params];
 }
 
@@ -3903,8 +3903,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                                    clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3913,16 +3913,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUpdatePossibleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID)
                                              params:params];
 }
 
@@ -3930,8 +3930,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID)
                              params:params];
 }
 
@@ -3939,8 +3939,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID)
                              params:params];
 }
 
@@ -3948,32 +3948,32 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID)
                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14706,23 +14706,23 @@ using chip::SessionHandle;
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
                                        clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID)
                                           params:params];
 }
 
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirOccupiedToUnoccupiedDelayWithValue:dataValueDictionary
+    [self writeAttributePIROccupiedToUnoccupiedDelayWithValue:dataValueDictionary
                                         expectedValueInterval:expectedValueIntervalMs
                                                        params:nil];
 }
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                      params:(MTRWriteParams * _Nullable)params
 {
@@ -14730,29 +14730,29 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
                                        clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID)
                                           params:params];
 }
 
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirUnoccupiedToOccupiedDelayWithValue:dataValueDictionary
+    [self writeAttributePIRUnoccupiedToOccupiedDelayWithValue:dataValueDictionary
                                         expectedValueInterval:expectedValueIntervalMs
                                                        params:nil];
 }
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                      params:(MTRWriteParams * _Nullable)params
 {
@@ -14760,29 +14760,29 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID)
                              params:params];
 }
 
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
+    [self writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
                                             expectedValueInterval:expectedValueIntervalMs
                                                            params:nil];
 }
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                          params:(MTRWriteParams * _Nullable)params
 {
@@ -14791,7 +14791,7 @@ using chip::SessionHandle;
     [self.device
         writeAttributeWithEndpointID:@(_endpoint)
                            clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID)
                                value:dataValueDictionary
                expectedValueInterval:expectedValueIntervalMs
                    timedWriteTimeout:timedWriteTimeout];
@@ -15028,7 +15028,7 @@ using chip::SessionHandle;
 
 @end
 
-@implementation MTRClusterWakeOnLan
+@implementation MTRClusterWakeOnLAN
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
@@ -15046,48 +15046,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID)
                                              params:params];
 }
 

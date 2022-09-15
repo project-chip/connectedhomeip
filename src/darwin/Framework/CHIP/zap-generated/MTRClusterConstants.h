@@ -34,8 +34,8 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeAccessControlID = 0x0000001F,
     MTRClusterIDTypeActionsID = 0x00000025,
     MTRClusterIDTypeBasicID = 0x00000028,
-    MTRClusterIDTypeOtaSoftwareUpdateProviderID = 0x00000029,
-    MTRClusterIDTypeOtaSoftwareUpdateRequestorID = 0x0000002A,
+    MTRClusterIDTypeOTASoftwareUpdateProviderID = 0x00000029,
+    MTRClusterIDTypeOTASoftwareUpdateRequestorID = 0x0000002A,
     MTRClusterIDTypeLocalizationConfigurationID = 0x0000002B,
     MTRClusterIDTypeTimeFormatLocalizationID = 0x0000002C,
     MTRClusterIDTypeUnitLocalizationID = 0x0000002D,
@@ -77,7 +77,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeFlowMeasurementID = 0x00000404,
     MTRClusterIDTypeRelativeHumidityMeasurementID = 0x00000405,
     MTRClusterIDTypeOccupancySensingID = 0x00000406,
-    MTRClusterIDTypeWakeOnLanID = 0x00000503,
+    MTRClusterIDTypeWakeOnLANID = 0x00000503,
     MTRClusterIDTypeChannelID = 0x00000504,
     MTRClusterIDTypeTargetNavigatorID = 0x00000505,
     MTRClusterIDTypeMediaPlaybackID = 0x00000506,
@@ -226,7 +226,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AccessControl attributes
-    MTRAttributeIDTypeClusterAccessControlAttributeAclID = 0x00000000,
+    MTRAttributeIDTypeClusterAccessControlAttributeACLID = 0x00000000,
     MTRAttributeIDTypeClusterAccessControlAttributeExtensionID = 0x00000001,
     MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID = 0x00000002,
     MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID = 0x00000003,
@@ -274,28 +274,28 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBasicAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster OtaSoftwareUpdateProvider attributes
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID
+    // Cluster OTASoftwareUpdateProvider attributes
+    MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID
+    MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID
+    MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster OtaSoftwareUpdateRequestor attributes
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID = 0x00000000,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID = 0x00000001,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID = 0x00000002,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID = 0x00000003,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID
+    // Cluster OTASoftwareUpdateRequestor attributes
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID = 0x00000000,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID = 0x00000001,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID = 0x00000002,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID = 0x00000003,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster LocalizationConfiguration attributes
@@ -1090,9 +1090,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID = 0x00000000,
     MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID = 0x00000001,
     MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID = 0x00000002,
-    MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID = 0x00000010,
-    MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID = 0x00000011,
-    MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID = 0x00000012,
+    MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID = 0x00000010,
+    MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID = 0x00000011,
+    MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID = 0x00000012,
     MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID = 0x00000020,
     MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID = 0x00000021,
     MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID = 0x00000022,
@@ -1107,13 +1107,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster WakeOnLan attributes
-    MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID = 0x00000000,
-    MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    // Cluster WakeOnLAN attributes
+    MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID = 0x00000000,
+    MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Channel attributes
     MTRAttributeIDTypeClusterChannelAttributeChannelListID = 0x00000000,
@@ -1537,15 +1537,15 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster Basic commands
     MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID = 0x10020000,
 
-    // Cluster OtaSoftwareUpdateProvider commands
-    MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID = 0x00000000,
-    MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID = 0x00000001,
-    MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID = 0x00000002,
-    MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID = 0x00000003,
-    MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID = 0x00000004,
+    // Cluster OTASoftwareUpdateProvider commands
+    MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID = 0x00000000,
+    MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageResponseID = 0x00000001,
+    MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID = 0x00000002,
+    MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateResponseID = 0x00000003,
+    MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID = 0x00000004,
 
-    // Cluster OtaSoftwareUpdateRequestor commands
-    MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID = 0x00000000,
+    // Cluster OTASoftwareUpdateRequestor commands
+    MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID = 0x00000000,
 
     // Cluster GeneralCommissioning commands
     MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID = 0x00000000,
@@ -1808,10 +1808,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBasicEventLeaveID = 0x00000002,
     MTREventIDTypeClusterBasicEventReachableChangedID = 0x00000003,
 
-    // Cluster OtaSoftwareUpdateRequestor events
-    MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventStateTransitionID = 0x00000000,
-    MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventVersionAppliedID = 0x00000001,
-    MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventDownloadErrorID = 0x00000002,
+    // Cluster OTASoftwareUpdateRequestor events
+    MTREventIDTypeClusterOTASoftwareUpdateRequestorEventStateTransitionID = 0x00000000,
+    MTREventIDTypeClusterOTASoftwareUpdateRequestorEventVersionAppliedID = 0x00000001,
+    MTREventIDTypeClusterOTASoftwareUpdateRequestorEventDownloadErrorID = 0x00000002,
 
     // Cluster GeneralDiagnostics events
     MTREventIDTypeClusterGeneralDiagnosticsEventHardwareFaultChangeID = 0x00000000,

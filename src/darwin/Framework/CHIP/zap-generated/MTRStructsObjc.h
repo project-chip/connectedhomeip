@@ -180,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeID;
 @property (nonatomic, copy) NSNumber * _Nonnull endpoint;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
@@ -189,7 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousState;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 @property (nonatomic, copy) NSNumber * _Nonnull reason;
@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull productID;
 
@@ -207,7 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded;
 @property (nonatomic, copy) NSNumber * _Nullable progressPercent;
