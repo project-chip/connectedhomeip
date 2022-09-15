@@ -47,8 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
-       params:(MTRSubscribeParams * _Nullable)params
+- (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams *)params
 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion;

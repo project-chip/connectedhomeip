@@ -126,12 +126,12 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Initialize the device object with the given node id and controller.  This
+ * Create a device object with the given node id and controller.  This
  * will always succeed, even if there is no such node id on the controller's
  * fabric, but attempts to actually use the MTRBaseDevice will fail
  * (asynchronously) in that case.
  */
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -173,9 +173,7 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -254,9 +252,7 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
                                    clusterID:(NSNumber * _Nullable)clusterID
                                  attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
+                                      params:(MTRSubscribeParams *)params
                                        queue:(dispatch_queue_t)queue
                                reportHandler:(MTRDeviceResponseHandler)reportHandler
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
@@ -292,9 +288,25 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
-@interface MTRAttributePath : NSObject <NSCopying>
+/**
+ * A path indicating a specific cluster on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRClusterPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
+
++ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * A path indicating a specific attribute on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRAttributePath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -305,9 +317,12 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTREventPath : NSObject
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
+/**
+ * A path indicating a specific event that can be emitted on a device
+ * (i.e. without any wildcards).  There can be multiple instances of actual
+ * events for a given event path.
+ */
+@interface MTREventPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * event;
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID;
@@ -316,9 +331,11 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTRCommandPath : NSObject
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
+/**
+ * A path indicating a specific command on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRCommandPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * command;
 
 + (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID;

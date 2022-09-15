@@ -30,13 +30,15 @@
 
 int main(int argc, const char * argv[])
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsInteractive(commands);
-    registerCommandsPayload(commands);
-    registerClusterOtaSoftwareUpdateProviderInteractive(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
+    @autoreleasepool {
+        Commands commands;
+        registerCommandsPairing(commands);
+        registerCommandsInteractive(commands);
+        registerCommandsPayload(commands);
+        registerClusterOtaSoftwareUpdateProviderInteractive(commands);
+        registerCommandsStorage(commands);
+        registerCommandsTests(commands);
+        registerClusters(commands);
+        return commands.Run(argc, (char **) argv);
+    }
 }

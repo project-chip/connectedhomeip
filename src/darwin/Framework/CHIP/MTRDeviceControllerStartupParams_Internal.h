@@ -83,12 +83,12 @@ NS_ASSUME_NONNULL_BEGIN
                              keystore:(chip::Crypto::OperationalKeystore *)keystore
                                params:(MTRDeviceControllerStartupParams *)params;
 
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk NS_UNAVAILABLE;
-- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
-                                       ipk:(NSData *)ipk NS_UNAVAILABLE;
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner NS_UNAVAILABLE;
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes *)rootCertificate NS_UNAVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -39,7 +39,7 @@ MTROTAHeader * ParseOTAHeader(const char * otaFilePath)
     }
 
     NSError * error;
-    return [MTROTAHeaderParser headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
+    return [MTROTAHeader headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
 }
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters

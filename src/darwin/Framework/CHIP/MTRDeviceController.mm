@@ -20,10 +20,10 @@
 
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerDelegateBridge.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRDevicePairingDelegateBridge.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
@@ -73,6 +73,8 @@ static NSString * const kErrorKeyAllocation = @"Generating new operational key f
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
 static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
+static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
+static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
 @interface MTRDeviceController ()
 
@@ -81,19 +83,19 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
-@property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
+@property (readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
 @property (readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
-@property (readonly) MTRControllerFactory * factory;
+@property (readonly) MTRDeviceControllerFactory * factory;
 @property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
 @property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
 @end
 
 @implementation MTRDeviceController
 
-- (instancetype)initWithFactory:(MTRControllerFactory *)factory queue:(dispatch_queue_t)queue
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
         _chipWorkQueue = queue;
@@ -101,8 +103,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
 
-        _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
-        if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+        _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
+        if ([self checkForInitError:(_deviceControllerDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
             return nil;
         }
 
@@ -139,11 +141,10 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 - (void)cleanupAfterStartup
 {
     [_factory controllerShuttingDown:self];
-    [self cleanup];
 }
 
 // Part of cleanupAfterStartup that has to interact with the Matter work queue
-// in a very specific way that only MTRControllerFactory knows about.
+// in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
     if (_cppCommissioner) {
@@ -158,6 +159,11 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+}
+
+- (void)deinitFromFactory
+{
+    [self cleanup];
 }
 
 // Clean up any members we might have allocated.
@@ -177,9 +183,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         _partialDACVerifier = nullptr;
     }
 
-    if (_pairingDelegateBridge) {
-        delete _pairingDelegateBridge;
-        _pairingDelegateBridge = nullptr;
+    if (_deviceControllerDelegateBridge) {
+        delete _deviceControllerDelegateBridge;
+        _deviceControllerDelegateBridge = nullptr;
     }
 }
 
@@ -249,7 +255,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
         chip::Controller::SetupParams commissionerParams;
 
-        commissionerParams.pairingDelegate = _pairingDelegateBridge;
+        commissionerParams.pairingDelegate = _deviceControllerDelegateBridge;
 
         _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
 
@@ -357,10 +363,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return nodeID;
 }
 
-- (BOOL)pairDevice:(uint64_t)deviceID
-     discriminator:(uint16_t)discriminator
-      setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error;
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
 
@@ -368,67 +373,29 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning:error]);
 
-        std::string manualPairingCode;
-        chip::SetupPayload payload;
-        payload.discriminator.SetLongValue(discriminator);
-        payload.setUpPINCode = setupPINCode;
+        // Try to get a QR code if possible (because it has a better
+        // discriminator, etc), then fall back to manual code if that fails.
+        NSString * pairingCode = [payload qrCodeString];
+        if (pairingCode == nil) {
+            pairingCode = [payload manualEntryCode];
+        }
+        if (pairingCode == nil) {
+            success = ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
+            return;
+        }
 
-        auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        success = ![self checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
-        VerifyOrReturn(success);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
+        _operationalCredentialsDelegate->SetDeviceID(nodeId);
+        CHIP_ERROR errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
 
     return success;
 }
 
-- (BOOL)pairDevice:(uint64_t)deviceID
-           address:(NSString *)address
-              port:(uint16_t)port
-      setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        chip::Inet::IPAddress addr;
-        chip::Inet::IPAddress::FromString([address UTF8String], addr);
-        chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
-        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-
-    return success;
-}
-
-- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-    return success;
-}
-
-- (BOOL)commissionDevice:(uint64_t)deviceID
-     commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                   error:(NSError * __autoreleasing *)error
+- (BOOL)commissionNodeWithID:(NSNumber *)nodeID
+         commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                       error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
 
@@ -473,9 +440,10 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        auto errorCode = self.cppCommissioner->Commission(deviceID, params);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        chip::NodeId deviceId = [nodeID unsignedLongLongValue];
+        _operationalCredentialsDelegate->SetDeviceID(deviceId);
+        auto errorCode = self.cppCommissioner->Commission(deviceId, params);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
     return success;
 }
@@ -497,12 +465,12 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
         auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
     return success;
 }
 
-- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+- (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
 
@@ -511,14 +479,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning:error]);
 
         _operationalCredentialsDelegate->ResetDeviceID();
-        auto errorCode = self.cppCommissioner->StopPairing(deviceID);
-        success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        auto errorCode = self.cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
     });
-
     return success;
 }
 
-- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+- (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], nil);
 
@@ -528,42 +495,17 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning:error]);
 
-        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
-        success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([nodeID unsignedLongLongValue], &deviceProxy);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
     });
     VerifyOrReturnValue(success, nil);
 
     return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
 }
 
-- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completion:(MTRDeviceConnectionCallback)completion
+- (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
 {
-    NSError * error;
-    if (![self checkIsRunning:&error]) {
-        dispatch_async(queue, ^{
-            completion(nil, error);
-        });
-        return NO;
-    }
-
-    // We know getSessionForNode will return YES here, since we already checked
-    // that we are running.
-    return [self getSessionForNode:deviceID
-                        completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                            // Create an MTRBaseDevice for the node id involved, now that our
-                            // CASE session is primed.  We don't actually care about the session
-                            // information here.
-                            dispatch_async(queue, ^{
-                                MTRBaseDevice * device;
-                                if (error == nil) {
-                                    device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
-                                } else {
-                                    device = nil;
-                                }
-                                completion(device, error);
-                            });
-                        }];
+    return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
@@ -591,10 +533,10 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     os_unfair_lock_unlock(&_deviceMapLock);
 }
 
-- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     dispatch_async(_chipWorkQueue, ^{
-        self->_pairingDelegateBridge->setDelegate(delegate, queue);
+        self->_deviceControllerDelegateBridge->setDelegate(delegate, queue);
     });
 }
 
@@ -614,20 +556,23 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     });
 }
 
-+ (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
++ (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
+                                              iterations:(NSNumber *)iterations
+                                                    salt:(NSData *)salt
+                                                   error:(NSError * __autoreleasing *)error
 {
+    // Spake2pVerifier::Generate takes the passcode by non-const reference for some reason.
+    uint32_t unboxedSetupPasscode = [setupPasscode unsignedIntValue];
     chip::Spake2pVerifier verifier;
-    CHIP_ERROR err = verifier.Generate(iterations, AsByteSpan(salt), setupPincode);
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("computePaseVerifier generation failed: %s", chip::ErrorStr(err));
+    CHIP_ERROR err = verifier.Generate([iterations unsignedIntValue], AsByteSpan(salt), unboxedSetupPasscode);
+    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierGenerationFailed error:error]) {
         return nil;
     }
 
     uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
     chip::MutableByteSpan serializedBytes(serializedBuffer);
     err = verifier.Serialize(serializedBytes);
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("computePaseVerifier serialization failed: %s", chip::ErrorStr(err));
+    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierSerializationFailed error:error]) {
         return nil;
     }
 
@@ -644,14 +589,14 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
         chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
+        auto success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
         VerifyOrReturn(success);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);
 
         errorCode = deviceProxy->GetAttestationChallenge(challenge);
-        success = ![self checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
         VerifyOrReturn(success);
 
         attestationChallenge = AsData(challenge);
@@ -692,7 +637,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return YES;
 }
 
-- (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
++ (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
 {
     if (CHIP_NO_ERROR == errorCode) {
         return NO;
