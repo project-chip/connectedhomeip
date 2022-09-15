@@ -82,9 +82,9 @@ if (chip_enable_wifi) {
   enable_openthread_cli = false
 }
 
-# ThunderBoards and Explorer Kit (No LCD)
+# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
 if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
-    silabs_board == "BRD2703A") {
+    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
   show_qr_code = false
   disable_lcd = true
 }
