@@ -29,6 +29,7 @@ action("build-darwin-framework") {
 
   inputs = [
     "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
     "${chip_root}/src/darwin/Framework/Matter.xcodeproj",
   ]
 
