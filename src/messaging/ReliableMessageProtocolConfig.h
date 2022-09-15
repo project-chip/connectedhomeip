@@ -47,22 +47,6 @@ namespace chip {
 #endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
- *
- *  @brief
- *    Should an address lookup of the peer happen on every first message that fails
- *    to send on the link.
- *
- *  The default value selected to not perform lookup was for the following reasons:
- *    1. The likelihood of the IP address changing right away is extremely slim.
- *    2. On bad links, there resolutions occur extremely frequently, making the link
- *       worse.
- */
-#ifndef CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
-#define CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP 0
-#endif // CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
-
-/**
  *  @def CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
  *
  *  @brief
@@ -86,6 +70,22 @@ namespace chip {
 #ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 #define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT (200_ms32)
 #endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
+
+/**
+ *  @def CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+ *
+ *  @brief
+ *    Should an address lookup of the peer happen on every first message that fails
+ *    to send on the link.
+ *
+ *  The default value selected to not perform lookup was for the following reasons:
+ *    1. The likelihood of the IP address changing right away is extremely slim.
+ *    2. On bad links, there resolutions occur extremely frequently, making the link
+ *       worse.
+ */
+#ifndef CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+#define CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP 0
+#endif // CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
 
 /**
  *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
