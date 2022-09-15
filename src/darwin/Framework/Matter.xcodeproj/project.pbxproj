@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		029CCBE129073DE400D8F0F9 /* MTRLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 029CCBDF29073DE300D8F0F9 /* MTRLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		029CCBE229073DE400D8F0F9 /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 029CCBE029073DE400D8F0F9 /* MTRLogging.mm */; };
 		1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */; };
 		1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857307265519AE0050A4D9 /* callback-stub.cpp */; };
 		1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */; };
@@ -146,6 +148,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		029CCBDF29073DE300D8F0F9 /* MTRLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRLogger.h; sourceTree = "<group>"; };
+		029CCBE029073DE400D8F0F9 /* MTRLogging.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRLogging.mm; sourceTree = "<group>"; };
 		1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestOTAProvider.m; sourceTree = "<group>"; };
 		1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestOTAProvider.h; sourceTree = "<group>"; };
 		1E857307265519AE0050A4D9 /* callback-stub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "callback-stub.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/callback-stub.cpp"; sourceTree = "<group>"; };
@@ -411,7 +415,9 @@
 				B2E0D7AB245B0B5C003C5B48 /* MTRError_Internal.h */,
 				5129BCFC26A9EE3300122DDF /* MTRError.h */,
 				B2E0D7AA245B0B5C003C5B48 /* MTRError.mm */,
+				029CCBDF29073DE300D8F0F9 /* MTRLogger.h */,
 				991DC08A247704DC00C13860 /* MTRLogging.h */,
+				029CCBE029073DE400D8F0F9 /* MTRLogging.mm */,
 				B289D41F2639C0D300D4E314 /* MTROnboardingPayloadParser.h */,
 				B289D4202639C0D300D4E314 /* MTROnboardingPayloadParser.m */,
 				B2E0D7A9245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h */,
@@ -497,6 +503,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				029CCBE129073DE400D8F0F9 /* MTRLogger.h in Headers */,
 				517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */,
 				51E51FBF282AD37A00FC978D /* MTRDeviceControllerStartupParams.h in Headers */,
 				5136661628067D550025EDAE /* MTRControllerFactory.h in Headers */,
@@ -529,6 +536,7 @@
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
 				7596A84428762729004DAE0E /* MTRDevice.h in Headers */,
+				991DC08B247704DC00C13860 /* MTRLogging.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */,
 				7596A84D287782EF004DAE0E /* MTRAsyncCallbackWorkQueue_Internal.h in Headers */,
 				7596A83E28751220004DAE0E /* MTRBaseClusters_internal.h in Headers */,
@@ -556,7 +564,6 @@
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51E0310027EA20D20083DC9C /* MTRControllerAccessControl.h in Headers */,
 				7596A85628788557004DAE0E /* MTRClustersObjc_internal.h in Headers */,
-				991DC08B247704DC00C13860 /* MTRLogging.h in Headers */,
 				7596A84828762783004DAE0E /* MTRAsyncCallbackWorkQueue.h in Headers */,
 				5A7947E527C0129F00434CF2 /* MTRDeviceController+XPC.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* MTRError_Internal.h in Headers */,
@@ -708,6 +715,7 @@
 				1ED276E226C5812A00547A89 /* MTRCluster.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* MTRError.mm in Sources */,
 				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
+				029CCBE229073DE400D8F0F9 /* MTRLogging.mm in Sources */,
 				51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */,
 				1ED276E026C57CF000547A89 /* MTRCallbackBridge.mm in Sources */,
 				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,
