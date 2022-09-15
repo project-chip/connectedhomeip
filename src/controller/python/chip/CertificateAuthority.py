@@ -22,6 +22,7 @@ import ctypes
 from dataclasses import dataclass, field
 from typing import *
 from ctypes import *
+from chip.native import PyChipError
 from rich.pretty import pprint
 import json
 import logging
@@ -74,7 +75,7 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_InitializeDelegate.restype = c_void_p
         self._Handle().pychip_OpCreds_InitializeDelegate.argtypes = [ctypes.py_object, ctypes.c_uint32, ctypes.c_void_p]
 
-        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = c_uint32
+        self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = PyChipError
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
         if (persistentStorage is None):
@@ -195,8 +196,7 @@ class CertificateAuthority:
             lambda: self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
         )
 
-        if res != 0:
-            raise self._chipStack.ErrorToException(res)
+        res.success_or_raise()
 
         self._maximizeCertChains = enabled
 

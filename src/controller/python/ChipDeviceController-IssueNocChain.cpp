@@ -20,6 +20,7 @@
 #include <string>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -33,7 +34,7 @@ using namespace chip;
 extern "C" {
 
 typedef void (*pychip_DeviceController_IssueNOCChainCallbackPythonCallback)(
-    PyObject * context, ChipError::StorageType status, const uint8_t * noc, size_t nocLen, const uint8_t * icac, size_t icacLen,
+    PyObject * context, PyChipError status, const uint8_t * noc, size_t nocLen, const uint8_t * icac, size_t icacLen,
     const uint8_t * rcac, size_t rcacLen, const uint8_t * ipk, size_t ipkLen, NodeId adminSubject);
 
 static pychip_DeviceController_IssueNOCChainCallbackPythonCallback pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct;
@@ -44,9 +45,8 @@ void pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback(
     pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct = callback;
 }
 
-ChipError::StorageType pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommissioner * devCtrl,
-                                                             PyObject * pythonContext, uint8_t * NOCSRElements,
-                                                             size_t NOCSRElementsLen, NodeId nodeId);
+PyChipError pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommissioner * devCtrl, PyObject * pythonContext,
+                                                  uint8_t * NOCSRElements, size_t NOCSRElementsLen, NodeId nodeId);
 }
 
 void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
@@ -90,25 +90,22 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
-            context, err.AsInteger(), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
+            context, ToPyChipError(err), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
             chipRcacSpan.data(), chipRcacSpan.size(), ipkData.data(), ipk.HasValue() ? ipkData.size() : 0,
             adminSubject.ValueOr(kUndefinedNodeId));
     }
     else
     {
-        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(context, err.AsInteger(), nullptr, 0, nullptr, 0, nullptr,
-                                                                         0, nullptr, 0, 0);
+        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(context, ToPyChipError(err), nullptr, 0, nullptr, 0,
+                                                                         nullptr, 0, nullptr, 0, 0);
     }
 }
 
-ChipError::StorageType pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommissioner * devCtrl,
-                                                             PyObject * pythonContext, uint8_t * NOCSRElements,
-                                                             size_t NOCSRElementsLen, NodeId nodeId)
+PyChipError pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommissioner * devCtrl, PyObject * pythonContext,
+                                                  uint8_t * NOCSRElements, size_t NOCSRElementsLen, NodeId nodeId)
 {
-    return devCtrl
-        ->IssueNOCChain(
-            ByteSpan(NOCSRElements, NOCSRElementsLen), nodeId,
-            /* Note: Memory leak here. This is a quick and a bit dirty PoC */
-            new Callback::Callback<Controller::OnNOCChainGeneration>(pychip_DeviceController_IssueNOCChainCallback, pythonContext))
-        .AsInteger();
+    return ToPyChipError(devCtrl->IssueNOCChain(
+        ByteSpan(NOCSRElements, NOCSRElementsLen), nodeId,
+        /* Note: Memory leak here. This is a quick and a bit dirty PoC */
+        new Callback::Callback<Controller::OnNOCChainGeneration>(pychip_DeviceController_IssueNOCChainCallback, pythonContext)));
 }

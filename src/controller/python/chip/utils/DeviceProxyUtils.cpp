@@ -27,12 +27,11 @@
 
 #include "system/SystemClock.h"
 #include <app/DeviceProxy.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <stdio.h>
 #include <system/SystemError.h>
 
 using namespace chip;
-
-static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
 extern "C" {
 

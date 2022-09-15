@@ -3,6 +3,8 @@ import glob
 import os
 import platform
 import construct
+import chip.exceptions
+import typing
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
 
@@ -16,6 +18,37 @@ def _AllDirsToRoot(dir):
         if parent == "" or parent == dir:
             break
         dir = parent
+
+
+class PyChipError(ctypes.Structure):
+    _fields_ = [('code', ctypes.c_uint32), ('line', ctypes.c_uint32), ('file', ctypes.c_void_p)]
+
+    def success_or_raise(self) -> None:
+        if self.code != 0:
+            raise self.to_exception()
+
+    @property
+    def is_success(self) -> bool:
+        return self.code == 0
+
+    def to_exception(self) -> typing.Union[None, chip.exceptions.ChipStackError]:
+        if not self.is_success:
+            exception_str = None
+            if self.file:
+                exception_str = f"{ctypes.string_at(self.file)}:{self.line}"
+            return chip.exceptions.ChipStackError(self.code, exception_str)
+
+    def __eq__(self, other):
+        if isinstance(other, int):
+            return self.code == other
+        if isinstance(other, PyChipError):
+            return self.code == other.code
+        if isinstance(other, chip.exceptions.ChipStackError):
+            return self.code == other.err
+        raise ValueError(f"Cannot compare PyChipError with {type(other)}")
+
+    def __ne__(self, other):
+        return not self == other
 
 
 def FindNativeLibraryPath() -> str:
@@ -79,7 +112,7 @@ def _GetLibraryHandle(shouldInit: bool) -> ctypes.CDLL:
             raise Exception("Common stack has not been initialized!")
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_CommonStackInit", ctypes.c_uint32, [ctypes.c_char_p])
+        setter.Set("pychip_CommonStackInit", PyChipError, [ctypes.c_char_p])
 
     return _nativeLibraryHandle
 

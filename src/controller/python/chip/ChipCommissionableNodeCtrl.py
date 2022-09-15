@@ -28,6 +28,7 @@ from __future__ import print_function
 from ctypes import *
 from .ChipStack import *
 from .exceptions import *
+from .native import PyChipError
 
 __all__ = ["ChipCommissionableNodeController"]
 
@@ -55,8 +56,7 @@ class ChipCommissionableNodeController(object):
         commissionableNodeCtrl = c_void_p(None)
         res = self._dmLib.pychip_CommissionableNodeController_NewController(
             pointer(commissionableNodeCtrl))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        res.success_or_raise()
 
         self.commissionableNodeCtrl = commissionableNodeCtrl
         self._ChipStack.commissionableNodeCtrl = commissionableNodeCtrl
@@ -86,15 +86,15 @@ class ChipCommissionableNodeController(object):
 
             self._dmLib.pychip_CommissionableNodeController_NewController.argtypes = [
                 POINTER(c_void_p)]
-            self._dmLib.pychip_CommissionableNodeController_NewController.restype = c_uint32
+            self._dmLib.pychip_CommissionableNodeController_NewController.restype = PyChipError
 
             self._dmLib.pychip_CommissionableNodeController_DeleteController.argtypes = [
                 c_void_p]
-            self._dmLib.pychip_CommissionableNodeController_DeleteController.restype = c_uint32
+            self._dmLib.pychip_CommissionableNodeController_DeleteController.restype = PyChipError
 
             self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.argtypes = [
                 c_void_p]
-            self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.restype = c_uint32
+            self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.restype = PyChipError
 
             self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners.argtypes = [
                 c_void_p]
