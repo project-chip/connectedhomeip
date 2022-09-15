@@ -316,7 +316,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
-#if CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+#if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
         // context with mExchangeMgr==nullptr is used.
@@ -330,7 +330,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
                 mSessionUpdateDelegate->UpdatePeerAddress(entry->ec->GetSessionHandle()->GetPeer());
             }
         }
-#endif // CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+#endif // CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
     }
     else
     {

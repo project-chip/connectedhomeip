@@ -72,20 +72,24 @@ namespace chip {
 #endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
- *  @def CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+ *  @def CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
  *
  *  @brief
  *    Should an address lookup of the peer happen on every first message that fails
  *    to send on the link.
  *
- *  The default value selected to not perform lookup was for the following reasons:
- *    1. The likelihood of the IP address changing right away is extremely slim.
- *    2. On bad links, there resolutions occur extremely frequently, making the link
- *       worse.
+ *  The default value to not perform lookup was selected because most implementations
+ *  of address lookup are not cache the and a request is sent on the link. Failing
+ *  to deliver the first message is far more likely to happen due to lossy link
+ *  than an actual address change where the peer did not reset. In the lossy link
+ *  situation the frequent lookup would make the link even worse. Additionally,
+ *  every message that arrives from a peer updates the address. If the peer has fallen
+ *  off the link due to any other reason, a re-resolve may not achieve an address that
+ *  is reachable, even if a resolve response occurs.
  */
-#ifndef CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
-#define CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP 0
-#endif // CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP
+#ifndef CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
+#define CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE 0
+#endif // CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
 
 /**
  *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
