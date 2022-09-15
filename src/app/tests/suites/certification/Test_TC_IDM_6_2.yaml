@@ -878,52 +878,57 @@ tests:
           the path."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
-          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+          #1:- Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
 
-          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+          #2:- To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access.
 
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0
+
+          #3:- basic subscribe-event-by-id 0x000 100 1000 1 0
           on TH(chip-tool) verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
+          [1663151225.226869][41115:41120] CHIP:DMG: ReportDataMessage =
+          [1663151225.226879][41115:41120] CHIP:DMG: {
+          [1663151225.226890][41115:41120] CHIP:DMG:         SubscriptionId = 0xd7d61f38,
+          [1663151225.226899][41115:41120] CHIP:DMG:         EventReportIBs =
+          [1663151225.226915][41115:41120] CHIP:DMG:         [
+          [1663151225.226923][41115:41120] CHIP:DMG:                 EventReportIB =
+          [1663151225.226939][41115:41120] CHIP:DMG:                 {
+          [1663151225.226948][41115:41120] CHIP:DMG:                         EventStatusIB =
+          [1663151225.226960][41115:41120] CHIP:DMG:                         {
+          [1663151225.226977][41115:41120] CHIP:DMG:                                 EventPath =
+          [1663151225.226989][41115:41120] CHIP:DMG:                                 {
+          [1663151225.227000][41115:41120] CHIP:DMG:                                         Endpoint = 0x0,
+          [1663151225.227014][41115:41120] CHIP:DMG:                                         Cluster = 0x28,
+          [1663151225.227022][41115:41120] CHIP:DMG:                                         Event = 0x0,
+          [1663151225.227030][41115:41120] CHIP:DMG:                                 },
+          [1663151225.227041][41115:41120] CHIP:DMG:
+          [1663151225.227049][41115:41120] CHIP:DMG:                                 StatusIB =
+          [1663151225.227058][41115:41120] CHIP:DMG:                                 {
+          [1663151225.227079][41115:41120] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
+          [1663151225.227090][41115:41120] CHIP:DMG:                                 },
+          [1663151225.227099][41115:41120] CHIP:DMG:
+          [1663151225.227105][41115:41120] CHIP:DMG:                         },
+          [1663151225.227115][41115:41120] CHIP:DMG:
+          [1663151225.227122][41115:41120] CHIP:DMG:                 },
+          [1663151225.227132][41115:41120] CHIP:DMG:
+          [1663151225.227138][41115:41120] CHIP:DMG:         ],
+          [1663151225.227149][41115:41120] CHIP:DMG:
+          [1663151225.227156][41115:41120] CHIP:DMG:         InteractionModelRevision = 1
+          [1663151225.227162][41115:41120] CHIP:DMG: }
+          [1663151225.227206][41115:41120] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1663151225.227226][41115:41120] CHIP:DMG: MoveToState ReadClient[0x7f52100258b0]: Moving to [AwaitingSu]
 
-          [1653479886.551289][22629:22634] CHIP:DMG: ReportDataMessage =
-          [1653479886.551299][22629:22634] CHIP:DMG: {
-          [1653479886.551308][22629:22634] CHIP:DMG:         SubscriptionId = 0xf5695d45,
-          [1653479886.551316][22629:22634] CHIP:DMG:         EventReportIBs =
-          [1653479886.551330][22629:22634] CHIP:DMG:         [
-          [1653479886.551338][22629:22634] CHIP:DMG:                 EventReportIB =
-          [1653479886.551352][22629:22634] CHIP:DMG:                 {
-          [1653479886.551373][22629:22634] CHIP:DMG:                         EventStatusIB =
-          [1653479886.551378][22629:22634] CHIP:DMG:                         {
-          [1653479886.551382][22629:22634] CHIP:DMG:                                 EventPath =
-          [1653479886.551387][22629:22634] CHIP:DMG:                                 {
-          [1653479886.551391][22629:22634] CHIP:DMG:                                         Endpoint = 0x0,
-          [1653479886.551397][22629:22634] CHIP:DMG:                                         Cluster = 0x28,
-          [1653479886.551412][22629:22634] CHIP:DMG:                                         Event = 0x0,
-          [1653479886.551420][22629:22634] CHIP:DMG:                                 },
-          [1653479886.551431][22629:22634] CHIP:DMG:
-          [1653479886.551438][22629:22634] CHIP:DMG:                                 StatusIB =
-          [1653479886.551446][22629:22634] CHIP:DMG:                                 {
-          [1653479886.551454][22629:22634] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
-          [1653479886.551462][22629:22634] CHIP:DMG:                                 },
-          [1653479886.551471][22629:22634] CHIP:DMG:
-          [1653479886.551477][22629:22634] CHIP:DMG:                         },
-          [1653479886.551487][22629:22634] CHIP:DMG:
-          [1653479886.551495][22629:22634] CHIP:DMG:                 },
-          [1653479886.551506][22629:22634] CHIP:DMG:
-          [1653479886.551513][22629:22634] CHIP:DMG:         ],
-          [1653479886.551524][22629:22634] CHIP:DMG:
-          [1653479886.551532][22629:22634] CHIP:DMG:         InteractionModelRevision = 1
-          [1653479886.551538][22629:22634] CHIP:DMG: }
-          [1653479886.551583][22629:22634] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
 
 
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
+
+
+          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
+          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]" 1 0
       disabled: true
 
     - label:

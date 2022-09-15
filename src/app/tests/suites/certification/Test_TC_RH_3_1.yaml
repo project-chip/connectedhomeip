@@ -160,6 +160,32 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          ./chip-tool relativehumiditymeasurement read feature-map  1 1
+
+          verify the "feature-map response" on the TH (all-cluster-minimal-app) log:
+
+          [1663157920.343837][6214:6214] CHIP:IM: Received Read request
+          [1663157920.343910][6214:6214] CHIP:DMG: ReadRequestMessage =
+          [1663157920.343933][6214:6214] CHIP:DMG: {
+          [1663157920.343952][6214:6214] CHIP:DMG: 	AttributePathIBs =
+          [1663157920.343974][6214:6214] CHIP:DMG: 	[
+          [1663157920.343994][6214:6214] CHIP:DMG: 		AttributePathIB =
+          [1663157920.344021][6214:6214] CHIP:DMG: 		{
+          [1663157920.344048][6214:6214] CHIP:DMG: 			Endpoint = 0x1,
+          [1663157920.344076][6214:6214] CHIP:DMG: 			Cluster = 0x405,
+          [1663157920.344104][6214:6214] CHIP:DMG: 			Attribute = 0x0000_FFFC,
+          [1663157920.344128][6214:6214] CHIP:DMG: 		}
+          [1663157920.344154][6214:6214] CHIP:DMG:
+          [1663157920.344177][6214:6214] CHIP:DMG: 	],
+          [1663157920.344202][6214:6214] CHIP:DMG:
+          [1663157920.344225][6214:6214] CHIP:DMG: 	isFabricFiltered = true,
+          [1663157920.344246][6214:6214] CHIP:DMG: 	InteractionModelRevision = 1
+          [1663157920.344266][6214:6214] CHIP:DMG: },
+          [1663157920.344332][6214:6214] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663157920.344414][6214:6214] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663157920.344440][6214:6214] CHIP:DMG: <RE:Run> Cluster 405, Attribute fffc is dirty
+
+
           ./chip-tool relativehumiditymeasurement read attribute-list  1 1
 
 
