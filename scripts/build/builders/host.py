@@ -361,19 +361,17 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
-            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
                           '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--output-file',
-                          os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
+            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
+                          '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
