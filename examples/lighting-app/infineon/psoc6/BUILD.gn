@@ -80,7 +80,7 @@ config("psoc6_ota_config") {
 
 psoc6_sdk_sources("lighting_app_sdk_sources") {
   include_dirs = [
-    "${chip_root}/src/platform/PSOC6",
+    "${chip_root}/src/platform/Infineon/PSOC6",
     "${psoc6_project_dir}/include",
     "${examples_plat_dir}",
   ]

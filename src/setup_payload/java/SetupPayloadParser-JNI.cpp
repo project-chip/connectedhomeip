@@ -158,12 +158,8 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         jclass enumClass  = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType");
         jfieldID enumType = nullptr;
 
-        switch (info.tag)
+        switch (info.type)
         {
-        case optionalQRCodeInfoTypeUnknown:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
-            break;
         case optionalQRCodeInfoTypeString:
             enumType =
                 env->GetStaticFieldID(enumClass, "TYPE_STRING", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
@@ -184,12 +180,18 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
             enumType =
                 env->GetStaticFieldID(enumClass, "TYPE_UINT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
-        default:
+        case optionalQRCodeInfoTypeUnknown:
+        default: // Optional Type variable has to set any value.
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         }
 
-        jobject enumObj = env->GetStaticObjectField(enumClass, enumType);
-        env->SetObjectField(optionalInfo, type, enumObj);
+        if (enumType != nullptr)
+        {
+            jobject enumObj = env->GetStaticObjectField(enumClass, enumType);
+            env->SetObjectField(optionalInfo, type, enumObj);
+        }
 
         env->SetObjectField(optionalInfo, data, env->NewStringUTF(info.data.c_str()));
         env->SetIntField(optionalInfo, int32, info.int32);

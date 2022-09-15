@@ -60,7 +60,9 @@
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
 
 /* The SoftwareVersion attribute of the Basic cluster. */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
 
 /* define Device type based on the application */
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 257 // 0x0101  Dimmable Bulb
