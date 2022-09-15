@@ -27,35 +27,27 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
 };
 
 /**
- * The protocol definition for the MTRDeviceControllerDelegate
+ * The protocol definition for the MTRDeviceControllerDelegate.
  *
  * All delegate methods will be called on the supplied Delegate Queue.
  */
 @protocol MTRDeviceControllerDelegate <NSObject>
 @optional
 /**
- * Notify the delegate when pairing status gets updated
- *
+ * Notify the delegate when commissioning status gets updated.
  */
 - (void)onStatusUpdate:(MTRCommissioningStatus)status;
 
 /**
- * Notify the delegate when pairing is completed
- *
+ * Notify the delegate when a commissioning session is established or the
+ * establishment has errored out.
  */
-- (void)onPairingComplete:(NSError * _Nullable)error;
+- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error;
 
 /**
- * Notify the delegate when commissioning is completed
- *
+ * Notify the delegate when commissioning is completed.
  */
 - (void)onCommissioningComplete:(NSError * _Nullable)error;
-
-/**
- * Notify the delegate when pairing is deleted
- *
- */
-- (void)onPairingDeleted:(NSError * _Nullable)error;
 
 @end
 

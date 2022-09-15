@@ -91,7 +91,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return self;
 }
 
-- (void)onPairingComplete:(NSError *)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
 
