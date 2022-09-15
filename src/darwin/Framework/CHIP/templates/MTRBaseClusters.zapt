@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * {{description}}
  */
-@interface MTRBaseCluster{{asUpperCamelCase name}} : MTRCluster
+@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                                 endpoint:(NSNumber *)endpoint
@@ -30,14 +30,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * {{description}}
  */
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion;
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion;
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion;
 {{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
   Params:(MTRReadParams * _Nullable)params completion:

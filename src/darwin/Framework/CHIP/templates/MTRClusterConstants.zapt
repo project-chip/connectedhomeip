@@ -7,7 +7,8 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
-MTRClusterIDType{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+MTRClusterIDType{{>cluster}}ID = {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 };
 
@@ -16,20 +17,23 @@ MTRClusterIDType{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 // Global attributes
 {{#zcl_attributes_server}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
 {{/unless}}
 {{/zcl_attributes_server}}
 
 {{#zcl_clusters}}
 {{#zcl_attributes_server}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} attributes
+// Cluster {{>cluster}} attributes
 {{/first}}
 {{#if clusterRef}}
-MTRAttributeIDTypeCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
 {{else}}
-MTRAttributeIDTypeCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID,
 {{/if}}
 {{#last}}
 
@@ -43,10 +47,12 @@ MTRAttributeIDTypeCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCame
 typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 {{#zcl_clusters}}
 {{#zcl_commands}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} commands
+// Cluster {{>cluster}} commands
 {{/first}}
-MTRCommandIDTypeCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
@@ -59,10 +65,12 @@ MTRCommandIDTypeCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCas
 typedef NS_ENUM(uint32_t, MTREventIDType) {
 {{#zcl_clusters}}
 {{#zcl_events}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} events
+// Cluster {{>cluster}} events
 {{/first}}
-MTREventIDTypeCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
+MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}

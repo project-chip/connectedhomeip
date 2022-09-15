@@ -25,7 +25,7 @@ using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
-@implementation MTRCluster{{asUpperCamelCase name}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
@@ -43,14 +43,15 @@ using chip::SessionHandle;
 }
 
 {{#chip_cluster_commands}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{>cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{>cluster}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -108,9 +109,10 @@ using chip::SessionHandle;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -128,7 +130,7 @@ using chip::SessionHandle;
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}

@@ -23,7 +23,7 @@ using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
-@implementation MTRBaseCluster{{asUpperCamelCase name}}
+@implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRBaseDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
@@ -41,14 +41,16 @@ using chip::SessionHandle;
 }
 
 {{#chip_cluster_commands}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{>cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -103,7 +105,7 @@ using chip::SessionHandle;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
   Params:(MTRReadParams * _Nullable)params completion:
@@ -116,7 +118,7 @@ using chip::SessionHandle;
     // Make a copy of params before we go async.
     params = [params copy];
     {{/if_is_fabric_scoped_struct~}}
-    new MTR{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
+    new MTR{{~>attribute_data_callback_name~}}CallbackBridge(self.callbackQueue,
       self.device,
       {{! This treats completion as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
