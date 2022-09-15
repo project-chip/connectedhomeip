@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 declare_args() {
   # Allows to change time between retries during the case session
   chip_case_retry_delta = ""
+
+  chip_config_mrp_on_first_msg_fail_do_mdsn_lookup = ""
 }
 
 defines = []
@@ -24,6 +26,11 @@ defines = []
 if (chip_case_retry_delta != "") {
   defines +=
       [ "CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL=${chip_case_retry_delta}" ]
+}
+
+if (chip_config_mrp_on_first_msg_fail_do_mdsn_lookup != "") {
+  defines +=
+      [ "CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP=${chip_config_mrp_on_first_msg_fail_do_mdsn_lookup}" ]
 }
 
 source_set("messaging_mrp_config") {
