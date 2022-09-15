@@ -2061,7 +2061,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
 
-        // NOTE: this array cannot have more than 9 entries, since 9 is what the spec requires as a minimum on servers
+        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
