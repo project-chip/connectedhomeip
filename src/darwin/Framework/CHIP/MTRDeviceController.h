@@ -54,9 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
  * provided discriminator.
  *
  * Then a PASE session will be established with the device, unless an error
- * occurs.  MTRDevicePairingDelegate will be notified as follows:
+ * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRPairingStatusFailed.
+ * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
  *
  * * Discovery succeeds but commissioning session setup fails: onPairingComplete
  *   with an error.
@@ -103,9 +103,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
+ * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
  *
- * @param[in] delegate The delegate the pairing process should use
+ * @param[in] delegate The delegate the commissioning process should use
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */

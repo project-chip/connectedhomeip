@@ -44,7 +44,7 @@
     }
 }
 
-- (void)onPairingComplete:(NSError *)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError *)error
 {
     if (error != nil) {
         ChipLogProgress(chipTool, "PASE establishment failed");
@@ -59,11 +59,6 @@
         _commandBridge->SetCommandExitStatus(commissionError);
         return;
     }
-}
-
-- (void)onPairingDeleted:(NSError *)error
-{
-    _commandBridge->SetCommandExitStatus(error, "Pairing Delete");
 }
 
 - (void)onCommissioningComplete:(NSError *)error

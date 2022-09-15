@@ -419,7 +419,7 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeMTR();
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -490,7 +490,7 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
@@ -803,7 +803,7 @@
 {
     self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
