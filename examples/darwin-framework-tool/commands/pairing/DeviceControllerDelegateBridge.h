@@ -20,7 +20,7 @@
 
 #import <Matter/Matter.h>
 
-@interface CHIPToolPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface CHIPToolDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property PairingCommandBridge * commandBridge;
 @property chip::NodeId deviceID;
 @property MTRDeviceController * commissioner;

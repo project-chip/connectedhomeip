@@ -15,20 +15,20 @@
  *    limitations under the License.
  */
 
-#import "MTRDevicePairingDelegate.h"
+#import "MTRDeviceControllerDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-class MTRDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate
+class MTRDeviceControllerDelegateBridge : public chip::Controller::DevicePairingDelegate
 {
 public:
-    MTRDevicePairingDelegateBridge();
-    ~MTRDevicePairingDelegateBridge();
+    MTRDeviceControllerDelegateBridge();
+    ~MTRDeviceControllerDelegateBridge();
 
-    void setDelegate(id<MTRDevicePairingDelegate> delegate, dispatch_queue_t queue);
+    void setDelegate(id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue);
 
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
@@ -39,10 +39,10 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
 private:
-    _Nullable id<MTRDevicePairingDelegate> mDelegate;
+    _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
 
-    MTRPairingStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
+    MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };
 
 NS_ASSUME_NONNULL_END

@@ -20,10 +20,10 @@
 
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
+#import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRDevicePairingDelegateBridge.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
@@ -83,7 +83,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
-@property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
+@property (readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
@@ -103,8 +103,8 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
 
-        _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
-        if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+        _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
+        if ([self checkForInitError:(_deviceControllerDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
             return nil;
         }
 
@@ -183,9 +183,9 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         _partialDACVerifier = nullptr;
     }
 
-    if (_pairingDelegateBridge) {
-        delete _pairingDelegateBridge;
-        _pairingDelegateBridge = nullptr;
+    if (_deviceControllerDelegateBridge) {
+        delete _deviceControllerDelegateBridge;
+        _deviceControllerDelegateBridge = nullptr;
     }
 }
 
@@ -255,7 +255,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
         chip::Controller::SetupParams commissionerParams;
 
-        commissionerParams.pairingDelegate = _pairingDelegateBridge;
+        commissionerParams.pairingDelegate = _deviceControllerDelegateBridge;
 
         _operationalCredentialsDelegate->SetDeviceCommissioner(_cppCommissioner);
 
@@ -533,10 +533,10 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     os_unfair_lock_unlock(&_deviceMapLock);
 }
 
-- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     dispatch_async(_chipWorkQueue, ^{
-        self->_pairingDelegateBridge->setDelegate(delegate, queue);
+        self->_deviceControllerDelegateBridge->setDelegate(delegate, queue);
     });
 }
 
