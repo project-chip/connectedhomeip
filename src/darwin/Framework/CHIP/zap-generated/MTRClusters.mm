@@ -17,10 +17,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRBaseDevice_internal.h"
 #import "MTRCallbackBridge_internal.h"
 #import "MTRClusterConstants.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_internal.h"
 #import "MTRClusters_internal.h"
 #import "MTRCommandPayloadsObjc.h"

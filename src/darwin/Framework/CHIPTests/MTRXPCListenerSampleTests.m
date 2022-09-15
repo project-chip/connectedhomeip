@@ -62,7 +62,7 @@ static MTRDeviceController * sController = nil;
 @interface MTRDeviceControllerServerSample<MatterDeviceControllerServerProtocol> : NSObject
 @property (nonatomic, readonly, strong) NSString * identifier;
 - (instancetype)initWithClientProxy:(id<MTRDeviceControllerClientProtocol>)proxy
-           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> *)cacheDictionary;
+        clusterStateCacheDictionary:(NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> *)cacheDictionary;
 @end
 
 @interface MTRXPCListenerSample ()
@@ -72,7 +72,8 @@ static MTRDeviceController * sController = nil;
 @property (nonatomic, readonly, strong) NSXPCInterface * clientInterface;
 @property (nonatomic, readonly, strong) NSXPCListener * xpcListener;
 @property (nonatomic, readonly, strong) NSMutableDictionary<NSString *, MTRDeviceControllerServerSample *> * servers;
-@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> * attributeCacheDictionary;
+@property (nonatomic, readonly, strong)
+    NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> * clusterStateCacheDictionary;
 
 @end
 
@@ -84,7 +85,7 @@ static MTRDeviceController * sController = nil;
         _serviceInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
         _clientInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
         _servers = [NSMutableDictionary dictionary];
-        _attributeCacheDictionary = [NSMutableDictionary dictionary];
+        _clusterStateCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];
         [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
     }
@@ -112,7 +113,7 @@ static MTRDeviceController * sController = nil;
     newConnection.exportedInterface = _serviceInterface;
     newConnection.remoteObjectInterface = _clientInterface;
     __auto_type newServer = [[MTRDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]
-                                                                attributeCacheDictionary:_attributeCacheDictionary];
+                                                             clusterStateCacheDictionary:_clusterStateCacheDictionary];
     newConnection.exportedObject = newServer;
     [_servers setObject:newServer forKey:newServer.identifier];
     newConnection.invalidationHandler = ^{
@@ -127,7 +128,8 @@ static MTRDeviceController * sController = nil;
 
 @interface MTRDeviceControllerServerSample ()
 @property (nonatomic, readwrite, strong) id<MTRDeviceControllerClientProtocol> clientProxy;
-@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> * attributeCacheDictionary;
+@property (nonatomic, readonly, strong)
+    NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> * clusterStateCacheDictionary;
 @end
 
 // This sample does not have multiple controllers and hence controller Id shall be the same.
@@ -136,12 +138,12 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 @implementation MTRDeviceControllerServerSample
 
 - (instancetype)initWithClientProxy:(id<MTRDeviceControllerClientProtocol>)proxy
-           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> *)cacheDictionary
+        clusterStateCacheDictionary:(NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> *)cacheDictionary
 {
     if ([super init]) {
         _clientProxy = proxy;
         _identifier = [[NSUUID UUID] UUIDString];
-        _attributeCacheDictionary = cacheDictionary;
+        _clusterStateCacheDictionary = cacheDictionary;
     }
     return self;
 }
@@ -302,9 +304,9 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        MTRAttributeCacheContainer * attributeCacheContainer;
+        MTRClusterStateCacheContainer * clusterStateCacheContainer;
         if (shouldCache) {
-            attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
+            clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
         }
 
         __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sharedController];
@@ -312,7 +314,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
         [established addObject:@NO];
         [device subscribeWithQueue:dispatch_get_main_queue()
             params:[MTRDeviceController decodeXPCSubscribeParams:params]
-            attributeCacheContainer:attributeCacheContainer
+            clusterStateCacheContainer:clusterStateCacheContainer
             attributeReportHandler:^(NSArray * value) {
                 NSLog(@"Received report: %@", value);
             }
@@ -326,8 +328,8 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
             }
             subscriptionEstablished:^() {
                 NSLog(@"Attribute cache subscription succeeded for device %llu", [nodeID unsignedLongLongValue]);
-                if (attributeCacheContainer) {
-                    [self.attributeCacheDictionary setObject:attributeCacheContainer forKey:nodeID];
+                if (clusterStateCacheContainer) {
+                    [self.clusterStateCacheDictionary setObject:clusterStateCacheContainer forKey:nodeID];
                 }
                 if (![established[0] boolValue]) {
                     established[0] = @YES;
@@ -341,23 +343,24 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     }
 }
 
-- (void)readAttributeCacheWithController:(id _Nullable)controller
-                                  nodeID:(NSNumber *)nodeID
-                              endpointID:(NSNumber * _Nullable)endpointID
-                               clusterID:(NSNumber * _Nullable)clusterID
-                             attributeID:(NSNumber * _Nullable)attributeID
-                              completion:(MTRValuesHandler)completion
+- (void)readClusterStateCacheWithController:(id _Nullable)controller
+                                     nodeID:(NSNumber *)nodeID
+                                 endpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                 completion:(MTRValuesHandler)completion
 {
-    MTRAttributeCacheContainer * attributeCacheContainer = _attributeCacheDictionary[nodeID];
-    if (attributeCacheContainer) {
-        [attributeCacheContainer
-            readAttributeWithEndpointID:endpointID
-                              clusterID:clusterID
-                            attributeID:attributeID
-                                  queue:dispatch_get_main_queue()
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                             }];
+    MTRClusterStateCacheContainer * clusterStateCacheContainer = _clusterStateCacheDictionary[nodeID];
+    if (clusterStateCacheContainer) {
+        [clusterStateCacheContainer
+            readAttributePathWithEndpointID:endpointID
+                                  clusterID:clusterID
+                                attributeID:attributeID
+                                      queue:dispatch_get_main_queue()
+                                 completion:^(
+                                     NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                     completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                 }];
     } else {
         NSLog(@"Attribute cache for node ID %llu was not setup", [nodeID unsignedLongLongValue]);
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -1683,7 +1686,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     sleep(1);
 }
 
-- (void)test900_SubscribeAttributeCache
+- (void)test900_SubscribeClusterStateCache
 {
 #if MANUAL_INDIVIDUAL_TEST
     [self initStack];
@@ -1694,12 +1697,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    MTRAttributeCacheContainer * attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
+    MTRClusterStateCacheContainer * clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
     NSLog(@"Setting up attribute cache subscription...");
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(60)];
     [device subscribeWithQueue:queue
         params:params
-        attributeCacheContainer:attributeCacheContainer
+        clusterStateCacheContainer:clusterStateCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Report for attribute cache: %@", value);
         }
@@ -1782,28 +1785,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     sleep(1);
     NSLog(@"Reading from attribute cache...");
     expectation = [self expectationWithDescription:@"Cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:@1
-                          clusterID:@6
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Cached attribute read: %@, error: %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertEqual([values count], 1);
-                             for (NSDictionary<NSString *, id> * value in values) {
-                                 XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-                                 NSDictionary * result = value;
-                                 MTRAttributePath * path = result[@"attributePath"];
-                                 XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
-                                 XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-                                 XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
-                                 XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-                                 XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-                                 XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
-                             }
-                             [expectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:@1
+                              clusterID:@6
+                            attributeID:@0
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Cached attribute read: %@, error: %@", values, error);
+                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                 XCTAssertEqual([values count], 1);
+                                 for (NSDictionary<NSString *, id> * value in values) {
+                                     XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
+                                     NSDictionary * result = value;
+                                     MTRAttributePath * path = result[@"attributePath"];
+                                     XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                     XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                     XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+                                     XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+                                     XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+                                     XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
+                                 }
+                                 [expectation fulfill];
+                             }];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 

@@ -2,7 +2,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRBaseClusters_internal.h"
 #import "MTRBaseDevice.h"
 #import "MTRBaseDevice_Internal.h"
@@ -210,19 +210,19 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
       }, subscriptionEstablished);
 }
 
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     new MTR{{>attribute_data_callback_name}}CallbackBridge(queue,
       completion,
       ^(Cancelable * success, Cancelable * failure) {
-          if (attributeCacheContainer.cppAttributeCache) {
+          if (clusterStateCacheContainer.cppClusterStateCache) {
               chip::app::ConcreteAttributePath path;
               using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
               path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
               path.mClusterId = TypeInfo::GetClusterId();
               path.mAttributeId = TypeInfo::GetAttributeId();
               TypeInfo::DecodableType value;
-              CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+              CHIP_ERROR err = clusterStateCacheContainer.cppClusterStateCache->Get<TypeInfo>(path, value);
               auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
               if (err == CHIP_NO_ERROR)
               {

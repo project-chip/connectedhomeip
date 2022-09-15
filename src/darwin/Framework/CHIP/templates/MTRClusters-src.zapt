@@ -2,7 +2,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRBaseDevice_internal.h"
 #import "MTRClusterConstants.h"
 #import "MTRClusters_internal.h"
