@@ -1496,7 +1496,6 @@ TSTAT.S.A0044=0
 TSTAT.S.A0045=0
 TSTAT.S.A0046=0
 TSTAT.S.A0047=0
-TSTAT.S.M.MinSetpointDeadBandWritable=1
 
 #Server commands
 TSTAT.S.C00.Rsp=1
