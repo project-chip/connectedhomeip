@@ -154,6 +154,7 @@ tests:
     - label: "TH reads ActiveHardwareFaults attribute value from DUT."
       verification: |
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
+
           On TH(chip-tool), verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1
 
           [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
@@ -163,6 +164,8 @@ tests:
 
           Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+          generaldiagnostics subscribe  active-hardware-faults 0 100 1 0
 
           Verify in TH(chip-tool) log
 

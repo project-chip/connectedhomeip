@@ -184,6 +184,29 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=1"
+      verification: |
+          On TH_CR1 send the below command
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
@@ -323,6 +346,34 @@ tests:
       PICS: CADMIN.S.A0000
       response:
           value: 1
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=2"
+      verification: |
+          On TH_CR1 send the below command
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          = wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2755]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR3 opens a 2nd commissioning window on DUT_CE"
       identity: "gamma"
