@@ -49,8 +49,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (chip_device_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
-} else if (chip_device_platform == "p6") {
-  import("//build_overrides/p6.gni")
+} else if (chip_device_platform == "psoc6") {
+  import("//build_overrides/psoc6.gni")
 } else if (chip_device_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (chip_device_platform == "mt793x") {
