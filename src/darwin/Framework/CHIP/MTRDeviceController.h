@@ -29,6 +29,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @class MTRCommissioningParameters;
 @class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -114,7 +115,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
  * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
@@ -216,6 +217,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                               iterations:(uint32_t)iterations
                                     salt:(NSData *)salt
     MTR_NEWLY_DEPRECATED("Please use computePASEVerifierForSetupPasscode:iterations:salt:error:");
+
+- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate
+                     queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setDeviceControllerDelegate:");
 
 @end
 
