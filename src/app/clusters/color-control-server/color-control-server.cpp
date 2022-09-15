@@ -176,6 +176,11 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
     }
 
     Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
+    if (newColorMode == ColorControlServer::ColorMode::COLOR_MODE_EHSV)
+    {
+        // Transpose COLOR_MODE_EHSV to COLOR_MODE_HSV after setting EnhancedColorMode
+        newColorMode = ColorControlServer::ColorMode::COLOR_MODE_HSV;
+    }
     Attributes::ColorMode::Set(endpoint, newColorMode);
 
     colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
@@ -788,7 +793,14 @@ bool ColorControlServer::moveHueCommand(EndpointId endpoint, uint8_t moveMode, u
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -955,7 +967,14 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -1067,7 +1086,14 @@ bool ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, uint
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -1157,7 +1183,14 @@ bool ColorControlServer::stepHueCommand(EndpointId endpoint, uint8_t stepMode, u
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
