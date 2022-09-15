@@ -29,8 +29,7 @@ if (chip_case_retry_delta != "") {
 }
 
 if (chip_config_mrp_on_first_msg_fail_do_mdsn_lookup != "") {
-  defines +=
-      [ "CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP=${chip_config_mrp_on_first_msg_fail_do_mdsn_lookup}" ]
+  defines += [ "CHIP_CONFIG_MRP_ON_FIRST_MSG_FAIL_DO_MDNS_LOOKUP=${chip_config_mrp_on_first_msg_fail_do_mdsn_lookup}" ]
 }
 
 source_set("messaging_mrp_config") {
