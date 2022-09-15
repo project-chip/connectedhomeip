@@ -232,9 +232,9 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                             return;
                         for (MTRAttributeReport * report in reports) {
                             // These should be exposed by the SDK
-                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterIDTypeTemperatureMeasurementID)] &&
                                 [report.path.attribute
-                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                    isEqualToNumber:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
                                 if (report.error != nil) {
                                     NSLog(@"Error reading temperature: %@", report.error);
                                 } else {
