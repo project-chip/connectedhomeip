@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "ameba_route_hook.h"
 #include "ameba_route_table.h"
@@ -99,7 +99,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 }
                 else
                 {
-                    printf("Added entry to route table\n");    
+                    printf("Added entry to route table\n");
                 }
             }
         }
@@ -153,12 +153,10 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 int8_t ameba_route_hook_init()
 {
     struct netif * lwip_netif = &xnetif[0];
-    ip_addr_t router_group  = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
+    ip_addr_t router_group    = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
     ameba_route_hook_t * hook = NULL;
-    uint8_t ret           = 0;
+    uint8_t ret               = 0;
 
-    //lwip_netif = netif_get_by_index(esp_netif_get_netif_impl_index(netif));
-    //lwip_netif = netif_get_by_index(0);
     if (lwip_netif == NULL)
     {
         printf("Invalid network interface\n");
