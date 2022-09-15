@@ -110,7 +110,7 @@ using chip::SessionHandle;
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -128,7 +128,7 @@ using chip::SessionHandle;
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}
