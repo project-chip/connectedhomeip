@@ -83,7 +83,7 @@ tests:
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=2"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           avahi-browse -rt _matterc._udp
 

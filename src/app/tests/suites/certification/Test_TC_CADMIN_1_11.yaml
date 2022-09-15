@@ -89,7 +89,7 @@ tests:
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=2"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
           + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
@@ -261,7 +261,7 @@ tests:
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
           ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
           +   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
           =   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local

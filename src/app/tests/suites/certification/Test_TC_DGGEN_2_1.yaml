@@ -165,7 +165,7 @@ tests:
           Please use Interactive mode to Verify subscription test cases
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
-          generaldiagnostics subscribe  active-hardware-faults 0 100 1 0 
+          generaldiagnostics subscribe  active-hardware-faults 0 100 1 0
 
           Verify in TH(chip-tool) log
 
