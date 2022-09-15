@@ -122,44 +122,50 @@ tests:
           ./chip-tool descriptor read parts-list 1 8
 
           Verify in TH(chip-tool) Log
+          [1663236558.589003][5550:5555] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 310844624
+          [1663236558.589059][5550:5555] CHIP:TOO:   PartsList: 0 entries
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
 
           ./chip-tool descriptor read parts-list 1 9
 
           Verify in TH(chip-tool) Log
+          [1663236593.607523][5556:5561] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3304459819
+          [1663236593.607583][5556:5561] CHIP:TOO:   PartsList: 0 entries
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
 
           ./chip-tool descriptor read parts-list 1 10
 
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+
+          [1663236642.682033][5565:5570] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2389378730
+          [1663236642.682091][5565:5570] CHIP:TOO:   PartsList: 0 entries
+
 
           ./chip-tool descriptor read parts-list 1 11
 
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+
+          [1663236682.900934][5573:5578] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3007496001
+          [1663236682.900988][5573:5578] CHIP:TOO:   PartsList: 0 entries
+
 
           ./chip-tool descriptor read parts-list 1 12
 
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+          [1663236715.610271][5579:5584] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2445783348
+          [1663236715.610328][5579:5584] CHIP:TOO:   PartsList: 0 entries
+
 
           ./chip-tool descriptor read parts-list 1 13
 
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+          [1663236752.985450][5590:5595] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4223376445
+          [1663236752.985512][5590:5595] CHIP:TOO:   PartsList: 0 entries
+
 
 
 
@@ -670,39 +676,41 @@ tests:
 
           ./chip-tool descriptor read parts-list 1 8
           Verify in TH(chip-tool) Log
+          [1663236927.299795][5601:5606] CHIP:TOO: Endpoint: 8 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 310
+          [1663236927.299849][5601:5606] CHIP:TOO:   PartsList: 0 entries
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
 
           ./chip-tool descriptor read parts-list 1 9
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+
+          [1663236962.433335][5608:5613] CHIP:TOO: Endpoint: 9 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3304459819
+          [1663236962.433395][5608:5613] CHIP:TOO:   PartsList: 0 entries
 
           ./chip-tool descriptor read parts-list 1 10
           Verify in TH(chip-tool) Log
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+          [1663236993.718577][5615:5620] CHIP:TOO: Endpoint: 10 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2389378730
+          [1663236993.718639][5615:5620] CHIP:TOO:   PartsList: 0 entries
+
 
           ./chip-tool descriptor read parts-list 1 11
           Verify in TH(chip-tool) Log
-
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
+          1663237029.086031][5627:5632] CHIP:TOO: Endpoint: 11 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3007496001
+          [1663237029.086097][5627:5632] CHIP:TOO:   PartsList: 0 entries
+          [
 
           ./chip-tool descriptor read parts-list 1 12
           Verify in TH(chip-tool) Log
+          [1663237048.194842][5636:5641] CHIP:TOO: Endpoint: 12 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2445783348
+          [1663237048.194910][5636:5641] CHIP:TOO:   PartsList: 0 entries
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
 
           ./chip-tool descriptor read parts-list 1 13
           Verify in TH(chip-tool) Log
+          1663237070.228529][5642:5647] CHIP:TOO: Endpoint: 13 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 4223376445
+          [1663237070.228588][5642:5647] CHIP:TOO:   PartsList: 0 entries
 
-          [1657014071.347535][5854:5859] CHIP:TOO: Endpoint: 7 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1352552269
-          [1657014071.347611][5854:5859] CHIP:TOO:   parts list: 0 entries
 
           ./chip-tool  descriptor read parts-list 1 14
           Verify in TH(chip-tool) Log
@@ -740,31 +748,33 @@ tests:
           ./chip-tool descriptor read device-list 1 4
           Verify in TH(chip-tool) Log
 
-          [1657004014.927308][4678:4683] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1398882309
-          [1657004014.927387][4678:4683] CHIP:TOO:   device list: 2 entries
-          [1657004014.927460][4678:4683] CHIP:TOO:     [1]: {
-          [1657004014.927514][4678:4683] CHIP:TOO:       Type: 259
-          [1657004014.927551][4678:4683] CHIP:TOO:       Revision: 1
-          [1657004014.927585][4678:4683] CHIP:TOO:      }
-          [1657004014.927622][4678:4683] CHIP:TOO:     [2]: {
-          [1657004014.927650][4678:4683] CHIP:TOO:       Type: 19
-          [1657004014.927678][4678:4683] CHIP:TOO:       Revision: 1
-          [1657004014.927705][4678:4683] CHIP:TOO:      }
+          [1663237341.014887][5658:5663] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2509692936
+          [1663237341.014959][5658:5663] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1663237341.015014][5658:5663] CHIP:TOO:     [1]: {
+          [1663237341.015044][5658:5663] CHIP:TOO:       Type: 770
+          [1663237341.015072][5658:5663] CHIP:TOO:       Revision: 1
+          [1663237341.015098][5658:5663] CHIP:TOO:      }
+          [1663237341.015130][5658:5663] CHIP:TOO:     [2]: {
+          [1663237341.015158][5658:5663] CHIP:TOO:       Type: 19
+          [1663237341.015184][5658:5663] CHIP:TOO:       Revision: 1
+          [1663237341.015210][5658:5663] CHIP:TOO:      }
+
 
 
           ./chip-tool descriptor read device-list 1 5
           Verify in TH(chip-tool) Log
 
-          [1657004035.789404][4690:4695] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 130458766
-          [1657004035.789470][4690:4695] CHIP:TOO:   device list: 2 entries
-          [1657004035.789526][4690:4695] CHIP:TOO:     [1]: {
-          [1657004035.789571][4690:4695] CHIP:TOO:       Type: 259
-          [1657004035.789601][4690:4695] CHIP:TOO:       Revision: 1
-          [1657004035.789629][4690:4695] CHIP:TOO:      }
-          [1657004035.789663][4690:4695] CHIP:TOO:     [2]: {
-          [1657004035.789691][4690:4695] CHIP:TOO:       Type: 19
-          [1657004035.789717][4690:4695] CHIP:TOO:       Revision: 1
-          [1657004035.789744][4690:4695] CHIP:TOO:      }
+          [[1663237406.574050][5670:5675] CHIP:DMG: }
+          [1663237406.574405][5670:5675] CHIP:TOO: Endpoint: 5 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1669202494
+          [1663237406.574473][5670:5675] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1663237406.574528][5670:5675] CHIP:TOO:     [1]: {
+          [1663237406.574559][5670:5675] CHIP:TOO:       Type: 770
+          [1663237406.574587][5670:5675] CHIP:TOO:       Revision: 1
+          [1663237406.574612][5670:5675] CHIP:TOO:      }
+          [1663237406.574643][5670:5675] CHIP:TOO:     [2]: {
+          [1663237406.574670][5670:5675] CHIP:TOO:       Type: 19
+          [1663237406.574695][5670:5675] CHIP:TOO:       Revision: 1
+          [1663237406.574721][5670:5675] CHIP:TOO:      }
 
 
           ./chip-tool descriptor read device-list 1 6
