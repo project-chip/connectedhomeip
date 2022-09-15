@@ -14,7 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster {{name}}
- *    {{description}}
+ * 
+ * {{description}}
  */
 @interface MTRBaseCluster{{asUpperCamelCase name}} : MTRCluster
 
@@ -23,6 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}
+
+/**
+ * Command {{name}}
+ *
+ * {{description}}
+ */
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion;
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion;
