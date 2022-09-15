@@ -128,8 +128,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeIdentifyTimeID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID)
                                              params:params];
 }
 
@@ -145,8 +145,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIdentifyID)
-                                  attributeID:@(MTRClusterIdentifyAttributeIdentifyTimeID)
+                                    clusterID:@(MTRClusterIDTypeIdentifyID)
+                                  attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -155,48 +155,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeIdentifyTypeID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIdentifyID)
-                                        attributeID:@(MTRClusterIdentifyAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeIdentifyID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIdentifyAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -442,48 +442,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeNameSupportID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeNameSupportID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupsID)
-                                        attributeID:@(MTRClusterGroupsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeGroupsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -989,88 +989,88 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeSceneCountID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeSceneCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentSceneWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeCurrentSceneID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeCurrentSceneID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentGroupWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeCurrentGroupID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeCurrentGroupID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneValidWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeSceneValidID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeSceneValidID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeNameSupportID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeNameSupportID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLastConfiguredByWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeLastConfiguredByID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterScenesID)
-                                        attributeID:@(MTRClusterScenesAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -1326,24 +1326,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeOnOffID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGlobalSceneControlWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeGlobalSceneControlID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeGlobalSceneControlID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOnTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeOnTimeID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
                                              params:params];
 }
 
@@ -1359,8 +1359,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOnOffID)
-                                  attributeID:@(MTRClusterOnOffAttributeOnTimeID)
+                                    clusterID:@(MTRClusterIDTypeOnOffID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -1369,8 +1369,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOffWaitTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeOffWaitTimeID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID)
                                              params:params];
 }
 
@@ -1386,8 +1386,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOnOffID)
-                                  attributeID:@(MTRClusterOnOffAttributeOffWaitTimeID)
+                                    clusterID:@(MTRClusterIDTypeOnOffID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -1396,8 +1396,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStartUpOnOffWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeStartUpOnOffID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID)
                                              params:params];
 }
 
@@ -1413,8 +1413,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOnOffID)
-                                  attributeID:@(MTRClusterOnOffAttributeStartUpOnOffID)
+                                    clusterID:@(MTRClusterIDTypeOnOffID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -1423,40 +1423,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffID)
-                                        attributeID:@(MTRClusterOnOffAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOnOffID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -1480,16 +1480,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSwitchTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeSwitchTypeID)
+                                          clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSwitchActionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeSwitchActionsID)
+                                          clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID)
                                              params:params];
 }
 
@@ -1505,8 +1505,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                  attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeSwitchActionsID)
+                                    clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -1514,41 +1514,43 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOnOffSwitchConfigurationID)
-                                        attributeID:@(MTRClusterOnOffSwitchConfigurationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -1930,64 +1932,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeCurrentLevelID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRemainingTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeRemainingTimeID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeMinLevelID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeMinLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeMaxLevelID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentFrequencyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeCurrentFrequencyID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinFrequencyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeMinFrequencyID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeMinFrequencyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxFrequencyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeMaxFrequencyID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeMaxFrequencyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOptionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeOptionsID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOptionsID)
                                              params:params];
 }
 
@@ -2003,8 +2005,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeOptionsID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOptionsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2013,8 +2015,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOnOffTransitionTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeOnOffTransitionTimeID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID)
                                              params:params];
 }
 
@@ -2030,8 +2032,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeOnOffTransitionTimeID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2040,8 +2042,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOnLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeOnLevelID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID)
                                              params:params];
 }
 
@@ -2057,8 +2059,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeOnLevelID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2067,8 +2069,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOnTransitionTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeOnTransitionTimeID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID)
                                              params:params];
 }
 
@@ -2084,8 +2086,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeOnTransitionTimeID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2094,8 +2096,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOffTransitionTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeOffTransitionTimeID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID)
                                              params:params];
 }
 
@@ -2111,8 +2113,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeOffTransitionTimeID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2121,8 +2123,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDefaultMoveRateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeDefaultMoveRateID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID)
                                              params:params];
 }
 
@@ -2138,8 +2140,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeDefaultMoveRateID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2148,8 +2150,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStartUpCurrentLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeStartUpCurrentLevelID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID)
                                              params:params];
 }
 
@@ -2165,8 +2167,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLevelControlID)
-                                  attributeID:@(MTRClusterLevelControlAttributeStartUpCurrentLevelID)
+                                    clusterID:@(MTRClusterIDTypeLevelControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2175,40 +2177,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLevelControlID)
-                                        attributeID:@(MTRClusterLevelControlAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeLevelControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -2232,8 +2234,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeActiveTextWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeActiveTextID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID)
                                              params:params];
 }
 
@@ -2249,8 +2251,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributeActiveTextID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2259,8 +2261,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeDescriptionID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID)
                                              params:params];
 }
 
@@ -2276,8 +2278,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributeDescriptionID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2286,8 +2288,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInactiveTextWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeInactiveTextID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID)
                                              params:params];
 }
 
@@ -2303,8 +2305,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributeInactiveTextID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2313,8 +2315,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOutOfServiceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeOutOfServiceID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID)
                                              params:params];
 }
 
@@ -2330,8 +2332,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributeOutOfServiceID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2340,16 +2342,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePolarityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributePolarityID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePresentValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributePresentValueID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID)
                                              params:params];
 }
 
@@ -2365,8 +2367,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributePresentValueID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2375,8 +2377,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeReliabilityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeReliabilityID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID)
                                              params:params];
 }
 
@@ -2392,8 +2394,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBinaryInputBasicID)
-                                  attributeID:@(MTRClusterBinaryInputBasicAttributeReliabilityID)
+                                    clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2402,56 +2404,56 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStatusFlagsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeStatusFlagsID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeApplicationTypeID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBinaryInputBasicID)
-                                        attributeID:@(MTRClusterBinaryInputBasicAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBinaryInputBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -2475,72 +2477,72 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeDeviceTypeListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeServerListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeServerListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClientListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeClientListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeClientListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePartsListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributePartsListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDescriptorID)
-                                        attributeID:@(MTRClusterDescriptorAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -2564,8 +2566,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeBindingID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeBindingID)
                                              params:params];
 }
 
@@ -2581,8 +2583,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBindingID)
-                                  attributeID:@(MTRClusterBindingAttributeBindingID)
+                                    clusterID:@(MTRClusterIDTypeBindingID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBindingAttributeBindingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2591,40 +2593,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBindingID)
-                                        attributeID:@(MTRClusterBindingAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBindingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -2648,8 +2650,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeAclID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
                                              params:params];
 }
 
@@ -2665,8 +2667,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterAccessControlID)
-                                  attributeID:@(MTRClusterAccessControlAttributeAclID)
+                                    clusterID:@(MTRClusterIDTypeAccessControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2675,8 +2677,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeExtensionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeExtensionID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeExtensionID)
                                              params:params];
 }
 
@@ -2692,8 +2694,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterAccessControlID)
-                                  attributeID:@(MTRClusterAccessControlAttributeExtensionID)
+                                    clusterID:@(MTRClusterIDTypeAccessControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeExtensionID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -2701,65 +2703,67 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeSubjectsPerAccessControlEntryWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeSubjectsPerAccessControlEntryID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeAccessControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetsPerAccessControlEntryWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeTargetsPerAccessControlEntryID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAccessControlEntriesPerFabricWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeAccessControlEntriesPerFabricID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeAccessControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccessControlID)
-                                        attributeID:@(MTRClusterAccessControlAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeAccessControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -3244,64 +3248,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeActionListID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeActionListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEndpointListsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeEndpointListsID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeEndpointListsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSetupURLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeSetupURLID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeSetupURLID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterActionsID)
-                                        attributeID:@(MTRClusterActionsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeActionsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterActionsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -3367,48 +3371,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeDataModelRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeDataModelRevisionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeVendorNameID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeVendorNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeVendorIDID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeVendorIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeProductNameID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeProductNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeProductIDID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeProductIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeNodeLabelID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeNodeLabelID)
                                              params:params];
 }
 
@@ -3424,8 +3428,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBasicID)
-                                  attributeID:@(MTRClusterBasicAttributeNodeLabelID)
+                                    clusterID:@(MTRClusterIDTypeBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBasicAttributeNodeLabelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3434,8 +3438,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLocationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeLocationID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeLocationID)
                                              params:params];
 }
 
@@ -3451,8 +3455,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBasicID)
-                                  attributeID:@(MTRClusterBasicAttributeLocationID)
+                                    clusterID:@(MTRClusterIDTypeBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBasicAttributeLocationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3461,80 +3465,80 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeHardwareVersionID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeHardwareVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeHardwareVersionStringID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeHardwareVersionStringID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeSoftwareVersionID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeSoftwareVersionStringID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionStringID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeManufacturingDateID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeManufacturingDateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributePartNumberID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributePartNumberID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeProductURLID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeProductURLID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeProductLabelID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeProductLabelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeSerialNumberID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeSerialNumberID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalConfigDisabledWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeLocalConfigDisabledID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID)
                                              params:params];
 }
 
@@ -3550,8 +3554,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBasicID)
-                                  attributeID:@(MTRClusterBasicAttributeLocalConfigDisabledID)
+                                    clusterID:@(MTRClusterIDTypeBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3560,64 +3564,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeReachableID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeReachableID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeUniqueIDID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeUniqueIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCapabilityMinimaWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeCapabilityMinimaID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeCapabilityMinimaID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBasicID)
-                                        attributeID:@(MTRClusterBasicAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -3779,41 +3783,43 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
+                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateProviderAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateProviderAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -3878,10 +3884,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                             params:params];
 }
 
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -3896,8 +3903,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                  attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                                    clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3906,64 +3913,67 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUpdatePossibleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateProgressWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -3987,8 +3997,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeActiveLocaleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeActiveLocaleID)
+                                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID)
                                              params:params];
 }
 
@@ -4004,8 +4014,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterLocalizationConfigurationID)
-                                  attributeID:@(MTRClusterLocalizationConfigurationAttributeActiveLocaleID)
+                                    clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -4014,48 +4024,50 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSupportedLocalesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeSupportedLocalesID)
+                                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeSupportedLocalesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLocalizationConfigurationID)
-                                        attributeID:@(MTRClusterLocalizationConfigurationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeLocalizationConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -4079,8 +4091,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeHourFormatWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeHourFormatID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID)
                                              params:params];
 }
 
@@ -4096,8 +4108,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                  attributeID:@(MTRClusterTimeFormatLocalizationAttributeHourFormatID)
+                                    clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -4106,8 +4118,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeActiveCalendarTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeActiveCalendarTypeID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID)
                                              params:params];
 }
 
@@ -4123,8 +4135,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                  attributeID:@(MTRClusterTimeFormatLocalizationAttributeActiveCalendarTypeID)
+                                    clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -4132,49 +4144,51 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedCalendarTypesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTimeFormatLocalizationID)
-                                        attributeID:@(MTRClusterTimeFormatLocalizationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeTimeFormatLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -4198,8 +4212,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureUnitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeTemperatureUnitID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID)
                                              params:params];
 }
 
@@ -4215,8 +4229,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterUnitLocalizationID)
-                                  attributeID:@(MTRClusterUnitLocalizationAttributeTemperatureUnitID)
+                                    clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -4225,40 +4239,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUnitLocalizationID)
-                                        attributeID:@(MTRClusterUnitLocalizationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeUnitLocalizationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -4282,48 +4296,50 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSourcesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeSourcesID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceConfigurationID)
-                                        attributeID:@(MTRClusterPowerSourceConfigurationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -4347,288 +4363,288 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeStatusID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOrderWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeOrderID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeOrderID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeDescriptionID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeDescriptionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedInputVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredAssessedInputVoltageID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedInputFrequencyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredAssessedInputFrequencyID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputFrequencyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredCurrentTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredCurrentTypeID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredCurrentTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredAssessedCurrentID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredNominalVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredNominalVoltageID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredNominalVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredMaximumCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredMaximumCurrentID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredMaximumCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredPresentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeWiredPresentID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeWiredPresentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveWiredFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeActiveWiredFaultsID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeActiveWiredFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatVoltageID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatPercentRemainingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatPercentRemainingID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatTimeRemainingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatTimeRemainingID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatChargeLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatChargeLevelID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatReplacementNeededWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatReplacementNeededID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementNeededID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatReplaceabilityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatReplaceabilityID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatReplaceabilityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatPresentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatPresentID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatPresentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveBatFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeActiveBatFaultsID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatReplacementDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatReplacementDescriptionID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementDescriptionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatCommonDesignationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatCommonDesignationID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatCommonDesignationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatANSIDesignationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatANSIDesignationID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatANSIDesignationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatIECDesignationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatIECDesignationID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatIECDesignationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatApprovedChemistryWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatApprovedChemistryID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatApprovedChemistryID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatCapacityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatCapacityID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatCapacityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatQuantityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatQuantityID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatQuantityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatChargeStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatChargeStateID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatTimeToFullChargeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatTimeToFullChargeID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatFunctionalWhileChargingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatFunctionalWhileChargingID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatFunctionalWhileChargingID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBatChargingCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeBatChargingCurrentID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeBatChargingCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveBatChargeFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeActiveBatChargeFaultsID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPowerSourceID)
-                                        attributeID:@(MTRClusterPowerSourceAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypePowerSourceID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPowerSourceAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -4762,8 +4778,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeBreadcrumbID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID)
                                              params:params];
 }
 
@@ -4779,8 +4795,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterGeneralCommissioningID)
-                                  attributeID:@(MTRClusterGeneralCommissioningAttributeBreadcrumbID)
+                                    clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                  attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -4788,73 +4804,75 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeBasicCommissioningInfoWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeBasicCommissioningInfoID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                     attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRegulatoryConfigWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeRegulatoryConfigID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLocationCapabilityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeLocationCapabilityID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportsConcurrentConnectionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralCommissioningID)
-                                        attributeID:@(MTRClusterGeneralCommissioningAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -5100,40 +5118,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeMaxNetworksID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeMaxNetworksID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworksWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeNetworksID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeNetworksID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeScanMaxTimeSecondsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeScanMaxTimeSecondsID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeScanMaxTimeSecondsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeConnectMaxTimeSecondsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInterfaceEnabledWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeInterfaceEnabledID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID)
                                              params:params];
 }
 
@@ -5149,8 +5167,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterNetworkCommissioningID)
-                                  attributeID:@(MTRClusterNetworkCommissioningAttributeInterfaceEnabledID)
+                                    clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                  attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -5159,64 +5177,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLastNetworkingStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeLastNetworkingStatusID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkingStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLastNetworkIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeLastNetworkIDID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLastConnectErrorValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeLastConnectErrorValueID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterNetworkCommissioningID)
-                                        attributeID:@(MTRClusterNetworkCommissioningAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -5274,40 +5292,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDiagnosticLogsID)
-                                        attributeID:@(MTRClusterDiagnosticLogsAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDiagnosticLogsID)
-                                        attributeID:@(MTRClusterDiagnosticLogsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDiagnosticLogsID)
-                                        attributeID:@(MTRClusterDiagnosticLogsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDiagnosticLogsID)
-                                        attributeID:@(MTRClusterDiagnosticLogsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDiagnosticLogsID)
-                                        attributeID:@(MTRClusterDiagnosticLogsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDiagnosticLogsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -5366,112 +5384,113 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeNetworkInterfacesID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeNetworkInterfacesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRebootCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeRebootCountID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUpTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeUpTimeID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalOperationalHoursWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeTotalOperationalHoursID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeBootReasonsID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveHardwareFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveRadioFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeActiveRadioFaultsID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveNetworkFaultsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTestEventTriggersEnabledWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGeneralDiagnosticsID)
-                                        attributeID:@(MTRClusterGeneralDiagnosticsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -5537,72 +5556,73 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeThreadMetricsID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeThreadMetricsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapFreeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapUsedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapHighWatermarkWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSoftwareDiagnosticsID)
-                                        attributeID:@(MTRClusterSoftwareDiagnosticsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -5668,545 +5688,562 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeChannelID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRoutingRoleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRoutingRoleID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRoutingRoleID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeNetworkNameID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNetworkNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePanIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributePanIdID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePanIdID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeExtendedPanIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeshLocalPrefixWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeOverrunCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePartitionIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWeightingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeWeightingID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDataVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeDataVersionID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStableDataVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeStableDataVersionID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeStableDataVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLeaderRouterIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDetachedRoleCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChildRoleCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeChildRoleCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChildRoleCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRouterRoleCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLeaderRoleCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttachAttemptCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePartitionIdChangeCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBetterPartitionAttachAttemptCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                     attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID)
-                                          params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeParentChangeCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeParentChangeCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeParentChangeCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxTotalCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxTotalCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxUnicastCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxBroadcastCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxAckRequestedCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxAckedCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckedCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxNoAckRequestedCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxDataCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxDataCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxDataPollCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxBeaconCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxBeaconRequestCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxOtherCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxOtherCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxOtherCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxRetryCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxRetryCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxRetryCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxDirectMaxRetryExpiryCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxIndirectMaxRetryExpiryCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrCcaCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrAbortCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrBusyChannelCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxTotalCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxTotalCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxUnicastCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxBroadcastCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDataCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDataPollCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxBeaconCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxBeaconRequestCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxOtherCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxOtherCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxOtherCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxAddressFilteredCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDestAddrFilteredCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDuplicatedCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrNoFrameCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrUnknownNeighborCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrInvalidSrcAddrCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrSecCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrFcsCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrOtherCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeActiveTimestampID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveTimestampID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePendingTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributePendingTimestampID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePendingTimestampID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeDelayID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDelayID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSecurityPolicyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelPage0MaskWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalDatasetComponentsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveNetworkFaultsListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterThreadNetworkDiagnosticsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -6272,144 +6309,149 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeBssidID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSecurityTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWiFiVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelNumberWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeChannelNumberID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRssiWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeRssiID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBeaconLostCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBeaconRxCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketMulticastRxCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketMulticastTxCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketUnicastRxCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketUnicastTxCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentMaxRateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeOverrunCountID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeOverrunCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -6475,112 +6517,114 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributePHYRateID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePHYRateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFullDuplexWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeFullDuplexID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFullDuplexID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketRxCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributePacketRxCountID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketRxCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePacketTxCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketTxCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTxErrCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCollisionCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCollisionCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeOverrunCountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCarrierDetectWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTimeSinceResetWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterEthernetNetworkDiagnosticsID)
-                                        attributeID:@(MTRClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -6604,32 +6648,32 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeVendorNameID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeVendorIDID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeProductNameID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeNodeLabelID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID)
                                              params:params];
 }
 
@@ -6645,8 +6689,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                  attributeID:@(MTRClusterBridgedDeviceBasicAttributeNodeLabelID)
+                                    clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -6655,128 +6699,128 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeHardwareVersionID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeHardwareVersionStringID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionStringID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeSoftwareVersionID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeSoftwareVersionStringID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionStringID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeManufacturingDateID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeManufacturingDateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributePartNumberID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributePartNumberID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeProductURLID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductURLID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeProductLabelID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductLabelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeSerialNumberID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSerialNumberID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeReachableID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeReachableID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeUniqueIDID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeUniqueIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBridgedDeviceBasicID)
-                                        attributeID:@(MTRClusterBridgedDeviceBasicAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -6800,64 +6844,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPositionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeNumberOfPositionsID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeCurrentPositionID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeCurrentPositionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMultiPressMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeMultiPressMaxID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeMultiPressMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterSwitchID)
-                                        attributeID:@(MTRClusterSwitchAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeSwitchID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7004,64 +7048,67 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeWindowStatusID)
+                                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAdminFabricIndexWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeAdminFabricIndexID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                     attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAdminVendorIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeAdminVendorIdID)
+                                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAdministratorCommissioningID)
-                                        attributeID:@(MTRClusterAdministratorCommissioningAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAdministratorCommissioningAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7352,88 +7399,90 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeNOCsID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFabricsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeFabricsID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeFabricsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedFabricsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeSupportedFabricsID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeSupportedFabricsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCommissionedFabricsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeCommissionedFabricsID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeCommissionedFabricsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTrustedRootCertificatesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeTrustedRootCertificatesID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeTrustedRootCertificatesID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentFabricIndexWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeCurrentFabricIndexID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOperationalCredentialsID)
-                                        attributeID:@(MTRClusterOperationalCredentialsAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7647,8 +7696,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeGroupKeyMapID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID)
                                              params:params];
 }
 
@@ -7664,8 +7713,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterGroupKeyManagementID)
-                                  attributeID:@(MTRClusterGroupKeyManagementAttributeGroupKeyMapID)
+                                    clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                  attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -7674,64 +7723,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGroupTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeGroupTableID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupTableID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxGroupsPerFabricWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeMaxGroupsPerFabricID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupsPerFabricID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxGroupKeysPerFabricWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterGroupKeyManagementID)
-                                        attributeID:@(MTRClusterGroupKeyManagementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7755,48 +7804,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeLabelListID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFixedLabelID)
-                                        attributeID:@(MTRClusterFixedLabelAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeFixedLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7820,8 +7869,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeLabelListID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeLabelListID)
                                              params:params];
 }
 
@@ -7837,8 +7886,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterUserLabelID)
-                                  attributeID:@(MTRClusterUserLabelAttributeLabelListID)
+                                    clusterID:@(MTRClusterIDTypeUserLabelID)
+                                  attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeLabelListID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -7847,40 +7896,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterUserLabelID)
-                                        attributeID:@(MTRClusterUserLabelAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeUserLabelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -7904,48 +7953,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStateValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeStateValueID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBooleanStateID)
-                                        attributeID:@(MTRClusterBooleanStateAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBooleanStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -8003,40 +8052,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeDescriptionID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeStandardNamespaceID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeSupportedModesID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeCurrentModeID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeStartUpModeID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID)
                                              params:params];
 }
 
@@ -8052,8 +8101,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterModeSelectID)
-                                  attributeID:@(MTRClusterModeSelectAttributeStartUpModeID)
+                                    clusterID:@(MTRClusterIDTypeModeSelectID)
+                                  attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -8062,8 +8111,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeOnModeID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeOnModeID)
                                              params:params];
 }
 
@@ -8079,8 +8128,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterModeSelectID)
-                                  attributeID:@(MTRClusterModeSelectAttributeOnModeID)
+                                    clusterID:@(MTRClusterIDTypeModeSelectID)
+                                  attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeOnModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -8089,40 +8138,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterModeSelectID)
-                                        attributeID:@(MTRClusterModeSelectAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -8858,40 +8907,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeLockStateID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLockStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLockTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeLockTypeID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLockTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActuatorEnabledWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeActuatorEnabledID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeActuatorEnabledID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDoorStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeDoorStateID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDoorStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDoorOpenEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeDoorOpenEventsID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID)
                                              params:params];
 }
 
@@ -8907,8 +8956,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeDoorOpenEventsID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -8917,8 +8966,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeDoorClosedEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeDoorClosedEventsID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID)
                                              params:params];
 }
 
@@ -8934,8 +8983,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeDoorClosedEventsID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -8944,8 +8993,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOpenPeriodWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeOpenPeriodID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID)
                                              params:params];
 }
 
@@ -8961,8 +9010,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeOpenPeriodID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -8971,104 +9020,107 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfTotalUsersSupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfTotalUsersSupportedID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfTotalUsersSupportedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPINUsersSupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfPINUsersSupportedID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfPINUsersSupportedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfRFIDUsersSupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfRFIDUsersSupportedID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfRFIDUsersSupportedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfYearDaySchedulesSupportedPerUserWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfHolidaySchedulesSupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxPINCodeLengthWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeMaxPINCodeLengthID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeMaxPINCodeLengthID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinPINCodeLengthWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeMinPINCodeLengthID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeMinPINCodeLengthID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxRFIDCodeLengthWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeMaxRFIDCodeLengthID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeMaxRFIDCodeLengthID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinRFIDCodeLengthWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeMinRFIDCodeLengthID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeMinRFIDCodeLengthID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCredentialRulesSupportWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeCredentialRulesSupportID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeCredentialRulesSupportID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfCredentialsSupportedPerUserWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeDoorLockID)
+                                     attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLanguageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeLanguageID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLanguageID)
                                              params:params];
 }
 
@@ -9084,8 +9136,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeLanguageID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLanguageID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9094,8 +9146,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLEDSettingsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeLEDSettingsID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID)
                                              params:params];
 }
 
@@ -9111,8 +9163,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeLEDSettingsID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9121,8 +9173,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeAutoRelockTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeAutoRelockTimeID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID)
                                              params:params];
 }
 
@@ -9138,8 +9190,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeAutoRelockTimeID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9148,8 +9200,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSoundVolumeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeSoundVolumeID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID)
                                              params:params];
 }
 
@@ -9165,8 +9217,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeSoundVolumeID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9175,8 +9227,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOperatingModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeOperatingModeID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID)
                                              params:params];
 }
 
@@ -9192,8 +9244,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeOperatingModeID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9202,24 +9254,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSupportedOperatingModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeSupportedOperatingModesID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeSupportedOperatingModesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultConfigurationRegisterWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeDefaultConfigurationRegisterID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeDefaultConfigurationRegisterID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEnableLocalProgrammingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeEnableLocalProgrammingID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID)
                                              params:params];
 }
 
@@ -9237,8 +9289,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeEnableLocalProgrammingID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9247,8 +9299,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnableOneTouchLockingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeEnableOneTouchLockingID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID)
                                              params:params];
 }
 
@@ -9266,8 +9318,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeEnableOneTouchLockingID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9276,8 +9328,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnableInsideStatusLEDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeEnableInsideStatusLEDID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID)
                                              params:params];
 }
 
@@ -9295,8 +9347,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeEnableInsideStatusLEDID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9305,8 +9357,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnablePrivacyModeButtonWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeEnablePrivacyModeButtonID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID)
                                              params:params];
 }
 
@@ -9324,8 +9376,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeEnablePrivacyModeButtonID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9334,8 +9386,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLocalProgrammingFeaturesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeLocalProgrammingFeaturesID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID)
                                              params:params];
 }
 
@@ -9353,8 +9405,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeLocalProgrammingFeaturesID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9363,8 +9415,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeWrongCodeEntryLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeWrongCodeEntryLimitID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID)
                                              params:params];
 }
 
@@ -9380,8 +9432,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeWrongCodeEntryLimitID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9390,8 +9442,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUserCodeTemporaryDisableTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeUserCodeTemporaryDisableTimeID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID)
                                              params:params];
 }
 
@@ -9409,8 +9461,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeUserCodeTemporaryDisableTimeID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9419,8 +9471,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSendPINOverTheAirWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeSendPINOverTheAirID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID)
                                              params:params];
 }
 
@@ -9436,8 +9488,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeSendPINOverTheAirID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9446,8 +9498,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRequirePINforRemoteOperationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeRequirePINforRemoteOperationID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID)
                                              params:params];
 }
 
@@ -9465,8 +9517,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeRequirePINforRemoteOperationID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9475,8 +9527,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeExpiringUserTimeoutWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeExpiringUserTimeoutID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID)
                                              params:params];
 }
 
@@ -9492,8 +9544,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterDoorLockID)
-                                  attributeID:@(MTRClusterDoorLockAttributeExpiringUserTimeoutID)
+                                    clusterID:@(MTRClusterIDTypeDoorLockID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -9502,40 +9554,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterDoorLockID)
-                                        attributeID:@(MTRClusterDoorLockAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeDoorLockID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -9818,168 +9870,174 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeTypeID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalClosedLimitLiftWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributePhysicalClosedLimitLiftID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalClosedLimitTiltWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributePhysicalClosedLimitTiltID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionLiftID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionTiltID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfActuationsLiftWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeNumberOfActuationsLiftID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfActuationsTiltWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeNumberOfActuationsTiltID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsTiltID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeConfigStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeConfigStatusID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeConfigStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftPercentageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionLiftPercentageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercentageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltPercentageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionTiltPercentageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                     attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercentageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeOperationalStatusID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeOperationalStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetPositionLiftPercent100thsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetPositionTiltPercent100thsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEndProductTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeEndProductTypeID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeEndProductTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftPercent100thsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltPercent100thsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledOpenLimitLiftWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeInstalledOpenLimitLiftID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledClosedLimitLiftWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeInstalledClosedLimitLiftID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledOpenLimitTiltWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeInstalledOpenLimitTiltID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledClosedLimitTiltWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeInstalledClosedLimitTiltID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeModeID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeModeID)
                                              params:params];
 }
 
@@ -9995,8 +10053,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterWindowCoveringID)
-                                  attributeID:@(MTRClusterWindowCoveringAttributeModeID)
+                                    clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                  attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10005,48 +10063,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSafetyStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeSafetyStatusID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeSafetyStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWindowCoveringID)
-                                        attributeID:@(MTRClusterWindowCoveringAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeWindowCoveringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWindowCoveringAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -10146,32 +10204,32 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierMovingStateID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierSafetyStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierSafetyStatusID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCapabilitiesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierCapabilitiesID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierOpenEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierOpenEventsID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID)
                                              params:params];
 }
 
@@ -10187,8 +10245,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierOpenEventsID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10197,8 +10255,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCloseEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierCloseEventsID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID)
                                              params:params];
 }
 
@@ -10214,8 +10272,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierCloseEventsID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10224,8 +10282,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCommandOpenEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierCommandOpenEventsID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID)
                                              params:params];
 }
 
@@ -10243,8 +10301,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierCommandOpenEventsID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10253,8 +10311,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCommandCloseEventsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierCommandCloseEventsID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID)
                                              params:params];
 }
 
@@ -10272,8 +10330,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierCommandCloseEventsID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10282,8 +10340,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierOpenPeriodWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierOpenPeriodID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID)
                                              params:params];
 }
 
@@ -10299,8 +10357,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierOpenPeriodID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10309,8 +10367,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierClosePeriodWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierClosePeriodID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID)
                                              params:params];
 }
 
@@ -10326,8 +10384,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBarrierControlID)
-                                  attributeID:@(MTRClusterBarrierControlAttributeBarrierClosePeriodID)
+                                    clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10336,48 +10394,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBarrierPositionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeBarrierPositionID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBarrierControlID)
-                                        attributeID:@(MTRClusterBarrierControlAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBarrierControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -10401,153 +10459,160 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMaxPressureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxPressureID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxSpeedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxSpeedID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxSpeedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxFlowWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxFlowID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxFlowID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinConstPressureWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMinConstPressureID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstPressureID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstPressureWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxConstPressureID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstPressureID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinCompPressureWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMinCompPressureID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinCompPressureID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxCompPressureWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxCompPressureID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxCompPressureID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinConstSpeedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMinConstSpeedID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstSpeedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstSpeedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxConstSpeedID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstSpeedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinConstFlowWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMinConstFlowID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstFlowID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstFlowWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxConstFlowID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstFlowID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinConstTempWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMinConstTempID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstTempID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstTempWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeMaxConstTempID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstTempID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePumpStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributePumpStatusID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePumpStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEffectiveOperationModeWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEffectiveControlModeWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeEffectiveControlModeID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveControlModeID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCapacityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeCapacityID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSpeedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeSpeedID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLifetimeRunningHoursWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID)
+                             params:params];
 }
 
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -10562,8 +10627,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                  attributeID:@(MTRClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID)
+                                    clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10572,17 +10637,18 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributePowerID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLifetimeEnergyConsumedWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID)
+                             params:params];
 }
 
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -10598,19 +10664,20 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                  attributeID:@(MTRClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                         attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeOperationModeID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID)
                                              params:params];
 }
 
@@ -10626,8 +10693,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                  attributeID:@(MTRClusterPumpConfigurationAndControlAttributeOperationModeID)
+                                    clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10636,8 +10703,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeControlModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeControlModeID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID)
                                              params:params];
 }
 
@@ -10653,8 +10720,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                  attributeID:@(MTRClusterPumpConfigurationAndControlAttributeControlModeID)
+                                    clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -10662,42 +10729,45 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPumpConfigurationAndControlID)
-                                        attributeID:@(MTRClusterPumpConfigurationAndControlAttributeClusterRevisionID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeClusterRevisionID)
+                                          params:params];
 }
 
 @end
@@ -10903,80 +10973,80 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeLocalTemperatureID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOutdoorTemperatureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOutdoorTemperatureID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOutdoorTemperatureID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupancyID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupancyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMinHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAbsMinHeatSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAbsMinHeatSetpointLimitID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMaxHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAbsMaxHeatSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAbsMaxHeatSetpointLimitID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMinCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAbsMinCoolSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAbsMinCoolSetpointLimitID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMaxCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAbsMaxCoolSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAbsMaxCoolSetpointLimitID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePICoolingDemandWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributePICoolingDemandID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributePICoolingDemandID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePIHeatingDemandWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributePIHeatingDemandID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributePIHeatingDemandID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeHVACSystemTypeConfigurationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeHVACSystemTypeConfigurationID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID)
                                              params:params];
 }
 
@@ -10994,8 +11064,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeHVACSystemTypeConfigurationID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11004,8 +11074,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureCalibrationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeLocalTemperatureCalibrationID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID)
                                              params:params];
 }
 
@@ -11023,8 +11093,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeLocalTemperatureCalibrationID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11033,8 +11103,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedCoolingSetpointWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupiedCoolingSetpointID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID)
                                              params:params];
 }
 
@@ -11052,8 +11122,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeOccupiedCoolingSetpointID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11062,8 +11132,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedHeatingSetpointWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupiedHeatingSetpointID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID)
                                              params:params];
 }
 
@@ -11081,8 +11151,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeOccupiedHeatingSetpointID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11091,8 +11161,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedCoolingSetpointWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeUnoccupiedCoolingSetpointID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID)
                                              params:params];
 }
 
@@ -11110,8 +11180,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeUnoccupiedCoolingSetpointID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11120,8 +11190,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedHeatingSetpointWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeUnoccupiedHeatingSetpointID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID)
                                              params:params];
 }
 
@@ -11139,8 +11209,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeUnoccupiedHeatingSetpointID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11149,8 +11219,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMinHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeMinHeatSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID)
                                              params:params];
 }
 
@@ -11166,8 +11236,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeMinHeatSetpointLimitID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11176,8 +11246,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMaxHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeMaxHeatSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID)
                                              params:params];
 }
 
@@ -11193,8 +11263,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeMaxHeatSetpointLimitID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11203,8 +11273,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMinCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeMinCoolSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID)
                                              params:params];
 }
 
@@ -11220,8 +11290,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeMinCoolSetpointLimitID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11230,8 +11300,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMaxCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeMaxCoolSetpointLimitID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID)
                                              params:params];
 }
 
@@ -11247,8 +11317,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeMaxCoolSetpointLimitID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11257,8 +11327,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMinSetpointDeadBandWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeMinSetpointDeadBandID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID)
                                              params:params];
 }
 
@@ -11274,8 +11344,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeMinSetpointDeadBandID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11284,8 +11354,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRemoteSensingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeRemoteSensingID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID)
                                              params:params];
 }
 
@@ -11301,8 +11371,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeRemoteSensingID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11311,8 +11381,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeControlSequenceOfOperationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeControlSequenceOfOperationID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID)
                                              params:params];
 }
 
@@ -11330,8 +11400,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeControlSequenceOfOperationID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11340,8 +11410,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSystemModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeSystemModeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSystemModeID)
                                              params:params];
 }
 
@@ -11357,8 +11427,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeSystemModeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSystemModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11367,40 +11437,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeThermostatRunningModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeThermostatRunningModeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningModeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStartOfWeekWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeStartOfWeekID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfWeeklyTransitionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeNumberOfWeeklyTransitionsID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfDailyTransitionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeNumberOfDailyTransitionsID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointHoldWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeTemperatureSetpointHoldID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID)
                                              params:params];
 }
 
@@ -11418,8 +11488,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeTemperatureSetpointHoldID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11428,8 +11498,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointHoldDurationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeTemperatureSetpointHoldDurationID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID)
                                              params:params];
 }
 
@@ -11447,8 +11517,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeTemperatureSetpointHoldDurationID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11456,10 +11526,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeThermostatProgrammingOperationModeWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeThermostatProgrammingOperationModeID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeThermostatID)
+                                     attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID)
+                                          params:params];
 }
 
 - (void)writeAttributeThermostatProgrammingOperationModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -11476,8 +11547,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeThermostatProgrammingOperationModeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11486,40 +11557,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeThermostatRunningStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeThermostatRunningStateID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeSourceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeSetpointChangeSourceID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeAmountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeSetpointChangeAmountID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeAmountID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeSourceTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeSetpointChangeSourceTimestampID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceTimestampID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupiedSetbackID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID)
                                              params:params];
 }
 
@@ -11535,8 +11606,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeOccupiedSetbackID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11545,24 +11616,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupiedSetbackMinID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeOccupiedSetbackMaxID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeUnoccupiedSetbackID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID)
                                              params:params];
 }
 
@@ -11578,8 +11649,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeUnoccupiedSetbackID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11588,24 +11659,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeUnoccupiedSetbackMinID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeUnoccupiedSetbackMaxID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEmergencyHeatDeltaWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeEmergencyHeatDeltaID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID)
                                              params:params];
 }
 
@@ -11621,8 +11692,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeEmergencyHeatDeltaID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11631,8 +11702,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACTypeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACTypeID)
                                              params:params];
 }
 
@@ -11648,8 +11719,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACTypeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACTypeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11658,8 +11729,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACCapacityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACCapacityID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCapacityID)
                                              params:params];
 }
 
@@ -11675,8 +11746,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACCapacityID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCapacityID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11685,8 +11756,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACRefrigerantTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACRefrigerantTypeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID)
                                              params:params];
 }
 
@@ -11702,8 +11773,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACRefrigerantTypeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11712,8 +11783,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACCompressorTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACCompressorTypeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID)
                                              params:params];
 }
 
@@ -11729,8 +11800,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACCompressorTypeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11739,8 +11810,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACErrorCodeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACErrorCodeID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID)
                                              params:params];
 }
 
@@ -11756,8 +11827,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACErrorCodeID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11766,8 +11837,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACLouverPositionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACLouverPositionID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID)
                                              params:params];
 }
 
@@ -11783,8 +11854,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACLouverPositionID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11793,16 +11864,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeACCoilTemperatureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACCoilTemperatureID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeACCapacityformatWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeACCapacityformatID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID)
                                              params:params];
 }
 
@@ -11818,8 +11889,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatID)
-                                  attributeID:@(MTRClusterThermostatAttributeACCapacityformatID)
+                                    clusterID:@(MTRClusterIDTypeThermostatID)
+                                  attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11828,40 +11899,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatID)
-                                        attributeID:@(MTRClusterThermostatAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeThermostatID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -11885,8 +11956,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFanModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeFanModeID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeFanModeID)
                                              params:params];
 }
 
@@ -11902,8 +11973,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributeFanModeID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeFanModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11912,8 +11983,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFanModeSequenceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeFanModeSequenceID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID)
                                              params:params];
 }
 
@@ -11929,8 +12000,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributeFanModeSequenceID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11939,8 +12010,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePercentSettingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributePercentSettingID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributePercentSettingID)
                                              params:params];
 }
 
@@ -11956,8 +12027,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributePercentSettingID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributePercentSettingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -11966,24 +12037,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePercentCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributePercentCurrentID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSpeedMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeSpeedMaxID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSpeedSettingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeSpeedSettingID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID)
                                              params:params];
 }
 
@@ -11999,8 +12070,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributeSpeedSettingID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -12009,24 +12080,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeSpeedCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeSpeedCurrentID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRockSupportWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeRockSupportID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeRockSupportID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRockSettingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeRockSettingID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeRockSettingID)
                                              params:params];
 }
 
@@ -12042,8 +12113,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributeRockSettingID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeRockSettingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -12052,16 +12123,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeWindSupportWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeWindSupportID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeWindSupportID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWindSettingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeWindSettingID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeWindSettingID)
                                              params:params];
 }
 
@@ -12077,8 +12148,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterFanControlID)
-                                  attributeID:@(MTRClusterFanControlAttributeWindSettingID)
+                                    clusterID:@(MTRClusterIDTypeFanControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeWindSettingID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -12087,40 +12158,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFanControlID)
-                                        attributeID:@(MTRClusterFanControlAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeFanControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFanControlAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -12143,11 +12214,12 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureDisplayModeWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                     attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID)
-                                          params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID)
+                             params:params];
 }
 
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -12163,20 +12235,23 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                  attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                         attributeID:
+                             @(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeKeypadLockoutWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID)
+                             params:params];
 }
 
 - (void)writeAttributeKeypadLockoutWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -12190,20 +12265,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                  attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                         attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeScheduleProgrammingVisibilityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID)
                              params:params];
 }
 
@@ -12222,8 +12299,9 @@ using chip::SessionHandle;
 
     [self.device
         writeAttributeWithEndpointID:@(_endpoint)
-                           clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                         attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID)
+                           clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                         attributeID:
+                             @(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID)
                                value:dataValueDictionary
                expectedValueInterval:expectedValueIntervalMs
                    timedWriteTimeout:timedWriteTimeout];
@@ -12231,42 +12309,47 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeAttributeListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterThermostatUserInterfaceConfigurationID)
-                                        attributeID:@(MTRClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID)
+                        attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID)
+                             params:params];
 }
 
 @end
@@ -13011,80 +13094,80 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCurrentHueID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentSaturationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCurrentSaturationID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRemainingTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeRemainingTimeID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCurrentXID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCurrentXID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCurrentYID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCurrentYID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDriftCompensationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeDriftCompensationID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeDriftCompensationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCompensationTextWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCompensationTextID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCompensationTextID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorTemperatureMiredsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorTemperatureMiredsID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorModeID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorModeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOptionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeOptionsID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeOptionsID)
                                              params:params];
 }
 
@@ -13100,8 +13183,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeOptionsID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeOptionsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13110,160 +13193,160 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPrimariesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeNumberOfPrimariesID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeNumberOfPrimariesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary1XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary1XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary1XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary1YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary1YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary1YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary1IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary1IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary1IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary2XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary2XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary2XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary2YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary2YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary2YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary2IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary2IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary2IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary3XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary3XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary3XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary3YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary3YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary3YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary3IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary3IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary3IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary4XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary4XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary4XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary4YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary4YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary4YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary4IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary4IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary4IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary5XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary5XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary5XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary5YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary5YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary5YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary5IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary5IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary5IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary6XWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary6XID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary6XID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary6YWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary6YID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary6YID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary6IntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributePrimary6IntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributePrimary6IntensityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWhitePointXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeWhitePointXID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID)
                                              params:params];
 }
 
@@ -13279,8 +13362,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeWhitePointXID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13289,8 +13372,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeWhitePointYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeWhitePointYID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID)
                                              params:params];
 }
 
@@ -13306,8 +13389,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeWhitePointYID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13316,8 +13399,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointRXID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID)
                                              params:params];
 }
 
@@ -13333,8 +13416,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointRXID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13343,8 +13426,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointRYID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID)
                                              params:params];
 }
 
@@ -13360,8 +13443,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointRYID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13370,8 +13453,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRIntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointRIntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID)
                                              params:params];
 }
 
@@ -13387,8 +13470,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointRIntensityID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13397,8 +13480,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointGXID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID)
                                              params:params];
 }
 
@@ -13414,8 +13497,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointGXID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13424,8 +13507,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointGYID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID)
                                              params:params];
 }
 
@@ -13441,8 +13524,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointGYID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13451,8 +13534,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGIntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointGIntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID)
                                              params:params];
 }
 
@@ -13468,8 +13551,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointGIntensityID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13478,8 +13561,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBXWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointBXID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID)
                                              params:params];
 }
 
@@ -13495,8 +13578,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointBXID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13505,8 +13588,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBYWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointBYID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID)
                                              params:params];
 }
 
@@ -13522,8 +13605,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointBYID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13532,8 +13615,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBIntensityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorPointBIntensityID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID)
                                              params:params];
 }
 
@@ -13549,8 +13632,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeColorPointBIntensityID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13559,96 +13642,97 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnhancedCurrentHueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeEnhancedCurrentHueID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEnhancedColorModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeEnhancedColorModeID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeEnhancedColorModeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopActiveWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorLoopActiveID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorLoopActiveID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopDirectionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorLoopDirectionID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorLoopDirectionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorLoopTimeID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorLoopTimeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopStartEnhancedHueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorLoopStartEnhancedHueID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorLoopStartEnhancedHueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopStoredEnhancedHueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorLoopStoredEnhancedHueID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorLoopStoredEnhancedHueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorCapabilitiesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorCapabilitiesID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorCapabilitiesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorTempPhysicalMinMiredsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorTempPhysicalMinMiredsID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMinMiredsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeColorTempPhysicalMaxMiredsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeColorTempPhysicalMaxMiredsID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMaxMiredsID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCoupleColorTempToLevelMinMiredsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeColorControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStartUpColorTemperatureMiredsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeStartUpColorTemperatureMiredsID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID)
                                              params:params];
 }
 
@@ -13666,8 +13750,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterColorControlID)
-                                  attributeID:@(MTRClusterColorControlAttributeStartUpColorTemperatureMiredsID)
+                                    clusterID:@(MTRClusterIDTypeColorControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13676,40 +13760,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterColorControlID)
-                                        attributeID:@(MTRClusterColorControlAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeColorControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -13733,32 +13817,32 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributePhysicalMinLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributePhysicalMinLevelID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalMaxLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributePhysicalMaxLevelID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMaxLevelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBallastStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeBallastStatusID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeMinLevelID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID)
                                              params:params];
 }
 
@@ -13774,8 +13858,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeMinLevelID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13784,8 +13868,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMaxLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeMaxLevelID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID)
                                              params:params];
 }
 
@@ -13801,8 +13885,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeMaxLevelID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13810,10 +13894,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeIntrinsicBalanceFactorWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
+                                          params:params];
 }
 
 - (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -13830,8 +13915,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13839,10 +13924,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeBallastFactorAdjustmentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID)
+                                          params:params];
 }
 
 - (void)writeAttributeBallastFactorAdjustmentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -13859,8 +13945,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13869,16 +13955,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLampQuantityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampQuantityID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLampTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampTypeID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID)
                                              params:params];
 }
 
@@ -13894,8 +13980,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampTypeID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13904,8 +13990,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLampManufacturerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampManufacturerID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID)
                                              params:params];
 }
 
@@ -13921,8 +14007,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampManufacturerID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13931,8 +14017,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLampRatedHoursWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampRatedHoursID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID)
                                              params:params];
 }
 
@@ -13948,8 +14034,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampRatedHoursID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13958,8 +14044,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLampBurnHoursWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampBurnHoursID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID)
                                              params:params];
 }
 
@@ -13975,8 +14061,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampBurnHoursID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -13985,8 +14071,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLampAlarmModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampAlarmModeID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID)
                                              params:params];
 }
 
@@ -14002,8 +14088,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampAlarmModeID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -14011,10 +14097,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeLampBurnHoursTripPointWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeLampBurnHoursTripPointID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID)
+                                          params:params];
 }
 
 - (void)writeAttributeLampBurnHoursTripPointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14031,8 +14118,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterBallastConfigurationID)
-                                  attributeID:@(MTRClusterBallastConfigurationAttributeLampBurnHoursTripPointID)
+                                    clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                  attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -14041,40 +14128,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterBallastConfigurationID)
-                                        attributeID:@(MTRClusterBallastConfigurationAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeBallastConfigurationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14098,80 +14185,81 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeMinMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMinMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeMaxMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMaxMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeToleranceID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLightSensorTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeLightSensorTypeID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeLightSensorTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIlluminanceMeasurementID)
-                                        attributeID:@(MTRClusterIlluminanceMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14195,72 +14283,73 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeMinMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMinMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeMaxMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMaxMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeToleranceID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTemperatureMeasurementID)
-                                        attributeID:@(MTRClusterTemperatureMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeTemperatureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14284,112 +14373,112 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeMinMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeMinMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeMaxMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeToleranceID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeScaledValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeScaledValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinScaledValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeMinScaledValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeMinScaledValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxScaledValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeMaxScaledValueID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxScaledValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeScaledToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeScaledToleranceID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeScaleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeScaleID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeScaleID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterPressureMeasurementID)
-                                        attributeID:@(MTRClusterPressureMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypePressureMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPressureMeasurementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14413,72 +14502,72 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeMinMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeMinMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeMaxMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeMaxMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeToleranceID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterFlowMeasurementID)
-                                        attributeID:@(MTRClusterFlowMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeFlowMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14502,73 +14591,78 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeToleranceID)
+                                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeToleranceID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterRelativeHumidityMeasurementID)
-                                        attributeID:@(MTRClusterRelativeHumidityMeasurementAttributeClusterRevisionID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeClusterRevisionID)
+                                          params:params];
 }
 
 @end
@@ -14591,33 +14685,34 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeOccupancyID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancySensorTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeOccupancySensorTypeID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancySensorTypeBitmapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeOccupancySensorTypeBitmapID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                          params:params];
 }
 
 - (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14634,8 +14729,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                    clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -14643,10 +14738,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                          params:params];
 }
 
 - (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14663,8 +14759,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                    clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -14672,10 +14768,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                             params:params];
 }
 
 - (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14691,20 +14788,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID)
+                             params:params];
 }
 
 - (void)writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14720,20 +14819,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID)
+                             params:params];
 }
 
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14749,20 +14850,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID)
+                             params:params];
 }
 
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14778,20 +14881,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID)
+                             params:params];
 }
 
 - (void)writeAttributePhysicalContactOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14807,20 +14912,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID)
+                             params:params];
 }
 
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -14836,12 +14943,13 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactUnoccupiedToOccupiedThresholdWithParams:
@@ -14849,8 +14957,9 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterOccupancySensingID)
-                        attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID)
+                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID)
                              params:params];
 }
 
@@ -14867,51 +14976,53 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterOccupancySensingID)
-                                  attributeID:@(MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                         attributeID:
+                             @(MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterOccupancySensingID)
-                                        attributeID:@(MTRClusterOccupancySensingAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOccupancySensingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -14935,48 +15046,48 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeMACAddressID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterWakeOnLanID)
-                                        attributeID:@(MTRClusterWakeOnLanAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -15100,64 +15211,64 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeChannelListID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeChannelListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLineupWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeLineupID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeLineupID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentChannelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeCurrentChannelID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeCurrentChannelID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterChannelID)
-                                        attributeID:@(MTRClusterChannelAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeChannelID)
+                                        attributeID:@(MTRAttributeIDTypeClusterChannelAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -15216,56 +15327,56 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeTargetListID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeTargetListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentTargetWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeCurrentTargetID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeCurrentTargetID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTargetNavigatorID)
-                                        attributeID:@(MTRClusterTargetNavigatorAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeTargetNavigatorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTargetNavigatorAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -15687,96 +15798,96 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeCurrentStateID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeCurrentStateID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStartTimeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeStartTimeID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeStartTimeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDurationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeDurationID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeDurationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSampledPositionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeSampledPositionID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeSampledPositionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePlaybackSpeedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributePlaybackSpeedID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributePlaybackSpeedID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSeekRangeEndWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeSeekRangeEndID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeEndID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSeekRangeStartWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeSeekRangeStartID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeStartID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaPlaybackID)
-                                        attributeID:@(MTRClusterMediaPlaybackAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeMediaPlaybackID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaPlaybackAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -15953,56 +16064,56 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeInputListID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeInputListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentInputWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeCurrentInputID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeCurrentInputID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterMediaInputID)
-                                        attributeID:@(MTRClusterMediaInputAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeMediaInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterMediaInputAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16065,40 +16176,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLowPowerID)
-                                        attributeID:@(MTRClusterLowPowerAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeLowPowerID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLowPowerID)
-                                        attributeID:@(MTRClusterLowPowerAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeLowPowerID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLowPowerID)
-                                        attributeID:@(MTRClusterLowPowerAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeLowPowerID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLowPowerID)
-                                        attributeID:@(MTRClusterLowPowerAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeLowPowerID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterLowPowerID)
-                                        attributeID:@(MTRClusterLowPowerAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeLowPowerID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLowPowerAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16153,40 +16264,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterKeypadInputID)
-                                        attributeID:@(MTRClusterKeypadInputAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeKeypadInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterKeypadInputID)
-                                        attributeID:@(MTRClusterKeypadInputAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeKeypadInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterKeypadInputID)
-                                        attributeID:@(MTRClusterKeypadInputAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeKeypadInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterKeypadInputID)
-                                        attributeID:@(MTRClusterKeypadInputAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeKeypadInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterKeypadInputID)
-                                        attributeID:@(MTRClusterKeypadInputAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeKeypadInputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterKeypadInputAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16426,17 +16537,18 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeAcceptHeaderID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedStreamingProtocolsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeSupportedStreamingProtocolsID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                     attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID)
+                                          params:params];
 }
 
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -16453,8 +16565,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterContentLauncherID)
-                                  attributeID:@(MTRClusterContentLauncherAttributeSupportedStreamingProtocolsID)
+                                    clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                  attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -16463,40 +16575,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterContentLauncherID)
-                                        attributeID:@(MTRClusterContentLauncherAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeContentLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterContentLauncherAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16589,56 +16701,56 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeOutputListID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeOutputListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentOutputWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeCurrentOutputID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeCurrentOutputID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAudioOutputID)
-                                        attributeID:@(MTRClusterAudioOutputAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeAudioOutputID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAudioOutputAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16762,16 +16874,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeCatalogListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeCatalogListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentAppWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeCurrentAppID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID)
                                              params:params];
 }
 
@@ -16787,8 +16899,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterApplicationLauncherID)
-                                  attributeID:@(MTRClusterApplicationLauncherAttributeCurrentAppID)
+                                    clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                  attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -16797,40 +16909,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationLauncherID)
-                                        attributeID:@(MTRClusterApplicationLauncherAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeApplicationLauncherID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationLauncherAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -16854,104 +16966,104 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeVendorNameID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeVendorIDID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeVendorIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeApplicationNameID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationNameID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeProductIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeProductIDID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeProductIDID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeApplicationID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeStatusID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeStatusID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationVersionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeApplicationVersionID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationVersionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAllowedVendorListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeAllowedVendorListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeAllowedVendorListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterApplicationBasicID)
-                                        attributeID:@(MTRClusterApplicationBasicAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeApplicationBasicID)
+                                        attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -17089,40 +17201,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccountLoginID)
-                                        attributeID:@(MTRClusterAccountLoginAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAccountLoginID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccountLoginID)
-                                        attributeID:@(MTRClusterAccountLoginAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeAccountLoginID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccountLoginID)
-                                        attributeID:@(MTRClusterAccountLoginAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeAccountLoginID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccountLoginID)
-                                        attributeID:@(MTRClusterAccountLoginAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeAccountLoginID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterAccountLoginID)
-                                        attributeID:@(MTRClusterAccountLoginAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeAccountLoginID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -17224,473 +17336,492 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasurementTypeID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcVoltageID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcVoltageMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcVoltageMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcCurrentID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcCurrentMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcCurrentMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcPowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcPowerMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcPowerMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcVoltageMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcVoltageDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcCurrentMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcCurrentDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcPowerMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeDcPowerDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcFrequencyID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcFrequencyMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcFrequencyMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNeutralCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeNeutralCurrentID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalActivePowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeTotalActivePowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalReactivePowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeTotalReactivePowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalApparentPowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeTotalApparentPowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcFrequencyMultiplierID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcFrequencyDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePowerMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePowerMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePowerDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePowerDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeInstantaneousVoltageID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousLineCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeInstantaneousLineCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousActiveCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousReactiveCurrentWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousPowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeInstantaneousPowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMinID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMaxID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeReactivePowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeApparentPowerID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePowerFactorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsVoltageMeasurementPeriodWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID)
+                             params:params];
 }
 
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -17706,20 +17837,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                         attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID)
+                             params:params];
 }
 
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -17735,20 +17868,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                         attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID)
+                             params:params];
 }
 
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -17764,20 +17899,22 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                         attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID)
+                             params:params];
 }
 
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -17793,19 +17930,20 @@ using chip::SessionHandle;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
+    [self.device
+        writeAttributeWithEndpointID:@(_endpoint)
+                           clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                         attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID)
+                               value:dataValueDictionary
+               expectedValueInterval:expectedValueIntervalMs
+                   timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID)
                                              params:params];
 }
 
@@ -17821,8 +17959,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID)
+                                    clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                  attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -17830,10 +17968,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID)
+                                          params:params];
 }
 
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -17850,8 +17989,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID)
+                                    clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                  attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -17860,56 +17999,56 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcVoltageMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcVoltageDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcCurrentMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcCurrentDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcPowerMultiplierID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcPowerDivisorWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcPowerDivisorID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeOverloadAlarmsMaskID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID)
                                              params:params];
 }
 
@@ -17925,8 +18064,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeOverloadAlarmsMaskID)
+                                    clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                  attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -17935,24 +18074,24 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeVoltageOverloadWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeVoltageOverloadID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentOverloadWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeCurrentOverloadID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID)
                                              params:params];
 }
 
@@ -17968,8 +18107,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterElectricalMeasurementID)
-                                  attributeID:@(MTRClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID)
+                                    clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                  attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -17978,200 +18117,207 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageOverloadWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcVoltageOverloadID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentOverloadWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcCurrentOverloadID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcActivePowerOverloadWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcActivePowerOverloadID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcReactivePowerOverloadWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcReactivePowerOverloadID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltageWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSagID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSwellID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLineCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeLineCurrentPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReactiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltagePhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeReactivePowerPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeApparentPowerPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePowerFactorPhaseBID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID)
                                              params:params];
 }
 
@@ -18179,176 +18325,184 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterElectricalMeasurementID)
-                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID)
                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLineCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeLineCurrentPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReactiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltagePhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeReactivePowerPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeApparentPowerPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributePowerFactorPhaseCID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID)
                                              params:params];
 }
 
@@ -18356,96 +18510,103 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterElectricalMeasurementID)
-                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID)
                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterElectricalMeasurementID)
-                                        attributeID:@(MTRClusterElectricalMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -19942,8 +20103,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBooleanID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBooleanID)
                                              params:params];
 }
 
@@ -19959,8 +20120,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBooleanID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -19969,8 +20130,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap8ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap8ID)
                                              params:params];
 }
 
@@ -19986,8 +20147,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap8ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -19996,8 +20157,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap16ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap16ID)
                                              params:params];
 }
 
@@ -20013,8 +20174,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap16ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20023,8 +20184,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap32WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap32ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap32ID)
                                              params:params];
 }
 
@@ -20040,8 +20201,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap32ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap32ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20050,8 +20211,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap64WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap64ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap64ID)
                                              params:params];
 }
 
@@ -20067,8 +20228,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap64ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeBitmap64ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20077,8 +20238,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt8uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt8uID)
                                              params:params];
 }
 
@@ -20094,8 +20255,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt8uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20104,8 +20265,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt16uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt16uID)
                                              params:params];
 }
 
@@ -20121,8 +20282,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt16uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20131,8 +20292,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt24uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt24uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt24uID)
                                              params:params];
 }
 
@@ -20148,8 +20309,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt24uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt24uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20158,8 +20319,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt32uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt32uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt32uID)
                                              params:params];
 }
 
@@ -20175,8 +20336,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt32uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt32uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20185,8 +20346,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt40uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt40uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt40uID)
                                              params:params];
 }
 
@@ -20202,8 +20363,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt40uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt40uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20212,8 +20373,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt48uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt48uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt48uID)
                                              params:params];
 }
 
@@ -20229,8 +20390,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt48uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt48uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20239,8 +20400,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt56uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt56uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt56uID)
                                              params:params];
 }
 
@@ -20256,8 +20417,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt56uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt56uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20266,8 +20427,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt64uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt64uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt64uID)
                                              params:params];
 }
 
@@ -20283,8 +20444,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt64uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt64uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20293,8 +20454,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt8sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt8sID)
                                              params:params];
 }
 
@@ -20310,8 +20471,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt8sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20320,8 +20481,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt16sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt16sID)
                                              params:params];
 }
 
@@ -20337,8 +20498,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt16sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20347,8 +20508,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt24sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt24sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt24sID)
                                              params:params];
 }
 
@@ -20364,8 +20525,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt24sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt24sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20374,8 +20535,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt32sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt32sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt32sID)
                                              params:params];
 }
 
@@ -20391,8 +20552,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt32sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt32sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20401,8 +20562,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt40sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt40sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt40sID)
                                              params:params];
 }
 
@@ -20418,8 +20579,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt40sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt40sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20428,8 +20589,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt48sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt48sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt48sID)
                                              params:params];
 }
 
@@ -20445,8 +20606,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt48sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt48sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20455,8 +20616,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt56sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt56sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt56sID)
                                              params:params];
 }
 
@@ -20472,8 +20633,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt56sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt56sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20482,8 +20643,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt64sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt64sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt64sID)
                                              params:params];
 }
 
@@ -20499,8 +20660,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt64sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeInt64sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20509,8 +20670,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnum8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnum8ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnum8ID)
                                              params:params];
 }
 
@@ -20526,8 +20687,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnum8ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnum8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20536,8 +20697,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnum16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnum16ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnum16ID)
                                              params:params];
 }
 
@@ -20553,8 +20714,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnum16ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnum16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20563,8 +20724,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFloatSingleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFloatSingleID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeFloatSingleID)
                                              params:params];
 }
 
@@ -20580,8 +20741,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeFloatSingleID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeFloatSingleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20590,8 +20751,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFloatDoubleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFloatDoubleID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeFloatDoubleID)
                                              params:params];
 }
 
@@ -20607,8 +20768,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeFloatDoubleID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeFloatDoubleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20617,8 +20778,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeOctetStringID)
                                              params:params];
 }
 
@@ -20634,8 +20795,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20644,8 +20805,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListInt8uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListInt8uID)
                                              params:params];
 }
 
@@ -20661,8 +20822,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListInt8uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20671,8 +20832,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListOctetStringID)
                                              params:params];
 }
 
@@ -20688,8 +20849,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20698,8 +20859,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListStructOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListStructOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListStructOctetStringID)
                                              params:params];
 }
 
@@ -20717,8 +20878,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListStructOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListStructOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20727,8 +20888,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLongOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeLongOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeLongOctetStringID)
                                              params:params];
 }
 
@@ -20744,8 +20905,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeLongOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeLongOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20754,8 +20915,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeCharStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeCharStringID)
                                              params:params];
 }
 
@@ -20771,8 +20932,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeCharStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20781,8 +20942,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLongCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeLongCharStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeLongCharStringID)
                                              params:params];
 }
 
@@ -20798,8 +20959,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeLongCharStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeLongCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20808,8 +20969,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEpochUsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEpochUsID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEpochUsID)
                                              params:params];
 }
 
@@ -20825,8 +20986,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEpochUsID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEpochUsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20835,8 +20996,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEpochSWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEpochSID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEpochSID)
                                              params:params];
 }
 
@@ -20852,8 +21013,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEpochSID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEpochSID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20862,8 +21023,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeVendorIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeVendorIdID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeVendorIdID)
                                              params:params];
 }
 
@@ -20879,8 +21040,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeVendorIdID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeVendorIdID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20888,10 +21049,11 @@ using chip::SessionHandle;
 
 - (NSDictionary<NSString *, id> *)readAttributeListNullablesAndOptionalsStructWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTestClusterID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListNullablesAndOptionalsStructID)
+                                          params:params];
 }
 
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -20908,8 +21070,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListNullablesAndOptionalsStructID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20918,8 +21080,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnumAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnumAttrID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnumAttrID)
                                              params:params];
 }
 
@@ -20935,8 +21097,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnumAttrID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeEnumAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20945,8 +21107,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStructAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeStructAttrID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeStructAttrID)
                                              params:params];
 }
 
@@ -20962,8 +21124,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeStructAttrID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeStructAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20972,8 +21134,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt8uID)
                                              params:params];
 }
 
@@ -20989,8 +21151,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -20999,8 +21161,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt8sID)
                                              params:params];
 }
 
@@ -21016,8 +21178,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21026,8 +21188,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt16uID)
                                              params:params];
 }
 
@@ -21045,8 +21207,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21055,8 +21217,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt16sID)
                                              params:params];
 }
 
@@ -21074,8 +21236,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeRangeRestrictedInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21084,8 +21246,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListLongOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListLongOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListLongOctetStringID)
                                              params:params];
 }
 
@@ -21101,8 +21263,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListLongOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListLongOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21111,8 +21273,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListFabricScopedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListFabricScopedID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListFabricScopedID)
                                              params:params];
 }
 
@@ -21128,8 +21290,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListFabricScopedID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeListFabricScopedID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21138,8 +21300,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTimedWriteBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeTimedWriteBooleanID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeTimedWriteBooleanID)
                                              params:params];
 }
 
@@ -21155,8 +21317,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeTimedWriteBooleanID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeTimedWriteBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21165,8 +21327,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneralErrorBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeGeneralErrorBooleanID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeGeneralErrorBooleanID)
                                              params:params];
 }
 
@@ -21182,8 +21344,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeGeneralErrorBooleanID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeGeneralErrorBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21192,8 +21354,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeClusterErrorBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeClusterErrorBooleanID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeClusterErrorBooleanID)
                                              params:params];
 }
 
@@ -21209,8 +21371,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeClusterErrorBooleanID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeClusterErrorBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21219,8 +21381,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUnsupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeUnsupportedID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeUnsupportedID)
                                              params:params];
 }
 
@@ -21236,8 +21398,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeUnsupportedID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeUnsupportedID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21246,8 +21408,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBooleanID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBooleanID)
                                              params:params];
 }
 
@@ -21263,8 +21425,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBooleanID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21273,8 +21435,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap8ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap8ID)
                                              params:params];
 }
 
@@ -21290,8 +21452,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap8ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21300,8 +21462,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap16ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap16ID)
                                              params:params];
 }
 
@@ -21317,8 +21479,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap16ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21327,8 +21489,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap32WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap32ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap32ID)
                                              params:params];
 }
 
@@ -21344,8 +21506,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap32ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap32ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21354,8 +21516,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap64WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap64ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap64ID)
                                              params:params];
 }
 
@@ -21371,8 +21533,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap64ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableBitmap64ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21381,8 +21543,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt8uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt8uID)
                                              params:params];
 }
 
@@ -21398,8 +21560,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt8uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21408,8 +21570,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt16uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt16uID)
                                              params:params];
 }
 
@@ -21425,8 +21587,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt16uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21435,8 +21597,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt24uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt24uID)
                                              params:params];
 }
 
@@ -21452,8 +21614,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt24uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt24uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21462,8 +21624,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt32uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt32uID)
                                              params:params];
 }
 
@@ -21479,8 +21641,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt32uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt32uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21489,8 +21651,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt40uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt40uID)
                                              params:params];
 }
 
@@ -21506,8 +21668,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt40uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt40uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21516,8 +21678,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt48uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt48uID)
                                              params:params];
 }
 
@@ -21533,8 +21695,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt48uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt48uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21543,8 +21705,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt56uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt56uID)
                                              params:params];
 }
 
@@ -21560,8 +21722,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt56uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt56uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21570,8 +21732,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt64uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt64uID)
                                              params:params];
 }
 
@@ -21587,8 +21749,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt64uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt64uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21597,8 +21759,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt8sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt8sID)
                                              params:params];
 }
 
@@ -21614,8 +21776,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt8sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21624,8 +21786,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt16sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt16sID)
                                              params:params];
 }
 
@@ -21641,8 +21803,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt16sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21651,8 +21813,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt24sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt24sID)
                                              params:params];
 }
 
@@ -21668,8 +21830,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt24sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt24sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21678,8 +21840,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt32sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt32sID)
                                              params:params];
 }
 
@@ -21695,8 +21857,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt32sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt32sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21705,8 +21867,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt40sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt40sID)
                                              params:params];
 }
 
@@ -21722,8 +21884,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt40sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt40sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21732,8 +21894,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt48sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt48sID)
                                              params:params];
 }
 
@@ -21749,8 +21911,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt48sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt48sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21759,8 +21921,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt56sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt56sID)
                                              params:params];
 }
 
@@ -21776,8 +21938,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt56sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt56sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21786,8 +21948,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt64sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt64sID)
                                              params:params];
 }
 
@@ -21803,8 +21965,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt64sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableInt64sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21813,8 +21975,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnum8ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnum8ID)
                                              params:params];
 }
 
@@ -21830,8 +21992,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnum8ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnum8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21840,8 +22002,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnum16ID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnum16ID)
                                              params:params];
 }
 
@@ -21857,8 +22019,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnum16ID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnum16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21867,8 +22029,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatSingleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableFloatSingleID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableFloatSingleID)
                                              params:params];
 }
 
@@ -21884,8 +22046,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableFloatSingleID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableFloatSingleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21894,8 +22056,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatDoubleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableFloatDoubleID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableFloatDoubleID)
                                              params:params];
 }
 
@@ -21911,8 +22073,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableFloatDoubleID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableFloatDoubleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21921,8 +22083,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableOctetStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableOctetStringID)
                                              params:params];
 }
 
@@ -21938,8 +22100,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableOctetStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21948,8 +22110,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableCharStringID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableCharStringID)
                                              params:params];
 }
 
@@ -21965,8 +22127,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableCharStringID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -21975,8 +22137,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnumAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnumAttrID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnumAttrID)
                                              params:params];
 }
 
@@ -21992,8 +22154,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnumAttrID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableEnumAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22002,8 +22164,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableStructWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableStructID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableStructID)
                                              params:params];
 }
 
@@ -22019,8 +22181,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableStructID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableStructID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22029,8 +22191,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
                                              params:params];
 }
 
@@ -22048,8 +22210,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22058,8 +22220,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
                                              params:params];
 }
 
@@ -22077,8 +22239,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22087,8 +22249,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
                                              params:params];
 }
 
@@ -22106,8 +22268,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22116,8 +22278,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
                                              params:params];
 }
 
@@ -22135,8 +22297,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
+                                    clusterID:@(MTRClusterIDTypeTestClusterID)
+                                  attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -22145,40 +22307,40 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeTestClusterID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTestClusterAttributeClusterRevisionID)
                                              params:params];
 }
 
