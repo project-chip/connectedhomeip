@@ -82,10 +82,10 @@ namespace chip {
  *  of address lookup are not cache the and a request is sent on the link. Failing
  *  to deliver the first message is far more likely to happen due to lossy link
  *  than an actual address change where the peer did not reset. In the lossy link
- *  situation the frequent lookup would make the link even worse. Additionally,
- *  every message that arrives from a peer updates the address. If the peer has fallen
- *  off the link due to any other reason, a re-resolve may not achieve an address that
- *  is reachable, even if a resolve response occurs.
+ *  situation, doing further DNS resolutions on a degraded link can exacerbate that
+ *  problem greatly. Additionally, every message that arrives from a peer updates the
+ *  address. If the peer has fallen off the link due to any other reason, a re-resolve
+ *  may not achieve an address that is reachable, even if a resolve response occurs.
  */
 #ifndef CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
 #define CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE 0
