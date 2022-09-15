@@ -585,7 +585,7 @@ tests:
       verification: |
           DUT implementation required to verify read an attribute of data type Float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -871,24 +871,72 @@ tests:
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
           The message flow  can expect as mentioned below
-            TH -> DUT ReadRequest
-              DUT -> TH ReportData, not last chunk
-              TH -> DUT StatusResponse
-              Possibly repeat steps 2 & 3 a few times
-              DUT -> TH ReportData, last chunk, SuppressResponse set to true
-              TH -> DUT standalone ack
+             TH(all-clusters-app) -> DUT(chip-tool) ReadRequest
+              DUT(chip-tool) -> TH(all-clusters-app) ReportData, not last chunk
+              TH (all-clusters-app)-> DUT(chip-tool) StatusResponse
+              Possibly DUT and TH repeat  itself steps 2 & 3 a few times
+              DUT(chip-tool) -> TH(all-clusters-app) ReportData, last chunk, SuppressResponse set to true
+              TH(all-clusters-app) -> DUT(chip-tool) standalone ack
 
-          On TH verify that  The last chunked message should not receive any status response from the DUT
-
-          [1658396687.401934][3726:3731] CHIP:DMG:
-          [1658396687.401958][3726:3731] CHIP:DMG:                 },
-          [1658396687.401987][3726:3731] CHIP:DMG:
-          [1658396687.402010][3726:3731] CHIP:DMG:         ],
-          [1658396687.402048][3726:3731] CHIP:DMG:
-          [1658396687.402072][3726:3731] CHIP:DMG:         SuppressResponse = true,
-          [1658396687.402097][3726:3731] CHIP:DMG:         InteractionModelRevision = 1
-          [1658396687.402119][3726:3731] CHIP:DMG: }
-          [1658396687.402400][3726:3731] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFB DataVersion: 3456275847
+          From TH(all-clusters-app) will send read request to DUT(chip-tool), Then DUT(chip-tool) will send the report data message for the request which sent from TH(All-clusters-app), this report message keep on generating  the report data until it reaches the last chuck message and for last chunk message DUT(chip-tool) will not get status response message
+          [1663148506.794519][39604:39604] CHIP:EM: Removed CHIP MessageCounter:119127068 from RetransTable on exchange 23857r
+          [1663148506.794525][39604:39604] CHIP:DMG: StatusResponseMessage =
+          [1663148506.794527][39604:39604] CHIP:DMG: {
+          [1663148506.794530][39604:39604] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1663148506.794533][39604:39604] CHIP:DMG:         InteractionModelRevision = 1
+          [1663148506.794535][39604:39604] CHIP:DMG: }
+          [1663148506.794538][39604:39604] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1663148506.794542][39604:39604] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
+          [1663148506.794544][39604:39604] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663148506.794550][39604:39604] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663148506.794553][39604:39604] CHIP:DMG: <RE:Run> Cluster 2f, Attribute fffb is dirty
+          [1663148506.794554][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=2 AttributeId=0x0000_FFFB (expanded=1)
+          [1663148506.794558][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002F e=2 p=v
+          [1663148506.794561][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794570][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute 0 is dirty
+          [1663148506.794572][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_0000 (expanded=1)
+          [1663148506.794575][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794578][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794583][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute 1 is dirty
+          [1663148506.794585][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_0001 (expanded=1)
+          [1663148506.794588][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794591][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794595][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute 2 is dirty
+          [1663148506.794597][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_0002 (expanded=1)
+          [1663148506.794600][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794603][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794607][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute fffc is dirty
+          [1663148506.794609][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_FFFC (expanded=1)
+          [1663148506.794613][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794615][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794620][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute fffd is dirty
+          [1663148506.794622][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_FFFD (expanded=1)
+          [1663148506.794624][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794626][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794630][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute fff8 is dirty
+          [1663148506.794632][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_FFF8 (expanded=1)
+          [1663148506.794635][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794638][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794642][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute fff9 is dirty
+          [1663148506.794644][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_FFF9 (expanded=1)
+          [1663148506.794647][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794650][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794653][39604:39604] CHIP:DMG: <RE:Run> Cluster 406, Attribute fffb is dirty
+          [1663148506.794655][39604:39604] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=2 AttributeId=0x0000_FFFB (expanded=1)
+          [1663148506.794657][39604:39604] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=2 p=v
+          [1663148506.794660][39604:39604] CHIP:DMG: AccessControl: allowed
+          [1663148506.794671][39604:39604] CHIP:DMG: <RE> Sending report (payload has 626 bytes)...
+          [1663148506.794675][39604:39604] CHIP:EM: Piggybacking Ack for MessageCounter:219862429 on exchange: 23857r
+          [1663148506.794682][39604:39604] CHIP:IN: Prepared secure message 0x56076c430da8 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 23857r with MessageCounter:119127069.
+          [1663148506.794686][39604:39604] CHIP:IN: Sending encrypted msg 0x56076c430da8 with MessageCounter:119127069 to 0x000000000001B669 (1) at monotonic time: 000000000279FAAD msec
+          [1663148506.794700][39604:39604] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
+          [1663148506.794703][39604:39604] CHIP:DMG: <RE> ReportsInFlight = 0 with readHandler 0, RE has no more messages
+          [1663148506.794705][39604:39604] CHIP:DMG: IM RH moving to [AwaitingDestruction]
+          [1663148506.794710][39604:39604] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
+          [1663148506.796418][39604:39604] CHIP:EM: Received message of type 0x10 with protocolId (0, 0) and MessageCounter:219862430 on exchange 23857r
+          [1663148506.796422][39604:39604] CHIP:EM: Found matching exchange: 23857r, Delegate: (nil)
+          [1663148506.796427][39604:39604] CHIP:EM: Rxd Ack; Removing MessageCounter:119127069 from Retrans Table on exchange 23857r
+          [1663148506.796429][39604:39604] CHIP:EM: Removed CHIP MessageCounter:119127069 from RetransTable on exchange 23857r
       disabled: true
 
     - label:
