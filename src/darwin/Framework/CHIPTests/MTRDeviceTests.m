@@ -19,9 +19,9 @@
  */
 
 // module headers
-#import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
@@ -738,7 +738,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                    }];
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
@@ -748,7 +748,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
     [device subscribeWithQueue:queue
         params:params
-        attributeCacheContainer:attributeCacheContainer
+        clusterStateCacheContainer:clusterStateCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Received report: %@", value);
             if (reportHandler) {
@@ -792,15 +792,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Read cache
     NSLog(@"Reading from cache...");
     XCTestExpectation * cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [MTRBaseClusterOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                                     endpoint:@1
-                                                        queue:queue
-                                                   completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                                       NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                                       XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                                       XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
-                                                       [cacheExpectation fulfill];
-                                                   }];
+    [MTRBaseClusterOnOff readAttributeOnOffWithClusterStateCache:clusterStateCacheContainer
+                                                        endpoint:@1
+                                                           queue:queue
+                                                      completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                                          NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                                          XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                          XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
+                                                          [cacheExpectation fulfill];
+                                                      }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
@@ -855,118 +855,118 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Read cache
     NSLog(@"Reading from cache...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [MTRBaseClusterOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                                     endpoint:@1
-                                                        queue:queue
-                                                   completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                                       NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                                       XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                                       XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
-                                                       [cacheExpectation fulfill];
-                                                   }];
+    [MTRBaseClusterOnOff readAttributeOnOffWithClusterStateCache:clusterStateCacheContainer
+                                                        endpoint:@1
+                                                           queue:queue
+                                                      completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                                          NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                                          XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                          XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
+                                                          [cacheExpectation fulfill];
+                                                      }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Read from cache using generic path
     NSLog(@"Reading from cache using generic path...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:@1
-                          clusterID:@6
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertEqual([values count], 1);
-                             MTRAttributePath * path = values[0][@"attributePath"];
-                             XCTAssertEqual([path.endpoint unsignedShortValue], 1);
-                             XCTAssertEqual([path.cluster unsignedLongValue], 6);
-                             XCTAssertEqual([path.attribute unsignedLongValue], 0);
-                             XCTAssertNil(values[0][@"error"]);
-                             XCTAssertTrue([values[0][@"data"][@"type"] isEqualToString:@"Boolean"]);
-                             XCTAssertEqual([values[0][@"data"][@"value"] boolValue], NO);
-                             [cacheExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:@1
+                              clusterID:@6
+                            attributeID:@0
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                 XCTAssertEqual([values count], 1);
+                                 MTRAttributePath * path = values[0][@"attributePath"];
+                                 XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                                 XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                                 XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                                 XCTAssertNil(values[0][@"error"]);
+                                 XCTAssertTrue([values[0][@"data"][@"type"] isEqualToString:@"Boolean"]);
+                                 XCTAssertEqual([values[0][@"data"][@"value"] boolValue], NO);
+                                 [cacheExpectation fulfill];
+                             }];
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 
     // Read from cache with wildcard path
     NSLog(@"Reading from cache using wildcard endpoint...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:nil
-                          clusterID:@6
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertTrue([values count] > 0);
-                             for (NSDictionary<NSString *, id> * value in values) {
-                                 MTRAttributePath * path = value[@"attributePath"];
-                                 XCTAssertEqual([path.cluster unsignedLongValue], 6);
-                                 XCTAssertEqual([path.attribute unsignedLongValue], 0);
-                                 XCTAssertNil(value[@"error"]);
-                             }
-                             [cacheExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:nil
+                              clusterID:@6
+                            attributeID:@0
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                 XCTAssertTrue([values count] > 0);
+                                 for (NSDictionary<NSString *, id> * value in values) {
+                                     MTRAttributePath * path = value[@"attributePath"];
+                                     XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                                     XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                                     XCTAssertNil(value[@"error"]);
+                                 }
+                                 [cacheExpectation fulfill];
+                             }];
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 
     // Read from cache with wildcard path
     NSLog(@"Reading from cache using wildcard cluster ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:@1
-                          clusterID:nil
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertTrue([values count] > 0);
-                             for (NSDictionary<NSString *, id> * value in values) {
-                                 MTRAttributePath * path = value[@"attributePath"];
-                                 XCTAssertEqual([path.endpoint unsignedShortValue], 1);
-                                 XCTAssertEqual([path.attribute unsignedLongValue], 0);
-                             }
-                             [cacheExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:@1
+                              clusterID:nil
+                            attributeID:@0
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                 XCTAssertTrue([values count] > 0);
+                                 for (NSDictionary<NSString *, id> * value in values) {
+                                     MTRAttributePath * path = value[@"attributePath"];
+                                     XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                                     XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                                 }
+                                 [cacheExpectation fulfill];
+                             }];
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 
     // Read from cache with wildcard path
     NSLog(@"Reading from cache using wildcard attribute ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:@1
-                          clusterID:@6
-                        attributeID:nil
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertTrue([values count] > 0);
-                             for (NSDictionary<NSString *, id> * value in values) {
-                                 MTRAttributePath * path = value[@"attributePath"];
-                                 XCTAssertEqual([path.endpoint unsignedShortValue], 1);
-                                 XCTAssertEqual([path.cluster unsignedLongValue], 6);
-                                 XCTAssertNil(value[@"error"]);
-                             }
-                             [cacheExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:@1
+                              clusterID:@6
+                            attributeID:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                 XCTAssertTrue([values count] > 0);
+                                 for (NSDictionary<NSString *, id> * value in values) {
+                                     MTRAttributePath * path = value[@"attributePath"];
+                                     XCTAssertEqual([path.endpoint unsignedShortValue], 1);
+                                     XCTAssertEqual([path.cluster unsignedLongValue], 6);
+                                     XCTAssertNil(value[@"error"]);
+                                 }
+                                 [cacheExpectation fulfill];
+                             }];
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 
     // Read from cache with wildcard path
     NSLog(@"Reading from cache using wildcard endpoint ID and cluster ID...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:nil
-                          clusterID:nil
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                             XCTAssertNotNil(error);
-                             [cacheExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributePathWithEndpointID:nil
+                              clusterID:nil
+                            attributeID:@0
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                                 XCTAssertNotNil(error);
+                                 [cacheExpectation fulfill];
+                             }];
     [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 }
 

@@ -226,7 +226,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                                                            maxInterval:@(maxIntervalSeconds)];
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
                     params:params
-                    attributeCacheContainer:nil
+                    clusterStateCacheContainer:nil
                     attributeReportHandler:^(NSArray * _Nullable reports) {
                         if (!reports)
                             return;

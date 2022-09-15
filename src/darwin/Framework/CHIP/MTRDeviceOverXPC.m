@@ -17,8 +17,8 @@
 
 #import "MTRDeviceOverXPC.h"
 
-#import "MTRAttributeCacheContainer+XPC.h"
 #import "MTRCluster.h"
+#import "MTRClusterStateCacheContainer+XPC.h"
 #import "MTRDeviceController+XPC.h"
 #import "MTRDeviceControllerOverXPC_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
@@ -50,19 +50,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                     params:(MTRSubscribeParams *)params
-    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(void (^_Nullable)(NSArray * value))attributeReportHandler
-         eventReportHandler:(void (^_Nullable)(NSArray * value))eventReportHandler
-               errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
-    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+                        params:(MTRSubscribeParams *)params
+    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
+        attributeReportHandler:(void (^_Nullable)(NSArray * value))attributeReportHandler
+            eventReportHandler:(void (^_Nullable)(NSArray * value))eventReportHandler
+                  errorHandler:(void (^)(NSError * error))errorHandler
+       subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     MTR_LOG_DEBUG("Subscribing all attributes... Note that attributeReportHandler, eventReportHandler, and resubscriptionScheduled "
                   "are not supported.");
     __auto_type workBlock = ^{
-        if (attributeCacheContainer) {
-            [attributeCacheContainer setXPCConnection:self->_xpcConnection controllerID:self.controllerID deviceID:self.nodeID];
+        if (clusterStateCacheContainer) {
+            [clusterStateCacheContainer setXPCConnection:self->_xpcConnection controllerID:self.controllerID deviceID:self.nodeID];
         }
         [self->_xpcConnection getProxyHandleWithCompletion:^(
             dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
                 [handle.proxy subscribeWithController:self.controllerID
                                                nodeID:self.nodeID
                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
-                                          shouldCache:(attributeCacheContainer != nil)
+                                          shouldCache:(clusterStateCacheContainer != nil)
                                            completion:^(NSError * _Nullable error) {
                                                dispatch_async(queue, ^{
                                                    if (error) {
