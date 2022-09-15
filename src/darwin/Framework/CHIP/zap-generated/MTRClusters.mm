@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
-#import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRBaseDevice_internal.h"
 #import "MTRCallbackBridge_internal.h"
 #import "MTRClusterConstants.h"

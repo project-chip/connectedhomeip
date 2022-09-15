@@ -17,8 +17,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRAttributeCacheContainer.h>
-
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRCommandPayloadsObjc.h>

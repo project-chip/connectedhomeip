@@ -2,7 +2,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRBaseClusters_internal.h"
 #import "MTRBaseDevice.h"
 #import "MTRBaseDevice_Internal.h"
@@ -176,18 +176,18 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
     MTRSubscribeAttribute<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge, {{asObjectiveCClass type parent.name}}, TypeInfo::DecodableType>(params, subscriptionEstablished, reportHandler, self.callbackQueue, self.device, self->_endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
 }
 
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     auto * bridge = new MTR{{>attribute_data_callback_name}}CallbackBridge(queue, completion);
     std::move(*bridge).DispatchLocalAction(^({{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb) {
-          if (attributeCacheContainer.cppAttributeCache) {
+          if (clusterStateCacheContainer.cppClusterStateCache) {
               chip::app::ConcreteAttributePath path;
               using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
               path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
               path.mClusterId = TypeInfo::GetClusterId();
               path.mAttributeId = TypeInfo::GetAttributeId();
               TypeInfo::DecodableType value;
-              CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+              CHIP_ERROR err = clusterStateCacheContainer.cppClusterStateCache->Get<TypeInfo>(path, value);
               if (err == CHIP_NO_ERROR)
               {
                 successCb(bridge, value);
@@ -280,7 +280,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 }
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-  [self readAttribute{{asUpperCamelCase name}}WithAttributeCache:attributeCacheContainer endpoint:endpoint queue:queue completion:
+  [self readAttribute{{asUpperCamelCase name}}WithClusterStateCache:attributeCacheContainer.realContainer endpoint:endpoint queue:queue completion:
       ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         // Cast is safe because subclass does not add any selectors.
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
