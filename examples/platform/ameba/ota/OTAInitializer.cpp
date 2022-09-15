@@ -20,8 +20,6 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
-#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 
 using namespace chip;
@@ -30,11 +28,9 @@ using namespace chip::DeviceLayer;
 namespace {
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-ExtendedOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
 } // namespace
 
 extern "C" void amebaQueryImageCmdHandler()
@@ -59,9 +55,4 @@ void OTAInitializer::InitOTARequestor(void)
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
 }
