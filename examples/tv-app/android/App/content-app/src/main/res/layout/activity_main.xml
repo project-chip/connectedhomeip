@@ -7,12 +7,49 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/helloTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="10pt"
+        app:layout_constraintBottom_toTopOf="@+id/commandTextView"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/commandTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/helloTextView"
+        android:textSize="10pt"
+        android:text="No Command!!"
+        app:layout_constraintBottom_toTopOf="@+id/sendMessageButton"
+        app:layout_constraintTop_toBottomOf="@+id/helloTextView" />
+
+    <Spinner
+        android:id="@+id/spinnerAttribute"
+        android:layout_width="239dp"
+        android:layout_height="40dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sendMessageButton"
+        app:layout_constraintTop_toBottomOf="@+id/commandTextView" />
+
+
+    <Button
+        android:id="@+id/sendMessageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/helloTextView"
+        android:text="Update"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/spinnerAttribute"
+        app:layout_constraintTop_toBottomOf="@+id/commandTextView" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="spinnerAttribute,sendMessageButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
