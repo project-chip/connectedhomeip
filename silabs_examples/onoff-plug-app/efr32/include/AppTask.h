@@ -23,13 +23,19 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "BaseApplication.h"
+#include "FreeRTOS.h"
 #include "OnOffPlugManager.h"
 #include "sl_simple_button_instances.h"
-
-#include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
+
+/**********************************************************
+ * Defines
+ *********************************************************/
+
+// Application-defined error codes in the CHIP_ERROR space.
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -39,53 +45,66 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
-class AppTask
+/**********************************************************
+ * AppTask Declaration
+ *********************************************************/
+class AppTask : public BaseApplication
 {
 
 public:
-    CHIP_ERROR StartAppTask();
+
+    AppTask() = default;
+
+    static AppTask & GetAppTask() { return sAppTask; }
+
+    /**
+     * @brief AppTask task main loop function
+     *
+     * @param pvParameter FreeRTOS task parameter
+     */
     static void AppTaskMain(void * pvParameter);
 
-    void PostEvent(const AppEvent * event);
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
+    CHIP_ERROR StartAppTask();
+
+    /**
+     * @brief Event handler when a button is pressed
+     * Function posts an event for button processing
+     *
+     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
+     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
+     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     */
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
+
+        /**
+     * @brief Callback called by the identify-server when an identify command is received
+     *
+     * @param identify identify structure the command applies on
+     */
+    static void OnIdentifyStart(Identify * identify);
+
+    /**
+     * @brief Callback called by the identify-server when an identify command is stopped or finished
+     *
+     * @param identify identify structure the command applies on
+     */
+    static void OnIdentifyStop(Identify * identify);
 
 private:
-    friend AppTask & GetAppTask(void);
+    static AppTask sAppTask;
 
-    CHIP_ERROR Init();
-
-    static void ApplyAction(OnOffPlugManager::Action_t aAction, int32_t aActor);
-
-    void CancelTimer(void);
-
-    void DispatchEvent(AppEvent * event);
-
-    static void OnOffButtonHandler(AppEvent * aEvent);
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
-    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(OnOffPlugManager::Action_t aAction);
+    static void OnOffActionEventHandler(AppEvent * aEvent);
 
     static void UpdateClusterState(intptr_t context);
 
-    void StartTimer(uint32_t aTimeoutMs);
+    /**
+     * @brief AppTask initialisation function
+     *
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR Init();
 
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
-
-        kFunction_Invalid
-    } Function;
-
-    Function_t mFunction;
-    bool mFunctionTimerActive;
-
-    static AppTask sAppTask;
+    static void TimerEventHandler(TimerHandle_t xTimer);
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}

@@ -47,25 +47,7 @@
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/EFR32/ThreadStackManagerImpl.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-#endif
-#ifdef SL_WIFI
-#include "wfx_host_events.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
-#endif /* SL_WIFI */
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
-#define EXAMPLE_VENDOR_ID 0xcafe
-
-#define SYSTEM_STATE_LED &sl_led_led0
 #define ONOFF_LED &sl_led_led1
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_ONOFF_BUTTON &sl_button_btn1
@@ -74,40 +56,9 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
-
-TaskHandle_t sAppTaskHandle;
-QueueHandle_t sAppEventQueue;
-
-LEDWidget sStatusLED;
 LEDWidget sOnOffLED;
 
-#ifdef DISPLAY_ENABLED
-SilabsLCD slLCD;
-#endif
-
-#ifdef SL_WIFI
-bool sIsWiFiProvisioned = false;
-bool sIsWiFiEnabled     = false;
-bool sIsWiFiAttached    = false;
-
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif /* SL_WIFI */
-
-#if CHIP_ENABLE_OPENTHREAD
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-#endif /* CHIP_ENABLE_OPENTHREAD */
-bool sHaveBLEConnections = false;
-
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
-StaticQueue_t sAppEventQueueStruct;
-
-StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-StaticTask_t appTaskStruct;
 
 /**********************************************************
  * Identify Callbacks
@@ -116,7 +67,12 @@ StaticTask_t appTaskStruct;
 namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
+    ChipLogProgress(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    AppTask::GetAppTask().StopStatusLEDTimer();
+#endif
 }
 } // namespace
 
@@ -155,8 +111,8 @@ void OnTriggerIdentifyEffect(Identify * identify)
 
 Identify gIdentify = {
     chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    AppTask::GetAppTask().OnIdentifyStart,
+    AppTask::GetAppTask().OnIdentifyStop,
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnTriggerIdentifyEffect,
 };
@@ -168,53 +124,20 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::StartAppTask()
-{
-    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (sAppEventQueue == NULL)
-    {
-        EFR32_LOG("Failed to allocate app event queue");
-        appError(APP_ERROR_EVENT_QUEUE_FAILED);
-    }
-
-    // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    return (sAppTaskHandle == nullptr) ? APP_ERROR_CREATE_TASK_FAILED : CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-#ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    EFR32_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    EFR32_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-
-    sWiFiNetworkCommissioningInstance.Init();
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) "onoffPlug-App");
 #endif
 
-    // Create FreeRTOS sw timer for Function Selection.
-    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
-                                  1,                // == default timer period (mS)
-                                  false,            // no timer reload (==one-shot)
-                                  (void *) this,    // init timer id = app task obj context
-                                  TimerEventHandler // timer callback handler
-    );
-    if (sFunctionTimer == NULL)
+    err = BaseApplication::Init(&gIdentify);
+    if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("funct timer create failed");
-        appError(APP_ERROR_CREATE_TIMER_FAILED);
+        EFR32_LOG("BaseApplication::Init() failed");
+        appError(err);
     }
 
-    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     err = PlugMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -222,45 +145,23 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-    PlugMgr().SetCallbacks(ApplyAction);
+    PlugMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Initialize LEDs
-    LEDWidget::InitGpio();
-    sStatusLED.Init(SYSTEM_STATE_LED);
     sOnOffLED.Init(ONOFF_LED);
     sOnOffLED.Set(PlugMgr().IsPlugOn());
 
-#ifdef DISPLAY_ENABLED
-    slLCD.Init((uint8_t *) "OnOff-Plug-App");
-#endif
-
-    ConfigurationMgr().LogDeviceConfig();
-
-// Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
-    // Create buffer for QR code that can fit max size and null terminator.
-    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-    chip::MutableCharSpan QRCode(qrCodeBuffer);
-
-    if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
-    {
-        slLCD.SetQRCode((uint8_t *) QRCode.data(), QRCode.size());
-        slLCD.ShowQRCode(true, true);
-    }
-    else
-    {
-        EFR32_LOG("Getting QR code failed!");
-    }
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif // QR_CODE_ENABLED
-
     return err;
+}
+
+CHIP_ERROR AppTask::StartAppTask()
+{
+    return BaseApplication::StartAppTask(AppTaskMain);
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
+    QueueHandle_t sAppEventQueue = *(static_cast<QueueHandle_t *>(pvParameter));
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -268,6 +169,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         EFR32_LOG("AppTask.Init() failed");
         appError(err);
     }
+
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    sAppTask.StartStatusLEDTimer();
+#endif
 
     EFR32_LOG("App Task started");
 
@@ -279,74 +184,51 @@ void AppTask::AppTaskMain(void * pvParameter)
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
+    }
+}
 
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-#ifdef SL_WIFI
-            sIsWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-            sIsWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-            sIsWiFiAttached    = ConnectivityMgr().IsWiFiStationConnected();
-#endif /* SL_WIFI */
-#if CHIP_ENABLE_OPENTHREAD
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-#endif /* CHIP_ENABLE_OPENTHREAD */
-            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
+void AppTask::OnIdentifyStart(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStart");
 
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink
-        // the LEDs at an even rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (gIdentify.mActive)
-            {
-                sStatusLED.Blink(250, 250);
-            }
-            if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
-            {
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
-                {
-                    sStatusLED.Blink(50, 50);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
-                {
-                    sStatusLED.Blink(1000, 1000);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
-                {
-                    sStatusLED.Blink(300, 700);
-                }
-            }
-#if CHIP_ENABLE_OPENTHREAD
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-#else
-            if (sIsWiFiProvisioned && sIsWiFiEnabled && !sIsWiFiAttached)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    sAppTask.StartStatusLEDTimer();
 #endif
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else if (sHaveBLEConnections) { sStatusLED.Blink(100, 100); }
-            else { sStatusLED.Blink(50, 950); }
-        }
+}
 
-        sStatusLED.Animate();
-        sOnOffLED.Animate();
+void AppTask::OnIdentifyStop(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStop");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    sAppTask.StopStatusLEDTimer();
+#endif
+}
+
+void AppTask::OnOffActionEventHandler(AppEvent * aEvent)
+{
+    bool initiated = false;
+    OnOffPlugManager::Action_t action;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    
+
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        action = (PlugMgr().IsPlugOn()) ? OnOffPlugManager::OFF_ACTION : OnOffPlugManager::ON_ACTION;
+    }
+    else
+    {
+        err = APP_ERROR_UNHANDLED_EVENT;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        initiated = PlugMgr().InitiateAction(aEvent->Type, action);
+
+        if (!initiated)
+        {
+            EFR32_LOG("Action is already in progress or active.");
+        }
     }
 }
 
@@ -363,237 +245,49 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
 
     if (buttonHandle == APP_ONOFF_BUTTON && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
-        button_event.Handler = OnOffButtonHandler;
+        button_event.Handler = OnOffActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
     else if (buttonHandle == APP_FUNCTION_BUTTON)
     {
-        button_event.Handler = FunctionHandler;
+        button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
 
-void AppTask::OnOffButtonHandler(AppEvent * aEvent)
+void AppTask::ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    OnOffPlugManager::Action_t action;
+    // Action initiated, update the light led
+    bool lightOn = aAction == OnOffPlugManager::ON_ACTION;
+    EFR32_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    sOnOffLED.Set(lightOn);
 
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        if (PlugMgr().IsPlugOn())
-        {
-            action = OnOffPlugManager::OFF_ACTION;
-        }
-        else
-        {
-            action = OnOffPlugManager::ON_ACTION;
-        }
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
-    }
+#ifdef DISPLAY_ENABLED
+    sAppTask.GetLCD().WriteDemoUI(lightOn);
+#endif
 
-    if (err == CHIP_NO_ERROR)
+    if (aActor == AppEvent::kEventType_Button)
     {
-        bool initiated = PlugMgr().InitiateAction(aEvent->Type, action);
-
-        if (!initiated)
-        {
-            EFR32_LOG("Action is already in progress or active.");
-        }
+        sAppTask.mSyncClusterToButtonAction = true;
     }
 }
 
-void AppTask::TimerEventHandler(TimerHandle_t xTimer)
-{
-    AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *) xTimer;
-    event.Handler            = FunctionTimerEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type != AppEvent::kEventType_Timer)
-    {
-        return;
-    }
-
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
-    {
-        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
-        // cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        sAppTask.mFunction = kFunction_FactoryReset;
-
-        // Turn off all LEDs before starting blink to make sure blink is
-        // co-ordinated.
-        sStatusLED.Set(false);
-        sOnOffLED.Set(false);
-
-        sStatusLED.Blink(500);
-        sOnOffLED.Blink(500);
-    }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
-    {
-        // Actually trigger Factory Reset
-        sAppTask.mFunction = kFunction_NoneSelected;
-        chip::Server::GetInstance().ScheduleFactoryReset();
-    }
-}
-
-void AppTask::FunctionHandler(AppEvent * aEvent)
-{
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
-    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
-    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
-    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
-    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
-    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
-        {
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = kFunction_StartBleAdv;
-        }
-    }
-    else
-    {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
-        {
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-#ifdef SL_WIFI
-            if (!ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-            if (!ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
-            {
-                // Enable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
-            }
-            else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
-        }
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
-        {
-            // Set OnOff status LED back to show state of outlet.
-            sOnOffLED.Set(PlugMgr().IsPlugOn());
-
-            sAppTask.CancelTimer();
-
-            // Change the function to none selected since factory reset has been
-            // canceled.
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            EFR32_LOG("Factory Reset has been Canceled");
-        }
-    }
-}
-
-void AppTask::CancelTimer()
-{
-    if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
-    {
-        EFR32_LOG("app timer stop() failed");
-        appError(APP_ERROR_STOP_TIMER_FAILED);
-    }
-
-    mFunctionTimerActive = false;
-}
-
-void AppTask::StartTimer(uint32_t aTimeoutInMs)
-{
-    if (xTimerIsTimerActive(sFunctionTimer))
-    {
-        EFR32_LOG("app timer already started!");
-        CancelTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
-    {
-        EFR32_LOG("app timer start() failed");
-        appError(APP_ERROR_START_TIMER_FAILED);
-    }
-
-    mFunctionTimerActive = true;
-}
-
-void AppTask::ApplyAction(OnOffPlugManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(OnOffPlugManager::Action_t aAction)
 {
     // action has been completed on the outlet
     if (aAction == OnOffPlugManager::ON_ACTION)
     {
         EFR32_LOG("Outlet ON")
-        sOnOffLED.Set(true);
     }
     else if (aAction == OnOffPlugManager::OFF_ACTION)
     {
         EFR32_LOG("Outlet OFF")
-        sOnOffLED.Set(false);
     }
 
-    if (aActor == AppEvent::kEventType_Button)
+    if (sAppTask.mSyncClusterToButtonAction)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
-    }
-}
-
-void AppTask::PostEvent(const AppEvent * aEvent)
-{
-    if (sAppEventQueue != NULL)
-    {
-        BaseType_t status;
-        if (xPortIsInsideInterrupt())
-        {
-            BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
-
-#ifdef portYIELD_FROM_ISR
-            portYIELD_FROM_ISR(higherPrioTaskWoken);
-#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
-            portEND_SWITCHING_ISR(higherPrioTaskWoken);
-#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
-#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
-#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
-        }
-        else
-        {
-            status = xQueueSend(sAppEventQueue, aEvent, 1);
-        }
-
-        if (!status)
-            EFR32_LOG("Failed to post event to app task event queue");
-    }
-    else
-    {
-        EFR32_LOG("Event Queue is NULL should never happen");
-    }
-}
-
-void AppTask::DispatchEvent(AppEvent * aEvent)
-{
-    if (aEvent->Handler)
-    {
-        aEvent->Handler(aEvent);
-    }
-    else
-    {
-        EFR32_LOG("Event received with no handler. Dropping event.");
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 }
 

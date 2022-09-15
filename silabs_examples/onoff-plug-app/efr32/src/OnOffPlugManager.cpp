@@ -75,9 +75,10 @@ CHIP_ERROR OnOffPlugManager::Init()
     return CHIP_NO_ERROR;
 }
 
-void OnOffPlugManager::SetCallbacks(Callback_fn_apply aApplyAction_CB)
+void OnOffPlugManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
-    mApplyAction_CB = aApplyAction_CB;
+    mActionInitiated_CB = aActionInitiated_CB;
+    mActionCompleted_CB = aActionCompleted_CB;
 }
 
 bool OnOffPlugManager::IsPlugOn()
@@ -124,9 +125,9 @@ bool OnOffPlugManager::InitiateAction(int32_t aActor, Action_t aAction)
     if (action_initiated)
     {
         mIsOn = aAction;
-        if (mApplyAction_CB)
+        if (mActionCompleted_CB)
         {
-            mApplyAction_CB(aAction, aActor);
+            mActionCompleted_CB(aAction);
         }
 
         if (mAutoTurnOff && mIsOn == ON_ACTION)
@@ -137,6 +138,11 @@ bool OnOffPlugManager::InitiateAction(int32_t aActor, Action_t aAction)
             mAutoTurnOffTimerArmed = true;
 
             EFR32_LOG("Auto Turn off enabled. Will be triggered in %u seconds", mAutoTurnOffDuration);
+        }
+
+        if (mActionInitiated_CB)
+        {
+            mActionInitiated_CB(aAction, aActor);
         }
     }
 
@@ -189,7 +195,7 @@ void OnOffPlugManager::TimerEventHandler(TimerHandle_t xTimer)
     {
         event.Handler = OffEffectTimerEventHandler;
     }
-    GetAppTask().PostEvent(&event);
+    AppTask::GetAppTask().PostEvent(&event);
 }
 
 void OnOffPlugManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)

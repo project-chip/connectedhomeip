@@ -66,7 +66,7 @@ int main(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EFR32_LOG("Starting App Task");
-    if (GetAppTask().StartAppTask() != CHIP_NO_ERROR)
+    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
     EFR32_LOG("Starting FreeRTOS scheduler");
@@ -80,5 +80,5 @@ int main(void)
 
 void sl_button_on_change(const sl_button_t * handle)
 {
-    GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
+    AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }
