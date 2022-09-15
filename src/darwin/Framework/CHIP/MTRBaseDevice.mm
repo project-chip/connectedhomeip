@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCallbackBridgeBase_internal.h"
 #import "MTRCluster.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging.h"
@@ -306,13 +306,13 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                     params:(MTRSubscribeParams *)params
-    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
-         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
-               errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
+                        params:(MTRSubscribeParams *)params
+    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
+        attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+            eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+                  errorHandler:(void (^)(NSError * error))errorHandler
+       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
@@ -351,19 +351,19 @@ public:
 
                    std::unique_ptr<SubscriptionCallback> callback;
                    std::unique_ptr<ReadClient> readClient;
-                   std::unique_ptr<ClusterStateCache> attributeCache;
-                   if (attributeCacheContainer) {
-                       __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
+                   std::unique_ptr<ClusterStateCache> clusterStateCache;
+                   if (clusterStateCacheContainer) {
+                       __weak MTRClusterStateCacheContainer * weakPtr = clusterStateCacheContainer;
                        callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler,
                            errorHandler, resubscriptionScheduled, subscriptionEstablished, ^{
-                               MTRAttributeCacheContainer * container = weakPtr;
+                               MTRClusterStateCacheContainer * container = weakPtr;
                                if (container) {
-                                   container.cppAttributeCache = nullptr;
+                                   container.cppClusterStateCache = nullptr;
                                }
                            });
-                       attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
+                       clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
                        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                           attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                           clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
                    } else {
                        callback = std::make_unique<SubscriptionCallback>(queue, attributeReportHandler, eventReportHandler,
                            errorHandler, resubscriptionScheduled, subscriptionEstablished, nil);
@@ -389,10 +389,10 @@ public:
                        return;
                    }
 
-                   if (attributeCacheContainer) {
-                       attributeCacheContainer.cppAttributeCache = attributeCache.get();
+                   if (clusterStateCacheContainer) {
+                       clusterStateCacheContainer.cppClusterStateCache = clusterStateCache.get();
                        // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
-                       callback->AdoptAttributeCache(std::move(attributeCache));
+                       callback->AdoptClusterStateCache(std::move(clusterStateCache));
                    }
                    // Callback and ReadClient will be deleted when OnDone is called or an error is
                    // encountered.

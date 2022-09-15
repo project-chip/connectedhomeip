@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +16,20 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#pragma once
 
-#import "MTRAttributeCacheContainer.h"
+#include "app-common/zap-generated/ids/Clusters.h"
+#include "app-common/zap-generated/ids/Commands.h"
+#include "lib/core/CHIPError.h"
 
-NS_ASSUME_NONNULL_BEGIN
+CHIP_ERROR InitBindingHandler();
+void SwitchWorkerFunction(intptr_t context);
+void BindingWorkerFunction(intptr_t context);
 
-@interface MTRAttributeCacheContainer (XPC)
-- (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
-            controllerID:(id<NSCopying>)controllerID
-                deviceID:(NSNumber *)deviceID;
-@end
-
-NS_ASSUME_NONNULL_END
+struct BindingCommandData
+{
+    chip::EndpointId localEndpointId = 1;
+    chip::CommandId commandId;
+    chip::ClusterId clusterId;
+    bool isGroup = false;
+};

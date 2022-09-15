@@ -19,13 +19,13 @@
 
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRAttestationInfo.h>
-#import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCSRInfo.h>
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissioningParameters.h>

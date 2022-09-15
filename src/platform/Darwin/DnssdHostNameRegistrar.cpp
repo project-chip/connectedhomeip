@@ -174,7 +174,6 @@ void LogDetails(nw_interface_t interface, InetInterfacesVector inetInterfaces, I
 bool HasValidFlags(unsigned int flags, bool allowLoopbackOnly)
 {
     VerifyOrReturnValue(!allowLoopbackOnly || (flags & IFF_LOOPBACK), false);
-    VerifyOrReturnValue(!(flags & IFF_POINTOPOINT), false);
     VerifyOrReturnValue((flags & IFF_RUNNING), false);
     VerifyOrReturnValue((flags & IFF_MULTICAST), false);
     return true;
@@ -183,7 +182,8 @@ bool HasValidFlags(unsigned int flags, bool allowLoopbackOnly)
 bool HasValidNetworkType(nw_interface_t interface)
 {
     auto interfaceType = nw_interface_get_type(interface);
-    return interfaceType == nw_interface_type_wifi || interfaceType == nw_interface_type_wired;
+    return interfaceType == nw_interface_type_wifi || interfaceType == nw_interface_type_wired ||
+        interfaceType == nw_interface_type_other;
 }
 
 bool IsValidInterfaceId(uint32_t targetInterfaceId, nw_interface_t interface)

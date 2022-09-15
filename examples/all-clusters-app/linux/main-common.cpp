@@ -18,6 +18,7 @@
 
 #include "main-common.h"
 #include "AllClustersCommandDelegate.h"
+#include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -59,6 +60,7 @@ constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_"
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
+chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 // TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
 
@@ -263,4 +265,11 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "TV Linux App: LowPower::SetDefaultDelegate");
     chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
+}
+
+void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
+{
+    sWindowCoveringManager.Init(endpoint);
+    chip::app::Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
+    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 }
