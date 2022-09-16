@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
+#include <messaging/ReliableMessageMgr.h>
 
 namespace chip {
 namespace app {
@@ -798,7 +799,19 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     else
     {
         VerifyOrReturnError(mReadPrepareParams.mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
-        timeout = System::Clock::Seconds16(mMaxInterval) + mReadPrepareParams.mSessionHolder->GetAckTimeout();
+
+        //
+        // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
+        // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
+        // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
+        // basis for that computation.
+        //
+        // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
+        // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
+        //
+        auto publisherTransmissionTimeout =
+            GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()).mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     }
 
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned

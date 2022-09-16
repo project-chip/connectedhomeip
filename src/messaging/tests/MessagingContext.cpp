@@ -95,6 +95,8 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
 }
 
+using namespace System::Clock::Literals;
+
 void MessagingContext::SetMRPMode(MRPMode mode)
 {
     if (mode == MRPMode::kDefault)
@@ -103,9 +105,31 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
         mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
         mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        OverrideDefaultIdleMRPConfig(0_ms32);
+        OverrideDefaultActiveMRPConfig(0_ms32);
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
     }
     else
     {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        OverrideDefaultIdleMRPConfig(10_ms32);
+        OverrideDefaultActiveMRPConfig(10_ms32);
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
+
         mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
             ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
         mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(

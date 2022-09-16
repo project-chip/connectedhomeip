@@ -143,6 +143,20 @@ struct ReliableMessageProtocolConfig
     }
 };
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+/**
+ * @brief
+ *
+ * Functions to override the default idle/active MRP intervals in test.
+ *
+ * Set to 0 to disable the override.
+ *
+ */
+void OverrideDefaultIdleMRPConfig(System::Clock::Milliseconds32 idleRetransTimeout);
+void OverrideDefaultActiveMRPConfig(System::Clock::Milliseconds32 activeRetransTimeout);
+#endif
+
 /// @brief The default MRP config. The value is defined by spec, and shall be same for all implementations,
 ReliableMessageProtocolConfig GetDefaultMRPConfig();
 
