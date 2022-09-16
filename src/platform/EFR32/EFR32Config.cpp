@@ -84,7 +84,7 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool & val)
     CHIP_ERROR err;
     uint32_t objectType;
     size_t dataLen;
-    bool tmpVal;
+    bool tmpVal = 0;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -106,7 +106,7 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t & val)
     CHIP_ERROR err;
     uint32_t objectType;
     size_t dataLen;
-    uint32_t tmpVal;
+    uint32_t tmpVal = 0;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -128,7 +128,7 @@ CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t & val)
     CHIP_ERROR err;
     uint32_t objectType;
     size_t dataLen;
-    uint64_t tmpVal;
+    uint64_t tmpVal = 0;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -264,8 +264,8 @@ exit:
 CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
     CHIP_ERROR err;
-    uint32_t tmpVal;
-    Key key = kMinConfigKey_MatterCounter + counterIdx;
+    uint32_t tmpVal = 0;
+    Key key         = kMinConfigKey_MatterCounter + counterIdx;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 

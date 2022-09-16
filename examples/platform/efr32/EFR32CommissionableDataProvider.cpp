@@ -82,7 +82,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifie
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode)
+CHIP_ERROR EFR32DeviceDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
     return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_SetupPinCode, setupPasscode);
 }
