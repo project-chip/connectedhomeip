@@ -22,13 +22,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class MTRDeviceControllerDelegateBridge : public chip::Controller::DevicePairingDelegate
-{
+@class MTRDeviceController;
+
+class MTRDeviceControllerDelegateBridge : public chip::Controller::DevicePairingDelegate {
 public:
     MTRDeviceControllerDelegateBridge();
     ~MTRDeviceControllerDelegateBridge();
 
-    void setDelegate(id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue);
+    void setDelegate(MTRDeviceController * controller, id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue);
 
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
@@ -39,6 +40,7 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
 private:
+    MTRDeviceController * _Nullable mController;
     _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
 
