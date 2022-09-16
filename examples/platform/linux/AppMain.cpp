@@ -146,7 +146,8 @@ static bool EnsureWiFiIsStarted()
 class SampleTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
-    static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFFF'FFFEull);
+    /// NOTE: If you copy this, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your trigger codes.
+    static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFF1'0000ull);
 
     SampleTestEventTriggerDelegate() { memset(&mEnableKey[0], 0, sizeof(mEnableKey)); }
 

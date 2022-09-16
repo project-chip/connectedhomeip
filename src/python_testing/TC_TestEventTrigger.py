@@ -31,7 +31,7 @@ kBadKey = bytes([(b + 1) for b in range(16)])
 kAllZerosKey = bytes(b"\x00" * 16)
 
 # Assumes `SampleTestEventTriggerDelegate` as it exists in Linux AppMain.cpp
-kValidEventTrigger = 0xFFFF_FFFF_FFFF_FFFE
+kValidEventTrigger = 0xFFFF_FFFF_FFF1_0000
 kInvalidEventTrigger = 0  # Per TC-DGEN-2.3
 
 
