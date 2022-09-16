@@ -475,7 +475,8 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
-    if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded) {
+    if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded)
+    {
         //
         // Set this to true to ensure our caller will return immediately without proceeding further.
         //
