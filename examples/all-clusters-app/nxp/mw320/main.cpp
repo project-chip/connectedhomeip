@@ -1129,9 +1129,12 @@ void task_test_main(void * param)
             PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
             emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
                                false);
-            // sync-up the Light attribute (for test event)
+#ifdef SUPPORT_MANUAL_CTRL
+            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
             PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
             emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
+#endif // SUPPORT_MANUAL_CTRL
+
             need2sync_sw_attr = false;
         }
         // =============================
@@ -1157,9 +1160,12 @@ void init_mw320_sdk()
     mflash_drv_init();
     cli_init();
     part_init();
+
     psm = part_get_layout_by_id(FC_COMP_PSM, NULL);
     part_to_flash_desc(psm, &fl);
     init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
+    PRINTF("[PSM]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+
     f1 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     f2 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     if (f1 && f2)
