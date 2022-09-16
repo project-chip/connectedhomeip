@@ -82,12 +82,12 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterOtaSoftwareUpdateProvider ()
+@interface MTRBaseClusterOTASoftwareUpdateProvider ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterOtaSoftwareUpdateRequestor ()
+@interface MTRBaseClusterOTASoftwareUpdateRequestor ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
@@ -277,7 +277,7 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterWakeOnLan ()
+@interface MTRBaseClusterWakeOnLAN ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

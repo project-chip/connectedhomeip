@@ -24,7 +24,7 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
     OTAProviderUserUnknown = 0x03,
 };
 
-@interface DeviceSoftwareVersionModelData : MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@interface DeviceSoftwareVersionModelData : MTROTASoftwareUpdateProviderClusterQueryImageParams
 @property BOOL softwareVersionValid;
 @property (strong, nonatomic, nullable) NSNumber * cDVersionNumber;
 @property (strong, nonatomic, nullable) NSNumber * minApplicableSoftwareVersion;
@@ -32,7 +32,7 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 @property (strong, nonatomic, nullable) NSString * otaURL;
 @end
 
-@interface DeviceSoftwareVersionModel : MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
+@interface DeviceSoftwareVersionModel : MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 @property (strong, nonatomic, nullable) DeviceSoftwareVersionModelData * deviceModelData;
 - (NSComparisonResult)CompareSoftwareVersions:(DeviceSoftwareVersionModel * _Nullable)otherObject;
 @end
@@ -40,28 +40,28 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 @interface OTAProviderDelegate : NSObject <MTROTAProviderDelegate>
 - (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
                        controller:(MTRDeviceController * _Nonnull)controller
-                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-                       completion:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+                       completion:(void (^_Nonnull)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion;
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
                                controller:(MTRDeviceController * _Nonnull)controller
-                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
                                completion:
-                                   (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                   (void (^_Nonnull)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion;
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
                                 controller:(MTRDeviceController * _Nonnull)controller
-                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
                                 completion:(MTRStatusCompletion _Nonnull)completion;
 
 @property (strong, nonatomic, nullable) NSArray<DeviceSoftwareVersionModel *> * candidates;
 @property (strong, nonatomic, nullable) DeviceSoftwareVersionModel * selectedCandidate;
 @property (strong, nonatomic, nullable) NSNumber * nodeID;
-@property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAQueryStatus queryImageStatus;
+@property (nonatomic, readwrite) MTROTASoftwareUpdateProviderOTAQueryStatus queryImageStatus;
 @property (nonatomic, readwrite) UserConsentState userConsentState;
-@property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAApplyUpdateAction action;
+@property (nonatomic, readwrite) MTROTASoftwareUpdateProviderOTAApplyUpdateAction action;
 @property (nonatomic, readwrite, nullable) NSNumber * delayedActionTime;
 @property (nonatomic, readwrite, nullable) NSNumber * timedInvokeTimeoutMs;
 @property (nonatomic, readwrite, nullable) NSNumber * userConsentNeeded;

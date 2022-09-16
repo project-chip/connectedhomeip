@@ -32,6 +32,7 @@
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/TypeTraits.h>
@@ -66,13 +67,15 @@ CHIP_ERROR LogCertificationDeclaration(const ByteSpan & cd)
 
     // TODO Add an option to load a TrustStore so the subjectKeyId can be extracted from the CMS envelope in order
     // to select the proper public key.
-    ByteSpan cdContentOut;
-    uint8_t pubKey[] = { 0x04, 0x3c, 0x39, 0x89, 0x22, 0x45, 0x2b, 0x55, 0xca, 0xf3, 0x89, 0xc2, 0x5b, 0xd1, 0xbc, 0xa4, 0x65,
-                         0x69, 0x52, 0xcc, 0xb9, 0x0e, 0x88, 0x69, 0x24, 0x9a, 0xd8, 0x47, 0x46, 0x53, 0x01, 0x4c, 0xbf, 0x95,
-                         0xd6, 0x87, 0x96, 0x5e, 0x03, 0x6b, 0x52, 0x1c, 0x51, 0x03, 0x7e, 0x6b, 0x8c, 0xed, 0xef, 0xca, 0x1e,
-                         0xb4, 0x40, 0x46, 0x69, 0x4f, 0xa0, 0x88, 0x82, 0xee, 0xd6, 0x51, 0x9d, 0xec, 0xba };
+    ByteSpan kid;
+    ReturnErrorOnFailure(Credentials::CMS_ExtractKeyId(cd, kid));
 
-    ReturnErrorOnFailure(Credentials::CMS_Verify(cd, Crypto::P256PublicKey(pubKey), cdContentOut));
+    Crypto::P256PublicKey verifyingKey;
+    Credentials::CsaCdKeysTrustStore cdKeysTrustStore;
+    ReturnErrorOnFailure(cdKeysTrustStore.LookupVerifyingKey(kid, verifyingKey));
+
+    ByteSpan cdContentOut;
+    ReturnErrorOnFailure(Credentials::CMS_Verify(cd, verifyingKey, cdContentOut));
 
     constexpr uint8_t kTag_FormatVersion       = 0;  /**< [ unsigned int ] Format version. */
     constexpr uint8_t kTag_VendorId            = 1;  /**< [ unsigned int ] Vedor identifier. */

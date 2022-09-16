@@ -419,7 +419,7 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeMTR();
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -490,7 +490,7 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
@@ -683,7 +683,7 @@
     }
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
@@ -803,7 +803,7 @@
 {
     self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
@@ -1105,7 +1105,7 @@
     return self;
 }
 
-- (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
+- (void)deviceAttestationFailedForController:(MTRDeviceController *)controller device:(void *)device error:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController

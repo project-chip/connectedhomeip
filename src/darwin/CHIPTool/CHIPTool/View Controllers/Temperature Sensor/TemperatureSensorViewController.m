@@ -226,15 +226,15 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                                                            maxInterval:@(maxIntervalSeconds)];
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
                     params:params
-                    attributeCacheContainer:nil
+                    clusterStateCacheContainer:nil
                     attributeReportHandler:^(NSArray * _Nullable reports) {
                         if (!reports)
                             return;
                         for (MTRAttributeReport * report in reports) {
                             // These should be exposed by the SDK
-                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterIDTypeTemperatureMeasurementID)] &&
                                 [report.path.attribute
-                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                    isEqualToNumber:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
                                 if (report.error != nil) {
                                     NSLog(@"Error reading temperature: %@", report.error);
                                 } else {

@@ -1985,7 +1985,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2012,7 +2012,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
 
     other.vendorId = self.vendorId;
     other.productId = self.productId;
@@ -2038,7 +2038,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2065,7 +2065,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
 
     other.status = self.status;
     other.delayedActionTime = self.delayedActionTime;
@@ -2092,7 +2092,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+@implementation MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2107,7 +2107,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
 
     other.updateToken = self.updateToken;
     other.newVersion = self.newVersion;
@@ -2125,7 +2125,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+@implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2140,7 +2140,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
 
     other.action = self.action;
     other.delayedActionTime = self.delayedActionTime;
@@ -2157,7 +2157,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+@implementation MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2172,7 +2172,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
 
     other.updateToken = self.updateToken;
     other.softwareVersion = self.softwareVersion;
@@ -2190,7 +2190,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2211,7 +2211,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
 
     other.providerNodeId = self.providerNodeId;
     other.vendorId = self.vendorId;

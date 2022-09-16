@@ -2004,7 +2004,7 @@ void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
         value)
 {
@@ -2086,9 +2086,9 @@ void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlACLListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRAccessControlAclListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRAccessControlACLListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2627,7 +2627,7 @@ void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2650,10 +2650,10 @@ void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2667,7 +2667,7 @@ void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2690,10 +2690,10 @@ void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2707,7 +2707,7 @@ void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2730,9 +2730,9 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2746,7 +2746,7 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
 {
@@ -2756,8 +2756,8 @@ void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTROtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
-            newElement_0 = [MTROtaSoftwareUpdateRequestorClusterProviderLocation new];
+            MTROTASoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+            newElement_0 = [MTROTASoftwareUpdateRequestorClusterProviderLocation new];
             newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
             newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
@@ -2773,10 +2773,10 @@ void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2790,7 +2790,7 @@ void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2813,10 +2813,10 @@ void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2830,7 +2830,7 @@ void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2853,10 +2853,10 @@ void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2870,7 +2870,7 @@ void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2893,9 +2893,9 @@ void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8669,7 +8669,7 @@ void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRWakeOnLANGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8692,9 +8692,9 @@ void MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLANGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRWakeOnLANGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8708,7 +8708,7 @@ void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRWakeOnLANAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8731,9 +8731,9 @@ void MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLANAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRWakeOnLANAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8747,7 +8747,7 @@ void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRWakeOnLANAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8770,9 +8770,9 @@ void MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLANAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRWakeOnLANAttributeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11956,10 +11956,10 @@ void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
 {
-    auto * response = [MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams new];
+    auto * response = [MTROTASoftwareUpdateProviderClusterQueryImageResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
@@ -12020,10 +12020,10 @@ void MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     DispatchSuccess(context, response);
 };
 
-void MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
 {
-    auto * response = [MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams new];
+    auto * response = [MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams new];
     {
         response.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
     }
@@ -14198,7 +14198,7 @@ void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14206,11 +14206,11 @@ void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14224,7 +14224,7 @@ void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSub
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14236,10 +14236,10 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
+    auto * self = static_cast<MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
         context);
     if (!self->mQueue) {
         return;
@@ -14254,7 +14254,7 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     }
 }
 
-void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14262,10 +14262,10 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14279,7 +14279,7 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubs
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14291,11 +14291,11 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14309,7 +14309,7 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     }
 }
 
-void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14317,9 +14317,9 @@ void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14333,7 +14333,7 @@ void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscript
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
+void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14345,11 +14345,11 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14363,7 +14363,7 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackS
     }
 }
 
-void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14371,11 +14371,11 @@ void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14389,7 +14389,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackS
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14401,11 +14401,11 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished(void * context)
 {
     auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(
+        = static_cast<MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(
             context);
     if (!self->mQueue) {
         return;
@@ -14420,7 +14420,7 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     }
 }
 
-void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14428,11 +14428,11 @@ void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14446,7 +14446,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSub
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14458,10 +14458,10 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
+    auto * self = static_cast<MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
         context);
     if (!self->mQueue) {
         return;
@@ -14476,7 +14476,7 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     }
 }
 
-void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
@@ -14484,10 +14484,10 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14501,7 +14501,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
@@ -14513,11 +14513,11 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
