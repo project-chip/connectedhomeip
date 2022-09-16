@@ -432,7 +432,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
             }
             BOOL shouldWaitAfterDeviceAttestation = NO;
             if ([commissioningParams.deviceAttestationDelegate
-                    respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
+                    respondsToSelector:@selector(deviceAttestationCompletedForController:device:attestationDeviceInfo:error:)]) {
                 shouldWaitAfterDeviceAttestation = YES;
             }
             _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
@@ -536,7 +536,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     dispatch_async(_chipWorkQueue, ^{
-        self->_deviceControllerDelegateBridge->setDelegate(delegate, queue);
+        self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
     });
 }
 

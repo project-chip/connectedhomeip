@@ -490,7 +490,7 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
@@ -683,7 +683,7 @@
     }
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
@@ -1105,7 +1105,7 @@
     return self;
 }
 
-- (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
+- (void)deviceAttestationFailedForController:(MTRDeviceController *)controller device:(void *)device error:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController
