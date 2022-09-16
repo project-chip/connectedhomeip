@@ -475,6 +475,15 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
+    if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded)
+    {
+        //
+        // Set this to true to ensure our caller will return immediately without proceeding further.
+        //
+        *aTriedEncode = true;
+        return CHIP_NO_ERROR;
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.

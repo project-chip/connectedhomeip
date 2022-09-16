@@ -9974,6 +9974,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_range_restricted_int16s", 1, value);
         }
+        case TestCluster::Attributes::WriteOnlyInt8u::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("write_only_int8u", 1, value);
+        }
         case TestCluster::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
