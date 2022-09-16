@@ -3708,6 +3708,7 @@ server cluster TestCluster = 4294048773 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
+  attribute int8u writeOnlyInt8u = 16426;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -4772,6 +4773,7 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt8s default = -20;
     ram      attribute nullableRangeRestrictedInt16u default = 200;
     ram      attribute nullableRangeRestrictedInt16s default = -100;
+    callback attribute writeOnlyInt8u;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

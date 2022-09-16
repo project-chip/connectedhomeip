@@ -7405,6 +7405,7 @@ private:
 | * NullableRangeRestrictedInt8s                                      | 0x4027 |
 | * NullableRangeRestrictedInt16u                                     | 0x4028 |
 | * NullableRangeRestrictedInt16s                                     | 0x4029 |
+| * WriteOnlyInt8u                                                    | 0x402A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -13034,6 +13035,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "write-only-int8u", Attributes::WriteOnlyInt8u::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -13189,7 +13191,9 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
                                                                               credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(
             Id, "nullable-range-restricted-int16s", INT16_MIN, INT16_MAX, Attributes::NullableRangeRestrictedInt16s::Id,
-            credsIssuerConfig),                                                                                       //
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "write-only-int8u", 0, UINT8_MAX, Attributes::WriteOnlyInt8u::Id,
+                                             credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                       //
         make_unique<SubscribeAttribute>(Id, "boolean", Attributes::Boolean::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "bitmap8", Attributes::Bitmap8::Id, credsIssuerConfig),                   //
@@ -13278,6 +13282,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "write-only-int8u", Attributes::WriteOnlyInt8u::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

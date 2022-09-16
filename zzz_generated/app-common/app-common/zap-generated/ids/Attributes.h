@@ -4932,6 +4932,10 @@ namespace NullableRangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00004029;
 } // namespace NullableRangeRestrictedInt16s
 
+namespace WriteOnlyInt8u {
+static constexpr AttributeId Id = 0x0000402A;
+} // namespace WriteOnlyInt8u
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

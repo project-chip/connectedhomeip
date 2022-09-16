@@ -5301,6 +5301,13 @@ labels.
                                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                       params:(MTRWriteParams * _Nullable)params;
 
+- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params;
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                       params:(MTRWriteParams * _Nullable)params;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params;
