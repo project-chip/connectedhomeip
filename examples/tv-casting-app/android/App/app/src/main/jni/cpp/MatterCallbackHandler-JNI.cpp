@@ -18,14 +18,11 @@
 
 #include "MatterCallbackHandler-JNI.h"
 
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
-
 using namespace chip;
 
-CHIP_ERROR MatterCallbackHandlerJNI::SetUp(JNIEnv * env, jobject inHandler)
+CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)
 {
-    ChipLogProgress(AppServer, "MatterCallbackHandlerJNI::SetUp called");
+    ChipLogProgress(AppServer, "CallbackBaseJNI::SetUp called");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mObject = env->NewGlobalRef(inHandler);
@@ -34,7 +31,7 @@ CHIP_ERROR MatterCallbackHandlerJNI::SetUp(JNIEnv * env, jobject inHandler)
     mClazz = env->GetObjectClass(mObject);
     VerifyOrExit(mClazz != nullptr, ChipLogError(AppServer, "Failed to get handler Java class"));
 
-    mMethod = env->GetMethodID(mClazz, "handle", "(ILjava/lang/String;)V");
+    mMethod = env->GetMethodID(mClazz, "handle", mMethodSignature);
     if (mMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'handle' method");
@@ -44,16 +41,16 @@ CHIP_ERROR MatterCallbackHandlerJNI::SetUp(JNIEnv * env, jobject inHandler)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp error: %s", err.AsString());
+        ChipLogError(AppServer, "CallbackBaseJNI::SetUp error: %s", err.AsString());
         return err;
     }
 
     return err;
 }
 
-void MatterCallbackHandlerJNI::Handle(CHIP_ERROR callbackErr)
+void FailureHandlerJNI::Handle(CHIP_ERROR callbackErr)
 {
-    ChipLogProgress(AppServer, "MatterCallbackHandlerJNI::Handle called");
+    ChipLogProgress(AppServer, "FailureHandlerJNI::Handle called");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniCallbackErrString(env, callbackErr.AsString());
@@ -65,6 +62,320 @@ void MatterCallbackHandlerJNI::Handle(CHIP_ERROR callbackErr)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "MatterCallbackHandlerJNI::Handle status error: %s", err.AsString());
+        ChipLogError(AppServer, "FailureHandlerJNI::Handle status error: %s", err.AsString());
     }
+}
+
+void SubscriptionEstablishedHandlerJNI::Handle()
+{
+    ChipLogProgress(AppServer, "SubscriptionEstablishedHandlerJNI::Handle called");
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->CallVoidMethod(mObject, mMethod);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SubscriptionEstablishedHandlerJNI::Handle status error: %s", err.AsString());
+    }
+}
+
+jobject ConvertToLongJObject(uint64_t responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass responseTypeClass = env->FindClass("java/lang/Long");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(J)V");
+    return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+jobject ConvertToFloatJObject(float responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass responseTypeClass = env->FindClass("java/lang/Float");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(F)V");
+    return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+jobject ConvertToShortJObject(uint16_t responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass responseTypeClass = env->FindClass("java/lang/Short");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(S)V");
+    return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+jobject ConvertToByteJObject(uint8_t responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass responseTypeClass = env->FindClass("java/lang/Byte");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(B)V");
+    return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+jstring ConvertToJString(chip::CharSpan responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    return env->NewStringUTF(std::string(responseData.data(), responseData.size()).c_str());
+}
+
+jobject ConvertToIntegerJObject(uint32_t responseData)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass responseTypeClass = env->FindClass("java/lang/Integer");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(I)V");
+    return env->NewObject(responseTypeClass, constructor, responseData);
+}
+
+// MEDIA PLAYBACK
+
+jobject CurrentStateSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "CurrentStateSuccessHandlerJNI::ConvertToJObject called");
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jclass enumClass = nullptr;
+    CHIP_ERROR err =
+        JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackStateEnum", enumClass);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        return nullptr;
+    }
+
+    jfieldID enumType = nullptr;
+    switch (responseData)
+    {
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying:
+        enumType = env->GetStaticFieldID(enumClass, "Playing", "Lcom/chip/casting/MediaPlaybackTypes$PlaybackStateEnum;");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPaused:
+        enumType = env->GetStaticFieldID(enumClass, "Paused", "Lcom/chip/casting/MediaPlaybackTypes$PlaybackStateEnum;");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kNotPlaying:
+        enumType = env->GetStaticFieldID(enumClass, "NotPlaying", "Lcom/chip/casting/MediaPlaybackTypes$PlaybackStateEnum;");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kBuffering:
+        enumType = env->GetStaticFieldID(enumClass, "Buffering", "Lcom/chip/casting/MediaPlaybackTypes$PlaybackStateEnum;");
+        break;
+    default:
+        enumType = env->GetStaticFieldID(enumClass, "Unknown", "Lcom/chip/casting/MediaPlaybackTypes$PlaybackStateEnum;");
+        break;
+    }
+
+    if (enumType != nullptr)
+    {
+        return env->GetStaticObjectField(enumClass, enumType);
+    }
+    return nullptr;
+}
+
+jobject DurationSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "DurationSuccessHandlerJNI::ConvertToJObject called");
+    return responseData.IsNull() ? nullptr : ConvertToLongJObject(responseData.Value());
+}
+
+jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "SampledPositionSuccessHandlerJNI::ConvertToJObject called");
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jobject jSampledPosition = nullptr;
+    if (!responseData.IsNull())
+    {
+        const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & playbackPosition =
+            responseData.Value();
+
+        jclass responseTypeClass = nullptr;
+        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPosition",
+                                                                  responseTypeClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+            return nullptr;
+        }
+
+        if (playbackPosition.position.IsNull())
+        {
+            jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Long;)V");
+            jSampledPosition      = env->NewObject(responseTypeClass, constructor, playbackPosition.updatedAt);
+        }
+        else
+        {
+            jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Long;java/lang/Long;)V");
+            jSampledPosition =
+                env->NewObject(responseTypeClass, constructor, playbackPosition.updatedAt, playbackPosition.position.Value());
+        }
+    }
+
+    return jSampledPosition;
+}
+
+jobject PlaybackSpeedSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "PlaybackSpeedSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToFloatJObject(responseData);
+}
+
+jobject SeekRangeEndSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "SeekRangeEndSuccessHandlerJNI::ConvertToJObject called");
+    return responseData.IsNull() ? nullptr : ConvertToLongJObject(responseData.Value());
+}
+
+jobject SeekRangeStartSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "SeekRangeStartSuccessHandlerJNI::ConvertToJObject called");
+    return responseData.IsNull() ? nullptr : ConvertToLongJObject(responseData.Value());
+}
+
+// TARGET NAVIGATOR
+jobject CurrentTargetSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "CurrentTargetSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToByteJObject(responseData);
+}
+
+jobject TargetListSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "TargetListSuccessHandlerJNI::ConvertToJObject called");
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jobject jArrayList;
+    chip::JniReferences::GetInstance().CreateArrayList(jArrayList);
+    auto iter = responseData.begin();
+    while (iter.Next())
+    {
+        const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & targetInfo = iter.GetValue();
+
+        jclass responseTypeClass = nullptr;
+        CHIP_ERROR err =
+            JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/TargetNavigatorTypes$TargetInfo", responseTypeClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+            return nullptr;
+        }
+
+        jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Integer;java/lang/String;)V");
+        jobject jTargetInfo   = env->NewObject(responseTypeClass, constructor, targetInfo.identifier, targetInfo.name);
+
+        chip::JniReferences::GetInstance().AddToList(jArrayList, jTargetInfo);
+    }
+    return jArrayList;
+}
+
+// LEVEL CONTROL
+jobject CurrentLevelSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "CurrentLevelSuccessHandlerJNI::ConvertToJObject called");
+    return responseData.IsNull() ? nullptr : ConvertToByteJObject(responseData.Value());
+}
+
+jobject MinLevelSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "MinLevelSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToByteJObject(responseData);
+}
+
+jobject MaxLevelSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "MaxLevelSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToByteJObject(responseData);
+}
+
+// CONTENT LAUNCHER
+jobject SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToIntegerJObject(responseData);
+}
+
+// APPLICATION BASIC
+jobject VendorNameSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "VendorNameSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToJString(responseData);
+}
+
+jobject VendorIDSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "VendorIDSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToShortJObject(responseData);
+}
+
+jobject ApplicationNameSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "ApplicationNameSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToJString(responseData);
+}
+
+jobject ProductIDSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "ProductIDSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToShortJObject(responseData);
+}
+
+jobject ApplicationVersionSuccessHandlerJNI::ConvertToJObject(
+    chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "ApplicationVersionSuccessHandlerJNI::ConvertToJObject called");
+    return ConvertToJString(responseData);
 }

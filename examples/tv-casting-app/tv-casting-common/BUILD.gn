@@ -47,6 +47,7 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/CHIPCommand.cpp",
+    "include/ApplicationBasic.h",
     "include/ApplicationLauncher.h",
     "include/CastingServer.h",
     "include/Channel.h",

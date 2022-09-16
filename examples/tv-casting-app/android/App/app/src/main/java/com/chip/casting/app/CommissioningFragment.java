@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.MatterCallbackHandler;
+import com.chip.casting.MatterError;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
@@ -53,9 +54,9 @@ public class CommissioningFragment extends Fragment {
             GlobalCastingConstants.CommissioningWindowDurationSecs,
             new MatterCallbackHandler() {
               @Override
-              public void handle(Status status) {
-                Log.d(TAG, "handle() called on CommissioningComplete event with " + status);
-                if (status.isSuccess()) {
+              public void handle(MatterError error) {
+                Log.d(TAG, "handle() called on CommissioningComplete event with " + error);
+                if (error.isNoError()) {
                   callback.handleCommissioningComplete();
                 }
               }

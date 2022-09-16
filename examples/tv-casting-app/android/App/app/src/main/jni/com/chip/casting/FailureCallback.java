@@ -17,7 +17,7 @@
  */
 package com.chip.casting;
 
-public abstract class MatterCallbackHandler {
+public abstract class FailureCallback {
   public abstract void handle(MatterError err);
 
   public final void handle(int errorCode, String errorMessage) {

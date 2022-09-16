@@ -21,7 +21,9 @@ import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity
-    implements CommissionerDiscoveryFragment.Callback, CommissioningFragment.Callback {
+    implements CommissionerDiscoveryFragment.Callback,
+        CommissioningFragment.Callback,
+        SelectClusterFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -49,7 +51,17 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleCommissioningComplete() {
+    showFragment(SelectClusterFragment.newInstance());
+  }
+
+  @Override
+  public void handleContentLauncherSelected() {
     showFragment(ContentLauncherFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleMediaPlaybackSelected() {
+    showFragment(MediaPlaybackFragment.newInstance(tvCastingApp));
   }
 
   /**
