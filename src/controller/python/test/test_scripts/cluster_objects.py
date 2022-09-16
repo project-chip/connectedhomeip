@@ -145,7 +145,7 @@ class ClusterObjectTests:
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
                             AttributeId=5), Status=chip.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=6), Status=chip.interaction_model.Status.InvalidValue)
+                            AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")
