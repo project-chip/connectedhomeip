@@ -94,7 +94,6 @@ source_set("efr32-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-
 source_set("efr32-factory-data-provider") {
   sources = [
     "EFR32CommissionableDataProvider.cpp",
