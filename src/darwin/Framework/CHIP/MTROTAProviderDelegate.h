@@ -21,10 +21,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRQueryImageCompletionHandler)(
-    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
+    MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
 
 typedef void (^MTRApplyUpdateRequestCompletionHandler)(
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
+    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
 
 typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
 
@@ -46,7 +46,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
                        completion:(MTRQueryImageCompletionHandler)completion;
 
 /**
@@ -60,7 +60,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
-                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                                completion:(MTRApplyUpdateRequestCompletionHandler)completion;
 
 /**
@@ -73,7 +73,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
-                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                                 completion:(MTRStatusCompletion)completion;
 
 /**

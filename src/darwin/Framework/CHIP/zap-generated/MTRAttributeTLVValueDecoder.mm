@@ -2538,8 +2538,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTROtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
-                    newElement_0 = [MTROtaSoftwareUpdateRequestorClusterProviderLocation new];
+                    MTROTASoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+                    newElement_0 = [MTROTASoftwareUpdateRequestorClusterProviderLocation new];
                     newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
                     newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];

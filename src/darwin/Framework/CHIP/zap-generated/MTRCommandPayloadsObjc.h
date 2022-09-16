@@ -1490,7 +1490,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull vendorId;
 
@@ -1526,7 +1526,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status;
 
@@ -1562,7 +1562,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull updateToken;
 
@@ -1586,7 +1586,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull action;
 
@@ -1610,7 +1610,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull updateToken;
 
@@ -1634,7 +1634,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
+@interface MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeId;
 
