@@ -223,7 +223,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 5000
 
     ### Mandatory Depends on the FeatureMap
     - label:

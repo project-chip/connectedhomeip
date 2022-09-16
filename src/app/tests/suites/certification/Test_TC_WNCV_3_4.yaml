@@ -28,7 +28,7 @@ config:
         defaultValue: 3000
     fullMotionDuration:
         type: int16u
-        defaultValue: 6000
+        defaultValue: 7000
 
 tests:
     - label: "0: Wait for the commissioned device to be retrieved"
