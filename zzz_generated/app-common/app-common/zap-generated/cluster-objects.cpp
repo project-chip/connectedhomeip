@@ -20762,6 +20762,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NullableRangeRestrictedInt16s::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt16s));
         break;
+    case Attributes::WriteOnlyInt8u::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, writeOnlyInt8u));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;

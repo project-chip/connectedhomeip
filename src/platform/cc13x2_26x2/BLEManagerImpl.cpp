@@ -467,7 +467,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
 
     sInstance.mAdvDatachipOBle[advIndex++] = 0x02;
     sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS;
-    sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED | GAP_ADTYPE_FLAGS_LIMITED;
+    sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED | GAP_ADTYPE_FLAGS_GENERAL;
     sInstance.mAdvDatachipOBle[advIndex++] = advLength;
     sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_SERVICE_DATA;
     sInstance.mAdvDatachipOBle[advIndex++] = static_cast<uint8_t>(LO_UINT16(CHIPOBLE_SERV_UUID));
@@ -792,7 +792,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     GapAdv_disable(sInstance.advHandleLegacy);
                     sInstance.mFlags.Clear(Flags::kAdvertising);
 
-                    uint16_t newParamMax = 0, newParamMin = 0;
+                    uint32_t newParamMax = 0, newParamMin = 0;
                     if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
                     {
                         // Update advertising interval

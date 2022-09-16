@@ -19017,6 +19017,24 @@ labels.
                                                              completion:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completion;
 
+- (void)readAttributeWriteOnlyInt8uWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion;
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
+                                       params:(MTRWriteParams * _Nullable)params
+                                   completion:(MTRStatusCompletion)completion;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeWriteOnlyInt8uWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeWriteOnlyInt8uWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                              completion:
+                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion;
 /**
  * This API does not support setting autoResubscribe to NO in the

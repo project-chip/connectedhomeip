@@ -22,8 +22,8 @@
  * Implements all the callbacks to the application from the CHIP Stack
  *
  **/
-#include "DeviceCallbacks.h"
 
+#include "DeviceCallbacks.h"
 #include "CHIPDeviceManager.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
@@ -121,6 +122,9 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+
+        ChipLogProgress(DeviceLayer, "Initializing route hook...");
+        ameba_route_hook_init();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
         if (!isOTAInitialized)

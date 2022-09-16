@@ -1445,6 +1445,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt8sID = 0x00004027,
     MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16uID = 0x00004028,
     MTRAttributeIDTypeClusterTestClusterAttributeNullableRangeRestrictedInt16sID = 0x00004029,
+    MTRAttributeIDTypeClusterTestClusterAttributeWriteOnlyInt8uID = 0x0000402A,
     MTRAttributeIDTypeClusterTestClusterAttributeGeneratedCommandListID = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterTestClusterAttributeAcceptedCommandListID = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterTestClusterAttributeAttributeListID = MTRAttributeIDTypeGlobalAttributeAttributeListID,
