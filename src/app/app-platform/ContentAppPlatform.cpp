@@ -398,7 +398,7 @@ void ContentAppPlatform::SetCurrentApp(ContentApp * app)
 
 bool ContentAppPlatform::IsCurrentApp(ContentApp * app)
 {
-    if (HasCurrentApp())
+    if (!HasCurrentApp())
     {
         return false;
     }
