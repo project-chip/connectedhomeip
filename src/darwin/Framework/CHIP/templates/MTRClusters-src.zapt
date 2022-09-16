@@ -26,7 +26,7 @@ using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
-@implementation MTRCluster{{asUpperCamelCase name}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -44,14 +44,15 @@ using chip::SessionHandle;
 }
 
 {{#chip_cluster_commands}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{>cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{>cluster}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -125,10 +126,10 @@ using chip::SessionHandle;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
-{{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -146,7 +147,7 @@ using chip::SessionHandle;
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}
@@ -154,11 +155,11 @@ using chip::SessionHandle;
 {{/chip_server_cluster_attributes}}
 
 @end
-{{#if (isStrEqual (asUpperCamelCase name) "UnitTesting")}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 
-@implementation MTRClusterTestCluster
+@implementation MTRCluster{{compatClusterNameRemapping name}}
 @end
-{{/if}}
+{{/unless}}
 
 @implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
@@ -172,7 +173,7 @@ using chip::SessionHandle;
 {
   [self {{asLowerCamelCase name}}WithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
       {{#if hasSpecificResponse}}
-    ^(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable data, NSError * _Nullable error) {
+    ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params * _Nullable data, NSError * _Nullable error) {
       // Cast is safe because subclass does not add any selectors.
       completionHandler(static_cast<MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase responseName}}Params *>(data), error);
     }
@@ -188,6 +189,35 @@ using chip::SessionHandle;
 }
 {{/unless}}
 {{/chip_cluster_commands}}
+{{~#chip_server_cluster_attributes}}
+{{~!Backwards compat for now: Treat DeviceTypeList as DeviceList.  That's OK, since all these bits are deprecated. ~}}
+{{~#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline~}}
+{{~#*inline "attributeImpls"}}
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params
+{
+  return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
+}
+{{#if isWritableAttribute}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:params];
+}
+{{/if}}
+{{/inline~}}
+{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+  {{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Descriptor")}}
+    {{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "DeviceTypeList")}}
+      {{> attributeImpls}}
+    {{/if}}
+  {{/if}}
+{{else}}
+  {{> attributeImpls}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
 @end
 
 {{/chip_client_clusters}}
