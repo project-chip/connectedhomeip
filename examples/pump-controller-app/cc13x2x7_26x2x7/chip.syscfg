@@ -77,7 +77,6 @@ ble.connUpdateParamsPeripheral.reqMinConnInt = 30;
 ble.connUpdateParamsPeripheral.reqMaxConnInt = 50;
 ble.advSet1.$name                            = "ti_ble5stack_broadcaster_advertisement_set0";
 ble.advSet1.advParam1.$name                  = "ti_ble5stack_broadcaster_advertisement_params0";
-ble.advSet1.advParam1.primIntMax             = 200;
 ble.advSet1.advData1.$name                   = "ti_ble5stack_broadcaster_advertisement_data0";
 ble.advSet1.scanRes1.$name                   = "ti_ble5stack_broadcaster_advertisement_data1";
 
