@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -483,7 +483,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     ReturnErrorOnFailure(protocol == DnssdServiceProtocol::kDnssdProtocolTcp
                              ? MakeInstanceName(service.mName, sizeof(service.mName), peerId)
                              : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
-    strncpy(service.mType, serviceType, sizeof(service.mType));
+    Platform::CopyString(service.mType, serviceType);
     service.mAddressType   = Inet::IPAddressType::kAny;
     service.mInterface     = interfaceId;
     service.mProtocol      = protocol;
@@ -643,7 +643,7 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     DnssdService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
-    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
+    Platform::CopyString(service.mType, kOperationalServiceName);
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = type;
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
@@ -665,7 +665,7 @@ CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
         DnssdService service;
 
         ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
-        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
+        Platform::CopyString(service.mType, kCommissionableServiceName);
         service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
         service.mAddressType = Inet::IPAddressType::kAny;
         return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
@@ -689,7 +689,7 @@ CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
         DnssdService service;
 
         ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
-        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
+        Platform::CopyString(service.mType, kCommissionerServiceName);
         service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
         service.mAddressType = Inet::IPAddressType::kAny;
         return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);

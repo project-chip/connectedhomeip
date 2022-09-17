@@ -31,6 +31,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/android/AndroidConfig.h>
@@ -239,7 +240,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
     chip::JniUtfString utfValue(env, (jstring) javaValue);
     outLen = strlen(utfValue.c_str());
 
-    strncpy(buf, utfValue.c_str(), bufSize);
+    Platform::CopyString(buf, bufSize, utfValue.c_str());
 
     return CHIP_NO_ERROR;
 }
