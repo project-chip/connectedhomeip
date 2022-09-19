@@ -206,6 +206,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/416#issuecomment-1228072461
     - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
       verification: |

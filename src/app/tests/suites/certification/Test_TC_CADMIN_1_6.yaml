@@ -207,6 +207,7 @@ tests:
                 value: 180
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "TH_CR2 starts a commissioning process on DUT_CE"
       identity: "beta"
@@ -238,6 +239,7 @@ tests:
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
+          clusterError: 4
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
