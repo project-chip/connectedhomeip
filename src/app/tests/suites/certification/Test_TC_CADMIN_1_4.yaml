@@ -142,9 +142,9 @@ tests:
     - label:
           "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
-          Verify if the DUT_CE is broadcasting using 
+          Verify if the DUT_CE is broadcasting using
 
           ubuntu@ubuntu:~/may16_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
           +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
