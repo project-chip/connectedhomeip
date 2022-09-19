@@ -71,7 +71,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
             }
           }
         }
-      }      
+      }
     }
 
     if (!found) {
