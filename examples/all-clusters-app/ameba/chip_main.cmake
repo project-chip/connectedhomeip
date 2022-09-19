@@ -163,6 +163,9 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DsoHack.cpp
 
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
@@ -204,6 +207,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/route_hook
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

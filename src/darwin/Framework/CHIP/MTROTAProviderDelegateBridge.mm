@@ -16,7 +16,7 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -128,7 +128,7 @@ private:
 
         auto fileDesignator = [[NSString alloc] initWithBytes:fd length:fdl encoding:NSUTF8StringEncoding];
         auto offset = @(mTransfer.GetStartOffset());
-        auto completionHandler = ^(NSError * error) {
+        auto completionHandler = ^(NSError * _Nullable error) {
             dispatch_async(mWorkQueue, ^{
                 if (error != nil) {
                     LogErrorOnFailure([MTRError errorToCHIPErrorCode:error]);
@@ -149,7 +149,7 @@ private:
             });
         };
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -159,7 +159,7 @@ private:
                                                         controller:controller
                                                     fileDesignator:fileDesignator
                                                             offset:offset
-                                                 completionHandler:completionHandler];
+                                                        completion:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -177,7 +177,7 @@ private:
             error = CHIP_ERROR_INTERNAL;
         }
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -227,7 +227,7 @@ private:
 
         // TODO Handle MaxLength
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -238,7 +238,7 @@ private:
                                           blockSize:blockSize
                                          blockIndex:blockIndex
                                         bytesToSkip:bytesToSkip
-                                  completionHandler:completionHandler];
+                                         completion:completionHandler];
         });
 
         return CHIP_NO_ERROR;
@@ -368,7 +368,7 @@ bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath 
     }
 
     auto * controller =
-        [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
+        [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
     if (controller == nil) {
         commandHandler->AddStatus(commandPath, Status::Failure);
         return false;
@@ -443,7 +443,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         return;
     }
 
-    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
         commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
@@ -455,7 +455,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     auto completionHandler = ^(
-        MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+        MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
         dispatch_async(mWorkQueue, ^{
             CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
             VerifyOrReturn(handler != nullptr);
@@ -466,9 +466,9 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
             Commands::QueryImageResponse::Type response;
             ConvertFromQueryImageResponseParms(data, response);
 
-            auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
+            auto hasUpdate = [data.status isEqual:@(MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
             auto isBDXProtocolSupported =
-                [commandParams.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+                [commandParams.protocolsSupported containsObject:@(MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
 
             if (hasUpdate && isBDXProtocolSupported) {
                 auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
@@ -509,7 +509,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         [strongDelegate handleQueryImageForNodeID:@(nodeId)
                                        controller:controller
                                            params:commandParams
-                                completionHandler:completionHandler];
+                                       completion:completionHandler];
     });
 }
 
@@ -527,7 +527,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     auto completionHandler
-        = ^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
+        = ^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
               dispatch_async(mWorkQueue, ^{
                   CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
                   VerifyOrReturn(handler != nullptr);
@@ -542,7 +542,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
               });
           };
 
-    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
     ConvertToApplyUpdateRequestParams(commandData, commandParams);
 
     auto strongDelegate = mDelegate;
@@ -550,7 +550,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
         [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
                                                controller:controller
                                                    params:commandParams
-                                        completionHandler:completionHandler];
+                                               completion:completionHandler];
     });
 }
 
@@ -577,7 +577,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
         });
     };
 
-    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
     ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
 
     auto strongDelegate = mDelegate;
@@ -585,12 +585,12 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
         [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
                                                 controller:controller
                                                     params:commandParams
-                                         completionHandler:completionHandler];
+                                                completion:completionHandler];
     });
 }
 
 CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
-    const Commands::QueryImage::DecodableType & commandData, MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams)
+    const Commands::QueryImage::DecodableType & commandData, MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams)
 {
     commandParams.vendorId = [NSNumber numberWithUnsignedShort:commandData.vendorId];
     commandParams.productId = [NSNumber numberWithUnsignedShort:commandData.productId];
@@ -623,7 +623,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
 }
 
 void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
-    const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
+    const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
     Commands::QueryImageResponse::Type & response)
 {
     response.status = static_cast<OTAQueryStatus>([responseParams.status intValue]);
@@ -659,14 +659,14 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
 
 void MTROTAProviderDelegateBridge::ConvertToApplyUpdateRequestParams(
     const Commands::ApplyUpdateRequest::DecodableType & commandData,
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams)
+    MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams)
 {
     commandParams.updateToken = AsData(commandData.updateToken);
     commandParams.newVersion = [NSNumber numberWithUnsignedLong:commandData.newVersion];
 }
 
 void MTROTAProviderDelegateBridge::ConvertFromApplyUpdateRequestResponseParms(
-    const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
+    const MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
     Commands::ApplyUpdateResponse::Type & response)
 {
     response.action = static_cast<OTAApplyUpdateAction>([responseParams.action intValue]);
@@ -675,7 +675,7 @@ void MTROTAProviderDelegateBridge::ConvertFromApplyUpdateRequestResponseParms(
 
 void MTROTAProviderDelegateBridge::ConvertToNotifyUpdateAppliedParams(
     const Commands::NotifyUpdateApplied::DecodableType & commandData,
-    MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams)
+    MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams)
 {
     commandParams.updateToken = AsData(commandData.updateToken);
     commandParams.softwareVersion = [NSNumber numberWithUnsignedLong:commandData.softwareVersion];

@@ -76,9 +76,9 @@ MTRDeviceController * InitializeMTR(void)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        __auto_type * factory = [MTRControllerFactory sharedInstance];
-        __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
-        if (![factory startup:factoryParams]) {
+        __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startControllerFactory:factoryParams error:nil]) {
             return;
         }
 
@@ -87,14 +87,14 @@ MTRDeviceController * InitializeMTR(void)
             return;
         }
 
-        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
-        params.vendorId = @(kTestVendorId);
+        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:keys.ipk fabricID:@(1) nocSigner:keys];
+        params.vendorID = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
-        sController = [factory startControllerOnExistingFabric:params];
+        sController = [factory createControllerOnExistingFabric:params error:nil];
         if (sController == nil) {
-            sController = [factory startControllerOnNewFabric:params];
+            sController = [factory createControllerOnNewFabric:params error:nil];
         }
     });
 
@@ -113,9 +113,9 @@ MTRDeviceController * MTRRestartController(MTRDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:keys.ipk fabricID:@(1) nocSigner:keys];
 
-    sController = [[MTRControllerFactory sharedInstance] startControllerOnExistingFabric:params];
+    sController = [[MTRDeviceControllerFactory sharedInstance] createControllerOnExistingFabric:params error:nil];
 
     return sController;
 }
@@ -129,20 +129,21 @@ uint64_t MTRGetLastPairedDeviceId(void)
     return deviceId;
 }
 
-BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDevice(DeviceConnectionCallback completionHandler)
 {
-    MTRDeviceController * controller = InitializeMTR();
+    InitializeMTR();
 
     // Let's use the last device that was paired
     uint64_t deviceId = MTRGetLastPairedDeviceId();
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+
+    return MTRGetConnectedDeviceWithID(deviceId, completionHandler);
 }
 
 MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
 {
     NSError * error;
     MTRDeviceController * controller = InitializeMTR();
-    MTRBaseDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
+    MTRBaseDevice * device = [controller deviceBeingCommissionedWithNodeID:@(MTRGetLastPairedDeviceId()) error:&error];
     if (error) {
         NSLog(@"Error retrieving device being commissioned for deviceId %llu", MTRGetLastPairedDeviceId());
         return nil;
@@ -150,11 +151,16 @@ MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
     return device;
 }
 
-BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, DeviceConnectionCallback completionHandler)
 {
     MTRDeviceController * controller = InitializeMTR();
 
-    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    // We can simplify this now that devices can be gotten sync, but for now just do the async dispatch.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(deviceId) controller:controller];
+        completionHandler(device, nil);
+    });
+    return YES;
 }
 
 BOOL MTRIsDevicePaired(uint64_t deviceId)
@@ -180,38 +186,37 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
         MTRBaseClusterOperationalCredentials * opCredsCluster =
-            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
-        [opCredsCluster
-            readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                if (error) {
-                    NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
-                    return;
-                }
-                MTROperationalCredentialsClusterRemoveFabricParams * params =
-                    [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
-                params.fabricIndex = value;
-                [opCredsCluster removeFabricWithParams:params
-                                     completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                         NSError * _Nullable error) {
-                                         if (error) {
-                                             NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
-                                                 params.fabricIndex, deviceId, error);
-                                             return;
-                                         }
-                                         NSLog(@"Successfully unpaired deviceId %llu", deviceId);
-                                     }];
-            }];
+            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:@(0) queue:dispatch_get_main_queue()];
+        [opCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
+                return;
+            }
+            MTROperationalCredentialsClusterRemoveFabricParams * params =
+                [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+            params.fabricIndex = value;
+            [opCredsCluster removeFabricWithParams:params
+                                        completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                            NSError * _Nullable error) {
+                                            if (error) {
+                                                NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
+                                                    params.fabricIndex, deviceId, error);
+                                                return;
+                                            }
+                                            NSLog(@"Successfully unpaired deviceId %llu", deviceId);
+                                        }];
+        }];
     });
 }
 
 @implementation CHIPToolPersistentStorageDelegate
 
-// MARK: MTRPersistentStorageDelegate
+// MARK: MTRStorage
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
     NSData * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, key);
-    NSLog(@"MTRPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    NSLog(@"MTRStorage Get Value for Key: %@, value %@", key, value);
     return value;
 }
 

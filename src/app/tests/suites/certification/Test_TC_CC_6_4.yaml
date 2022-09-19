@@ -105,7 +105,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveToColorTemperature command to TH"
-      PICS: CC.C.C0a.Rsp
+      PICS: CC.C.C0a.Tx
       verification: |
           ./chip-tool colorcontrol move-to-color-temperature 150 300 0 0 1 1
 
@@ -147,7 +147,7 @@ tests:
     - label:
           "DUT reads ColorTemperatureMired attribute from TH (potentially
           multiple times)"
-      PICS: CC.C.C0a.Rsp && CC.C.A0007
+      PICS: CC.C.C0a.Tx && CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
@@ -178,7 +178,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveColorTemperature command to TH"
-      PICS: CC.C.C4b.Rsp
+      PICS: CC.C.C4b.Tx
       verification: |
           ./chip-tool colorcontrol move-color-temperature 1 16319 0 65279 0 0 1 1
 
@@ -229,7 +229,7 @@ tests:
     - label:
           "DUT reads ColorTemperatureMired attribute from TH (potentially
           multiple times)"
-      PICS: CC.C.C4b.Rsp && CC.C.A0007
+      PICS: CC.C.C4b.Tx && CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 
@@ -261,7 +261,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepColorTemperature command to TH"
-      PICS: CC.C.C4c.Rsp
+      PICS: CC.C.C4c.Tx
       verification: |
           ./chip-tool colorcontrol step-color-temperature 1 32639 200 0 65279 0 0 1 1
 
@@ -313,7 +313,7 @@ tests:
     - label:
           "DUT reads ColorTemperatureMired attribute from TH (potentially
           multiple times)"
-      PICS: CC.C.C4c.Rsp & CC.C.A0007
+      PICS: CC.C.C4c.Tx & CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
           Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
@@ -342,7 +342,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
-      PICS: CC.C.C47.Rsp
+      PICS: CC.C.C47.Tx
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
@@ -388,7 +388,7 @@ tests:
     - label:
           "DUT reads ColorTemperatureMired attribute from TH (potentially
           multiple times)"
-      PICS: CC.C.C47.Rsp && CC.C.A0007
+      PICS: CC.C.C47.Tx && CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
 

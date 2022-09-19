@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 @interface MTRDevice ()
-- (instancetype)initWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // Called from MTRClusters for writes and commands
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values

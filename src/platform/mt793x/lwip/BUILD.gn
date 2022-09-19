@@ -1,0 +1,67 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/mt793x/lwip/lwip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lwip/lwip.gni")
+import("${lwip_root}/lwip.gni")
+
+assert(chip_with_lwip)
+
+assert(lwip_platform == "external",
+       "Unsupported lwIP platform: ${lwip_platform}")
+
+declare_args() {
+  # Enable lwIP debugging.
+  lwip_debug = is_debug
+}
+
+import("//build_overrides/mt793x_sdk.gni")
+import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
+
+#buildconfig_header("lwip_buildconfig") {
+#  header = "lwip_buildconfig.h"
+#  header_dir = "lwip"
+#
+#  defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
+#  if (lwip_platform != "external") {
+#    if (current_os == "android") {
+#      defines += [ "LWIP_NO_STDINT_H=1" ]
+#    }
+#  }
+#}
+
+config("lwip_config") {
+  include_dirs = [
+    "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc",
+  ]
+}
+
+lwip_target("lwip") {
+  public = [ "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc/lwipopts.h" ]
+
+  sources = []
+
+  public_deps = [ ":lwip_buildconfig" ]
+
+  public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
+
+  public_configs = [
+    ":lwip_config",
+    "${chip_root}/src:includes",
+  ]
+}

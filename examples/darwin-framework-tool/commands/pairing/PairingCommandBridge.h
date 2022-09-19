@@ -24,7 +24,6 @@ enum class PairingMode
 {
     None,
     Code,
-    Ethernet,
     Ble,
 };
 
@@ -64,12 +63,6 @@ public:
         case PairingMode::Code:
             AddArgument("payload", &mOnboardingPayload);
             break;
-        case PairingMode::Ethernet:
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
-            AddArgument("device-remote-ip", &ipAddress);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
-            break;
         case PairingMode::Ble:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
@@ -84,9 +77,8 @@ public:
 private:
     void PairWithCode(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
-    void PairWithIPAddress(NSError * __autoreleasing * error);
     void Unpair();
-    void SetUpPairingDelegate();
+    void SetUpDeviceControllerDelegate();
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -94,9 +86,7 @@ private:
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
     chip::NodeId mNodeId;
-    uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     char * mOnboardingPayload;
-    char * ipAddress;
 };

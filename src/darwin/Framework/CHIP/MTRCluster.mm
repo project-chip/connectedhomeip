@@ -51,7 +51,7 @@ using namespace ::chip;
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWriteParams alloc] init];
     other.timedWriteTimeout = self.timedWriteTimeout;
@@ -65,12 +65,12 @@ using namespace ::chip;
 - (instancetype)init
 {
     if (self = [super init]) {
-        _fabricFiltered = nil;
+        _fabricFiltered = YES;
     }
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRReadParams alloc] init];
     other.fabricFiltered = self.fabricFiltered;
@@ -80,18 +80,20 @@ using namespace ::chip;
 @end
 
 @implementation MTRSubscribeParams
-- (instancetype)init
+- (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval
 {
     if (self = [super init]) {
-        _keepPreviousSubscriptions = nil;
-        _autoResubscribe = nil;
+        _keepPreviousSubscriptions = NO;
+        _autoResubscribe = YES;
+        _minInterval = [minInterval copy];
+        _maxInterval = [maxInterval copy];
     }
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRSubscribeParams alloc] init];
+    auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
     other.fabricFiltered = self.fabricFiltered;
     other.keepPreviousSubscriptions = self.keepPreviousSubscriptions;
     other.autoResubscribe = self.autoResubscribe;

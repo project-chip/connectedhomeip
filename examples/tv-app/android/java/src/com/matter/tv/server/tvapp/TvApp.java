@@ -37,6 +37,8 @@ public class TvApp {
 
   public native void nativeInit();
 
+  public native void initializeCommissioner(UserPrompter userPrompter);
+
   // called before Matter server is inited
   public native void preServerInit();
 

@@ -86,6 +86,32 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH aga"
       verification: |
+          ./chip-tool powersourceconfiguration read attribute-list 1 0
+
+          Verify the ReadRequestMessage the TH (all-cluster-minimal-app) log:
+
+          [1663147271.622589][2750:2750] CHIP:IM: Received Read request
+          [1663147271.622666][2750:2750] CHIP:DMG: ReadRequestMessage =
+          [1663147271.622692][2750:2750] CHIP:DMG: {
+          [1663147271.622714][2750:2750] CHIP:DMG: 	AttributePathIBs =
+          [1663147271.622739][2750:2750] CHIP:DMG: 	[
+          [1663147271.622789][2750:2750] CHIP:DMG: 		AttributePathIB =
+          [1663147271.622821][2750:2750] CHIP:DMG: 		{
+          [1663147271.622849][2750:2750] CHIP:DMG: 			Endpoint = 0x0,
+          [1663147271.622880][2750:2750] CHIP:DMG: 			Cluster = 0x2e,
+          [1663147271.622914][2750:2750] CHIP:DMG: 			Attribute = 0x0000_FFFB,
+          [1663147271.622943][2750:2750] CHIP:DMG: 		}
+          [1663147271.622971][2750:2750] CHIP:DMG:
+          [1663147271.622996][2750:2750] CHIP:DMG: 	],
+          [1663147271.623023][2750:2750] CHIP:DMG:
+          [1663147271.623049][2750:2750] CHIP:DMG: 	isFabricFiltered = true,
+          [1663147271.623074][2750:2750] CHIP:DMG: 	InteractionModelRevision = 1
+          [1663147271.623097][2750:2750] CHIP:DMG: },
+          [1663147271.623168][2750:2750] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663147271.623246][2750:2750] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663147271.623274][2750:2750] CHIP:DMG: <RE:Run> Cluster 2e, Attribute fffb is dirty
+
+
           ./chip-tool powersourceconfiguration read sources 1 0
 
           verify the " sources response" on the TH (all-cluster-minimal-app) log:

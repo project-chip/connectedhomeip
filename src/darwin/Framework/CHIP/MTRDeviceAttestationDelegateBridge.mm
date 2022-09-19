@@ -30,7 +30,8 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
         mResult = attestationResult;
 
         id<MTRDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
-        if ([strongDelegate respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
+        if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:
+                                                                                          device:attestationDeviceInfo:error:)]) {
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
                 NSData * dacData = AsData(info.dacDerBuffer());
@@ -43,18 +44,18 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                 NSError * error = (attestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
                     ? nil
                     : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                [strongDelegate deviceAttestation:mDeviceController
-                               completedForDevice:device
-                            attestationDeviceInfo:deviceInfo
-                                            error:error];
+                [strongDelegate deviceAttestationCompletedForController:mDeviceController
+                                                                 device:device
+                                                  attestationDeviceInfo:deviceInfo
+                                                                  error:error];
             }
         } else if ((attestationResult != chip::Credentials::AttestationVerificationResult::kSuccess) &&
-            [strongDelegate respondsToSelector:@selector(deviceAttestation:failedForDevice:error:)]) {
+            [strongDelegate respondsToSelector:@selector(deviceAttestationFailedForController:device:error:)]) {
 
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
                 NSError * error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                [strongDelegate deviceAttestation:mDeviceController failedForDevice:device error:error];
+                [strongDelegate deviceAttestationFailedForController:mDeviceController device:device error:error];
             }
         }
     });

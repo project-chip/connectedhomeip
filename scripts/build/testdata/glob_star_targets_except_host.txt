@@ -18,6 +18,11 @@ android-x64-tv-server
 android-x86-chip-tool
 android-x86-tv-server
 bl602-light
+bouffalolab-BL702-IoT-DVK-light
+bouffalolab-BL702-IoT-DVK-light-rpc
+bouffalolab-BL706-IoT-DVK-BL706C-22-light
+bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+bouffalolab-BL706-NIGHT-LIGHT-light
 cc13x2x7_26x2x7-all-clusters
 cc13x2x7_26x2x7-all-clusters-minimal
 cc13x2x7_26x2x7-lock-ftd
@@ -61,6 +66,7 @@ esp32-m5stack-all-clusters-rpc-ipv6only
 esp32-m5stack-ota-requestor
 esp32-m5stack-ota-requestor-rpc
 esp32-qemu-tests
+genio-lighting-app
 imx-all-clusters-app
 imx-all-clusters-app-release
 imx-all-clusters-minimal-app

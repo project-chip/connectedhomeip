@@ -23,14 +23,11 @@
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 
-@class MTRDeviceController;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRBaseDevice ()
 
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller;
-- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * Only returns non-nil if the device is using a PASE session.  Otherwise, the
@@ -57,10 +54,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
 /**
- * Controllers are created via the MTRControllerFactory object.
+ * Controllers are created via the MTRDeviceControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Initialize the device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 @end
 
@@ -78,8 +83,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRAttributeReport ()
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path
-                       value:(nullable id)value
-                       error:(nullable NSError *)error;
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error;
 @end
 
 @interface MTREventReport ()
@@ -87,8 +92,8 @@ NS_ASSUME_NONNULL_BEGIN
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
                    timestamp:(NSNumber *)timestamp
-                       value:(nullable id)value
-                       error:(nullable NSError *)error;
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error;
 @end
 
 // Exported utility function

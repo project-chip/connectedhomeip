@@ -220,13 +220,13 @@ tests:
               minValue: 170
               maxValue: 230
 
-    - label: "Wait 13s"
+    - label: "Wait 19s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 13000
+                value: 19000
 
     - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000

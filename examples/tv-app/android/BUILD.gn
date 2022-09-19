@@ -40,7 +40,6 @@ shared_library("jni") {
     "java/AppImpl.cpp",
     "java/AppImpl.h",
     "java/AppPlatform-JNI.cpp",
-    "java/AppPlatform-JNI.h",
     "java/AppPlatformShellCommands-JNI.cpp",
     "java/AppPlatformShellCommands-JNI.h",
     "java/ChannelManager.cpp",

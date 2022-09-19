@@ -68,12 +68,10 @@ static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReade
     temp.Init(aReader);
     tagControl = static_cast<TLVTagControl>(temp.GetControlByte() & kTLVTagControlMask);
 
-    aWriter("%zd ", aDepth);
+    aWriter("0x%02X, ", temp.GetLengthRead());
 
     for (size_t i = 0; i < aDepth; i++)
         aWriter("%s", aIndent);
-
-    aWriter("%p, ", temp.GetReadPoint());
 
     if (IsProfileTag(tag))
     {
@@ -147,7 +145,11 @@ static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReade
         case kTLVType_ByteString:
             err = temp.GetDataPtr(strbuf);
             VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_ByteString"));
-            aWriter("%p\n", strbuf);
+            aWriter("hex:");
+            for (uint32_t i = 0; i < len; i++)
+            {
+                aWriter("%02X", strbuf[i]);
+            }
             break;
 
         case kTLVType_Null:
@@ -267,7 +269,7 @@ const char * DecodeType(const TLVType aType)
         break;
 
     case kTLVType_ByteString:
-        retval = "Data";
+        retval = "Octet String";
         break;
 
     case kTLVType_Null:

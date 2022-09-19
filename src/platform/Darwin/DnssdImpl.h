@@ -20,6 +20,8 @@
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
 
+#include "DnssdHostNameRegistrar.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -93,9 +95,10 @@ struct RegisterContext : public GenericContext
     DnssdPublishCallback callback;
     std::string mType;
     std::string mInstanceName;
+    HostNameRegistrar mHostNameRegistrar;
 
     RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
-    virtual ~RegisterContext() {}
+    virtual ~RegisterContext() { mHostNameRegistrar.Unregister(); }
 
     void DispatchFailure(DNSServiceErrorType err) override;
     void DispatchSuccess() override;

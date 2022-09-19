@@ -126,6 +126,8 @@ class {{filename}}: public TestCommandBridge
     {{#*inline "testCommand"}}Test{{asUpperCamelCase label}}_{{index}}{{/inline}}
     CHIP_ERROR {{>testCommand}}()
     {
+        {{#*inline "cluster"}}{{asUpperCamelCase cluster preserveAcronyms=true}}{{/inline}}
+        {{#*inline "attribute"}}{{asUpperCamelCase attribute preserveAcronyms=true}}{{/inline}}
         {{#if (isTestOnlyCluster cluster)}}
         {{asEncodableType}} value;
         {{#chip_tests_item_parameters}}
@@ -134,19 +136,19 @@ class {{filename}}: public TestCommandBridge
         return {{command}}("{{identity}}", value);
         {{else}}
         MTRBaseDevice * device = GetDevice("{{identity}}");
-        MTRBaseCluster{{asUpperCamelCase cluster}} * cluster = [[MTRBaseCluster{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
+        __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpoint:@({{endpoint}}) queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         {{#if isCommand}}
           {{#if commandObject.arguments.length}}
-            __auto_type * params = [[MTR{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Params alloc] init];
+            __auto_type * params = [[MTR{{>cluster}}Cluster{{asUpperCamelCase command preserveAcronyms=true}}Params alloc] init];
           {{/if}}
           {{#chip_tests_item_parameters}}
             {{>test_value target=(concat "params." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster depth=0}}
           {{/chip_tests_item_parameters}}
-          [cluster {{asLowerCamelCase command}}With{{#if commandObject.arguments.length}}Params:params completionHandler{{else}}CompletionHandler{{/if}}:
+          [cluster {{asLowerCamelCase command}}With{{#if commandObject.arguments.length}}Params:params completion{{else}}Completion{{/if}}:
           {{#if commandObject.hasSpecificResponse}}
-            ^(MTR{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase commandObject.responseName}}Params * _Nullable values, NSError * _Nullable err) {
+            ^(MTR{{>cluster}}Cluster{{asUpperCamelCase commandObject.responseName}}Params * _Nullable values, NSError * _Nullable err) {
           {{else}}
             ^(NSError * _Nullable err) {
           {{/if}}
@@ -154,11 +156,9 @@ class {{filename}}: public TestCommandBridge
           {{#chip_tests_item_parameters}}
             {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
           {{/chip_tests_item_parameters}}
-          MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-          [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:minIntervalArgument]
-                                                                   maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
-                                                                   params:params
-                                                                   subscriptionEstablished:^{
+          __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalArgument) maxInterval:@(maxIntervalArgument)];
+          [cluster subscribeAttribute{{>attribute}}WithParams:params
+                                      subscriptionEstablished:^{
               VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
               NextTest();
           }
@@ -167,14 +167,14 @@ class {{filename}}: public TestCommandBridge
           {{> subscribeDataCallback }} = ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
         {{else if isReadAttribute}}
         {{#if_is_fabric_scoped_struct attributeObject.type}}
-        MTRReadParams * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = [NSNumber numberWithBool:{{fabricFiltered}}];
+        __auto_type * params = [[MTRReadParams alloc] init];
+        params.fabricFiltered = {{fabricFiltered}};
         {{/if_is_fabric_scoped_struct}}
-        [cluster readAttribute{{asUpperCamelCase attribute}}With
+        [cluster readAttribute{{>attribute}}With
         {{~#if_is_fabric_scoped_struct attributeObject.type~}}
-        Params:params completionHandler:
+        Params:params completion:
         {{~else~}}
-        CompletionHandler:
+        Completion:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
         {{else if isWriteAttribute}}
@@ -182,7 +182,7 @@ class {{filename}}: public TestCommandBridge
             id {{asLowerCamelCase name}}Argument;
             {{>test_value target=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue cluster=parent.cluster depth=0}}
           {{/chip_tests_item_parameters}}
-          [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completionHandler:^(NSError * _Nullable err) {
+          [cluster writeAttribute{{>attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completion:^(NSError * _Nullable err) {
         {{/if}}
             NSLog(@"{{label}} Error: %@", err);
 

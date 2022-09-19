@@ -135,10 +135,7 @@ public:
         {
             version = aPath.mDataVersion.Value();
         }
-        else
-        {
-            ChipLogError(DataManagement, "expect aPath has valid mDataVersion");
-        }
+
         gOnReadAttributeDataCallback(mAppContext, version, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }

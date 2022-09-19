@@ -422,12 +422,12 @@ server cluster OnOff = 6 {
 }
 
 server cluster Descriptor = 29 {
-  struct DeviceType {
+  struct DeviceTypeStruct {
     devtype_id type = 0;
     int16u revision = 1;
   }
 
-  readonly attribute DeviceType deviceList[] = 0;
+  readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
@@ -585,30 +585,30 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 2;
     OTADownloadProtocol protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
-    optional CHAR_STRING location = 5;
+    optional CHAR_STRING<2> location = 5;
     optional BOOLEAN requestorCanConsent = 6;
-    optional OCTET_STRING metadataForProvider = 7;
+    optional OCTET_STRING<512> metadataForProvider = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
-    OCTET_STRING updateToken = 0;
+    OCTET_STRING<32> updateToken = 0;
     INT32U newVersion = 1;
   }
 
   request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING updateToken = 0;
+    OCTET_STRING<32> updateToken = 0;
     INT32U softwareVersion = 1;
   }
 
   response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
-    optional CHAR_STRING imageURI = 2;
+    optional CHAR_STRING<256> imageURI = 2;
     optional INT32U softwareVersion = 3;
-    optional CHAR_STRING softwareVersionString = 4;
-    optional OCTET_STRING updateToken = 5;
+    optional CHAR_STRING<64> softwareVersionString = 4;
+    optional OCTET_STRING<32> updateToken = 5;
     optional BOOLEAN userConsentNeeded = 6;
-    optional OCTET_STRING metadataForRequestor = 7;
+    optional OCTET_STRING<512> metadataForRequestor = 7;
   }
 
   response struct ApplyUpdateResponse = 3 {
@@ -684,7 +684,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeId = 0;
     vendor_id vendorId = 1;
     OTAAnnouncementReason announcementReason = 2;
-    optional OCTET_STRING metadataForNode = 3;
+    optional OCTET_STRING<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
@@ -859,33 +859,33 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ScanNetworksRequest {
-    optional nullable OCTET_STRING ssid = 0;
+    optional nullable OCTET_STRING<32> ssid = 0;
     optional INT64U breadcrumb = 1;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
-    OCTET_STRING ssid = 0;
-    OCTET_STRING credentials = 1;
+    OCTET_STRING<32> ssid = 0;
+    OCTET_STRING<64> credentials = 1;
     optional INT64U breadcrumb = 2;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING operationalDataset = 0;
+    OCTET_STRING<254> operationalDataset = 0;
     optional INT64U breadcrumb = 1;
   }
 
   request struct RemoveNetworkRequest {
-    OCTET_STRING networkID = 0;
+    OCTET_STRING<32> networkID = 0;
     optional INT64U breadcrumb = 1;
   }
 
   request struct ConnectNetworkRequest {
-    OCTET_STRING networkID = 0;
+    OCTET_STRING<32> networkID = 0;
     optional INT64U breadcrumb = 1;
   }
 
   request struct ReorderNetworkRequest {
-    OCTET_STRING networkID = 0;
+    OCTET_STRING<32> networkID = 0;
     INT8U networkIndex = 1;
     optional INT64U breadcrumb = 2;
   }
@@ -899,7 +899,7 @@ server cluster NetworkCommissioning = 49 {
 
   response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
-    optional CHAR_STRING debugText = 1;
+    optional CHAR_STRING<512> debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
@@ -943,7 +943,7 @@ server cluster DiagnosticLogs = 50 {
   request struct RetrieveLogsRequestRequest {
     LogsIntent intent = 0;
     LogsTransferProtocol requestedProtocol = 1;
-    OCTET_STRING transferFileDesignator = 2;
+    OCTET_STRING<32> transferFileDesignator = 2;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -1042,7 +1042,7 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct TestEventTriggerRequest {
-    OCTET_STRING enableKey = 0;
+    OCTET_STRING<16> enableKey = 0;
     INT64U eventTrigger = 1;
   }
 
@@ -1464,7 +1464,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct UpdateFabricLabelRequest {
-    CHAR_STRING label = 0;
+    CHAR_STRING<32> label = 0;
   }
 
   request struct RemoveFabricRequest {
@@ -1595,7 +1595,7 @@ endpoint 0 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceList;
+    callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
@@ -1645,7 +1645,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    callback attribute supportedLocales default = en-US;
+    callback attribute supportedLocales;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1901,7 +1901,7 @@ endpoint 1 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceList;
+    callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;

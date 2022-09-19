@@ -85,13 +85,26 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
 CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 {
-    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload);
+    DiscoveryType discoveryType =
+        mUseOnlyOnNetworkDiscovery.ValueOr(false) ? DiscoveryType::kDiscoveryNetworkOnly : DiscoveryType::kAll;
+    return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, discoveryType);
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 {
     CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams);
+
+    // If no network discovery behavior and no network credentials are provided, assume that the pairing command is trying to pair
+    // with an on-network device.
+    if (!mUseOnlyOnNetworkDiscovery.HasValue())
+    {
+        auto threadCredentials = commissioningParams.GetThreadOperationalDataset();
+        auto wiFiCredentials   = commissioningParams.GetWiFiCredentials();
+        mUseOnlyOnNetworkDiscovery.SetValue(!threadCredentials.HasValue() && !wiFiCredentials.HasValue());
+    }
+    DiscoveryType discoveryType = mUseOnlyOnNetworkDiscovery.Value() ? DiscoveryType::kDiscoveryNetworkOnly : DiscoveryType::kAll;
+
+    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)

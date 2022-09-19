@@ -1,0 +1,88 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "mt793x")
+
+static_library("mt793x") {
+  sources = [
+    "../SingletonConfigurationManager.cpp",
+    "BLEGattProfile.c",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPMem-Platform.cpp",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "DnssdImpl.cpp",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "MT793XConfig.cpp",
+    "MT793XConfig.h",
+    "MtkWiFiEvents.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  # "${chip_root}/src/app:app_config",
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  public_deps += [ "${chip_root}/third_party/mt793x_sdk/mDNSResponder" ]
+
+  # Add pigweed KVS
+  deps = [
+    "$dir_pw_kvs:crc16",
+    "$dir_pw_log",
+  ]
+  public_deps += [
+    "$dir_pw_checksum",
+    "$dir_pw_kvs",
+  ]
+
+  # mDNS
+  if (chip_mdns == "platform") {
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "ConnectivityManagerImpl_WIFI.cpp",
+      "NetworkCommissioningWiFiDriver.cpp",
+      "NetworkCommissioningWiFiDriver.h",
+    ]
+  }
+}

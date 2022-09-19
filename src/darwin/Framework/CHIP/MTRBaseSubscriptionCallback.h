@@ -75,9 +75,9 @@ public:
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<chip::app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
-    void AdoptAttributeCache(std::unique_ptr<chip::app::ClusterStateCache> aAttributeCache)
+    void AdoptClusterStateCache(std::unique_ptr<chip::app::ClusterStateCache> aClusterStateCache)
     {
-        mAttributeCache = std::move(aAttributeCache);
+        mClusterStateCache = std::move(aClusterStateCache);
     }
 
 protected:
@@ -142,7 +142,7 @@ private:
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
     std::unique_ptr<chip::app::ReadClient> mReadClient;
-    std::unique_ptr<chip::app::ClusterStateCache> mAttributeCache;
+    std::unique_ptr<chip::app::ClusterStateCache> mClusterStateCache;
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
 };

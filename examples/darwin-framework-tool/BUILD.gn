@@ -29,6 +29,7 @@ action("build-darwin-framework") {
 
   inputs = [
     "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
     "${chip_root}/src/darwin/Framework/Matter.xcodeproj",
   ]
 
@@ -99,10 +100,10 @@ executable("darwin-framework-tool") {
     "commands/common/MTRError_Utils.h",
     "commands/common/MTRLogging.h",
     "commands/pairing/Commands.h",
+    "commands/pairing/DeviceControllerDelegateBridge.mm",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.mm",
     "commands/pairing/PairingCommandBridge.mm",
-    "commands/pairing/PairingDelegateBridge.mm",
     "commands/payload/SetupPayloadParseCommand.mm",
     "commands/provider/Commands.h",
     "commands/provider/OTAProviderDelegate.mm",

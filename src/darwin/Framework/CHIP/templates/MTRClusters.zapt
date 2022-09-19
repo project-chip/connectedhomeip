@@ -1,8 +1,8 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRAttributeCacheContainer.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
 
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRCluster.h>
@@ -18,21 +18,23 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-@interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                                endpoint:(NSNumber *)endpoint
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion;
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion;
 {{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params;
 {{#if isWritableAttribute}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs;

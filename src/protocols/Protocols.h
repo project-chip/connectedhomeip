@@ -25,6 +25,7 @@
 #pragma once
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace Protocols {
@@ -92,10 +93,48 @@ CHIP_STANDARD_PROTOCOL(Echo, 0x0004)                      // Echo Protocol.  To 
 // Protocols reserved for internal protocol use
 static constexpr Id NotSpecified(VendorId::NotSpecified, 0xFFFF); // The profile ID is either not specified or a wildcard
 
-// Pre-delare our MessageTypeTraits so message type headers know what they are
-// specializing.
+//
+// Pre-declaration of type traits that protocol headers are expected to define.
+//
+// A protocol header should first define an enumeration that lists the various message types as enum classes.
+//
+// It should then define MessageTypeTraits as a template specialization of that enumeration containing two methods:
+//      1. static constexpr const Protocols::Id & ProtocolId() that returns the Protocol ID
+//      2. static auto GetTypeToNameTable() that returns a pointer to std::array<MessageTypeNameLookup, N> where N = number of
+//      messages in protocol.
+//
 template <typename T>
 struct MessageTypeTraits;
+
+//
+// Encapsulates a tuple of message type ID and its associated name.
+//
+struct MessageTypeNameLookup
+{
+    //
+    // Constructor that takes an enumeration value for a specific message ID and its associated name.
+    //
+    template <typename T>
+    constexpr MessageTypeNameLookup(T id, const char * name) : mId(to_underlying(id)), mName(name)
+    {}
+
+    const uint8_t mId;
+    const char * mName;
+};
+
+//
+// Given a protocol ID and a message type ID, retrieve the logical name of that message.
+//
+// This will not return a nullptr.
+//
+const char * GetMessageTypeName(Id protocolId, uint8_t msgType);
+
+//
+// Given a protool ID, retrieve the logical name for that protocol.
+//
+// This will not return a nullptr.
+//
+const char * GetProtocolName(Id protocolId);
 
 } // namespace Protocols
 } // namespace chip

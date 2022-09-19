@@ -27,8 +27,12 @@ jobs:
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
+        container:
+            image: connectedhomeip/chip-build:0.5.99
+
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
+              if: ${{ !env.ACT }}
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -36,6 +40,65 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            # To use act like:
+            #   act -j code-lints
+            #
+            # Note you likely still need to have non submodules setup for the
+            # local machine, like:
+            #   git submodule deinit --all
+            - uses: actions/checkout@v3
+              if: ${{ env.ACT }}
+              name: Checkout (ACT for local build)
+
+            # Bootstrap and checkout for internal scripts (like idl_lint)
+            # to run
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Check for matter lint errors
+              if: always()
+              run: |
+                 for idl_file in $(find . -name '*.matter'); do
+                     # TODO: all these conformance failures should be fixed
+                     #       Issues exist for most of them:
+                     #       https://github.com/project-chip/connectedhomeip/issues/19180
+                     #       https://github.com/project-chip/connectedhomeip/issues/19176
+                     #       https://github.com/project-chip/connectedhomeip/issues/19175
+                     #       https://github.com/project-chip/connectedhomeip/issues/19173
+                     #       https://github.com/project-chip/connectedhomeip/issues/19169
+                     #       https://github.com/project-chip/connectedhomeip/issues/22640
+                     if [ "$idl_file" = './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/noip_rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_doorlock_aNKYAreMXE.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_extendedcolorlight_8lcaaYJVAa.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_heatingcoolingunit_ncdGai1E5a.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_humiditysensor_Xyj4gda6Hb.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_lightsensor_lZQycTFcJK.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_occupancysensor_iHyVgifZuo.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_onofflight_bbs1b7IaOV.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_onofflightswitch_FsPlMr090Q.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_onoffpluginunit_Wtf8ss5EBY.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_pressuresensor_s0qC9wLH4k.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_speaker_RpzeXdimqA.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_temperaturesensor_Qy1zkNW7c3.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_thermostat_bm3fb8dhYi.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/chef/devices/rootnode_windowcovering_RLCxaGi9Yx.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/lighting-app/lighting-common/lighting-app.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
+                     if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+
+                     ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
+                 done
 
             - name: Check broken links
               # On-push disabled until the job can run fully green

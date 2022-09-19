@@ -93,10 +93,9 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
     {
         err = CHIP_ERROR_UNEXPECTED_EVENT;
     }
-
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LockMgr().InitiateAction(LockManager::ACTOR_BUTTON, action);
+        initiated = LockMgr().InitiateAction(AppEvent::kEventType_Button, action);
 
         if (!initiated)
         {

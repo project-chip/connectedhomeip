@@ -39,7 +39,7 @@ tests:
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       command: "readAttribute"
       attribute: "ThreadMetrics"
-      PICS: DGSW.S.A0000
+      PICS: DGSW.S.A0000 && DGSW.S.C00.Rsp
       response:
           constraints:
               type: list
@@ -48,7 +48,7 @@ tests:
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
-      PICS: DGSW.S.A0002
+      PICS: DGSW.S.A0002 && DGSW.S.C00.Rsp
       response:
           constraints:
               type: int64u
@@ -57,7 +57,7 @@ tests:
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
-      PICS: DGSW.S.A0003
+      PICS: DGSW.S.A0003 && DGSW.S.C00.Rsp
       response:
           constraints:
               type: int64u

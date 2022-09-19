@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
@@ -9,7 +9,7 @@
 
 {{#chip_client_clusters includeAll=true}}
 
-@interface MTRBaseCluster{{asUpperCamelCase name}} ()
+@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

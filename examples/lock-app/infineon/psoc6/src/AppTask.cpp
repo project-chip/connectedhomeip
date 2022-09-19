@@ -132,6 +132,23 @@ void NetWorkCommissioningInstInit()
     sWiFiNetworkCommissioningInstance.Init();
 }
 
+void OnIdentifyStart(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void OnIdentifyStop(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    OnIdentifyStart,
+    OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+};
+
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model

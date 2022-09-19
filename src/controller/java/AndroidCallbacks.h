@@ -45,7 +45,8 @@ struct GetConnectedDeviceCallback
 struct ReportCallback : public app::ReadClient::Callback
 {
     /** Subscription established callback can be nullptr. */
-    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback);
+    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
+                   jobject resubscriptionAttemptCallback);
     ~ReportCallback();
 
     void OnReportBegin() override;
@@ -54,6 +55,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -61,18 +63,23 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
+
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
-    void ReportError(jobject attributePath, CHIP_ERROR err);
-    void ReportError(jobject attributePath, Protocols::InteractionModel::Status status);
-    void ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode);
+    void ReportError(jobject attributePath, jobject eventPath, CHIP_ERROR err);
+    void ReportError(jobject attributePath, jobject eventPath, Protocols::InteractionModel::Status status);
+    void ReportError(jobject attributePath, jobject eventPath, const char * message, ChipError::StorageType errorCode);
 
     CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
+
+    CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
 
     app::ReadClient * mReadClient = nullptr;
 
     app::BufferedReadCallback mBufferedReadAdapter;
     jobject mWrapperCallbackRef                 = nullptr;
     jobject mSubscriptionEstablishedCallbackRef = nullptr;
+    jobject mResubscriptionAttemptCallbackRef   = nullptr;
     jobject mReportCallbackRef                  = nullptr;
     // NodeState Java object that will be returned to the application.
     jobject mNodeStateObj = nullptr;

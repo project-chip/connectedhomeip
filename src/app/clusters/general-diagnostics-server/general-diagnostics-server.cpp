@@ -364,23 +364,20 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 
     auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
 
+    // Spec says "EnableKeyMismatch" but this never existed prior to 1.0 SVE2 and mismatches
+    // test plans as well. ConstraintError is specified for most other errors, so
+    // we keep the behavior as close as possible, except for EnableKeyMismatch which
+    // is going to be a ConstraintError.
     if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
     {
-        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
     CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
-    Status returnStatus                 = StatusIB(handleEventTriggerResult).mStatus;
 
-    // When HandleEventTrigger returns INVALID_ARGUMENT we convert that into InvalidCommand to be spec
-    // compliant.
-    if (handleEventTriggerResult == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        returnStatus = Status::InvalidCommand;
-    }
-
-    commandObj->AddStatus(commandPath, returnStatus);
+    // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
+    commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
     return true;
 }
 
