@@ -5,10 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
 import com.example.contentapp.AttributeHolder;
 import com.example.contentapp.MainActivity;
-import com.matter.tv.app.api.Clusters;
 import com.matter.tv.app.api.MatterIntentConstants;
 
 public class MatterCommandReceiver extends BroadcastReceiver {
@@ -31,13 +29,15 @@ public class MatterCommandReceiver extends BroadcastReceiver {
           byte[] commandPayload =
               intent.getByteArrayExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD);
           String command = new String(commandPayload);
-          String message = new StringBuilder()
+          String message =
+              new StringBuilder()
                   .append("Received matter command ")
                   .append(commandId)
                   .append(" on cluster ")
                   .append(clusterId)
                   .append(" with payload : ")
-                  .append(command).toString();
+                  .append(command)
+                  .toString();
           Log.d(TAG, message);
           String response = "{\"0\":1, \"1\":\"custom response from content app\"}";
 
@@ -53,7 +53,12 @@ public class MatterCommandReceiver extends BroadcastReceiver {
           String attributeAction =
               intent.getStringExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION);
           if (attributeAction.equals(MatterIntentConstants.ATTRIBUTE_ACTION_READ)) {
-            String response = "{\"" + attributeId + "\":" + AttributeHolder.getInstance().getAttributeValue(clusterId, attributeId) + "}";
+            String response =
+                "{\""
+                    + attributeId
+                    + "\":"
+                    + AttributeHolder.getInstance().getAttributeValue(clusterId, attributeId)
+                    + "}";
             sendResponseViaPendingIntent(context, intent, response);
           } else {
             Log.e(

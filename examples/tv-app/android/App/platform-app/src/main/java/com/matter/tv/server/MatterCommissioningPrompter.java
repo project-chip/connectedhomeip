@@ -11,7 +11,6 @@ import android.util.Log;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
-
 import com.matter.tv.server.service.MatterServant;
 import com.matter.tv.server.tvapp.UserPrompter;
 import com.matter.tv.server.tvapp.UserPrompterResolver;
