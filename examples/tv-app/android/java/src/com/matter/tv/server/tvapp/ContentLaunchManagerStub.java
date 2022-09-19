@@ -58,15 +58,21 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
     Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay + " at " + endpoint);
 
     boolean found = false;
-    for (ContentLaunchEntry entry : entries) {
-      for (ContentLaunchSearchParameter parameter : entry.parameters) {
-        for (ContentLaunchSearchParameter query : search) {
-          if (query.type == parameter.type && query.data.equals(parameter.data)) {
-            Log.d(TAG, " TEST CASE found match=" + entry.name);
-            found = true;
+    if (entries != null) {
+      for (ContentLaunchEntry entry : entries) {
+        if (entry.parameters != null) {
+          for (ContentLaunchSearchParameter parameter : entry.parameters) {
+            if (search != null) {
+              for (ContentLaunchSearchParameter query : search) {
+                if (query.type == parameter.type && query.data.equals(parameter.data)) {
+                  Log.d(TAG, " TEST CASE found match=" + entry.name);
+                  found = true;
+                }
+              }
+            }
           }
         }
-      }
+      }      
     }
 
     if (!found) {
