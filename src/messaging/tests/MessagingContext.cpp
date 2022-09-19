@@ -97,6 +97,9 @@ void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
 
 using namespace System::Clock::Literals;
 
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveIdleRetransTimeout;
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveActiveRetransTimeout;
+
 void MessagingContext::SetMRPMode(MRPMode mode)
 {
     if (mode == MRPMode::kDefault)
@@ -107,8 +110,7 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        OverrideDefaultIdleMRPConfig(0_ms32);
-        OverrideDefaultActiveMRPConfig(0_ms32);
+        ClearLocalMRPConfigOverride();
 #else
         //
         // A test is calling this function assuming the overrides above are going to work
@@ -120,8 +122,7 @@ void MessagingContext::SetMRPMode(MRPMode mode)
     else
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        OverrideDefaultIdleMRPConfig(10_ms32);
-        OverrideDefaultActiveMRPConfig(10_ms32);
+        OverrideLocalMRPConfig(MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout);
 #else
         //
         // A test is calling this function assuming the overrides above are going to work
@@ -130,14 +131,14 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         VerifyOrDie(false);
 #endif
 
-        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
-        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(10), System::Clock::Milliseconds32(10)));
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
     }
 }
 

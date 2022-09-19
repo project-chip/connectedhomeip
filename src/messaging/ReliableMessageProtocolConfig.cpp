@@ -32,17 +32,19 @@ namespace chip {
 using namespace System::Clock::Literals;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-static System::Clock::Milliseconds32 idleRetransTimeoutOverride   = 0_ms32;
-static System::Clock::Milliseconds32 activeRetransTimeoutOverride = 0_ms32;
+static Optional<System::Clock::Timeout> idleRetransTimeoutOverride   = NullOptional;
+static Optional<System::Clock::Timeout> activeRetransTimeoutOverride = NullOptional;
 
-void OverrideDefaultIdleMRPConfig(System::Clock::Milliseconds32 idleRetransTimeout)
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout)
 {
-    idleRetransTimeoutOverride = idleRetransTimeout;
+    idleRetransTimeoutOverride.SetValue(idleRetransTimeout);
+    activeRetransTimeoutOverride.SetValue(activeRetransTimeout);
 }
 
-void OverrideDefaultActiveMRPConfig(System::Clock::Milliseconds32 activeRetransTimeout)
+void ClearLocalMRPConfigOverride()
 {
-    activeRetransTimeoutOverride = activeRetransTimeout;
+    activeRetransTimeoutOverride.ClearValue();
+    idleRetransTimeoutOverride.ClearValue();
 }
 #endif
 
@@ -71,14 +73,14 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (idleRetransTimeoutOverride != 0_ms32)
+    if (idleRetransTimeoutOverride.HasValue())
     {
-        config.mIdleRetransTimeout = idleRetransTimeoutOverride;
+        config.mIdleRetransTimeout = idleRetransTimeoutOverride.Value();
     }
 
-    if (activeRetransTimeoutOverride != 0_ms32)
+    if (activeRetransTimeoutOverride.HasValue())
     {
-        config.mActiveRetransTimeout = activeRetransTimeoutOverride;
+        config.mActiveRetransTimeout = activeRetransTimeoutOverride.Value();
     }
 #endif
 
