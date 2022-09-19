@@ -31,6 +31,8 @@ pw_python_package("build_examples") {
     "testdata/dry_run_linux-arm64-ota-requestor-nodeps-ipv6only.txt",
     "testdata/dry_run_linux-x64-all-clusters-coverage.txt",
     "testdata/dry_run_nrf-nrf52840dk-pump.txt",
+    "testdata/dry_run_openiotsdk-lock.txt",
+    "testdata/dry_run_openiotsdk-shell.txt",
   ]
 
   sources = [
@@ -54,6 +56,7 @@ pw_python_package("build_examples") {
     "builders/mbed.py",
     "builders/mw320.py",
     "builders/nrf.py",
+    "builders/openiotsdk.py",
     "builders/qpg.py",
     "builders/telink.py",
     "builders/tizen.py",

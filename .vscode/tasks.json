@@ -242,6 +242,68 @@
                 "showReuseMessage": true,
                 "clear": true
             }
+        },
+        {
+            "label": "Build Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Crun",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Crun",
+                "-dtrue",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
         }
     ],
     "inputs": [
@@ -286,6 +348,20 @@
             "description": "What mbed application type do you want to use?",
             "options": ["simple", "boot", "upgrade"],
             "default": "simple"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkDebugMode",
+            "description": "Do you want to use debug mode?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkExample",
+            "description": "What Open IoT SDK example application do you want to use?",
+            "options": ["shell", "lock-app"],
+            "default": "shell"
         },
         {
             "type": "promptString",
@@ -428,6 +504,8 @@
                 "nrf-nrf5340-pump",
                 "nrf-nrf5340-pump-controller",
                 "nrf-nrf5340-shell",
+                "openiotsdk-lock",
+                "openiotsdk-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
