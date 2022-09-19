@@ -68,7 +68,7 @@ struct MessageTestEntry
     size_t encryptedLength;
     size_t privacyLength;
 
-    const char * key;
+    const char * encryptKey;
     const char * privacyKey;
     const char * epochKey;
 
@@ -100,11 +100,9 @@ struct MessageTestEntry theMessageTestVector[] = {
         .encryptedLength = 30,
         .privacyLength   = 30,
 
-        .key        = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
-        .privacyKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
-        .nonce        = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xb8\x0b\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb",
+        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
         .sessionId   = 0x0bb8, // 3000
         .peerNodeId  = 0x0000000000000000ULL,
