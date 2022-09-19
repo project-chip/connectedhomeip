@@ -21,14 +21,15 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
+#include "BaseApplication.h"
 #include "AppEvent.h"
 #include "FreeRTOS.h"
-#include "LightingManager.h"
 #include "sl_simple_button_instances.h"
-
+#include "LightingManager.h"
 #include "timers.h" // provides FreeRTOS timer support
+#include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -39,59 +40,32 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
-class AppTask
+class AppTask : public BaseApplication
 {
 
 public:
-    CHIP_ERROR StartAppTask();
+    
+    AppTask() = default;
+    static AppTask & GetAppTask() { return sAppTask; }
     static void AppTaskMain(void * pvParameter);
+    CHIP_ERROR StartAppTask();
+
+
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
+    static void OnIdentifyStart(Identify * identify);
+    static void OnIdentifyStop(Identify * identify);
 
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t value);
-    void PostEvent(const AppEvent * event);
-
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
 
 private:
-    friend AppTask & GetAppTask(void);
-
-    CHIP_ERROR Init();
+    static AppTask sAppTask;
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction);
-
-    void CancelTimer(void);
-
-    void DispatchEvent(AppEvent * event);
-
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
     static void LightActionEventHandler(AppEvent * aEvent);
     static void LightControlEventHandler(AppEvent * aEvent);
-    static void TimerEventHandler(TimerHandle_t xTimer);
-
     static void UpdateClusterState(intptr_t context);
-
-    void StartTimer(uint32_t aTimeoutMs);
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
-
-        kFunction_Invalid
-    } Function;
-
-    Function_t mFunction;
-    bool mFunctionTimerActive;
-    bool mSyncClusterToButtonAction;
-
-    static AppTask sAppTask;
+    static void ButtonHandler(AppEvent * aEvent);
+    CHIP_ERROR Init();
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}

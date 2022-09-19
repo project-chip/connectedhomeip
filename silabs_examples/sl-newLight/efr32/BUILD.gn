@@ -78,7 +78,7 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4160A" || efr32_board == "BRD2207A") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B") {
   rgb_led = true
 }
 
@@ -171,15 +171,16 @@ efr32_executable("newLight_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
+    "light_modules/LightingManager.cpp",
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "light_modules/LightingManager.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
@@ -188,6 +189,7 @@ efr32_executable("newLight_app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -196,14 +198,15 @@ efr32_executable("newLight_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
     if (chip_openthread_ftd) {
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        "${chip_root}/third_party/openthread:openthread",
+        "${chip_root}/third_party/openthread:openthread-platform",
+        "${examples_plat_dir}:efr-matter-shell",
       ]
     } else {
       deps += [
@@ -248,8 +251,16 @@ efr32_executable("newLight_app") {
   }
 
   if (lcd_on) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-    defines += [ "DISPLAY_ENABLED" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_LIGHT=1",
+    ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
 
@@ -331,6 +342,12 @@ efr32_executable("newLight_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
+  }
+
+  # Attestation Credentials
+
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
   }
 
   output_dir = root_out_dir

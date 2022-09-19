@@ -160,6 +160,7 @@ efr32_executable("template_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
@@ -190,8 +191,9 @@ efr32_executable("template_app") {
     ]
     if (chip_openthread_ftd) {
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        "${chip_root}/third_party/openthread:openthread",
+        "${chip_root}/third_party/openthread:openthread-platform",
+        "${examples_plat_dir}:efr-matter-shell",
       ]
     } else {
       deps += [
@@ -236,8 +238,16 @@ efr32_executable("template_app") {
   }
 
   if (lcd_on) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-    defines += [ "DISPLAY_ENABLED" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_LIGHT=1",
+    ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
 

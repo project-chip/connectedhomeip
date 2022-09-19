@@ -34,14 +34,14 @@
 #include <cmath>
 #include <cstring>
 #include <stdio.h>
-
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include "AppConfig.h"
 #include "em_gpio.h"
 #include "sl_led.h"
 #include "sl_pwm_led.h"
 #include "sl_simple_rgb_pwm_led.h"
 
-
+using namespace chip::app::Clusters::OnOff;
 /**
  * @brief Red led instance.
  */
@@ -136,7 +136,8 @@ void LEDWidgetRGB::InitGpioRGB()
     sl_pwm_led_init(&led_pwm_red);
     sl_pwm_led_init(&led_pwm_green);
     sl_pwm_led_init(&led_pwm_blue);
-    sl_led_init(&sl_led_rgb);
+    sl_led_init((sl_led_t *)&sl_led_rgb_pwm);
+    
 }
 
 
@@ -166,6 +167,8 @@ void LEDWidgetRGB::Init(const sl_led_rgb_pwm_t* led)
 
 void LEDWidgetRGB::SetLevel(uint8_t level)
 {
+    bool currentValue;
+    EmberAfStatus status;
     /* 1. Check if the input value is correct. */
     if (level > ATTRIBUTE_LEVEL_MAX)
     {

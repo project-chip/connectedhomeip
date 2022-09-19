@@ -10,7 +10,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceFolder}/out/${input:efr32Examples}-app/${input:efr32Boards}/chip-efr32-${input:efr32Examples}-example.out",
-            "serverpath": "/Applications/SEGGER/JLink_V758e/JLinkGDBServerCLExe",
+            "serverpath": "/Applications/SEGGER/JLink_V780/JLinkGDBServerCLExe",
             "servertype": "jlink",
             "device": "${input:efr32MCU}",
             "interface": "swd",
