@@ -39,6 +39,7 @@ class App:
         self.lastLogIndex = 0
         self.kvsPathSet = {'/tmp/chip_kvs'}
         self.options = None
+        self.killed = False
 
     def start(self, options=None):
         if not self.process:
@@ -85,9 +86,13 @@ class App:
     def kill(self):
         if self.process:
             self.process.kill()
+        self.killed = True
 
     def wait(self, timeout=None):
         while True:
+            # If the App was never started, AND was killed, exit immediately
+            if self.killed:
+                return 0
             # If the App was never started, wait cannot be called on the process
             if self.process == None:
                 time.sleep(0.1)
