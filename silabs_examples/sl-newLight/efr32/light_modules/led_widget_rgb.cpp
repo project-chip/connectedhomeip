@@ -40,8 +40,11 @@
 #include "sl_led.h"
 #include "sl_pwm_led.h"
 #include "sl_simple_rgb_pwm_led.h"
+#include "AppTask.h"
 
-using namespace chip::app::Clusters::OnOff;
+using namespace chip;
+using namespace ::chip::DeviceLayer;
+
 /**
  * @brief Red led instance.
  */
@@ -168,7 +171,6 @@ void LEDWidgetRGB::Init(const sl_led_rgb_pwm_t* led)
 void LEDWidgetRGB::SetLevel(uint8_t level)
 {
     bool currentValue;
-    EmberAfStatus status;
     /* 1. Check if the input value is correct. */
     if (level > ATTRIBUTE_LEVEL_MAX)
     {
@@ -184,7 +186,15 @@ void LEDWidgetRGB::SetLevel(uint8_t level)
     }
 
     /* 2. Update the color. */
-    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentValue);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    if(currentValue){
+        
+        this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
+    }
+    
 }
 
 
@@ -229,25 +239,44 @@ void LEDWidgetRGB::GetLevel(ColorElements* rgb)
 
 void LEDWidgetRGB::SetHue(uint8_t hue)
 {
+    bool currentValue;
     // Hue takes a value [0, 360] and is expressed in degrees.
     // See appclusters, section 3.2.7.1.
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentValue);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     this->current_hue_ = static_cast<uint16_t>((hue * 360) / ATTRIBUTE_LEVEL_MAX);
-    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_); 
+    if(currentValue){
+        
+        this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
+    }
+    
+   
 }
 
 
 void LEDWidgetRGB::SetSaturation(uint8_t sat)
 {
+    bool currentValue;
     // Saturation takes a value [0, 1] representing a percentage.
     // The Color Control cluster accepts saturation values 0 to 254.
     // See appclusters, section 3.2.7.2.
-    this->current_saturation_ = sat/254.0;
-    this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentValue);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    
+    this->current_saturation_ = static_cast<uint16_t>((sat * 360) / ATTRIBUTE_LEVEL_MAX);
+    if(currentValue){
+        
+        this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
+    }
 }
 
 
 void LEDWidgetRGB::SetColor(uint8_t hue, float saturation, uint8_t level)
 {
+    bool currentValue;
     /* 1. Convert the hue and saturation input to RGB values. (HSV to RGB conversion) */
     ColorElements rgb = 
     {
@@ -257,14 +286,20 @@ void LEDWidgetRGB::SetColor(uint8_t hue, float saturation, uint8_t level)
     };
 
     HueToRGB(hue, saturation, level, &rgb, PWM_MAX_VALUE);
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentValue);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     /* 2. Set the color values. */
-    this->SetColorRGB(&rgb);
+    if(currentValue){
+        this->SetColorRGB(&rgb);      
+    }
 }
 
 
 void LEDWidgetRGB::SetColorRGB(ColorElements* rgb)
 {
+    bool currentValue;
     /* 1. Verify that the struct argument is not null. */
     if (rgb == nullptr)
     {
@@ -273,7 +308,15 @@ void LEDWidgetRGB::SetColorRGB(ColorElements* rgb)
     }
 
     /* 2. Call the PWM driver to set the new values. */
-    this->led_rgb_->set_rgb_color(this->led_rgb_->led_common.context, rgb->red_value, rgb->green_value, rgb->blue_value);
+    
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OnOffServer::Instance().getOnOffValue(1, &currentValue);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    /* 2. Set the color values. */
+    if(currentValue){
+        this->led_rgb_->set_rgb_color(this->led_rgb_->led_common.context, rgb->red_value, rgb->green_value, rgb->blue_value);   
+    }
 }
 
 
