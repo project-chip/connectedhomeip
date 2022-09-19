@@ -77,7 +77,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
 {
     bool returnValue = false;
 
-    if ( BoltLockMgr().ValidatePIN(pinCode, err) )
+    if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
         returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
     }
@@ -90,7 +90,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 {
     bool returnValue = false;
 
-    if ( BoltLockMgr().ValidatePIN(pinCode, err) )
+    if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
         returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
     }
