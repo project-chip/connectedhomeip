@@ -79,6 +79,8 @@ struct MessageTestEntry
     const char * mic;
 
     uint16_t sessionId;
+    NodeId peerNodeId;
+    FabricIndex fabricIndex;
 };
 
 struct MessageTestEntry theMessageTestVector[] = {
@@ -90,8 +92,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
                      "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
-        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                   "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 14,
@@ -104,7 +106,9 @@ struct MessageTestEntry theMessageTestVector[] = {
         .nonce        = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
         .privacyNonce = "\xb8\x0b\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb",
 
-        .sessionId = 0x0bb8, // 3000
+        .sessionId   = 0x0bb8, // 3000
+        .peerNodeId  = 0x0000000000000000ULL,
+        .fabricIndex = 1,
     },
 };
 
@@ -215,9 +219,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-    // NodeId aliceNodeId              = 0x0ull;
-    NodeId bobNodeId                = 0x0ull;
-    FabricIndex aliceBobfabricIndex = 1;
+
     SessionHolder aliceToBobSession;
 
     callback.mSuite = inSuite;
@@ -229,8 +231,9 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
         ChipLogProgress(Test, "===> TestSessionManagerDispatch[%d] '%s': sessionId=0x%04x", i, testEntry.name, testEntry.sessionId);
 
         // Inject Sessions
-        err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, bobNodeId, testEntry.sessionId,
-                                                          aliceBobfabricIndex, peer, CryptoContext::SessionRole::kResponder);
+        err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
+                                                          testEntry.sessionId, testEntry.fabricIndex, peer,
+                                                          CryptoContext::SessionRole::kResponder);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         const char * plain = testEntry.plain;
@@ -239,7 +242,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
         chip::System::PacketBufferHandle msg =
             chip::MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(privacy), testEntry.privacyLength);
 
-        // TODO: inject raw keys
+        // TODO: inject raw keys rather than always defaulting to test key
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
         sessionManager.OnMessageReceived(peerAddress, std::move(msg));
@@ -298,7 +301,6 @@ nlTestSuite sSuite =
  */
 int TestSessionManagerDispatchSuite()
 {
-    // return 0;
     return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
