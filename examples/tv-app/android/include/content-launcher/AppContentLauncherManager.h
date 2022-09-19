@@ -60,5 +60,5 @@ private:
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
 
-    ContentAppAttributeDelegate *mAttributeDelegate;
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

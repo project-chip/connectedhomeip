@@ -88,12 +88,10 @@ public:
                    const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN),
-        mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
-        mMediaPlaybackDelegate(attributeDelegate),
-        mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
+        mMediaPlaybackDelegate(attributeDelegate), mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
     AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
@@ -174,9 +172,9 @@ protected:
     std::vector<DataVersion *> mDataVersions{};
 
     std::vector<uint16_t> mAdminVendorIds{};
+
 private:
     ContentAppAttributeDelegate * mAttributeDelegate;
-
 };
 
 } // namespace AppPlatform

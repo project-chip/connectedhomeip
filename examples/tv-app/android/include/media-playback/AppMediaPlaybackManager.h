@@ -19,8 +19,8 @@
 #pragma once
 
 #include "../../java/ContentAppAttributeDelegate.h"
-#include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/media-playback-server/media-playback-server.h>
 #include <cstdint>
 #include <jni.h>
 
@@ -52,14 +52,13 @@ enum MediaPlaybackRequest : uint8_t
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
-using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+using MediaPlaybackDelegate       = chip::app::Clusters::MediaPlayback::Delegate;
+using PlaybackResponseType        = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 class AppMediaPlaybackManager : public MediaPlaybackDelegate
 {
 public:
-
     AppMediaPlaybackManager(ContentAppAttributeDelegate * attributeDelegate);
 
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
@@ -89,7 +88,6 @@ public:
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
 private:
-
     uint64_t HandleMediaRequestGetAttribute(chip::AttributeId attribute);
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
@@ -99,6 +97,5 @@ private:
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
 
-    ContentAppAttributeDelegate *mAttributeDelegate;
-
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

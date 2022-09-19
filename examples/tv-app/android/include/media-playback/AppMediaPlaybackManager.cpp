@@ -20,10 +20,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <cstdint>
 #include <jni.h>
+#include <json/json.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <json/json.h>
 
 using namespace std;
 using namespace chip;
@@ -33,12 +33,8 @@ using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::Uint8;
 using chip::CharSpan;
 
-
 AppMediaPlaybackManager::AppMediaPlaybackManager(ContentAppAttributeDelegate * attributeDelegate) :
-    mAttributeDelegate(attributeDelegate)
-{};
-
-
+    mAttributeDelegate(attributeDelegate){};
 
 PlaybackStateEnum AppMediaPlaybackManager::HandleGetCurrentState()
 {
@@ -103,19 +99,19 @@ void AppMediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playb
 }
 
 void AppMediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                              const uint64_t & deltaPositionMilliseconds)
+                                                 const uint64_t & deltaPositionMilliseconds)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
 }
 
 void AppMediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & deltaPositionMilliseconds)
+                                                const uint64_t & deltaPositionMilliseconds)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
 }
 
 void AppMediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                      const uint64_t & positionMilliseconds)
+                                         const uint64_t & positionMilliseconds)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }
@@ -129,8 +125,6 @@ void AppMediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Pl
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
 }
-
-
 
 uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::AttributeId attributeId)
 {
@@ -147,24 +141,25 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
         if (reader.parse(resStr, value))
         {
             std::string attrId = to_string(attributeId);
-            ChipLogProgress(
-                Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
-                attrId.c_str());
+            ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
+                            attrId.c_str());
             if (!value[attrId].empty())
             {
                 ret = static_cast<uint64_t>(value[attrId].asUInt());
                 return ret;
             }
-            ChipLogError(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute error. Invalid response from the content app.");
+            ChipLogError(Zcl,
+                         "AppMediaPlaybackManager::HandleMediaRequestGetAttribute error. Invalid response from the content app.");
             return ret;
         }
     }
-    ChipLogError(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute error. Did not get a response back from the content app.");
+    ChipLogError(
+        Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute error. Did not get a response back from the content app.");
     return ret;
 }
 
 Commands::PlaybackResponse::Type AppMediaPlaybackManager::HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                          uint64_t deltaPositionMilliseconds)
+                                                                             uint64_t deltaPositionMilliseconds)
 {
     // Ideally should not come here
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequest");
@@ -180,9 +175,9 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
     response.position  = Nullable<uint64_t>(0);
 
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition");
-    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id, chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
+    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id,
+                                               chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
     const char * resStr = mAttributeDelegate->Read(aPath);
-
 
     if (resStr != nullptr && *resStr != 0)
     {
@@ -191,13 +186,14 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
         if (reader.parse(resStr, value))
         {
             std::string attrId = to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
-            ChipLogProgress(
-                Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
-                attrId.c_str());
+            ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
+                            attrId.c_str());
             if (!value[attrId].empty())
             {
-                std::string updatedAt = to_string(static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
-                std::string position = to_string(static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
+                std::string updatedAt = to_string(
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
+                std::string position = to_string(
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
                 if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty())
                 {
                     // valid response

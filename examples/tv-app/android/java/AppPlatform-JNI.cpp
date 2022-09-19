@@ -84,5 +84,6 @@ JNI_METHOD(void, reportAttributeChange)
 (JNIEnv *, jobject, jint endpointId, jint clusterId, jint attributeId)
 {
     chip::DeviceLayer::StackLock lock;
-    ReportAttributeChange(static_cast<EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId), static_cast<chip::AttributeId>(attributeId));
+    ReportAttributeChange(static_cast<EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId),
+                          static_cast<chip::AttributeId>(attributeId));
 }
