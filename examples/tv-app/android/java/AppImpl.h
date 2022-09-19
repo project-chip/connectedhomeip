@@ -88,7 +88,7 @@ public:
                    const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), 
+        mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
@@ -106,10 +106,10 @@ public:
         return &mContentLauncherDelegate;
     };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
-    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override 
-    { 
+    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override
+    {
         mMediaPlaybackDelegate.SetEndpointId(GetEndpointId());
-        return &mMediaPlaybackDelegate; 
+        return &mMediaPlaybackDelegate;
     };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
