@@ -424,6 +424,21 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Debug Open IoT SDK example application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK example",
+            "showDevDebugOutput": "parsed"
         }
     ],
     "inputs": [
@@ -479,6 +494,13 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkApp",
+            "description": "What Open IoT SDK example do you want to use?",
+            "options": ["shell", "lock-app"],
+            "default": "shell"
         }
     ]
 }

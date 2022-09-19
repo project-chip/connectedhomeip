@@ -1,0 +1,11 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating openiotsdk-shell
+cmake -GNinja -S {root}/examples/shell/openiotsdk -B {out}/openiotsdk-shell --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55
+
+# Remove old artifacts openiotsdk-shell
+bash -c 'rm -rf {out}/openiotsdk-shell/chip-*'
+
+# Building openiotsdk-shell
+cmake --build {out}/openiotsdk-shell
