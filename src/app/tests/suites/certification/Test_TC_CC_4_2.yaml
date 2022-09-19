@@ -44,7 +44,7 @@ tests:
       command: "On"
 
     - label:
-          "TH sends MoveToSaturation command to DUT with Saturation=60 and
+          "TH sends MoveToSaturation command to DUT with Saturation=150 and
           TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C03.Rsp
       command: "MoveToSaturation"

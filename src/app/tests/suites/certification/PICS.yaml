@@ -807,6 +807,9 @@ PICS:
     - label: "Does the device implement the ACCapacityFormat attribute?"
       id: TSTAT.S.A0047
 
+    - label: "Is the MinSetpointDeadBand attribute writeable?"
+      id: TSTAT.S.M.MinSetpointDeadBandWritable
+
     #Thermostat commands
     - label: "Does the device implement the SetpointRaiseLower command?"
       id: TSTAT.S.C00.Rsp
