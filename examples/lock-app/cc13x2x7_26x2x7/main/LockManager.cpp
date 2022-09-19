@@ -498,7 +498,13 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    schedule = mWeekdaySchedule[userIndex][weekdayIndex];
+    const auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -519,11 +525,12 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
 
-    scheduleInStorage.daysMask    = daysMask;
-    scheduleInStorage.startHour   = startHour;
-    scheduleInStorage.startMinute = startMinute;
-    scheduleInStorage.endHour     = endHour;
-    scheduleInStorage.endMinute   = endMinute;
+    scheduleInStorage.schedule.daysMask    = daysMask;
+    scheduleInStorage.schedule.startHour   = startHour;
+    scheduleInStorage.schedule.startMinute = startMinute;
+    scheduleInStorage.schedule.endHour     = endHour;
+    scheduleInStorage.schedule.endMinute   = endMinute;
+    scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
     KeyValueStoreMgr().Put(WeekDaySchedules, reinterpret_cast<const void *>(mWeekdaySchedule),
@@ -545,9 +552,13 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    const auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
 
-    schedule = scheduleInStorage;
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -566,8 +577,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
 
-    scheduleInStorage.localStartTime = localStartTime;
-    scheduleInStorage.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
     KeyValueStoreMgr().Put(YearDaySchedules, reinterpret_cast<const void *>(mYeardaySchedule),
@@ -586,9 +598,13 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    const auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
 
-    schedule = scheduleInStorage;
+    schedule = scheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -604,9 +620,10 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
 
-    scheduleInStorage.localStartTime = localStartTime;
-    scheduleInStorage.localEndTime   = localEndTime;
-    scheduleInStorage.operatingMode  = operatingMode;
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.operatingMode  = operatingMode;
+    scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
     KeyValueStoreMgr().Put(HolidaySchedules, reinterpret_cast<const void *>(&(mHolidaySchedule)),
@@ -658,6 +675,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
 
         ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", endpointId);
 
+        err = DlOperationError::kInvalidCredential;
+        DoorLockServer::Instance().TrackWrongCodeEntry(endpointId);
         return false;
     }
 
@@ -688,5 +707,6 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                   lockStateToString(lockState), endpointId);
 
     err = DlOperationError::kInvalidCredential;
+    DoorLockServer::Instance().TrackWrongCodeEntry(endpointId);
     return false;
 }
