@@ -1392,7 +1392,6 @@ limitations under the License.
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Poll Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
