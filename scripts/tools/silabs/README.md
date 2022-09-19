@@ -1,52 +1,64 @@
-#FactoryDataProvider for EFR32 Matter device
+#`FactoryDataProvider` for EFR32 Matter device
 
 ## Introduction
 
-The python FactoryDataProvider.py script allows a user to store a set of
+The python `FactoryDataProvider.py` script allows a user to store a set of
 commissionable data in the matter nvm3 section of an EFR32 device. This script
 can handle writing to any MCU EFR32MG12 or EFR32MG24 family.
 
 # Prerequisites
 
 The users need to have in their hands a valid and matching set of spake2p+
-credentials - Setup Discriminator - Setup Passcode - Spake2p Iteration count -
-Spake2p Salt and one of the following: - Spake2p Verifier or the path to spake2p
-generator binary
+credentials:
+
+-   Setup Discriminator
+-   Setup Passcode
+-   Spake2p Iteration count
+-   Spake2p Salt
+
+and one of the following:
+
+-   Spake2p Verifier
+
+or
+
+-   path to spake2p generator binary
 
 You can use this same spake2p generator to randomly generate a set of
 credentials or generate your a verifier based on the given Passcode, Iteration
 count and Salt.
 
-More info on the Spak2p generator and how to build it can be found here
+More info on the Spake2p generator and how to build it can be found here
 [Spake2p](https://github.com/project-chip/connectedhomeip/blob/master/src/tools/spake2p/README.md)
 
-# How to use FactoryDataProvider.py
+# How to use `FactoryDataProvider.py`
 
-Using Python 3 call the 'FactoryDataProvider' script and provide the needed
+Using Python 3 call the `FactoryDataProvider` script and provide the needed
 arguments. The script will validate the received data and if the device is
 connected to the host, write the data in the right nvm3 location.
 
 If the device is not connected, The script will generate an image that can be
-flashed to your device ulteriorly but you must provide the MCU family name.
+flashed to your device at a later time but you must provide the MCU family name.
 (EFR32MG12 or EFR32MG24).
 
 If you have more than one device connected to the host. Provide the J-tag serial
 number to ensure you are writing to the right device.
 
-| Arguments          | Conformace | Type    | Description                                                                             |
-| ------------------ | ---------- | ------- | --------------------------------------------------------------------------------------- |
-| --discriminator    | Required   | dec/hex | Provide BLE pairing discriminator.                                                      |
-| --passcode         | Required   | dec/hex | Provide the default PASE session passcode used to generate the spake2p verifier.        |
-| --spake2_iteration | Required   | dec/hex | Provide Spake2+ iteration count used to generate the spake2p verifier                   |
-| --spake2_salt      | Required   | string' | Provide Spake2+ salt used to generate the spake2p verifier.                             |
-| --spake2_verifier  | optional'' | string' | Provide The pre-generated Spake2+ verifier                                              |
-| --gen_spake2p_path | optional'' | string  | Provide the absolute path to spake2p generator.                                         |
-| --mcu_family       | optional   | string  | MCU Family target. Only needed if your board isn't plugged in (EFR32MG12 or EFR32MG24). |
-| --jtag_serial      | optional   | string  | Provide the serial number of the jtag if you have more than one board connected"        |
+| Arguments          | Conformance          | Type               | Description                                                                             |
+| ------------------ | -------------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| --discriminator    | Required             | dec/hex            | Provide BLE pairing discriminator.                                                      |
+| --passcode         | Required             | dec/hex            | Provide the default PASE session passcode used to generate the spake2p verifier.        |
+| --spake2_iteration | Required             | dec/hex            | Provide Spake2+ iteration count used to generate the spake2p verifier                   |
+| --spake2_salt      | Required             | string<sup>1</sup> | Provide Spake2+ salt used to generate the spake2p verifier.                             |
+| --spake2_verifier  | optional<sup>2</sup> | string<sup>1</sup> | Provide The pre-generated Spake2+ verifier                                              |
+| --gen_spake2p_path | optional<sup>2</sup> | string             | Provide the absolute path to spake2p generator.                                         |
+| --mcu_family       | optional             | string             | MCU Family target. Only needed if your board isn't plugged in (EFR32MG12 or EFR32MG24). |
+| --jtag_serial      | optional             | string             | Provide the serial number of the jtag if you have more than one board connected"        |
 
-' Salt and verifier must be provided as base64 string '' You need to provide
-either a pre-generated spake2_verifier or path to the spake2p generator to
-generate the verifier
+<sup>1</sup> Salt and verifier must be provided as base64 string
+
+<sup>2</sup> You need to provide either a pre-generated spake2_verifier or path
+to the spake2p generator to generate the verifier
 
 e.g"
 
