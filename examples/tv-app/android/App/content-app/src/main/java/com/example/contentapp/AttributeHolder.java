@@ -1,6 +1,5 @@
 package com.example.contentapp;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
