@@ -55,15 +55,19 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SPEED:
-        Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed "+playbackSpeed+ " at " + endpoint);
+        Log.d(
+            TAG,
+            "getAttributes SampledPosition PlaybackSpeed " + playbackSpeed + " at " + endpoint);
         return playbackSpeed;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_END:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeEnd "+playbackDuration+ " at " + endpoint);
+        Log.d(
+            TAG,
+            "getAttributes SampledPosition SeekRangeEnd " + playbackDuration + " at " + endpoint);
         return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_START:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart "+startTime+ " at " + endpoint);
+        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart " + startTime + " at " + endpoint);
         return startTime;
     }
 
