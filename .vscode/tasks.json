@@ -268,6 +268,26 @@
             "command": "scripts/examples/openiotsdk_example.sh",
             "args": [
                 "-Crun",
+                "-n${input:openiotsdkNetwork}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Ctest",
+                "-n${input:openiotsdkNetwork}",
                 "${input:openiotsdkExample}"
             ],
             "group": "test",
@@ -286,6 +306,7 @@
             "command": "scripts/examples/openiotsdk_example.sh",
             "args": [
                 "-Crun",
+                "-n${input:openiotsdkNetwork}",
                 "-dtrue",
                 "${input:openiotsdkExample}"
             ],
@@ -362,6 +383,12 @@
             "description": "What Open IoT SDK example application do you want to use?",
             "options": ["shell", "lock-app"],
             "default": "shell"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetwork",
+            "description": "Type the network name that you want to use. \"user\" means user network mode",
+            "default": "user"
         },
         {
             "type": "promptString",
