@@ -210,7 +210,6 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     {
         err = CHIP_ERROR_INCORRECT_STATE;
     }
-    ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetAttribute: ret=%llu", ret);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -243,7 +242,6 @@ long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackReque
     }
 
     ret = static_cast<long>(jAttributeValue);
-    ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute: ret=%ld", ret);
 
 exit:
     if (err != CHIP_NO_ERROR)
