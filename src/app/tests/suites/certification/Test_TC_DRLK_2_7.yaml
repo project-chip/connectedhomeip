@@ -164,15 +164,15 @@ tests:
       arguments:
           values:
               - name: "YearDayIndex"
-                value: 2
+                value: 0
               - name: "userIndex"
-                value: 21
+                value: 15
       response:
           values:
               - name: "YearDayIndex"
-                value: 2
+                value: 0
               - name: "userIndex"
-                value: 21
+                value: 15
               - name: "status"
                 value: 0x85
               - name: "LocalStartTime"
