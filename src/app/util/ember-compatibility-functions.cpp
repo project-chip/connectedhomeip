@@ -415,6 +415,10 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
                                  mCluster->generatedCommandList);
     default:
+        // This function is only called if attributeCluster is non-null in
+        // ReadSingleClusterData, which only happens for attributes listed in
+        // GlobalAttributesNotInMetadata.  If we reach this code, someone added
+        // a global attribute to that list but not the above switch.
         VerifyOrDieWithMsg(false, DataManagement, "Unexpected global attribute: " ChipLogFormatMEI,
                            ChipLogValueMEI(aPath.mAttributeId));
         return CHIP_NO_ERROR;
