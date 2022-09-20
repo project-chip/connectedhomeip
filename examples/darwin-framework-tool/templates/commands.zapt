@@ -27,7 +27,7 @@
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
@@ -35,7 +35,30 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}",
+            {{~#if_is_float_or_double_data_type type~}}
+                -std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity(), std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity()
+            {{~else~}}
+                {{~#if_is_underlying_zcl_type_signed type~}}
+                    INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MIN, INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                {{~else~}}0,
+                    {{~#unless (is_lowercase_equal type 'BOOLEAN')~}}
+                        UINT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                    {{~else~}}
+                        1
+                    {{~/unless~}}
+                {{~/if_is_underlying_zcl_type_signed~}}
+            {{~/if_is_float_or_double_data_type~}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -99,7 +122,7 @@ private:
 class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ReadAttribute
 {
 public:
-    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 
@@ -143,15 +166,38 @@ public:
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("attr-name", "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}");
         {{#if_chip_complex}}
         AddArgument("attr-value", &mComplex);
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
-        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
+        AddArgument("attr-value",
+            {{~#if_is_float_or_double_data_type type~}}
+                -std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity(), std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity()
+            {{~else~}}
+                {{~#if_is_underlying_zcl_type_signed type~}}
+                    INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MIN, INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                {{~else~}}0,
+                    {{~#unless (is_lowercase_equal type 'BOOLEAN')~}}
+                        UINT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                    {{~else~}}
+                        1
+                    {{~/unless~}}
+                {{~/if_is_underlying_zcl_type_signed~}}
+            {{~/if_is_float_or_double_data_type~}}, &mValue);
         {{/if_chip_complex}}
         WriteAttribute::AddArguments();
     }
@@ -206,7 +252,7 @@ private:
 class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public SubscribeAttribute
 {
 public:
-    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 

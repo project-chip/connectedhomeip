@@ -12,7 +12,30 @@ public:
           {{#if (isString type)}}
           AddArgument("{{name}}", &m{{asUpperCamelCase name}});
           {{else}}
-          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          AddArgument("{{name}}",
+            {{~#if_is_float_or_double_data_type type~}}
+                -std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity(), std::numeric_limits<
+                {{~#unless (is_lowercase_equal type 'single')~}}
+                    {{~type~}}
+                {{~else~}}
+                    float
+                {{~/unless~}}>::infinity()
+            {{~else~}}
+                {{~#if_is_underlying_zcl_type_signed type~}}
+                    INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MIN, INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                {{~else~}}0,
+                    {{~#unless (is_lowercase_equal type 'BOOLEAN')~}}
+                        UINT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
+                    {{~else~}}
+                        1
+                    {{~/unless~}}
+                {{~/if_is_underlying_zcl_type_signed~}}
+            {{~/if_is_float_or_double_data_type~}}, &m{{asUpperCamelCase name}});
           {{/if}}
         {{/chip_tests_config}}
     }

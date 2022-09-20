@@ -76,7 +76,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value);
+                           const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
