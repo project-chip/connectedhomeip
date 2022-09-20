@@ -30,7 +30,8 @@ LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
-CHIP_ERROR LightingManager::Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel)
+CHIP_ERROR LightingManager::Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t aMinLevel, uint8_t aMaxLevel,
+                                 uint8_t aDefaultLevel)
 {
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
@@ -127,7 +128,7 @@ void LightingManager::Set(bool aOn)
 
 void LightingManager::UpdateLight()
 {
-    constexpr uint32_t kPwmWidthUs = 20000u;
+    constexpr uint32_t kPwmWidthUs  = 20000u;
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
 
