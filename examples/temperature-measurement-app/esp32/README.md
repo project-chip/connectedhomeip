@@ -1,4 +1,4 @@
-# CHIP ESP32 Temperature Sensor Example
+# Matter ESP32 Temperature Sensor Example
 
 This example is meant to represent a minimal-sized application.
 
