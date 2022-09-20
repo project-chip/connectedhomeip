@@ -92,7 +92,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     uint32_t timerId;
     uint8_t buttonevent = 1;
     timerId = (uint32_t) pvTimerGetTimerID(xTimer);
-    
+
 
     switch (timerId)
     {
