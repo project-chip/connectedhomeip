@@ -218,6 +218,7 @@ tests:
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 3
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE using ECM"
       cluster: "AdministratorCommissioning"
@@ -269,6 +270,16 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: payload
+
+    - label: "DUT_CE is commissioned by TH_CR2"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
     - label:
           "TH_CR1 tries to revoke the commissioning window on DUT_CE using

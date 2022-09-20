@@ -79,6 +79,7 @@ class Target:
         builder.target = self
         builder.identifier = self.name
         builder.output_dir = os.path.join(output_prefix, self.name)
+        builder.chip_dir = repository_path
         builder.enable_flashbundle(enable_flashbundle)
 
         return builder

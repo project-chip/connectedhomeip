@@ -109,7 +109,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 215
+              minValue: 216
               maxValue: 254
 
     - label: "Wait 2s"
@@ -126,7 +126,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 215
+              minValue: 216
               maxValue: 254
 
     - label:
@@ -210,9 +210,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          constraints:
-              minValue: CurrentSaturationValue
-              maxValue: 230
+          value: CurrentSaturationValue
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.A400b
@@ -311,9 +309,7 @@ tests:
       response:
           saveAs: ColorTemperatureMiredsStep4f
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMaxMireds + ColorTempPhysicalMinMireds ) /
-                  2
+              minValue: ColorTempPhysicalMinMireds
               maxValue: ColorTempPhysicalMaxMireds
 
     - label: "Wait 2s"
@@ -414,9 +410,7 @@ tests:
       PICS: CC.S.A4000 && CC.S.C47.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          constraints:
-              minValue: EnhancedCurrentHueValue
-              maxValue: 28750
+          value: EnhancedCurrentHueValue
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp

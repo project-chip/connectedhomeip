@@ -158,7 +158,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     }
 
     DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds32(2),
+        System::Clock::Seconds32(4),
         [](Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             hal_reboot();

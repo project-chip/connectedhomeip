@@ -125,7 +125,8 @@
  *    provision the device with its unique operational credentials and manage
  *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
+// !Note - 3 is not spec compliant, only to accomodate shell test app RAM use
+#define CHIP_CONFIG_MAX_FABRICS 3
 
 /**
  *  @name Interaction Model object pool configuration.

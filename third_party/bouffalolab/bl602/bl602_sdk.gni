@@ -189,7 +189,7 @@ template("bl602_sdk") {
       "SYS_AOS_LOOP_ENABLE=1",
       "BL602_USE_HAL_DRIVER=1",
       "BL602=BL602",
-      "SYS_LOOPRT_ENABLE=1",
+
       "CFG_TXDESC=2",
       "CFG_STA_MAX=1",
       "CFG_CHIP_BL602",
@@ -294,11 +294,6 @@ template("bl602_sdk") {
     cflags_cc = [ "-fpermissive" ]
     cflags_cc += [ "-std=c++17" ]
     cflags_cc += [ "-D _GNU_SOURCE" ]
-
-    #cflags_cc += [ "-fcommon" ]
-    #cflags_cc += [ "-fno-rtti" ]
-    #cflags_cc += [ "-Wnon-virtual-dtor" ]
-    #cflags_cc += [ "-frtti" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
