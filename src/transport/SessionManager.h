@@ -476,13 +476,34 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
 
-    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure unicast message.
+     *
+     * @param packetHeader The PacketHeader of the message processed with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureUnicastMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);
 
-    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure group message.
+     *
+     * @param packetHeader The PacketHeader of the message processed with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureGroupMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch an unsecured message.
+     *
+     * @param packetHeader The PacketHeader of the message processed with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void UnauthenticatedMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                         System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);

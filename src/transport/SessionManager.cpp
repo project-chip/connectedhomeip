@@ -544,7 +544,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader packetHeader;
 
-    CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
+    CHIP_ERROR err = packetHeader.DecodeFixed(msg);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
@@ -568,11 +568,21 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     }
 }
 
-void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+void SessionManager::UnauthenticatedMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                     System::PacketBufferHandle && msg)
 {
+    // Drop unsecured messages with privacy enabled.
+    if (packetHeader.HasPrivacyFlag())
+    {
+        ChipLogError(Inet, "Dropping unauthenticated message with privacy flag set");
+        return;
+    }
+
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+
     Optional<NodeId> source      = packetHeader.GetSourceNodeId();
     Optional<NodeId> destination = packetHeader.GetDestinationNodeId();
+
     if ((source.HasValue() && destination.HasValue()) || (!source.HasValue() && !destination.HasValue()))
     {
         ChipLogProgress(Inet,
@@ -639,7 +649,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     }
 }
 
-void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                   System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -647,6 +657,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(packetHeader.GetSessionId());
 
     PayloadHeader payloadHeader;
+
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
@@ -736,25 +748,19 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     }
 }
 
-void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msg)
 {
     PayloadHeader payloadHeader;
+    PacketHeader packetHeaderCopy;
+    System::PacketBufferHandle msgCopy;
     Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
     VerifyOrReturn(nullptr != groups);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (!packetHeader.GetDestinationGroupId().HasValue())
+    if (!packetHeader.HasDestinationGroupId())
     {
         return; // malformed packet
-    }
-
-    GroupId groupId = packetHeader.GetDestinationGroupId().Value();
-
-    if (msg.IsNull())
-    {
-        ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
-        return;
     }
 
     // Check if Message Header is valid first
@@ -773,29 +779,60 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    System::PacketBufferHandle msgCopy;
+    // Extract MIC from the end of the message.
+    uint8_t * data     = msg->Start();
+    uint16_t len       = msg->DataLength();
+    uint16_t footerLen = packetHeader.MICTagLength();
+    VerifyOrReturn(footerLen <= len); // err = CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+
+    uint16_t taglen = 0;
+    MessageAuthenticationCode mac;
+    ReturnOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+    VerifyOrReturn(taglen == footerLen); // err = CHIP_ERROR_INTERNAL;
+
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        CryptoContext context(groupContext.keyContext);
+        msgCopy = msg.CloneData();
+
+        if (packetHeader.HasPrivacyFlag())
+        {
+
+            // Perform privacy deobfuscation, if applicable.
+            uint8_t * privacyHeader = msgCopy->Start() + Header::kPrivacyHeaderOffset;
+            uint16_t privacyLength  = packetHeader.PrivacyHeaderLength();
+            ReturnOnFailure(context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
+        }
+
+        ReturnOnFailure(packetHeaderCopy.DecodeAndConsume(msgCopy));
+
+        if (msgCopy.IsNull())
+        {
+            ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
+            return;
+        }
+
         // Optimization to reduce number of decryption attempts
+        GroupId groupId = packetHeaderCopy.GetDestinationGroupId().Value();
         if (groupId != groupContext.group_id)
         {
             continue;
         }
-        msgCopy = msg.CloneData();
+
         CryptoContext::NonceStorage nonce;
-        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
-                                  packetHeader.GetSourceNodeId().Value());
-        decrypted = (CHIP_NO_ERROR ==
-                     SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), nonce, payloadHeader, packetHeader, msgCopy));
+        CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
+                                  packetHeaderCopy.GetSourceNodeId().Value());
+        decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
     }
     iter->Release();
     if (!decrypted)
     {
-        ChipLogError(Inet, "Failed to retrieve Key. Discarding everything");
+        ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");
         return;
     }
-    msg = std::move(msgCopy);
+    msg          = std::move(msgCopy);
+    packetHeader = packetHeaderCopy;
 
     // MCSP check
     if (packetHeader.IsValidMCSPMsg())

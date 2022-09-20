@@ -50,6 +50,13 @@ typedef int PacketHeaderFlags;
 
 namespace Header {
 
+enum Consts
+{
+    kHeaderMinLength        = 8,
+    kPrivacyHeaderMinLength = 4,
+    kPrivacyHeaderOffset    = 4,
+};
+
 enum class SessionType : uint8_t
 {
     kUnicastSession = 0,
@@ -172,6 +179,10 @@ public:
 
     bool HasPrivacyFlag() const { return mSecFlags.Has(Header::SecFlagValues::kPrivacyFlag); }
 
+    bool HasSourceNodeId() const { return mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent); }
+    bool HasDestinationNodeId() const { return mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent); }
+    bool HasDestinationGroupId() const { return mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent); }
+
     void SetFlags(Header::SecFlagValues value) { mSecFlags.Set(value); }
     void SetFlags(Header::MsgFlagValues value) { mMsgFlags.Set(value); }
 
@@ -202,15 +213,13 @@ public:
     bool IsValidGroupMsg() const
     {
         // Check is based on spec 4.11.2
-        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationGroupId().HasValue() &&
-                !IsSecureSessionControlMsg());
+        return (IsGroupSession() && HasSourceNodeId() && HasDestinationGroupId() && !IsSecureSessionControlMsg());
     }
 
     bool IsValidMCSPMsg() const
     {
         // Check is based on spec 4.9.2.4
-        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationNodeId().HasValue() &&
-                IsSecureSessionControlMsg());
+        return (IsGroupSession() && HasSourceNodeId() && HasDestinationNodeId() && IsSecureSessionControlMsg());
     }
 
     bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
@@ -316,6 +325,38 @@ public:
         return *this;
     }
 
+    uint16_t PrivacyHeaderLength() const
+    {
+        uint16_t length = Header::kPrivacyHeaderMinLength;
+        if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
+        {
+            length += sizeof(NodeId);
+        }
+        if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
+        {
+            length += sizeof(NodeId);
+        }
+        else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent))
+        {
+            length += sizeof(GroupId);
+        }
+        /*
+        if (mSecFlags.Has(Header::SecFlagValues::kMsgExtensionFlag))
+        {
+            // Add message extension length from length field
+            // offset += sizeof(uint16_t);
+        }
+        */
+        return length;
+    }
+
+    uint16_t PayloadOffset() const
+    {
+        uint16_t offset = Header::kPrivacyHeaderMinLength;
+        offset += PrivacyHeaderLength();
+        return offset;
+    }
+
     /**
      * A call to `Encode` will require at least this many bytes on the current
      * object to be successful.
@@ -323,6 +364,18 @@ public:
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
     uint16_t EncodeSizeBytes() const;
+
+    /**
+     * Decodes the fixed portion of the header fields from the given buffer.
+     * The fixed header includes: message flags, session id, and security flags.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeFixed(const System::PacketBufferHandle & buf);
 
     /**
      * Decodes a header from the given buffer.
@@ -430,7 +483,7 @@ class PayloadHeader
 {
 public:
     constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
-    constexpr PayloadHeader(const PayloadHeader &) = default;
+    constexpr PayloadHeader(const PayloadHeader &)   = default;
     PayloadHeader & operator=(const PayloadHeader &) = default;
 
     /** Get the Session ID from this header. */

@@ -131,6 +131,31 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
     return static_cast<uint16_t>(size);
 }
 
+CHIP_ERROR PacketHeader::DecodeFixed(const System::PacketBufferHandle & buf)
+{
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    const uint8_t * const data = buf->Start();
+    uint16_t size              = buf->DataLength();
+    LittleEndian::Reader reader(data, size);
+    int version;
+
+    uint8_t msgFlags;
+    SuccessOrExit(err = reader.Read8(&msgFlags).StatusCode());
+    version = ((msgFlags & kVersionMask) >> kVersionShift);
+    VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
+    SetMessageFlags(msgFlags);
+
+    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
+
+    uint8_t securityFlags;
+    SuccessOrExit(err = reader.Read8(&securityFlags).StatusCode());
+    SetSecurityFlags(securityFlags);
+
+exit:
+
+    return err;
+}
+
 CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
