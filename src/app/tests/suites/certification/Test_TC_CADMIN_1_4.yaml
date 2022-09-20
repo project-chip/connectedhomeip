@@ -138,13 +138,45 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    #Check for DNS-SD advertisement is not possible in YAML
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
+      verification: |
+          On TH_CR2 send the below command
+
+          Verify if the DUT_CE is broadcasting using
+
+          ubuntu@ubuntu:~/may16_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       PICS: OPCREDS.S.A0001
       attribute: "Fabrics"
+      fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }]
+          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
           constraints:
               type: list
 
@@ -154,8 +186,9 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       PICS: OPCREDS.S.A0001
+      fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId2 }]
+          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
           constraints:
               type: list
 
@@ -264,3 +297,4 @@ tests:
                 value: payload
       response:
           error: FAILURE
+          clusterError: 9

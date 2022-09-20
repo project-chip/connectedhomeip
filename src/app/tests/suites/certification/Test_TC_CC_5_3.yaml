@@ -162,7 +162,7 @@ tests:
           value: 14000
 
     - label: "TH reads ColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0008
+      PICS: CC.S.F03 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
       response:
@@ -172,7 +172,7 @@ tests:
               maxValue: 2
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A4001
+      PICS: CC.S.F03 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
       response:

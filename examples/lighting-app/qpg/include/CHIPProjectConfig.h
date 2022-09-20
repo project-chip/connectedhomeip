@@ -118,16 +118,6 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
- *  @def CHIP_CONFIG_MAX_FABRICS
- *
- *  @brief
- *    Maximum number of fabrics the device can participate in.  Each fabric can
- *    provision the device with its unique operational credentials and manage
- *    its own access control lists.
- */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
-
-/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief

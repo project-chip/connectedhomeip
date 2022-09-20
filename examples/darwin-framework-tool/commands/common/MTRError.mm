@@ -26,11 +26,11 @@
 #import <lib/support/TypeTraits.h>
 
 // Stolen for now from the framework, need to export this properly.
-@interface MTRErrorHolder : NSObject
+@interface DFTErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 @end
 
-@implementation MTRErrorHolder
+@implementation DFTErrorHolder
 
 - (instancetype)initWithError:(CHIP_ERROR)error
 {
@@ -64,8 +64,8 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 
     if (error.userInfo != nil) {
         id underlyingError = error.userInfo[@"underlyingError"];
-        if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
-            return ((MTRErrorHolder *) underlyingError).error;
+        if (underlyingError != nil && [underlyingError isKindOfClass:[DFTErrorHolder class]]) {
+            return ((DFTErrorHolder *) underlyingError).error;
         }
     }
 
