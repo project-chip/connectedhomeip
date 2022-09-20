@@ -212,8 +212,8 @@ def runJavaPrettifier(templates_file, output_dir):
 def main():
     checkPythonVersion()
 
-    # The maximum meory usage is over 4GB (#15620)
-    os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+    # The maximum memory usage is over 4GB (#15620)
+    os.environ["NODE_OPTIONS"] = "--max-old-space-size=9216"
     zap_file, zcl_file, templates_file, output_dir = runArgumentsParser()
     runGeneration(zap_file, zcl_file, templates_file, output_dir)
 
