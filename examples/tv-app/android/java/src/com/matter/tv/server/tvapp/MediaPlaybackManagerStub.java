@@ -55,15 +55,19 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SPEED:
-        Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed at " + endpoint);
+        Log.d(
+            TAG,
+            "getAttributes SampledPosition PlaybackSpeed " + playbackSpeed + " at " + endpoint);
         return playbackSpeed;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_END:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeEnd at " + endpoint);
+        Log.d(
+            TAG,
+            "getAttributes SampledPosition SeekRangeEnd " + playbackDuration + " at " + endpoint);
         return playbackDuration;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_START:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart at " + endpoint);
+        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart " + startTime + " at " + endpoint);
         return startTime;
     }
 
@@ -124,7 +128,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         }
         playbackState = PLAYBACK_STATE_PLAYING;
         playbackSpeed =
-            (playbackSpeed >= 0 ? -1 : Math.min(playbackSpeed * 2, playbackMaxRewindSpeed));
+            (playbackSpeed >= 0 ? -1 : Math.max(playbackSpeed * 2, playbackMaxRewindSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
@@ -135,7 +139,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         }
         playbackState = PLAYBACK_STATE_PLAYING;
         playbackSpeed =
-            (playbackSpeed <= 0 ? 1 : Math.max(playbackSpeed * 2, playbackMaxForwardSpeed));
+            (playbackSpeed <= 0 ? 1 : Math.min(playbackSpeed * 2, playbackMaxForwardSpeed));
 
         return RESPONSE_STATUS_SUCCESS;
 
@@ -176,6 +180,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
 
   @Override
   public MediaPlaybackPosition getPosition() {
+    Log.d(TAG, "getPosition " + playbackPosition);
     return new MediaPlaybackPosition(playbackPosition);
   }
 }
