@@ -24,6 +24,7 @@
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SessionManager.h indirectly
 
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
@@ -49,6 +50,12 @@ using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Test;
+using namespace chip::Credentials;
+
+using GroupInfo      = GroupDataProvider::GroupInfo;
+using GroupKey       = GroupDataProvider::GroupKey;
+using KeySet         = GroupDataProvider::KeySet;
+using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
 using TestContext = chip::Test::LoopbackTransportManager;
 
@@ -80,7 +87,8 @@ struct MessageTestEntry
 
     uint16_t sessionId;
     NodeId peerNodeId;
-    FabricIndex fabricIndex;
+    GroupId groupId;
+    NodeId sourceNodeId;
 };
 
 struct MessageTestEntry theMessageTestVector[] = {
@@ -92,27 +100,64 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
                      "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
-        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                   "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 14,
         .encryptedLength = 30,
         .privacyLength   = 30,
 
+        // NOTE: unicast message tests must use test key currently
         .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
         .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .sessionId   = 0x0bb8, // 3000
-        .peerNodeId  = 0x0000000000000000ULL,
-        .fabricIndex = 1,
+        .sessionId  = 0x0bb8, // 3000
+        .peerNodeId = 0x0000000000000000ULL,
+    },
+    {
+        .name     = "secure group message (no privacy)",
+        .peerAddr = "::1",
+
+        .payload = "",
+
+        .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
+        .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
+        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
+
+        .payloadLength   = 0,
+        .plainLength     = 24,
+        .encryptedLength = 40,
+        .privacyLength   = 40,
+
+        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
+        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
+        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+
+        .nonce        = "\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
+        .privacyNonce = "\xdb\x7d\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
+
+        .sessionId    = 0xdb7d, // 56189
+        .peerNodeId   = 0x0000000000000000ULL,
+        .groupId      = 2,
+        .sourceNodeId = 0x0000000000000002ULL,
     },
 };
 
 const uint16_t theMessageTestVectorLength = sizeof(theMessageTestVector) / sizeof(theMessageTestVector[0]);
 
 // Just enough init to replace a ton of boilerplate
+constexpr FabricIndex kFabricIndex = kMinValidFabricIndex;
+constexpr size_t kGroupIndex       = 0;
+
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+static chip::TestPersistentStorageDelegate sStorageDelegate;
+static GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 class FabricTableHolder
 {
 public:
@@ -129,6 +174,13 @@ public:
         ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
         ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
+        // Initialize Group Data Provider
+        sProvider.SetStorageDelegate(&sStorageDelegate);
+        // sProvider.SetListener(&chip::app::TestGroups::sListener);
+        ReturnErrorOnFailure(sProvider.Init());
+        Credentials::SetGroupDataProvider(&sProvider);
+
+        // Initialize Fabric Table
         chip::FabricTable::InitParams initParams;
         initParams.storage             = &mStorage;
         initParams.operationalKeystore = &mOpKeyStore;
@@ -203,6 +255,41 @@ void TestSessionManagerInit(nlTestSuite * inSuite, TestContext & ctx, SessionMan
                                            &fabricTableHolder.GetFabricTable()));
 }
 
+// constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
+static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
+constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
+
+SessionHandle InjectGroupSessionWithTestKey(nlTestSuite * inSuite, MessageTestEntry & testEntry)
+{
+    constexpr uint16_t kKeySetIndex = 0x0;
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    GroupId groupId              = testEntry.groupId;
+    GroupDataProvider * provider = GetGroupDataProvider();
+
+    static KeySet sKeySet(kKeySetIndex, SecurityPolicy::kTrustFirst, 1);
+    static GroupKey sGroupKeySet(groupId, kKeySetIndex);
+    static GroupInfo sGroupInfo(groupId, "Group Name No Matter");
+    static Transport::IncomingGroupSession sSessionBobToFriends(groupId, kFabricIndex, testEntry.sourceNodeId);
+
+    if (testEntry.epochKey)
+    {
+        memcpy(sKeySet.epoch_keys[0].key, testEntry.epochKey, 16);
+        sKeySet.epoch_keys[0].start_time = 0;
+        sGroupInfo.group_id              = groupId;
+        sGroupKeySet.group_id            = groupId;
+
+        err = provider->SetKeySet(kFabricIndex, kCompressedFabricId1, sKeySet);
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+        err = provider->SetGroupKeyAt(kFabricIndex, kGroupIndex, sGroupKeySet);
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+        err = provider->SetGroupInfoAt(kFabricIndex, kGroupIndex, sGroupInfo);
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+    }
+
+    return SessionHandle(sSessionBobToFriends);
+}
+
 void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -228,19 +315,22 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 
         ChipLogProgress(Test, "===> TestSessionManagerDispatch[%d] '%s': sessionId=0x%04x", i, testEntry.name, testEntry.sessionId);
 
+        // TODO: inject raw keys rather than always defaulting to test key
+        // TODO: switch on session type
+
         // Inject Sessions
         err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
-                                                          testEntry.sessionId, testEntry.fabricIndex, peer,
+                                                          testEntry.sessionId, kFabricIndex, peer,
                                                           CryptoContext::SessionRole::kResponder);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        InjectGroupSessionWithTestKey(inSuite, testEntry);
 
         const char * plain = testEntry.plain;
         const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
         const char * privacy = testEntry.privacy;
         chip::System::PacketBufferHandle msg =
             chip::MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(privacy), testEntry.privacyLength);
-
-        // TODO: inject raw keys rather than always defaulting to test key
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
         sessionManager.OnMessageReceived(peerAddress, std::move(msg));
