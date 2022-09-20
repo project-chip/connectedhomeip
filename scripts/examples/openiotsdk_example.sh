@@ -18,6 +18,7 @@
 
 # Build and/or run Open IoT SDK examples.
 
+IS_TEST=0
 NAME="$(basename "$0")"
 HERE="$(dirname "$0")"
 CHIP_ROOT="$(realpath "$HERE"/../..)"
@@ -34,21 +35,25 @@ FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
 GDB_PLUGIN="$FAST_MODEL_PLUGINS_PATH/GDBRemoteConnection.so"
 OIS_CONFIG="$CHIP_ROOT/config/openiotsdk"
 FVP_CONFIG_FILE="$OIS_CONFIG/fvp/cs300.conf"
+EXAMPLE_TEST_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/integration-tests"
 TELNET_TERMINAL_PORT=5000
+FAILED_TESTS=0
+FVP_NETWORK="user"
 
 function show_usage() {
     cat <<EOF
 Usage: $0 [options] example
 
-Build and/or run the Open IoT SDK example.
+Build, run or test the Open IoT SDK example.
 
 Options:
     -h,--help                       Show this help
     -c,--clean                      Clean target build
     -s,--scratch                    Remove build directory at all before building
-    -C,--command    <command>       Action to execute <build-run | run | build - default>
+    -C,--command    <command>       Action to execute <build-run | run | test | build - default>
     -d,--debug      <debug_enable>  Build in debug mode <true | false - default>
     -p,--path       <build_path>    Build path <build_path - default is example_dir/build>
+    -n,--network    <network_name>  FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
     shell
@@ -122,6 +127,12 @@ function run_fvp() {
         RUN_OPTIONS+=(--allow-debug-plugin --plugin "$GDB_PLUGIN")
     fi
 
+    if [[ $FVP_NETWORK == "user" ]]; then
+        RUN_OPTIONS+=(-C mps3_board.hostbridge.userNetworking=1)
+    else
+        RUN_OPTIONS+=(-C mps3_board.hostbridge.interfaceName="$FVP_NETWORK")
+    fi
+
     echo "Running $EXAMPLE_EXE_PATH with options: ${RUN_OPTIONS[@]}"
 
     "$FVP_BIN" "${RUN_OPTIONS[@]}" -f "$FVP_CONFIG_FILE" --application "$EXAMPLE_EXE_PATH" >/dev/null 2>&1 &
@@ -132,6 +143,53 @@ function run_fvp() {
     # stop the fvp
     kill -9 "$FVP_PID" || true
     sleep 1
+}
+
+function run_test() {
+
+    EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    # Check if executable file exists
+    if ! [ -f "$EXAMPLE_EXE_PATH" ]; then
+        echo "Error: $EXAMPLE_EXE_PATH does not exist." >&2
+        exit 1
+    fi
+
+    # Check if FVP exists
+    if ! [ -x "$(command -v "$FVP_BIN")" ]; then
+        echo "Error: $FVP_BIN not installed." >&2
+        exit 1
+    fi
+
+    # Activate Matter environment with pytest
+    source "$CHIP_ROOT"/scripts/activate.sh
+
+    # Check if pytest exists
+    if ! [ -x "$(command -v pytest)" ]; then
+        echo "Error: pytest not installed." >&2
+        exit 1
+    fi
+
+    TEST_OPTIONS=()
+
+    if [[ $FVP_NETWORK ]]; then
+        TEST_OPTIONS+=(--networkInterface="$FVP_NETWORK")
+    fi
+
+    if [[ -f $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json ]]; then
+        rm -rf "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json
+    fi
+
+    set +e
+    pytest --json-report --json-report-summary --json-report-file="$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json --binaryPath="$EXAMPLE_EXE_PATH" --fvp="$FVP_BIN" --fvpConfig="$FVP_CONFIG_FILE" "${TEST_OPTIONS[@]}" "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_app.py
+    set -e
+
+    if [[ ! -f $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json ]]; then
+        exit 1
+    else
+        if [[ $(jq '.summary | has("failed")' $EXAMPLE_TEST_PATH/$EXAMPLE/test_report.json) == true ]]; then
+            FAILED_TESTS=$(jq '.summary.failed' "$EXAMPLE_TEST_PATH/$EXAMPLE"/test_report.json)
+        fi
+    fi
 }
 
 SHORT=C:,p:,d:.n:,c,s,h
@@ -166,6 +224,10 @@ while :; do
             BUILD_PATH=$CHIP_ROOT/$2
             shift 2
             ;;
+        -n | --network)
+            FVP_NETWORK=$2
+            shift 2
+            ;;
         -* | --*)
             shift
             break
@@ -174,7 +236,7 @@ while :; do
             echo "Unexpected option: $1"
             show_usage
             exit 2
-        ;;
+            ;;
     esac
 done
 
@@ -195,7 +257,7 @@ case "$1" in
 esac
 
 case "$COMMAND" in
-    build | run | build-run) ;;
+    build | run | test | build-run) ;;
     *)
         echo "Wrong command definition"
         show_usage
@@ -216,4 +278,13 @@ fi
 
 if [[ "$COMMAND" == *"run"* ]]; then
     run_fvp
+fi
+
+if [[ "$COMMAND" == *"test"* ]]; then
+    IS_TEST=1
+    run_test
+fi
+
+if [[ $IS_TEST -eq 1 ]]; then
+    exit "$FAILED_TESTS"
 fi

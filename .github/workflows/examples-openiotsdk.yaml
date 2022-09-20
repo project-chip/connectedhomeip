@@ -28,6 +28,9 @@ jobs:
         name: Open IoT SDK examples building
         timeout-minutes: 90
 
+        env:
+            TEST_NETWORK_NAME: OIStest
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
@@ -35,6 +38,7 @@ jobs:
             image: connectedhomeip/chip-build-openiotsdk:0.6.06
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
+            options: --privileged
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
@@ -58,6 +62,11 @@ jobs:
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
 
+            - name: Build and install Python controller
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+
             - name: Build shell example
               id: build_shell
               timeout-minutes: 10
@@ -77,3 +86,17 @@ jobs:
                     openiotsdk release lock-app \
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
+
+            - name: Test shell example
+              if: steps.build_shell.outcome == 'success'
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/openiotsdk_example.sh -C test shell
+
+            - name: Test lock-app example
+              if: steps.build_lock_app.outcome == 'success'
+              timeout-minutes: 5
+              run: |
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh -C test -n ${TEST_NETWORK_NAME}tap lock-app
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
