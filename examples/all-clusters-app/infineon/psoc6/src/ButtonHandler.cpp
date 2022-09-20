@@ -91,8 +91,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     // Get the button index of the expired timer and call button event helper.
     uint32_t timerId;
     uint8_t buttonevent = 1;
-    timerId = (uint32_t) pvTimerGetTimerID(xTimer);
-
+    timerId             = (uint32_t) pvTimerGetTimerID(xTimer);
 
     switch (timerId)
     {
