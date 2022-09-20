@@ -30,6 +30,7 @@
 #endif
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -68,6 +69,11 @@ static void UpdateClusterState(intptr_t context);
 #ifndef _countof
 #define _countof(a) (sizeof(a) / sizeof(a[0]))
 #endif
+
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                         0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                         0xcc, 0xdd, 0xee, 0xff };
 
 static wiced_led_config_t chip_lighting_led_config[2] = {
     {
@@ -174,8 +180,10 @@ void InitApp(intptr_t args)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     /* Start CHIP datamodel server */
+    static chip::OTATestEventTriggerDelegate testEventTriggerDelegate{ chip::ByteSpan(sTestEventTriggerEnableKey) };
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
