@@ -204,6 +204,21 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
+    /// Inform the Lookup handle that the previous node lookup was not sufficient
+    /// for the purpose of the caller (e.g establishing a session fails with the
+    /// result of the previous lookup), and that more data is needed.
+    ///
+    /// If this returns CHIP_NO_ERROR, the following is expected:
+    ///   - The listener OnNodeAddressResolved will be called with the additional data.
+    ///   - handle must NOT be destroyed while the lookup is in progress (it
+    ///     is part of an internal 'lookup list')
+    ///   - handle must NOT be reused (the lookup is done on a per-node basis
+    ///     and maintains lookup data internally while the operation is still
+    ///     in progress)
+    ///
+    /// If no additional data is available at the time of the request, it returns CHIP_ERROR_WELL_EMPTY.
+    virtual CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) = 0;
+
     /// Stops an active lookup request.
     ///
     /// Caller controlls weather the `fail` callback of the handle is invoked or not by using

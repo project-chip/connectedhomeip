@@ -306,6 +306,15 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
     VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
 
+    if (CHIP_ERROR_TIMEOUT == error)
+    {
+        if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
+        {
+            MoveToState(State::ResolvingAddress);
+            return;
+        }
+    }
+
     DequeueConnectionCallbacks(error);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
