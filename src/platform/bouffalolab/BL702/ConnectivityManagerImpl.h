@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Texas Instruments Incorporated
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *          Platform-specific connectivity manager class for the Texas
- *          Instruments BL702 platform.
- */
+
 
 #pragma once
 

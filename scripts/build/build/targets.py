@@ -621,10 +621,8 @@ def Bl602Targets():
 def BouffalolabTargets():
     target = Target('bouffalolab', BouffalolabBuilder)
 
-    yield target.Extend('BL706-IoT-DVK-BL706C-22-light', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
-    yield target.Extend('BL702-IoT-DVK-light', board=BouffalolabBoard.BL702_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
-    yield target.Extend('BL706-IoT-DVK-BL706C-22-light-rpc', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL706C-22")
-    yield target.Extend('BL702-IoT-DVK-light-rpc', board=BouffalolabBoard.BL702_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL702")
+    yield target.Extend('BL706-IoT-DVK-light', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
+    yield target.Extend('BL706-IoT-DVK-light-rpc', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL706C-22")
     yield target.Extend('BL706-NIGHT-LIGHT-light', board=BouffalolabBoard.BL706_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
 
 
