@@ -209,7 +209,6 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01
       response:
-          value: 2600
           constraints:
               type: int16s
               minValue: 1600
@@ -280,7 +279,6 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
       response:
-          value: 2000
           constraints:
               type: int16s
               minValue: 700
@@ -289,7 +287,6 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           UnoccupiedHeatingSetpoint attribute"
-
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
@@ -352,7 +349,6 @@ tests:
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
       response:
-          value: 700
           constraints:
               type: int16s
               minValue: 700
@@ -432,7 +428,6 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05
       response:
-          value: 3000
           constraints:
               type: int16s
               minValue: 700
@@ -523,7 +518,6 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
       response:
-          value: 1600
           constraints:
               type: int16s
               minValue: 1600
@@ -602,7 +596,6 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018
       response:
-          value: 3200
           constraints:
               type: int16s
               minValue: 1600
@@ -675,14 +668,14 @@ tests:
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 &&!TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
       arguments:
           value: 3000
 
     - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 &&!TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
       arguments:
           value: 2950
 
@@ -707,7 +700,6 @@ tests:
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05
       response:
-          value: 25
           constraints:
               type: int8s
               minValue: 0
@@ -718,7 +710,7 @@ tests:
           MinSetpointDeadBand attribute"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: 5
 
@@ -727,14 +719,14 @@ tests:
           MinSetpointDeadBand attribute"
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       response:
           value: 5
 
     - label: "Writes the value below MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: -1
       response:
@@ -743,7 +735,7 @@ tests:
     - label: "Writes the value above MinSetpointDeadBand "
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: 30
       response:
@@ -752,14 +744,14 @@ tests:
     - label: "Writes the min limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: 0
 
     - label: "Writes the max limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
           value: 25
 
