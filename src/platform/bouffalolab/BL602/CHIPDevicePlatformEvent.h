@@ -82,7 +82,7 @@ struct BleC2IndDoneEventType
 };
 
 /**
- * Represents platform-specific event information for Zephyr platforms.
+ * Represents platform-specific event information for BL602 platforms.
  */
 struct ChipDevicePlatformEvent final
 {

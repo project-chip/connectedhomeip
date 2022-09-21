@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements heap memory allocation APIs for CHIP. These functions are platform
- *      specific and might be C Standard Library heap functions re-direction in most of cases.
- *
- */
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
