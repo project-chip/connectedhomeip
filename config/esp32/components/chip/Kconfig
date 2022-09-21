@@ -713,6 +713,20 @@ menu "CHIP Device Layer"
                 WARNING: This option makes it possible to circumvent basic chip security functionality.
                 Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
+        config TEST_EVENT_TRIGGER_ENABLED
+            bool "Enable Test Event Trigger"
+            default y
+            help
+                Enable TestEventTrigger in GeneralDiagnostics cluster.
+
+        config TEST_EVENT_TRIGGER_ENABLE_KEY
+            string "Test Event Trigger Enable Key"
+            depends on TEST_EVENT_TRIGGER_ENABLED
+            default "00112233445566778899aabbccddeeff"
+            help
+                The EnableKey in hex string format used by TestEventTrigger command in GeneralDiagnostics
+                cluster. The length of the string should be 32.
+
         config ENABLE_FIXED_TUNNEL_SERVER
             bool "Use Fixed Tunnel Server"
             default n
