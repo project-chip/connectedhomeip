@@ -1,6 +1,6 @@
 # CHIP BL70X Lighting App Example
 
-BL70X is highly integrated BLE and IEEE 802.15.4 combo chipset for IoT applications, and BL702 is a general name for BL70X family. 
+BL70X is highly integrated BLE and IEEE 802.15.4 combo chip for IoT applications, and BL702 is a general name for BL70X family. 
 
 This example is powered by BL706 and functions as a Thread light bulb device type, with on/off, level and color capabilities. 
 The steps were verified with following boards:
