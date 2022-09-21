@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the ThreadStackManager object for
- *          BL702 platforms using the Bouffalolab SDK and the OpenThread
- *          stack.
- *
- */
-/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>

@@ -34,7 +34,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates Zephyr platform-specific event types that are visible to the application.
+ * Enumerates BL602 platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -42,7 +42,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates Zephyr platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates BL602 platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -82,7 +82,7 @@ struct BleC2IndDoneEventType
 };
 
 /**
- * Represents platform-specific event information for Zephyr platforms.
+ * Represents platform-specific event information for BL602 platforms.
  */
 struct ChipDevicePlatformEvent final
 {

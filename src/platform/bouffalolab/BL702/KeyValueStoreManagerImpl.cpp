@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific key value storage implementation for Bouffalolab BL702
- */
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
