@@ -15,6 +15,10 @@
 
 name: 3.2.2. [TC-DGSW-2.2] Event Functionality [{DUT_Sever}]
 
+PICS:
+    - DGSW.S.E
+    - DGSW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
