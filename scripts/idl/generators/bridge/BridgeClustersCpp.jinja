@@ -3,7 +3,7 @@
 #include "BridgeGlobalStructs.h"
 
 namespace clusters {
-struct {{cluster.name}}Cluster : public CommonCluster
+struct {{cluster.name}}Cluster : public GeneratedCluster
 {
   {%-   for struct in cluster.structs %}
   {%-     if struct.tag == None %}
@@ -39,113 +39,28 @@ struct {{cluster.name}}Cluster : public CommonCluster
   {%-     endif %}
   {%-   endfor %}
 
-
-  static constexpr chip::ClusterId kClusterId = {{cluster.code}};
-
-  chip::ClusterId GetClusterId() override { return kClusterId; }
-
-  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
-  {
-    switch(aPath.mAttributeId)
-    {
+  {{cluster.name}}Cluster() :
   {%-  for attr in cluster.attributes %}
-    case {{attr.definition.code}}:
-      return m{{attr.definition.name | capitalcase}}.Write(aPath, aDecoder);
+      m{{attr.definition.name | capitalcase}}(chip::CharSpan("{{attr.definition.name}}"), {{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getRawSizeAndType(cluster, idl)}}{{attr | getInit(cluster, idl)}}){{"," if not loop.last}}
   {%-  endfor  %}
-    default:
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+  {
   }
 
-  chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
+  static constexpr uint32_t kClusterId ={{cluster.code}};
+  chip::ClusterId GetClusterId() override { return kClusterId; }
+
+  std::vector<AttributeInterface*> GetAttributes() override
   {
-    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-{%-  for attr in cluster.attributes %}
-      { {{attr.definition.code}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-{%-  endfor  %}
-    };
-    return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
+    return std::vector<AttributeInterface*>({
+  {%-  for attr in cluster.attributes %}
+      static_cast<AttributeInterface*>(&m{{attr.definition.name | capitalcase}}),
+  {%-  endfor  %}
+    });
   }
 
 {%  for attr in cluster.attributes %}
-  {{attr | getType(cluster, idl)}}{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr.definition | getField(cluster, idl)}}, false> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
+  {{"List" if attr.definition.is_list}}Attribute<{{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}};
 {%-  endfor  %}
-};
-
-struct {{cluster.name}}Access : public CommonAttributeAccessInterface
-{
-  {{cluster.name}}Access() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), {{cluster.name}}Cluster::kClusterId) {}
-
-  {{cluster.name}}Cluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
-  {
-    CommonCluster * cluster = FindCluster(aPath);
-    return cluster ? static_cast<{{cluster.name}}Cluster*>(cluster) : nullptr;
-  }
-
-  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-
-    switch(aPath.mAttributeId) {
-  {%-  for attr in cluster.attributes -%}
-  {%-    if attr.is_readable %}
-    case {{attr.definition.code}}:
-      return c->m{{attr.definition.name | capitalcase}}.Read(aPath, aEncoder);
-
-  {%-    endif %}
-  {%-  endfor  %}
-    default:
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-  }
-
-  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    return c->ForwardWriteToBridge(aPath, aDecoder);
-  }
-
-  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return;
-
-    switch(aPath.mAttributeId) {
-  {%-  for attr in cluster.attributes -%}
-  {%-    if attr.is_writable %}
-  {%-      if attr.definition.is_list %}
-    case {{attr.definition.code}}:
-      c->m{{attr.definition.name | capitalcase}}.ListWriteBegin(aPath);
-      return;
-  {%-      endif %}
-  {%-    endif %}
-  {%-  endfor  %}
-    }
-  }
-
-  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return;
-
-    switch(aPath.mAttributeId) {
-  {%-  for attr in cluster.attributes -%}
-  {%-    if attr.is_writable %}
-  {%-      if attr.definition.is_list %}
-    case {{attr.definition.code}}:
-      c->m{{attr.definition.name | capitalcase}}.ListWriteEnd(aPath, aWriteWasSuccessful);
-      return;
-  {%-      endif %}
-  {%-    endif %}
-  {%-  endfor  %}
-    }
-  }
 };
 
 }

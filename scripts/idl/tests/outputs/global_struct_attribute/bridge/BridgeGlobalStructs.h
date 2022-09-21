@@ -4,6 +4,9 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app/data-model/Nullable.h>
 
+#include <string>
+#include <vector>
+
 namespace clusters {
 
 
@@ -27,8 +30,8 @@ struct LabelStruct
     t.value = value;
     return t.Encode(writer, tag);
   }
-  FixedOctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> label;
-  FixedOctetString<16, ZCL_CHAR_STRING_ATTRIBUTE_TYPE> value;
+  std::string label;
+  std::string value;
 };
 
 }

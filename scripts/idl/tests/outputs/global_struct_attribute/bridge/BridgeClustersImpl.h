@@ -10,35 +10,17 @@ struct ClusterInfo
   chip::ClusterId id;
   const char *name;
   uint16_t size;
-  CommonCluster* (*ctor)(void*);
+  GeneratedCluster* (*ctor)(void*);
 } static const kKnownClusters[] = {
 
   {
     18,
     "DemoCluster",
     sizeof(DemoClusterCluster),
-    [](void *mem) -> CommonCluster* {
+    [](void *mem) -> GeneratedCluster* {
       return new(mem) DemoClusterCluster();
     },
   },
-};
-
-inline void BridgeRegisterAllAttributeOverrides()
-{
-
-  static DemoClusterAccess DemoCluster;
-  registerAttributeAccessOverride(&DemoCluster);
-}
-
-struct AttrInfo
-{
-  chip::ClusterId cluster;
-  chip::AttributeId attr;
-  const char *name;
-} static const kKnownAttributes[] = {
-
-  { 18, 32, "SingleLabel" },
-  { 18, 33, "SomeLabels" },
 };
 
 }

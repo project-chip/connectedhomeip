@@ -18,6 +18,12 @@
 
 #pragma once
 
-std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId);
+#include "DynamicDevice.h"
 
-std::vector<Action *> GetActionListInfo(chip::EndpointId parentId);
+void StartUserInput();
+
+extern std::vector<std::unique_ptr<Device>> g_devices;
+extern std::vector<std::unique_ptr<DynamicDevice>> g_device_impls;
+
+bool RemoveDeviceAt(uint32_t index);
+int AddDevice(std::unique_ptr<DynamicDevice> device);

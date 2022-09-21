@@ -58,7 +58,7 @@ constexpr uint16_t ActionsAttrAccess::ClusterRevision;
 CHIP_ERROR ActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        std::vector<Action *> actionList = GetActionListInfo(endpoint);
+        chip::Span<Action *> actionList = GetActionListInfo(endpoint);
 
         for (auto action : actionList)
         {
@@ -81,14 +81,14 @@ CHIP_ERROR ActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, Attri
 
 CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    std::vector<EndpointListInfo> infoList = GetEndpointListInfo(endpoint);
-
-    CHIP_ERROR err = aEncoder.EncodeList([&infoList](const auto & encoder) -> CHIP_ERROR {
-        for (auto info : infoList)
+    CHIP_ERROR err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (auto & room : gRooms)
         {
+            if (room.GetEndpointListSize() == 0)
+                continue;
             Actions::Structs::EndpointListStruct::Type endpointListStruct = {
-                info.GetEndpointListId(), CharSpan::fromCharString(info.GetName().c_str()), info.GetType(),
-                DataModel::List<chip::EndpointId>(info.GetEndpointListData(), info.GetEndpointListSize())
+                room.GetEndpointListId(), CharSpan::fromCharString(room.GetName().c_str()), room.GetType(),
+                DataModel::List<chip::EndpointId>(room.GetEndpointListData(), room.GetEndpointListSize())
             };
             ReturnErrorOnFailure(encoder.Encode(endpointListStruct));
         }

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/config/standalone/args.gni")
 
-chip_data_model("bridge-common") {
-  zap_file = "bridge-app.zap"
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/bridge-app/zap-generated"
-  is_server = true
-
-  # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
-  cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
-}
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/bridge-app/bridge-common/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]

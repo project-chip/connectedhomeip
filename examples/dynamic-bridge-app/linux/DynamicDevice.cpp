@@ -19,26 +19,14 @@
 
 #include "DynamicDevice.h"
 
-void DynamicAttributeList::Add(chip::AttributeId id, EmberAfAttributeType type, uint16_t maxSize, EmberAfClusterMask mask)
-{
-    // Do what DECLARE_DYNAMIC_ATTRIBUTE does.
-    mAttributeDecls.emplace_back(
-        EmberAfAttributeMetadata{ id, type, maxSize, (uint8_t)(mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)), ZAP_EMPTY_DEFAULT() });
-}
+DynamicDevice::DynamicDevice() {}
 
-void DynamicAttributeList::Add(EmberAfAttributeMetadata metadata)
-{
-    mAttributeDecls.emplace_back(metadata);
-}
-
-DynamicDeviceImpl::DynamicDeviceImpl() {}
-
-void DynamicDeviceImpl::AddDeviceType(EmberAfDeviceType type)
+void DynamicDevice::AddDeviceType(EmberAfDeviceType type)
 {
     mDeviceTypes.push_back(type);
 }
 
-Device DynamicDeviceImpl::CreateDevice()
+Device DynamicDevice::CreateDevice()
 {
     // All nodes are bridged devices.
     mDeviceTypes.push_back(EmberAfDeviceType{ DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT });
@@ -52,24 +40,29 @@ Device DynamicDeviceImpl::CreateDevice()
                   chip::Span<EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size()), mParentEndpointId);
 }
 
-DynamicDeviceImpl & DynamicDeviceImpl::AddCluster(std::unique_ptr<CommonCluster> cluster, const DynamicAttributeList & attribs,
-                                                  const chip::CommandId * incomingCommands,
-                                                  const chip::CommandId * outgoingCommands)
+DynamicDevice & DynamicDevice::AddCluster(std::unique_ptr<CommonCluster> cluster,
+                                          const chip::Span<EmberAfAttributeMetadata> & attribs,
+                                          const chip::CommandId * incomingCommands, const chip::CommandId * outgoingCommands)
 {
     AddCluster(cluster.get(), attribs, incomingCommands, outgoingCommands);
     mClusters.emplace_back(std::move(cluster));
     return *this;
 }
 
-DynamicDeviceImpl & DynamicDeviceImpl::AddCluster(CommonCluster * cluster, const DynamicAttributeList & attribs,
-                                                  const chip::CommandId * incomingCommands,
-                                                  const chip::CommandId * outgoingCommands)
+DynamicDevice & DynamicDevice::AddCluster(CommonCluster * cluster, const chip::Span<EmberAfAttributeMetadata> & attribs,
+                                          const chip::CommandId * incomingCommands, const chip::CommandId * outgoingCommands)
 {
-    mAttribStorage.push_back(attribs.mAttributeDecls);
     // Do what DECLARE_DYNAMIC_CLUSTER does.
-    mClusterDecls.emplace_back(EmberAfCluster{ cluster->GetClusterId(), mAttribStorage.back().data(),
-                                               (uint16_t) mAttribStorage.back().size(), 0, ZAP_CLUSTER_MASK(SERVER), nullptr,
-                                               incomingCommands, outgoingCommands });
+    mClusterDecls.emplace_back(EmberAfCluster{ cluster->GetClusterId(), attribs.data(), (uint16_t) attribs.size(), 0,
+                                               ZAP_CLUSTER_MASK(SERVER), nullptr, incomingCommands, outgoingCommands });
     mClusterRawPtrs.emplace_back(cluster);
     return *this;
+}
+
+DynamicDevice & DynamicDevice::AddCluster(std::unique_ptr<DynamicCluster> cluster)
+{
+    auto ptr = cluster.get();
+    return AddCluster(std::move(cluster),
+                      chip::Span<EmberAfAttributeMetadata>(ptr->mAttributeDecls.data(), ptr->mAttributeDecls.size()),
+                      ptr->mIncomingCommands, ptr->mOutgoingCommands);
 }

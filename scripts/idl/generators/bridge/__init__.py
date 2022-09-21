@@ -81,40 +81,33 @@ def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
     return None
 
 
-def get_array_count(attr: Attribute):
-    # TBD how to determine array lengths?
-    return 1
-
-
 def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(attr.definition, cluster, idl)
     if attr.definition.is_list:
-        return 'ZCL_ARRAY_ATTRIBUTE_TYPE, {} * {} + 2'.format(size, get_array_count(attr))
+        return 'ZCL_ARRAY_ATTRIBUTE_TYPE, {}'.format(size)
     return '{}, {}'.format(matterType, size)
 
 
 def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(definition, cluster, idl)
     if container == 'OctetString':
-        return 'FixedOctetString<{}, {}>'.format(size, matterType)
+        return 'std::string'
+    if definition.is_list:
+        cType = 'std::vector<{}>'.format(cType)
     if definition.is_nullable:
         cType = '::chip::app::DataModel::Nullable<{}>'.format(cType)
+    if definition.is_nullable:
+        cType = '::chip::Optional<{}>'.format(cType)
     return cType
 
 
 def get_attr_type(attr: Attribute, cluster: Cluster, idl: Idl):
-    if attr.definition.is_list:
-        count = get_array_count(attr)
-        nullable = 'false'
-        if attr.definition.is_nullable:
-            nullable = 'true'
-        return 'ArrayAttribute<{}, {}, '.format(count, nullable)
-    return 'Attribute<'
+    return get_field_type(attr.definition, cluster, idl)
 
 
 def get_attr_init(attr: Attribute, cluster: Cluster, idl: Idl):
     if attr.definition.name == 'clusterRevision':
-        return ' = ZCL_' + camel_to_const(cluster.name) + '_CLUSTER_REVISION'
+        return ', ZCL_' + camel_to_const(cluster.name) + '_CLUSTER_REVISION'
     return ''
 
 

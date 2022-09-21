@@ -1,0 +1,197 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <AppMain.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/PlatformManager.h>
+
+#include <app-common/zap-generated/af-structs.h>
+
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/EventLogging.h>
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/reporting/reporting.h>
+#include <app/util/af-types.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/util.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ZclString.h>
+#include <platform/CommissionableDataProvider.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
+
+#include "Backend.h"
+
+#include "CommissionableInit.h"
+#include "Device.h"
+#include "main.h"
+#include <app/server/Server.h>
+
+#include "AppMain.h"
+
+#ifdef PW_RPC_ENABLED
+#include "bridge_service.h"
+#include "Rpc.h"
+#include "pw_rpc_system_server/rpc_server.h"
+static chip::rpc::Bridge bridge_service;
+#endif
+
+
+#include <cassert>
+#include <iostream>
+#include <vector>
+
+using namespace chip;
+using namespace chip::Credentials;
+using namespace chip::Inet;
+using namespace chip::Transport;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
+
+static EndpointId gCurrentEndpointId;
+static EndpointId gFirstDynamicEndpointId;
+static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+Room gRooms[kMaxRooms];
+
+bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Actions::Commands::InstantAction::DecodableType & commandData)
+{
+    // No actions are implemented, just return status NotFound.
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
+    return true;
+}
+
+Device * FindDeviceEndpoint(chip::EndpointId id)
+{
+    for (auto dev : gDevices)
+    {
+        if (dev && dev->GetEndpointId() == id)
+            return dev;
+    }
+    return nullptr;
+}
+
+int AddDeviceEndpoint(Device * dev)
+{
+    uint8_t index = 0;
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        if (nullptr == gDevices[index])
+        {
+            gDevices[index] = dev;
+            EmberAfStatus ret;
+            while (1)
+            {
+                // Todo: Update this to schedule the work rather than use this lock
+                dev->SetEndpointId(gCurrentEndpointId);
+                ret =
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, dev->endpointType(), dev->versions(), dev->deviceTypes());
+                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
+                                    gCurrentEndpointId, index);
+                    return index;
+                }
+                if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                {
+                    ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: %d!", ret);
+                    gDevices[index] = nullptr;
+                    return -1;
+                }
+                // Handle wrap condition
+                if (++gCurrentEndpointId < gFirstDynamicEndpointId)
+                {
+                    gCurrentEndpointId = gFirstDynamicEndpointId;
+                }
+            }
+        }
+        index++;
+    }
+    ChipLogProgress(DeviceLayer, "Failed to add dynamic endpoint: No endpoints available!");
+    return -1;
+}
+
+int RemoveDeviceEndpoint(Device * dev)
+{
+    uint8_t index = 0;
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        if (gDevices[index] == dev)
+        {
+            // Todo: Update this to schedule the work rather than use this lock
+            DeviceLayer::StackLock lock;
+            EndpointId ep   = emberAfClearDynamicEndpoint(index);
+            gDevices[index] = nullptr;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
+            // Silence complaints about unused ep when progress logging
+            // disabled.
+            UNUSED_VAR(ep);
+            return index;
+        }
+        index++;
+    }
+    return -1;
+}
+
+Room * FindRoom(const std::string & name)
+{
+    for (auto & room : gRooms)
+    {
+        if (room.GetName() == name)
+            return &room;
+    }
+    return nullptr;
+}
+
+chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId)
+{
+    return chip::Span<Action *>();
+}
+
+void ApplicationInit()
+{
+#ifdef PW_RPC_ENABLED
+    chip::rpc::Init();
+
+    pw::rpc::system_server::Server().RegisterService(bridge_service);
+#endif
+
+    gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
+        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
+    gCurrentEndpointId = gFirstDynamicEndpointId;
+    StartUserInput();
+}
+
+int main(int argc, char * argv[])
+{
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    std::vector<CommonAttributeAccessInterface> clusterAccess;
+    for(auto& entry : clusters::kKnownClusters) {
+        clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
+    }
+
+    ChipLinuxAppMainLoop();
+    return 0;
+}

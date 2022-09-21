@@ -21,7 +21,7 @@
 #include "main.h"
 
 std::vector<std::unique_ptr<Device>> g_devices;
-std::vector<std::unique_ptr<DynamicDeviceImpl>> g_device_impls;
+std::vector<std::unique_ptr<DynamicDevice>> g_device_impls;
 
 bool RemoveDeviceAt(uint32_t index)
 {
@@ -41,7 +41,7 @@ bool RemoveDeviceAt(uint32_t index)
     return true;
 }
 
-int AddDevice(std::unique_ptr<DynamicDeviceImpl> device)
+int AddDevice(std::unique_ptr<DynamicDevice> device)
 {
     auto dev = std::make_unique<Device>(device->CreateDevice());
     int ep   = AddDeviceEndpoint(dev.get());

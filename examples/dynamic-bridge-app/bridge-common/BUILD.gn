@@ -15,8 +15,9 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-chip_data_model("bridge-common") {
+chip_data_model("dynamic-bridge-common") {
   zap_file = "bridge-app.zap"
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/bridge-app/zap-generated"
@@ -24,4 +25,16 @@ chip_data_model("bridge-common") {
 
   # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
   cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
+}
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_protobuf_compiler/proto.gni")
+
+  pw_proto_library("bridge_service") {
+    sources = [ "protos/bridge_service.proto" ]
+    inputs = [ "protos/bridge_service.options" ]
+    strip_prefix = "protos"
+    prefix = "bridge_service"
+  }
 }

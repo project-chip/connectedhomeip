@@ -15,7 +15,7 @@
 
 namespace {
 
-std::unique_ptr<DynamicDeviceImpl> g_pending;
+std::unique_ptr<DynamicDevice> g_pending;
 
 // Pseudo-index representing the device being built.
 static constexpr int kPendingDeviceIndex = -1;
@@ -94,11 +94,7 @@ void NewDevice(const std::vector<std::string> & tokens)
     }
     else if (!type.HasValue())
     {
-        g_pending = std::make_unique<DynamicDeviceImpl>();
-    }
-    else if (type.Value() == "switch")
-    {
-        g_pending = std::make_unique<DynamicSwitchDevice>();
+        g_pending = std::make_unique<DynamicDevice>();
     }
     else
     {
@@ -125,12 +121,8 @@ void AddCluster(const std::vector<std::string> & tokens)
     {
         if (cluster_name == cluster.name)
         {
-            std::unique_ptr<CommonCluster> obj(cluster.ctor(::operator new(cluster.size)));
-            DynamicAttributeList dynamic_attrs;
-            auto attrs = obj->GetAllAttributes();
-            for (auto & attr : attrs)
-                dynamic_attrs.Add(attr);
-            g_pending->AddCluster(std::move(obj), dynamic_attrs, nullptr, nullptr);
+            g_pending->AddCluster(
+                std::make_unique<DynamicCluster>(std::unique_ptr<GeneratedCluster>(cluster.ctor(::operator new(cluster.size)))));
             printf("Added cluster %s/%d\n", cluster.name, cluster.id);
             return;
         }
@@ -215,7 +207,7 @@ void AddType(const std::vector<std::string> & tokens)
     g_pending->AddDeviceType(devType);
 }
 
-DynamicDeviceImpl * FindDevice(int32_t index)
+DynamicDevice * FindDevice(int32_t index)
 {
     if (index == kPendingDeviceIndex)
     {
@@ -223,7 +215,7 @@ DynamicDeviceImpl * FindDevice(int32_t index)
     }
     else if ((uint32_t) index < g_device_impls.size())
     {
-        return g_device_impls[index].get();
+        return g_device_impls[(uint32_t) index].get();
     }
     else
     {
@@ -235,7 +227,7 @@ Device * FindEndpoint(int32_t index)
 {
     if (index >= 0 && (uint32_t) index < g_device_impls.size())
     {
-        return g_devices[index].get();
+        return g_devices[(uint32_t) index].get();
     }
     else
     {
@@ -243,7 +235,7 @@ Device * FindEndpoint(int32_t index)
     }
 }
 
-ClusterInterface * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId)
+ClusterInterface * FindCluster(DynamicDevice * dev, const std::string & clusterId)
 {
     uint32_t id;
     const char * start = clusterId.data();
@@ -275,33 +267,20 @@ ClusterInterface * FindCluster(DynamicDeviceImpl * dev, const std::string & clus
 
 const EmberAfAttributeMetadata * FindAttrib(ClusterInterface * cluster, const std::string & attrId)
 {
+    AttributeInterface * attr = nullptr;
     uint32_t id;
     const char * start = attrId.data();
     const char * end   = start + attrId.size();
-    if (std::from_chars(start, end, id).ptr != end)
+    if (std::from_chars(start, end, id).ptr == end)
     {
-        auto clusterId = cluster->GetClusterId();
-        id             = 0;
-        for (const auto & c : clusters::kKnownAttributes)
-        {
-            if (c.cluster == clusterId && attrId == c.name)
-            {
-                id = c.attr;
-                break;
-            }
-        }
-        if (!id)
-            return nullptr;
+        attr = cluster->FindAttribute(id);
+    }
+    if (!attr)
+    {
+        attr = cluster->FindAttributeByName(chip::CharSpan(attrId.data(), attrId.size()));
     }
 
-    for (auto & attr : cluster->GetAllAttributes())
-    {
-        if (attr.attributeId == id)
-        {
-            return &attr;
-        }
-    }
-    return nullptr;
+    return attr ? &attr->GetMetadata() : nullptr;
 }
 
 void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & str, EmberAfAttributeType type)
@@ -371,7 +350,7 @@ void SetValue(const std::vector<std::string> & tokens)
         return;
     }
 
-    DynamicDeviceImpl * dev = FindDevice(index);
+    DynamicDevice * dev = FindDevice(index);
     if (!dev)
     {
         printf("Could not find device at index %d\n", index);
@@ -396,7 +375,7 @@ void SetValue(const std::vector<std::string> & tokens)
         printf("Cluster does not implement attr %s\nSupported attributes: ", attrId.c_str());
         for (auto attrMeta : cluster->GetAllAttributes())
         {
-            printf("%d ", attrMeta.attributeId);
+            printf("%d ", attrMeta->GetId());
         }
         printf("\n");
         return;
@@ -451,7 +430,7 @@ void DelRoom(const std::vector<std::string> & tokens)
 
 void AddToRoom(const std::vector<std::string> & tokens)
 {
-    uint32_t index;
+    int32_t index;
     std::string room;
     const char * err = Parse(tokens, 0, &room, &index);
     if (err)
@@ -476,7 +455,7 @@ void AddToRoom(const std::vector<std::string> & tokens)
 
 void DelFromRoom(const std::vector<std::string> & tokens)
 {
-    uint32_t index;
+    int32_t index;
     std::string room;
     const char * err = Parse(tokens, 0, &room, &index);
     if (err)

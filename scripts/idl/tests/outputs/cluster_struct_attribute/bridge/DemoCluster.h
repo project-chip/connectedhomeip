@@ -3,100 +3,28 @@
 #include "BridgeGlobalStructs.h"
 
 namespace clusters {
-struct DemoClusterCluster : public CommonCluster
+struct DemoClusterCluster : public GeneratedCluster
 {
 
-
-  static constexpr chip::ClusterId kClusterId = 10;
-
-  chip::ClusterId GetClusterId() override { return kClusterId; }
-
-  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  DemoClusterCluster() :
+      mSingleFailSafe(chip::CharSpan("singleFailSafe"), 5, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest)),
+      mArmFailsafes(chip::CharSpan("armFailsafes"), 100, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest))
   {
-    switch(aPath.mAttributeId)
-    {
-    case 5:
-      return mSingleFailSafe.Write(aPath, aDecoder);
-    case 100:
-      return mArmFailsafes.Write(aPath, aDecoder);
-    default:
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
   }
 
-  chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
+  chip::ClusterId GetClusterId() override { return 10; }
+
+  std::vector<AttributeInterface*> GetAttributes() override
   {
-    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-      { 5, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest), ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-      { 100, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest) * 1 + 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-    };
-    return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
+    return std::vector<AttributeInterface*>({
+      static_cast<AttributeInterface*>(&mSingleFailSafe),
+      static_cast<AttributeInterface*>(&mArmFailsafes),
+    });
   }
 
 
-  Attribute<5, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest), ArmFailSafeRequest, false> mSingleFailSafe;
-  ArrayAttribute<1, false, 100, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(ArmFailSafeRequest) * 1 + 2, ArmFailSafeRequest, false> mArmFailsafes;
-};
-
-struct DemoClusterAccess : public CommonAttributeAccessInterface
-{
-  DemoClusterAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), DemoClusterCluster::kClusterId) {}
-
-  DemoClusterCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
-  {
-    CommonCluster * cluster = FindCluster(aPath);
-    return cluster ? static_cast<DemoClusterCluster*>(cluster) : nullptr;
-  }
-
-  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-
-    switch(aPath.mAttributeId) {
-    case 5:
-      return c->mSingleFailSafe.Read(aPath, aEncoder);
-    case 100:
-      return c->mArmFailsafes.Read(aPath, aEncoder);
-    default:
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-  }
-
-  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return CHIP_ERROR_NOT_IMPLEMENTED;
-    return c->ForwardWriteToBridge(aPath, aDecoder);
-  }
-
-  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return;
-
-    switch(aPath.mAttributeId) {
-    case 100:
-      c->mArmFailsafes.ListWriteBegin(aPath);
-      return;
-    }
-  }
-
-  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
-  {
-    auto * c = GetCluster(aPath);
-    if (!c)
-      return;
-
-    switch(aPath.mAttributeId) {
-    case 100:
-      c->mArmFailsafes.ListWriteEnd(aPath, aWriteWasSuccessful);
-      return;
-    }
-  }
+  Attribute<ArmFailSafeRequest> mSingleFailSafe;
+  ListAttribute<std::vector<ArmFailSafeRequest>> mArmFailsafes;
 };
 
 }

@@ -38,9 +38,9 @@ const clusters::ClusterInfo * FindCluster(uint32_t id)
 
 ::pw::Status Bridge::Add(const ::chip_rpc_bridge_AddDevice & request, ::chip_rpc_bridge_AddDeviceResponse & response)
 {
-    std::unique_ptr<DynamicDeviceImpl> pending;
+    std::unique_ptr<DynamicDevice> pending;
 
-    pending = std::make_unique<DynamicDeviceImpl>();
+    pending = std::make_unique<DynamicDevice>();
     pending->SetParentEndpointId(request.parent_endpoint);
 
     for (pb_size_t i = 0; i < request.clusters_count; i++)
@@ -53,12 +53,8 @@ const clusters::ClusterInfo * FindCluster(uint32_t id)
             return pw::Status::InvalidArgument();
         }
 
-        std::unique_ptr<CommonCluster> obj(cluster->ctor(::operator new(cluster->size)));
-        DynamicAttributeList dynamic_attrs;
-        auto attrs = obj->GetAllAttributes();
-        for (auto & attr : attrs)
-            dynamic_attrs.Add(attr);
-        pending->AddCluster(std::move(obj), dynamic_attrs, nullptr, nullptr);
+        pending->AddCluster(
+            std::make_unique<DynamicCluster>(std::unique_ptr<GeneratedCluster>(cluster->ctor(::operator new(cluster->size)))));
     }
 
     for (pb_size_t i = 0; i < request.device_types_count; i++)
