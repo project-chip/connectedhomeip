@@ -18,19 +18,20 @@
 
 #pragma once
 
+#include "../../java/ContentAppAttributeDelegate.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <cstdint>
 #include <jni.h>
 
-enum MediaPlaybackRequestAttribute : uint8_t
+enum MediaPlaybackRequestAttribute : chip::AttributeId
 {
-    MEDIA_PLAYBACK_ATTRIBUTE_PLAYBACK_STATE   = 0,
-    MEDIA_PLAYBACK_ATTRIBUTE_START_TIME       = 1,
-    MEDIA_PLAYBACK_ATTRIBUTE_DURATION         = 2,
-    MEDIA_PLAYBACK_ATTRIBUTE_SPEED            = 3,
-    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_END   = 4,
-    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_START = 5,
-    MEDIA_PLAYBACK_ATTRIBUTE_COUNT,
+    MEDIA_PLAYBACK_ATTRIBUTE_PLAYBACK_STATE   = chip::app::Clusters::MediaPlayback::Attributes::CurrentState::Id,
+    MEDIA_PLAYBACK_ATTRIBUTE_START_TIME       = chip::app::Clusters::MediaPlayback::Attributes::StartTime::Id,
+    MEDIA_PLAYBACK_ATTRIBUTE_DURATION         = chip::app::Clusters::MediaPlayback::Attributes::Duration::Id,
+    MEDIA_PLAYBACK_ATTRIBUTE_SPEED            = chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id,
+    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_END   = chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id,
+    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_START = chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id,
 };
 
 enum MediaPlaybackRequest : uint8_t
@@ -48,16 +49,17 @@ enum MediaPlaybackRequest : uint8_t
     MEDIA_PLAYBACK_REQUEST_SEEK          = 10,
 };
 
+using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
-using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+using MediaPlaybackDelegate       = chip::app::Clusters::MediaPlayback::Delegate;
+using PlaybackResponseType        = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
-class MediaPlaybackManager : public MediaPlaybackDelegate
+class AppMediaPlaybackManager : public MediaPlaybackDelegate
 {
 public:
-    static void NewManager(jint endpoint, jobject manager);
-    void InitializeWithObjects(jobject managerObject);
+    AppMediaPlaybackManager(ContentAppAttributeDelegate * attributeDelegate);
 
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
@@ -83,17 +85,17 @@ public:
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
-private:
-    jobject mMediaPlaybackManagerObject = nullptr;
-    jmethodID mRequestMethod            = nullptr;
-    jmethodID mGetAttributeMethod       = nullptr;
-    jmethodID mGetPositionMethod        = nullptr;
+    void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
-    uint64_t HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute);
-    long HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute);
+private:
+    uint64_t HandleMediaRequestGetAttribute(chip::AttributeId attribute);
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
+    EndpointId mEndpointId;
+
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
+
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

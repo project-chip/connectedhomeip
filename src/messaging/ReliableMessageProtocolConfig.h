@@ -156,4 +156,24 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig();
  */
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+/**
+ * @brief
+ *
+ * Overrides the local idle and active retransmission timeout parameters (which are usually set through compile
+ * time defines). This is reserved for tests that need the ability to set these at runtime to make certain test scenarios possible.
+ *
+ */
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout);
+
+/**
+ * @brief
+ *
+ * Disables the overrides set previously in OverrideLocalMRPConfig().
+ *
+ */
+void ClearLocalMRPConfigOverride();
+#endif
+
 } // namespace chip

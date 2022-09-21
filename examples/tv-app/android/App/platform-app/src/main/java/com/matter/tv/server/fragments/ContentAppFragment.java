@@ -119,7 +119,7 @@ public class ContentAppFragment extends Fragment {
               adapter.addAll(
                   ContentAppDiscoveryService.getReceiverInstance()
                       .getDiscoveredContentApps()
-                      .entrySet());
+                      .keySet());
               adapter.notifyDataSetChanged();
             }
           }

@@ -144,7 +144,7 @@ public class MatterServant {
   }
 
   public void initCommissioner() {
-    mTvApp.initializeCommissioner(new MatterCommissioningPrompter(activity));
+    mTvApp.initializeCommissioner(new MatterCommissioningPrompter(context));
   }
 
   public void restart() {
@@ -159,6 +159,10 @@ public class MatterServant {
 
   public void setActivity(Activity activity) {
     this.activity = activity;
+  }
+
+  public Activity getActivity() {
+    return activity;
   }
 
   public void sendCustomCommand(String customCommand) {

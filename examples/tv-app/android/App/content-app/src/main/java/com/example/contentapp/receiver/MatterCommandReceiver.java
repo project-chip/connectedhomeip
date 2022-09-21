@@ -5,12 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import com.example.contentapp.AttributeHolder;
+import com.example.contentapp.MainActivity;
 import com.matter.tv.app.api.MatterIntentConstants;
 
 public class MatterCommandReceiver extends BroadcastReceiver {
   private static final String TAG = "MatterCommandReceiver";
-  private static final int ACCEPT_HEADER = 0;
-  private static final int SUPPORTED_STREAMING_PROTOCOLS = 1;
 
   @Override
   public void onReceive(Context context, Intent intent) {
@@ -24,36 +24,41 @@ public class MatterCommandReceiver extends BroadcastReceiver {
     switch (intentAction) {
       case MatterIntentConstants.ACTION_MATTER_COMMAND:
         int commandId = intent.getIntExtra(MatterIntentConstants.EXTRA_COMMAND_ID, -1);
+        int clusterId = intent.getIntExtra(MatterIntentConstants.EXTRA_CLUSTER_ID, -1);
         if (commandId != -1) {
-          int clusterId = intent.getIntExtra(MatterIntentConstants.EXTRA_CLUSTER_ID, -1);
           byte[] commandPayload =
               intent.getByteArrayExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD);
-          Log.d(
-              TAG,
+          String command = new String(commandPayload);
+          String message =
               new StringBuilder()
                   .append("Received matter command ")
                   .append(commandId)
                   .append(" on cluster ")
                   .append(clusterId)
                   .append(" with payload : ")
-                  .append(new String(commandPayload))
-                  .toString());
+                  .append(command)
+                  .toString();
+          Log.d(TAG, message);
           String response = "{\"0\":1, \"1\":\"custom response from content app\"}";
+
+          Intent in = new Intent(context, MainActivity.class);
+          in.putExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, command);
+          context.startActivity(in);
+
+          Log.d(TAG, "Started activity. Now sending response");
+
           sendResponseViaPendingIntent(context, intent, response);
         } else {
           int attributeId = intent.getIntExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, -1);
           String attributeAction =
               intent.getStringExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION);
           if (attributeAction.equals(MatterIntentConstants.ATTRIBUTE_ACTION_READ)) {
-            String response;
-            if (attributeId == ACCEPT_HEADER) {
-              response =
-                  "{\"0\": [\"video/mp4\", \"application/x-mpegURL\", \"application/dash+xml\"] }";
-            } else if (attributeId == SUPPORTED_STREAMING_PROTOCOLS) {
-              response = "{\"1\":3}";
-            } else {
-              response = "";
-            }
+            String response =
+                "{\""
+                    + attributeId
+                    + "\":"
+                    + AttributeHolder.getInstance().getAttributeValue(clusterId, attributeId)
+                    + "}";
             sendResponseViaPendingIntent(context, intent, response);
           } else {
             Log.e(

@@ -75,8 +75,8 @@ uint64_t MediaPlaybackManager::HandleGetDuration()
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
-    uint64_t ret = HandleMediaRequestGetAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SPEED);
-    return static_cast<float>(ret) / 10000.0f;
+    long ret = HandleMediaRequestGetLongAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SPEED);
+    return static_cast<float>(ret);
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
@@ -220,6 +220,38 @@ exit:
     return ret;
 }
 
+long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute)
+{
+    long ret              = 0;
+    jlong jAttributeValue = -1;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
+    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        goto exit;
+    }
+
+    ret = static_cast<long>(jAttributeValue);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
+    }
+
+    return ret;
+}
+
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest,
                                                                           uint64_t deltaPositionMilliseconds)
 
@@ -287,8 +319,8 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
         jclass inputClass    = env->GetObjectClass(positionObj);
         jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
         jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetIntField(positionObj, positionId)));
-        response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
+        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetLongField(positionObj, positionId)));
+        response.updatedAt   = static_cast<uint64_t>(env->GetLongField(positionObj, updatedAtId));
     }
 
 exit:

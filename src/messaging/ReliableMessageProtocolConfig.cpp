@@ -31,6 +31,23 @@ namespace chip {
 
 using namespace System::Clock::Literals;
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+static Optional<System::Clock::Timeout> idleRetransTimeoutOverride   = NullOptional;
+static Optional<System::Clock::Timeout> activeRetransTimeoutOverride = NullOptional;
+
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout)
+{
+    idleRetransTimeoutOverride.SetValue(idleRetransTimeout);
+    activeRetransTimeoutOverride.SetValue(activeRetransTimeout);
+}
+
+void ClearLocalMRPConfigOverride()
+{
+    activeRetransTimeoutOverride.ClearValue();
+    idleRetransTimeoutOverride.ClearValue();
+}
+#endif
+
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
     // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
@@ -52,6 +69,18 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
         // which the device can be at sleep and not be able to receive any messages).
         config.mIdleRetransTimeout += sedIntervalsConfig.IdleIntervalMS;
         config.mActiveRetransTimeout += sedIntervalsConfig.ActiveIntervalMS;
+    }
+#endif
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (idleRetransTimeoutOverride.HasValue())
+    {
+        config.mIdleRetransTimeout = idleRetransTimeoutOverride.Value();
+    }
+
+    if (activeRetransTimeoutOverride.HasValue())
+    {
+        config.mActiveRetransTimeout = activeRetransTimeoutOverride.Value();
     }
 #endif
 

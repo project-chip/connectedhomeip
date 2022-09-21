@@ -301,6 +301,20 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+ *
+ *  @brief
+ *    Length of the shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    Note that the default value of 32 includes the null terminator.
+ *    WARNING: `strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE)` will result in different keys
+ *              than expected and give unexpected results for shared secrets that contain '\x00'.
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+#define CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH 32
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+
+/**
  *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
  *
  *  @brief
