@@ -48,7 +48,6 @@ uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
 static LEDWidget statusLED1;
-// static LEDWidget statusLED2;
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -68,6 +67,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kCommissioningComplete:
         log_info("Commissioning complete\r\n");
+        GetAppTask().LightStateInit();
         break;
 
     case DeviceEventType::kWiFiConnectivityChange:
