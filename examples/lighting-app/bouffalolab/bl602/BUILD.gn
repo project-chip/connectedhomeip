@@ -81,6 +81,8 @@ bl602_executable("lighting_app") {
   sources = [
     #"${bl602_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/InitPlatform.cpp",
+    "${examples_plat_dir}/route_hook/bl_route_hook.c",
+    "${examples_plat_dir}/route_hook/bl_route_table.c",
     "include/CHIPProjectConfig.h",
     "src/AppTask.cpp",
     "src/CHIPDeviceManager.cpp",
@@ -162,6 +164,7 @@ bl602_executable("lighting_app") {
     include_dirs += [
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/bouffalolab/bl602",
+      "${examples_plat_dir}/route_hook",
     ]
   }
 

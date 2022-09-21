@@ -60,6 +60,8 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/lwip/src/include/lwip/apps",
       "${bl602_sdk_root}/components/network/lwip/lwip-port",
       "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/hook",
+      "${bl602_sdk_root}/components/network/lwip_mdns",
 
       #"${bl602_sdk_root}/components/network/lwip_mdns",
 
@@ -250,6 +252,9 @@ template("bl602_sdk") {
       "OS_USING_FREERTOS",
       "BL602_MATTER_SUPPORT",
       "TD_DIAGNOSIS_STA",
+      "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
+      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
+      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
     ]
 
     if (bl602_board == "BL-HWC-G1") {

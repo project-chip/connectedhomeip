@@ -37,6 +37,7 @@
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
+#include <route_hook/bl_route_hook.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -84,6 +85,12 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
+        }
+
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ChipLogProgress(DeviceLayer, "Initializing route hook...");
+            bl_route_hook_init();
         }
         break;
     }
