@@ -325,9 +325,9 @@ public:
         return *this;
     }
 
-    uint16_t PrivacyHeaderLength() const
+    size_t PrivacyHeaderLength() const
     {
-        uint16_t length = Header::kPrivacyHeaderMinLength;
+        size_t length = Header::kPrivacyHeaderMinLength;
         if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
         {
             length += sizeof(NodeId);
@@ -350,9 +350,9 @@ public:
         return length;
     }
 
-    uint16_t PayloadOffset() const
+    size_t PayloadOffset() const
     {
-        uint16_t offset = Header::kPrivacyHeaderMinLength;
+        size_t offset = Header::kPrivacyHeaderMinLength;
         offset += PrivacyHeaderLength();
         return offset;
     }

@@ -801,7 +801,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
 
             // Perform privacy deobfuscation, if applicable.
             uint8_t * privacyHeader = msgCopy->Start() + Header::kPrivacyHeaderOffset;
-            uint16_t privacyLength  = packetHeader.PrivacyHeaderLength();
+            size_t privacyLength    = packetHeader.PrivacyHeaderLength();
             ReturnOnFailure(context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
         }
 
