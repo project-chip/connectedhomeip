@@ -83,7 +83,7 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
-        config["silabs-thread"]["EFR32_BOARD"] = None
+        config["silabs-thread"]["SILABS_BOARD"] = None
         config["ameba"]["AMEBA_SDK"] = None
         config["ameba"]["MATTER_SDK"] = None
         config["ameba"]["MODEL"] = 'D'
@@ -493,11 +493,11 @@ def main() -> int:
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
-        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
+        if 'SILABS_BOARD' not in config['silabs-thread'] or config['silabs-thread']['SILABS_BOARD'] is None:
             flush_print(
-                'EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+                'SILABS_BOARD was not configured. Make sure silabs-thread.SILABS_BOARD is set on your config.yaml file')
             exit(1)
-        efr32_board = config['silabs-thread']['EFR32_BOARD']
+        silabs_board = config['silabs-thread']['SILABS_BOARD']
     elif options.build_target == "ameba":
         if config['ameba']['AMEBA_SDK'] is None:
             flush_print(
@@ -669,7 +669,7 @@ def main() -> int:
                 f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
             efr32_cmd_args.append('./')
             efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
-            efr32_cmd_args.append(f'{efr32_board}')
+            efr32_cmd_args.append(f'{silabs_board}')
             efr32_cmd_args.append(
                 f'\'sample_name=\"{options.sample_device_type_name}\"\'')
             if sw_ver_string:
@@ -808,7 +808,7 @@ def main() -> int:
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             shell.run_cmd(
-                f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
+                f"python3 out/{options.sample_device_type_name}/{silabs_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
         elif (options.build_target == "ameba"):

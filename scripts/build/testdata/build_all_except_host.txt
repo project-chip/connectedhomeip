@@ -200,340 +200,340 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/infineon/cyw30739 --args=chip_progress_logging=false {out}/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
 
 # Generating efr32-brd4161a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-light
 
 # Generating efr32-brd4161a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
 
 # Generating efr32-brd4161a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4161a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-with-ota-requestor
 
 # Generating efr32-brd4161a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
 # Generating efr32-brd4161a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
 # Generating efr32-brd4161a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4161a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-with-ota-requestor
 
 # Generating efr32-brd4161a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-switch
 
 # Generating efr32-brd4161a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-switch-with-ota-requestor
 
 # Generating efr32-brd4161a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
 
 # Generating efr32-brd4161a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4161a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
 # Generating efr32-brd4161a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4163a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-light
 
 # Generating efr32-brd4163a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-light-rpc
 
 # Generating efr32-brd4163a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4163a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-with-ota-requestor
 
 # Generating efr32-brd4163a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-lock
 
 # Generating efr32-brd4163a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
 
 # Generating efr32-brd4163a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4163a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-with-ota-requestor
 
 # Generating efr32-brd4163a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-switch
 
 # Generating efr32-brd4163a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-switch-with-ota-requestor
 
 # Generating efr32-brd4163a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
 
 # Generating efr32-brd4163a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4163a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-window-covering
 
 # Generating efr32-brd4163a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4164a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-light
 
 # Generating efr32-brd4164a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-light-rpc
 
 # Generating efr32-brd4164a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4164a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-with-ota-requestor
 
 # Generating efr32-brd4164a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-lock
 
 # Generating efr32-brd4164a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
 
 # Generating efr32-brd4164a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4164a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-with-ota-requestor
 
 # Generating efr32-brd4164a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-switch
 
 # Generating efr32-brd4164a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-switch-with-ota-requestor
 
 # Generating efr32-brd4164a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
 
 # Generating efr32-brd4164a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4164a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-window-covering
 
 # Generating efr32-brd4164a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4166a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-light
 
 # Generating efr32-brd4166a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-light-rpc
 
 # Generating efr32-brd4166a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4166a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-with-ota-requestor
 
 # Generating efr32-brd4166a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-lock
 
 # Generating efr32-brd4166a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
 
 # Generating efr32-brd4166a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4166a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-with-ota-requestor
 
 # Generating efr32-brd4166a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-switch
 
 # Generating efr32-brd4166a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-switch-with-ota-requestor
 
 # Generating efr32-brd4166a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
 
 # Generating efr32-brd4166a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4166a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-window-covering
 
 # Generating efr32-brd4166a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4170a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-light
 
 # Generating efr32-brd4170a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-light-rpc
 
 # Generating efr32-brd4170a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4170a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-with-ota-requestor
 
 # Generating efr32-brd4170a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-lock
 
 # Generating efr32-brd4170a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
 
 # Generating efr32-brd4170a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4170a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-with-ota-requestor
 
 # Generating efr32-brd4170a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-switch
 
 # Generating efr32-brd4170a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-switch-with-ota-requestor
 
 # Generating efr32-brd4170a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
 
 # Generating efr32-brd4170a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4170a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-window-covering
 
 # Generating efr32-brd4170a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4186a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-light
 
 # Generating efr32-brd4186a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-light-rpc
 
 # Generating efr32-brd4186a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4186a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-with-ota-requestor
 
 # Generating efr32-brd4186a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-lock
 
 # Generating efr32-brd4186a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
 
 # Generating efr32-brd4186a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4186a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-with-ota-requestor
 
 # Generating efr32-brd4186a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-switch
 
 # Generating efr32-brd4186a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-switch-with-ota-requestor
 
 # Generating efr32-brd4186a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
 
 # Generating efr32-brd4186a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4186a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-window-covering
 
 # Generating efr32-brd4186a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4187a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-light
 
 # Generating efr32-brd4187a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-light-rpc
 
 # Generating efr32-brd4187a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4187a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-with-ota-requestor
 
 # Generating efr32-brd4187a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-lock
 
 # Generating efr32-brd4187a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
 
 # Generating efr32-brd4187a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4187a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-with-ota-requestor
 
 # Generating efr32-brd4187a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-switch
 
 # Generating efr32-brd4187a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-switch-with-ota-requestor
 
 # Generating efr32-brd4187a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
 
 # Generating efr32-brd4187a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4187a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-window-covering
 
 # Generating efr32-brd4187a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4304a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-light
 
 # Generating efr32-brd4304a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-light-rpc
 
 # Generating efr32-brd4304a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4304a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-with-ota-requestor
 
 # Generating efr32-brd4304a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-lock
 
 # Generating efr32-brd4304a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
 
 # Generating efr32-brd4304a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4304a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-with-ota-requestor
 
 # Generating efr32-brd4304a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-switch
 
 # Generating efr32-brd4304a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-switch-with-ota-requestor
 
 # Generating efr32-brd4304a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
 
 # Generating efr32-brd4304a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4304a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-window-covering
 
 # Generating efr32-brd4304a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-window-covering-with-ota-requestor
 
 # Generating esp32-c3devkit-all-clusters
 mkdir -p {out}/esp32-c3devkit-all-clusters

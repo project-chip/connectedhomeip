@@ -18,7 +18,7 @@ declare_args() {
 }
 
 if (silabs_board == "") {
-  silabs_board = getenv("EFR32_BOARD")
+  silabs_board = getenv("SILABS_BOARD")
 }
 
 assert(silabs_board != "", "silabs_board must be specified")
@@ -92,6 +92,6 @@ if (silabs_board == "BRD4304A") {
   silabs_mcu = "MGM240L022RNF"
 } else {
   print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A)")
+      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A)")
   assert(false, "The board ${silabs_board} is unsupported")
 }
