@@ -98,7 +98,7 @@
 #define LWIP_IPV6_AUTOCONFIG (LWIP_IPV6)
 #define LWIP_IPV6_ROUTER_SUPPORT 1
 #define LWIP_ND6_LISTEN_RA 1
-
+#define LWIP_IPV6_DUP_DETECT_ATTEMPTS 0
 #define LWIP_ND6_NUM_NEIGHBORS (2)
 #define LWIP_ND6_NUM_DESTINATIONS (3)
 #define LWIP_ND6_NUM_PREFIXES (2)
@@ -195,5 +195,4 @@
 
 #define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
-
 #endif /* __LWIPOPTS_H__ */
