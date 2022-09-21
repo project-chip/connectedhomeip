@@ -41,11 +41,19 @@ constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
 
 std::string GetFilename(const char * name)
 {
+    const char * tmpdir = getenv("TMPDIR");
+
+    if (tmpdir == nullptr)
+    {
+        tmpdir = "/tmp";
+    }
+
     if (name == nullptr)
     {
-        return "/tmp/chip_tool_config.ini";
+        return std::string(tmpdir) + "/chip_tool_config.ini";
     }
-    return "/tmp/chip_tool_config." + std::string(name) + ".ini";
+
+    return std::string(tmpdir) + "/chip_tool_config." + std::string(name) + ".ini";
 }
 
 CHIP_ERROR PersistentStorage::Init(const char * name)
