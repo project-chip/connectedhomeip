@@ -1559,12 +1559,6 @@ cp {out}/android-x86-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 # Building bl602-light
 ninja -C {out}/bl602-light
 
-# Building bouffalolab-BL702-IoT-DVK-light
-ninja -C {out}/bouffalolab-BL702-IoT-DVK-light
-
-# Building bouffalolab-BL702-IoT-DVK-light-rpc
-ninja -C {out}/bouffalolab-BL702-IoT-DVK-light-rpc
-
 # Building bouffalolab-BL706-IoT-DVK-BL706C-22-light
 ninja -C {out}/bouffalolab-BL706-IoT-DVK-BL706C-22-light
 
