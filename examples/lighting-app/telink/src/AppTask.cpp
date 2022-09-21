@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/attribute-storage.h>
@@ -62,6 +63,8 @@ namespace {
 constexpr int kAppEventQueueSize      = 10;
 constexpr uint8_t kButtonPushEvent    = 1;
 constexpr uint8_t kButtonReleaseEvent = 0;
+constexpr uint8_t kDefaultMinLevel    = 0;
+constexpr uint8_t kDefaultMaxLevel    = 254;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
@@ -112,6 +115,8 @@ Identify sIdentify = {
 
 } // namespace
 
+using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -134,13 +139,18 @@ CHIP_ERROR AppTask::Init()
     InitButtons();
 
     // Init lighting manager
-    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
+    uint8_t minLightLevel = kDefaultMinLevel;
+    Clusters::LevelControl::Attributes::MinLevel::Get(1, &minLightLevel);
+
+    uint8_t maxLightLevel = kDefaultMaxLevel;
+    Clusters::LevelControl::Attributes::MaxLevel::Get(1, &maxLightLevel);
+
+    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL, minLightLevel, maxLightLevel, maxLightLevel);
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to int lighting manager");
         return ret;
     }
-
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
@@ -422,20 +432,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t onoff = LightingMgr().IsTurnedOn();
-
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(1, LightingMgr().IsTurnedOn());
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating on/off cluster failed: %x", status);
     }
 
-    uint8_t level = LightingMgr().GetLevel();
-
-    status =
-        emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level, ZCL_INT8U_ATTRIBUTE_TYPE);
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, LightingMgr().GetLevel());
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
