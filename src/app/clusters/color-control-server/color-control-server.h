@@ -91,7 +91,8 @@ public:
     {
         COLOR_MODE_HSV         = 0x00,
         COLOR_MODE_CIE_XY      = 0x01,
-        COLOR_MODE_TEMPERATURE = 0x02
+        COLOR_MODE_TEMPERATURE = 0x02,
+        COLOR_MODE_EHSV        = 0x03
     };
 
     enum Conversion
