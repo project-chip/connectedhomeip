@@ -33,10 +33,12 @@ class PyChipError(ctypes.Structure):
 
     def to_exception(self) -> typing.Union[None, chip.exceptions.ChipStackError]:
         if not self.is_success:
-            exception_str = None
-            if self.file:
-                exception_str = f"{ctypes.string_at(self.file)}:{self.line}"
-            return chip.exceptions.ChipStackError(self.code, exception_str)
+            return chip.exceptions.ChipStackError(self.code, str(self))
+
+    def __str__(self):
+        buf = ctypes.create_string_buffer(256)
+        GetLibraryHandle().pychip_FormatError(ctypes.pointer(self), buf, 256)
+        return buf.value.decode()
 
     def __eq__(self, other):
         if isinstance(other, int):
@@ -113,6 +115,7 @@ def _GetLibraryHandle(shouldInit: bool) -> ctypes.CDLL:
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
         setter.Set("pychip_CommonStackInit", PyChipError, [ctypes.c_char_p])
+        setter.Set("pychip_FormatError", None, [ctypes.POINTER(PyChipError), ctypes.c_char_p, ctypes.c_uint32])
 
     return _nativeLibraryHandle
 

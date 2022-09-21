@@ -220,16 +220,13 @@ class ChipDeviceController():
 
         self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
             c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32]
-        self._dmLib.pychip_OpCreds_AllocateController.restype = c_uint32
+        self._dmLib.pychip_OpCreds_AllocateController.restype = PyChipError
 
         # TODO(erjiaqing@): Figure out how to control enableServerInteractions for a single device controller (node)
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
                 opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags))
-        )
-
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        ).success_or_raise()
 
         self.devCtrl = devCtrl
         self._fabricAdmin = fabricAdmin
@@ -420,9 +417,7 @@ class ChipDeviceController():
         """
         self.CheckIsActive()
 
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).success_or_raise()
 
     # TODO: This needs to be called MarkSessionDefunct
     def CloseSession(self, nodeid):
@@ -629,12 +624,9 @@ class ChipDeviceController():
         if isinstance(filter, int):
             filter = str(filter)
 
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
-                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00"))
-
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00")).success_or_raise()
 
         if timeoutSecond != 0:
             if stopOnFirst:
@@ -754,28 +746,22 @@ class ChipDeviceController():
     def OpenCommissioningWindow(self, nodeid, timeout, iteration, discriminator, option):
         self.CheckIsActive()
 
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                 self.devCtrl, nodeid, timeout, iteration, discriminator, option)
-        )
-
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        ).success_or_raise()
 
     def GetCompressedFabricId(self):
         self.CheckIsActive()
 
         fabricid = c_uint64(0)
 
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetCompressedFabricId(
                 self.devCtrl, pointer(fabricid))
-        )
+        ).success_or_raise()
 
-        if res == 0:
-            return fabricid.value
-        else:
-            raise self._ChipStack.ErrorToException(res)
+        return fabricid.value
 
     def GetFabricIdInternal(self):
         """Get the fabric ID from the object. Only used to validate cached value from property."""
@@ -783,15 +769,12 @@ class ChipDeviceController():
 
         fabricid = c_uint64(0)
 
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetFabricId(
                 self.devCtrl, pointer(fabricid))
-        )
+        ).success_or_raise()
 
-        if res == 0:
-            return fabricid.value
-        else:
-            raise self._ChipStack.ErrorToException(res)
+        return fabricid.value
 
     def GetNodeIdInternal(self) -> int:
         """Get the node ID from the object. Only used to validate cached value from property."""
@@ -799,15 +782,12 @@ class ChipDeviceController():
 
         nodeid = c_uint64(0)
 
-        res = self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetNodeId(
                 self.devCtrl, pointer(nodeid))
-        )
+        ).success_or_raise()
 
-        if res == 0:
-            return nodeid.value
-        else:
-            raise self._ChipStack.ErrorToException(res)
+        return nodeid.value
 
     def GetClusterHandler(self):
         self.CheckIsActive()
@@ -839,9 +819,8 @@ class ChipDeviceController():
                 print('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice)
 
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs)
-        res.success_or_raise()
+        self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs).success_or_raise()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
@@ -889,13 +868,12 @@ class ChipDeviceController():
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
-        res = ClusterCommand.SendCommand(
+        ClusterCommand.SendCommand(
             future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
-        res.success_or_raise()
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).success_or_raise()
         return await future
 
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
@@ -927,9 +905,8 @@ class ChipDeviceController():
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     v[0], v[1], v[2], 1, v[1].value))
 
-        res = ClusterAttribute.WriteAttributes(
-            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs)
-        res.success_or_raise()
+        ClusterAttribute.WriteAttributes(
+            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).success_or_raise()
         return await future
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
@@ -1108,9 +1085,8 @@ class ChipDeviceController():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
-                                    subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions)
-        res.success_or_raise()
+        ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
+                              subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions).success_or_raise()
         return await future
 
     async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
@@ -1323,9 +1299,9 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [c_void_p, c_uint64, c_uint32, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = PyChipError
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [
                 c_void_p, c_uint16]
@@ -1353,6 +1329,7 @@ class ChipDeviceController():
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = PyChipError
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
@@ -1443,3 +1420,9 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.restype = None
+
+            self._dmLib.pychip_DeviceController_GetNodeId.argtypes = [c_void_p, POINTER(c_uint64)]
+            self._dmLib.pychip_DeviceController_GetNodeId.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
+            self._dmLib.pychip_DeviceController_GetFabricId.restype = PyChipError

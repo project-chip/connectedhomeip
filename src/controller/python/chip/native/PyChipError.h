@@ -83,3 +83,7 @@ inline PyChipError ToPyChipError(const CHIP_ERROR & aError)
 
 static_assert(std::is_same<decltype(PyChipError::mCode), chip::ChipError::StorageType>::value,
               "python assumes CHIP_ERROR maps to c_uint32");
+
+extern "C" {
+void pychip_FormatError(PyChipError * apError, char * apBuf, uint32_t aBufSize);
+}
