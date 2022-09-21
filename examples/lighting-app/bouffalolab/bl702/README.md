@@ -1,13 +1,12 @@
-# CHIP BL702 Lighting App Example
+# CHIP BL70X Lighting App Example
 
-BL702/BL704/BL706 is highly integrated BLE and IEEE 802.15.4 combo chipsets for IoT applications.
-This example functions as a Thread light bulb device type, with on/off, level and color capabilities. 
+BL70X is highly integrated BLE and IEEE 802.15.4 combo chipset for IoT applications, and BL702 is a general name for BL70X family. 
+
+This example is powered by BL706 and functions as a Thread light bulb device type, with on/off, level and color capabilities. 
 The steps were verified with following boards:
 
     -   BL706-IoT-DVK
     -   BL706-NIGHT-LIGHT
-        > Note, please make sure both of flash and `PSRAM` shipped with develop
-        > board/device are at lease 2MB.
 
 ## Build
 
@@ -51,10 +50,8 @@ The steps were verified with following boards:
         -   Build lighting-app for board BL706-NIGHT-LIGHT
 
             ```shell
-            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT module_type="BL702"
+            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT
             ```
-
-            > module `BL706C-22` is for all BL702/BL706 example by default. You can build image for module BL702 with build options `module_type="BL702"` as above.
 
     -   With UART shell command enabled:
 
@@ -86,16 +83,9 @@ The steps were verified with following boards:
 -   Build options
     -   Build options list
         There are some build options for function and debug purpose as below. 
-        -   `enable_chip_shell`, whether to enable shell comman line. It is set to false by default.
-        -   `module_type`
-            Currently, there are two module types:
-            - BL702
-            - BL706C-22
+        -   `chip_build_libshell`, whether to enable shell command line. It is set to false by default.
         -   `baudrate`, UART baudrate for log output or shell command line.
-        -   `enable_psram`, whether to enable psram. It is set to true by default.
-        -   `enable_cdc`, whether to enable CDC for log output or shell command line.
-        -   `enable_zigbee_lib`, whether to link zigbee lib in Bouffalo Lab IOT SDK. This option is available for bridge app, and make sure you have Bouffalo Lab IOT SDK within ZigBee library.
-        -   `enable_debug_callstack`, whether to enable call stack print when hit an exception or assert for debug purpose. It is set to false by default.
+        -   `enable_psram`, whether to enable `PSRAM`. It is set to true by default.
     -   How to use
         Before using these build options, please check whether they are available to configure in BUILD.gn file under example application folder.
         -   build with `build_examples.py`
@@ -103,7 +93,7 @@ The steps were verified with following boards:
         -   build with gn_bouffalolab_example.sh
             Input build options, such as 
             ```
-            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK enable_debug_callstack=true
+            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
             ```
 
 -   Download image
