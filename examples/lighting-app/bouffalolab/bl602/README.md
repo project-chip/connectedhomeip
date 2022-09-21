@@ -3,7 +3,8 @@
 This example functions as a wifi light bulb device type, with on/off
 capabilities. The steps were verified on BL602-IoT-Matter-V1 board.
 
-BL602-IoT-Matter-V1 board and [purchase link](https://www.amazon.com/dp/B0B9ZVGXD8):
+BL602-IoT-Matter-V1 board and
+[purchase link](https://www.amazon.com/dp/B0B9ZVGXD8):
 <img src="../../../platform/bouffalolab/bl602/doc/images/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## Initial setup

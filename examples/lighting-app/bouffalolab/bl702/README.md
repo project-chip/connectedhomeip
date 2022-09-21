@@ -1,9 +1,11 @@
 # CHIP BL70X Lighting App Example
 
-BL70X is highly integrated BLE and IEEE 802.15.4 combo chip for IoT applications, and BL702 is a general name for BL70X family. 
+BL70X is highly integrated BLE and IEEE 802.15.4 combo chip for IoT
+applications, and BL702 is a general name for BL70X family.
 
-This example is powered by BL706 and functions as a Thread light bulb device type, with on/off, level and color capabilities. 
-The steps were verified with following boards:
+This example is powered by BL706 and functions as a Thread light bulb device
+type, with on/off, level and color capabilities. The steps were verified with
+following boards:
 
     -   BL706-IoT-DVK
     -   BL706-NIGHT-LIGHT
@@ -67,8 +69,7 @@ The steps were verified with following boards:
 
 -   Build with `build_examples.py`
 
-    -   Build for BL706-IoT-DVK and BL706-NIGHT-LIGHT as
-        following commands.
+    -   Build for BL706-IoT-DVK and BL706-NIGHT-LIGHT as following commands.
 
         ```shell
         ./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build
@@ -81,17 +82,20 @@ The steps were verified with following boards:
         ```
 
 -   Build options
-    -   Build options list
-        There are some build options for function and debug purpose as below. 
-        -   `chip_build_libshell`, whether to enable shell command line. It is set to false by default.
+
+    -   Build options list There are some build options for function and debug
+        purpose as below.
+        -   `chip_build_libshell`, whether to enable shell command line. It is
+            set to false by default.
         -   `baudrate`, UART baudrate for log output or shell command line.
-        -   `enable_psram`, whether to enable `PSRAM`. It is set to true by default.
-    -   How to use
-        Before using these build options, please check whether they are available to configure in BUILD.gn file under example application folder.
-        -   build with `build_examples.py`
-            Modify value of build options in BUILD.gn file under example application folder.
-        -   build with gn_bouffalolab_example.sh
-            Input build options, such as 
+        -   `enable_psram`, whether to enable `PSRAM`. It is set to true by
+            default.
+    -   How to use Before using these build options, please check whether they
+        are available to configure in BUILD.gn file under example application
+        folder.
+        -   build with `build_examples.py` Modify value of build options in
+            BUILD.gn file under example application folder.
+        -   build with gn_bouffalolab_example.sh Input build options, such as
             ```
             ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
             ```
