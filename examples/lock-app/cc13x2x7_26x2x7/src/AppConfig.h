@@ -28,7 +28,7 @@ int cc13x2_26x2LogInit(void);
 void cc13x2_26x2Log(const char * aFormat, ...);
 #define PLAT_LOG(...) cc13x2_26x2Log(__VA_ARGS__);
 
-#define ACTUATOR_MOVEMENT_PERIOD_MS 10
+#define ACTUATOR_MOVEMENT_PERIOD_MS 1000
 
 #ifdef __cplusplus
 }

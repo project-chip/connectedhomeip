@@ -30,8 +30,6 @@ struct AppEvent
         kEventType_ButtonLeft,
         kEventType_ButtonRight,
         kEventType_AppEvent,
-        kEventType_Lock,
-        kEventType_Timer,
     };
 
     enum AppEventButtonType
@@ -60,11 +58,6 @@ struct AppEvent
             uint8_t Action;
             int32_t Actor;
         } LockEvent;
-
-        struct
-        {
-            void * Context;
-        } TimerEvent;
     };
 
     EventHandler Handler;

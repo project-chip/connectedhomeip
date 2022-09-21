@@ -100,9 +100,13 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     }
 
     if (state.Value() == DlLockState::kUnlocked)
+    {
         mState = kState_UnlockCompleted;
+    }
     else
+    {
         mState = kState_LockCompleted;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -174,17 +178,7 @@ void LockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callba
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-bool LockManager::IsActionInProgress()
-{
-    return (mState == kState_LockInitiated || mState == kState_UnlockInitiated);
-}
-
-bool LockManager::NextState()
-{
-    return (mState == kState_UnlockCompleted);
-}
-
-bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LockManager::InitiateAction(Action_t aAction)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -213,7 +207,7 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
         if (mActionInitiated_CB)
         {
-            mActionInitiated_CB(aAction, aActor);
+            mActionInitiated_CB(aAction);
         }
     }
 
@@ -254,9 +248,9 @@ void LockManager::TimerEventHandler(TimerHandle_t xTimer)
     // once sLockTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = lock;
-    event.Handler            = ActuatorMovementTimerEventHandler;
+    event.Type                  = AppEvent::kEventType_AppEvent;
+    event.BoltLockEvent.Context = lock;
+    event.Handler               = ActuatorMovementTimerEventHandler;
     GetAppTask().PostEvent(&event);
 }
 
@@ -264,7 +258,7 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    LockManager * lock = static_cast<LockManager *>(aEvent->TimerEvent.Context);
+    LockManager * lock = static_cast<LockManager *>(aEvent->BoltLockEvent.Context);
 
     if (lock->mState == kState_LockInitiated)
     {

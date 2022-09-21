@@ -62,7 +62,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
     bool status = LockMgr().Lock(endpointId, pinCode, err);
     if (status == true)
     {
-        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
+        LockMgr().InitiateAction(LockManager::LOCK_ACTION);
     }
     return status;
 }
@@ -74,7 +74,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     bool status = LockMgr().Unlock(endpointId, pinCode, err);
     if (status == true)
     {
-        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+        LockMgr().InitiateAction(LockManager::UNLOCK_ACTION);
     }
 
     return status;

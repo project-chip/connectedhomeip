@@ -121,6 +121,42 @@ int AppTask::StartAppTask()
     return ret;
 }
 
+void uiLocking(void)
+{
+    PLAT_LOG("Lock initiated");
+    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+}
+
+void uiLocked(void)
+{
+    PLAT_LOG("Lock completed");
+    LED_stopBlinking(sAppGreenHandle);
+    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+}
+
+void uiUnlocking(void)
+{
+    PLAT_LOG("Unlock initiated");
+    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+}
+
+void uiUnlocked(void)
+{
+    PLAT_LOG("Unlock completed");
+    LED_stopBlinking(sAppGreenHandle);
+    LED_setOff(sAppGreenHandle);
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOff(sAppRedHandle);
+}
+
 int AppTask::Init()
 {
     LED_Params ledParams;
@@ -216,18 +252,15 @@ int AppTask::Init()
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
-    // Initial lock state
-    chip::app::DataModel::Nullable<DlLockState> state;
-    EndpointId endpointId{ 1 };
     PlatformMgr().LockChipStack();
-    Attributes::LockState::Get(endpointId, state);
-
     {
         uint8_t  numberOfCredentialsPerUser      = 0;
         uint16_t numberOfUsers                   = 0;
         uint8_t  numberOfWeekdaySchedulesPerUser = 0;
         uint8_t  numberOfYeardaySchedulesPerUser = 0;
         uint8_t  numberOfHolidaySchedules        = 0;
+        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+        EndpointId endpointId{ 1 };
 
         if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
         {
@@ -254,8 +287,7 @@ int AppTask::Init()
             numberOfHolidaySchedules = 10;
         }
 
-        PlatformMgr().UnlockChipStack();
-
+        Attributes::LockState::Get(endpointId, state);
         ret = LockMgr().Init(state,
                              CC13X2_26X2DoorLock::LockInitParams::ParamBuilder()
                                  .SetNumberOfUsers(numberOfUsers)
@@ -264,7 +296,18 @@ int AppTask::Init()
                                  .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                                  .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
                                  .GetLockParam());
+
+        if (state.Value() == DlLockState::kLocked)
+        {
+            uiLocked();
+        }
+        else
+        {
+            uiUnlocked();
+        }
     }
+
+    PlatformMgr().UnlockChipStack();
 
     if (ret != CHIP_NO_ERROR)
     {
@@ -344,47 +387,28 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     }
 }
 
-void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LockManager::Action_t aAction)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        PLAT_LOG("Lock initiated");
-        ; // TODO
+        uiLocking();
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        PLAT_LOG("Unlock initiated");
-        ; // TODO
+        uiUnlocking();
     }
 
-    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
 void AppTask::ActionCompleted(LockManager::Action_t aAction)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        PLAT_LOG("Lock completed");
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-        LED_stopBlinking(sAppRedHandle);
-        LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+        uiLocked();
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        PLAT_LOG("Unlock completed");
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOff(sAppGreenHandle);
-        LED_stopBlinking(sAppRedHandle);
-        LED_setOff(sAppRedHandle);
+        uiUnlocked();
     }
 }
 
@@ -429,7 +453,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            LockMgr().InitiateAction(0, LockManager::UNLOCK_ACTION);
+            LockMgr().InitiateAction(LockManager::UNLOCK_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -440,7 +464,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            LockMgr().InitiateAction(0, LockManager::LOCK_ACTION);
+            LockMgr().InitiateAction(LockManager::LOCK_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
@@ -475,22 +499,5 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_None:
     default:
         break;
-    }
-}
-
-void AppTask::UpdateClusterState(intptr_t context)
-{
-    bool unlocked        = LockMgr().NextState();
-    DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
-
-    DlOperationSource source = DlOperationSource::kUnspecified;
-
-    // write the new lock value
-    EmberAfStatus status =
-        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        PLAT_LOG("ERR: updating lock state %x", status);
     }
 }

@@ -136,11 +136,9 @@ public:
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
                     CC13X2_26X2DoorLock::LockInitParams::LockParam lockParam);
-    bool NextState();
-    bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    bool InitiateAction(Action_t aAction);
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
+    typedef void (*Callback_fn_initiated)(Action_t);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 

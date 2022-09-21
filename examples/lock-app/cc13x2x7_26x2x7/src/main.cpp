@@ -21,8 +21,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <AppConfig.h>
-#include <AppTask.h>
+#include "AppConfig.h"
+#include "AppTask.h"
 
 #include <FreeRTOS.h>
 
