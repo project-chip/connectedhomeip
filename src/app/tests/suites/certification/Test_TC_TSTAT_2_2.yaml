@@ -32,14 +32,14 @@ tests:
                 value: nodeId
 
     - label: "Saving value for comparision in step 2a read MinCoolSetpointLimit"
-      PICS: TSTAT.S.A0005
+      PICS: TSTAT.S.A0017
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       response:
           saveAs: MinCoolSetpointLimit
 
     - label: "Saving value for comparision in step 2a read MaxCoolSetpointLimit"
-      PICS: TSTAT.S.A0006
+      PICS: TSTAT.S.A0018
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       response:
@@ -131,6 +131,7 @@ tests:
       response:
           saveAs: AbsMaxCoolSetpointLimit
 
+    #Using saved values when optional attributes are available
     - label: "Read attribute OccupiedCoolingSetpoint from the DUT"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
       command: "readAttribute"
@@ -141,6 +142,7 @@ tests:
               minValue: MinCoolSetpointLimit
               maxValue: MaxCoolSetpointLimit
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
           that the value is within range"
@@ -288,6 +290,7 @@ tests:
       arguments:
           value: MaxCoolSetpointLimit
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
           that the value is within range"
@@ -300,6 +303,7 @@ tests:
               minValue: MinHeatSetpointLimit
               maxValue: MaxHeatSetpointLimit
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
           that the value is within range"
@@ -637,6 +641,7 @@ tests:
       arguments:
           value: MaxCoolSetpointLimit
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
           verifies that the value is within range"
@@ -649,6 +654,7 @@ tests:
               minValue: MinHeatSetpointLimit
               maxValue: MaxHeatSetpointLimit
 
+    #Using hardcoded values when optional attributes are not available
     - label:
           "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
           verifies that the value is within range"
@@ -811,6 +817,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -823,6 +830,7 @@ tests:
               minValue: AbsMinHeatSetpointLimitValue
               maxValue: MaxHeatSetpointLimit
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -986,6 +994,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -1000,6 +1009,7 @@ tests:
               minValue: MinHeatSetpointLimit
               maxValue: AbsMaxHeatSetpointLimitValue
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -1190,6 +1200,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -1202,6 +1213,7 @@ tests:
               minValue: AbsMinCoolSetpointLimit
               maxValue: MaxCoolSetpointLimit
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -1356,6 +1368,7 @@ tests:
       arguments:
           value: MaxCoolSetpointLimit
 
+    #Using saved values when optional attributes are available
     - label:
           "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
@@ -1368,6 +1381,7 @@ tests:
               minValue: MinCoolSetpointLimit
               maxValue: AbsMaxCoolSetpointLimit
 
+    #Using hard coded values when optional attributes are not available
     - label:
           "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
