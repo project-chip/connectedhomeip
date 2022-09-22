@@ -78,11 +78,23 @@ class ProcessingPath:
         return 'ProcessingPath(%r)' % self.paths
 
 
+class IdlPostProcessor:
+    """Defines a callback that will apply after an entire parsing
+       is complete.
+    """
+
+    def FinalizeProcessing(self, idl: Idl):
+        """Update idl with any post-processing directives."""
+        pass
+
+
+
 class ProcessingContext:
     def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
         self.path = ProcessingPath()
         self.locator = locator
         self._not_handled = set()
+        self._idl_post_processors = []
 
     def GetCurrentLocationMeta(self) -> ParseMetaData:
         if not self.locator:
@@ -96,6 +108,14 @@ class ProcessingContext:
             logging.warning("TAG %s was not handled/recognized" % path)
             self._not_handled.add(path)
 
+    def AddIdlPostProcessor(self, processor: IdlPostProcessor):
+        self._idl_post_processors.append(processor)
+
+    def PostProcess(self, idl: Idl):
+        for p in self._idl_post_processors:
+            p.FinalizeProcessing(idl)
+
+        self._idl_post_processors = []
 
 class ElementProcessor:
     """A generic element processor.
@@ -224,6 +244,47 @@ class AttributeProcessor(ElementProcessor):
 
         self._cluster.attributes.append(self._attribute)
 
+class EnumProcessor(ElementProcessor, IdlPostProcessor):
+    def __init__(self, context: ProcessingContext, attrs):
+        super().__init__(context)
+        self._cluster_code = None # if set, enum belongs to a specific cluster
+        self._enum = Enum(name=attrs['name'], base_type=attrs['type'], entries = [])
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'item':
+            self._enum.entries.append(ConstantEntry(
+                name=attrs['name'],
+                code=ParseInt(attrs['value'])
+            ))
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'cluster':
+            if self._cluster_code is not None:
+                raise Exception('Multiple cluster codes for enum %s' % self._enum.name)
+            self._cluster_code = ParseInt(attrs['code'])
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return ElementProcessor(self.context)
+
+    def FinalizeProcessing(self, idl: Idl):
+        # We have two choices of adding an enum:
+        #   - inside a cluster if a code exists
+        #   - inside top level if a code does not exist
+
+        if self._cluster_code is None:
+            idl.enums.append(self._enum)
+        else:
+            found = False
+            for c in idl.clusters:
+                if c.code == self._cluster_code:
+                    c.enums.append(self._enum)
+                    found = True
+
+            if not found:
+                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' % (self._enum.name, self._cluster_code, self._cluster_code))
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
+
 
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
@@ -267,6 +328,8 @@ class ConfiguratorProcessor(ElementProcessor):
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
             return ClusterProcessor(self.context, self._idl)
+        elif name.lower() == 'enum':
+            return EnumProcessor(self.context, attrs)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
@@ -302,6 +365,8 @@ class ParseHandler(xml.sax.handler.ContentHandler):
     def endDocument(self):
         if len(self._processing_stack) != 1:
             raise Exception("Unexpected nesting!")
+
+        self._context.PostProcess(self._idl)
 
     def startElement(self, name, attrs):
         logging.debug("ELEMENT START: %r / %r" % (name, attrs))
