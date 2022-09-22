@@ -229,13 +229,13 @@ class AttributeProcessor(ElementProcessor):
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
 
-    def __init__(self, context: ProcessingContext, idl: Idl, parse_meta: Optional[ParseMetaData]):
+    def __init__(self, context: ProcessingContext, idl: Idl):
         super().__init__(context)
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
             name=None,
             code=None,
-            parse_meta=parse_meta,
+            parse_meta=GetParseMeta(context.locator),
         )
         self._idl = idl
 
@@ -267,7 +267,7 @@ class ConfiguratorProcessor(ElementProcessor):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
-            return ClusterProcessor(self.context, self._idl, GetParseMeta(self.context.locator))
+            return ClusterProcessor(self.context, self._idl)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
@@ -291,12 +291,13 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         super().__init__()
         self._idl = Idl(parse_file_name=filename)
         self._processing_stack = []
-        self._context = ProcessingContext()
+        self._context = None
 
     def ProcessResults(self):
         return self._idl
 
     def startDocument(self):
+        self._context = ProcessingContext(self._locator)
         self._processing_stack = [ZapXmlProcessor(self._context, self._idl)]
 
     def endDocument(self):
