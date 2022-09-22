@@ -28,13 +28,122 @@ except:
         os.path.join(os.path.dirname(__file__), '..')))
     from idl.matter_idl_types import *
 
+
+class ElementProcessor:
+    """A generic element processor.
+
+       XML processing will be done in the form of a stack. whenever
+       a new element comes in, its processor is moved to the top of
+       the stack and poped once the element ends.
+    """
+    def GetNextProcessor(self, name, attrs):
+        """Get the next processor to use for the given name"""
+        return ElementProcessor()
+
+    def HandleContent(self, content):
+        """Processes some content"""
+        pass
+
+    def EndProcessing(self):
+        """Finalizes the processing of the current element"""
+        pass
+
+class ClusterNameProcessor(ElementProcessor):
+    def __init__(self, cluster):
+        self._cluster = cluster
+
+    def HandleContent(self, content):
+        self._cluster.name = content.replace(' ','')
+        
+
+
+class ClusterCodeProcessor(ElementProcessor):
+    def __init__(self, cluster):
+        self._cluster = cluster
+
+    def HandleContent(self, content):
+        if content.startswith('0x'):
+            code = int(content[2:], 16)
+        else:
+            code = int(content)
+        self._cluster.code = code
+
+class ClusterProcessor(ElementProcessor):
+    """Handles configurator/cluster processing"""
+    def __init__(self, idl):
+        self._cluster = Cluster(
+            side = ClusterSide.CLIENT,
+            name = None,
+            code = None,
+        )
+        self._idl = idl
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'code':
+            return ClusterCodeProcessor(self._cluster)
+        elif name.lower() == 'name':
+            return ClusterNameProcessor(self._cluster)
+        else:
+            return ElementProcessor()
+
+    def EndProcessing(self):
+        if self._cluster.name is None:
+            raise Exception("Missing cluster name")
+        elif self._cluster.code is None:
+            raise Exception("Missing cluster code")
+
+        self._idl.clusters.append(self._cluster)
+
+
+class ConfiguratorProcessor(ElementProcessor):
+    def __init__(self, idl):
+        self._idl = idl
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'cluster':
+            return ClusterProcessor(self._idl)
+        else:
+            return ElementProcessor()
+
+
+class ZapXmlProcessor(ElementProcessor):
+    def __init__(self, idl):
+        self._idl = idl
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'configurator':
+            return ConfiguratorProcessor(self._idl)
+        else:
+            return ElementProcessor()
+
 class ParseHandler(xml.sax.handler.ContentHandler):
     def __init__(self, filename):
         super(xml.sax.handler.ContentHandler, self).__init__()
         self._idl = Idl(parse_file_name = filename)
+        self._processing_stack = []
 
     def ProcessResults(self):
         return self._idl
+
+    def startDocument(self):
+        self._processing_stack = [ZapXmlProcessor(self._idl)]
+
+    def endDocument(self):
+        if len(self._processing_stack) != 1:
+            raise Exception("Unexpected nesting!")
+
+    def startElement(self, name, attrs):
+        logging.debug("ELEMENT START: %r / %r" % (name, attrs))
+        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs))
+
+    def endElement(self, name):
+        logging.debug("ELEMENT END: %r" % name)
+        last = self._processing_stack.pop()
+        last.EndProcessing()
+
+    def characters(self, content):
+        self._processing_stack[-1].HandleContent(content)
+
 
 def ParseXml(filename_or_stream, filename):
     handler = ParseHandler(filename)
