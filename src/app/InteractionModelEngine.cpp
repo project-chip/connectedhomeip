@@ -793,7 +793,8 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
     {
         SubscriptionId subId;
         candidate->GetSubscriptionId(subId);
-        ChipLogProgress(DataManagement, "Evicting Subscription ID %u:0x%04X", candidate->GetSubjectDescriptor().fabricIndex, subId);
+        ChipLogProgress(DataManagement, "Evicting Subscription ID %u:0x%" PRIx32, candidate->GetSubjectDescriptor().fabricIndex,
+                        subId);
         candidate->Close();
         return true;
     }
