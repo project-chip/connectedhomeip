@@ -14,11 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 import os
 import xml.sax
 import xml.sax.handler
-from typing import Optional
+
+from typing import Optional, Union, List
 
 try:
     from idl.matter_idl_types import *
@@ -30,11 +32,55 @@ except:
     from idl.matter_idl_types import *
 
 
+class HandledDepth:
+    """Defines how deep a XML element has been handled."""
+    NOT_HANDLED = enum.auto()  # Unknown/parsed element
+    ENTIRE_TREE = enum.auto()  # Entire tree can be ignored
+    SINGLE_TAG = enum.auto()  # Single tag processed, but not sub-items
+
+
+def ParseInt(value: str) -> int:
+    if value.startswith('0x'):
+        return int(value[2:], 16)
+    else:
+        return int(value)
+
+
+def ParseAclRole(role: str) -> AccessPrivilege:
+    if role.lower() == 'view':
+        return AccessPrivilege.VIEW
+    elif role.lower() == 'operate':
+        return AccessPrivilege.OPERATE
+    elif role.lower() == 'manage':
+        return AccessPrivilege.MANAGE
+    elif role.lower() == 'administer':
+        return AccessPrivilege.ADMINISTER
+    else:
+        raise Exception('Unknown ACL role: %r' % role)
+
+
 def GetParseMeta(locator: Optional[xml.sax.xmlreader.Locator]) -> ParseMetaData:
     if not locator:
         return None
 
     return ParseMetaData(line=locator.getLineNumber(), column=locator.getColumnNumber())
+
+
+class ProcessingPath:
+    def __init__(self, name: Union[str, List[str]]):
+        if isinstance(name, list):
+            self.paths = name
+        else:
+            self.paths = [name]
+
+    def add(self, name: str):
+        return ProcessingPath(self.paths[:] + [name])
+
+    def __str__(self):
+        return '::'.join(self.paths)
+
+    def __repr__(self):
+        return 'ProcessingPath(%r)' % self.paths
 
 
 class ElementProcessor:
@@ -45,9 +91,19 @@ class ElementProcessor:
        the stack and poped once the element ends.
     """
 
+    def __init__(self, path: ProcessingPath, handled=HandledDepth.NOT_HANDLED):
+        self.path = path
+        self._handled = handled
+
     def GetNextProcessor(self, name, attrs, locator: Optional[xml.sax.xmlreader.Locator]):
         """Get the next processor to use for the given name"""
-        return ElementProcessor()
+
+        if self._handled == HandledDepth.SINGLE_TAG:
+            handled = HandledDepth.NOT_HANDLED
+        else:
+            handled = self._handled
+
+        return ElementProcessor(path=self.path.add(name), handled=handled)
 
     def HandleContent(self, content):
         """Processes some content"""
@@ -55,33 +111,111 @@ class ElementProcessor:
 
     def EndProcessing(self):
         """Finalizes the processing of the current element"""
-        pass
+        if self._handled == HandledDepth.NOT_HANDLED:
+            logging.warning("Did not have a dedicated handler for %s" % self.path)
 
 
 class ClusterNameProcessor(ElementProcessor):
-    def __init__(self, cluster):
+    def __init__(self, path: ProcessingPath, cluster):
+        super().__init__(path, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
     def HandleContent(self, content):
         self._cluster.name = content.replace(' ', '')
 
 
+class AttributeDescriptionProcessor(ElementProcessor):
+    def __init__(self, path: ProcessingPath, attribute):
+        super().__init__(path, handled=HandledDepth.SINGLE_TAG)
+        self._attribute = attribute
+
+    def HandleContent(self, content):
+        self._attribute.definition.name = content.replace(' ', '')
+
+
 class ClusterCodeProcessor(ElementProcessor):
-    def __init__(self, cluster):
+    def __init__(self, path: ProcessingPath, cluster):
+        super().__init__(path)
         self._cluster = cluster
 
     def HandleContent(self, content):
-        if content.startswith('0x'):
-            code = int(content[2:], 16)
+        self._cluster.code = ParseInt(content)
+
+
+class AttributeProcessor(ElementProcessor):
+    def __init__(self, path: ProcessingPath, cluster, attrs):
+        super().__init__(path)
+        self._cluster = cluster
+
+        if attrs['type'].lower() == 'array':
+            data_type = DataType(name=attrs['entryType'])
         else:
-            code = int(content)
-        self._cluster.code = code
+            data_type = DataType(name=attrs['type'])
+
+        if 'length' in attrs:
+            data_type.max_length = ParseInt(attrs['length'])
+
+        field = Field(
+            data_type=data_type,
+            code=ParseInt(attrs['code']),
+            name=None,
+            is_list=(attrs['type'].lower() == 'array')
+        )
+
+        self._attribute = Attribute(definition=field)
+
+        if attrs.get('optional', "false").lower() == 'true':
+            self._attribute.definition.attributes.add(FieldAttribute.OPTIONAL)
+
+        if attrs.get('isNullable', "false").lower() == 'true':
+            self._attribute.definition.attributes.add(FieldAttribute.NULLABLE)
+
+        if attrs.get('readable', "true").lower() == 'true':
+            self._attribute.tags.add(AttributeTag.READABLE)
+
+        if attrs.get('writable', "false").lower() == 'true':
+            self._attribute.tags.add(AttributeTag.WRITABLE)
+
+        # TODO: XML does not seem to contain information about
+        #   - NOSUBSCRIBE
+        #   - FABRIC_SCOPED
+
+        # TODO: do we care about default value at all?
+        #       General storage of default only applies to instantiation
+
+    def GetNextProcessor(self, name, attrs, locator):
+        if name.lower() == 'access':
+            if attrs['op'] == 'read':
+                self._attribute.readacl = ParseAclRole(attrs['role'])
+            elif attrs['op'] == 'write':
+                self._attribute.writeacl = ParseAclRole(attrs['role'])
+            else:
+                logging.warning("Unknown access: %r" % attrs['op'])
+            return ElementProcessor(self.path.add(name), handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'description':
+            return AttributeDescriptionProcessor(self.path.add(name), self._attribute)
+        else:
+            return ElementProcessor(self.path.add(name))
+
+    def HandleContent(self, content):
+        # Content generally is the name EXCEPT if access controls
+        # exist, in which case `description` contains the name
+        content = content.strip()
+        if content and not self._attribute.definition.name:
+            self._attribute.definition.name = content
+
+    def EndProcessing(self):
+        if self._attribute.definition.name is None:
+            raise Exception("Name for attribute was not parsed.")
+
+        self._cluster.attributes.append(self._attribute)
 
 
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
 
-    def __init__(self, idl: Idl, parse_meta: Optional[ParseMetaData]):
+    def __init__(self, path: ProcessingPath, idl: Idl, parse_meta: Optional[ParseMetaData]):
+        super().__init__(path)
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
             name=None,
@@ -92,11 +226,15 @@ class ClusterProcessor(ElementProcessor):
 
     def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'code':
-            return ClusterCodeProcessor(self._cluster)
+            return ClusterCodeProcessor(self.path.add(name), self._cluster)
         elif name.lower() == 'name':
-            return ClusterNameProcessor(self._cluster)
+            return ClusterNameProcessor(self.path.add(name), self._cluster)
+        elif name.lower() == 'attribute':
+            return AttributeProcessor(self.path.add(name), self._cluster, attrs)
+        elif name.lower() in ['define', 'description', 'domain']:
+            return ElementProcessor(self.path.add(name), handled=HandledDepth.ENTIRE_TREE)
         else:
-            return ElementProcessor()
+            return ElementProcessor(self.path.add(name))
 
     def EndProcessing(self):
         if self._cluster.name is None:
@@ -108,30 +246,34 @@ class ClusterProcessor(ElementProcessor):
 
 
 class ConfiguratorProcessor(ElementProcessor):
-    def __init__(self, idl: Idl):
+    def __init__(self, path: ProcessingPath, idl: Idl):
+        super().__init__(path)
         self._idl = idl
 
     def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'cluster':
-            return ClusterProcessor(self._idl, GetParseMeta(locator))
+            return ClusterProcessor(self.path.add(name), self._idl, GetParseMeta(locator))
+        elif name.lower() == 'domain':
+            return ElementProcessor(self.path.add(name), handled=HandledDepth.ENTIRE_TREE)
         else:
-            return ElementProcessor()
+            return ElementProcessor(self.path.add(name))
 
 
 class ZapXmlProcessor(ElementProcessor):
-    def __init__(self, idl: Idl):
+    def __init__(self, path: ProcessingPath, idl: Idl):
+        super().__init__(path)
         self._idl = idl
 
     def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'configurator':
-            return ConfiguratorProcessor(self._idl)
+            return ConfiguratorProcessor(self.path.add(name), self._idl)
         else:
-            return ElementProcessor()
+            return ElementProcessor(self.path.add(name))
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
     def __init__(self, filename):
-        super(xml.sax.handler.ContentHandler, self).__init__()
+        super().__init__()
         self._idl = Idl(parse_file_name=filename)
         self._processing_stack = []
 
@@ -139,7 +281,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         return self._idl
 
     def startDocument(self):
-        self._processing_stack = [ZapXmlProcessor(self._idl)]
+        self._processing_stack = [ZapXmlProcessor(ProcessingPath([]), self._idl)]
 
     def endDocument(self):
         if len(self._processing_stack) != 1:
