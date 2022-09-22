@@ -18,6 +18,7 @@ import logging
 import os
 import xml.sax
 import xml.sax.handler
+from typing import Optional
 
 try:
     from idl.matter_idl_types import *
@@ -29,6 +30,13 @@ except:
     from idl.matter_idl_types import *
 
 
+def GetParseMeta(locator: Optional[xml.sax.xmlreader.Locator]) -> ParseMetaData:
+    if not locator:
+        return None
+
+    return ParseMetaData(line=locator.getLineNumber(), column=locator.getColumnNumber())
+
+
 class ElementProcessor:
     """A generic element processor.
 
@@ -37,7 +45,7 @@ class ElementProcessor:
        the stack and poped once the element ends.
     """
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name, attrs, locator: Optional[xml.sax.xmlreader.Locator]):
         """Get the next processor to use for the given name"""
         return ElementProcessor()
 
@@ -73,15 +81,16 @@ class ClusterCodeProcessor(ElementProcessor):
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
 
-    def __init__(self, idl):
+    def __init__(self, idl: Idl, parse_meta: Optional[ParseMetaData]):
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
             name=None,
             code=None,
+            parse_meta=parse_meta,
         )
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'code':
             return ClusterCodeProcessor(self._cluster)
         elif name.lower() == 'name':
@@ -99,21 +108,21 @@ class ClusterProcessor(ElementProcessor):
 
 
 class ConfiguratorProcessor(ElementProcessor):
-    def __init__(self, idl):
+    def __init__(self, idl: Idl):
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'cluster':
-            return ClusterProcessor(self._idl)
+            return ClusterProcessor(self._idl, GetParseMeta(locator))
         else:
             return ElementProcessor()
 
 
 class ZapXmlProcessor(ElementProcessor):
-    def __init__(self, idl):
+    def __init__(self, idl: Idl):
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name, attrs, locator):
         if name.lower() == 'configurator':
             return ConfiguratorProcessor(self._idl)
         else:
@@ -138,7 +147,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
     def startElement(self, name, attrs):
         logging.debug("ELEMENT START: %r / %r" % (name, attrs))
-        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs))
+        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs, self._locator))
 
     def endElement(self, name):
         logging.debug("ELEMENT END: %r" % name)
