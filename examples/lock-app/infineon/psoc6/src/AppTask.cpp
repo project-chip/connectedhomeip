@@ -331,6 +331,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     P6_LOG("App Task started");
 
+    // Users and credentials should be checked once from flash on boot
+    LockMgr().ReadConfigValues();
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
