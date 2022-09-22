@@ -1,9 +1,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "utils_log.h"
 #include "bl_route_hook.h"
 #include "bl_route_table.h"
+#include "utils_log.h"
 
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"

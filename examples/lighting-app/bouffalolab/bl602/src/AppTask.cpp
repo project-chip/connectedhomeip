@@ -587,11 +587,12 @@ void AppTask::LightStateUpdateEventHandler(void)
 
 void AppTask::LightStateInit(void)
 {
-    uint8_t onoff = 1;
-    uint8_t level = 254;
+    uint8_t onoff       = 1;
+    uint8_t level       = 254;
     EndpointId endpoint = 1;
 
-    emberAfWriteAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,ZCL_INT8U_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,
+                          ZCL_INT8U_ATTRIBUTE_TYPE);
 
     emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }

@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 
 #include <platform/bouffalolab/BL702/bl702Config.h>

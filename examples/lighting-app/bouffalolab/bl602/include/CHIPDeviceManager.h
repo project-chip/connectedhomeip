@@ -71,7 +71,7 @@ public:
      * @param value              pointer to the new value
      */
     virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     uint8_t type, uint16_t size, uint8_t * value)
+                                             uint8_t type, uint16_t size, uint8_t * value)
     {}
     // virtual ~CHIPDeviceManagerCallbacks();
 };

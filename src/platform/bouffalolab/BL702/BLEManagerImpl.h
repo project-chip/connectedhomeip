@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
