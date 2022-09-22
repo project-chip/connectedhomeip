@@ -778,19 +778,18 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
             {
                 startTime = 0;
                 hash      = 0;
-                memset(encryptionKey, 0, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                memset(encryptionKey, 0, sizeof(encryptionKey));
                 ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item));
 
                 if (keyCount++ < keys_count)
                 {
                     startTime = key.start_time;
                     hash      = key.hash;
-                    memcpy(encryptionKey, key.encryption_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+                    memcpy(encryptionKey, key.encryption_key, sizeof(encryptionKey));
                 }
                 ReturnErrorOnFailure(writer.Put(TagStartTime(), static_cast<uint64_t>(startTime)));
                 ReturnErrorOnFailure(writer.Put(TagKeyHash(), hash));
-                ReturnErrorOnFailure(
-                    writer.Put(TagKeyValue(), ByteSpan(encryptionKey, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)));
+                ReturnErrorOnFailure(writer.Put(TagKeyValue(), ByteSpan(encryptionKey)));
 
                 ReturnErrorOnFailure(writer.EndContainer(item));
             }
