@@ -37,7 +37,7 @@ tests:
 
     - label:
           "TH sends a multicast Identify command with the IdentifyTime set to
-          0x0078 (120s) to DUT with GroupID and PIXIT.SC.ENDPOINT"
+          0x0078 (120s) to DUT with GroupID and PIXIT.G.ENDPOINT"
       PICS: I.S.C00.Rsp
       verification: |
           ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
@@ -50,7 +50,7 @@ tests:
 
     - label:
           "TH reads immediately IdentifyTime attribute from DUT on the
-          PIXIT.SC.ENDPOINT set by DUT"
+          PIXIT.G.ENDPOINT set by DUT"
       PICS: I.S.A0000
       verification: |
           ./chip-tool identify read identify-time 1 1
