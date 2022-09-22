@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 
