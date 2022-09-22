@@ -132,15 +132,11 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         log_info("IPv4 Server ready...\r\n");
-        // TODO
-        // wifiLED.Set(true);
         chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
         log_info("Lost IPv4 connectivity...\r\n");
-        // TODO
-        // wifiLED.Set(false);
     }
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
