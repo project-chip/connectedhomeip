@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 43.2.2. [TC-DGSW-2.2] Event functionality with server as DUT
+name: 3.2.2. [TC-DGSW-2.2] Event Functionality [{DUT_Sever}]
 
 PICS:
     - DGSW.S.E
@@ -21,21 +21,19 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Software Diagnostics"
+    cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
 
     - label:
-          "Reads a list of SoftwareFault struct from DUT and data type in each
-          field of the struct must match the value listed in spec"
+          "DUT sends an event report to TH. TH reads a list of SoftwareFault
+          struct from DUT."
+      PICS: DGSW.S.E00
       verification: |
           Provision DUT and TH.
 
@@ -64,12 +62,4 @@ tests:
           [1655375196.292341][35133:35138] CHIP:TOO:       FaultRecording: 546875204A756E2031362031303A32363A313420323032320A
           [1655375196.292391][35133:35138] CHIP:TOO:      }
           [1655375196.292438][35133:35138] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGSW.S.E00
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter '0' for success"
-              - name: "expectedValue"
-                value: 0
+      disabled: true

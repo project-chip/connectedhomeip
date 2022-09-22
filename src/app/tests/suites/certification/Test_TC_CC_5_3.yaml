@@ -152,14 +152,18 @@ tests:
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       attribute: "CurrentX"
       response:
-          value: 13000
+          constraints:
+              minValue: 11050
+              maxValue: 14950
 
     - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       attribute: "CurrentY"
       response:
-          value: 14000
+          constraints:
+              minValue: 11900
+              maxValue: 16100
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0008
