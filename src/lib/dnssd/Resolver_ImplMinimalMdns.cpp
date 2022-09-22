@@ -281,6 +281,7 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR StopDiscovery() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -710,6 +711,11 @@ CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().DiscoverCommissioners(filter);
+}
+
+CHIP_ERROR ResolverProxy::StopDiscovery()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd
