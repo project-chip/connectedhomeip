@@ -16,8 +16,8 @@
 
 import logging
 import os
-import xml.sax;
-import xml.sax.handler;
+import xml.sax
+import xml.sax.handler
 
 try:
     from idl.matter_idl_types import *
@@ -36,6 +36,7 @@ class ElementProcessor:
        a new element comes in, its processor is moved to the top of
        the stack and poped once the element ends.
     """
+
     def GetNextProcessor(self, name, attrs):
         """Get the next processor to use for the given name"""
         return ElementProcessor()
@@ -48,13 +49,13 @@ class ElementProcessor:
         """Finalizes the processing of the current element"""
         pass
 
+
 class ClusterNameProcessor(ElementProcessor):
     def __init__(self, cluster):
         self._cluster = cluster
 
     def HandleContent(self, content):
-        self._cluster.name = content.replace(' ','')
-        
+        self._cluster.name = content.replace(' ', '')
 
 
 class ClusterCodeProcessor(ElementProcessor):
@@ -68,13 +69,15 @@ class ClusterCodeProcessor(ElementProcessor):
             code = int(content)
         self._cluster.code = code
 
+
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
+
     def __init__(self, idl):
         self._cluster = Cluster(
-            side = ClusterSide.CLIENT,
-            name = None,
-            code = None,
+            side=ClusterSide.CLIENT,
+            name=None,
+            code=None,
         )
         self._idl = idl
 
@@ -116,10 +119,11 @@ class ZapXmlProcessor(ElementProcessor):
         else:
             return ElementProcessor()
 
+
 class ParseHandler(xml.sax.handler.ContentHandler):
     def __init__(self, filename):
         super(xml.sax.handler.ContentHandler, self).__init__()
-        self._idl = Idl(parse_file_name = filename)
+        self._idl = Idl(parse_file_name=filename)
         self._processing_stack = []
 
     def ProcessResults(self):
