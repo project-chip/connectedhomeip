@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,8 @@
 
 #include "AppConfig.h"
 
+#include <lib/support/CodeUtils.h>
+
 #include <drivers/pwm.h>
 #include <logging/log.h>
 #include <zephyr.h>
@@ -28,13 +30,16 @@ LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
-CHIP_ERROR LightingManager::Init(const device * pwmDevice, uint32_t pwmChannel)
+CHIP_ERROR LightingManager::Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t aMinLevel, uint8_t aMaxLevel,
+                                 uint8_t aDefaultLevel)
 {
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
 
     mState      = kState_On;
-    mLevel      = kMaxLevel;
+    mMinLevel   = aMinLevel;
+    mMaxLevel   = aMaxLevel;
+    mLevel      = aDefaultLevel;
     mPwmDevice  = pwmDevice;
     mPwmChannel = pwmChannel;
 
@@ -123,7 +128,9 @@ void LightingManager::Set(bool aOn)
 
 void LightingManager::UpdateLight()
 {
-    constexpr uint32_t kPwmWidthUs = 20000u;
-    const uint8_t level            = mState == kState_On ? mLevel : 0;
-    pwm_pin_set_usec(mPwmDevice, mPwmChannel, kPwmWidthUs, kPwmWidthUs * level / kMaxLevel, 0);
+    constexpr uint32_t kPwmWidthUs  = 20000u;
+    const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
+    const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
+
+    pwm_pin_set_usec(mPwmDevice, mPwmChannel, kPwmWidthUs, kPwmWidthUs * effectiveLevel / maxEffectiveLevel, 0);
 }
