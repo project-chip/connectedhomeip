@@ -59,13 +59,6 @@ def ParseAclRole(role: str) -> AccessPrivilege:
         raise Exception('Unknown ACL role: %r' % role)
 
 
-def GetParseMeta(locator: Optional[xml.sax.xmlreader.Locator]) -> ParseMetaData:
-    if not locator:
-        return None
-
-    return ParseMetaData(line=locator.getLineNumber(), column=locator.getColumnNumber())
-
-
 class ProcessingPath:
     def __init__(self, paths: List[str] = None):
         if paths is None:
@@ -90,6 +83,12 @@ class ProcessingContext:
         self.path = ProcessingPath()
         self.locator = locator
         self._not_handled = set()
+
+    def GetCurrentLocationMeta(self) -> ParseMetaData:
+        if not self.locator:
+            return None
+
+        return ParseMetaData(line=self.locator.getLineNumber(), column=self.locator.getColumnNumber())
 
     def MarkTagNotHandled(self):
         path = str(self.path)
@@ -235,7 +234,7 @@ class ClusterProcessor(ElementProcessor):
             side=ClusterSide.CLIENT,
             name=None,
             code=None,
-            parse_meta=GetParseMeta(context.locator),
+            parse_meta=context.GetCurrentLocationMeta()
         )
         self._idl = idl
 
