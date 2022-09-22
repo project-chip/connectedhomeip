@@ -208,7 +208,8 @@ void LogBufferAsHex(const char * label, const ByteSpan & span)
     size_t remaining = span.size();
     if (remaining == 0)
     {
-        ChipLogProgress(Support, "%s>>>", ((label != nullptr) ? label : ""));
+        chip::Logging::Log(chip::Logging::kLogModule_NotSpecified, chip::Logging::kLogCategory_None, "%s>>>",
+                           ((label != nullptr) ? label : ""));
         return;
     }
 
@@ -221,11 +222,13 @@ void LogBufferAsHex(const char * label, const ByteSpan & span)
         CHIP_ERROR err = BytesToUppercaseHexString(cursor, chunk_size, &hex_buf[0], sizeof(hex_buf));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(Support, "Failed to dump hex %" CHIP_ERROR_FORMAT, err.Format());
+            chip::Logging::Log(chip::Logging::kLogModule_NotSpecified, chip::Logging::kLogCategory_None,
+                               "Failed to dump hex %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        ChipLogProgress(Support, "%s>>>%s", ((label != nullptr) ? label : ""), hex_buf);
+        chip::Logging::Log(chip::Logging::kLogModule_NotSpecified, chip::Logging::kLogCategory_None, "%s>>>%s",
+                           ((label != nullptr) ? label : ""), hex_buf);
 
         cursor += chunk_size;
         remaining -= chunk_size;
