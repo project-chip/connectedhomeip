@@ -270,7 +270,7 @@ class ChipStack(object):
         # Initialize the chip stack.
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
             self._persistentStorage.GetSdkStorageObject(), enableServerInteractions)
-        res.success_or_raise()
+        res.raise_on_error()
 
         im.InitIMDelegate()
         ClusterAttribute.Init()

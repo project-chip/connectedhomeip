@@ -196,7 +196,7 @@ class CertificateAuthority:
             lambda: self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
         )
 
-        res.success_or_raise()
+        res.raise_on_error()
 
         self._maximizeCertChains = enabled
 

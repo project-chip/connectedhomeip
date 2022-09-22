@@ -56,7 +56,7 @@ class ChipCommissionableNodeController(object):
         commissionableNodeCtrl = c_void_p(None)
         res = self._dmLib.pychip_CommissionableNodeController_NewController(
             pointer(commissionableNodeCtrl))
-        res.success_or_raise()
+        res.raise_on_error()
 
         self.commissionableNodeCtrl = commissionableNodeCtrl
         self._ChipStack.commissionableNodeCtrl = commissionableNodeCtrl

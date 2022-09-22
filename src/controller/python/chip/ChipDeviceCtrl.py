@@ -226,7 +226,7 @@ class ChipDeviceController():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
                 opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags))
-        ).success_or_raise()
+        ).raise_on_error()
 
         self.devCtrl = devCtrl
         self._fabricAdmin = fabricAdmin
@@ -417,7 +417,7 @@ class ChipDeviceController():
         """
         self.CheckIsActive()
 
-        self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).success_or_raise()
+        self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
 
     # TODO: This needs to be called MarkSessionDefunct
     def CloseSession(self, nodeid):
@@ -626,7 +626,7 @@ class ChipDeviceController():
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
-                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00")).success_or_raise()
+                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00")).raise_on_error()
 
         if timeoutSecond != 0:
             if stopOnFirst:
@@ -749,7 +749,7 @@ class ChipDeviceController():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                 self.devCtrl, nodeid, timeout, iteration, discriminator, option)
-        ).success_or_raise()
+        ).raise_on_error()
 
     def GetCompressedFabricId(self):
         self.CheckIsActive()
@@ -759,7 +759,7 @@ class ChipDeviceController():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetCompressedFabricId(
                 self.devCtrl, pointer(fabricid))
-        ).success_or_raise()
+        ).raise_on_error()
 
         return fabricid.value
 
@@ -772,7 +772,7 @@ class ChipDeviceController():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetFabricId(
                 self.devCtrl, pointer(fabricid))
-        ).success_or_raise()
+        ).raise_on_error()
 
         return fabricid.value
 
@@ -785,7 +785,7 @@ class ChipDeviceController():
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetNodeId(
                 self.devCtrl, pointer(nodeid))
-        ).success_or_raise()
+        ).raise_on_error()
 
         return nodeid.value
 
@@ -820,7 +820,7 @@ class ChipDeviceController():
                 return DeviceProxyWrapper(returnDevice)
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs).success_or_raise()
+            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs).raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
@@ -835,7 +835,7 @@ class ChipDeviceController():
                     raise TimeoutError("Timed out waiting for DNS-SD resolution")
 
         if returnDevice.value is None:
-            returnErr.success_or_raise()
+            returnErr.raise_on_error()
 
         return DeviceProxyWrapper(returnDevice, self._dmLib)
 
@@ -873,7 +873,7 @@ class ChipDeviceController():
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).success_or_raise()
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).raise_on_error()
         return await future
 
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
@@ -906,7 +906,7 @@ class ChipDeviceController():
                     v[0], v[1], v[2], 1, v[1].value))
 
         ClusterAttribute.WriteAttributes(
-            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).success_or_raise()
+            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).raise_on_error()
         return await future
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
@@ -1086,7 +1086,7 @@ class ChipDeviceController():
             v) for v in events] if events else None
 
         ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
-                              subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions).success_or_raise()
+                              subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions).raise_on_error()
         return await future
 
     async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
