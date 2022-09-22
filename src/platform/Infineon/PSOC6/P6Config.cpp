@@ -198,7 +198,7 @@ CHIP_ERROR P6Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t d
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&data), dataLen);
+    return PersistedStorage::KeyValueStoreMgr().Put(key_str, data, dataLen);
 }
 
 CHIP_ERROR P6Config::ClearConfigValue(Key key)

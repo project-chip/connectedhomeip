@@ -37,7 +37,7 @@ void ButtonHandler::Init(void)
     for (uint8_t i = 0; i < kButtonCount; i++)
     {
         buttonTimers[i] = xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
-                                       APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
+                                       APP_BUTTON_MIN_ASSERT_TIME_MS, // timer period
                                        false,                         // no timer reload (==one-shot)
                                        (void *) (int) i,              // init timer id = button index
                                        TimerCallback                  // timer callback handler (all buttons use
@@ -88,8 +88,8 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
 {
     // Get the button index of the expired timer and call button event helper.
     uint32_t timerId;
-    uint8_t buttonevent = 0;
-    timerId             = (uint32_t) pvTimerGetTimerID(xTimer);
+    uint8_t buttonevent;
+    timerId = (uint32_t) pvTimerGetTimerID(xTimer);
     if (timerId)
     {
         buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
@@ -98,7 +98,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     {
         buttonevent = cyhal_gpio_read(APP_LIGHT_BUTTON);
     }
-    if (buttonevent)
+    if (!buttonevent)
     {
         GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
     }
