@@ -169,7 +169,7 @@ class AttributeDescriptionProcessor(ElementProcessor):
 
 class ClusterCodeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, cluster):
-        super().__init__(context)
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
     def HandleContent(self, content):
@@ -308,7 +308,10 @@ class ClusterProcessor(ElementProcessor):
             return ClusterNameProcessor(self.context, self._cluster)
         elif name.lower() == 'attribute':
             return AttributeProcessor(self.context, self._cluster, attrs)
-        elif name.lower() in ['define', 'description', 'domain']:
+        elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
+            # NOTE: we COULD use client and server to create separate definitions
+            #       of each, but the usefulness of this is unclear as the definitions are
+            #       likely identical and matter has no concept of differences between the two
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return ElementProcessor(self.context)
@@ -324,7 +327,7 @@ class ClusterProcessor(ElementProcessor):
 
 class ConfiguratorProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, idl: Idl):
-        super().__init__(context)
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._idl = idl
 
     def GetNextProcessor(self, name, attrs):
