@@ -360,7 +360,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         self._processing_stack = []
         self._context = None
 
-    def ProcessResults(self):
+    def ProcessResults(self) -> Idl:
         return self._idl
 
     def startDocument(self):
@@ -373,12 +373,12 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
         self._context.PostProcess(self._idl)
 
-    def startElement(self, name, attrs):
+    def startElement(self, name: str, attrs):
         logging.debug("ELEMENT START: %r / %r" % (name, attrs))
         self._context.path.push(name)
         self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs))
 
-    def endElement(self, name):
+    def endElement(self, name: str):
         logging.debug("ELEMENT END: %r" % name)
 
         last = self._processing_stack.pop()
@@ -392,7 +392,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         self._processing_stack[-1].HandleContent(content)
 
 
-def ParseXml(filename_or_stream, filename):
+def ParseXml(filename_or_stream, filename: str) -> Idl:
     handler = ParseHandler(filename)
     parser = xml.sax.make_parser()
     parser.setContentHandler(handler)
