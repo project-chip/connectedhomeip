@@ -108,7 +108,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .encryptedLength = 30,
         .privacyLength   = 30,
 
-        // NOTE: unicast message tests must use test key currently
+        // TODO(#22830): unicast message tests must use test key currently
         .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
         .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
@@ -132,7 +132,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .encryptedLength = 35,
         .privacyLength   = 35,
 
-        // NOTE: unicast message tests must use test key currently
+        // TODO(#22830): unicast message tests must use test key currently
         .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
         .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
@@ -283,11 +283,10 @@ void TestSessionManagerInit(nlTestSuite * inSuite, TestContext & ctx, SessionMan
 static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
 constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
 
-SessionHandle InjectGroupSessionWithTestKey(nlTestSuite * inSuite, MessageTestEntry & testEntry)
+CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageTestEntry & testEntry)
 {
     constexpr uint16_t kKeySetIndex = 0x0;
 
-    CHIP_ERROR err               = CHIP_NO_ERROR;
     GroupId groupId              = testEntry.groupId;
     GroupDataProvider * provider = GetGroupDataProvider();
 
@@ -303,15 +302,14 @@ SessionHandle InjectGroupSessionWithTestKey(nlTestSuite * inSuite, MessageTestEn
         sGroupInfo.group_id              = groupId;
         sGroupKeySet.group_id            = groupId;
 
-        err = provider->SetKeySet(kFabricIndex, kCompressedFabricId1, sKeySet);
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
-        err = provider->SetGroupKeyAt(kFabricIndex, kGroupIndex, sGroupKeySet);
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
-        err = provider->SetGroupInfoAt(kFabricIndex, kGroupIndex, sGroupInfo);
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+        ReturnErrorOnFailure(provider->SetKeySet(kFabricIndex, kCompressedFabricId1, sKeySet));
+        ReturnErrorOnFailure(provider->SetGroupKeyAt(kFabricIndex, kGroupIndex, sGroupKeySet));
+        ReturnErrorOnFailure(provider->SetGroupInfoAt(kFabricIndex, kGroupIndex, sGroupInfo));
     }
 
-    return SessionHandle(sSessionBobToFriends);
+    sessionHolder = SessionHandle(sSessionBobToFriends);
+
+    return CHIP_NO_ERROR;
 }
 
 void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
@@ -330,6 +328,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SessionHolder aliceToBobSession;
+    SessionHolder testGroupSession;
 
     callback.mSuite = inSuite;
     for (unsigned i = 0; i < theMessageTestVectorLength; i++)
@@ -339,7 +338,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 
         ChipLogProgress(Test, "===> TestSessionManagerDispatch[%d] '%s': sessionId=0x%04x", i, testEntry.name, testEntry.sessionId);
 
-        // TODO: inject raw keys rather than always defaulting to test key
+        // TODO(#22830): inject raw keys rather than always defaulting to test key
         // TODO: switch on session type
 
         // Inject Sessions
@@ -348,7 +347,8 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
                                                           CryptoContext::SessionRole::kResponder);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        InjectGroupSessionWithTestKey(inSuite, testEntry);
+        err = InjectGroupSessionWithTestKey(testGroupSession, testEntry);
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
         const char * plain = testEntry.plain;
         const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
