@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -2427,9 +2427,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
-    // Append string terminating character.
-    mdnsService.mHostName[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mHostName, serviceInfo.mHostNameBuffer);
 
     if (strchr(serviceType, '.') == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -2440,9 +2438,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mType, serviceType, substringSize);
-    // Append string terminating character.
-    mdnsService.mType[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mType, serviceType);
 
     // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
     const char * protocolSubstringStart = serviceType + substringSize + 1;
@@ -2455,9 +2451,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(protocol, protocolSubstringStart, substringSize);
-    // Append string terminating character.
-    protocol[substringSize] = '\0';
+    Platform::CopyString(protocol, protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {

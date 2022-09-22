@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ constexpr uint16_t kUDPBroadcastPort = 23367;
 
 void SetDeviceName(const char * newDeviceName)
 {
-    strncpy(sDeviceName, newDeviceName, sizeof(sDeviceName) - 1);
+    chip::Platform::CopyString(sDeviceName, newDeviceName);
 }
 
 void PublishService()
