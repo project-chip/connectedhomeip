@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import logging
+import os
+import xml.sax;
+import xml.sax.handler;
+
+try:
+    from idl.matter_idl_types import *
+except:
+    import sys
+
+    sys.path.append(os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..')))
+    from idl.matter_idl_types import *
+
+class ParseHandler(xml.sax.handler.ContentHandler):
+    def __init__(self, filename):
+        super(xml.sax.handler.ContentHandler, self).__init__()
+        self._idl = Idl(parse_file_name = filename)
+
+    def ProcessResults(self):
+        return self._idl
+
+def ParseXml(filename_or_stream, filename):
+    handler = ParseHandler(filename)
+    parser = xml.sax.make_parser()
+    parser.setContentHandler(handler)
+    parser.parse(filename_or_stream)
+
+    return handler.ProcessResults()
+
+
+if __name__ == '__main__':
+    # This Parser is generally not intended to be run as a stand-alone binary.
+    # The ability to run is for debug and to print out the parsed AST.
+    import click
+    import coloredlogs
+    import pprint
+
+    # Supported log levels, mapping string values required for argument
+    # parsing into logging constants
+    __LOG_LEVELS__ = {
+        'debug': logging.DEBUG,
+        'info': logging.INFO,
+        'warn': logging.WARN,
+        'fatal': logging.FATAL,
+    }
+
+    @click.command()
+    @click.option(
+        '--log-level',
+        default='INFO',
+        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        help='Determines the verbosity of script output.')
+    @click.argument('filename')
+    def main(log_level, filename=None):
+        coloredlogs.install(level=__LOG_LEVELS__[
+                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+
+        logging.info("Starting to parse ...")
+        data = ParseXml(filename, filename)
+        logging.info("Parse completed")
+
+        logging.info("Data:")
+        pprint.pp(data)
+
+    main()
