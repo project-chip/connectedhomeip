@@ -192,7 +192,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          saveAs: CurrentSaturationValue
           constraints:
               minValue: 170
               maxValue: 230
@@ -210,7 +209,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: CurrentSaturationValue
+          constraints:
+              minValue: 170
+              maxValue: 230
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.A400b
@@ -306,7 +307,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          saveAs: ColorTemperatureStep4f
           constraints:
               minValue: ColorTempPhysicalMinMireds
               maxValue: ColorTempPhysicalMaxMireds
@@ -324,7 +324,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          value: ColorTemperatureStep4f
+          constraints:
+              minValue: ColorTempPhysicalMinMireds
+              maxValue: ColorTempPhysicalMaxMireds
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=20000,
@@ -391,7 +393,6 @@ tests:
       PICS: CC.S.A4000 && CC.S.C47.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          saveAs: EnhancedCurrentHueValue
           constraints:
               minValue: 21250
               maxValue: 28750
@@ -409,7 +410,9 @@ tests:
       PICS: CC.S.A4000 && CC.S.C47.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          value: EnhancedCurrentHueValue
+          constraints:
+              minValue: 21250
+              maxValue: 28750
 
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
