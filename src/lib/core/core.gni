@@ -47,6 +47,9 @@ declare_args() {
   # Configure chip logging to output through pigweed logging.
   chip_use_pw_logging = false
 
+  # Configure chip logging to output through external logging implementation.
+  chip_use_external_logging = false
+
   # Enable short error strings.
   chip_config_short_error_str = false
 
