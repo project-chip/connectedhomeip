@@ -67,20 +67,35 @@ def GetParseMeta(locator: Optional[xml.sax.xmlreader.Locator]) -> ParseMetaData:
 
 
 class ProcessingPath:
-    def __init__(self, name: Union[str, List[str]]):
-        if isinstance(name, list):
-            self.paths = name
-        else:
-            self.paths = [name]
+    def __init__(self, paths: List[str] = None):
+        if paths is None:
+            paths = []
+        self.paths = paths
 
-    def add(self, name: str):
-        return ProcessingPath(self.paths[:] + [name])
+    def push(self, name: str):
+        self.paths.append(name)
+
+    def pop(self):
+        self.paths.pop()
 
     def __str__(self):
         return '::'.join(self.paths)
 
     def __repr__(self):
         return 'ProcessingPath(%r)' % self.paths
+
+
+class ProcessingContext:
+    def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
+        self.path = ProcessingPath()
+        self.locator = locator
+        self._not_handled = set()
+
+    def MarkTagNotHandled(self):
+        path = str(self.path)
+        if path not in self._not_handled:
+            logging.warning("TAG %s was not handled/recognized" % path)
+            self._not_handled.add(path)
 
 
 class ElementProcessor:
@@ -91,11 +106,11 @@ class ElementProcessor:
        the stack and poped once the element ends.
     """
 
-    def __init__(self, path: ProcessingPath, handled=HandledDepth.NOT_HANDLED):
-        self.path = path
+    def __init__(self, context: ProcessingContext, handled=HandledDepth.NOT_HANDLED):
+        self.context = context
         self._handled = handled
 
-    def GetNextProcessor(self, name, attrs, locator: Optional[xml.sax.xmlreader.Locator]):
+    def GetNextProcessor(self, name, attrs):
         """Get the next processor to use for the given name"""
 
         if self._handled == HandledDepth.SINGLE_TAG:
@@ -103,7 +118,7 @@ class ElementProcessor:
         else:
             handled = self._handled
 
-        return ElementProcessor(path=self.path.add(name), handled=handled)
+        return ElementProcessor(context=self.context, handled=handled)
 
     def HandleContent(self, content):
         """Processes some content"""
@@ -112,12 +127,12 @@ class ElementProcessor:
     def EndProcessing(self):
         """Finalizes the processing of the current element"""
         if self._handled == HandledDepth.NOT_HANDLED:
-            logging.warning("Did not have a dedicated handler for %s" % self.path)
+            self.context.MarkTagNotHandled()
 
 
 class ClusterNameProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, cluster):
-        super().__init__(path, handled=HandledDepth.SINGLE_TAG)
+    def __init__(self, context: ProcessingContext, cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
     def HandleContent(self, content):
@@ -125,8 +140,8 @@ class ClusterNameProcessor(ElementProcessor):
 
 
 class AttributeDescriptionProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, attribute):
-        super().__init__(path, handled=HandledDepth.SINGLE_TAG)
+    def __init__(self, context: ProcessingContext, attribute):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._attribute = attribute
 
     def HandleContent(self, content):
@@ -134,8 +149,8 @@ class AttributeDescriptionProcessor(ElementProcessor):
 
 
 class ClusterCodeProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, cluster):
-        super().__init__(path)
+    def __init__(self, context: ProcessingContext, cluster):
+        super().__init__(context)
         self._cluster = cluster
 
     def HandleContent(self, content):
@@ -143,8 +158,8 @@ class ClusterCodeProcessor(ElementProcessor):
 
 
 class AttributeProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, cluster, attrs):
-        super().__init__(path)
+    def __init__(self, context: ProcessingContext, cluster, attrs):
+        super().__init__(context)
         self._cluster = cluster
 
         if attrs['type'].lower() == 'array':
@@ -183,7 +198,7 @@ class AttributeProcessor(ElementProcessor):
         # TODO: do we care about default value at all?
         #       General storage of default only applies to instantiation
 
-    def GetNextProcessor(self, name, attrs, locator):
+    def GetNextProcessor(self, name, attrs):
         if name.lower() == 'access':
             if attrs['op'] == 'read':
                 self._attribute.readacl = ParseAclRole(attrs['role'])
@@ -191,11 +206,11 @@ class AttributeProcessor(ElementProcessor):
                 self._attribute.writeacl = ParseAclRole(attrs['role'])
             else:
                 logging.warning("Unknown access: %r" % attrs['op'])
-            return ElementProcessor(self.path.add(name), handled=HandledDepth.SINGLE_TAG)
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
-            return AttributeDescriptionProcessor(self.path.add(name), self._attribute)
+            return AttributeDescriptionProcessor(self.context, self._attribute)
         else:
-            return ElementProcessor(self.path.add(name))
+            return ElementProcessor(self.context)
 
     def HandleContent(self, content):
         # Content generally is the name EXCEPT if access controls
@@ -214,8 +229,8 @@ class AttributeProcessor(ElementProcessor):
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
 
-    def __init__(self, path: ProcessingPath, idl: Idl, parse_meta: Optional[ParseMetaData]):
-        super().__init__(path)
+    def __init__(self, context: ProcessingContext, idl: Idl, parse_meta: Optional[ParseMetaData]):
+        super().__init__(context)
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
             name=None,
@@ -224,17 +239,17 @@ class ClusterProcessor(ElementProcessor):
         )
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs, locator):
+    def GetNextProcessor(self, name, attrs):
         if name.lower() == 'code':
-            return ClusterCodeProcessor(self.path.add(name), self._cluster)
+            return ClusterCodeProcessor(self.context, self._cluster)
         elif name.lower() == 'name':
-            return ClusterNameProcessor(self.path.add(name), self._cluster)
+            return ClusterNameProcessor(self.context, self._cluster)
         elif name.lower() == 'attribute':
-            return AttributeProcessor(self.path.add(name), self._cluster, attrs)
+            return AttributeProcessor(self.context, self._cluster, attrs)
         elif name.lower() in ['define', 'description', 'domain']:
-            return ElementProcessor(self.path.add(name), handled=HandledDepth.ENTIRE_TREE)
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
-            return ElementProcessor(self.path.add(name))
+            return ElementProcessor(self.context)
 
     def EndProcessing(self):
         if self._cluster.name is None:
@@ -246,29 +261,29 @@ class ClusterProcessor(ElementProcessor):
 
 
 class ConfiguratorProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, idl: Idl):
-        super().__init__(path)
+    def __init__(self, context: ProcessingContext, idl: Idl):
+        super().__init__(context)
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs, locator):
+    def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
-            return ClusterProcessor(self.path.add(name), self._idl, GetParseMeta(locator))
+            return ClusterProcessor(self.context, self._idl, GetParseMeta(self.context.locator))
         elif name.lower() == 'domain':
-            return ElementProcessor(self.path.add(name), handled=HandledDepth.ENTIRE_TREE)
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
-            return ElementProcessor(self.path.add(name))
+            return ElementProcessor(self.context)
 
 
 class ZapXmlProcessor(ElementProcessor):
-    def __init__(self, path: ProcessingPath, idl: Idl):
-        super().__init__(path)
+    def __init__(self, context: ProcessingContext, idl: Idl):
+        super().__init__(context)
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs, locator):
+    def GetNextProcessor(self, name, attrs):
         if name.lower() == 'configurator':
-            return ConfiguratorProcessor(self.path.add(name), self._idl)
+            return ConfiguratorProcessor(self.context, self._idl)
         else:
-            return ElementProcessor(self.path.add(name))
+            return ElementProcessor(self.context)
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
@@ -276,12 +291,13 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         super().__init__()
         self._idl = Idl(parse_file_name=filename)
         self._processing_stack = []
+        self._context = ProcessingContext()
 
     def ProcessResults(self):
         return self._idl
 
     def startDocument(self):
-        self._processing_stack = [ZapXmlProcessor(ProcessingPath([]), self._idl)]
+        self._processing_stack = [ZapXmlProcessor(self._context, self._idl)]
 
     def endDocument(self):
         if len(self._processing_stack) != 1:
@@ -289,12 +305,18 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
     def startElement(self, name, attrs):
         logging.debug("ELEMENT START: %r / %r" % (name, attrs))
-        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs, self._locator))
+        self._context.path.push(name)
+        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs))
 
     def endElement(self, name):
         logging.debug("ELEMENT END: %r" % name)
+
         last = self._processing_stack.pop()
         last.EndProcessing()
+
+        # important to pop AFTER processing end to allow processing
+        # end to access the current context
+        self._context.path.pop()
 
     def characters(self, content):
         self._processing_stack[-1].HandleContent(content)
