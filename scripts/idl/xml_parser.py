@@ -88,7 +88,6 @@ class IdlPostProcessor:
         pass
 
 
-
 class ProcessingContext:
     def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
         self.path = ProcessingPath()
@@ -116,6 +115,7 @@ class ProcessingContext:
             p.FinalizeProcessing(idl)
 
         self._idl_post_processors = []
+
 
 class ElementProcessor:
     """A generic element processor.
@@ -244,11 +244,12 @@ class AttributeProcessor(ElementProcessor):
 
         self._cluster.attributes.append(self._attribute)
 
+
 class EnumProcessor(ElementProcessor, IdlPostProcessor):
     def __init__(self, context: ProcessingContext, attrs):
         super().__init__(context)
-        self._cluster_code = None # if set, enum belongs to a specific cluster
-        self._enum = Enum(name=attrs['name'], base_type=attrs['type'], entries = [])
+        self._cluster_code = None  # if set, enum belongs to a specific cluster
+        self._enum = Enum(name=attrs['name'], base_type=attrs['type'], entries=[])
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'item':
@@ -280,7 +281,8 @@ class EnumProcessor(ElementProcessor, IdlPostProcessor):
                     found = True
 
             if not found:
-                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' % (self._enum.name, self._cluster_code, self._cluster_code))
+                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' %
+                                (self._enum.name, self._cluster_code, self._cluster_code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
