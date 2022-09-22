@@ -166,13 +166,14 @@ tests:
           "TH reads RxErrInvalidScrAddrCount attribute value from DUT and verify
           data type"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read rx-err-invalid-src-addr-count 476 0
+          ./chip-tool threadnetworkdiagnostics read rx-err-invalid-src-addr-count 54 0
+          Verify "RxErrInvalidSrcAddrCount response" on the TH(Chip-tool) Log:
 
-           [1649826953.827775][3727:3732] CHIP:DMG:        SuppressResponse = true,
-           [1649826953.827837][3727:3732] CHIP:DMG:        InteractionModelRevision = 1
-           [1649826953.827894][3727:3732] CHIP:DMG: }
-           [1649826953.828197][3727:3732] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0034 DataVersion: 2758196590
-           [1649826953.828346][3727:3732] CHIP:TOO:   RxErrInvalidSrcAddrCount: 0
+          [1649826953.827775][3727:3732] CHIP:DMG:        SuppressResponse = true,
+          [1649826953.827837][3727:3732] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826953.827894][3727:3732] CHIP:DMG: }
+          [1649826953.828197][3727:3732] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0034 DataVersion: 2758196590
+          [1649826953.828346][3727:3732] CHIP:TOO:   RxErrInvalidSrcAddrCount: 0
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGTHREAD.S.A0034
