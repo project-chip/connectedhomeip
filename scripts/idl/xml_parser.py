@@ -46,7 +46,14 @@ def ParseInt(value: str) -> int:
         return int(value)
 
 
-def ParseAclRole(role: str) -> AccessPrivilege:
+def ParseAclRole(attrs) -> AccessPrivilege:
+    # XML seems to use both role and privilege to mean the same thing
+    # they are used interchangeably
+    if 'role' in attrs:
+        role = attrs['role']
+    else:
+        role = attrs['privilege']
+
     if role.lower() == 'view':
         return AccessPrivilege.VIEW
     elif role.lower() == 'operate':
@@ -219,12 +226,7 @@ class AttributeProcessor(ElementProcessor):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'access':
-
-            # both role and privilege exist in XML
-            if 'role' in attrs:
-                role = ParseAclRole(attrs['role'])
-            else:
-                role = ParseAclRole(attrs['privilege'])
+            role = ParseAclRole(attrs)
 
             if attrs['op'] == 'read':
                 self._attribute.readacl = role
@@ -250,6 +252,7 @@ class AttributeProcessor(ElementProcessor):
             raise Exception("Name for attribute was not parsed.")
 
         self._cluster.attributes.append(self._attribute)
+
 
 class StructProcessor(ElementProcessor, IdlPostProcessor):
     def __init__(self, context: ProcessingContext, attrs):
@@ -279,15 +282,14 @@ class StructProcessor(ElementProcessor, IdlPostProcessor):
                 #       this seems a defficiency in XML format.
                 self._field_index += 1
 
-
             if 'length' in attrs:
                 data_type.max_length = ParseInt(attrs['length'])
 
             field = Field(
-                data_type = data_type,
+                data_type=data_type,
                 code=self._field_index,
                 name=attrs['name'],
-                is_list = (attrs.get('array', 'false').lower() == 'true'),
+                is_list=(attrs.get('array', 'false').lower() == 'true'),
             )
 
             if attrs.get('optional', "false").lower() == 'true':
