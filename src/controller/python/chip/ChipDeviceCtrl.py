@@ -402,10 +402,10 @@ class ChipDeviceController():
     def CloseBLEConnection(self):
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(
                 self.devCtrl)
-        )
+        ).raise_on_error()
 
     def ExpireSessions(self, nodeid):
         """Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
@@ -423,10 +423,10 @@ class ChipDeviceController():
     def CloseSession(self, nodeid):
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_CloseSession(
                 self.devCtrl, nodeid)
-        )
+        ).raise_on_error()
 
     def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
         self.CheckIsActive()
@@ -572,18 +572,18 @@ class ChipDeviceController():
     def SetWiFiCredentials(self, ssid: str, credentials: str):
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid.encode("utf-8"), credentials.encode("utf-8"))
-        )
+        ).raise_on_error()
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
                 threadOperationalDataset, len(threadOperationalDataset))
-        )
+        ).raise_on_error()
 
     def ResolveNode(self, nodeid):
         self.CheckIsActive()
@@ -645,57 +645,57 @@ class ChipDeviceController():
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(
                 self.devCtrl, long_discriminator)
-        )
+        ).raise_on_error()
 
     def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
         ''' Deprecated, use DiscoverCommissionableNodes
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(
                 self.devCtrl, short_discriminator)
-        )
+        ).raise_on_error()
 
     def DiscoverCommissionableNodesVendor(self, vendor):
         ''' Deprecated, use DiscoverCommissionableNodes
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor(
                 self.devCtrl, vendor)
-        )
+        ).raise_on_error()
 
     def DiscoverCommissionableNodesDeviceType(self, device_type):
         ''' Deprecated, use DiscoverCommissionableNodes
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType(
                 self.devCtrl, device_type)
-        )
+        ).raise_on_error()
 
     def DiscoverCommissionableNodesCommissioningEnabled(self):
         ''' Deprecated, use DiscoverCommissionableNodes
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(
                 self.devCtrl)
-        )
+        ).raise_on_error()
 
     def PrintDiscoveredDevices(self):
         ''' Deprecated, use GetCommissionableNodes
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_PrintDiscoveredDevices(
                 self.devCtrl)
         )
@@ -738,10 +738,10 @@ class ChipDeviceController():
         '''
         self.CheckIsActive()
 
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes(
                 self.devCtrl)
-        )
+        ).raise_on_error()
 
     def OpenCommissioningWindow(self, nodeid, timeout, iteration, discriminator, option):
         self.CheckIsActive()
@@ -1402,6 +1402,8 @@ class ChipDeviceController():
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
 
             self._dmLib.pychip_TestCommissioningCallbacks.argtypes = []
+            self._dmLib.pychip_TestCommissioningCallbacks.restype = c_bool
+
             self._dmLib.pychip_ResetCommissioningTests.argtypes = []
             self._dmLib.pychip_TestPaseConnection.argtypes = [c_uint64]
 
