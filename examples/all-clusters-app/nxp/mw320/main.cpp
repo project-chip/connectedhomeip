@@ -46,8 +46,12 @@
 #include <ChipShellCollection.h>
 
 // cr++
+#if (defined (CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+#include "FactoryDataProvider.h"
+#else
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif // if CONFIG_CHIP_MW320_REAL_FACTORY_DATA
 // cr--
 // ota++
 #include "app/clusters/ota-requestor/BDXDownloader.h"
@@ -106,6 +110,7 @@ enum
 static int Matter_Selection = MAX_SELECTION;
 #define RUN_RST_LT_DELAY 10
 static const char * TAG = "mw320";
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -117,6 +122,9 @@ const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
 portSTACK_TYPE * task_main_stack = NULL;
 TaskHandle_t task_main_task_handler;
+
+uint8_t *__FACTORY_DATA_START;
+uint32_t __FACTORY_DATA_SIZE;
 
 #if CHIP_ENABLE_OPENTHREAD
 extern "C" {
@@ -1033,7 +1041,16 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     // Init ZCL Data Model and CHIP App Server
     {
         // Initialize device attestation config
+#if (defined (CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+        FactoryDataProvider::GetDefaultInstance().Init();
+    #if (CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER == 1)
+        SetDeviceInstanceInfoProvider(&FactoryDataProvider::GetDefaultInstance());
+    #endif // USE_LOCAL_DEVICEINSTANCEINFOPROVIDER
+        SetDeviceAttestationCredentialsProvider(&FactoryDataProvider::GetDefaultInstance());
+        SetCommissionableDataProvider(&FactoryDataProvider::GetDefaultInstance());
+#else
         SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_CHIP_MW320_REAL_FACTORY_DATA
     }
     {
         //    chip::Server::GetInstance().Init();
@@ -1152,6 +1169,8 @@ void init_mw320_sdk()
     short history = 0;
     uint32_t * wififw;
     struct partition_entry * psm;
+    struct partition_entry * manu_dat;
+    uint8_t * pmfdat;
 
     PRINTF("=> init mw320 sdk \r\n");
     PRINTF("call mcuInitPower() \r\n");
@@ -1165,6 +1184,13 @@ void init_mw320_sdk()
     part_to_flash_desc(psm, &fl);
     init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
     PRINTF("[PSM]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+
+    manu_dat = part_get_layout_by_id(FC_COMP_USER_APP, NULL);
+    part_to_flash_desc(manu_dat, &fl);
+    PRINTF("[Manufacture_Data]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+    pmfdat = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
+    __FACTORY_DATA_START = pmfdat;
+    __FACTORY_DATA_SIZE = (uint32_t)fl.fl_size;
 
     f1 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     f2 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);

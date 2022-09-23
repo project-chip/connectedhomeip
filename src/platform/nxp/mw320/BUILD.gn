@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/platform/device.gni")
+import("//build_overrides/mw320_sdk.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
+
 
 assert(chip_device_platform == "mw320")
 
@@ -59,6 +61,13 @@ static_library("mw320") {
     "mw320_ota.cpp",
     "mw320_ota.h",
   ]
+
+  if ( chip_with_factory_data == 1 ) {
+    sources += [
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
 
   defines = [ "MW320_LOG_ENABLED=1" ]
   # Do Sync-connect/scan

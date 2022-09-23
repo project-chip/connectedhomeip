@@ -22,6 +22,7 @@ declare_args() {
   # Location of the mw320 SDK.
   mw320_sdk_root = "${chip_root}/third_party/nxp/mw320_sdk/repo"
   #mbedtls_use_tinycrypt = false
+  chip_with_factory_data = 0
 }
 
 assert(mw320_sdk_root != "", "mw320_sdk_root must be specified")
@@ -109,6 +110,13 @@ template("mw320_sdk") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
+
+   if (chip_with_factory_data == 1) {
+      defines += [
+        "CONFIG_CHIP_MW320_REAL_FACTORY_DATA=1",
+      ]
+    }
+
 
     cflags = [
       "-Wno-unused-function",

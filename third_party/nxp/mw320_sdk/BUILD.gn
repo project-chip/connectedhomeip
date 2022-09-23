@@ -69,6 +69,16 @@ config("mbedtls_mw320_config") {
 
     #    "MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED",
   ]
+
+  if (chip_with_factory_data == 1) {
+    defines += [
+      "MBEDTLS_X509_CRT_PARSE_C",
+      "MBEDTLS_X509_USE_C",
+      "MBEDTLS_PK_PARSE_C",
+      "MBEDTLS_PLATFORM_C",
+    ]
+  }
+
   #if (mbedtls_use_tinycrypt) {
   if (chip_crypto == "tinycrypt") {
     defines += [
