@@ -284,6 +284,9 @@ class EventProcessor(ElementProcessor):
 
             self._event.fields.append(field)
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'access':
+            self._event.readacl = ParseAclRole(attrs)
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
@@ -594,6 +597,23 @@ class CommandProcessor(ElementProcessor):
         if self._command:
             self._cluster.commands.append(self._command)
 
+class ClusterGlobalAttributeProcessor(ElementProcessor):
+    def __init__(self, context: ProcessingContext, cluster: Cluster, code: int):
+        self._cluster = cluster
+        self._code = code
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'featurebit':
+            # It is uncler what featurebits mean. likely a bitmap should be created
+            # here, however only one such example exists currently: door-lock-cluster.xml
+            logging.info('Ignoring featurebit tag for global attribute 0x%X (%d)' % (self._code, self._code))
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return ElementProcessor(self.context)
+
+    def EndProcessing(self):
+        self._cluster.attributes.append(self.context.GetGlobalAttribute(self._code)
+
 
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
@@ -619,8 +639,7 @@ class ClusterProcessor(ElementProcessor):
             return EventProcessor(self.context, self._cluster, attrs)
         elif name.lower() == 'globalattribute':
             # We ignore 'side' and 'value' since they do not seem useful
-            self._cluster.attributes.append(self.context.GetGlobalAttribute(ParseInt(attrs['code'])))
-            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+            return ClusterGlobalAttributeProcessor(self.context, ParseInt(attrs['code']))
         elif name.lower() == 'command':
             return CommandProcessor(self.context, self._cluster, attrs)
         elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
@@ -696,6 +715,21 @@ class ConfiguratorProcessor(ElementProcessor):
         elif name.lower() == 'bitmap':
             return BitmapProcessor(self.context, attrs)
         elif name.lower() == 'domain':
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name.lower() == 'accesscontrol':
+            # These contain operation/role/modifier and generally only contain a 
+            # description. These do not seem as useful to parse.
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name.lower() == 'atomic':
+            # A list of types in 'chip-types'
+            # Generally does not seem useful - matches a type id to a description, size and some discrete/analog flags
+            #
+            # Could be eventually used as a preload of types into base types, however matter idl
+            # generator logic has hardcoded sizing as well.
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name.lower() == 'devicetype':
+            # A list of device types in 'matter-devices.xml'
+            # Useful for conformance tests, but does not seem usable for serialization logic
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name.lower() == 'global':
             return GlobalProcessor(self.context)
