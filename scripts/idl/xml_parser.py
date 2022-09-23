@@ -430,7 +430,11 @@ class BitmapProcessor(ElementProcessor):
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
         if self._cluster_code is None:
-            raise Exception("Bitmap %r has no cluster code" % self._bitmap)
+            # Log only instead of critical, as not our XML is well formed.
+            # For example at the time of writing this, SwitchFeature in switch-cluster.xml
+            # did not have a code associated with it.
+            logging.error("Bitmap %r has no cluster code" % self._bitmap)
+            return
 
         found = False
         for c in idl.clusters:
