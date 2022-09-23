@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -24,11 +24,9 @@
 
 using namespace chip::app::Clusters::Actions;
 
-// LightingManager LightingManager::sLight;
-
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
-    strncpy(mName, szDeviceName, sizeof(mName));
+    chip::Platform::CopyString(mName, szDeviceName);
     mLocation   = szLocation;
     mReachable  = false;
     mEndpointId = 0;
@@ -66,7 +64,7 @@ void Device::SetName(const char * szName)
 
     ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
 
-    strncpy(mName, szName, sizeof(mName));
+    chip::Platform::CopyString(mName, szName);
 
     if (changed)
     {

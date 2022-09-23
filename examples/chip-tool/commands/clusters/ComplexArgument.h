@@ -24,6 +24,7 @@
 #include <json/json.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
 #include "JsonParser.h"
@@ -195,7 +196,7 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
-        strncpy(buffer, value.asCString(), size);
+        chip::Platform::CopyString(buffer, size, value.asCString());
 
         request = chip::CharSpan(buffer, size);
         return CHIP_NO_ERROR;
