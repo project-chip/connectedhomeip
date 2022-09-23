@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,14 +111,13 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
             candidate.productId       = static_cast<uint16_t>(iter.get("productId", 1).asUInt());
             candidate.softwareVersion = static_cast<uint32_t>(iter.get("softwareVersion", 10).asUInt64());
-            strncpy(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString(),
-                    OTAProviderExample::SW_VER_STR_MAX_LEN);
+            chip::Platform::CopyString(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString());
             candidate.cDVersionNumber              = static_cast<uint16_t>(iter.get("cDVersionNumber", 0).asUInt());
             candidate.softwareVersionValid         = iter.get("softwareVersionValid", true).asBool() ? true : false;
             candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(iter.get("minApplicableSoftwareVersion", 0).asUInt64());
             candidate.maxApplicableSoftwareVersion =
                 static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
-            strncpy(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString(), OTAProviderExample::OTA_URL_MAX_LEN);
+            chip::Platform::CopyString(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString());
             candidates.push_back(candidate);
             ret = true;
         }

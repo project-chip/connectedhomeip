@@ -226,12 +226,7 @@
         "TestCommissioningWindow"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
-    "SoftwareDiagnostics": [
-        "Test_TC_DGSW_1_1",
-        "Test_TC_DGSW_2_1",
-        "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
-    ],
+    "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
     "Subscriptions": ["TestSubscribe_OnOff"],
     "DoorLock": [
         "DL_UsersAndCredentials",

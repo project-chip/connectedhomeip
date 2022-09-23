@@ -151,7 +151,9 @@ tests:
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          value: 12000
+          constraints:
+              minValue: 10200
+              maxValue: 13800
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=12000,
@@ -261,7 +263,9 @@ tests:
       PICS: CC.S.F01 && CC.S.A4000 && CC.S.C41.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          value: 6000
+          constraints:
+              minValue: 5100
+              maxValue: 6900
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0008
