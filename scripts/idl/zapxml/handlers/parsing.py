@@ -16,6 +16,10 @@ from idl.matter_idl_types import *
 
 
 def ParseInt(value: str) -> int:
+    """Convert a string that is a known integer into an actual number.
+
+       Supports decimal or hex values prefixed with '0x'
+    """
     if value.startswith('0x'):
         return int(value[2:], 16)
     else:
@@ -23,6 +27,10 @@ def ParseInt(value: str) -> int:
 
 
 def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
+    """Given attributes of an '<access .../>' tag, generate the underlying
+       access privilege by looking at the role/privilege attribute.
+    """
+
     # XML seems to use both role and privilege to mean the same thing
     # they are used interchangeably
     if 'role' in attrs:
@@ -43,6 +51,10 @@ def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
 
 
 def AttrsToAttribute(attrs) -> Attribute:
+    """Given the attributes of an '<attribute .../>' tag, generate the
+       underlying IDL Attribute dataclass.
+    """
+
     if attrs['type'].lower() == 'array':
         data_type = DataType(name=attrs['entryType'])
     else:
@@ -75,7 +87,10 @@ def AttrsToAttribute(attrs) -> Attribute:
     # TODO: XML does not seem to contain information about
     #   - NOSUBSCRIBE
 
-    # TODO: do we care about default value at all?
-    #       General storage of default only applies to instantiation
+    # TODO: do we care about default value at all? XML contains it, but IDL
+    #       only applies it on endpoint instantiation (which makes more sense
+    #       if default values on endpoints can be different)
+    #
+    #       Generally would expect .zap files to contain defaults, not XML.
 
     return attribute
