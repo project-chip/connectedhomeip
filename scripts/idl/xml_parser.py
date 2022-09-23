@@ -373,6 +373,100 @@ class EnumProcessor(ElementProcessor, IdlPostProcessor):
         self.context.AddIdlPostProcessor(self)
 
 
+class CommandProcessor(ElementProcessor):
+    def __init__(self, context: ProcessingContext, cluster, attrs):
+        super().__init__(context)
+        self._cluster = cluster
+        self._command = None
+        self._struct = Struct(name=attrs['name'], fields=[])
+        self._field_index = 0  # commands DO NOT support field index it seems
+
+        if attrs['source'].lower() == 'client':
+            self._struct.tag = StructTag.REQUEST
+
+            name = attrs['name']
+
+            if name.endswith('Request'):
+                request_name = name
+                command_name = name[:-7]
+            else:
+                request_name = name+'Request'
+                command_name = name
+
+            if 'response' in attrs:
+                response_name = attrs['response']
+            else:
+                response_name = 'DefaultResponse'
+
+            # TODO: what if no response? DefaultResponse?
+            self._command = Command(
+                name=name,
+                code=ParseInt(attrs['code']),
+                input_param=request_name,
+                output_param=response_name,
+            )
+
+            # TODO: command attributes:
+            #    - timed invoke
+            #    - fabric scoped
+        else:
+            self._struct.tag = StructTag.RESPONSE
+            self._struct.code = ParseInt(attrs['code'])
+
+    def GetArgumentField(self, attrs):
+        data_type = DataType(name=attrs['type'])
+
+        if 'length' in attrs:
+            data_type.max_length = ParseInt(attrs['length'])
+
+        self._field_index += 1
+
+        field = Field(
+            data_type=data_type,
+            code=self._field_index,
+            name=attrs['name'],
+            is_list=(attrs.get('array', 'false') == 'true')
+        )
+
+        if attrs.get('optional', "false").lower() == 'true':
+            field.attributes.add(FieldAttribute.OPTIONAL)
+
+        if attrs.get('isNullable', "false").lower() == 'true':
+            field.attributes.add(FieldAttribute.NULLABLE)
+
+        return field
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'access':
+            if attrs['op'] != 'invoke':
+                raise Exception('Unknown access for %r' % self._struct)
+
+            if self._command:
+                self._command.invokeacl = ParseAclRole(attrs)
+            else:
+                logging.warning("Ignored access role for reply %r" % self._struct)
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'arg':
+            self._struct.fields.append(self.GetArgumentField(attrs))
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'description':
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            # TODO: implement
+            return ElementProcessor(self.context)
+
+    def EndProcessing(self):
+
+        if self._struct.fields:
+            self._cluster.structs.append(self._struct)
+        else:
+            # no input
+            self._command.input_param = None
+
+        if self._command:
+            self._cluster.commands.append(self._command)
+
+
 class ClusterProcessor(ElementProcessor):
     """Handles configurator/cluster processing"""
 
@@ -393,6 +487,8 @@ class ClusterProcessor(ElementProcessor):
             return ClusterNameProcessor(self.context, self._cluster)
         elif name.lower() == 'attribute':
             return AttributeProcessor(self.context, self._cluster, attrs)
+        elif name.lower() == 'command':
+            return CommandProcessor(self.context, self._cluster, attrs)
         elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
             # NOTE: we COULD use client and server to create separate definitions
             #       of each, but the usefulness of this is unclear as the definitions are
