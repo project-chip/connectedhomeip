@@ -23,7 +23,7 @@ from .base import HandledDepth, BaseHandler
 
 
 class ClusterNameHandler(BaseHandler):
-    """Handles /configuration/cluster/name elements."""
+    """Handles /configurator/cluster/name elements."""
 
     def __init__(self, context: Context, cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -34,7 +34,7 @@ class ClusterNameHandler(BaseHandler):
 
 
 class AttributeDescriptionHandler(BaseHandler):
-    """Handles /configuration/cluster/attribute/description elements."""
+    """Handles /configurator/cluster/attribute/description elements."""
 
     def __init__(self, context: Context, attribute):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -45,7 +45,7 @@ class AttributeDescriptionHandler(BaseHandler):
 
 
 class ClusterCodeHandler(BaseHandler):
-    """Handles /configuration/cluster/code elements."""
+    """Handles /configurator/cluster/code elements."""
 
     def __init__(self, context: Context, cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -56,7 +56,7 @@ class ClusterCodeHandler(BaseHandler):
 
 
 class EventHandler(BaseHandler):
-    """Handles /configuration/cluster/event elements."""
+    """Handles /configurator/cluster/event elements."""
 
     def __init__(self, context: Context, cluster, attrs):
         super().__init__(context)
@@ -112,7 +112,7 @@ class EventHandler(BaseHandler):
 
 
 class AttributeHandler(BaseHandler):
-    """Handles /configuration/cluster/attribute elements."""
+    """Handles /configurator/cluster/attribute elements."""
 
     def __init__(self, context: Context, cluster, attrs):
         super().__init__(context)
@@ -155,7 +155,7 @@ class AttributeHandler(BaseHandler):
 
 
 class StructHandler(BaseHandler, IdlPostProcessor):
-    """ Handling /configuration/struct elements."""
+    """ Handling /configurator/struct elements."""
 
     def __init__(self, context: Context, attrs):
         super().__init__(context)
@@ -234,7 +234,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
 
 
 class EnumHandler(BaseHandler, IdlPostProcessor):
-    """ Handling /configuration/enum elements."""
+    """ Handling /configurator/enum elements."""
 
     def __init__(self, context: Context, attrs):
         super().__init__(context)
@@ -279,7 +279,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
 
 class BitmapHandler(BaseHandler):
-    """ Handling /configuration/bitmap elements."""
+    """ Handling /configurator/bitmap elements."""
 
     def __init__(self, context: Context, attrs):
         super().__init__(context)
@@ -329,7 +329,7 @@ class BitmapHandler(BaseHandler):
 
 
 class CommandHandler(BaseHandler):
-    """Handles /configuration/cluster/command elements."""
+    """Handles /configurator/cluster/command elements."""
 
     def __init__(self, context: Context, cluster, attrs):
         super().__init__(context)
@@ -425,7 +425,7 @@ class CommandHandler(BaseHandler):
 
 
 class ClusterGlobalAttributeHandler(BaseHandler):
-    """Handles /configuration/cluster/globalAttribute elements."""
+    """Handles /configurator/cluster/globalAttribute elements."""
 
     def __init__(self, context: Context, cluster: Cluster, code: int):
         super().__init__(context)
@@ -446,7 +446,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
 
 
 class ClusterHandler(BaseHandler):
-    """Handles /configuration/cluster elements."""
+    """Handles /configurator/cluster elements."""
 
     def __init__(self, context: Context, idl: Idl):
         super().__init__(context)
@@ -493,7 +493,7 @@ class ClusterHandler(BaseHandler):
 
 
 class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
-    """Handling /configuration/clusterExtension elements."""
+    """Handling /configurator/clusterExtension elements."""
 
     def __init__(self, context: Context, code: int):
         # NOTE: IDL is set to NONE so that ClusterHandler cannot
@@ -524,7 +524,7 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
 
 
 class GlobalAttributeHandler(BaseHandler):
-    """Handling configuration/global/globalAttribute elements."""
+    """Handling configurator/global/globalAttribute elements."""
 
     def __init__(self, context: Context, attribute: Attribute):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -548,7 +548,7 @@ class GlobalAttributeHandler(BaseHandler):
 
 
 class GlobalHandler(BaseHandler):
-    """Handling configuration/global elements."""
+    """Handling configurator/global elements."""
 
     def __init__(self, context: Context):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -566,8 +566,8 @@ class GlobalHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
-class ConfigurationHandler(BaseHandler):
-    """ Handling /configuration elements."""
+class ConfiguratorHandler(BaseHandler):
+    """ Handling /configurator elements."""
 
     def __init__(self, context: Context, idl: Idl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
