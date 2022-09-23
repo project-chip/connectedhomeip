@@ -12,5 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .handlers import ZapXmlHandler
+from .base import BaseHandler
 from .context import Context
+from .handlers import ConfigurationHandler
+
+from idl.matter_idl_types import Idl
+
+class ZapXmlHandler(BaseHandler):
+    def __init__(self, context: Context, idl: Idl):
+        super().__init__(context)
+        self._idl = idl
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'configurator':
+            return ConfigurationHandler(self.context, self._idl)
+        else:
+            return BaseHandler(self.context)
