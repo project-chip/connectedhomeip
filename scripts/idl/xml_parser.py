@@ -242,6 +242,57 @@ class ClusterCodeProcessor(ElementProcessor):
         self._cluster.code = ParseInt(content)
 
 
+class EventProcessor(ElementProcessor):
+    def __init__(self, context: ProcessingContext, cluster, attrs):
+        super().__init__(context)
+        self._cluster = cluster
+
+        if attrs['priority'] == 'debug':
+            priority = EventPriority.DEBUG
+        elif attrs['priority'] == 'info':
+            priority = EventPriority.INFO
+        elif attrs['priority'] == 'critical':
+            priority = EventPriority.CRITICAL
+        else:
+            raise Exception("Unknown event priority: %s" % attrs['priority'])
+
+        self._event = Event(
+            priority=priority,
+            code=ParseInt(attrs['code']),
+            name=attrs['name'],
+            fields=[],
+        )
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'field':
+            data_type = DataType(name=attrs['type'])
+            if 'length' in attrs:
+                data_type.max_length = ParseInt(attrs['length'])
+
+            field = Field(
+                data_type=data_type,
+                code=ParseInt(attrs['id']),
+                name=attrs['name'],
+                is_list=(attrs.get('array', 'false').lower() == 'true'),
+            )
+
+            if attrs.get('optional', "false").lower() == 'true':
+                field.attributes.add(FieldAttribute.OPTIONAL)
+
+            if attrs.get('isNullable', "false").lower() == 'true':
+                field.attributes.add(FieldAttribute.NULLABLE)
+
+            self._event.fields.append(field)
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'description':
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return ElementProcessor(self.context)
+
+    def EndProcessing(self):
+        self._cluster.events.append(self._event)
+
+
 class AttributeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, cluster, attrs):
         super().__init__(context)
@@ -564,6 +615,8 @@ class ClusterProcessor(ElementProcessor):
             return ClusterNameProcessor(self.context, self._cluster)
         elif name.lower() == 'attribute':
             return AttributeProcessor(self.context, self._cluster, attrs)
+        elif name.lower() == 'event':
+            return EventProcessor(self.context, self._cluster, attrs)
         elif name.lower() == 'globalattribute':
             # We ignore 'side' and 'value' since they do not seem useful
             self._cluster.attributes.append(self.context.GetGlobalAttribute(ParseInt(attrs['code'])))
