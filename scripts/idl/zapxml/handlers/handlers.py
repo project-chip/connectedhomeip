@@ -25,7 +25,7 @@ from .base import HandledDepth, BaseHandler
 class ClusterNameHandler(BaseHandler):
     """Handles /configurator/cluster/name elements."""
 
-    def __init__(self, context: Context, cluster):
+    def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
@@ -36,29 +36,29 @@ class ClusterNameHandler(BaseHandler):
 class AttributeDescriptionHandler(BaseHandler):
     """Handles /configurator/cluster/attribute/description elements."""
 
-    def __init__(self, context: Context, attribute):
+    def __init__(self, context: Context, attribute: Attribute):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._attribute = attribute
 
-    def HandleContent(self, content):
+    def HandleContent(self, content: str):
         self._attribute.definition.name = content.replace(' ', '')
 
 
 class ClusterCodeHandler(BaseHandler):
     """Handles /configurator/cluster/code elements."""
 
-    def __init__(self, context: Context, cluster):
+    def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
-    def HandleContent(self, content):
+    def HandleContent(self, content: str):
         self._cluster.code = ParseInt(content)
 
 
 class EventHandler(BaseHandler):
     """Handles /configurator/cluster/event elements."""
 
-    def __init__(self, context: Context, cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context)
         self._cluster = cluster
 
@@ -78,7 +78,7 @@ class EventHandler(BaseHandler):
             fields=[],
         )
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
             data_type = DataType(name=attrs['type'])
             if 'length' in attrs:
@@ -114,12 +114,12 @@ class EventHandler(BaseHandler):
 class AttributeHandler(BaseHandler):
     """Handles /configurator/cluster/attribute elements."""
 
-    def __init__(self, context: Context, cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context)
         self._cluster = cluster
         self._attribute = AttrsToAttribute(attrs)
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
             if 'modifier' in attrs:
                 if attrs['modifier'] != 'fabric-scoped':
@@ -140,7 +140,7 @@ class AttributeHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
-    def HandleContent(self, content):
+    def HandleContent(self, content: str):
         # Content generally is the name EXCEPT if access controls
         # exist, in which case `description` contains the name
         content = content.strip()
@@ -171,7 +171,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         # TODO: handle this isFabricScoped attribute
         self._is_fabric_scoped = (attrs.get('isFabricScoped', "false").lower() == 'true')
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'item':
             data_type = DataType(
                 name=attrs['type']
@@ -331,7 +331,7 @@ class BitmapHandler(BaseHandler):
 class CommandHandler(BaseHandler):
     """Handles /configurator/cluster/command elements."""
 
-    def __init__(self, context: Context, cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context)
         self._cluster = cluster
         self._command = None
@@ -393,7 +393,7 @@ class CommandHandler(BaseHandler):
 
         return field
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
             if attrs['op'] != 'invoke':
                 raise Exception('Unknown access for %r' % self._struct)
@@ -432,7 +432,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         self._cluster = cluster
         self._code = code
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'featurebit':
             # It is uncler what featurebits mean. likely a bitmap should be created
             # here, however only one such example exists currently: door-lock-cluster.xml
@@ -458,7 +458,7 @@ class ClusterHandler(BaseHandler):
         )
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'code':
             return ClusterCodeHandler(self.context, self._cluster)
         elif name.lower() == 'name':
@@ -530,7 +530,7 @@ class GlobalAttributeHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._attribute = attribute
 
-    def HandleContent(self, content):
+    def HandleContent(self, content: str):
         # Content generally is the name EXCEPT if access controls
         # exist, in which case `description` contains the name
         #
@@ -573,7 +573,7 @@ class ConfiguratorHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'cluster':
             return ClusterHandler(self.context, self._idl)
         elif name.lower() == 'enum':
