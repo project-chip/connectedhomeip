@@ -233,7 +233,7 @@ class AttributeProcessor(ElementProcessor):
             elif attrs['op'] == 'write':
                 self._attribute.writeacl = role
             else:
-                logging.warning("Unknown access: %r" % attrs['op'])
+                logging.error("Unknown access: %r" % attrs['op'])
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return AttributeDescriptionProcessor(self.context, self._attribute)
@@ -323,8 +323,8 @@ class StructProcessor(ElementProcessor, IdlPostProcessor):
                     found = True
 
             if not found:
-                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' %
-                                (self._struct.name, self._cluster_code, self._cluster_code))
+                logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
+                              (self._struct.name, self._cluster_code, self._cluster_code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -366,8 +366,52 @@ class EnumProcessor(ElementProcessor, IdlPostProcessor):
                     found = True
 
             if not found:
-                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' %
-                                (self._enum.name, self._cluster_code, self._cluster_code))
+                logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
+                              (self._enum.name, self._cluster_code, self._cluster_code))
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
+
+
+class BitmapProcessor(ElementProcessor):
+    def __init__(self, context: ProcessingContext, attrs):
+        super().__init__(context)
+        self._cluster_code = None
+        self._bitmap = Bitmap(name=attrs['name'], base_type=attrs['type'], entries=[])
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'cluster':
+            if self._cluster_code is not None:
+                raise Exception('Multiple cluster codes for structr %s' % self._struct.name)
+            self._cluster_code = ParseInt(attrs['code'])
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'field':
+            self._bitmap.entries.append(ConstantEntry(
+                name=attrs['name'],
+                code=ParseInt(attrs['mask'])
+            ))
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'description':
+            return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return ElementProcessor(self.context)
+
+    def FinalizeProcessing(self, idl: Idl):
+        # We have two choices of adding an enum:
+        #   - inside a cluster if a code exists
+        #   - inside top level if a code does not exist
+        if self._cluster_code is None:
+            raise Exception("Bitmap %r has no cluster code" % self._bitmap)
+
+        found = False
+        for c in idl.clusters:
+            if c.code == self._cluster_code:
+                c.bitmaps.append(self._bitmap)
+                found = True
+
+        if not found:
+            logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
+                          (self._bitmap.name, self._cluster_code, self._cluster_code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -518,6 +562,8 @@ class ConfiguratorProcessor(ElementProcessor):
             return EnumProcessor(self.context, attrs)
         elif name.lower() == 'struct':
             return StructProcessor(self.context, attrs)
+        elif name.lower() == 'bitmap':
+            return BitmapProcessor(self.context, attrs)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
