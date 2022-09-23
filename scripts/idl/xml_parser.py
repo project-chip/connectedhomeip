@@ -600,6 +600,7 @@ class CommandProcessor(ElementProcessor):
 
 class ClusterGlobalAttributeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, cluster: Cluster, code: int):
+        super().__init__(context)
         self._cluster = cluster
         self._code = code
 
@@ -613,7 +614,7 @@ class ClusterGlobalAttributeProcessor(ElementProcessor):
             return ElementProcessor(self.context)
 
     def EndProcessing(self):
-        self._cluster.attributes.append(self.context.GetGlobalAttribute(self._code)
+        self._cluster.attributes.append(self.context.GetGlobalAttribute(self._code))
 
 
 class ClusterProcessor(ElementProcessor):
@@ -640,7 +641,7 @@ class ClusterProcessor(ElementProcessor):
             return EventProcessor(self.context, self._cluster, attrs)
         elif name.lower() == 'globalattribute':
             # We ignore 'side' and 'value' since they do not seem useful
-            return ClusterGlobalAttributeProcessor(self.context, ParseInt(attrs['code']))
+            return ClusterGlobalAttributeProcessor(self.context, self._cluster, ParseInt(attrs['code']))
         elif name.lower() == 'command':
             return CommandProcessor(self.context, self._cluster, attrs)
         elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
@@ -847,8 +848,8 @@ if __name__ == '__main__':
     @ click.option(
         '--global-attributes',
         help='What global attributes file to preload')
-    @ click.argument('filename')
-    def main(log_level, global_attributes=None, filename=None):
+    @ click.argument('filenames', nargs=-1)
+    def main(log_level, global_attributes, filenames):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
@@ -857,7 +858,7 @@ if __name__ == '__main__':
         sources=[]
         if global_attributes is not None:
             sources.append(ParseSource(source=global_attributes))
-        if filename is not None:
+        for filename in filenames:
             sources.append(ParseSource(source=filename))
 
         data=ParseXmls(sources)
