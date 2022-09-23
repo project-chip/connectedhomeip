@@ -292,7 +292,7 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
 
     static KeySet sKeySet(kKeySetIndex, SecurityPolicy::kTrustFirst, 1);
     static GroupKey sGroupKeySet(groupId, kKeySetIndex);
-    static GroupInfo sGroupInfo(groupId, "Group Name No Matter");
+    static GroupInfo sGroupInfo(groupId, "Name Matter Not");
     static Transport::IncomingGroupSession sSessionBobToFriends(groupId, kFabricIndex, testEntry.sourceNodeId);
 
     if (testEntry.epochKey)
