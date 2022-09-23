@@ -20,6 +20,7 @@ from typing import Optional, Union, List
 
 from .context import Context, IdlPostProcessor
 
+
 class HandledDepth:
     """Defines how deep a XML element has been handled."""
     NOT_HANDLED = enum.auto()  # Unknown/parsed element
@@ -91,7 +92,6 @@ def AttrsToAttribute(attrs) -> Attribute:
     #       General storage of default only applies to instantiation
 
     return attribute
-
 
 
 class ElementHandler:
@@ -252,8 +252,8 @@ class StructHandler(ElementHandler, IdlPostProcessor):
     def __init__(self, context: Context, attrs):
         super().__init__(context)
 
-         # if set, struct belongs to a specific cluster
-        self._cluster_codes = set() 
+        # if set, struct belongs to a specific cluster
+        self._cluster_codes = set()
         self._struct = Struct(name=attrs['name'], fields=[])
         self._field_index = 0
         # The following are not set:
@@ -316,8 +316,8 @@ class StructHandler(ElementHandler, IdlPostProcessor):
                         found = True
 
                 if not found:
-                   logging.error('Enum %s could not find cluster (code %d/0x%X)' %
-                              (self._struct.name, code, code))
+                    logging.error('Enum %s could not find cluster (code %d/0x%X)' %
+                                  (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
 
@@ -574,6 +574,8 @@ class ClusterHandler(ElementHandler):
 
 # Cluster extensions have extra bits for existing clusters. Can only be loaded
 # IF the underlying cluster exits
+
+
 class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
     def __init__(self, context: Context, code: int):
         # NOTE: IDL is set to NONE so that ClusterHandler cannot
@@ -600,9 +602,7 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
 
         if not found:
             logging.error('Could not extend cluster 0x%X (%d): cluster not found' %
-                           (self._cluster_code, self._cluster_code))
-
-
+                          (self._cluster_code, self._cluster_code))
 
 
 class GlobalAttributeHandler(ElementHandler):
@@ -695,4 +695,3 @@ class ZapXmlHandler(ElementHandler):
             return ConfigurationHandler(self.context, self._idl)
         else:
             return ElementHandler(self.context)
-

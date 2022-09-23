@@ -18,6 +18,7 @@ import xml.sax.handler
 from idl.zapxml.handlers import Context, ZapXmlHandler
 from idl.matter_idl_types import Idl
 
+
 class ParseHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         super().__init__()

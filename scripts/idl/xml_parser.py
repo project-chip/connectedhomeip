@@ -36,7 +36,6 @@ except:
 import idl.zapxml
 
 
-
 @ dataclass
 class ParseSource:
     source: Union[str, typing.IO]  # filename or stream

@@ -18,6 +18,7 @@ import xml.sax.xmlreader
 from idl.matter_idl_types import Idl, ParseMetaData, Attribute
 from typing import Optional, List
 
+
 class IdlPostProcessor:
     """Defines a callback that will apply after an entire parsing
        is complete.
@@ -26,6 +27,7 @@ class IdlPostProcessor:
     def FinalizeProcessing(self, idl: Idl):
         """Update idl with any post-processing directives."""
         pass
+
 
 class ProcessingPath:
     def __init__(self, paths: List[str] = None):
@@ -44,7 +46,6 @@ class ProcessingPath:
 
     def __repr__(self):
         return 'ProcessingPath(%r)' % self.paths
-
 
 
 class Context:
