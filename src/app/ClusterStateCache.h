@@ -483,6 +483,8 @@ public:
         mEventStatusCache.clear();
     }
 
+    CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
+
 private:
     using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.

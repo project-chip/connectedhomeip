@@ -1077,9 +1077,9 @@ JNI_METHOD(void, subscribe)
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Subscribe);
+    app::ReadClient * readClient = Platform::New<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Subscribe);
 
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
@@ -1126,9 +1126,9 @@ JNI_METHOD(void, read)
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Read);
+    app::ReadClient * readClient = Platform::New<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)

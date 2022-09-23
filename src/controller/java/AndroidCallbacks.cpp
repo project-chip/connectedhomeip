@@ -121,7 +121,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
 
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
                                jobject resubscriptionAttemptCallback) :
-    mBufferedReadAdapter(*this)
+    mClusterCacheAdapter(*this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -186,6 +186,8 @@ void ReportCallback::OnReportBegin()
 
 void ReportCallback::OnReportEnd()
 {
+    UpdateClusterDataVersion();
+
     // Transform C++ jobject pair list to a Java HashMap, and call onReport() on the Java callback.
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -281,6 +283,34 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     env->CallVoidMethod(mNodeStateObj, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), attributeStateObj);
     VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
+
+    UpdateClusterDataVersion();
+}
+
+void ReportCallback::UpdateClusterDataVersion()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    chip::app::ConcreteClusterPath lastConcreteClusterPath;
+    if (mClusterCacheAdapter.GetLastReportDataPath(lastConcreteClusterPath) == CHIP_NO_ERROR &&
+        lastConcreteClusterPath.IsValidConcreteClusterPath())
+    {
+        chip::Optional<chip::DataVersion> committedDataVersion;
+        if (mClusterCacheAdapter.GetVersion(lastConcreteClusterPath, committedDataVersion) == CHIP_NO_ERROR)
+        {
+            if (committedDataVersion.HasValue())
+            {
+                // SetDataVersion to NodeState
+                jmethodID setDataVersionMethod;
+                CHIP_ERROR err =
+                    JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
+                VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
+                env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
+                                    static_cast<jlong>(lastConcreteClusterPath.mClusterId),
+                                    static_cast<jint>(committedDataVersion.Value()));
+                VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
+            }
+        }
+    }
 }
 
 void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus)
