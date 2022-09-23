@@ -2349,6 +2349,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
               completion(nil, myError);
           };
 
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                      deviceID:@(myNodeId)
                                                        params:nil
@@ -2358,7 +2359,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                        XCTAssertNil(error);
                                                        [subscribeExpectation fulfill];
                                                    }];
-    [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ subscribeExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [clusterStateCacheContainer
