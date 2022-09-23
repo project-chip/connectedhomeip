@@ -18,6 +18,7 @@ from .handlers import ConfigurationHandler
 
 from idl.matter_idl_types import Idl
 
+
 class ZapXmlHandler(BaseHandler):
     def __init__(self, context: Context, idl: Idl):
         super().__init__(context)
