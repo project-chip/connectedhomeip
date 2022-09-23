@@ -19,6 +19,7 @@ from idl.matter_idl_types import *
 from typing import Optional, Union, List
 
 from .context import Context, IdlPostProcessor
+from .parsing import ParseInt, AttrsToAccessPrivilege, AttrsToAttribute
 
 
 class HandledDepth:
@@ -26,73 +27,6 @@ class HandledDepth:
     NOT_HANDLED = enum.auto()  # Unknown/parsed element
     ENTIRE_TREE = enum.auto()  # Entire tree can be ignored
     SINGLE_TAG = enum.auto()  # Single tag processed, but not sub-items
-
-
-def ParseInt(value: str) -> int:
-    if value.startswith('0x'):
-        return int(value[2:], 16)
-    else:
-        return int(value)
-
-
-def ParseAclRole(attrs) -> AccessPrivilege:
-    # XML seems to use both role and privilege to mean the same thing
-    # they are used interchangeably
-    if 'role' in attrs:
-        role = attrs['role']
-    else:
-        role = attrs['privilege']
-
-    if role.lower() == 'view':
-        return AccessPrivilege.VIEW
-    elif role.lower() == 'operate':
-        return AccessPrivilege.OPERATE
-    elif role.lower() == 'manage':
-        return AccessPrivilege.MANAGE
-    elif role.lower() == 'administer':
-        return AccessPrivilege.ADMINISTER
-    else:
-        raise Exception('Unknown ACL role: %r' % role)
-
-
-def AttrsToAttribute(attrs) -> Attribute:
-    if attrs['type'].lower() == 'array':
-        data_type = DataType(name=attrs['entryType'])
-    else:
-        data_type = DataType(name=attrs['type'])
-
-    if 'length' in attrs:
-        data_type.max_length = ParseInt(attrs['length'])
-
-    field = Field(
-        data_type=data_type,
-        code=ParseInt(attrs['code']),
-        name=None,
-        is_list=(attrs['type'].lower() == 'array')
-    )
-
-    attribute = Attribute(definition=field)
-
-    if attrs.get('optional', "false").lower() == 'true':
-        attribute.definition.attributes.add(FieldAttribute.OPTIONAL)
-
-    if attrs.get('isNullable', "false").lower() == 'true':
-        attribute.definition.attributes.add(FieldAttribute.NULLABLE)
-
-    if attrs.get('readable', "true").lower() == 'true':
-        attribute.tags.add(AttributeTag.READABLE)
-
-    if attrs.get('writable', "false").lower() == 'true':
-        attribute.tags.add(AttributeTag.WRITABLE)
-
-    # TODO: XML does not seem to contain information about
-    #   - NOSUBSCRIBE
-
-    # TODO: do we care about default value at all?
-    #       General storage of default only applies to instantiation
-
-    return attribute
-
 
 class ElementHandler:
     """A generic element processor.
@@ -196,7 +130,7 @@ class EventHandler(ElementHandler):
             self._event.fields.append(field)
             return ElementHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'access':
-            self._event.readacl = ParseAclRole(attrs)
+            self._event.readacl = AttrsToAccessPrivilege(attrs)
             return ElementHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return ElementHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -220,7 +154,7 @@ class AttributeHandler(ElementHandler):
                     raise Exception("UNKNOWN MODIFIER: %s" % attrs['modifier'])
                 self._attribute.tags.add(AttributeTag.FABRIC_SCOPED)
             else:
-                role = ParseAclRole(attrs)
+                role = AttrsToAccessPrivilege(attrs)
 
                 if attrs['op'] == 'read':
                     self._attribute.readacl = role
@@ -485,7 +419,7 @@ class CommandHandler(ElementHandler):
                 raise Exception('Unknown access for %r' % self._struct)
 
             if self._command:
-                self._command.invokeacl = ParseAclRole(attrs)
+                self._command.invokeacl = AttrsToAccessPrivilege(attrs)
             else:
                 logging.warning("Ignored access role for reply %r" % self._struct)
             return ElementHandler(self.context, handled=HandledDepth.SINGLE_TAG)
