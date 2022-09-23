@@ -622,13 +622,13 @@ class ClusterProcessor(ElementProcessor):
 
     def __init__(self, context: ProcessingContext, idl: Idl):
         super().__init__(context)
-        self._cluster=Cluster(
+        self._cluster = Cluster(
             side=ClusterSide.CLIENT,
             name=None,
             code=None,
             parse_meta=context.GetCurrentLocationMeta()
         )
-        self._idl=idl
+        self._idl = idl
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'code':
@@ -664,7 +664,7 @@ class ClusterProcessor(ElementProcessor):
 class GlobalAttributeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, attribute: Attribute):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
-        self._attribute=attribute
+        self._attribute = attribute
 
     def HandleContent(self, content):
         # Content generally is the name EXCEPT if access controls
@@ -672,9 +672,9 @@ class GlobalAttributeProcessor(ElementProcessor):
         #
         # Global attributes do not currently have access controls, so this
         # case is not handled here
-        content=content.strip()
+        content = content.strip()
         if content and not self._attribute.definition.name:
-            self._attribute.definition.name=content
+            self._attribute.definition.name = content
 
     def EndProcessing(self):
         if self._attribute.definition.name is None:
@@ -705,7 +705,7 @@ class GlobalProcessor(ElementProcessor):
 class ConfiguratorProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, idl: Idl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
-        self._idl=idl
+        self._idl = idl
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
@@ -742,7 +742,7 @@ class ConfiguratorProcessor(ElementProcessor):
 class ZapXmlProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, idl: Idl):
         super().__init__(context)
-        self._idl=idl
+        self._idl = idl
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'configurator':
@@ -754,23 +754,23 @@ class ZapXmlProcessor(ElementProcessor):
 class ParseHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         super().__init__()
-        self._idl=Idl()
-        self._processing_stack=[]
+        self._idl = Idl()
+        self._processing_stack = []
         # Context persists across all
-        self._context=ProcessingContext()
+        self._context = ProcessingContext()
 
     def PrepareParsing(self, filename):
         # This is a bit ugly: filename keeps changing during parse
         # IDL meta is not prepared for this (as source is XML and .matter is
         # single file)
-        self._idl.parse_file_name=filename
+        self._idl.parse_file_name = filename
 
     def ProcessResults(self) -> Idl:
         return self._idl
 
     def startDocument(self):
-        self._context.locator=self._locator
-        self._processing_stack=[ZapXmlProcessor(self._context, self._idl)]
+        self._context.locator = self._locator
+        self._processing_stack = [ZapXmlProcessor(self._context, self._idl)]
 
     def endDocument(self):
         if len(self._processing_stack) != 1:
@@ -786,7 +786,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
     def endElement(self, name: str):
         logging.debug("ELEMENT END: %r" % name)
 
-        last=self._processing_stack.pop()
+        last = self._processing_stack.pop()
         last.EndProcessing()
 
         # important to pop AFTER processing end to allow processing
@@ -800,7 +800,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 @ dataclass
 class ParseSource:
     source: Union[str, typing.IO]  # filename or stream
-    name: Optional[str]=None  # actual filename to use, None if the source is a filename already
+    name: Optional[str] = None  # actual filename to use, None if the source is a filename already
 
     @ property
     def source_file_name(self):
@@ -810,13 +810,13 @@ class ParseSource:
 
 
 def ParseXmls(sources: List[ParseSource]) -> Idl:
-    handler=ParseHandler()
+    handler = ParseHandler()
 
     for source in sources:
         logging.info('Parsing %s...' % source.source_file_name)
         handler.PrepareParsing(source.source_file_name)
 
-        parser=xml.sax.make_parser()
+        parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
         parser.parse(source.source)
 
@@ -832,7 +832,7 @@ if __name__ == '__main__':
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
-    __LOG_LEVELS__={
+    __LOG_LEVELS__ = {
         'debug': logging.DEBUG,
         'info': logging.INFO,
         'warn': logging.WARN,
@@ -855,13 +855,13 @@ if __name__ == '__main__':
 
         logging.info("Starting to parse ...")
 
-        sources=[]
+        sources = []
         if global_attributes is not None:
             sources.append(ParseSource(source=global_attributes))
         for filename in filenames:
             sources.append(ParseSource(source=filename))
 
-        data=ParseXmls(sources)
+        data = ParseXmls(sources)
         logging.info("Parse completed")
 
         logging.info("Data:")
