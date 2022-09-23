@@ -74,15 +74,6 @@ NSString * const MTRArrayValueType = @"Array";
 
 class MTRDataValueDictionaryCallbackBridge;
 
-@interface MTRBaseDevice ()
-
-@property (nonatomic, readonly, assign, nullable) chip::DeviceProxy * cppPASEDevice;
-@property (nonatomic, readwrite) NSMutableDictionary * reportHandlerBridges;
-
-- (chip::NodeId)deviceID;
-- (BOOL)isPASEDevice;
-@end
-
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
@@ -223,19 +214,8 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
-        chip::Optional<SessionHandle> session = device->GetSecureSession();
-        if (!session.HasValue()) {
-            MTR_LOG_ERROR("Failing to initialize MTRBaseDevice: no secure session");
-            return nil;
-        }
-
-        if (!session.Value()->AsSecureSession()->IsPASESession()) {
-            MTR_LOG_ERROR("Failing to initialize MTRBaseDevice: not a PASE session");
-            return nil;
-        }
-
-        _cppPASEDevice = device;
-        _nodeID = kUndefinedNodeId;
+        _isPASEDevice = YES;
+        _nodeID = device->GetDeviceId();
         _deviceController = controller;
     }
     return self;
@@ -244,7 +224,7 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
-        _cppPASEDevice = nil;
+        _isPASEDevice = NO;
         _nodeID = [nodeID unsignedLongLongValue];
         _deviceController = controller;
     }
@@ -258,32 +238,13 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return [controller baseDeviceForNodeID:nodeID];
 }
 
-- (chip::DeviceProxy * _Nullable)paseDevice
-{
-    return _cppPASEDevice;
-}
-
-- (chip::NodeId)deviceID
-{
-    if (_cppPASEDevice != nullptr) {
-        return _cppPASEDevice->GetDeviceId();
-    }
-
-    return self.nodeID;
-}
-
-- (BOOL)isPASEDevice
-{
-    return _cppPASEDevice != nullptr;
-}
-
 - (void)invalidateCASESession
 {
     if (self.isPASEDevice) {
         return;
     }
 
-    [self.deviceController invalidateCASESessionForNode:self.deviceID];
+    [self.deviceController invalidateCASESessionForNode:self.nodeID];
 }
 
 namespace {
@@ -1195,7 +1156,7 @@ exit:
                    };
 
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
-                   container.deviceID = [self deviceID];
+                   container.deviceID = self.nodeID;
                    container.pathParams = Platform::New<app::AttributePathParams>();
                    if (endpointID) {
                        container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
@@ -1261,7 +1222,7 @@ exit:
 {
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");
-    PurgeReadClientContainers([self deviceID], queue, completion);
+    PurgeReadClientContainers(self.nodeID, queue, completion);
 }
 
 namespace {
@@ -1407,7 +1368,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion
 {
     MTR_LOG_DEBUG("Causing failure in subscribers on purpose");
-    CauseReadClientFailure([self deviceID], queue, completion);
+    CauseReadClientFailure(self.nodeID, queue, completion);
 }
 #endif
 
