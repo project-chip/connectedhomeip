@@ -100,7 +100,6 @@ def AttrsToAttribute(attrs) -> Attribute:
 
     # TODO: XML does not seem to contain information about
     #   - NOSUBSCRIBE
-    #   - FABRIC_SCOPED
 
     # TODO: do we care about default value at all?
     #       General storage of default only applies to instantiation
@@ -251,14 +250,19 @@ class AttributeProcessor(ElementProcessor):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'access':
-            role = ParseAclRole(attrs)
-
-            if attrs['op'] == 'read':
-                self._attribute.readacl = role
-            elif attrs['op'] == 'write':
-                self._attribute.writeacl = role
+            if 'modifier' in attrs:
+                if attrs['modifier'] != 'fabric-scoped':
+                    raise Exception("UNKNOWN MODIFIER: %s" % attrs['modifier'])
+                self._attribute.tags.add(AttributeTag.FABRIC_SCOPED)
             else:
-                logging.error("Unknown access: %r" % attrs['op'])
+                role = ParseAclRole(attrs)
+
+                if attrs['op'] == 'read':
+                    self._attribute.readacl = role
+                elif attrs['op'] == 'write':
+                    self._attribute.writeacl = role
+                else:
+                    logging.error("Unknown access: %r" % attrs['op'])
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return AttributeDescriptionProcessor(self.context, self._attribute)
