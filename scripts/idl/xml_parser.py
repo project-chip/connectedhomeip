@@ -17,9 +17,11 @@
 import enum
 import logging
 import os
+import typing
 import xml.sax
 import xml.sax.handler
 
+from dataclasses import dataclass, field
 from typing import Optional, Union, List
 
 try:
@@ -66,6 +68,46 @@ def ParseAclRole(attrs) -> AccessPrivilege:
         raise Exception('Unknown ACL role: %r' % role)
 
 
+def AttrsToAttribute(attrs) -> Attribute:
+    if attrs['type'].lower() == 'array':
+        data_type = DataType(name=attrs['entryType'])
+    else:
+        data_type = DataType(name=attrs['type'])
+
+    if 'length' in attrs:
+        data_type.max_length = ParseInt(attrs['length'])
+
+    field = Field(
+        data_type=data_type,
+        code=ParseInt(attrs['code']),
+        name=None,
+        is_list=(attrs['type'].lower() == 'array')
+    )
+
+    attribute = Attribute(definition=field)
+
+    if attrs.get('optional', "false").lower() == 'true':
+        attribute.definition.attributes.add(FieldAttribute.OPTIONAL)
+
+    if attrs.get('isNullable', "false").lower() == 'true':
+        attribute.definition.attributes.add(FieldAttribute.NULLABLE)
+
+    if attrs.get('readable', "true").lower() == 'true':
+        attribute.tags.add(AttributeTag.READABLE)
+
+    if attrs.get('writable', "false").lower() == 'true':
+        attribute.tags.add(AttributeTag.WRITABLE)
+
+    # TODO: XML does not seem to contain information about
+    #   - NOSUBSCRIBE
+    #   - FABRIC_SCOPED
+
+    # TODO: do we care about default value at all?
+    #       General storage of default only applies to instantiation
+
+    return attribute
+
+
 class ProcessingPath:
     def __init__(self, paths: List[str] = None):
         if paths is None:
@@ -102,11 +144,29 @@ class ProcessingContext:
         self._not_handled = set()
         self._idl_post_processors = []
 
+        # Map of code -> attribute
+        self._global_attributes = {}
+
     def GetCurrentLocationMeta(self) -> ParseMetaData:
         if not self.locator:
             return None
 
         return ParseMetaData(line=self.locator.getLineNumber(), column=self.locator.getColumnNumber())
+
+    def GetGlobalAttribute(self, code):
+        if code in self._global_attributes:
+            return self._global_attributes[code]
+
+        raise Exception(
+            'Global attribute 0x%X (%d) not found. You probably need to load global-attributes.xml' % (code, code))
+
+    def AddGlobalAttribute(self, attribute: Attribute):
+        # NOTE: this may get added several times as both 'client' and 'server'
+        #       however matter should not differentiate between the two
+        code = attribute.definition.code
+        logging.info('Adding global attribute 0x%X (%d): %s' % (code, code, attribute.definition.name))
+
+        self._global_attributes[code] = attribute
 
     def MarkTagNotHandled(self):
         path = str(self.path)
@@ -187,42 +247,7 @@ class AttributeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, cluster, attrs):
         super().__init__(context)
         self._cluster = cluster
-
-        if attrs['type'].lower() == 'array':
-            data_type = DataType(name=attrs['entryType'])
-        else:
-            data_type = DataType(name=attrs['type'])
-
-        if 'length' in attrs:
-            data_type.max_length = ParseInt(attrs['length'])
-
-        field = Field(
-            data_type=data_type,
-            code=ParseInt(attrs['code']),
-            name=None,
-            is_list=(attrs['type'].lower() == 'array')
-        )
-
-        self._attribute = Attribute(definition=field)
-
-        if attrs.get('optional', "false").lower() == 'true':
-            self._attribute.definition.attributes.add(FieldAttribute.OPTIONAL)
-
-        if attrs.get('isNullable', "false").lower() == 'true':
-            self._attribute.definition.attributes.add(FieldAttribute.NULLABLE)
-
-        if attrs.get('readable', "true").lower() == 'true':
-            self._attribute.tags.add(AttributeTag.READABLE)
-
-        if attrs.get('writable', "false").lower() == 'true':
-            self._attribute.tags.add(AttributeTag.WRITABLE)
-
-        # TODO: XML does not seem to contain information about
-        #   - NOSUBSCRIBE
-        #   - FABRIC_SCOPED
-
-        # TODO: do we care about default value at all?
-        #       General storage of default only applies to instantiation
+        self._attribute = AttrsToAttribute(attrs)
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'access':
@@ -531,6 +556,10 @@ class ClusterProcessor(ElementProcessor):
             return ClusterNameProcessor(self.context, self._cluster)
         elif name.lower() == 'attribute':
             return AttributeProcessor(self.context, self._cluster, attrs)
+        elif name.lower() == 'globalattribute':
+            # We ignore 'side' and 'value' since they do not seem useful
+            self._cluster.attributes.append(self.context.GetGlobalAttribute(ParseInt(attrs['code'])))
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'command':
             return CommandProcessor(self.context, self._cluster, attrs)
         elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
@@ -550,6 +579,47 @@ class ClusterProcessor(ElementProcessor):
         self._idl.clusters.append(self._cluster)
 
 
+class GlobalAttributeProcessor(ElementProcessor):
+    def __init__(self, context: ProcessingContext, attribute: Attribute):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._attribute = attribute
+
+    def HandleContent(self, content):
+        # Content generally is the name EXCEPT if access controls
+        # exist, in which case `description` contains the name
+        #
+        # Global attributes do not currently have access controls, so this
+        # case is not handled here
+        content = content.strip()
+        if content and not self._attribute.definition.name:
+            self._attribute.definition.name = content
+
+    def EndProcessing(self):
+        if self._attribute.definition.name is None:
+            raise Exception("Name for attribute was not parsed.")
+
+        self.context.AddGlobalAttribute(self._attribute)
+
+
+class GlobalProcessor(ElementProcessor):
+    """Processes configurator/global """
+
+    def __init__(self, context: ProcessingContext):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'attribute':
+            if attrs['side'].lower() == 'client':
+                # We expect to also have 'server' equivalent, so ignore client
+                # side attributes
+                logging.debug('Ignoring global client-side attribute %s' % (attrs['code']))
+                return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+
+            return GlobalAttributeProcessor(self.context, AttrsToAttribute(attrs))
+        else:
+            return ElementProcessor(self.context)
+
+
 class ConfiguratorProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, idl: Idl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -566,6 +636,8 @@ class ConfiguratorProcessor(ElementProcessor):
             return BitmapProcessor(self.context, attrs)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name.lower() == 'global':
+            return GlobalProcessor(self.context)
         else:
             return ElementProcessor(self.context)
 
@@ -583,17 +655,24 @@ class ZapXmlProcessor(ElementProcessor):
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
-    def __init__(self, filename):
+    def __init__(self):
         super().__init__()
-        self._idl = Idl(parse_file_name=filename)
+        self._idl = Idl()
         self._processing_stack = []
-        self._context = None
+        # Context persists across all
+        self._context = ProcessingContext()
+
+    def PrepareParsing(self, filename):
+        # This is a bit ugly: filename keeps changing during parse
+        # IDL meta is not prepared for this (as source is XML and .matter is
+        # single file)
+        self._idl.parse_file_name = filename
 
     def ProcessResults(self) -> Idl:
         return self._idl
 
     def startDocument(self):
-        self._context = ProcessingContext(self._locator)
+        self._context.locator = self._locator
         self._processing_stack = [ZapXmlProcessor(self._context, self._idl)]
 
     def endDocument(self):
@@ -621,11 +700,28 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         self._processing_stack[-1].HandleContent(content)
 
 
-def ParseXml(filename_or_stream, filename: str) -> Idl:
-    handler = ParseHandler(filename)
-    parser = xml.sax.make_parser()
-    parser.setContentHandler(handler)
-    parser.parse(filename_or_stream)
+@dataclass
+class ParseSource:
+    source: Union[str, typing.IO]  # filename or stream
+    name: Optional[str] = None  # actual filename to use, None if the source is a filename already
+
+    @property
+    def source_file_name(self):
+        if self.name:
+            return self.name
+        return self.source  # assume string
+
+
+def ParseXmls(sources: List[ParseSource]) -> Idl:
+    handler = ParseHandler()
+
+    for source in sources:
+        logging.info('Parsing %s...' % source.source_file_name)
+        handler.PrepareParsing(source.source_file_name)
+
+        parser = xml.sax.make_parser()
+        parser.setContentHandler(handler)
+        parser.parse(source.source)
 
     return handler.ProcessResults()
 
@@ -652,13 +748,23 @@ if __name__ == '__main__':
         default='INFO',
         type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
         help='Determines the verbosity of script output.')
+    @click.option(
+        '--global-attributes',
+        help='What global attributes file to preload')
     @click.argument('filename')
-    def main(log_level, filename=None):
+    def main(log_level, global_attributes=None, filename=None):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
         logging.info("Starting to parse ...")
-        data = ParseXml(filename, filename)
+
+        sources = []
+        if global_attributes is not None:
+            sources.append(ParseSource(source=global_attributes))
+        if filename is not None:
+            sources.append(ParseSource(source=filename))
+
+        data = ParseXmls(sources)
         logging.info("Parse completed")
 
         logging.info("Data:")
