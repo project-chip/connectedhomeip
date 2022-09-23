@@ -74,14 +74,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 32768
+          constraints:
+              minValue: 27853
+              maxValue: 37683
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 19660
+          constraints:
+              minValue: 16711
+              maxValue: 22609
 
     - label:
           "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
@@ -166,14 +170,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 13107
+          constraints:
+              minValue: 11141
+              maxValue: 15073
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 13107
+          constraints:
+              minValue: 11141
+              maxValue: 15073
 
     - label: "TH writes 0 to the Options attribute"
       PICS: CC.S.A000f
@@ -226,14 +234,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 32768
+          constraints:
+              minValue: 27853
+              maxValue: 37683
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 19660
+          constraints:
+              minValue: 16711
+              maxValue: 22609
 
     - label: "TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
@@ -351,14 +363,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 26214
+          constraints:
+              minValue: 22282
+              maxValue: 30146
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 32768
+          constraints:
+              minValue: 27853
+              maxValue: 37683
 
     - label: "TH writes 1 to the Options attribute"
       PICS: CC.S.A000f
@@ -410,14 +426,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 32768
+          constraints:
+              minValue: 27853
+              maxValue: 37683
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 19660
+          constraints:
+              minValue: 16711
+              maxValue: 22609
 
     - label: "TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
@@ -455,14 +475,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 13107
+          constraints:
+              minValue: 11141
+              maxValue: 15073
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 13107
+          constraints:
+              minValue: 11141
+              maxValue: 15073
 
     - label:
           "TH sends MoveToColor command to DUT, with ColorX = 13107/0x3333
@@ -535,14 +559,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: 26214
+          constraints:
+              minValue: 22282
+              maxValue: 30146
 
     - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: 32768
+          constraints:
+              minValue: 27853
+              maxValue: 37683
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0008

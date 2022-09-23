@@ -76,14 +76,18 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 20000
+          constraints:
+              minValue: 17000
+              maxValue: 23000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 50
+          constraints:
+              minValue: 42
+              maxValue: 58
 
     - label:
           "TH sends EnhancedMoveToHueAndSaturation command to DUT with

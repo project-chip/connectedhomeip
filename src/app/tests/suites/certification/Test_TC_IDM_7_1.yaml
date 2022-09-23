@@ -35,39 +35,30 @@ tests:
           Use the below commands to provision the DUT with 5 reference devices (Reference device is unique instance of a Chip-tool)
           RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. in RPI platform
 
-          * For ethernet provisioning in DUT
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
           ./chip-all-clusters-app
 
+          Once DUT reach the  commissionable state pls send below mentioned command on RD"s respectively. Pls use equivalent command on the respective DUT
+
+
           *Provision the device using chip tool on first controller(RD1)
-          *./chip-tool pairing ethernet node-id  setup-pin-code  discriminator  device-remote-ip  device-remote-port(5540)
-          on first controller open a commissioning window using below command (In RD1)
-          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840 (Save the manualcode for 2nd  Provision)
+           ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840
 
           *Provision the device using chip tool on 2nd  controller(RD2)
-          * ./chip-tool pairing code 2 mannualcode –commissioner name beta
-          on 2nd controller open a commissioning window using below command (In RD2)
-          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 3rd Provision)
-
+            ./chip-tool pairing code 2 36453420312(mannualcode) --commissioner-name beta
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 --commissioner-name beta
 
           *Provision the device using chip tool on 3rd  controller(RD3)
-          * ./chip-tool pairing code 3 mannualcode –commissioner name gamma
-          on 3rd controller open a commissioning window using below command (In RD3)
-          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 4th Provision)
+          ./chip-tool pairing code 3 35603352859(mannualcode) --commissioner-name 4
+          ./chip-tool pairing open-commissioning-window 3 1 400 2000 3840 --commissioner-name 4
 
           *Provision the device using chip tool on 4th  controller(RD4)
-          * ./chip-tool pairing code 4 mannualcode –commissioner name 234
-          on 3rd controller open a commissioning window using below command (In RD4)
-          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 ( Save the manualcode for 5th Provision)
+           ./chip-tool pairing code 4 36375333175(mannualcode) --commissioner-name 5
+           ./chip-tool pairing open-commissioning-window 4 1 400 2000 3840 --commissioner-name 5
 
           *Provision the device using chip tool on 5th  controller(RD5)
-          * ./chip-tool pairing code 5 mannualcode –commissioner name 2345
-          on 3rd controller open a commissioning window using below command (In RD5)
-          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840
-
-
-          Please open 5 terminal windows  to observe the subscription report messages coming from different subscriptions(to different fabrics)
-
-          Please use Interactive mode to Verify subscription test cases. Here the command to enter interactive mode:-- ./chip-tool interactive start
+            ./chip-tool pairing code 5 35358158796(mannualcode) --commissioner-name 6
       disabled: true
 
     - label:
@@ -431,7 +422,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name beta  --keepSubscriptions 1
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -775,6 +766,8 @@ tests:
           contain 3 different paths. The subscription request from RD1 should
           contain 4 paths."
       verification: |
+          After provisioning again the values are been set to default values such as node label= " ". so in VS mentioned as node-label="", location=XX and local-config-disabled=FALSE but if your going to verify 3 steps contentiously you will get the attribute value as node-label="newlabel", location=in and local-config-disabled=TRUE.
+
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           Example commands given below are using 5 reference devices (User can use 5 reference devices and send the below command in from each reference device)
@@ -1074,7 +1067,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name beta  --keepSubscriptions 1
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
@@ -1096,6 +1089,8 @@ tests:
           Requests are activated, RD1 sends 6 subscription request messages with
           each of them having 3 different paths."
       verification: |
+          After provisioning again the values are been set to default values such as node label= " ". so in VS mentioned as node-label="", location=XX and local-config-disabled=FALSE but if your going to verify 3 steps contentiously you will get the attribute value as node-label="newlabel", location=in and local-config-disabled=TRUE.
+
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           Example commands given below are using 5 reference devices (User can use 5 reference devices and send the below command in from each reference device)
@@ -1328,7 +1323,7 @@ tests:
 
 
 
-           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name beta  --keepSubscriptions 1
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
           : }
           [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
           [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE

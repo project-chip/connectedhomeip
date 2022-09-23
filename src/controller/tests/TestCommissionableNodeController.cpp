@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -59,7 +60,7 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData inNodeData;
-    strncpy(inNodeData.resolutionData.hostName, "mockHostName", sizeof(inNodeData.resolutionData.hostName));
+    Platform::CopyString(inNodeData.resolutionData.hostName, "mockHostName");
     Inet::IPAddress::FromString("192.168.1.10", inNodeData.resolutionData.ipAddress[0]);
     inNodeData.resolutionData.numIPs++;
     inNodeData.resolutionData.port = 5540;
@@ -97,12 +98,11 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData invalidNodeData, validNodeData;
-    // strncpy(inNodeData1.hostName, "mockHostName1", sizeof inNodeData1.hostName);
     Inet::IPAddress::FromString("192.168.1.10", invalidNodeData.resolutionData.ipAddress[0]);
     invalidNodeData.resolutionData.numIPs++;
     invalidNodeData.resolutionData.port = 5540;
 
-    strncpy(validNodeData.resolutionData.hostName, "mockHostName2", sizeof validNodeData.resolutionData.hostName);
+    Platform::CopyString(validNodeData.resolutionData.hostName, "mockHostName2");
     Inet::IPAddress::FromString("192.168.1.11", validNodeData.resolutionData.ipAddress[0]);
     validNodeData.resolutionData.numIPs++;
     validNodeData.resolutionData.port = 5540;
