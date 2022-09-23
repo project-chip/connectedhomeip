@@ -340,7 +340,9 @@ class AttributeProcessor(ElementProcessor):
 class StructProcessor(ElementProcessor, IdlPostProcessor):
     def __init__(self, context: ProcessingContext, attrs):
         super().__init__(context)
-        self._cluster_code = None  # if set, struct belongs to a specific cluster
+
+         # if set, struct belongs to a specific cluster
+        self._cluster_codes = set() 
         self._struct = Struct(name=attrs['name'], fields=[])
         self._field_index = 0
         # The following are not set:
@@ -384,9 +386,7 @@ class StructProcessor(ElementProcessor, IdlPostProcessor):
             self._struct.fields.append(field)
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'cluster':
-            if self._cluster_code is not None:
-                raise Exception('Multiple cluster codes for structr %s' % self._struct.name)
-            self._cluster_code = ParseInt(attrs['code'])
+            self._cluster_codes.add(ParseInt(attrs['code']))
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return ElementProcessor(self.context)
@@ -394,20 +394,21 @@ class StructProcessor(ElementProcessor, IdlPostProcessor):
     def FinalizeProcessing(self, idl: Idl):
         # We have two choices of adding an enum:
         #   - inside a cluster if a code exists
-        #   - inside top level if a code does not exist
+        #   - inside top level if no codes were associated
 
-        if self._cluster_code is None:
-            idl.structs.append(self._struct)
+        if self._cluster_codes:
+            for code in self._cluster_codes:
+                found = False
+                for c in idl.clusters:
+                    if c.code == code:
+                        c.structs.append(self._struct)
+                        found = True
+
+                if not found:
+                   logging.error('Enum %s could not find cluster (code %d/0x%X)' %
+                              (self._struct.name, code, code))
         else:
-            found = False
-            for c in idl.clusters:
-                if c.code == self._cluster_code:
-                    c.structs.append(self._struct)
-                    found = True
-
-            if not found:
-                logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
-                              (self._struct.name, self._cluster_code, self._cluster_code))
+            idl.structs.append(self._struct)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -660,6 +661,38 @@ class ClusterProcessor(ElementProcessor):
 
         self._idl.clusters.append(self._cluster)
 
+# Cluster extensions have extra bits for existing clusters. Can only be loaded
+# IF the underlying cluster exits
+class ClusterExtensionProcessor(ClusterProcessor, IdlPostProcessor):
+    def __init__(self, context: ProcessingContext, code: int):
+        # NOTE: IDL is set to NONE so that ClusterProcessor cannot
+        #       inadvertently change it (it will be invalid anyway)
+        super().__init__(context, None)
+        self._cluster_code = code
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
+
+    def FinalizeProcessing(self, idl: Idl):
+        found = False
+        for c in idl.clusters:
+            if c.code == self._cluster_code:
+                found = True
+
+                # Append everything that can be appended
+                c.enums.extend(self._cluster.enums)
+                c.bitmaps.extend(self._cluster.bitmaps)
+                c.events.extend(self._cluster.events)
+                c.attributes.extend(self._cluster.attributes)
+                c.structs.extend(self._cluster.structs)
+                c.commands.extend(self._cluster.commands)
+
+        if not found:
+            logging.error('Could not extend cluster 0x%X (%d): cluster not found' %
+                           (self._cluster_code, self._cluster_code))
+
+
+
 
 class GlobalAttributeProcessor(ElementProcessor):
     def __init__(self, context: ProcessingContext, attribute: Attribute):
@@ -718,6 +751,8 @@ class ConfiguratorProcessor(ElementProcessor):
             return BitmapProcessor(self.context, attrs)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name.lower() == 'clusterextension':
+            return ClusterExtensionProcessor(self.context, ParseInt(attrs['code']))
         elif name.lower() == 'accesscontrol':
             # These contain operation/role/modifier and generally only contain a
             # description. These do not seem as useful to parse.
@@ -845,22 +880,14 @@ if __name__ == '__main__':
         default='INFO',
         type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
         help='Determines the verbosity of script output.')
-    @ click.option(
-        '--global-attributes',
-        help='What global attributes file to preload')
     @ click.argument('filenames', nargs=-1)
-    def main(log_level, global_attributes, filenames):
+    def main(log_level, filenames):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
         logging.info("Starting to parse ...")
 
-        sources = []
-        if global_attributes is not None:
-            sources.append(ParseSource(source=global_attributes))
-        for filename in filenames:
-            sources.append(ParseSource(source=filename))
-
+        sources = [ParseSource(source=name) for name in filenames]
         data = ParseXmls(sources)
         logging.info("Parse completed")
 
