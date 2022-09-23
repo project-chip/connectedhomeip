@@ -14,6 +14,7 @@
 
 from idl.matter_idl_types import *
 
+
 def ParseInt(value: str) -> int:
     if value.startswith('0x'):
         return int(value[2:], 16)
@@ -78,4 +79,3 @@ def AttrsToAttribute(attrs) -> Attribute:
     #       General storage of default only applies to instantiation
 
     return attribute
-

@@ -28,6 +28,7 @@ class HandledDepth:
     ENTIRE_TREE = enum.auto()  # Entire tree can be ignored
     SINGLE_TAG = enum.auto()  # Single tag processed, but not sub-items
 
+
 class ElementHandler:
     """A generic element processor.
 
