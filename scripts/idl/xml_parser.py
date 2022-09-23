@@ -25,60 +25,16 @@ from dataclasses import dataclass, field
 from typing import Optional, Union, List
 
 try:
-    from idl.zapxml.handlers import Context, ZapXmlHandler
+    from idl.matter_idl_types import Idl
 except:
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from idl.zapxml.handlers import Context, ZapXmlHandler
+    from idl.matter_idl_types import Idl
 
-from idl.matter_idl_types import Idl
+import idl.zapxml
 
-class ParseHandler(xml.sax.handler.ContentHandler):
-    def __init__(self):
-        super().__init__()
-        self._idl = Idl()
-        self._processing_stack = []
-        # Context persists across all
-        self._context = Context()
-
-    def PrepareParsing(self, filename):
-        # This is a bit ugly: filename keeps changing during parse
-        # IDL meta is not prepared for this (as source is XML and .matter is
-        # single file)
-        self._idl.parse_file_name = filename
-
-    def ProcessResults(self) -> Idl:
-        return self._idl
-
-    def startDocument(self):
-        self._context.locator = self._locator
-        self._processing_stack = [ZapXmlHandler(self._context, self._idl)]
-
-    def endDocument(self):
-        if len(self._processing_stack) != 1:
-            raise Exception("Unexpected nesting!")
-
-        self._context.PostProcess(self._idl)
-
-    def startElement(self, name: str, attrs):
-        logging.debug("ELEMENT START: %r / %r" % (name, attrs))
-        self._context.path.push(name)
-        self._processing_stack.append(self._processing_stack[-1].GetNextProcessor(name, attrs))
-
-    def endElement(self, name: str):
-        logging.debug("ELEMENT END: %r" % name)
-
-        last = self._processing_stack.pop()
-        last.EndProcessing()
-
-        # important to pop AFTER processing end to allow processing
-        # end to access the current context
-        self._context.path.pop()
-
-    def characters(self, content):
-        self._processing_stack[-1].HandleContent(content)
 
 
 @ dataclass
@@ -94,7 +50,7 @@ class ParseSource:
 
 
 def ParseXmls(sources: List[ParseSource]) -> Idl:
-    handler = ParseHandler()
+    handler = idl.zapxml.ParseHandler()
 
     for source in sources:
         logging.info('Parsing %s...' % source.source_file_name)
