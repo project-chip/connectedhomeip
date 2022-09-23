@@ -53,10 +53,25 @@ tests:
               - name: "status"
                 value: 0
 
+    #Endpoint configuration is not supported in YAML
     - label: "Reads the Status attribute"
-      cluster: "Application Basic"
-      endpoint: 3
-      command: "readAttribute"
-      attribute: "Status"
-      response:
-          value: 0
+      PICS: PICS_USER_PROMPT
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool applicationbasic read status 1 3
+          ./chip-tv-casting-app applicationbasic read status 1 3
+
+          On TH verify that the Status attribute  value as 0
+          [1658208937.049446][2428:2433] CHIP:DMG:         InteractionModelRevision = 1
+          [1658208937.049483][2428:2433] CHIP:DMG: }
+          [1658208937.049690][2428:2433] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_050D Attribute 0x0000_0005 DataVersion: 3850684771
+          [1658208937.049809][2428:2433] CHIP:TOO:   Status: 0
+          [1658208937.049922][2428:2433] CHIP:EM: Sending Standalone Ack for MessageCounter:75774840 on exchange 3041i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

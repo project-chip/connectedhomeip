@@ -17,29 +17,15 @@
  */
 #pragma once
 
-#include "TargetVideoPlayerInfo.h"
+#include "MediaBase.h"
 
-#include <controller/CHIPCluster.h>
 #include <functional>
 
 template <typename RequestType, typename ResponseType>
-class MediaCommandBase
+class MediaCommandBase : public MediaBase
 {
 public:
-    MediaCommandBase(chip::ClusterId clusterId) { mClusterId = clusterId; }
-
-    CHIP_ERROR SetTarget(TargetVideoPlayerInfo & targetVideoPlayerInfo, chip::EndpointId tvEndpoint)
-    {
-        auto deviceProxy = targetVideoPlayerInfo.GetOperationalDeviceProxy();
-        if (deviceProxy == nullptr)
-        {
-            ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-            return CHIP_ERROR_PEER_NODE_NOT_FOUND;
-        }
-        mTargetVideoPlayerInfo = &targetVideoPlayerInfo;
-        mTvEndpoint            = tvEndpoint;
-        return CHIP_NO_ERROR;
-    }
+    MediaCommandBase(chip::ClusterId clusterId) : MediaBase(clusterId) {}
 
     CHIP_ERROR Invoke(RequestType request, std::function<void(CHIP_ERROR)> responseCallback)
     {
@@ -49,15 +35,6 @@ public:
         ReturnErrorCodeIf(deviceProxy == nullptr || !deviceProxy->ConnectionReady(), CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
         sResponseCallback = responseCallback;
-
-        class MediaClusterBase : public chip::Controller::ClusterBase
-        {
-        public:
-            MediaClusterBase(chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
-                             chip::ClusterId cluster, chip::EndpointId endpoint) :
-                ClusterBase(exchangeManager, session, cluster, endpoint)
-            {}
-        };
 
         MediaClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), mClusterId,
                                  mTvEndpoint);
@@ -69,9 +46,6 @@ public:
     static void OnFailure(void * context, CHIP_ERROR error) { sResponseCallback(error); }
 
 protected:
-    chip::ClusterId mClusterId;
-    TargetVideoPlayerInfo * mTargetVideoPlayerInfo = nullptr;
-    chip::EndpointId mTvEndpoint;
     static std::function<void(CHIP_ERROR)> sResponseCallback;
 };
 

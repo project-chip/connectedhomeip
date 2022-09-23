@@ -19617,6 +19617,14 @@ typedef NS_ENUM(uint8_t, MTRTimeSynchronizationTimeSource) {
     MTRTimeSynchronizationTimeSourceGnss = 0x10,
 };
 
+typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
+    MTRSwitchFeatureLatchingSwitch = 0x1,
+    MTRSwitchFeatureMomentarySwitch = 0x2,
+    MTRSwitchFeatureMomentarySwitchRelease = 0x4,
+    MTRSwitchFeatureMomentarySwitchLongPress = 0x8,
+    MTRSwitchFeatureMomentarySwitchMultiPress = 0x10,
+};
+
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
     MTRAdministratorCommissioningCommissioningWindowStatusWindowNotOpen = 0x00,
     MTRAdministratorCommissioningCommissioningWindowStatusEnhancedWindowOpen = 0x01,
@@ -20307,6 +20315,11 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
     MTRMediaPlaybackPlaybackStatePaused = 0x01,
     MTRMediaPlaybackPlaybackStateNotPlaying = 0x02,
     MTRMediaPlaybackPlaybackStateBuffering = 0x03,
+};
+
+typedef NS_OPTIONS(uint32_t, MTRMediaPlaybackFeature) {
+    MTRMediaPlaybackFeatureAdvancedSeek = 0x1,
+    MTRMediaPlaybackFeatureVariableSpeed = 0x2,
 };
 
 typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
