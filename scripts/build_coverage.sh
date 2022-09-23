@@ -92,36 +92,8 @@ if [ "$skip_gn" == false ]; then
     ninja -C "$OUTPUT_ROOT" check
 fi
 
-echo "PWD:$PWD"
-echo "CHIP_ROOT:$CHIP_ROOT"
-echo "OUTPUT_ROOT:$OUTPUT_ROOT"
-
-rm -rf "$OUTPUT_ROOT/obj/src/access/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/app/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/ble/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/controller/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/credentials/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/crypto/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/inet/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/asn1/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/core/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/minimal_mdns/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/minimal_mdns/core/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/minimal_mdns/records/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/minimal_mdns/responders/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/shell/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/lib/support/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/messaging/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/platform/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/protocols/bdx/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/protocols/secure_channel/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/protocols/user_directed_commissioning/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/setup_payload/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/system/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/transport/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/transport/raw/tests"
-rm -rf "$OUTPUT_ROOT/obj/src/transport/retransmit/tests"
+# Remove unit test itself from coverage statistics
+find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
 
 mkdir -p "$COVERAGE_ROOT"
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
