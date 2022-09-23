@@ -524,11 +524,11 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 - (void)removeDevice:(MTRDevice *)device
 {
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[@(device.nodeID)];
+    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[device.nodeID];
     if (deviceToRemove == device) {
-        self.nodeIDToDeviceMap[@(device.nodeID)] = nil;
+        self.nodeIDToDeviceMap[device.nodeID] = nil;
     } else {
-        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID);
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, [device.nodeID unsignedLongLongValue]);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 }

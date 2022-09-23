@@ -55,7 +55,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID) controller:self.device.deviceController];
+    MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       baseDevice,
       {{#if hasSpecificResponse}}

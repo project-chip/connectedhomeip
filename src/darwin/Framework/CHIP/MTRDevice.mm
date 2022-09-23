@@ -146,7 +146,7 @@ private:
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID unsignedLongLongValue];
+        _nodeID = [nodeID copy];
         _deviceController = controller;
         _queue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
         ;
@@ -286,7 +286,7 @@ private:
 
     _subscriptionActive = YES;
 
-    [_deviceController getSessionForNode:_nodeID
+    [_deviceController getSessionForNode:[_nodeID unsignedLongLongValue]
                               completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                                   const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
                                   if (error != nil) {
@@ -369,7 +369,7 @@ private:
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
 
         [baseDevice readAttributePathWithEndpointID:endpointID
                                           clusterID:clusterID
@@ -412,7 +412,7 @@ private:
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
     // Start the asynchronous operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [self newBaseDevice];
     [baseDevice
         writeAttributeWithEndpointID:endpointID
                            clusterID:clusterID
@@ -446,7 +446,7 @@ private:
                          completion:(MTRDeviceResponseHandler)completion
 {
     // Perform this operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+    MTRBaseDevice * baseDevice = [self newBaseDevice];
     [baseDevice
         invokeCommandWithEndpointID:endpointID
                           clusterID:clusterID
@@ -469,7 +469,7 @@ private:
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.nodeID) controller:self.deviceController];
+    auto * baseDevice = [self newBaseDevice];
     [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
                                            discriminator:discriminator
                                                 duration:duration
@@ -687,6 +687,11 @@ private:
 
     [self _checkExpiredExpectedValues];
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (MTRBaseDevice *)newBaseDevice
+{
+    return [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
 }
 
 @end
