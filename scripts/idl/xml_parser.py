@@ -219,10 +219,17 @@ class AttributeProcessor(ElementProcessor):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'access':
+
+            # both role and privilege exist in XML
+            if 'role' in attrs:
+                role = ParseAclRole(attrs['role'])
+            else:
+                role = ParseAclRole(attrs['privilege'])
+
             if attrs['op'] == 'read':
-                self._attribute.readacl = ParseAclRole(attrs['role'])
+                self._attribute.readacl = role
             elif attrs['op'] == 'write':
-                self._attribute.writeacl = ParseAclRole(attrs['role'])
+                self._attribute.writeacl = role
             else:
                 logging.warning("Unknown access: %r" % attrs['op'])
             return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -243,6 +250,82 @@ class AttributeProcessor(ElementProcessor):
             raise Exception("Name for attribute was not parsed.")
 
         self._cluster.attributes.append(self._attribute)
+
+class StructProcessor(ElementProcessor, IdlPostProcessor):
+    def __init__(self, context: ProcessingContext, attrs):
+        super().__init__(context)
+        self._cluster_code = None  # if set, struct belongs to a specific cluster
+        self._struct = Struct(name=attrs['name'], fields=[])
+        self._field_index = 0
+        # The following are not set:
+        #    - tag not set because not a request/response
+        #    - code not set because not a response
+
+        # TODO: handle this isFabricScoped attribute
+        self._is_fabric_scoped = (attrs.get('isFabricScoped', "false").lower() == 'true')
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'item':
+            data_type = DataType(
+                name=attrs['type']
+            )
+
+            # TODO: handle isFabricSensitive
+
+            if 'fieldId' in attrs:
+                self._field_index = ParseInt(attrs['fieldId'])
+            else:
+                # NOTE: code does NOT exist, so the number is incremental here
+                #       this seems a defficiency in XML format.
+                self._field_index += 1
+
+
+            if 'length' in attrs:
+                data_type.max_length = ParseInt(attrs['length'])
+
+            field = Field(
+                data_type = data_type,
+                code=self._field_index,
+                name=attrs['name'],
+                is_list = (attrs.get('array', 'false').lower() == 'true'),
+            )
+
+            if attrs.get('optional', "false").lower() == 'true':
+                field.attributes.add(FieldAttribute.OPTIONAL)
+
+            if attrs.get('isNullable', "false").lower() == 'true':
+                field.attributes.add(FieldAttribute.NULLABLE)
+
+            self._struct.fields.append(field)
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'cluster':
+            if self._cluster_code is not None:
+                raise Exception('Multiple cluster codes for structr %s' % self._struct.name)
+            self._cluster_code = ParseInt(attrs['code'])
+            return ElementProcessor(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return ElementProcessor(self.context)
+
+    def FinalizeProcessing(self, idl: Idl):
+        # We have two choices of adding an enum:
+        #   - inside a cluster if a code exists
+        #   - inside top level if a code does not exist
+
+        if self._cluster_code is None:
+            idl.structs.append(self._struct)
+        else:
+            found = False
+            for c in idl.clusters:
+                if c.code == self._cluster_code:
+                    c.structs.append(self._struct)
+                    found = True
+
+            if not found:
+                logging.warning('Enum %s could not find its cluster (code %d/0x%X)' %
+                                (self._struct.name, self._cluster_code, self._cluster_code))
+
+    def EndProcessing(self):
+        self.context.AddIdlPostProcessor(self)
 
 
 class EnumProcessor(ElementProcessor, IdlPostProcessor):
@@ -335,6 +418,8 @@ class ConfiguratorProcessor(ElementProcessor):
             return ClusterProcessor(self.context, self._idl)
         elif name.lower() == 'enum':
             return EnumProcessor(self.context, attrs)
+        elif name.lower() == 'struct':
+            return StructProcessor(self.context, attrs)
         elif name.lower() == 'domain':
             return ElementProcessor(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
