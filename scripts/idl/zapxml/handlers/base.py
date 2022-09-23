@@ -26,9 +26,16 @@ class HandledDepth:
 class BaseHandler:
     """A generic element handler.
 
-       XML processing is be done in the form of a stack. whenever
-       a new element comes in, its processor is moved to the top of
-       the stack and poped once the element ends.
+       XML processing is done in the form of depth-first processing:
+          - Tree is descended into using `GetNextProcessor`
+          - Processors are expected to extend `BaseHandler` and allow for:
+             - GetNextProcessor to recurse
+             - HandleContent in case the text content is relevant
+             - EndProcessing once the entire tree has been walked (when xml element ends)
+
+       BaseHandler keeps track if it has been handled or ot by its `_handled` setting and
+       init parameter. Non-handled elements will be tagged within the context, resulting
+       in logs. This is to detect if unknown/new tags appear in XML files.
     """
 
     def __init__(self, context: Context, handled=HandledDepth.NOT_HANDLED):
