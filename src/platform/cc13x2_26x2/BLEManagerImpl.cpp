@@ -1,7 +1,7 @@
 
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -170,7 +170,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
     if (bufSize <= GAP_DEVICE_NAME_LEN)
     {
-        strncpy(buf, mDeviceName, bufSize);
+        Platform::CopyString(buf, bufSize, mDeviceName);
     }
     else
     {
@@ -186,7 +186,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
     if (strlen(deviceName) <= GAP_DEVICE_NAME_LEN)
     {
-        strncpy(mDeviceName, deviceName, strlen(deviceName));
+        Platform::CopyString(mDeviceName, deviceName);
 
         mFlags.Set(Flags::kBLEStackGATTNameUpdate);
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);

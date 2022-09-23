@@ -25,25 +25,6 @@
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
-// Stolen for now from the framework, need to export this properly.
-@interface DFTErrorHolder : NSObject
-@property (nonatomic, readonly) CHIP_ERROR error;
-@end
-
-@implementation DFTErrorHolder
-
-- (instancetype)initWithError:(CHIP_ERROR)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _error = error;
-    return self;
-}
-
-@end
-
 CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 {
     if (error == nil) {
@@ -64,8 +45,13 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 
     if (error.userInfo != nil) {
         id underlyingError = error.userInfo[@"underlyingError"];
-        if (underlyingError != nil && [underlyingError isKindOfClass:[DFTErrorHolder class]]) {
-            return ((DFTErrorHolder *) underlyingError).error;
+        if (underlyingError != nil) {
+            NSValue * chipErrorValue = [underlyingError valueForKey:@"error"];
+            if (chipErrorValue != nil) {
+                CHIP_ERROR chipError;
+                [chipErrorValue getValue:&chipError];
+                return chipError;
+            }
         }
     }
 

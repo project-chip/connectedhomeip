@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,16 +73,7 @@ public:
 
     CC32XXKVSEntry(char * key, const uint8_t * pBuf, uint16_t len)
     {
-        uint32_t mKLen = strlen(key);
-        if (mKLen > 40)
-        {
-            strncpy(mKey, key, 39);
-            mKey[39] = '\0';
-        }
-        else
-        {
-            strncpy(mKey, key, mKLen);
-        }
+        Platform::CopyString(mKey, key);
 
         mValueLen = len;
         mValue    = new uint8_t[len];
