@@ -15,6 +15,7 @@
 import enum
 from .context import Context
 
+
 class HandledDepth:
     """Defines how deep a XML element has been handled."""
     NOT_HANDLED = enum.auto()  # Unknown/parsed element
@@ -52,5 +53,3 @@ class BaseHandler:
         """Finalizes the processing of the current element"""
         if self._handled == HandledDepth.NOT_HANDLED:
             self.context.MarkTagNotHandled()
-
-
