@@ -24,6 +24,7 @@ class ZapXmlHandler(BaseHandler):
 
        Generally these files only contain a 'configurator' element in them
     """
+
     def __init__(self, context: Context, idl: Idl):
         super().__init__(context)
         self._idl = idl
