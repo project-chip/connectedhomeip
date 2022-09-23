@@ -29,12 +29,12 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT side:
-          sudo ./chip-all-clusters-app
+           sudo ./chip-all-clusters-app
 
           TH side:
-          ./chip-tool pairing ethernet 1 20202021 chiip5 matter123 3840 5540
+          ./chip-tool pairing ethernet 1 20202021 chiip5 matter123 3840  fe80::e65f:1ff:fe0f:2753  5540
 
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
       disabled: true
 
     - label:
