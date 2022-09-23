@@ -577,10 +577,12 @@ void AppTask::LightStateUpdateEventHandler(void)
         {
             statusLED.SetBrightness(0);
             statusLED.Set(0);
+            PostLightActionRequest(AppEvent::kEventType_Light,LightingManager::OFF_ACTION);
         }
         else
         {
             statusLED.SetBrightness(level);
+            PostLightActionRequest(AppEvent::kEventType_Light,LightingManager::ON_ACTION);
         }
     } while (0);
 }
