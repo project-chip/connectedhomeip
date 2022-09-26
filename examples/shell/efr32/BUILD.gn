@@ -47,7 +47,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
   ]
 }
@@ -85,7 +85,7 @@ efr32_executable("shell_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

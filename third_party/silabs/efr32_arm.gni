@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("efr32_board.gni")
+import("silabs_board.gni")
 
-if (efr32_family == "efr32mg12") {
+if (silabs_family == "efr32mg12") {
   arm_arch = "armv7e-m"
   arm_abi = "aapcs"
   arm_cpu = "cortex-m4"
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
-} else if (efr32_family == "efr32mg21" || efr32_family == "efr32mg24") {
+} else if (silabs_family == "efr32mg21" || silabs_family == "efr32mg24" ||
+           silabs_family == "mgm24") {
   arm_arch = "armv8-m.main+dsp"
   arm_abi = "aapcs"
   arm_cpu = "cortex-m33"

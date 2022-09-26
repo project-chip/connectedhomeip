@@ -40,7 +40,7 @@ efr32_sdk("sdk") {
     "${chip_root}/src/lib",
   ]
 
-  defines = [ "BOARD_ID=${efr32_board}" ]
+  defines = [ "BOARD_ID=${silabs_board}" ]
 }
 
 efr32_executable("persistent_storage") {
@@ -63,7 +63,7 @@ efr32_executable("persistent_storage") {
     "include",
   ]
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
