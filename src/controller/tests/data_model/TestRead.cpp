@@ -282,6 +282,7 @@ public:
     static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -1675,6 +1676,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
@@ -4451,6 +4453,51 @@ void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, vo
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+//
+// This validates the KeepSubscriptions flag by first setting up a valid subscription, then sending
+// a subsequent SubcribeRequest with empty attribute AND event paths with KeepSubscriptions = false.
+//
+// This should evict the previous subscription before sending back an error.
+//
+void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    TestReadCallback readCallback;
+    app::AttributePathParams pathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+
+    app::ReadPrepareParams readParam(ctx.GetSessionAliceToBob());
+    readParam.mpAttributePathParamsList    = &pathParams;
+    readParam.mAttributePathParamsListSize = 1;
+    readParam.mMaxIntervalCeilingSeconds   = 1;
+    readParam.mKeepSubscriptions           = false;
+
+    std::unique_ptr<app::ReadClient> readClient = std::make_unique<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+        app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 1);
+
+    ChipLogProgress(DataManagement, "Issue another subscription that will evict the first sub...");
+
+    readParam.mAttributePathParamsListSize = 0;
+    readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, readCallback.mOnError != 0);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -4488,6 +4535,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribeAttributeDeniedNotExistPath", TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath),
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
+    NL_TEST_DEF("TestReadHandler_KeepSubscriptionTest", TestReadInteraction::TestReadHandler_KeepSubscriptionTest),
     NL_TEST_SENTINEL()
 };
 // clang-format on
