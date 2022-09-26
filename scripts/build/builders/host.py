@@ -297,6 +297,9 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.NL_TEST_RUNNER:
             self.build_command = 'runner'
+            # board will NOT be used, but is required to be able to properly
+            # include things added by the test_runner efr32 build
+            self.extra_gn_options.append('silabs_board="BRD4161A"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
