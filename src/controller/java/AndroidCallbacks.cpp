@@ -282,7 +282,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addAttribute method"));
     env->CallVoidMethod(mNodeStateObj, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), attributeStateObj);
-    VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 
     UpdateClusterDataVersion();
 }
@@ -291,26 +291,36 @@ void ReportCallback::UpdateClusterDataVersion()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     chip::app::ConcreteClusterPath lastConcreteClusterPath;
-    if (mClusterCacheAdapter.GetLastReportDataPath(lastConcreteClusterPath) == CHIP_NO_ERROR &&
-        lastConcreteClusterPath.IsValidConcreteClusterPath())
+
+    if (mClusterCacheAdapter.GetLastReportDataPath(lastConcreteClusterPath) != CHIP_NO_ERROR)
     {
-        chip::Optional<chip::DataVersion> committedDataVersion;
-        if (mClusterCacheAdapter.GetVersion(lastConcreteClusterPath, committedDataVersion) == CHIP_NO_ERROR)
-        {
-            if (committedDataVersion.HasValue())
-            {
-                // SetDataVersion to NodeState
-                jmethodID setDataVersionMethod;
-                CHIP_ERROR err =
-                    JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
-                VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
-                env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
-                                    static_cast<jlong>(lastConcreteClusterPath.mClusterId),
-                                    static_cast<jint>(committedDataVersion.Value()));
-                VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
-            }
-        }
+        return;
     }
+
+    if (!lastConcreteClusterPath.IsValidConcreteClusterPath())
+    {
+        return;
+    }
+
+    chip::Optional<chip::DataVersion> committedDataVersion;
+    if (mClusterCacheAdapter.GetVersion(lastConcreteClusterPath, committedDataVersion) != CHIP_NO_ERROR)
+    {
+        return;
+    }
+    if (!committedDataVersion.HasValue())
+    {
+        return;
+    }
+
+    // SetDataVersion to NodeState
+    jmethodID setDataVersionMethod;
+    CHIP_ERROR err =
+        JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
+    env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
+                        static_cast<jlong>(lastConcreteClusterPath.mClusterId),
+                        static_cast<jint>(committedDataVersion.Value()));
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus)
@@ -386,7 +396,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
                         static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
                         eventStateObj);
-    VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 CHIP_ERROR ReportCallback::CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj)
@@ -658,7 +668,7 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
                         static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
                         eventStateObj);
-    VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj)

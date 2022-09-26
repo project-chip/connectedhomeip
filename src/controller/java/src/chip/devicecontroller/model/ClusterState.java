@@ -45,8 +45,8 @@ public final class ClusterState {
     dataVersion = Optional.of(version);
   }
 
-  public int getDataVersion() {
-    return dataVersion.get();
+  public Optional<Integer> getDataVersion() {
+    return dataVersion;
   }
 
   /**
