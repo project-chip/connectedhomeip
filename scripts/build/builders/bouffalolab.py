@@ -43,14 +43,11 @@ class BouffalolabApp(Enum):
 
 class BouffalolabBoard(Enum):
     BL706_IoT_DVK = 1
-    BL702_IoT_DVK = 2
-    BL706_NIGHT_LIGHT = 3
+    BL706_NIGHT_LIGHT = 2
 
     def GnArgName(self):
         if self == BouffalolabBoard.BL706_IoT_DVK:
             return 'BL706-IoT-DVK'
-        elif self == BouffalolabBoard.BL702_IoT_DVK:
-            return 'BL702-IoT-DVK'
         elif self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
         else:
@@ -63,7 +60,7 @@ class BouffalolabBuilder(GnBuilder):
                  root,
                  runner,
                  app: BouffalolabApp = BouffalolabApp.LIGHT,
-                 board: BouffalolabBoard = BouffalolabBoard.BL702_IoT_DVK,
+                 board: BouffalolabBoard = BouffalolabBoard.BL706_IoT_DVK,
                  enable_rpcs: bool = False,
                  module_type: str = "BL706C-22",
                  ):

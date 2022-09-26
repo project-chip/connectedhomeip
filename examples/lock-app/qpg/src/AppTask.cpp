@@ -542,12 +542,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
  */
 void AppTask::UpdateClusterState(void)
 {
+    using namespace chip::app::Clusters;
+    auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
+
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LOCK_ENDPOINT_ID, !BoltLockMgr().IsUnlocked());
+    EmberAfStatus status = DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
     }
 }

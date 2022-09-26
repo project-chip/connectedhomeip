@@ -92,8 +92,11 @@ if [ "$skip_gn" == false ]; then
     ninja -C "$OUTPUT_ROOT" check
 fi
 
+# Remove unit test itself from coverage statistics
+find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
+
 mkdir -p "$COVERAGE_ROOT"
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
-lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
+lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"

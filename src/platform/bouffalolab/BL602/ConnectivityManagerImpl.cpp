@@ -165,5 +165,15 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
     }
 }
 
+void ConnectivityManagerImpl::OnIPv6AddressAvailable()
+{
+    ChipLogProgress(DeviceLayer, "IPv6 addr available.");
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 } // namespace DeviceLayer
 } // namespace chip

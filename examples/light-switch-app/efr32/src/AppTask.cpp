@@ -24,9 +24,12 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "binding-handler.h"
+
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
 #include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"

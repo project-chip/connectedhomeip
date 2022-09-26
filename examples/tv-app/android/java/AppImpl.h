@@ -37,13 +37,12 @@
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
+#include "../include/media-playback/AppMediaPlaybackManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentAppAttributeDelegate.h"
 #include "KeypadInputManager.h"
-#include "MediaPlaybackManager.h"
-#include "MyUserPrompter-JNI.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -59,6 +58,7 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, EndpointId endpointId, jobject manager);
 EndpointId RemoveContentApp(EndpointId epId);
+void ReportAttributeChange(EndpointId epId, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -85,13 +85,13 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN, jobject manager) :
+                   const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(ContentAppAttributeDelegate(manager), { "image/*", "video/*" },
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
-        mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
+        mMediaPlaybackDelegate(attributeDelegate), mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
     AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
@@ -104,7 +104,11 @@ public:
         return &mContentLauncherDelegate;
     };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
-    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
+    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override
+    {
+        mMediaPlaybackDelegate.SetEndpointId(GetEndpointId());
+        return &mMediaPlaybackDelegate;
+    };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
 protected:
@@ -114,7 +118,7 @@ protected:
     ChannelManager mChannelDelegate;
     AppContentLauncherManager mContentLauncherDelegate;
     KeypadInputManager mKeypadInputDelegate;
-    MediaPlaybackManager mMediaPlaybackDelegate;
+    AppMediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
 };
 
@@ -156,6 +160,8 @@ public:
 
     void AddAdminVendorId(uint16_t vendorId);
 
+    void setContentAppAttributeDelegate(ContentAppAttributeDelegate * attributeDelegate);
+
 protected:
     std::vector<ContentAppImpl *> mContentApps{
         new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", nullptr),
@@ -166,6 +172,9 @@ protected:
     std::vector<DataVersion *> mDataVersions{};
 
     std::vector<uint16_t> mAdminVendorIds{};
+
+private:
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };
 
 } // namespace AppPlatform

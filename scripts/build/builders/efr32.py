@@ -117,7 +117,7 @@ class Efr32Builder(GnBuilder):
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
-        self.extra_gn_options = ['efr32_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
 
         if enable_rpcs:
             self.extra_gn_options.append('is_debug=false import("//with_pw_rpc.gni")')
