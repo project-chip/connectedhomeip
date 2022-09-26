@@ -380,9 +380,6 @@ class CommandHandler(BaseHandler):
             self._struct.tag = StructTag.RESPONSE
             self._struct.code = ParseInt(attrs['code'])
 
-
-
-
     def GetArgumentField(self, attrs):
         data_type = DataType(name=attrs['type'])
 
