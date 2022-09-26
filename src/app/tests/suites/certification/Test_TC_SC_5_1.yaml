@@ -26,8 +26,6 @@ tests:
     - label: "Precondition"
       verification: |
           Group Member is commissioned with Admin
-
-          DUT will set TestGroupEndpoint
       disabled: true
 
     - label: "TH writes ACL entry by setting AuthMode as Group to DUT"
@@ -55,11 +53,7 @@ tests:
           "Admin sends KeySetWrite command to GroupKeyManagement cluster to DUT
           on PIXIT.G.ENDPOINT"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
-          "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
-          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
 
           Verify success response on the TH Log:
 
@@ -123,8 +117,8 @@ tests:
       disabled: true
 
     - label:
-          "Admin sends AddGroup Command to DUT with the GroupID set by Admin on
-          PIXIT.SC.ENDPOINT"
+          "Admin sends AddGroup Command to DUT with the GroupID and GroupName
+          set by Admin on PIXIT.G.ENDPOINT"
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 1
 
@@ -139,7 +133,24 @@ tests:
 
     - label:
           "Admin sends ViewGroup command with the GroupID to the Group cluster
-          on the DUT on PIXIT.SC.ENDPOINT"
+          on the DUT on PIXIT.G.ENDPOINT"
+      verification: |
+          ./chip-tool groups view-group 0x0001 1 1
+
+          Verify  ViewGroupResponse on the TH Log:
+
+          [1651218576.149152][2635:2640] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
+          [1651218576.149231][2635:2640] CHIP:TOO:   ViewGroupResponse: {
+          [1651218576.149265][2635:2640] CHIP:TOO:     status: 0
+          [1651218576.149289][2635:2640] CHIP:TOO:     groupId: 1
+          [1651218576.149311][2635:2640] CHIP:TOO:     groupName: grp1
+          [1651218576.149335][2635:2640] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Verify DUT sends a ViewGroupResponse command with the same GroupName
+          created by Admin in step 1b."
+      PICS: G.S.F00
       verification: |
           ./chip-tool groups view-group 0x0001 1 1
 
@@ -203,9 +214,28 @@ tests:
           [1655965817.917408][3012:3017] CHIP:TOO:   GroupTable: 1 entries
           [1655965817.917506][3012:3017] CHIP:TOO:     [1]: {
           [1655965817.917559][3012:3017] CHIP:TOO:       GroupId: 1
-          [1655965817.917600][3012:3017] CHIP:TOO:       Endpoints: 2 entries
-          [1655965817.917642][3012:3017] CHIP:TOO:         [1]: 0
-          [1655965817.917680][3012:3017] CHIP:TOO:         [2]: 1
+          [1655965817.917600][3012:3017] CHIP:TOO:       Endpoints: 1 entries
+          [1655965817.917680][3012:3017] CHIP:TOO:         [1]: 1
+          [1655965817.917718][3012:3017] CHIP:TOO:       GroupName: grp1
+          [1655965817.917752][3012:3017] CHIP:TOO:       FabricIndex: 1
+          [1655965817.917784][3012:3017] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Verify each returned GroupInfoMapStruct contains an expected
+          GroupName as generated in step 1b."
+      PICS: G.S.F00
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          Verify  GroupTable on the TH Log:
+
+          [1655965817.917300][3012:3017] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1208492408
+          [1655965817.917408][3012:3017] CHIP:TOO:   GroupTable: 1 entries
+          [1655965817.917506][3012:3017] CHIP:TOO:     [1]: {
+          [1655965817.917559][3012:3017] CHIP:TOO:       GroupId: 1
+          [1655965817.917600][3012:3017] CHIP:TOO:       Endpoints: 1 entries
+          [1655965817.917680][3012:3017] CHIP:TOO:         [1]: 1
           [1655965817.917718][3012:3017] CHIP:TOO:       GroupName: grp1
           [1655965817.917752][3012:3017] CHIP:TOO:       FabricIndex: 1
           [1655965817.917784][3012:3017] CHIP:TOO:      }

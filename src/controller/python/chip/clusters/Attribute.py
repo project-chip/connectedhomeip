@@ -955,10 +955,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
-    if (not attributes) and (not events):
-        raise ValueError(
-            "Must read some something"
-        )
+
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, returnClusterObject)

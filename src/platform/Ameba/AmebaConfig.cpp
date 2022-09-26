@@ -152,6 +152,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     if (success == 0)
     {
+        outLen -= 1; // Don't count trailing null
         return CHIP_NO_ERROR;
     }
     else
@@ -245,7 +246,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = AmebaConfig::WriteConfigValueStr(key, strCopy.Get());
 exit:

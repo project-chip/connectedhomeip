@@ -282,6 +282,9 @@ void CastingServer::SetDefaultFabricIndex()
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
 }
 
+/**
+ * @brief Content Launcher cluster
+ */
 CHIP_ERROR CastingServer::ContentLauncher_LaunchURL(
     const char * contentUrl, const char * contentDisplayStr,
     chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
@@ -299,6 +302,9 @@ CHIP_ERROR CastingServer::ContentLauncher_LaunchContent(chip::app::Clusters::Con
     return mLaunchContentCommand.Invoke(search, autoPlay, data, responseCallback);
 }
 
+/**
+ * @brief Level Control cluster
+ */
 CHIP_ERROR CastingServer::LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize,
                                             uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                             std::function<void(CHIP_ERROR)> responseCallback)
@@ -322,6 +328,42 @@ CHIP_ERROR CastingServer::LevelControl_MoveToLevel(uint8_t level, uint16_t trans
     return mMoveToLevelCommand.Invoke(level, nullableTransitionTime, optionMask, optionOverride, responseCallback);
 }
 
+CHIP_ERROR CastingServer::LevelControl_SubscribeToCurrentLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::LevelControl_SubscribeToMinLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mMinLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mMinLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::LevelControl_SubscribeToMaxLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mMaxLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mMaxLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+/**
+ * @brief Media Playback cluster
+ */
 CHIP_ERROR CastingServer::MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mPlayCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
@@ -366,6 +408,89 @@ CHIP_ERROR CastingServer::MediaPlayback_SkipBackward(uint64_t deltaPositionMilli
     return mSkipBackwardCommand.Invoke(deltaPositionMilliseconds, responseCallback);
 }
 
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToCurrentState(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentStateSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentStateSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToStartTime(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mStartTimeSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStartTimeSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                   onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToDuration(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mDurationSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mDurationSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSampledPosition(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSampledPositionSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSampledPositionSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                         onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToPlaybackSpeed(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mPlaybackSpeedSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPlaybackSpeedSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                       onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSeekRangeEnd(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSeekRangeEndSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekRangeEndSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSeekRangeStart(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSeekRangeStartSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekRangeStartSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                        onSubscriptionEstablished);
+}
+
+/**
+ * @brief Application Launcher cluster
+ */
 CHIP_ERROR
 CastingServer::ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
@@ -390,6 +515,21 @@ CastingServer::ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLaunc
     return mHideAppCommand.Invoke(application, responseCallback);
 }
 
+CHIP_ERROR CastingServer::ApplicationLauncher_SubscribeToCurrentApp(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentAppSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentAppSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                    onSubscriptionEstablished);
+}
+
+/**
+ * @brief Target Navigator cluster
+ */
 CHIP_ERROR CastingServer::TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
                                                          std::function<void(CHIP_ERROR)> responseCallback)
 {
@@ -397,9 +537,56 @@ CHIP_ERROR CastingServer::TargetNavigator_NavigateTarget(const uint8_t target, c
     return mNavigateTargetCommand.Invoke(target, data, responseCallback);
 }
 
+CHIP_ERROR CastingServer::TargetNavigator_SubscribeToTargetList(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mTargetListSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mTargetListSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                    onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::TargetNavigator_SubscribeToCurrentTarget(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentTargetSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentTargetSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                       onSubscriptionEstablished);
+}
+
+/**
+ * @brief Keypad Input cluster
+ */
 CHIP_ERROR CastingServer::KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
                                               std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mSendKeyCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
     return mSendKeyCommand.Invoke(keyCode, responseCallback);
+}
+
+/**
+ * @brief Channel cluster
+ */
+CHIP_ERROR CastingServer::Channel_ChangeChannelCommand(const chip::CharSpan & match,
+                                                       std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mChangeChannelCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mChangeChannelCommand.Invoke(match, responseCallback);
+}
+
+CHIP_ERROR CastingServer::Channel_SubscribeToLineup(
+    void * context,
+    chip::Controller::ReadResponseSuccessCallback<chip::app::Clusters::Channel::Attributes::Lineup::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mLineupSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLineupSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval, onSubscriptionEstablished);
 }
