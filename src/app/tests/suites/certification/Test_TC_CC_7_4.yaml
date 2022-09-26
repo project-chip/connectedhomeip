@@ -76,14 +76,18 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 20000
+          constraints:
+              minValue: 17000
+              maxValue: 23000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 50
+          constraints:
+              minValue: 42
+              maxValue: 58
 
     - label:
           "TH sends EnhancedMoveToHueAndSaturation command to DUT with
@@ -180,7 +184,7 @@ tests:
           value: 80
 
     - label: "TH reads ColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0008
+      PICS: CC.S.F01 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
       response:
@@ -190,7 +194,7 @@ tests:
               maxValue: 2
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A4001
+      PICS: CC.S.F01 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
       response:

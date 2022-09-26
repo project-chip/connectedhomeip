@@ -309,7 +309,7 @@ CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrReturnError(strCopy, CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     return ESP32Config::WriteConfigValueStr(key, strCopy.Get());
 }

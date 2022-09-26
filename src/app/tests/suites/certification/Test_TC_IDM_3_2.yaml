@@ -219,7 +219,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -229,7 +229,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -239,7 +239,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -249,7 +249,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -259,7 +259,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of  data type List
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
     - label:
@@ -732,7 +732,7 @@ tests:
           [1653028897.526687][6605:6611] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3301562286
           [1653028897.526763][6605:6611] CHIP:TOO: on level: 2
 
-
+           TH sends below mentioned WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
           ./chip-tool levelcontrol write on-level 3 1 1 --data-version 0xc4c9d7ae
 
            On TH, verify that DUT sends a Write Response message with a success
@@ -803,7 +803,7 @@ tests:
           [1653029055.885209][6643:6648] CHIP:DMG: },
           [1653029055.885219][6643:6648] CHIP:DMG:
 
-
+          TH sends below mentioned  second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.
            ./chip-tool levelcontrol write on-level 4 1 1 --data-version 0xc4c9d7af
            on TH, verify that  DUT responds as DATA_VERSION_MISMATCH for the second Write request.
 
@@ -842,5 +842,5 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute which need NEEDS_TIMED_INTERACTION.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true

@@ -25,10 +25,10 @@ concurrency:
 jobs:
   efr32:
     name: EFR32
-    timeout-minutes: 110 
+    timeout-minutes: 110
 
     env:
-      EFR32_BOARD: BRD4161A
+      SILABS_BOARD: BRD4161A
       BUILD_TYPE: gn_efr32
 
     runs-on: ubuntu-latest

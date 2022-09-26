@@ -1329,6 +1329,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster Switch = 59 {
+  bitmap SwitchFeature : BITMAP32 {
+    kLatchingSwitch = 0x1;
+    kMomentarySwitch = 0x2;
+    kMomentarySwitchRelease = 0x4;
+    kMomentarySwitchLongPress = 0x8;
+    kMomentarySwitchMultiPress = 0x10;
+  }
+
   info event SwitchLatched = 0 {
     INT8U newPosition = 0;
   }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,10 +67,10 @@ public:
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     const char * GetInstanceName() const { return mInstanceName; }
-    void SetInstanceName(const char * instanceName) { strncpy(mInstanceName, instanceName, sizeof(mInstanceName)); }
+    void SetInstanceName(const char * instanceName) { Platform::CopyString(mInstanceName, instanceName); }
 
     const char * GetDeviceName() const { return mDeviceName; }
-    void SetDeviceName(const char * deviceName) { strncpy(mDeviceName, deviceName, sizeof(mDeviceName)); }
+    void SetDeviceName(const char * deviceName) { Platform::CopyString(mDeviceName, deviceName); }
 
     uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
     void SetLongDiscriminator(uint16_t value) { mLongDiscriminator = value; }

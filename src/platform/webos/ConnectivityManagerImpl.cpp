@@ -570,8 +570,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
             mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
             ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
-            strncpy(sWiFiIfName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, IFNAMSIZ);
-            sWiFiIfName[IFNAMSIZ - 1] = '\0';
+            Platform::CopyString(sWiFiIfName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
 
             wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
                                                                   kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,

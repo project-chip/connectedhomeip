@@ -535,7 +535,11 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
+    VerifyOrReturn([self checkIsRunning]);
+
     dispatch_async(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
         self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
     });
 }

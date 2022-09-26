@@ -52,6 +52,9 @@ public class AppPlatform {
   // Method to remove content app as endpoint (happens when the app is uninstalled)
   public native int removeContentApp(int endpointId);
 
+  // Method to report attribute change for content app endpoints to the SDK
+  public native void reportAttributeChange(int endpointId, int clusterId, int attributeId);
+
   static {
     System.loadLibrary("TvApp");
   }
