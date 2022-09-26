@@ -101,7 +101,8 @@ jobs:
               # TODO: some multipass/postprocess may be more appropriate to allow any ordering of 
               #       things.
               run: |
-                  ./scripts/idl/xml_parser.py \
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/idl/xml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
@@ -175,7 +176,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/types.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/zll.xml
+                      src/app/zap-templates/zcl/data-model/silabs/zll.xml \
+                    "
             - name: Build Apps
               timeout-minutes: 45
               run: |
