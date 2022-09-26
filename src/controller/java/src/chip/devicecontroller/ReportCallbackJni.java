@@ -22,15 +22,19 @@ import androidx.annotation.Nullable;
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
   @Nullable private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  @Nullable private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
   private ReportCallback wrappedReportCallback;
   private long callbackHandle;
 
   public ReportCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportCallback reportCallback) {
+      ReportCallback reportCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback) {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
-    this.callbackHandle = newCallback(subscriptionEstablishedCallback, reportCallback);
+    this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
+    this.callbackHandle =
+        newCallback(subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
   }
 
   long getCallbackHandle() {
@@ -39,7 +43,8 @@ public class ReportCallbackJni {
 
   private native long newCallback(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportCallback wrappedCallback);
+      ReportCallback wrappedCallback,
+      @Nullable ResubscriptionAttemptCallback resubscriptionAttemptCallback);
 
   private native void deleteCallback(long callbackHandle);
 

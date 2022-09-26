@@ -502,23 +502,6 @@ void ConnectivityManagerImpl::DriveStationState()
             mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
         }
-
-        // If the WiFi station interface is no longer enabled, or no longer provisioned,
-        // disconnect the station from the AP, unless the WiFi station mode is currently
-        // under application control.
-        if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
-            (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
-        {
-            ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            err = Internal::AmebaUtils::WiFiDisconnect();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "WiFiDisconnect() failed: %s", err);
-                return;
-            }
-
-            ChangeWiFiStationState(kWiFiStationState_Disconnecting);
-        }
     }
 
     // Otherwise the station interface is NOT connected to an AP, so...

@@ -215,6 +215,7 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
+                 minmdns_address_policy=None,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -224,9 +225,6 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
-
-        if board == HostBoard.ARM64:
-            self.build_env['PKG_CONFIG_PATH'] = os.path.join(self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -279,6 +277,11 @@ class HostBuilder(GnBuilder):
                 # Fake uses "//build/toolchain/fake:fake_x64_gcc"
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
+
+        if minmdns_address_policy:
+            if use_platform_mdns:
+                raise Exception('Address policy applies to minmdns only')
+            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -342,6 +345,9 @@ class HostBuilder(GnBuilder):
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
+        if self.board == HostBoard.ARM64:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
         return self.build_env
 
     def SysRootPath(self, name):
@@ -355,25 +361,31 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
-            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
+                           '-name', 'tests', '-exec', 'rm -rf {} \\;'], title="Cleanup unit tests")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--output-file',
-                          os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
+            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
-                          os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+                           os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
     def build_outputs(self):
         outputs = {}

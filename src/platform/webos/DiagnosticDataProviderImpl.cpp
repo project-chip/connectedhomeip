@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -288,8 +288,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             ThreadMetrics * thread = new ThreadMetrics();
 
-            strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, entry->d_name);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = atoi(entry->d_name);
 
@@ -439,8 +438,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 NetworkInterface * ifp = new NetworkInterface();
 
-                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
-                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+                Platform::CopyString(ifp->Name, ifa->ifa_name);
 
                 ifp->name          = CharSpan::fromCharString(ifp->Name);
                 ifp->isOperational = ifa->ifa_flags & IFF_RUNNING;

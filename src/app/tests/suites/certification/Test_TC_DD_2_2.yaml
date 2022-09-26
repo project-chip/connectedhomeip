@@ -36,6 +36,10 @@ tests:
           1 - 5.4.3. Discovery by Commissioner - DUT supports BLE (central role), Wi-Fi and IP connectivity - Wi-Fi certified n client
 
           2 - Test Harness must support all discovery transport technologies as the DUT (i.e. BLE, Wi-Fi and IP connectivity)
+
+          To put the DUT into commissionable state and verify commissionable state.
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use "chiptool discover commissionables"  to discover mDNS adv and provision the device using "chip-tool pairing code node-id payload".
+          otherwise if your DUT is advertising over BLE , pls use the "/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1" command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
       disabled: true
 
     - label: "TH starts matter announcement procedure using BLE transport"
@@ -69,14 +73,14 @@ tests:
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
-          Verify in TH as commissionee side:
+          Verify in TH as commissioner side:
           $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          Verify in DUT as commissioner side:
+          Verify in DUT as commissionee side:
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
@@ -127,14 +131,14 @@ tests:
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
-          Verify in TH as commissionee side:
+          Verify in TH as commissioner side:
           $  ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
           [1651743342.299897][3461:3464] CHIP:BLE: New device scanned: E4:5F:01:0F:1A:02
           [1651743342.299951][3461:3464] CHIP:BLE: Device discriminator match. Attempting to connect.
           [1651743342.303783][3461:3464] CHIP:BLE: Scan complete notification without an active scan.
           [1651743346.244175][3461:3464] CHIP:DL: ConnectDevice complete
 
-          Verify in DUT as commissioner side:
+          Verify in DUT as commissionee side:
           [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
           [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
           [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517

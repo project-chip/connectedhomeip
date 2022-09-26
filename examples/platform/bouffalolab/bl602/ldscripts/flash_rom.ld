@@ -11,7 +11,7 @@ __RFTLV_HEAD1_L = (0x41524150); /* PAPA */
 __RAM_START = 0x4200C000;
 __RAM_END = 0x4200C000 + 256K - __EM_SIZE; /* leave 8K left for BLE */
 
-__RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K);
+__RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K - 16K);
 __RAM_WIFI_LEN = (__RAM_END - __RAM_START - __RAM_TCM_LEN);
 
 MEMORY

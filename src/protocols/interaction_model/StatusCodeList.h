@@ -22,6 +22,8 @@
  * include this file, then undefine the macro.
  */
 
+/// WARNING: If you touch this list, please also update src/controller/python/chip/interaction_model/__init__.py
+
 // clang-format off
 CHIP_IM_STATUS_CODE(Success               , SUCCESS                 , 0x0)
 CHIP_IM_STATUS_CODE(Failure               , FAILURE                 , 0x01)

@@ -80,10 +80,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceType::Type & request);
+static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & request,
                         Json::Value & value);
 

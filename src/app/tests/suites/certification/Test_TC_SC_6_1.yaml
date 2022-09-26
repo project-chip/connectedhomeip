@@ -31,8 +31,20 @@ tests:
     - label: "Precondition"
       verification: |
           Group Member is commissioned with Admin
+      disabled: true
 
-          TH will set TestGroupEndpoint
+    - label: "Precondition"
+      verification: |
+          Execute this step before executing the test steps.
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 1 0
+
+          Verify success response on the TH Log:
+
+          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
+          [1652330385.328229][3240:3245] CHIP:DMG:                        {
+          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652330385.328298][3240:3245] CHIP:DMG:                        },
       disabled: true
 
     - label: "TH should have the ACL entry with the AuthMode as Group by DUT"
@@ -130,7 +142,7 @@ tests:
 
     - label:
           "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
-          PIXIT.SC.ENDPOINT"
+          PIXIT.G.ENDPOINT"
       PICS: GRPKEY.C.C00.Tx
       verification: |
 
@@ -195,7 +207,7 @@ tests:
           [1659350562.022661][5824:5824] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends AddGroup Command to TH on PIXIT.SC.ENDPOINT"
+    - label: "DUT sends AddGroup Command to TH on PIXIT.G.ENDPOINT"
       PICS: G.C.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 0

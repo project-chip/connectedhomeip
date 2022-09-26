@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -11,6 +12,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
+import com.matter.tv.server.model.ContentApp;
+import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import java.util.concurrent.TimeUnit;
 
 public class ContentAppAgentService extends Service {
@@ -28,17 +31,43 @@ public class ContentAppAgentService extends Service {
         @Override
         public boolean setSupportedClusters(
             com.matter.tv.app.api.SetSupportedClustersRequest request) throws RemoteException {
+          final int callingUID = Binder.getCallingUid();
+          final String pkg = getApplicationContext().getPackageManager().getNameForUid(callingUID);
           Log.d(
               TAG,
               "Received request to add the following supported clusters "
-                  + request.supportedClusters.toString());
-          // TODO : need to (re)discover the app with the new clusters.
-          return true;
+                  + request.supportedClusters.toString()
+                  + " for app "
+                  + pkg);
+          ContentApp contentApp =
+              ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApp(pkg);
+          if (contentApp != null) {
+            contentApp.setSupportedClusters(request.supportedClusters);
+            return true;
+          }
+          Log.e(TAG, "No matter content app found for package " + pkg);
+          return false;
         }
 
         @Override
-        public boolean reportAttributeChange(
-            com.matter.tv.app.api.ReportAttributeChangeRequest request) throws RemoteException {
+        public boolean reportAttributeChange(int clusterId, int attributeId)
+            throws RemoteException {
+          final int callingUID = Binder.getCallingUid();
+          final String pkg = getApplicationContext().getPackageManager().getNameForUid(callingUID);
+          Log.d(
+              TAG,
+              "Received request to report attribute change for cluster "
+                  + clusterId
+                  + " attribute "
+                  + attributeId);
+          ContentApp contentApp =
+              ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApp(pkg);
+          if (contentApp != null && contentApp.getEndpointId() != ContentApp.INVALID_ENDPOINTID) {
+            AppPlatformService.get()
+                .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+            return true;
+          }
+          Log.e(TAG, "No matter content app found for package " + pkg);
           return false;
         }
       };
@@ -108,7 +137,7 @@ public class ContentAppAgentService extends Service {
   }
 
   private static PendingIntent getPendingIntentForResponse(
-      final Context context, final String targetPackage, final int responseId) {
+      Context context, final String targetPackage, final int responseId) {
     Intent ackBackIntent = new Intent(ACTION_MATTER_RESPONSE);
     ackBackIntent.setClass(context, ContentAppAgentService.class);
     ackBackIntent.putExtra(EXTRA_RESPONSE_RECEIVING_PACKAGE, targetPackage);

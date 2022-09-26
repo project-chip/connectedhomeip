@@ -939,19 +939,20 @@ public class ClusterReadMapping {
         readBinaryInputBasicClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("binaryInputBasic", readBinaryInputBasicInteractionInfo);
     Map<String, InteractionInfo> readDescriptorInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readDescriptorDeviceListCommandParams =
+    Map<String, CommandParameterInfo> readDescriptorDeviceTypeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readDescriptorDeviceListAttributeInteractionInfo =
+    InteractionInfo readDescriptorDeviceTypeListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DescriptorCluster) cluster)
-                  .readDeviceListAttribute(
-                      (ChipClusters.DescriptorCluster.DeviceListAttributeCallback) callback);
+                  .readDeviceTypeListAttribute(
+                      (ChipClusters.DescriptorCluster.DeviceTypeListAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDescriptorClusterDeviceListAttributeCallback(),
-            readDescriptorDeviceListCommandParams);
+            () ->
+                new ClusterInfoMapping.DelegatedDescriptorClusterDeviceTypeListAttributeCallback(),
+            readDescriptorDeviceTypeListCommandParams);
     readDescriptorInteractionInfo.put(
-        "readDeviceListAttribute", readDescriptorDeviceListAttributeInteractionInfo);
+        "readDeviceTypeListAttribute", readDescriptorDeviceTypeListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDescriptorServerListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDescriptorServerListAttributeInteractionInfo =

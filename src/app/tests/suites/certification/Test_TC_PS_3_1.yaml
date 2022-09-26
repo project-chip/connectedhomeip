@@ -28,6 +28,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
@@ -108,6 +113,79 @@ tests:
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          ./chip-tool powersource read bat-charge-level 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log)
+
+          [1663140804.059599][2414:2414] CHIP:IM: Received Read request
+          [1663140804.059679][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663140804.059706][2414:2414] CHIP:DMG: {
+          [1663140804.059728][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663140804.059754][2414:2414] CHIP:DMG:         [
+          [1663140804.059779][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663140804.059828][2414:2414] CHIP:DMG:                 {
+          [1663140804.059861][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
+          [1663140804.059976][2414:2414] CHIP:DMG:                 }
+          [1663140804.060006][2414:2414] CHIP:DMG:
+          [1663140804.060033][2414:2414] CHIP:DMG:         ],
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663140804.060136][2414:2414] CHIP:DMG: },
+
+
+          ./chip-tool powersource read bat-replacement-needed 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log)
+
+          [1663141268.348233][2414:2414] CHIP:IM: Received Read request
+          [1663141268.348332][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141268.348388][2414:2414] CHIP:DMG: {
+          [1663141268.348418][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141268.348465][2414:2414] CHIP:DMG:         [
+          [1663141268.348498][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141268.348545][2414:2414] CHIP:DMG:                 {
+          [1663141268.348584][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1663141268.348735][2414:2414] CHIP:DMG:                 }
+          [1663141268.348774][2414:2414] CHIP:DMG:
+          [1663141268.348820][2414:2414] CHIP:DMG:         ],
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141268.348982][2414:2414] CHIP:DMG: },
+          [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663141268.349214][2414:2414] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663141268.349251][2414:2414] CHIP:DMG: <RE:Run> Cluster 2f, Attribute f is dirty
+
+
+          ./chip-tool powersource read bat-replaceability 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log
+
+
+          [1663141378.115928][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141378.115978][2414:2414] CHIP:DMG: {
+          [1663141378.116006][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141378.116050][2414:2414] CHIP:DMG:         [
+          [1663141378.116080][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141378.116124][2414:2414] CHIP:DMG:                 {
+          [1663141378.116160][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1663141378.116294][2414:2414] CHIP:DMG:                 }
+          [1663141378.116330][2414:2414] CHIP:DMG:
+          [1663141378.116372][2414:2414] CHIP:DMG:         ],
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141378.116521][2414:2414] CHIP:DMG: },
+          [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
@@ -235,6 +313,79 @@ tests:
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          ./chip-tool powersource read bat-charge-level 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+          [1663140804.059599][2414:2414] CHIP:IM: Received Read request
+          [1663140804.059679][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663140804.059706][2414:2414] CHIP:DMG: {
+          [1663140804.059728][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663140804.059754][2414:2414] CHIP:DMG:         [
+          [1663140804.059779][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663140804.059828][2414:2414] CHIP:DMG:                 {
+          [1663140804.059861][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
+          [1663140804.059976][2414:2414] CHIP:DMG:                 }
+          [1663140804.060006][2414:2414] CHIP:DMG:
+          [1663140804.060033][2414:2414] CHIP:DMG:         ],
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663140804.060136][2414:2414] CHIP:DMG: },
+
+
+          ./chip-tool powersource read bat-replacement-needed 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+          [1663141268.348233][2414:2414] CHIP:IM: Received Read request
+          [1663141268.348332][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141268.348388][2414:2414] CHIP:DMG: {
+          [1663141268.348418][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141268.348465][2414:2414] CHIP:DMG:         [
+          [1663141268.348498][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141268.348545][2414:2414] CHIP:DMG:                 {
+          [1663141268.348584][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1663141268.348735][2414:2414] CHIP:DMG:                 }
+          [1663141268.348774][2414:2414] CHIP:DMG:
+          [1663141268.348820][2414:2414] CHIP:DMG:         ],
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141268.348982][2414:2414] CHIP:DMG: },
+          [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663141268.349214][2414:2414] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663141268.349251][2414:2414] CHIP:DMG: <RE:Run> Cluster 2f, Attribute f is dirty
+
+
+          ./chip-tool powersource read bat-replaceability 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+
+          [1663141378.115928][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141378.115978][2414:2414] CHIP:DMG: {
+          [1663141378.116006][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141378.116050][2414:2414] CHIP:DMG:         [
+          [1663141378.116080][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141378.116124][2414:2414] CHIP:DMG:                 {
+          [1663141378.116160][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1663141378.116294][2414:2414] CHIP:DMG:                 }
+          [1663141378.116330][2414:2414] CHIP:DMG:
+          [1663141378.116372][2414:2414] CHIP:DMG:         ],
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141378.116521][2414:2414] CHIP:DMG: },
+          [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:

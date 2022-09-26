@@ -23,6 +23,8 @@
         -   [validate-att-cert](#validate-att-cert)
         -   [gen-cd](#gen-cd)
             -   [gen-cd example](#gen-cd-example)
+        -   [print-cd](#print-cd)
+            -   [print-cd example](#print-cd-example)
         -   [version](#version)
 
 ## Introduction
@@ -776,6 +778,45 @@ The binary output of the CMS signed CD is written to `cd.bin`.
 
 NOTE: `dac-origin-vendor-id` and `dac-origin-product-id` are not included in
 this example.
+
+### print-cd
+
+```
+$ ./out/debug/standalone/chip-cert print-cd -h
+Usage: chip-cert print-cd [<options...>] <file/str>
+
+Print a CHIP certification declaration (CD) content.
+
+ARGUMENTS
+
+  <file/str>
+
+       File or string containing a CHIP CMS Signed CD message.
+
+COMMAND OPTIONS
+
+   -o, --out <file/stdout>
+
+       The output printed CD content file name. If not specified
+       or if specified '-' then output is written to stdout.
+
+HELP OPTIONS
+
+  -h, --help
+       Print this output and then exit.
+
+  -v, --version
+       Print the version and then exit.
+```
+
+#### gen-cd example
+
+An example of printing a Certificate Declaration (CD), which is provided as a
+command line argument in a hex format:
+
+```
+./chip-cert print-cd 3081f506092a864886f70d010702a081e73081e4020103310d300b0609608648016503040201305006092a864886f70d010701a0430441152400012501f2ff360205018005028018250334122c04135a494732303134325a423333303030322d3234240500240600250794262408002509f1ff250a008018317e307c020103801462fa823359acfaa9963e1cfa140addf504f37160300b0609608648016503040201300a06082a8648ce3d04030204483046022100926296f7578158be7c459388336ca7383766c9eedd9855cbda6f4cf6bdf43211022100e0dbf4a2bcec4ea274baf0dea208b3365c6ed544086d101afdaf079a2c23e0de
+```
 
 ### version
 

@@ -3,15 +3,54 @@ package chip.setuppayload;
 /** Parser for scanned QR code or manual entry code. */
 public class SetupPayloadParser {
 
-  /** Returns {@link SetupPayload} parsed from the QR code string. */
-  public SetupPayload parseQrCode(String qrCodeString) throws UnrecognizedQrCodeException {
-    return fetchPayloadFromQrCode(qrCodeString);
+  /**
+   * Returns {@link SetupPayload} parsed from the QR code string. If an invalid element is included
+   * in the QRCode Parse result, SetupPayloadException occurs. Refer to {@link SetupPayload} for the
+   * description of the invalid element.
+   */
+  public SetupPayload parseQrCode(String qrCodeString)
+      throws UnrecognizedQrCodeException, SetupPayloadException {
+    return fetchPayloadFromQrCode(qrCodeString, false);
   }
 
-  /** Returns {@link SetupPayload} parsed from the manual entry code string. */
+  /**
+   * Returns {@link SetupPayload} parsed from the QR code string.
+   *
+   * @param qrCodeString the QRCode for commissioning device.
+   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
+   *     element validation is not checked. Consider saying that the payload must still parse
+   *     correctly, but this skips validation of the content past parsing (i.e. it does not validate
+   *     ranges for individual elements). Refer to {@link SetupPayload} for the description of the
+   *     invalid element.
+   */
+  public SetupPayload parseQrCode(String qrCodeString, boolean allowInvalidPayload)
+      throws UnrecognizedQrCodeException, SetupPayloadException {
+    return fetchPayloadFromQrCode(qrCodeString, allowInvalidPayload);
+  }
+
+  /**
+   * Returns {@link SetupPayload} parsed from the manual entry code string. If an SetupPINCode has
+   * invalid value, SetupPayloadException occurs. Refer to {@link SetupPayload} for the description
+   * of the invalid element.
+   */
   public SetupPayload parseManualEntryCode(String entryCodeString)
-      throws InvalidEntryCodeFormatException {
-    return fetchPayloadFromManualEntryCode(entryCodeString);
+      throws InvalidEntryCodeFormatException, SetupPayloadException {
+    return fetchPayloadFromManualEntryCode(entryCodeString, false);
+  }
+
+  /**
+   * Returns {@link SetupPayload} parsed from the manual entry code string.
+   *
+   * @param entryCodeString the manual Pairing Code for commissioning device.
+   * @param allowInvalidPayload Allow invalid payload components. If this value is true, payload
+   *     element validation is not checked. Consider saying that the payload must still parse
+   *     correctly, but this skips validation of the content past parsing (i.e. it does not validate
+   *     ranges for individual elements). Refer to {@link SetupPayload} for the description of the
+   *     invalid element.
+   */
+  public SetupPayload parseManualEntryCode(String entryCodeString, boolean allowInvalidPayload)
+      throws InvalidEntryCodeFormatException, SetupPayloadException {
+    return fetchPayloadFromManualEntryCode(entryCodeString, allowInvalidPayload);
   }
 
   /** Get QR code string from {@link SetupPayload}. */
@@ -21,11 +60,13 @@ public class SetupPayloadParser {
   public native String getManualEntryCodeFromPayload(SetupPayload payload)
       throws SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromQrCode(String qrCodeString)
-      throws UnrecognizedQrCodeException;
+  private native SetupPayload fetchPayloadFromQrCode(
+      String qrCodeString, boolean isAllowInvalidPayload)
+      throws UnrecognizedQrCodeException, SetupPayloadException;
 
-  private native SetupPayload fetchPayloadFromManualEntryCode(String entryCodeString)
-      throws InvalidEntryCodeFormatException;
+  private native SetupPayload fetchPayloadFromManualEntryCode(
+      String entryCodeString, boolean isAllowInvalidPayload)
+      throws InvalidEntryCodeFormatException, SetupPayloadException;
 
   static {
     System.loadLibrary("SetupPayloadParser");

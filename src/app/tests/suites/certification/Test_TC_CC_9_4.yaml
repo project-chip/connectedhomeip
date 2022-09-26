@@ -37,7 +37,7 @@ tests:
       disabled: true
 
     - label: "DUT sends ColorLoopSet command to TH."
-      PICS: CC.C.C44.Rsp
+      PICS: CC.C.C44.Tx
       verification: |
           ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1
 

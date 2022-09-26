@@ -171,6 +171,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    if (mStopCommissioning)
+    {
+        return CommissioningStage::kCleanup;
+    }
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
@@ -345,6 +349,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
@@ -494,6 +499,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
+            if (mDeviceCommissioningInfo.nodeId != kUndefinedNodeId)
+            {
+                mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
+            }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -501,10 +510,34 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendDACCertificateRequest:
             SetDAC(report.Get<RequestedCertificate>().certificate);
             break;
-        case CommissioningStage::kSendAttestationRequest:
-            // These don't need to be deep copied to local memory because they are used in this one step then never again.
-            mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
-                .SetAttestationSignature(report.Get<AttestationResponse>().signature);
+        case CommissioningStage::kSendAttestationRequest: {
+            auto & elements  = report.Get<AttestationResponse>().attestationElements;
+            auto & signature = report.Get<AttestationResponse>().signature;
+            if (elements.size() > sizeof(mAttestationElements))
+            {
+                ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %u larger than cache size %u",
+                             static_cast<unsigned>(elements.size()), static_cast<unsigned>(sizeof(mAttestationElements)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
+            }
+            memcpy(mAttestationElements, elements.data(), elements.size());
+            mAttestationElementsLen = static_cast<uint16_t>(elements.size());
+            mParams.SetAttestationElements(ByteSpan(mAttestationElements, elements.size()));
+            ChipLogDetail(Controller, "AutoCommissioner setting attestationElements buffer size %u/%u",
+                          static_cast<unsigned>(elements.size()),
+                          static_cast<unsigned>(mParams.GetAttestationElements().Value().size()));
+
+            if (signature.size() > sizeof(mAttestationSignature))
+            {
+                ChipLogError(Controller,
+                             "AutoCommissioner attestationSignature buffer size %u larger than "
+                             "cache size %u",
+                             static_cast<unsigned>(signature.size()), static_cast<unsigned>(sizeof(mAttestationSignature)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
+            }
+            memcpy(mAttestationSignature, signature.data(), signature.size());
+            mAttestationSignatureLen = static_cast<uint16_t>(signature.size());
+            mParams.SetAttestationSignature(ByteSpan(mAttestationSignature, signature.size()));
+
             // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
@@ -514,6 +547,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
             }
             break;
+        }
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
             nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;

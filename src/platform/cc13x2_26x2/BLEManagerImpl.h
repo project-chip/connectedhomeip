@@ -327,6 +327,7 @@ private:
     static void advCallback(uint32_t event, void * pBuf, uintptr_t arg);
     static void ClockHandler(uintptr_t arg);
     static void AdvTimeoutHandler(uintptr_t arg);
+    static void FastAdvTimeoutHandler(uintptr_t arg);
     static void CHIPoBLEProfile_charValueChangeCB(uint8_t paramId, uint16_t len, uint16_t connHandle);
     static void PasscodeCb(uint8_t * pDeviceAddr, uint16_t connHandle, uint8_t uiInputs, uint8_t uiOutputs, uint32_t numComparison);
     static void PairStateCb(uint16_t connHandle, uint8_t state, uint8_t status);

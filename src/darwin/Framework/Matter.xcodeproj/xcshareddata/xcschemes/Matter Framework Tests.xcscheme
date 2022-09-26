@@ -39,9 +39,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "MTRRemoteDeviceSampleTests">
-               </Test>
-               <Test
                   Identifier = "MTRXPCListenerSampleTests">
                </Test>
             </SkippedTests>

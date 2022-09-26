@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <struct name="DeviceType">
+  <struct name="DeviceTypeStruct">
     <cluster code="0x001d"/>
     <item name="type" type="DEVTYPE_ID"/>
     <item name="revision" type="INT16U"/>
@@ -29,9 +29,9 @@ limitations under the License.
     <code>0x001d</code>
     <define>DESCRIPTOR_CLUSTER</define>
     <description>The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.</description>
-    <attribute side="server" code="0x0000" define="DEVICE_LIST" type="ARRAY" entryType="DeviceType" writable="false" optional="false">device list</attribute>
-    <attribute side="server" code="0x0001" define="SERVER_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">server list</attribute>
-    <attribute side="server" code="0x0002" define="CLIENT_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">client list</attribute>
-    <attribute side="server" code="0x0003" define="PARTS_LIST" type="ARRAY" entryType="ENDPOINT_NO" writable="false" optional="false">parts list</attribute>
+    <attribute side="server" code="0x0000" define="DEVICE_LIST" type="ARRAY" entryType="DeviceTypeStruct" writable="false" optional="false">DeviceTypeList</attribute>
+    <attribute side="server" code="0x0001" define="SERVER_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ServerList</attribute>
+    <attribute side="server" code="0x0002" define="CLIENT_LIST" type="ARRAY" entryType="CLUSTER_ID" writable="false" optional="false">ClientList</attribute>
+    <attribute side="server" code="0x0003" define="PARTS_LIST" type="ARRAY" entryType="ENDPOINT_NO" writable="false" optional="false">PartsList</attribute>
   </cluster>
 </configurator>

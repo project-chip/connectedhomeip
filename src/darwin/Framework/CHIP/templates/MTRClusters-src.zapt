@@ -1,8 +1,8 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRBaseDevice_internal.h"
 #import "MTRClusterConstants.h"
 #import "MTRClusters_internal.h"
@@ -25,46 +25,49 @@ using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
-@implementation MTRCluster{{asUpperCamelCase name}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue
 {
     if (self = [super initWithQueue:queue]) {
         if (device == nil) {
             return nil;
         }
 
-        _endpoint = endpoint;
+        {{!TODO consider range-checking the incoming number to make sure it's
+                actually in the uint16_t range}}
+        _endpoint = [endpoint unsignedShortValue];
         _device = device;
     }
     return self;
 }
 
 {{#chip_cluster_commands}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{>cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
-  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{>cluster}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
+    MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID) controller:self.device.deviceController];
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       baseDevice,
       {{#if hasSpecificResponse}}
-        {{! This treats completionHandler as taking an id for the data.  This is
+        {{! This treats completion as taking an id for the data.  This is
             not great from a type-safety perspective, of course. }}
-        completionHandler,
+        completion,
       {{else}}
         {{! For now, don't change the bridge API; instead just use an adapter
             to invoke our completion handler. This is not great from a
             type-safety perspective, of course. }}
         ^(id _Nullable value, NSError * _Nullable error) {
-          completionHandler(error);
+          completion(error);
         },
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -106,9 +109,10 @@ using chip::SessionHandle;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -126,7 +130,7 @@ using chip::SessionHandle;
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}

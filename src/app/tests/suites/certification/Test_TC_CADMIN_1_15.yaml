@@ -228,6 +228,36 @@ tests:
           constraints:
               type: list
 
+    #Check for DNS-SD advertisement is not possible in YAML
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with 2 Operational
+          service records (_matter._tcp SRV records)."
+      verification: |
+          Execute the below command in any linux platform or in TH_CR1
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
       PICS: CADMIN.S.C00.Rsp

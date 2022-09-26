@@ -181,6 +181,63 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
+          ./chip-tool illuminancemeasurement read attribute-list 1 1
+
+          Verify DUT receives  AttributeList response on the TH(all-clusters-minimal-app) Log:
+          Received Read request
+          [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
+          [1663070281.411639][4422:4422] CHIP:DMG: {
+          [1663070281.411663][4422:4422] CHIP:DMG:         AttributePathIBs =
+          [1663070281.411698][4422:4422] CHIP:DMG:         [
+          [1663070281.411724][4422:4422] CHIP:DMG:                 AttributePathIB =
+          [1663070281.411757][4422:4422] CHIP:DMG:                 {
+          [1663070281.411794][4422:4422] CHIP:DMG:                         Endpoint = 0x1,
+          [1663070281.411830][4422:4422] CHIP:DMG:                         Cluster = 0x400,
+          [1663070281.411865][4422:4422] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1663070281.411898][4422:4422] CHIP:DMG:                 }
+          [1663070281.411930][4422:4422] CHIP:DMG:
+          [1663070281.411962][4422:4422] CHIP:DMG:         ],
+          [1663070281.411992][4422:4422] CHIP:DMG:
+          [1663070281.412021][4422:4422] CHIP:DMG:         isFabricFiltered = true,
+          [1663070281.412051][4422:4422] CHIP:DMG:         InteractionModelRevision = 1
+          [1663070281.412078][4422:4422] CHIP:DMG: },
+          [1663070281.412158][4422:4422] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663070281.412262][4422:4422] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663070281.412293][4422:4422] CHIP:DMG: <RE:Run> Cluster 400, Attribute fffb is dirty
+          [1663070281.412317][4422:4422] CHIP:DMG: Reading attribute: Cluster=0x0000_0400 Endpoint=1 AttributeId=0x0000_FFFB (expanded=0)
+          [1663070281.412345][4422:4422] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0400 e=1 p=v
+
+
+          ./chip-tool illuminancemeasurement read feature-map 1 1
+
+          Verify DUT receives  FeatureMap attribute response on the TH(all-clusters-minimal-app) Log:
+          Received Read request
+          [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
+          [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
+          [1663070306.262984][4422:4422] CHIP:DMG: {
+          [1663070306.263008][4422:4422] CHIP:DMG:         AttributePathIBs =
+          [1663070306.263041][4422:4422] CHIP:DMG:         [
+          [1663070306.263067][4422:4422] CHIP:DMG:                 AttributePathIB =
+          [1663070306.263103][4422:4422] CHIP:DMG:                 {
+          [1663070306.263140][4422:4422] CHIP:DMG:                         Endpoint = 0x1,
+          [1663070306.263175][4422:4422] CHIP:DMG:                         Cluster = 0x400,
+          [1663070306.263212][4422:4422] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1663070306.263244][4422:4422] CHIP:DMG:                 }
+          [1663070306.263277][4422:4422] CHIP:DMG:
+          [1663070306.263307][4422:4422] CHIP:DMG:         ],
+          [1663070306.263339][4422:4422] CHIP:DMG:
+          [1663070306.263370][4422:4422] CHIP:DMG:         isFabricFiltered = true,
+          [1663070306.263399][4422:4422] CHIP:DMG:         InteractionModelRevision = 1
+          [1663070306.263426][4422:4422] CHIP:DMG: },
+          [1663070306.263508][4422:4422] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663070306.263608][4422:4422] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663070306.263640][4422:4422] CHIP:DMG: <RE:Run> Cluster 400, Attribute fffc is dirty
+          [1663070306.263663][4422:4422] CHIP:DMG: Reading attribute: Cluster=0x0000_0400 Endpoint=1 AttributeId=0x0000_FFFC (expanded=0)
+          [1663070306.263695][4422:4422] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0400 e=1 p=v
+
+
+
+
           sudo ./chip-tool illuminancemeasurement read min-measured-value 1 1
           Verify DUT receives  min-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
 

@@ -40,7 +40,7 @@ tests:
 
            ./chip-tool channel read channel-list 1 1
 
-          By sending above command user can select the MajorNumber and MinorNumber instead 9 1 which are listed in chanel list
+          By sending above command user can select the MajorNumber and MinorNumber instead of 9 1 which are listed in chanel list.
 
           ./chip-tool channel change-channel-by-number 9  1 1 1
           ./chip-tv-casting-app channel change-channel-by-number 9 1 1 1

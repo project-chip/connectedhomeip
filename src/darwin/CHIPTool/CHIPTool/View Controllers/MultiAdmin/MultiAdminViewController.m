@@ -199,7 +199,6 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 - (IBAction)openPairingWindow:(id)sender
 {
-    NSUInteger setupPIN = [MTRSetupPayload generateRandomPIN];
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
@@ -209,9 +208,6 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                     }
                     int timeout = [timeoutStr intValue];
 
-                    NSString * output;
-                    NSError * error;
-                    MTRDeviceController * controller = InitializeMTR();
                     if ([self.useOnboardingTokenSwitch isOn]) {
                         NSString * discriminatorStr = [self.discriminatorField text];
                         if (discriminatorStr.length == 0) {
@@ -219,26 +215,53 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                         }
                         NSInteger discriminator = [discriminatorStr intValue];
 
-                        output = [controller openPairingWindowWithPIN:deviceId
-                                                             duration:timeout
-                                                        discriminator:discriminator
-                                                             setupPIN:setupPIN
-                                                                error:&error];
+                        __auto_type setupPasscode = [MTRSetupPayload generateRandomSetupPasscode];
+                        [chipDevice
+                            openCommissioningWindowWithSetupPasscode:setupPasscode
+                                                       discriminator:@(discriminator)
+                                                            duration:@(timeout)
+                                                               queue:dispatch_get_main_queue()
+                                                          completion:^(
+                                                              MTRSetupPayload * _Nullable payload, NSError * _Nullable error) {
+                                                              NSString * _Nullable code = nil;
+                                                              if (payload != nil) {
+                                                                  code = [payload manualEntryCode];
+                                                              }
 
-                        if (output != nil) {
-                            NSString * result = [@"Use Manual Code: " stringByAppendingString:output];
-                            [self updateResult:result];
-                        } else {
-                            [self updateResult:@"Failed in opening the pairing window"];
-                        }
+                                                              if (code != nil) {
+                                                                  NSString * result =
+                                                                      [@"Use Manual Code: " stringByAppendingString:code];
+                                                                  [self updateResult:result];
+                                                              } else {
+                                                                  NSString * errorDesc;
+                                                                  if (error == nil) {
+                                                                      errorDesc = @"Failed to generate manual code";
+                                                                  } else {
+                                                                      errorDesc = error.localizedDescription;
+                                                                  }
+                                                                  [self updateResult:[@"Failed in opening the pairing window"
+                                                                                         stringByAppendingString:errorDesc]];
+                                                              }
+                                                          }];
                     } else {
-                        BOOL didSend = [controller openPairingWindow:deviceId duration:timeout error:&error];
-                        if (didSend) {
-                            [self updateResult:@"Scan the QR code on the device"];
-                        } else {
-                            NSString * errorString = [@"Error: " stringByAppendingString:error.localizedDescription];
-                            [self updateResult:errorString];
-                        }
+                        __auto_type * cluster =
+                            [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:chipDevice
+                                                                                    endpoint:@(0)
+                                                                                       queue:dispatch_get_main_queue()];
+                        __auto_type * params =
+                            [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
+                        params.commissioningTimeout = @(timeout);
+                        params.timedInvokeTimeoutMs = @(10000);
+                        [cluster openBasicCommissioningWindowWithParams:params
+                                                             completion:^(NSError * _Nullable error) {
+                                                                 if (error == nil) {
+                                                                     [self updateResult:@"Scan the QR code on the device"];
+                                                                 } else {
+                                                                     NSString * errorString = [@"Error: "
+                                                                         stringByAppendingString:error.localizedDescription];
+                                                                     [self updateResult:errorString];
+                                                                 }
+                                                             }];
                     }
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];

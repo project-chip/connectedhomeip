@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("${build_root}/toolchain/flashable_executable.gni")
 
 template("bl602_executable") {
@@ -22,7 +23,14 @@ template("bl602_executable") {
 
   objcopy_image_name = output_base_name + ".bin"
   objcopy_image_format = "binary"
-  objcopy = "${root_build_dir}/../../third_party/bouffalolab/repo/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
+  objcopy = "riscv64-unknown-elf-objcopy"
+  if ("linux" == host_os) {
+    objcopy =
+        "../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-objcopy"
+  } else if ("mac" == host_os || "darwin" == host_os) {
+    objcopy =
+        "../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-objcopy"
+  }
 
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably

@@ -723,18 +723,23 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    if (chip::DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
     {
-        if (strcmp(service->mHostName, "") != 0)
-        {
-            chip::DeviceLayer::ThreadStackMgr().SetupSrpHost(service->mHostName);
-        }
-
         std::string regtype = GetFullType(service->mType, service->mProtocol);
         Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
         Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
-        return chip::DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes,
-                                                                 textEntries);
+        CHIP_ERROR err;
+
+        if (strcmp(service->mHostName, "") != 0)
+        {
+            err = DeviceLayer::ThreadStackMgr().SetupSrpHost(service->mHostName);
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        }
+
+        err = DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes, textEntries);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -743,6 +748,15 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        DeviceLayer::ThreadStackMgr().InvalidateAllSrpServices();
+        return DeviceLayer::ThreadStackMgr().RemoveInvalidSrpServices();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
     return DnssdTizen::GetInstance().UnregisterAllServices();
 }
 
@@ -758,6 +772,14 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     VerifyOrReturnError(IsSupportedProtocol(protocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        std::string fullType = GetFullType(type, protocol);
+        return DeviceLayer::ThreadStackMgr().DnsBrowse(fullType.c_str(), callback, context);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+
     return DnssdTizen::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
 }
 
@@ -767,6 +789,14 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
     VerifyOrReturnError(browseResult != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(browseResult->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        std::string fullType = GetFullType(browseResult->mType, browseResult->mProtocol);
+        return DeviceLayer::ThreadStackMgr().DnsResolve(fullType.c_str(), browseResult->mName, callback, context);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
     return DnssdTizen::GetInstance().Resolve(*browseResult, interface, callback, context);
 }

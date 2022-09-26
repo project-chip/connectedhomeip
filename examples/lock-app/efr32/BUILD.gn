@@ -85,9 +85,9 @@ if (chip_enable_wifi) {
   enable_openthread_cli = false
 }
 
-# ThunderBoards and Explorer Kit (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD2601B" ||
-    efr32_board == "BRD2703A") {
+# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
+if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
+    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -128,7 +128,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
@@ -174,7 +174,6 @@ efr32_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
@@ -184,6 +183,10 @@ efr32_executable("lock_app") {
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
+
+  if (use_wstk_leds) {
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
       use_wf200 || use_rs911x) {
@@ -315,7 +318,7 @@ efr32_executable("lock_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

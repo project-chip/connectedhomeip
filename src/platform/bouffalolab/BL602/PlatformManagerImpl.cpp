@@ -67,6 +67,8 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 static void WifiStaDisconect(void)
 {
+    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+
     uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
@@ -138,7 +140,6 @@ static void WifiStaDisconect(void)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
     }
 
-    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Disconnecting);
 }
 
@@ -200,6 +201,11 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
         log_info("[SYS] Memory left is %d Bytes\r\n", xPortGetFreeHeapSize());
 
         WifiStaConnected();
+    }
+    break;
+    case CODE_WIFI_ON_GOT_IP6: {
+        log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
+        ConnectivityMgrImpl().OnIPv6AddressAvailable();
     }
     break;
     default: {

@@ -61,14 +61,14 @@ if (use_silabs_thread_lib) {
   config("openthread_efr32_config") {
     defines = [
       "RADIO_CONFIG_DMP_SUPPORT=1",
-      "${efr32_board}=1",
-      "${efr32_mcu}",
+      "${silabs_board}=1",
+      "${silabs_mcu}",
       "OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-efr32-config-check.h\"",
     ]
 
     include_dirs = [
       "${chip_root}/examples/platform/efr32",
-      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
       "${sl_ot_efr32_root}/src/src",
       "${sl_openthread_root}/src/",
     ]
@@ -153,8 +153,8 @@ if (use_silabs_thread_lib) {
     public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
 
     libs = [
-      "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${COAP_API}${efr32_family}_gcc.a",
-      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${efr32_family}_gcc.a",
+      "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
+      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
     ]
   }
 }

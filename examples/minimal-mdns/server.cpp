@@ -22,9 +22,9 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
@@ -199,7 +199,9 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    mdns::Minimal::SetDefaultAddressPolicy();
+    // This forces the global MDNS instance to be loaded in, effectively setting
+    // built in policies for addresses.
+    (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
 
     printf("Running on port %d using %s...\n", gOptions.listenPort, gOptions.enableIpV4 ? "IPv4 AND IPv6" : "IPv6 ONLY");
 

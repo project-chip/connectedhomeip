@@ -858,14 +858,6 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Subscribe Request Message to DUT. DUT sends Report Data
-          message to DUT + TH sends Status Response Message with an error
-          Status."
-      verification: |
-          Mark this as not testable /NA. Out of Scope for V1.0
-      disabled: true
-
-    - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           path which indicates a cluster event that is not supported."
       verification: |
@@ -878,52 +870,57 @@ tests:
           the path."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
-          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+          #1:- Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
 
-          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
-          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+          #2:- To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access.
 
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
 
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0
+
+          #3:- basic subscribe-event-by-id 0x000 100 1000 1 0
           on TH(chip-tool) verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
+          [1663151225.226869][41115:41120] CHIP:DMG: ReportDataMessage =
+          [1663151225.226879][41115:41120] CHIP:DMG: {
+          [1663151225.226890][41115:41120] CHIP:DMG:         SubscriptionId = 0xd7d61f38,
+          [1663151225.226899][41115:41120] CHIP:DMG:         EventReportIBs =
+          [1663151225.226915][41115:41120] CHIP:DMG:         [
+          [1663151225.226923][41115:41120] CHIP:DMG:                 EventReportIB =
+          [1663151225.226939][41115:41120] CHIP:DMG:                 {
+          [1663151225.226948][41115:41120] CHIP:DMG:                         EventStatusIB =
+          [1663151225.226960][41115:41120] CHIP:DMG:                         {
+          [1663151225.226977][41115:41120] CHIP:DMG:                                 EventPath =
+          [1663151225.226989][41115:41120] CHIP:DMG:                                 {
+          [1663151225.227000][41115:41120] CHIP:DMG:                                         Endpoint = 0x0,
+          [1663151225.227014][41115:41120] CHIP:DMG:                                         Cluster = 0x28,
+          [1663151225.227022][41115:41120] CHIP:DMG:                                         Event = 0x0,
+          [1663151225.227030][41115:41120] CHIP:DMG:                                 },
+          [1663151225.227041][41115:41120] CHIP:DMG:
+          [1663151225.227049][41115:41120] CHIP:DMG:                                 StatusIB =
+          [1663151225.227058][41115:41120] CHIP:DMG:                                 {
+          [1663151225.227079][41115:41120] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
+          [1663151225.227090][41115:41120] CHIP:DMG:                                 },
+          [1663151225.227099][41115:41120] CHIP:DMG:
+          [1663151225.227105][41115:41120] CHIP:DMG:                         },
+          [1663151225.227115][41115:41120] CHIP:DMG:
+          [1663151225.227122][41115:41120] CHIP:DMG:                 },
+          [1663151225.227132][41115:41120] CHIP:DMG:
+          [1663151225.227138][41115:41120] CHIP:DMG:         ],
+          [1663151225.227149][41115:41120] CHIP:DMG:
+          [1663151225.227156][41115:41120] CHIP:DMG:         InteractionModelRevision = 1
+          [1663151225.227162][41115:41120] CHIP:DMG: }
+          [1663151225.227206][41115:41120] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1663151225.227226][41115:41120] CHIP:DMG: MoveToState ReadClient[0x7f52100258b0]: Moving to [AwaitingSu]
 
-          [1653479886.551289][22629:22634] CHIP:DMG: ReportDataMessage =
-          [1653479886.551299][22629:22634] CHIP:DMG: {
-          [1653479886.551308][22629:22634] CHIP:DMG:         SubscriptionId = 0xf5695d45,
-          [1653479886.551316][22629:22634] CHIP:DMG:         EventReportIBs =
-          [1653479886.551330][22629:22634] CHIP:DMG:         [
-          [1653479886.551338][22629:22634] CHIP:DMG:                 EventReportIB =
-          [1653479886.551352][22629:22634] CHIP:DMG:                 {
-          [1653479886.551373][22629:22634] CHIP:DMG:                         EventStatusIB =
-          [1653479886.551378][22629:22634] CHIP:DMG:                         {
-          [1653479886.551382][22629:22634] CHIP:DMG:                                 EventPath =
-          [1653479886.551387][22629:22634] CHIP:DMG:                                 {
-          [1653479886.551391][22629:22634] CHIP:DMG:                                         Endpoint = 0x0,
-          [1653479886.551397][22629:22634] CHIP:DMG:                                         Cluster = 0x28,
-          [1653479886.551412][22629:22634] CHIP:DMG:                                         Event = 0x0,
-          [1653479886.551420][22629:22634] CHIP:DMG:                                 },
-          [1653479886.551431][22629:22634] CHIP:DMG:
-          [1653479886.551438][22629:22634] CHIP:DMG:                                 StatusIB =
-          [1653479886.551446][22629:22634] CHIP:DMG:                                 {
-          [1653479886.551454][22629:22634] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
-          [1653479886.551462][22629:22634] CHIP:DMG:                                 },
-          [1653479886.551471][22629:22634] CHIP:DMG:
-          [1653479886.551477][22629:22634] CHIP:DMG:                         },
-          [1653479886.551487][22629:22634] CHIP:DMG:
-          [1653479886.551495][22629:22634] CHIP:DMG:                 },
-          [1653479886.551506][22629:22634] CHIP:DMG:
-          [1653479886.551513][22629:22634] CHIP:DMG:         ],
-          [1653479886.551524][22629:22634] CHIP:DMG:
-          [1653479886.551532][22629:22634] CHIP:DMG:         InteractionModelRevision = 1
-          [1653479886.551538][22629:22634] CHIP:DMG: }
-          [1653479886.551583][22629:22634] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
 
 
-          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
+
+
+          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233], "targets":null}]' 1 0
       disabled: true
 
     - label:
@@ -937,7 +934,7 @@ tests:
 
           To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
 
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
 
@@ -1098,70 +1095,6 @@ tests:
           [1655979915.866116][4607:4612] CHIP:TOO:     AdminFabricIndex: 1
           [1655979915.866148][4607:4612] CHIP:TOO:    }
           [1655979915.866233][4607:4612] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
-
-          [1655979915.863156][4607:4612] CHIP:DMG: ReportDataMessage =
-          [1655979915.863196][4607:4612] CHIP:DMG: {
-          [1655979915.863232][4607:4612] CHIP:DMG:         SubscriptionId = 0xeb39dedd,
-          [1655979915.863268][4607:4612] CHIP:DMG:         EventReportIBs =
-          [1655979915.863321][4607:4612] CHIP:DMG:         [
-          [1655979915.863357][4607:4612] CHIP:DMG:                 EventReportIB =
-          [1655979915.863412][4607:4612] CHIP:DMG:                 {
-          [1655979915.863450][4607:4612] CHIP:DMG:                         EventDataIB =
-          [1655979915.863496][4607:4612] CHIP:DMG:                         {
-          [1655979915.863538][4607:4612] CHIP:DMG:                                 EventPath =
-          [1655979915.863586][4607:4612] CHIP:DMG:                                 {
-          [1655979915.863636][4607:4612] CHIP:DMG:                                         Endpoint = 0x0,
-          [1655979915.863692][4607:4612] CHIP:DMG:                                         Cluster = 0x1f,
-          [1655979915.863743][4607:4612] CHIP:DMG:                                         Event = 0x0,
-          [1655979915.863790][4607:4612] CHIP:DMG:                                 },
-          [1655979915.863845][4607:4612] CHIP:DMG:
-          [1655979915.863892][4607:4612] CHIP:DMG:                                 EventNumber = 0x1,
-          [1655979915.863942][4607:4612] CHIP:DMG:                                 PriorityLevel = 0x1,
-          [1655979915.863990][4607:4612] CHIP:DMG:                                 SystemTimestamp = 0x4bdb01,
-          [1655979915.864036][4607:4612] CHIP:DMG:                                 EventData =
-          [1655979915.864083][4607:4612] CHIP:DMG:                                 {
-          [1655979915.864149][4607:4612] CHIP:DMG:                                         0x1 = NULL
-          [1655979915.864201][4607:4612] CHIP:DMG:                                         0x2 = 0,
-          [1655979915.864252][4607:4612] CHIP:DMG:                                         0x3 = 1,
-          [1655979915.864300][4607:4612] CHIP:DMG:                                         0x4 =
-          [1655979915.864348][4607:4612] CHIP:DMG:                                         {
-          [1655979915.864399][4607:4612] CHIP:DMG:                                                 0x1 = 5,
-          [1655979915.864454][4607:4612] CHIP:DMG:                                                 0x2 = 2,
-          [1655979915.864505][4607:4612] CHIP:DMG:                                                 0x3 = [
-          [1655979915.864571][4607:4612] CHIP:DMG:                                                                 112233,
-          [1655979915.864631][4607:4612] CHIP:DMG:                                                 ],
-          [1655979915.864685][4607:4612] CHIP:DMG:                                                 0x4 = NULL
-          [1655979915.864738][4607:4612] CHIP:DMG:                                                 0xfe = 1,
-          [1655979915.864791][4607:4612] CHIP:DMG:                                         },
-          [1655979915.864841][4607:4612] CHIP:DMG:                                         0xfe = 1,
-          [1655979915.864889][4607:4612] CHIP:DMG:                                 },
-          [1655979915.864934][4607:4612] CHIP:DMG:                         },
-          [1655979915.864989][4607:4612] CHIP:DMG:
-          [1655979915.865025][4607:4612] CHIP:DMG:                 },
-          [1655979915.865076][4607:4612] CHIP:DMG:
-          [1655979915.865111][4607:4612] CHIP:DMG:         ],
-          [1655979915.865163][4607:4612] CHIP:DMG:
-          [1655979915.865198][4607:4612] CHIP:DMG:         InteractionModelRevision = 1
-          [1655979915.865232][4607:4612] CHIP:DMG: }
-          [1655979915.865462][4607:4612] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1655979915.865497][4607:4612] CHIP:TOO:          Event number: 1
-          [1655979915.865530][4607:4612] CHIP:TOO:          Priority: Info
-          [1655979915.865562][4607:4612] CHIP:TOO:          Timestamp: 4971265
-          [1655979915.865683][4607:4612] CHIP:TOO:   AccessControlEntryChanged: {
-          [1655979915.865720][4607:4612] CHIP:TOO:     AdminNodeID: null
-          [1655979915.865767][4607:4612] CHIP:TOO:     AdminPasscodeID: 0
-          [1655979915.865802][4607:4612] CHIP:TOO:     ChangeType: 1
-          [1655979915.865835][4607:4612] CHIP:TOO:     LatestValue: {
-          [1655979915.865867][4607:4612] CHIP:TOO:       Privilege: 5
-          [1655979915.865899][4607:4612] CHIP:TOO:       AuthMode: 2
-          [1655979915.865939][4607:4612] CHIP:TOO:       Subjects: 1 entries
-          [1655979915.865981][4607:4612] CHIP:TOO:         [1]: 112233
-          [1655979915.866018][4607:4612] CHIP:TOO:       Targets: null
-          [1655979915.866052][4607:4612] CHIP:TOO:       FabricIndex: 1
-          [1655979915.866084][4607:4612] CHIP:TOO:      }
-          [1655979915.866116][4607:4612] CHIP:TOO:     AdminFabricIndex: 1
-          [1655979915.866148][4607:4612] CHIP:TOO:    }
-          [1655979915.866233][4607:4612] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
@@ -1200,7 +1133,7 @@ tests:
 
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0
+          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0    --keepSubscriptions 1
           On TH(chip-tool) verify that each event number
           [1658405014.975407][4236:4241] CHIP:DMG: }
           [1658405014.975582][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000

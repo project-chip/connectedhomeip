@@ -38,7 +38,7 @@ void ButtonHandler::Init(void)
     for (uint8_t i = 0; i < kButtonCount; i++)
     {
         buttonTimers[i] = xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
-                                       APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
+                                       APP_BUTTON_MIN_ASSERT_TIME_MS, // timer period
                                        false,                         // no timer reload (==one-shot)
                                        (void *) (int) i,              // init timer id = button index
                                        TimerCallback                  // timer callback handler (all buttons use
@@ -90,7 +90,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
 {
     // Get the button index of the expired timer and call button event helper.
     uint32_t timerId;
-    uint8_t buttonevent = 0;
+    uint8_t buttonevent = 1;
     timerId             = (uint32_t) pvTimerGetTimerID(xTimer);
 
     switch (timerId)
@@ -106,7 +106,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
         break;
     }
 
-    if (buttonevent)
+    if (!buttonevent)
     {
         GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
     }

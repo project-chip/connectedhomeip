@@ -105,12 +105,12 @@ CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::Rendezvous
     err = GetCommissionableDataProvider()->GetSetupPasscode(aPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %" CHIP_ERROR_FORMAT, err.Format());
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
         ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
                         static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
         aPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
 #else
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
 #endif
     }

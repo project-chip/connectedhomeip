@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import platform
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -62,11 +63,18 @@ class Bl602Builder(GnBuilder):
                               app.ExampleName(), 'bouffalolab', 'bl602'),
             runner=runner)
 
+        self.argsOpt = []
+
+        toolchain = os.path.join(root, '../../examples/platform/bouffalolab/common/toolchain')
+        toolchain = 'custom_toolchain="{}:riscv_gcc"'.format(toolchain)
+        if toolchain:
+            self.argsOpt.append(toolchain)
+
         self.app = app
         self.board = board
 
     def GnBuildArgs(self):
-        return ['bl602_board="%s"' % self.board.GnArgName()]
+        return self.argsOpt + ['bl602_board="%s"' % self.board.GnArgName()]
 
     def build_outputs(self):
         items = {

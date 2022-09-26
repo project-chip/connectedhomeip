@@ -398,6 +398,7 @@ extern bool Cmd_ResignCert(int argc, char * argv[]);
 extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
+extern bool Cmd_PrintCD(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
 extern bool ReadCert(const char * fileNameOrStr, X509 * cert);

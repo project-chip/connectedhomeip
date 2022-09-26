@@ -119,7 +119,7 @@
 - (void)_clearTextFields
 {
     MTRDeviceController * chipController = InitializeMTR();
-    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.controllerNodeId];
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.controllerNodeID];
     _endpointIDTextField.text = @"1";
     _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";

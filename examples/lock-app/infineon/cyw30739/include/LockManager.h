@@ -26,6 +26,24 @@
 #include <stdint.h>
 #include <wiced_timer.h>
 
+struct WeekDaysScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
+
 namespace CYW30739DoorLock {
 namespace ResourceRanges {
 // Used to size arrays
@@ -113,13 +131,6 @@ public:
         kState_UnlockCompleted,
     } State;
 
-    enum Actor_t
-    {
-        ACTOR_ZCL_CMD = 0,
-        ACTOR_APP_CMD,
-        ACTOR_BUTTON,
-    } Actor;
-
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
                     CYW30739DoorLock::LockInitParams::LockParam lockParam);
     bool NextState();
@@ -137,6 +148,10 @@ public:
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                  const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
                  DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
+
+    bool SetDoorState(chip::EndpointId endpointId, DlDoorState newState);
+
+    DlDoorState GetDoorState() const;
 
     bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential);
@@ -169,6 +184,7 @@ public:
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                       DlOperationError & err);
+
     const char * lockStateToString(DlLockState lockState) const;
 
     bool ReadConfigValues();
@@ -177,6 +193,7 @@ private:
     friend LockManager & LockMgr();
     chip::EndpointId mEndpointId;
     State_t mState;
+    DlDoorState mDoorState;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
@@ -189,10 +206,9 @@ private:
 
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
     EmberAfPluginDoorLockCredentialInfo mLockCredentials[kMaxCredentials];
-    EmberAfPluginDoorLockWeekDaySchedule mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
-    EmberAfPluginDoorLockYearDaySchedule mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
-    EmberAfPluginDoorLockHolidaySchedule mHolidaySchedule[kMaxHolidaySchedules];
-
+    WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
+    YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
+    HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[kMaxCredentials][kMaxCredentialSize];
     DlCredential mCredentials[kMaxUsers][kMaxCredentialsPerUser];
