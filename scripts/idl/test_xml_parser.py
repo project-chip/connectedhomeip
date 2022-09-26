@@ -116,6 +116,36 @@ class TestXmlParser(unittest.TestCase):
                                  ])
                          ]))
 
+    def testBitmap(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster><name>Test1</name><code>0x0001</code></cluster>
+              <cluster><name>Test2</name><code>0x0002</code></cluster>
+
+              <bitmap name="MyBitmap" type="BITMAP32">
+                 <cluster code="1"/>
+                 <cluster code="0x02"/>
+                 <field name="BitmapMask1" mask="0x1"/>
+                 <field name="BitmapMask2" mask="0x2"/>
+                 <field name="BitmapMask3" mask="0x4"/>
+              </bitmap>
+            </configurator>
+        ''')
+        bitmap = Bitmap(
+            name='MyBitmap',
+            base_type='BITMAP32',
+            entries=[
+                ConstantEntry(name='BitmapMask1', code=1),
+                ConstantEntry(name='BitmapMask2', code=2),
+                ConstantEntry(name='BitmapMask3', code=4)
+            ])
+
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(side=ClusterSide.CLIENT, name='Test1', code=1, bitmaps=[bitmap]),
+                             Cluster(side=ClusterSide.CLIENT, name='Test2', code=2, bitmaps=[bitmap]),
+                         ]))
+
 
 if __name__ == '__main__':
     unittest.main()
