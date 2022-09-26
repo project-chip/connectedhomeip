@@ -204,6 +204,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         }
         deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
+      if (chip_can_build_all_clusters_app) {
+        if (is_libfuzzer) {
+          deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app-fuzzing" ]
+        } else {
+          deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app" ]
+        }
+      }
     }
 
     if (current_os == "android") {
