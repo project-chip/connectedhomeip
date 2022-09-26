@@ -24,25 +24,28 @@ from idl.matter_idl_types import Idl
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
-    def __init__(self):
+    def __init__(self, include_meta_data=True):
         super().__init__()
         self._idl = Idl()
         self._processing_stack = []
         # Context persists across all
         self._context = Context()
+        self._include_meta_data = include_meta_data
 
     def PrepareParsing(self, filename):
         # This is a bit ugly: filename keeps changing during parse
         # IDL meta is not prepared for this (as source is XML and .matter is
         # single file)
-        self._idl.parse_file_name = filename
+        if self._include_meta_data:
+            self._idl.parse_file_name = filename
 
     def Finish(self) -> Idl:
         self._context.PostProcess(self._idl)
         return self._idl
 
     def startDocument(self):
-        self._context.locator = self._locator
+        if self._include_meta_data:
+            self._context.locator = self._locator
         self._processing_stack = [ZapXmlHandler(self._context, self._idl)]
 
     def endDocument(self):
@@ -80,8 +83,8 @@ class ParseSource:
         return self.source  # assume string
 
 
-def ParseXmls(sources: List[ParseSource]) -> Idl:
-    handler = ParseHandler()
+def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
+    handler = ParseHandler(include_meta_data=include_meta_data)
 
     for source in sources:
         logging.info('Parsing %s...' % source.source_file_name)

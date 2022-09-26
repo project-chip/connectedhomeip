@@ -39,14 +39,14 @@ def XmlToIdl(what: Union[str, List[str]]) -> Idl:
     for idx, txt in enumerate(what):
         sources.append(ParseSource(source=io.StringIO(txt), name=("Input %d" % (idx + 1))))
 
-    return ParseXmls(sources)
+    return ParseXmls(sources, include_meta_data=False)
 
 
 class TestXmlParser(unittest.TestCase):
 
     def testEmptyInput(self):
         idl = XmlToIdl('<configurator/>')
-        self.assertEqual(idl, Idl(parse_file_name='Input 1'))
+        self.assertEqual(idl, Idl())
 
     def testCluster(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -114,9 +114,9 @@ class TestXmlParser(unittest.TestCase):
                                      Command(name='GetSomeData', code=33, input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
                                              invokeacl=AccessPrivilege.ADMINISTER)
                                  ],
-                                 parse_meta=ParseMetaData(line=4, column=14))],
-                             endpoints=[],
-                             parse_file_name='Input 1'))
+                             )
+                         ],
+                             endpoints=[]))
 
 
 if __name__ == '__main__':
