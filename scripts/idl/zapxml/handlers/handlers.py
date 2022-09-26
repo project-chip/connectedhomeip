@@ -290,14 +290,13 @@ class BitmapHandler(BaseHandler):
 
     def __init__(self, context: Context, attrs):
         super().__init__(context)
-        self._cluster_code = None
+        self._cluster_codes = set()
         self._bitmap = Bitmap(name=attrs['name'], base_type=attrs['type'], entries=[])
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
-            if self._cluster_code is not None:
-                raise Exception('Multiple cluster codes for structr %s' % self._struct.name)
-            self._cluster_code = ParseInt(attrs['code'])
+            # Multiple clusters may be associated, like IasZoneStatus
+            self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'field':
             self._bitmap.entries.append(ConstantEntry(
@@ -314,22 +313,22 @@ class BitmapHandler(BaseHandler):
         # We have two choices of adding an enum:
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
-        if self._cluster_code is None:
+        if not self._cluster_codes:
             # Log only instead of critical, as not our XML is well formed.
             # For example at the time of writing this, SwitchFeature in switch-cluster.xml
             # did not have a code associated with it.
-            logging.error("Bitmap %r has no cluster code" % self._bitmap)
+            logging.error("Bitmap %r has no cluster codes" % self._bitmap)
             return
 
-        found = False
-        for c in idl.clusters:
-            if c.code == self._cluster_code:
-                c.bitmaps.append(self._bitmap)
-                found = True
-
-        if not found:
-            logging.error('Enum %s could not find its cluster (code %d/0x%X)' %
-                          (self._bitmap.name, self._cluster_code, self._cluster_code))
+        for code in self._cluster_codes:
+            found = False
+            for c in idl.clusters:
+                if c.code == code:
+                    c.bitmaps.append(self._bitmap)
+                    found = True
+            if not found:
+                logging.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
+                              (self._bitmap.name, code, code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
