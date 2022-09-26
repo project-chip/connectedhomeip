@@ -19,15 +19,18 @@ package chip.devicecontroller.model;
 
 import androidx.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 
 /** Class for tracking CHIP cluster state in a hierarchical manner. */
 public final class ClusterState {
   private Map<Long, AttributeState> attributes;
   private Map<Long, EventState> events;
+  private Optional<Integer> dataVersion;
 
   public ClusterState(Map<Long, AttributeState> attributes, Map<Long, EventState> events) {
     this.attributes = attributes;
     this.events = events;
+    this.dataVersion = Optional.empty();
   }
 
   public Map<Long, AttributeState> getAttributeStates() {
@@ -36,6 +39,14 @@ public final class ClusterState {
 
   public Map<Long, EventState> getEventStates() {
     return events;
+  }
+
+  public void setDataVersion(int version) {
+    dataVersion = Optional.of(version);
+  }
+
+  public Optional<Integer> getDataVersion() {
+    return dataVersion;
   }
 
   /**
