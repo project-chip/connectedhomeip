@@ -314,12 +314,10 @@ void ReportCallback::UpdateClusterDataVersion()
 
     // SetDataVersion to NodeState
     jmethodID setDataVersionMethod;
-    CHIP_ERROR err =
-        JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
     env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
-                        static_cast<jlong>(lastConcreteClusterPath.mClusterId),
-                        static_cast<jint>(committedDataVersion.Value()));
+                        static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jint>(committedDataVersion.Value()));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
