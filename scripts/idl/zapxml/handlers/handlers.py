@@ -356,6 +356,8 @@ class CommandHandler(BaseHandler):
                 request_name = name+'Request'
                 command_name = name
 
+            self._struct.name = request_name
+
             if 'response' in attrs:
                 response_name = attrs['response']
             else:
