@@ -168,7 +168,6 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #    - tag not set because not a request/response
         #    - code not set because not a response
 
-        # TODO: handle this isFabricScoped attribute
         self._is_fabric_scoped = (attrs.get('isFabricScoped', "false").lower() == 'true')
 
     def GetNextProcessor(self, name: str, attrs):

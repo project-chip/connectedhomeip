@@ -146,6 +146,52 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(side=ClusterSide.CLIENT, name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
 
+    def testStruct(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster><name>Test1</name><code>0x000A</code></cluster>
+              <cluster>
+                  <name>Test2</name>
+                  <code>20</code>
+
+                  <attribute side="server" code="123" type="SomeStruct" isNullable="true" writable="false">
+                     FabricAttribute
+                  </attribute>
+              </cluster>
+
+              <struct name="SomeStruct" isFabricScoped="true">
+                <cluster code="10" />
+                <cluster code="0x0014" />
+                <item name="FirstMember" type="int16u" />
+                <item name="SecondMember" type="int32u" />
+              </struct>
+
+            </configurator>
+        ''')
+        struct = Struct(
+            name='SomeStruct',
+            fields=[
+                Field(data_type=DataType(name='int16u'), code=1, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'), code=2, name='SecondMember')
+            ]
+        )
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(side=ClusterSide.CLIENT, name='Test1', code=10, structs=[struct]),
+                             Cluster(side=ClusterSide.CLIENT, name='Test2', code=20,
+                                     structs=[struct],
+                                     attributes=[
+                                         Attribute(
+                                             definition=Field(
+                                                 data_type=DataType(name='SomeStruct'),
+                                                 code=123,
+                                                 name='FabricAttribute',
+                                                 attributes={FieldAttribute.NULLABLE}
+                                             ),
+                                             tags={AttributeTag.READABLE, AttributeTag.FABRIC_SCOPED},
+                                             readacl=AccessPrivilege.VIEW,
+                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+
 
 if __name__ == '__main__':
     unittest.main()
