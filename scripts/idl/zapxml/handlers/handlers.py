@@ -211,10 +211,9 @@ class StructHandler(BaseHandler, IdlPostProcessor):
             return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
-        # We have two choices of adding an enum:
+        # We have two choices of adding a struct:
         #   - inside a cluster if a code exists
         #   - inside top level if no codes were associated
-
         if self._cluster_codes:
             for code in self._cluster_codes:
                 found = False
@@ -228,6 +227,14 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                                   (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
+
+        # Secondary processing, for fabric scoped:
+        #      while ZAP XML maintains these at a struct level. Update attributes
+        if self._is_fabric_scoped:
+            for cluster in idl.clusters:
+                for attribute in cluster.attributes:
+                    if self._struct.name == attribute.definition.data_type.name:
+                        attribute.tags.add(AttributeTag.FABRIC_SCOPED)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -363,12 +370,18 @@ class CommandHandler(BaseHandler):
                 output_param=response_name,
             )
 
-            # TODO: command attributes:
-            #    - timed invoke
-            #    - fabric scoped
+            if attrs.get('isFabricScoped', 'false') == 'true':
+                self._command.attributes.add(CommandAttribute.FABRIC_SCOPED)
+
+            if attrs.get('mustUseTimedInvoke', 'false') == 'true':
+                self._command.attributes.add(CommandAttribute.TIMED_INVOKE)
+
         else:
             self._struct.tag = StructTag.RESPONSE
             self._struct.code = ParseInt(attrs['code'])
+
+
+
 
     def GetArgumentField(self, attrs):
         data_type = DataType(name=attrs['type'])
