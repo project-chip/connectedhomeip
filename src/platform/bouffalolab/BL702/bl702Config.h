@@ -1,8 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019-2020 Google LLC.
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +13,6 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
-
-/**
- *    @file
- *          Utilities for interacting with the the BL702 Easyflash module.
  */
 
 #pragma once

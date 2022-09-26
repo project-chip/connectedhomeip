@@ -3,7 +3,8 @@
 This example functions as a wifi light bulb device type, with on/off
 capabilities. The steps were verified on BL602-IoT-Matter-V1 board.
 
-BL602-IoT-Matter-V1 board:
+BL602-IoT-Matter-V1 board and
+[purchase link](https://www.amazon.com/dp/B0B9ZVGXD8):
 <img src="../../../platform/bouffalolab/bl602/doc/images/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## Initial setup
@@ -66,7 +67,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     ```
     cd third_party/bouffalolab/repo/tools/flash_tool
 
-    ./bflb_iot_tool --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../out/bl602-light/chip-bl602-lighting-example.bin
+    ./bflb_iot_tool-ubuntu --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../out/bl602-light/chip-bl602-lighting-example.bin
     ```
 
     ```

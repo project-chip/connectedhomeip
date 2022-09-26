@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,12 +13,6 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
-
-/**
- *    @file
- *          Provides an implementation of the BLEManager singleton object
- *          for the BL602 platform.
  */
 
 #pragma once
@@ -38,7 +32,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the BLEManager singleton object for the BL602 platform.
+ * Concrete implementation of the BLEManager singleton object for the BL702 platform.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -48,7 +42,9 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
 private:
     // ===== Members that implement the BLEManager internal interface.
-
+    using IndicationAttrType =
+        std::conditional_t<std::is_same<bt_gatt_indicate_func_t, void (*)(bt_conn *, bt_gatt_indicate_params *, uint8_t)>::value,
+                           bt_gatt_indicate_params *, const bt_gatt_attr *>;
     CHIP_ERROR _Init(void);
     void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
@@ -90,6 +86,7 @@ private:
         kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
     };
 
     struct ServiceData;
@@ -98,8 +95,11 @@ private:
     uint16_t mGAPConns;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
-    bt_gatt_notify_params mNotifyParams[CONFIG_BT_MAX_CONN];
+    bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    PacketBufferHandle c3CharDataBufferHandle;
+#endif
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
@@ -110,6 +110,9 @@ private:
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR PrepareC3CharData();
+#endif
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
@@ -118,7 +121,7 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXCompleted(bt_conn * conn, void * param);
+    static void HandleTXIndicated(bt_conn * conn, IndicationAttrType attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
     static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
@@ -135,6 +138,10 @@ public:
     static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, uint16_t len, uint16_t offset,
                                  uint8_t flags);
     static bool HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, uint16_t value);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
 };
 
 /**
@@ -152,7 +159,7 @@ inline BLEManager & BLEMgr(void)
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
  * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the BL602 platform.
+ * that are specific to the BL702 platform.
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {

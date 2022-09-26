@@ -75,6 +75,7 @@ public:
     void WifiStationStateChange(void);
     void OnStationConnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
+    void OnIPv6AddressAvailable();
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.

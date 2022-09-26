@@ -34,7 +34,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates BL602 platform-specific event types that are visible to the application.
+ * Enumerates Zephyr platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -42,7 +42,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates BL602 platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates Zephyr platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -50,8 +50,8 @@ enum InternalPlatformSpecificEventTypes
     kPlatformZephyrBleConnected,
     kPlatformZephyrBleDisconnected,
     kPlatformZephyrBleCCCWrite,
-    kPlatformZephyrBleRXWrite,
-    kPlatformZephyrBleTXComplete,
+    kPlatformZephyrBleC1WriteEvent,
+    kPlatformZephyrBleC2IndDoneEvent,
     kPlatformZephyrBleOutOfBuffersEvent,
 };
 
@@ -69,19 +69,20 @@ struct BleCCCWriteEventType
     uint16_t Value;
 };
 
-struct BleRXWriteEventType
+struct BleC1WriteEventType
 {
     bt_conn * BtConn;
     ::chip::System::PacketBuffer * Data;
 };
 
-struct BleTXCompleteEventType
+struct BleC2IndDoneEventType
 {
     bt_conn * BtConn;
+    uint8_t Result;
 };
 
 /**
- * Represents platform-specific event information for the BL602 platform.
+ * Represents platform-specific event information for BL602 platforms.
  */
 struct ChipDevicePlatformEvent final
 {
@@ -89,8 +90,8 @@ struct ChipDevicePlatformEvent final
     {
         BleConnEventType BleConnEvent;
         BleCCCWriteEventType BleCCCWriteEvent;
-        BleRXWriteEventType BleRXWriteEvent;
-        BleTXCompleteEventType BleTXCompleteEvent;
+        BleC1WriteEventType BleC1WriteEvent;
+        BleC2IndDoneEventType BleC2IndDoneEvent;
     };
 };
 

@@ -203,6 +203,11 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
         WifiStaConnected();
     }
     break;
+    case CODE_WIFI_ON_GOT_IP6: {
+        log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
+        ConnectivityMgrImpl().OnIPv6AddressAvailable();
+    }
+    break;
     default: {
         log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
         /*nothing*/

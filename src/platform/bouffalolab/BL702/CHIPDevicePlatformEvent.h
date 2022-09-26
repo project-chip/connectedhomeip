@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Texas Instruments Incorporated
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,12 +39,12 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kPlatformZephyrEvent = chip::DeviceLayer::DeviceEventType::kRange_InternalPlatformSpecific,
+    kPlatformZephyrEvent = kRange_InternalPlatformSpecific,
     kPlatformZephyrBleConnected,
     kPlatformZephyrBleDisconnected,
     kPlatformZephyrBleCCCWrite,
-    kPlatformZephyrBleRXWrite,
-    kPlatformZephyrBleTXComplete,
+    kPlatformZephyrBleC1WriteEvent,
+    kPlatformZephyrBleC2IndDoneEvent,
     kPlatformZephyrBleOutOfBuffersEvent,
 };
 
@@ -63,15 +62,16 @@ struct BleCCCWriteEventType
     uint16_t Value;
 };
 
-struct BleRXWriteEventType
+struct BleC1WriteEventType
 {
     bt_conn * BtConn;
     ::chip::System::PacketBuffer * Data;
 };
 
-struct BleTXCompleteEventType
+struct BleC2IndDoneEventType
 {
     bt_conn * BtConn;
+    uint8_t Result;
 };
 
 /**
@@ -83,8 +83,8 @@ struct ChipDevicePlatformEvent final
     {
         BleConnEventType BleConnEvent;
         BleCCCWriteEventType BleCCCWriteEvent;
-        BleRXWriteEventType BleRXWriteEvent;
-        BleTXCompleteEventType BleTXCompleteEvent;
+        BleC1WriteEventType BleC1WriteEvent;
+        BleC2IndDoneEventType BleC2IndDoneEvent;
     };
 };
 
