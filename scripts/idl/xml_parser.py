@@ -52,10 +52,17 @@ if __name__ == '__main__':
     @ click.option(
         '--log-level',
         default='INFO',
+        show_default=True,
         type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
         help='Determines the verbosity of script output.')
+    @ click.option(
+        '--no-print',
+        show_default=True,
+        default=False,
+        is_flag=True,
+        help='Do not pring output data (parsed data)')
     @ click.argument('filenames', nargs=-1)
-    def main(log_level, filenames):
+    def main(log_level, no_print, filenames):
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
@@ -65,7 +72,8 @@ if __name__ == '__main__':
         data = ParseXmls(sources)
         logging.info("Parse completed")
 
-        logging.info("Data:")
-        pprint.pp(data)
+        if not no_print:
+            print("Data:")
+            pprint.pp(data)
 
     main()

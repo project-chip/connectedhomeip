@@ -302,6 +302,7 @@ jobs:
               #       things.
               run: |
                   ./scripts/idl/xml_parser.py \
+                      --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
