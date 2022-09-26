@@ -17,12 +17,8 @@
 import enum
 import logging
 import os
-import typing
 import xml.sax
 import xml.sax.handler
-
-from dataclasses import dataclass, field
-from typing import Optional, Union, List
 
 try:
     from idl.matter_idl_types import Idl
@@ -33,33 +29,7 @@ except:
         os.path.join(os.path.dirname(__file__), '..')))
     from idl.matter_idl_types import Idl
 
-import idl.zapxml
-
-
-@ dataclass
-class ParseSource:
-    source: Union[str, typing.IO]  # filename or stream
-    name: Optional[str] = None  # actual filename to use, None if the source is a filename already
-
-    @ property
-    def source_file_name(self):
-        if self.name:
-            return self.name
-        return self.source  # assume string
-
-
-def ParseXmls(sources: List[ParseSource]) -> Idl:
-    handler = idl.zapxml.ParseHandler()
-
-    for source in sources:
-        logging.info('Parsing %s...' % source.source_file_name)
-        handler.PrepareParsing(source.source_file_name)
-
-        parser = xml.sax.make_parser()
-        parser.setContentHandler(handler)
-        parser.parse(source.source)
-
-    return handler.ProcessResults()
+from idl.zapxml import ParseSource, ParseXmls
 
 
 if __name__ == '__main__':

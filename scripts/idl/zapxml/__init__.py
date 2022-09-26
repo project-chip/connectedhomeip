@@ -13,7 +13,11 @@
 # limitations under the License.
 
 import logging
+import typing
 import xml.sax.handler
+
+from dataclasses import dataclass
+from typing import Optional, Union, List
 
 from idl.zapxml.handlers import Context, ZapXmlHandler
 from idl.matter_idl_types import Idl
@@ -33,7 +37,8 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         # single file)
         self._idl.parse_file_name = filename
 
-    def ProcessResults(self) -> Idl:
+    def Finish(self) -> Idl:
+        self._context.PostProcess(self._idl)
         return self._idl
 
     def startDocument(self):
@@ -43,8 +48,6 @@ class ParseHandler(xml.sax.handler.ContentHandler):
     def endDocument(self):
         if len(self._processing_stack) != 1:
             raise Exception("Unexpected nesting!")
-
-        self._context.PostProcess(self._idl)
 
     def startElement(self, name: str, attrs):
         logging.debug("ELEMENT START: %r / %r" % (name, attrs))
@@ -63,3 +66,29 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
     def characters(self, content):
         self._processing_stack[-1].HandleContent(content)
+
+@dataclass
+class ParseSource:
+    source: Union[str, typing.IO]  # filename or stream
+    name: Optional[str] = None  # actual filename to use, None if the source is a filename already
+
+    @ property
+    def source_file_name(self):
+        if self.name:
+            return self.name
+        return self.source  # assume string
+
+def ParseXmls(sources: List[ParseSource]) -> Idl:
+    handler = ParseHandler()
+
+    for source in sources:
+        logging.info('Parsing %s...' % source.source_file_name)
+        handler.PrepareParsing(source.source_file_name)
+
+        parser = xml.sax.make_parser()
+        parser.setContentHandler(handler)
+        parser.parse(source.source)
+
+    return handler.Finish()
+
+
