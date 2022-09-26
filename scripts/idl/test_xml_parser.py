@@ -113,10 +113,8 @@ class TestXmlParser(unittest.TestCase):
                                  commands=[
                                      Command(name='GetSomeData', code=33, input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
                                              invokeacl=AccessPrivilege.ADMINISTER)
-                                 ],
-                             )
-                         ],
-                             endpoints=[]))
+                                 ])
+                         ]))
 
 
 if __name__ == '__main__':
