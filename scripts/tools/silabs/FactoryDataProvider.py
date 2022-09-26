@@ -19,6 +19,7 @@ import sys
 import argparse
 import struct
 
+
 class FactoryDataWriter:
     # CONSTANTS
     TEMP_FILE = 'tmp_nvm3.s37'
@@ -64,17 +65,16 @@ class FactoryDataWriter:
             The whole set of args passed to the script.
         """
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
-                            55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
+                             55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
         assert (bool(arguments.gen_spake2p_path) != bool(arguments.spake2_verifier)
                 ), "Provide either the spake2_verifier string or the path to the spake2 generator"
         assert not (arguments.passcode in INVALID_PASSCODES), "The provided passcode is invalid"
 
-        self._args=arguments
+        self._args = arguments
 
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
-
 
     def add_SerialNo_To_CMD(self, cmdList):
         """ Add the jtag serial command to the commander command
@@ -85,14 +85,13 @@ class FactoryDataWriter:
         if self._args.jtag_serial:
             cmdList.extend(["--serialno", self._args.jtagSerial])
 
-
     def create_nvm3injected_image(self):
         """ Use commander command lines create a binary flashable to the EFR32 
             containing the factory commissioning data in NVM3 section
         """
         isDeviceConnected = True
         print("passcode :", self._args.passcode)
-        print("discriminator :",self._args.discriminator)
+        print("discriminator :", self._args.discriminator)
         print("spake2_iteration :", self._args.spake2_iteration)
         print("spake2_salt :",  self._args.spake2_salt)
         print("spake2_verifier :",  self._args.spake2_verifier)
@@ -132,7 +131,6 @@ class FactoryDataWriter:
                     print("Connect debug port or provide the mcu_family")
                     return
 
-
         # Convert interger to little endian hex format and strings to hex byte array format for nvm3 storage
         Passcode = self._args.passcode.to_bytes(4, "little").hex()
         Spake2pIterationCount = self._args.spake2_iteration.to_bytes(4, 'little').hex()
@@ -165,6 +163,7 @@ class FactoryDataWriter:
             cmd = ['commander', 'flash', self.OUT_FILE, ]
             self.add_SerialNo_To_CMD(cmd)
             results = subprocess.run(cmd)
+
 
 def main():
     def all_int_format(i): return int(i, 0)
