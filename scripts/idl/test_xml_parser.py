@@ -31,7 +31,6 @@ except:
     from idl.zapxml import ParseSource, ParseXmls
 
 
-
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
     if not isinstance(what, list):
         what = [what]
@@ -43,14 +42,12 @@ def XmlToIdl(what: Union[str, List[str]]) -> Idl:
     return ParseXmls(sources)
 
 
-
 class TestXmlParser(unittest.TestCase):
 
     def testEmptyInput(self):
         idl = XmlToIdl('<configurator/>')
         self.assertEqual(idl, Idl(parse_file_name='Input 1'))
 
+
 if __name__ == '__main__':
     unittest.main()
-
-

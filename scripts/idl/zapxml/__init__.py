@@ -67,6 +67,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
     def characters(self, content):
         self._processing_stack[-1].HandleContent(content)
 
+
 @dataclass
 class ParseSource:
     source: Union[str, typing.IO]  # filename or stream
@@ -77,6 +78,7 @@ class ParseSource:
         if self.name:
             return self.name
         return self.source  # assume string
+
 
 def ParseXmls(sources: List[ParseSource]) -> Idl:
     handler = ParseHandler()
@@ -90,5 +92,3 @@ def ParseXmls(sources: List[ParseSource]) -> Idl:
         parser.parse(source.source)
 
     return handler.Finish()
-
-
