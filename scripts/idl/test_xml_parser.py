@@ -71,7 +71,7 @@ class TestXmlParser(unittest.TestCase):
                     <arg name="secondInput" type="INT16U" />
                 </command>
 
-                <command source="server" code="44" name="GetSomeDataResponse" disableDefaultResponse="true" optional="true">
+                <command source="server" code="0x44" name="GetSomeDataResponse" disableDefaultResponse="true" optional="true">
                     <description>Reply from server</description>
                     <arg name="dataPoint1" type="INT8U" />
                     <arg name="dataPoint2" type="INT8U" optional="true" />
@@ -108,7 +108,7 @@ class TestXmlParser(unittest.TestCase):
                                                 Field(data_type=DataType(name='INT8U'), code=2, name='dataPoint2',
                                                       attributes={FieldAttribute.OPTIONAL})
                                             ],
-                                            tag=StructTag.RESPONSE, code=44)
+                                            tag=StructTag.RESPONSE, code=0x44)
                                  ],
                                  commands=[
                                      Command(name='GetSomeData', code=33, input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
