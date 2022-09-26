@@ -27,6 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/mw320/MW320Config.h>
 
@@ -79,10 +80,27 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
         InitiateFactoryReset();
     }
+
+    if (!MW320Config::ConfigValueExists(MW320Config::kCounterKey_BootReason))
+    {
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(MW320Config::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(MW320Config::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()

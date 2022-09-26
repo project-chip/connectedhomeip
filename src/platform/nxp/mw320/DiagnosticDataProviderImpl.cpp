@@ -130,7 +130,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
-    return CHIP_NO_ERROR;
+    uint32_t reason = 0;
+
+    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
