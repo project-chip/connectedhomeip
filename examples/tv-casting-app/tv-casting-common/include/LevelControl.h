@@ -17,10 +17,12 @@
  */
 
 #include "MediaCommandBase.h"
+#include "MediaSubscriptionBase.h"
 
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
 
+// COMMAND CLASSES
 class StepCommand
     : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>
 {
@@ -40,4 +42,23 @@ public:
 
     CHIP_ERROR Invoke(uint8_t level, chip::app::DataModel::Nullable<uint16_t> transitionTime, uint8_t optionMask,
                       uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
+};
+
+// SUBSCRIBER CLASSES
+class CurrentLevelSubscriber : public MediaSubscriptionBase<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>
+{
+public:
+    CurrentLevelSubscriber() : MediaSubscriptionBase(chip::app::Clusters::LevelControl::Id) {}
+};
+
+class MinLevelSubscriber : public MediaSubscriptionBase<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>
+{
+public:
+    MinLevelSubscriber() : MediaSubscriptionBase(chip::app::Clusters::LevelControl::Id) {}
+};
+
+class MaxLevelSubscriber : public MediaSubscriptionBase<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>
+{
+public:
+    MaxLevelSubscriber() : MediaSubscriptionBase(chip::app::Clusters::LevelControl::Id) {}
 };

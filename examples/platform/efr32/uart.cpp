@@ -26,7 +26,7 @@ extern "C" {
 #include "em_usart.h"
 #include "sl_board_control.h"
 #include "sl_uartdrv_instances.h"
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
 #include "sl_uartdrv_eusart_vcom_config.h"
 #else
 #include "sl_uartdrv_usart_vcom_config.h"
@@ -44,7 +44,7 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
 #define HELPER1(x) EUSART##x##_RX_IRQn
 #else
 #define HELPER1(x) USART##x##_RX_IRQn
@@ -52,7 +52,7 @@ extern "C" {
 
 #define HELPER2(x) HELPER1(x)
 
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
 #define HELPER3(x) EUSART##x##_RX_IRQHandler
 #else
 #define HELPER3(x) USART##x##_RX_IRQHandler
@@ -61,7 +61,7 @@ extern "C" {
 #define HELPER4(x) HELPER3(x)
 
 // On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_eusart_vcom_handle
@@ -221,7 +221,7 @@ void uartConsoleInit(void)
     NVIC_ClearPendingIRQ(USART_IRQ);
     NVIC_EnableIRQ(USART_IRQ);
 
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
     // Clear previous RX interrupts
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
@@ -246,7 +246,7 @@ void USART_IRQHandler(void)
     otSysEventSignalPending();
 #endif
 
-#ifdef EFR32MG24
+#if (defined(EFR32MG24) || defined(MGM24))
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
 }

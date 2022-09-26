@@ -40,7 +40,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "HAL_VCOM_ENABLE=1",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
@@ -53,13 +53,16 @@ efr32_executable("pigweed_app") {
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
+
+  if (use_wstk_leds) {
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
 
   deps = [
     ":sdk",
@@ -73,7 +76,7 @@ efr32_executable("pigweed_app") {
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
