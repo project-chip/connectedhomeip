@@ -566,7 +566,7 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
       "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
-      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_spidrv_init.c",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_spidrv_init.c",
     ]
 
     if (use_wstk_leds) {
