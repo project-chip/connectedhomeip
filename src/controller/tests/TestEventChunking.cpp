@@ -21,7 +21,7 @@
 #include "app/ConcreteAttributePath.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
@@ -35,6 +35,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -155,8 +156,6 @@ public:
     void OnReportEnd() override { mOnReportEnd = true; }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
-
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override {}
 
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;
@@ -545,10 +544,8 @@ nlTestSuite sSuite =
 
 int TestReadChunkingTests()
 {
-    TestContext gContext;
     gSuite = &sSuite;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReadChunkingTests)

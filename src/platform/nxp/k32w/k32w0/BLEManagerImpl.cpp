@@ -184,6 +184,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(bleAppCreated == pdPASS, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE Radio Init */
+    XCVR_TemperatureUpdate(BOARD_GetTemperature());
     VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create BLE Controller Task */
@@ -308,23 +309,6 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::GetConnectionState(uint8_t co
     return NULL;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (val != mServiceMode)
-    {
-        mServiceMode = val;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
-
-exit:
-    return err;
-}
-
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -423,15 +407,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
-
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    case DeviceEventType::kServiceProvisioningChange:
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kServiceProvisioningChange");
-
-        mFlags.Clear(Flags::kAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-        break;
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
     default:
         break;
@@ -885,21 +860,15 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint32_t bleAdvTimeoutMs = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     mFlags.Set(Flags::kAdvertising);
     mFlags.Clear(Flags::kRestartAdvertising);
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT;
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
     }
-    else
-    {
-        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    }
-    StartBleAdvTimeoutTimer(bleAdvTimeoutMs);
 
     err = ConfigureAdvertisingData();
 
@@ -953,14 +922,6 @@ void BLEManagerImpl::DriveBLEState(void)
 
     // Check if BLE stack is initialized
     VerifyOrExit(mFlags.Has(Flags::kK32WBLEStackInitialized), /* */);
-
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        mFlags.Clear(Flags::kAdvertisingEnabled);
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-    }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
@@ -1557,13 +1518,6 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         // stop advertiser, change interval and restart it;
         sInstance.StopAdvertising();
         sInstance.StartAdvertising();
-        sInstance.StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT); // Slow advertise for 15 Minutes
-    }
-    else if (sInstance._IsAdvertisingEnabled())
-    {
-        // advertisement expired. we stop advertissing
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
-        sInstance.StopAdvertising();
     }
 
     return;

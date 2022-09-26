@@ -408,9 +408,14 @@ class AttributeCache:
             endpointCache = attributeCache[endpoint]
 
             for cluster in tlvCache[endpoint]:
+                if cluster not in _ClusterIndex:
+                    #
+                    # #22599 tracks dealing with unknown clusters more
+                    # gracefully so that clients can still access this data.
+                    #
+                    continue
+
                 clusterType = _ClusterIndex[cluster]
-                if (clusterType is None):
-                    raise Exception("Cannot find cluster in cluster index")
 
                 if (clusterType not in endpointCache):
                     endpointCache[clusterType] = {}
@@ -427,9 +432,6 @@ class AttributeCache:
                         endpointCache[clusterType].SetDataVersion(
                             clusterDataVersion)
                     except Exception as ex:
-                        logging.error(
-                            f"Error converting TLV to Cluster Object for path: Endpoint = {endpoint}, cluster = {str(clusterType)}")
-                        logging.error(f"|-- Exception: {repr(ex)}")
                         decodedValue = ValueDecodeFailure(
                             tlvCache[endpoint][cluster], ex)
                         endpointCache[clusterType] = decodedValue
@@ -438,34 +440,33 @@ class AttributeCache:
                     for attribute in tlvCache[endpoint][cluster]:
                         value = tlvCache[endpoint][cluster][attribute]
 
+                        if (cluster, attribute) not in _AttributeIndex:
+                            #
+                            # #22599 tracks dealing with unknown clusters more
+                            # gracefully so that clients can still access this data.
+                            #
+                            continue
+
                         attributeType = _AttributeIndex[(
                             cluster, attribute)][0]
-                        if (attributeType is None):
-                            raise Exception(
-                                "Cannot find attribute in attribute index")
 
                         if (attributeType not in clusterCache):
                             clusterCache[attributeType] = {}
 
                         if (type(value) is ValueDecodeFailure):
-                            logging.error(
-                                f"For path: Endpoint = {endpoint}, Attribute = {str(attributeType)}, got IM Error: {str(value.Reason)}")
                             clusterCache[attributeType] = value
                         else:
                             try:
                                 decodedValue = attributeType.FromTagDictOrRawValue(
                                     tlvCache[endpoint][cluster][attribute])
                             except Exception as ex:
-                                logging.error(
-                                    f"Error converting TLV to Cluster Object for path: Endpoint = {endpoint}, Attribute = {str(attributeType)}")
-                                logging.error(f"|-- Exception: {repr(ex)}")
                                 decodedValue = ValueDecodeFailure(value, ex)
 
                             clusterCache[attributeType] = decodedValue
 
 
 class SubscriptionTransaction:
-    def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
+    def __init__(self, transaction: AsyncReadTransaction, subscriptionId, devCtrl):
         self._onResubscriptionAttemptedCb = DefaultResubscriptionAttemptedCallback
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
         self._onEventChangeCb = DefaultEventChangeCallback
@@ -474,6 +475,9 @@ class SubscriptionTransaction:
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
         self._isDone = False
+        self._onResubscriptionSucceededCb = None
+        self._onResubscriptionSucceededCb_isAsync = False
+        self._onResubscriptionAttemptedCb_isAsync = False
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -493,14 +497,35 @@ class SubscriptionTransaction:
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
 
-    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None]):
+    def OverrideLivenessTimeoutMs(self, timeoutMs: int):
+        handle = chip.native.GetLibraryHandle()
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
+        )
+
+    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
         '''
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
         to have the following signature:
             def Callback(transaction: SubscriptionTransaction, errorEncountered: int, nextResubscribeIntervalMsec: int)
+
+        If the callback is an awaitable co-routine, isAsync should be set to True.
         '''
         if callback is not None:
             self._onResubscriptionAttemptedCb = callback
+            self._onResubscriptionAttemptedCb_isAsync = isAsync
+
+    def SetResubscriptionSucceededCallback(self, callback: Callback[[SubscriptionTransaction], None], isAsync=False):
+        '''
+        Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
+        is expected to have the following signature:
+            def Callback(transaction: SubscriptionTransaction)
+
+        If the callback is an awaitable co-routine, isAsync should be set to True.
+        '''
+        if callback is not None:
+            self._onResubscriptionSucceededCb = callback
+            self._onResubscriptionSucceededCb_isAsync = isAsync
 
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
@@ -550,7 +575,7 @@ class SubscriptionTransaction:
         return f'<Subscription (Id={self._subscriptionId})>'
 
 
-def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+async def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
     print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
@@ -691,14 +716,26 @@ class AsyncReadTransaction:
             self._subscription_handler = SubscriptionTransaction(
                 self, subscriptionId, self._devCtrl)
             self._future.set_result(self._subscription_handler)
+        else:
+            logging.info("Re-subscription succeeded!")
+            if self._subscription_handler._onResubscriptionSucceededCb is not None:
+                if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
+                    self._event_loop.create_task(
+                        self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
+                else:
+                    self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
 
     def handleSubscriptionEstablished(self, subscriptionId):
         self._event_loop.call_soon_threadsafe(
             self._handleSubscriptionEstablished, subscriptionId)
 
     def handleResubscriptionAttempted(self, terminationCause: int, nextResubscribeIntervalMsec: int):
-        self._event_loop.call_soon_threadsafe(
-            self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
+        if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
+            self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
+                self._subscription_handler, terminationCause, nextResubscribeIntervalMsec))
+        else:
+            self._event_loop.call_soon_threadsafe(
+                self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
@@ -724,9 +761,9 @@ class AsyncReadTransaction:
         if not self._future.done():
             if self._resultError:
                 if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(chipError, self._subscription_handler)
+                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
                 else:
-                    self._future.set_exception(chip.exceptions.ChipStackError(chipError))
+                    self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events))
@@ -873,7 +910,7 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> int:
     handle = chip.native.GetLibraryHandle()
 
     writeargs = []
@@ -898,7 +935,7 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
         lambda: handle.pychip_WriteClient_WriteAttributes(
-            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
+            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
@@ -918,10 +955,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
-    if (not attributes) and (not events):
-        raise ValueError(
-            "Must read some something"
-        )
+
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, returnClusterObject)

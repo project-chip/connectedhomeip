@@ -103,12 +103,12 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
     int32_t success = 0;
 
     success = getPref_bool_new(key.Namespace, key.Name, &intVal);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_bool_new: %s/%s failed\n", key.Namespace, key.Name);
 
     val = (intVal != 0);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -119,10 +119,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
     int32_t success = 0;
 
     success = getPref_u32_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -133,10 +133,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
     int32_t success = 0;
 
     success = getPref_u64_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -147,11 +147,12 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     int32_t success = 0;
 
     success = getPref_str_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_str_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
+        outLen -= 1; // Don't count trailing null
         return CHIP_NO_ERROR;
     }
     else
@@ -166,10 +167,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     int32_t success = 0;
 
     success = getPref_bin_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_bin_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
         return CHIP_NO_ERROR;
     }
@@ -192,6 +193,8 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, bool val)
     success = setPref_new(key.Namespace, key.Name, &value, 1);
     if (!success)
         ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, value ? "true" : "false");
+    else
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
 
     return CHIP_NO_ERROR;
 }
@@ -203,6 +206,8 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
     success = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint32_t));
     if (!success)
         ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+    else
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
 
     return CHIP_NO_ERROR;
 }
@@ -214,6 +219,8 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
     success = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint64_t));
     if (!success)
         ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+    else
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
 
     return CHIP_NO_ERROR;
 }
@@ -225,6 +232,8 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
     success = setPref_new(key.Namespace, key.Name, (uint8_t *) str, strlen(str) + 1);
     if (!success)
         ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, str);
+    else
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
     return CHIP_NO_ERROR;
 }
 
@@ -237,7 +246,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = AmebaConfig::WriteConfigValueStr(key, strCopy.Get());
 exit:
@@ -251,6 +260,8 @@ CHIP_ERROR AmebaConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
     success = setPref_new(key.Namespace, key.Name, (uint8_t *) data, dataLen);
     if (!success)
         ChipLogError(DeviceLayer, "setPref: %s/%s failed\n", key.Namespace, key.Name);
+    else
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", key.Namespace, key.Name, dataLen);
 
     return CHIP_NO_ERROR;
 }
@@ -262,6 +273,8 @@ CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
     success = deleteKey(key.Namespace, key.Name);
     if (!success)
         ChipLogProgress(DeviceLayer, "%s : %s/%s failed\n", __FUNCTION__, key.Namespace, key.Name);
+    else
+        ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
 
     return CHIP_NO_ERROR;
 }

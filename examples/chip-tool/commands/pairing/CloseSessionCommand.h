@@ -19,7 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -46,11 +46,12 @@ private:
     chip::NodeId mDestinationId;
     chip::Optional<uint16_t> mTimeoutSecs;
 
-    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Try to send the action CloseSession status report.
-    CHIP_ERROR CloseSession(chip::DeviceProxy * device);
+    CHIP_ERROR CloseSession(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

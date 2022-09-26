@@ -1,0 +1,151 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 4.1.1. [TC-LTIME-1.1] Global Attributes [DUT as Client]
+
+PICS:
+    - LTIME.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "{DUTread} (0xFFFD) ClusterRevision attribute"
+      PICS: LTIME.C.Afffd
+      verification: |
+          ./chip-tool timeformatlocalization read  cluster-revision 1 0
+          Verify DUT receives  cluster-revision attribute response on the TH(all-clusters-app) Log:
+          [1659778215.939476][17263:17263] CHIP:IM: Received Read request
+          [1659778215.939559][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778215.939577][17263:17263] CHIP:DMG: {
+          [1659778215.939592][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778215.939611][17263:17263] CHIP:DMG:         [
+          [1659778215.939625][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778215.939650][17263:17263] CHIP:DMG:                 {
+          [1659778215.939670][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778215.939696][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778215.939716][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFFD,
+          [1659778215.939732][17263:17263] CHIP:DMG:                 }
+          [1659778215.939753][17263:17263] CHIP:DMG:
+          [1659778215.939766][17263:17263] CHIP:DMG:         ],
+          [1659778215.939786][17263:17263] CHIP:DMG:
+          [1659778215.939804][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778215.939821][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778215.939836][17263:17263] CHIP:DMG: },
+          [1659778215.939918][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659778215.939984][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+      disabled: true
+
+    - label: "{DUTread} (0xFFFC) FeatureMap attribute"
+      PICS: LTIME.C.Afffc
+      verification: |
+          Out of scope for V1.0
+
+          https://github.com/project-chip/connectedhomeip/issues/18989
+      disabled: true
+
+    - label: "{DUTread} (0xFFFB) AttributeList attribute"
+      PICS: LTIME.C.Afffb
+      verification: |
+          ./chip-tool timeformatlocalization read attribute-list 1 0
+          Verify DUT receives attribute-list attribute response on the TH(all-clusters-app) Log:
+          [1659778367.039215][17263:17263] CHIP:IM: Received Read request
+          [1659778367.039321][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778367.039342][17263:17263] CHIP:DMG: {
+          [1659778367.039357][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778367.039378][17263:17263] CHIP:DMG:         [
+          [1659778367.039397][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778367.039419][17263:17263] CHIP:DMG:                 {
+          [1659778367.039443][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778367.039468][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778367.039492][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659778367.039515][17263:17263] CHIP:DMG:                 }
+          [1659778367.039540][17263:17263] CHIP:DMG:
+          [1659778367.039559][17263:17263] CHIP:DMG:         ],
+          [1659778367.039585][17263:17263] CHIP:DMG:
+          [1659778367.039602][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778367.039621][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778367.039640][17263:17263] CHIP:DMG: },
+          [1659778367.039748][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label: "{DUTread} (0xFFFA) EventList attribute"
+      PICS: LTIME.C.Afffa
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label: "{DUTread} (0xFFF9) AcceptedCommandList attribute"
+      PICS: LTIME.C.Afff9
+      verification: |
+          ./chip-tool timeformatlocalization read accepted-command-list 1 0
+          Verify DUT receives AcceptedCommandList attribute response on the TH(all-clusters-app) Log:
+
+          [1659778416.327618][17263:17263] CHIP:IM: Received Read request
+          [1659778416.327695][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778416.327711][17263:17263] CHIP:DMG: {
+          [1659778416.327723][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778416.327738][17263:17263] CHIP:DMG:         [
+          [1659778416.327751][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778416.327767][17263:17263] CHIP:DMG:                 {
+          [1659778416.327783][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778416.327799][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778416.327815][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFF9,
+          [1659778416.327829][17263:17263] CHIP:DMG:                 }
+          [1659778416.327846][17263:17263] CHIP:DMG:
+          [1659778416.327859][17263:17263] CHIP:DMG:         ],
+          [1659778416.327876][17263:17263] CHIP:DMG:
+          [1659778416.327891][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778416.327905][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778416.327917][17263:17263] CHIP:DMG: },
+      disabled: true
+
+    - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
+      PICS: LTIME.C.Afff8
+      verification: |
+          ./chip-tool timeformatlocalization read generated-command-list 1 0
+          Verify DUT receives GeneratedCommandList attribute response on the TH(all-clusters-app) Log:
+          [1659778463.618184][17263:17263] CHIP:IM: Received Read request
+          [1659778463.618262][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778463.618278][17263:17263] CHIP:DMG: {
+          [1659778463.618291][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778463.618310][17263:17263] CHIP:DMG:         [
+          [1659778463.618325][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778463.618345][17263:17263] CHIP:DMG:                 {
+          [1659778463.618364][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778463.618383][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778463.618402][17263:17263] CHIP:DMG:                         Attribute = 0x0000_FFF8,
+          [1659778463.618418][17263:17263] CHIP:DMG:                 }
+          [1659778463.618442][17263:17263] CHIP:DMG:
+          [1659778463.618458][17263:17263] CHIP:DMG:         ],
+          [1659778463.618479][17263:17263] CHIP:DMG:
+          [1659778463.618496][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778463.618513][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778463.618529][17263:17263] CHIP:DMG: },
+          [1659778463.618601][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659778463.618663][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+      disabled: true

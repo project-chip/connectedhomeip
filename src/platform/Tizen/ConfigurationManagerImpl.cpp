@@ -177,5 +177,10 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     PosixConfig::RunConfigUnitTest();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

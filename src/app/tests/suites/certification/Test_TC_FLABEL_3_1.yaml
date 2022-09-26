@@ -1,0 +1,58 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 98.3.1. [TC-FLABEL-3.1] Fixed Label cluster [DUT-client]
+
+PICS:
+    - FLABEL.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "DUT reads LabelList from the TH"
+      PICS: FLABEL.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool fixedlabel read label-list 1 0
+          Verify DUT receives LabelList attribute response on the TH(all-clusters-app) Log:
+
+          [1659609299.722973][2409:2409] CHIP:IM: Received Read request
+          [1659609299.723073][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659609299.723107][2409:2409] CHIP:DMG: {
+          [1659609299.723135][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659609299.723164][2409:2409] CHIP:DMG:         [
+          [1659609299.723190][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659609299.723224][2409:2409] CHIP:DMG:                 {
+          [1659609299.723261][2409:2409] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609299.723357][2409:2409] CHIP:DMG:                         Cluster = 0x40,
+          [1659609299.723404][2409:2409] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659609299.723444][2409:2409] CHIP:DMG:                 }
+          [1659609299.723483][2409:2409] CHIP:DMG:
+          [1659609299.723518][2409:2409] CHIP:DMG:         ],
+          [1659609299.723555][2409:2409] CHIP:DMG:
+          [1659609299.723589][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659609299.723624][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609299.723654][2409:2409] CHIP:DMG: },
+          [1659609299.723746][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true

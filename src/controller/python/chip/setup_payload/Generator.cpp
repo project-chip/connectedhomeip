@@ -35,12 +35,12 @@ extern "C" ChipError::StorageType pychip_SetupPayload_PrintOnboardingCodes(uint3
     SetupPayload payload;
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kNone;
 
-    payload.version               = version;
-    payload.setUpPINCode          = passcode;
-    payload.vendorID              = vendorId;
-    payload.productID             = productId;
-    payload.discriminator         = discriminator;
-    payload.rendezvousInformation = rendezvousFlags.SetRaw(capabilities);
+    payload.version      = version;
+    payload.setUpPINCode = passcode;
+    payload.vendorID     = vendorId;
+    payload.productID    = productId;
+    payload.discriminator.SetLongValue(discriminator);
+    payload.rendezvousInformation.SetValue(rendezvousFlags.SetRaw(capabilities));
 
     switch (customFlow)
     {

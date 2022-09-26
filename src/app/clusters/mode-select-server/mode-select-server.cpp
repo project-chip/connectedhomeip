@@ -33,6 +33,7 @@
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace std;
 using namespace chip;
@@ -40,6 +41,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+
+using BootReasonType = GeneralDiagnostics::BootReasonType;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 
@@ -132,9 +135,6 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         EmberAfStatus status = Attributes::StartUpMode::Get(endpointId, startUpMode);
         if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
         {
-            // Initialise currentMode to 0
-            uint8_t currentMode = 0;
-            status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
 #ifdef EMBER_AF_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
@@ -147,7 +147,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = 0;
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
-                    emberAfIsNonVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                    !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
@@ -158,7 +158,27 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
             }
 #endif // EMBER_AF_PLUGIN_ON_OFF
-            if (status == EMBER_ZCL_STATUS_SUCCESS && startUpMode.Value() != currentMode)
+
+            BootReasonType bootReason = BootReasonType::kUnspecified;
+            CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT, error.Format());
+                // We really only care whether the boot reason is OTA.  Assume it's not.
+                bootReason = BootReasonType::kUnspecified;
+            }
+            if (bootReason == BootReasonType::kSoftwareUpdateCompleted)
+            {
+                ChipLogDetail(Zcl, "ModeSelect: CurrentMode is ignored for OTA reboot");
+                return;
+            }
+
+            // Initialise currentMode to 0
+            uint8_t currentMode = 0;
+            status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
+
+            if ((status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
                 if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -189,8 +209,8 @@ namespace {
  */
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 {
-    return emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id) &&
-        emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id);
+    return !emberAfIsKnownVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id) &&
+        !emberAfIsKnownVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id);
 }
 
 } // namespace

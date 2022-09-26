@@ -29,7 +29,6 @@ from wheel.bdist_wheel import bdist_wheel
 import argparse
 import json
 import os
-import platform
 import shutil
 
 
@@ -45,7 +44,7 @@ parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
 parser.add_argument(
-    '--server', help='build the server variant', default=False, type=bool)
+    '--lib-name', help='the native library to include (if any)', default=None)
 
 args = parser.parse_args()
 
@@ -58,20 +57,9 @@ class InstalledScriptInfo:
         self.installName = os.path.splitext(name)[0]
 
 
-if args.server:
-    chipDLLName = "_ChipServer.so"
-else:
-    chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
+libName = args.lib_name
 chipPackageVer = args.build_number
-
-if args.server:
-    installScripts = []
-else:
-    installScripts = [
-        InstalledScriptInfo("chip-device-ctrl.py"),
-        InstalledScriptInfo("chip-repl.py"),
-    ]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -110,6 +98,7 @@ try:
             os.makedirs(os.path.dirname(dstFile), exist_ok=True)
             shutil.copyfile(srcFile, dstFile)
 
+    installScripts = [InstalledScriptInfo(script) for script in manifest['scripts']]
     for script in installScripts:
         os.rename(os.path.join(tmpDir, script.name),
                   os.path.join(tmpDir, script.installName))
@@ -121,62 +110,15 @@ try:
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
-    requiredPackages = [
-        "coloredlogs",
-        'construct',
-
-        #
-        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
-        # For now, let's just avoid that version.
-        #
-        # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
-        #
-        #
-        'ipython!=8.1.0',
-        'dacite',
-        'rich',
-        'stringcase',
-        'pyyaml',
-        'ipdb',
-        'ipykernel',
-        'deprecation'
-    ]
-
-    if platform.system() == "Darwin":
-        requiredPackages.append("pyobjc-framework-corebluetooth")
-
-    if platform.system() == "Linux":
-        requiredPackages.append("dbus-python")
-        requiredPackages.append("pygobject")
+    requiredPackages = manifest['package_reqs']
 
     #
     # Build the chip package...
     #
-    packages = [
-        'chip',
-        'chip.ble',
-        'chip.ble.commissioning',
-        'chip.configuration',
-        'chip.clusters',
-        'chip.discovery',
-        'chip.exceptions',
-        'chip.internal',
-        'chip.interaction_model',
-        'chip.logging',
-        'chip.native',
-        'chip.clusters',
-        'chip.tlv',
-        'chip.setup_payload',
-        'chip.storage',
-    ]
-    #print ("Server: {}".format(args.server))
-    if args.server:
-        packages.append('chip.server')
-
-    #print("packages: {}".format(packages))
+    packages = manifest['packages']
 
     print("packageName: {}".format(packageName))
-    print("chipDLLName: {}".format(chipDLLName))
+    print("libName: {}".format(libName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
@@ -200,11 +142,10 @@ try:
             '': tmpDir,
         },
         package_data={
-            packageName: [
-                # Include the wrapper DLL as package data in the "chip" package.
-                chipDLLName
+            packages[0]: [
+                libName
             ]
-        },
+        } if libName else {},
         scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
@@ -225,7 +166,7 @@ try:
         },
         cmdclass={
             'bdist_wheel': bdist_wheel_override
-        },
+        } if libName else {},
         script_args=['clean', '--all', 'bdist_wheel']
     )
 

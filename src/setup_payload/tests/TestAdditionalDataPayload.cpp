@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTestContext.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
@@ -168,8 +170,7 @@ void TestGeneratingRotatingDeviceIdAsString(nlTestSuite * inSuite, void * inCont
     // Parsing out the lifetime counter value
     long lifetimeCounter;
     char lifetimeCounterStr[3];
-    strncpy(lifetimeCounterStr, rotatingDeviceIdHexBuffer, 2);
-    lifetimeCounterStr[2] = 0;
+    Platform::CopyString(lifetimeCounterStr, rotatingDeviceIdHexBuffer);
 
     char * parseEnd;
     lifetimeCounter = strtol(lifetimeCounterStr, &parseEnd, 16);
@@ -276,11 +277,6 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-};
-
 } // namespace
 
 /**
@@ -317,17 +313,11 @@ int TestAdditionalDataPayload()
         TestAdditionalDataPayload_Teardown
     };
     // clang-format on
-    TestContext context;
-
-    context.mSuite = &theSuite;
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    // Run Test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return nlTestRunnerStats(&theSuite);
+    return chip::ExecuteTestsWithoutContext(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestAdditionalDataPayload);

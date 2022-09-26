@@ -27,6 +27,10 @@
 
 #include <platform/Darwin/PosixConfig.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Darwin/WiFi/WiFiNetworkInfos.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -40,6 +44,13 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);
+    CHIP_ERROR StoreWiFiNetworkInformations(WiFiNetworkInfos & infos);
+    CHIP_ERROR ClearWiFiNetworkInformations();
+    bool HasWiFiNetworkInformations();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
@@ -80,6 +91,14 @@ private:
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

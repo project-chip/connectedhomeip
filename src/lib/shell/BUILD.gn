@@ -63,6 +63,11 @@ static_library("shell") {
       "MainLoopCYW30739.cpp",
       "streamer_cyw30739.cpp",
     ]
+  } else if (chip_device_platform == "mt793x") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_mt793x.cpp",
+    ]
   } else if (current_os == "zephyr") {
     sources += [
       "MainLoopZephyr.cpp",
@@ -79,10 +84,25 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_bl602.cpp",
     ]
+  } else if (chip_device_platform == "bl702") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_bl702.cpp",
+    ]
   } else if (chip_device_platform == "cc13x2_26x2") {
     sources += [
       "MainLoopDefault.cpp",
       "streamer_cc13x2_26x2.cpp",
+    ]
+  } else if (chip_device_platform == "mw320") {
+    sources += [
+      "MainLoopMW320.cpp",
+      "streamer_mw320.cpp",
+    ]
+  } else if (chip_device_platform == "ameba") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_ameba.cpp",
     ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]

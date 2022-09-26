@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 config("chip_examples_project_config") {
@@ -40,14 +41,19 @@ config("chip_examples_project_config") {
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
-  sources = [ "project_include/OpenThreadConfig.h" ]
+  if (chip_enable_openthread) {
+    sources = [ "project_include/OpenThreadConfig.h" ]
 
-  public_deps = [
-    "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
-    "${efr32_sdk_build_root}:efr32_sdk",
-  ]
+    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
-  public_configs = [ ":chip_examples_project_config" ]
+    if (use_silabs_thread_lib) {
+      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
+    } else {
+      public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
+    }
+
+    public_configs = [ ":chip_examples_project_config" ]
+  }
 }
 
 source_set("efr-matter-shell") {
@@ -63,4 +69,27 @@ source_set("efr-matter-shell") {
       "${chip_root}/src/lib/shell:shell_core",
     ]
   }
+}
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [
+    # Set to 1 to enable EFR32 attestation credentials
+    "EFR32_ATTESTATION_CREDENTIALS",
+  ]
+}
+
+source_set("efr32-attestation-credentials") {
+  sources = [
+    "EFR32DeviceAttestationCreds.cpp",
+    "EFR32DeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
 }

@@ -31,6 +31,7 @@ typedef uint32_t AttributeId;
 typedef uint32_t ClusterId;
 typedef uint8_t ClusterStatus;
 typedef uint32_t CommandId;
+typedef uint64_t CompressedFabricId;
 typedef uint32_t DataVersion;
 typedef uint32_t DeviceTypeId;
 typedef uint16_t EndpointId;
@@ -44,6 +45,9 @@ typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
+
+constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
+constexpr FabricId kUndefinedFabricId                     = 0ULL;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr FabricIndex kMinValidFabricIndex  = 1;
@@ -122,6 +126,11 @@ constexpr bool IsValidEndpointId(EndpointId aEndpointId)
 constexpr bool IsValidFabricIndex(FabricIndex fabricIndex)
 {
     return (fabricIndex >= kMinValidFabricIndex) && (fabricIndex <= kMaxValidFabricIndex);
+}
+
+constexpr bool IsValidFabricId(FabricId fabricId)
+{
+    return fabricId != kUndefinedFabricId;
 }
 
 } // namespace chip

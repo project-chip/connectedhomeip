@@ -54,6 +54,12 @@ enum class SetupCodePairerBehaviour : uint8_t
     kPaseOnly,
 };
 
+enum class DiscoveryType : uint8_t
+{
+    kDiscoveryNetworkOnly,
+    kAll,
+};
+
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
@@ -61,7 +67,8 @@ public:
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
-                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission);
+                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission,
+                          DiscoveryType discoveryType             = DiscoveryType::kAll);
 
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
@@ -71,6 +78,10 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+    // Called to notify us that the DeviceCommissioner is shutting down and we
+    // should not try to do any more new work.
+    void CommissionerShuttingDown();
 
 private:
     // DevicePairingDelegate implementation.
@@ -147,6 +158,7 @@ private:
     chip::NodeId mRemoteId;
     uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
+    DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
 
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on

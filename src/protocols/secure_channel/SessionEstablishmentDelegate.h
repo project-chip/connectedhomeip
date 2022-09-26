@@ -26,6 +26,7 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
+#include <transport/SessionHandle.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -35,7 +36,9 @@ class DLL_EXPORT SessionEstablishmentDelegate
 {
 public:
     /**
-     *   Called when session establishment fails with an error
+     *   Called when session establishment fails with an error.  This will be
+     *   called at most once per session establishment and will not be called if
+     *   OnSessionEstablished is called.
      */
     virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
 
@@ -45,7 +48,9 @@ public:
     virtual void OnSessionEstablishmentStarted() {}
 
     /**
-     *   Called when the new secure session has been established
+     *   Called when the new secure session has been established.  This is
+     *   mututally exclusive with OnSessionEstablishmentError for a give session
+     *   establishment.
      */
     virtual void OnSessionEstablished(const SessionHandle & session) {}
 

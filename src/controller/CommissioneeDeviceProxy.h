@@ -103,9 +103,9 @@ public:
     /**
      *  In case there exists an open session to the device, mark it as expired.
      */
-    CHIP_ERROR CloseSession();
+    void CloseSession();
 
-    CHIP_ERROR Disconnect() override { return CloseSession(); }
+    void Disconnect() override { CloseSession(); }
 
     /**
      * @brief
@@ -133,6 +133,7 @@ public:
     bool IsSessionSetupInProgress() const { return mState == ConnectionState::Connecting; }
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
+    void ShutdownSubscriptions() override {}
     PeerId GetPeerId() const { return mPeerId; }
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
     const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }

@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "CloseSessionCommand.h"
-#include "CommissionedListCommand.h"
-#include "OpenCommissioningWindowCommand.h"
-#include "PairingCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/pairing/CloseSessionCommand.h"
+#include "commands/pairing/CommissionedListCommand.h"
+#include "commands/pairing/OpenCommissioningWindowCommand.h"
+#include "commands/pairing/PairingCommand.h"
 
 #include <app/server/Dnssd.h>
 #include <commands/common/CredentialIssuerCommands.h>

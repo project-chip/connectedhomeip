@@ -16,6 +16,7 @@
  */
 
 #include "PICSBooleanReader.h"
+#include "PICSNormalizer.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -43,6 +44,7 @@ std::map<std::string, bool> PICSBooleanReader::Read(std::string filepath)
 
         std::getline(ss, key, '=');
         VerifyOrDieWithMsg(!key.empty(), chipTool, "Missing PICS key at line %u", lineNumber + 1);
+        key = PICSNormalizer::Normalize(key);
 
         std::getline(ss, value);
         if (value == "0")

@@ -1,0 +1,263 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    111.2.5. [TC-DRLK-2.5] Verification for the following Commands - Set Week
+    Day Schedule, Get Week Day Schedule , Get Week Day Schedule Response, Clear
+    Week Day Schedule [DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new user"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
+
+    - label: "TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          constraints:
+              minValue: 0
+              maxValue: 255
+
+    - label: "TH reads NumberOfTotalUsers Supported attribute"
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupported
+          constraints:
+              minValue: 0
+              maxValue: 65534
+
+    - label: "TH send Set Week Day Schedule Command"
+      PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 2
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+
+    #issue #18591
+    - label: "TH send Get Week Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                value: 2
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                constraints:
+                    hasValue: true
+                    minValue: 16
+              - name: "endMinute"
+                constraints:
+                    hasValue: true
+                    minValue: 55
+
+    - label: "TH send Set Week Day Schedule Command"
+      PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 7
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+      response:
+          error: INVALID_COMMAND
+
+    - label: "TH send Get Week Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x85
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false
+
+    - label: "TH sends Clear Week Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
+      command: "ClearWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+
+    - label: "TH sends Get Week Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x8B
+              - name: "daysMask"
+                constraints:
+                    hasValue: false
+              - name: "startHour"
+                constraints:
+                    hasValue: false
+              - name: "startMinute"
+                constraints:
+                    hasValue: false
+              - name: "endHour"
+                constraints:
+                    hasValue: false
+              - name: "endMinute"
+                constraints:
+                    hasValue: false
+
+    - label: "Cleanup the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1

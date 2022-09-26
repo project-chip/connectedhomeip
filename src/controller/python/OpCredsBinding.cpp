@@ -77,6 +77,8 @@ public:
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, pubKey, rcac, icac, noc);
     }
 
+    void SetMaximallyLargeCertsUsed(bool enabled) { mExampleOpCredsIssuer.SetMaximallyLargeCertsUsed(enabled); }
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
@@ -84,14 +86,6 @@ private:
     {
         return mExampleOpCredsIssuer.GenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI,
                                                       onCompletion);
-    }
-
-    CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                    const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                    Callback::Callback<OnNOCChainGeneration> * onCompletion) override
-    {
-        return mExampleOpCredsIssuer.GenerateChipNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC,
-                                                          PAI, onCompletion);
     }
 
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override { mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId); }
@@ -105,7 +99,6 @@ private:
 } // namespace Controller
 } // namespace chip
 
-extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 
@@ -299,17 +292,13 @@ struct OpCredsContext
     void * mPyContext;
 };
 
-void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCredentialsIndex)
+void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCredentialsIndex,
+                                         Controller::Python::StorageAdapter * storageAdapter)
 {
     auto context      = Platform::MakeUnique<OpCredsContext>();
     context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
 
-    if (pychip_Storage_GetStorageAdapter() == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (context->mAdapter->Initialize(*pychip_Storage_GetStorageAdapter()) != CHIP_NO_ERROR)
+    if (context->mAdapter->Initialize(*storageAdapter) != CHIP_NO_ERROR)
     {
         return nullptr;
     }
@@ -332,9 +321,11 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 }
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
-                                                         chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId, const char * paaTrustStorePath,
-                                                         bool useTestCommissioner)
+                                                         chip::Controller::DeviceCommissioner ** outDevCtrl, FabricId fabricId,
+                                                         chip::NodeId nodeId, chip::VendorId adminVendorId,
+                                                         const char * paaTrustStorePath, bool useTestCommissioner,
+                                                         bool enableServerInteractions, CASEAuthTag * caseAuthTags,
+                                                         uint32_t caseAuthTagLen)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -347,6 +338,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     {
         paaTrustStorePath = "./credentials/development/paa-root-certs";
     }
+
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
@@ -369,8 +361,18 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
-                                              nocSpan);
+    CATValues catValues;
+
+    if (caseAuthTagLen > kMaxSubjectCATAttributeCount)
+    {
+        ChipLogError(Controller, "Too many of CASE Tags (%u) exceeds kMaxSubjectCATAttributeCount",
+                     static_cast<unsigned>(caseAuthTagLen));
+        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+    }
+
+    memcpy(catValues.values.data(), caseAuthTags, caseAuthTagLen * sizeof(CASEAuthTag));
+
+    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, catValues, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     Controller::SetupParams initParams;
@@ -380,7 +382,9 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
-    initParams.enableServerInteractions       = true;
+    initParams.enableServerInteractions       = enableServerInteractions;
+    initParams.controllerVendorId             = adminVendorId;
+    initParams.permitMultiControllerFabrics   = true;
 
     if (useTestCommissioner)
     {
@@ -394,25 +398,31 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
-    FabricInfo * fabricInfo = devCtrl->GetFabricInfo();
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL.AsInteger());
-
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
 
-    err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(devCtrl->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
-                                                  compressedFabricIdSpan);
+    err =
+        chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();
+
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
+{
+    VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, CHIP_ERROR_INCORRECT_STATE.AsInteger());
+
+    context->mAdapter->SetMaximallyLargeCertsUsed(enabled);
 
     return CHIP_NO_ERROR.AsInteger();
 }

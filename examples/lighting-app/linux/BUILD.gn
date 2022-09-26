@@ -61,7 +61,7 @@ executable("chip-lighting-app") {
 
     sources += [
       "${chip_root}/examples/platform/linux/Rpc.cpp",
-      "${dir_pigweed}/targets/host/system_rpc_server.cc",
+      "${chip_root}/examples/platform/linux/system_rpc_server.cc",
     ]
 
     deps += [

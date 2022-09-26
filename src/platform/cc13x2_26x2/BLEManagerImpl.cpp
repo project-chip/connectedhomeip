@@ -1,7 +1,7 @@
 
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -125,19 +125,6 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(BLEManager::CHIPoBLEServiceMode val)
-{
-    mServiceMode = val;
-
-    /* Trigger state update */
-    return DriveBLEState();
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
@@ -183,7 +170,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
     if (bufSize <= GAP_DEVICE_NAME_LEN)
     {
-        strncpy(buf, mDeviceName, bufSize);
+        Platform::CopyString(buf, bufSize, mDeviceName);
     }
     else
     {
@@ -199,7 +186,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
     if (strlen(deviceName) <= GAP_DEVICE_NAME_LEN)
     {
-        strncpy(mDeviceName, deviceName, strlen(deviceName));
+        Platform::CopyString(mDeviceName, deviceName);
 
         mFlags.Set(Flags::kBLEStackGATTNameUpdate);
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
@@ -480,7 +467,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
 
     sInstance.mAdvDatachipOBle[advIndex++] = 0x02;
     sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS;
-    sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED | GAP_ADTYPE_FLAGS_LIMITED;
+    sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED | GAP_ADTYPE_FLAGS_GENERAL;
     sInstance.mAdvDatachipOBle[advIndex++] = advLength;
     sInstance.mAdvDatachipOBle[advIndex++] = GAP_ADTYPE_SERVICE_DATA;
     sInstance.mAdvDatachipOBle[advIndex++] = static_cast<uint8_t>(LO_UINT16(CHIPOBLE_SERV_UUID));
@@ -805,7 +792,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                     GapAdv_disable(sInstance.advHandleLegacy);
                     sInstance.mFlags.Clear(Flags::kAdvertising);
 
-                    uint16_t newParamMax = 0, newParamMin = 0;
+                    uint32_t newParamMax = 0, newParamMin = 0;
                     if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
                     {
                         // Update advertising interval
@@ -843,6 +830,15 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 {
 
                     // Start advertisement timeout timer
+                    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+                    {
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout, CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                    }
+                    else
+                    {
+                        Util_rescheduleClock(&sInstance.clkAdvTimeout,
+                                             ADV_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+                    }
                     Util_startClock(&sInstance.clkAdvTimeout);
 
                     sInstance.mFlags.Set(Flags::kAdvertising);
@@ -858,6 +854,9 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 sInstance.mFlags.Clear(Flags::kAdvertising);
 
                 Util_stopClock(&sInstance.clkAdvTimeout);
+
+                // reset fast advertising
+                sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
             }
         }
     }
@@ -873,10 +872,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
     case BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: {
         uint8_t dataLen = ((CHIPoBLEIndEvt_t *) (pMsg->pData))->len;
-        uint16_t i      = 0;
-        void * connHandle;
-        ConnRec_t * activeConnObj = NULL;
-        ChipDeviceEvent event;
 
         CHIPoBLEProfile_SetParameter(CHIPOBLEPROFILE_TX_CHAR, dataLen, (void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData),
                                      BLEManagerImpl::sSelfEntity);
@@ -884,21 +879,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
         BLEMGR_LOG("BLEMGR: BLE Process Application Message: BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: Length: %d", dataLen);
 
         ICall_free((void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData));
-
-        // Find active connection
-        for (i = 0; i < MAX_NUM_BLE_CONNS; i++)
-        {
-            if (sInstance.connList[i].connHandle != 0xffff)
-            {
-                activeConnObj = &sInstance.connList[i];
-            }
-        }
-
-        connHandle = (void *) &activeConnObj->connHandle;
-
-        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-        event.CHIPoBLEIndicateConfirm.ConId = connHandle;
-        PlatformMgr().PostEventOrDie(&event);
 
         dealloc = TRUE;
     }
@@ -967,7 +947,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             CHIPoBLEProfile_GetParameter(CHIPOBLEPROFILE_CCCWrite, &cccValue, 1);
 
             // Check whether it is a sub/unsub event. 0x1 = Notifications enabled, 0x2 = Indications enabled
-            if (cccValue & 1)
+            if (cccValue & 0x2)
             {
                 // Post event to CHIP
                 BLEMGR_LOG("BLEMGR: BLE Process Application Message: CHIPOBLE_CHAR_CHANGE_EVT, Subscrbe");
@@ -1125,6 +1105,8 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
 
         /* Stop advertisement timeout timer */
         Util_stopClock(&sInstance.clkAdvTimeout);
+        // reset fast advertising
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         DriveBLEState();
 
@@ -1743,10 +1725,19 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
 
     if (sInstance.mFlags.Has(Flags::kAdvertisingEnabled))
     {
-        BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
+        if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+        {
+            BLEMGR_LOG("BLEMGR: Fast advertising timeout reached");
 
-        sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+            sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
+            sInstance.mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+        }
+        else
+        {
+            BLEMGR_LOG("BLEMGR: Advertising timeout reached");
 
+            sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
+        }
         /* Send event to process state change request */
         DriveBLEState();
     }

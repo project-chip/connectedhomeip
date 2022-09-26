@@ -31,7 +31,9 @@
 #include <drivers/hwinfo.h>
 #include <sys/util.h>
 
-#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <platform/nrfconnect/Reboot.h>
+#elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
 #include <dfu/mcuboot.h>
 #endif
 
@@ -88,7 +90,12 @@ BootReasonType DetermineBootReason()
 
     if (reason & RESET_SOFTWARE)
     {
-#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+        if (GetSoftwareRebootReason() == SoftwareRebootReason::kSoftwareUpdate)
+        {
+            return BootReasonType::kSoftwareUpdateCompleted;
+        }
+#elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
         if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
         {
             return BootReasonType::kSoftwareUpdateCompleted;
@@ -319,6 +326,11 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
+}
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

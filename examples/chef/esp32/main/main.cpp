@@ -67,8 +67,6 @@ static void chip_shell_task(void * args)
 {
 
     cmd_misc_init();
-    cmd_ping_init();
-    cmd_send_init();
 
     Engine::Root().RunMainLoop();
 }
@@ -98,13 +96,6 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
             ChipLogProgress(Shell, "Lost IPv6 connectivity...");
         }
 
-        break;
-
-    case DeviceEventType::kSessionEstablished:
-        if (event->SessionEstablished.IsCommissioner)
-        {
-            ChipLogProgress(Shell, "Commissioner detected!");
-        }
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionEstablished:

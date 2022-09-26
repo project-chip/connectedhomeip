@@ -13,9 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    19.8.5. [TC-IDM-7.1] Multi Fabric Subscription Test Cases. DUT as the
-    server.
+name: 3.6.5. [TC-IDM-7.1] Multi Fabric Subscription Test Cases. [{DUT_Server}]
+
+PICS:
+    - MCORE.IDM.S
 
 config:
     nodeId: 0x12344321
@@ -23,19 +24,1362 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Please use Interactive mode to Verify subscription test cases
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Use the below commands to provision the DUT with 5 reference devices (Reference device is unique instance of a Chip-tool)
+          RD1, RD2, RD3, RD4, RD5 should be on separate, distinct fabrics. in RPI platform
+
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app
+
+          Once DUT reach the  commissionable state pls send below mentioned command on RD"s respectively. Pls use equivalent command on the respective DUT
+
+
+          *Provision the device using chip tool on first controller(RD1)
+           ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840
+
+          *Provision the device using chip tool on 2nd  controller(RD2)
+            ./chip-tool pairing code 2 36453420312(mannualcode) --commissioner-name beta
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 --commissioner-name beta
+
+          *Provision the device using chip tool on 3rd  controller(RD3)
+          ./chip-tool pairing code 3 35603352859(mannualcode) --commissioner-name 4
+          ./chip-tool pairing open-commissioning-window 3 1 400 2000 3840 --commissioner-name 4
+
+          *Provision the device using chip tool on 4th  controller(RD4)
+           ./chip-tool pairing code 4 36375333175(mannualcode) --commissioner-name 5
+           ./chip-tool pairing open-commissioning-window 4 1 400 2000 3840 --commissioner-name 5
+
+          *Provision the device using chip tool on 5th  controller(RD5)
+            ./chip-tool pairing code 5 35358158796(mannualcode) --commissioner-name 6
+      disabled: true
+
     - label:
-          "All Reference Devices send 3 Subscribe Request Messages to DUT.(Total
-          - 12 active subscriptions) They can subscribe to different attributes
+          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
+          DUT.(Total - 15 active subscriptions) Each subscribe request should
+          contain 3 different paths. They can subscribe to different attributes
           and events. Once all subscriptions are active, change the value of all
           the attributes that have been subscribed or trigger an action on the
           DUT to generate an event."
       verification: |
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
+          Example commands given below are using 5 reference devices (User can use 5 reference devices and send the below command in from each reference device)
+
+          Send 3 Subscriptionrequest messages from each Reference Device(Eg. RD1...) to DUT  and verify all the subscription requests are success and change the value of
+          all the attributes by sending a write command, after sending a write command verify on each of these Reference Devices that the appropriate attribute
+           value has been received.
+
+
+
+          on the first reference device  send 3 Subscribe Request Messages to DUT
+           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+          [1660652952.537644][58131:58136] CHIP:EM: Removed CHIP MessageCounter:11153878 from RetransTable on exchange 57366i
+          [1660652952.537721][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660652952.537759][58131:58136] CHIP:DMG: {
+          [1660652952.537794][58131:58136] CHIP:DMG:         SubscriptionId = 0x50d4243c,
+          [1660652952.537829][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660652952.537873][58131:58136] CHIP:DMG:         [
+          [1660652952.537907][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660652952.537964][58131:58136] CHIP:DMG:                 {
+          [1660652952.538008][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660652952.538055][58131:58136] CHIP:DMG:                         {
+          [1660652952.538106][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660652952.538152][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660652952.538205][58131:58136] CHIP:DMG:                                 {
+          [1660652952.538254][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660652952.538308][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660652952.538358][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660652952.538409][58131:58136] CHIP:DMG:                                 }
+          [1660652952.538465][58131:58136] CHIP:DMG:
+          [1660652952.538517][58131:58136] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660652952.538562][58131:58136] CHIP:DMG:                         },
+          [1660652952.538615][58131:58136] CHIP:DMG:
+          [1660652952.538654][58131:58136] CHIP:DMG:                 },
+          [1660652952.538700][58131:58136] CHIP:DMG:
+          [1660652952.538734][58131:58136] CHIP:DMG:         ],
+          [1660652952.538777][58131:58136] CHIP:DMG:
+          [1660652952.538811][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660652952.538844][58131:58136] CHIP:DMG: }
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+          [1660653005.341371][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660653005.341441][58131:58136] CHIP:DMG: {
+          [1660653005.341503][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
+          [1660653005.341568][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653005.341648][58131:58136] CHIP:DMG:         [
+          [1660653005.341711][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653005.341808][58131:58136] CHIP:DMG:                 {
+          [1660653005.341881][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653005.341972][58131:58136] CHIP:DMG:                         {
+          [1660653005.342065][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653005.342148][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653005.342244][58131:58136] CHIP:DMG:                                 {
+          [1660653005.342340][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653005.342436][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653005.342528][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653005.342616][58131:58136] CHIP:DMG:                                 }
+          [1660653005.342708][58131:58136] CHIP:DMG:
+          [1660653005.342801][58131:58136] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653005.342883][58131:58136] CHIP:DMG:                         },
+          [1660653005.342972][58131:58136] CHIP:DMG:
+          [1660653005.343045][58131:58136] CHIP:DMG:                 },
+          [1660653005.343129][58131:58136] CHIP:DMG:
+          [1660653005.343191][58131:58136] CHIP:DMG:         ],
+          [1660653005.343270][58131:58136] CHIP:DMG:
+          [1660653005.343331][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653005.343392][58131:58136] CHIP:DMG: }
+          [1660653005.343616][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653005.343884][58131:58136] CHIP:TOO:   Location: XX
+          [1660653005.343983][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa00129b0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+          [1660653043.575397][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660653043.575423][58131:58136] CHIP:DMG: {
+          [1660653043.575445][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
+          [1660653043.575467][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653043.575504][58131:58136] CHIP:DMG:         [
+          [1660653043.575526][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653043.575556][58131:58136] CHIP:DMG:                 {
+          [1660653043.575579][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653043.575605][58131:58136] CHIP:DMG:                         {
+          [1660653043.575633][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653043.575658][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653043.575686][58131:58136] CHIP:DMG:                                 {
+          [1660653043.575713][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653043.575743][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653043.575806][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653043.575833][58131:58136] CHIP:DMG:                                 }
+          [1660653043.575863][58131:58136] CHIP:DMG:
+          [1660653043.575892][58131:58136] CHIP:DMG:                                 Data = false,
+          [1660653043.575917][58131:58136] CHIP:DMG:                         },
+          [1660653043.575944][58131:58136] CHIP:DMG:
+          [1660653043.575966][58131:58136] CHIP:DMG:                 },
+          [1660653043.575993][58131:58136] CHIP:DMG:
+          [1660653043.576013][58131:58136] CHIP:DMG:         ],
+          [1660653043.576041][58131:58136] CHIP:DMG:
+          [1660653043.576063][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653043.576084][58131:58136] CHIP:DMG: }
+          [1660653043.576169][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653043.576207][58131:58136] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653043.576240][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0012b40]: Moving to [AwaitingSu]
+
+
+
+          on the 2nd reference device send 3 Subscribe Request Messages to DUT
+          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653125.592310][58143:58148] CHIP:DMG: {
+          [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
+          [1660653125.592387][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653125.592435][58143:58148] CHIP:DMG:         [
+          [1660653125.592472][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653125.592527][58143:58148] CHIP:DMG:                 {
+          [1660653125.592568][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653125.592618][58143:58148] CHIP:DMG:                         {
+          [1660653125.592675][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653125.592726][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653125.592785][58143:58148] CHIP:DMG:                                 {
+          [1660653125.592839][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653125.592896][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653125.592946][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653125.592997][58143:58148] CHIP:DMG:                                 }
+          [1660653125.593051][58143:58148] CHIP:DMG:
+          [1660653125.593109][58143:58148] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653125.593158][58143:58148] CHIP:DMG:                         },
+          [1660653125.593212][58143:58148] CHIP:DMG:
+          [1660653125.593255][58143:58148] CHIP:DMG:                 },
+          [1660653125.593305][58143:58148] CHIP:DMG:
+          [1660653125.593342][58143:58148] CHIP:DMG:         ],
+          [1660653125.593390][58143:58148] CHIP:DMG:
+          [1660653125.593428][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653125.593464][58143:58148] CHIP:DMG: }
+          [1660653125.593640][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653125.593706][58143:58148] CHIP:TOO:   NodeLabel:
+          [1660653125.593776][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff6800df30]: Moving to [AwaitingSu]
+
+
+
+
+           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653198.460359][58143:58148] CHIP:DMG: {
+          [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
+          [1660653198.460487][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653198.460567][58143:58148] CHIP:DMG:         [
+          [1660653198.460630][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653198.460718][58143:58148] CHIP:DMG:                 {
+          [1660653198.460786][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653198.460871][58143:58148] CHIP:DMG:                         {
+          [1660653198.460966][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653198.461058][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653198.461147][58143:58148] CHIP:DMG:                                 {
+          [1660653198.461244][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653198.461335][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653198.461427][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653198.461513][58143:58148] CHIP:DMG:                                 }
+          [1660653198.461604][58143:58148] CHIP:DMG:
+          [1660653198.461699][58143:58148] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653198.461782][58143:58148] CHIP:DMG:                         },
+          [1660653198.461880][58143:58148] CHIP:DMG:
+          [1660653198.461952][58143:58148] CHIP:DMG:                 },
+          [1660653198.462037][58143:58148] CHIP:DMG:
+          [1660653198.462099][58143:58148] CHIP:DMG:         ],
+          [1660653198.462176][58143:58148] CHIP:DMG:
+          [1660653198.462241][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653198.462303][58143:58148] CHIP:DMG: }
+          [1660653198.462524][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653198.462606][58143:58148] CHIP:TOO:   Location: XX
+          [1660653198.462695][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68010fa0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
+          [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653260.633387][58143:58148] CHIP:DMG: {
+          [1660653260.633442][58143:58148] CHIP:DMG:         SubscriptionId = 0x60feee4d,
+          [1660653260.633493][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653260.633560][58143:58148] CHIP:DMG:         [
+          [1660653260.633615][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653260.633691][58143:58148] CHIP:DMG:                 {
+          [1660653260.633755][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653260.633820][58143:58148] CHIP:DMG:                         {
+          [1660653260.633891][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653260.633964][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653260.634046][58143:58148] CHIP:DMG:                                 {
+          [1660653260.634130][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653260.634212][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653260.634292][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653260.634366][58143:58148] CHIP:DMG:                                 }
+          [1660653260.634445][58143:58148] CHIP:DMG:
+          [1660653260.634523][58143:58148] CHIP:DMG:                                 Data = false,
+          [1660653260.634600][58143:58148] CHIP:DMG:                         },
+          [1660653260.634674][58143:58148] CHIP:DMG:
+          [1660653260.634736][58143:58148] CHIP:DMG:                 },
+          [1660653260.634802][58143:58148] CHIP:DMG:
+          [1660653260.634855][58143:58148] CHIP:DMG:         ],
+          [1660653260.635066][58143:58148] CHIP:DMG:
+          [1660653260.635128][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653260.635181][58143:58148] CHIP:DMG: }
+          [1660653260.635371][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653260.635446][58143:58148] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653260.635523][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68011170]: Moving to [AwaitingSu]
+
+
+
+
+          on the 3rd reference device send 3 Subscribe Request Messages to DUT
+          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
+          [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653438.741143][58149:58154] CHIP:DMG: {
+          [1660653438.741236][58149:58154] CHIP:DMG:         SubscriptionId = 0xff93c648,
+          [1660653438.741262][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653438.741294][58149:58154] CHIP:DMG:         [
+          [1660653438.741318][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653438.741352][58149:58154] CHIP:DMG:                 {
+          [1660653438.741380][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653438.741415][58149:58154] CHIP:DMG:                         {
+          [1660653438.741448][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653438.741479][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653438.741517][58149:58154] CHIP:DMG:                                 {
+          [1660653438.741553][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653438.741592][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653438.741627][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653438.741660][58149:58154] CHIP:DMG:                                 }
+          [1660653438.741695][58149:58154] CHIP:DMG:
+          [1660653438.741732][58149:58154] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653438.741764][58149:58154] CHIP:DMG:                         },
+          [1660653438.741800][58149:58154] CHIP:DMG:
+          [1660653438.741828][58149:58154] CHIP:DMG:                 },
+          [1660653438.741859][58149:58154] CHIP:DMG:
+          [1660653438.741883][58149:58154] CHIP:DMG:         ],
+          [1660653438.741913][58149:58154] CHIP:DMG:
+          [1660653438.741938][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653438.741961][58149:58154] CHIP:DMG: }
+          [1660653438.742081][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653438.742125][58149:58154] CHIP:TOO:   NodeLabel:
+          [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653500.501007][58149:58154] CHIP:DMG: {
+          [1660653500.501077][58149:58154] CHIP:DMG:         SubscriptionId = 0xb129bd8c,
+          [1660653500.501126][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653500.501204][58149:58154] CHIP:DMG:         [
+          [1660653500.501253][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653500.501323][58149:58154] CHIP:DMG:                 {
+          [1660653500.501397][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653500.501466][58149:58154] CHIP:DMG:                         {
+          [1660653500.501550][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653500.501615][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653500.501698][58149:58154] CHIP:DMG:                                 {
+          [1660653500.501765][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653500.501835][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653500.501905][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653500.501971][58149:58154] CHIP:DMG:                                 }
+          [1660653500.502041][58149:58154] CHIP:DMG:
+          [1660653500.502111][58149:58154] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653500.502176][58149:58154] CHIP:DMG:                         },
+          [1660653500.502249][58149:58154] CHIP:DMG:
+          [1660653500.502303][58149:58154] CHIP:DMG:                 },
+          [1660653500.502367][58149:58154] CHIP:DMG:
+          [1660653500.502414][58149:58154] CHIP:DMG:         ],
+          [1660653500.502473][58149:58154] CHIP:DMG:
+          [1660653500.502520][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653500.502567][58149:58154] CHIP:DMG: }
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653545.650817][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653545.650842][58149:58154] CHIP:DMG: {
+          [1660653545.650864][58149:58154] CHIP:DMG:         SubscriptionId = 0x5310d542,
+          [1660653545.650901][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653545.650929][58149:58154] CHIP:DMG:         [
+          [1660653545.650950][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653545.650999][58149:58154] CHIP:DMG:                 {
+          [1660653545.651032][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653545.651060][58149:58154] CHIP:DMG:                         {
+          [1660653545.651088][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653545.651123][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653545.651151][58149:58154] CHIP:DMG:                                 {
+          [1660653545.651179][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653545.651209][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653545.651238][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653545.651265][58149:58154] CHIP:DMG:                                 }
+          [1660653545.651294][58149:58154] CHIP:DMG:
+          [1660653545.651323][58149:58154] CHIP:DMG:                                 Data = false,
+          [1660653545.651349][58149:58154] CHIP:DMG:                         },
+          [1660653545.651377][58149:58154] CHIP:DMG:
+          [1660653545.651399][58149:58154] CHIP:DMG:                 },
+          [1660653545.651425][58149:58154] CHIP:DMG:
+          [1660653545.651446][58149:58154] CHIP:DMG:         ],
+          [1660653545.651473][58149:58154] CHIP:DMG:
+          [1660653545.651494][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653545.651514][58149:58154] CHIP:DMG: }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 4th reference device send 3 Subscribe Request Messages to DUT
+          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          : }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 5th reference device send 3 Subscribe Request Messages to DUT
+          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          : }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          once all the subscription is active, on the first reference device enter below mentioned commands to change the attribute values in RD1
+
+          basic write node-label ""newnode"" 1 0
+          ReportDataMessage =
+          [1660653595.180285][58131:58136] CHIP:DMG: {
+          [1660653595.180335][58131:58136] CHIP:DMG:         SubscriptionId = 0x50d4243c,
+          [1660653595.180388][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653595.180456][58131:58136] CHIP:DMG:         [
+          [1660653595.180508][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653595.180579][58131:58136] CHIP:DMG:                 {
+          [1660653595.180640][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653595.180707][58131:58136] CHIP:DMG:                         {
+          [1660653595.180794][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f7,
+          [1660653595.180874][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653595.180958][58131:58136] CHIP:DMG:                                 {
+          [1660653595.181042][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653595.181131][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653595.181214][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653595.181281][58131:58136] CHIP:DMG:                                 }
+          [1660653595.181353][58131:58136] CHIP:DMG:
+          [1660653595.181426][58131:58136] CHIP:DMG:                                 Data = ""newnode"" (9 chars),
+          [1660653595.181491][58131:58136] CHIP:DMG:                         },
+          [1660653595.181564][58131:58136] CHIP:DMG:
+          [1660653595.181638][58131:58136] CHIP:DMG:                 },
+          [1660653595.181706][58131:58136] CHIP:DMG:
+          [1660653595.181772][58131:58136] CHIP:DMG:         ],
+          [1660653595.181858][58131:58136] CHIP:DMG:
+          [1660653595.181924][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653595.181987][58131:58136] CHIP:DMG: }
+          [1660653595.182209][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190839
+          [1660653595.182295][58131:58136] CHIP:TOO:   NodeLabel: "newnode"
+          [1660653595.182400][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x50d4243c Peer = 01:0000000000000001
+
+          basic write location in 1 0
+          ReportDataMessage =
+          [1660653646.567396][58131:58136] CHIP:DMG: {
+          [1660653646.567414][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
+          [1660653646.567432][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653646.567455][58131:58136] CHIP:DMG:         [
+          [1660653646.567472][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653646.567497][58131:58136] CHIP:DMG:                 {
+          [1660653646.567515][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653646.567537][58131:58136] CHIP:DMG:                         {
+          [1660653646.567560][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f8,
+          [1660653646.567581][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653646.567604][58131:58136] CHIP:DMG:                                 {
+          [1660653646.567627][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653646.567651][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653646.567676][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653646.567699][58131:58136] CHIP:DMG:                                 }
+          [1660653646.567723][58131:58136] CHIP:DMG:
+          [1660653646.567749][58131:58136] CHIP:DMG:                                 Data = "in" (2 chars),
+          [1660653646.567852][58131:58136] CHIP:DMG:                         },
+          [1660653646.567880][58131:58136] CHIP:DMG:
+          [1660653646.567904][58131:58136] CHIP:DMG:                 },
+          [1660653646.567931][58131:58136] CHIP:DMG:
+          [1660653646.567952][58131:58136] CHIP:DMG:         ],
+          [1660653646.567980][58131:58136] CHIP:DMG:
+          [1660653646.568002][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653646.568023][58131:58136] CHIP:DMG: }
+          [1660653646.568112][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190840
+          [1660653646.568151][58131:58136] CHIP:TOO:   Location: in
+          [1660653646.568191][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xea4facb0 Peer = 01:0000000000000001
+
+
+          basic write local-config-disabled 1 1 0
+          ReportDataMessage =
+          [1660653666.029792][58131:58136] CHIP:DMG: {
+          [1660653666.029813][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
+          [1660653666.029835][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653666.029862][58131:58136] CHIP:DMG:         [
+          [1660653666.029883][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653666.029921][58131:58136] CHIP:DMG:                 {
+          [1660653666.029947][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653666.029980][58131:58136] CHIP:DMG:                         {
+          [1660653666.030013][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f9,
+          [1660653666.030045][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653666.030071][58131:58136] CHIP:DMG:                                 {
+          [1660653666.030107][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653666.030137][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653666.030161][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653666.030184][58131:58136] CHIP:DMG:                                 }
+          [1660653666.030209][58131:58136] CHIP:DMG:
+          [1660653666.030234][58131:58136] CHIP:DMG:                                 Data = true,
+          [1660653666.030255][58131:58136] CHIP:DMG:                         },
+          [1660653666.030278][58131:58136] CHIP:DMG:
+          [1660653666.030297][58131:58136] CHIP:DMG:                 },
+          [1660653666.030320][58131:58136] CHIP:DMG:
+          [1660653666.030337][58131:58136] CHIP:DMG:         ],
+          [1660653666.030361][58131:58136] CHIP:DMG:
+          [1660653666.030378][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653666.030395][58131:58136] CHIP:DMG: }
+          [1660653666.030472][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190841
+          [1660653666.030502][58131:58136] CHIP:TOO:   LocalConfigDisabled: TRUE
+          [1660653666.030535][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x1ff9dbc5 Peer = 01:00000
+
+          Once RD1 change the attibute values by sending above command, verify that  all the RD*(RD2/3/4/5) should be notified with a subscription report
+
+          on the 2nd reference device verify the ReportDataMessage with the attribute value change
+          [1660653595.177882][58143:58148] CHIP:EM: Handling via exchange: 9001r, Delegate: 0xaaaaea1cd718
+          [1660653595.178151][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653595.178219][58143:58148] CHIP:DMG: {
+          [1660653595.178272][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
+          [1660653595.178325][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653595.178396][58143:58148] CHIP:DMG:         [
+          [1660653595.178449][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653595.178522][58143:58148] CHIP:DMG:                 {
+          [1660653595.178580][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653595.178647][58143:58148] CHIP:DMG:                         {
+          [1660653595.178717][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f7,
+          [1660653595.178804][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653595.178874][58143:58148] CHIP:DMG:                                 {
+          [1660653595.178942][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653595.179014][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653595.179086][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653595.179153][58143:58148] CHIP:DMG:                                 }
+          [1660653595.179225][58143:58148] CHIP:DMG:
+          [1660653595.179300][58143:58148] CHIP:DMG:                                 Data = ""newnode"" (9 chars),
+          [1660653595.179363][58143:58148] CHIP:DMG:                         },
+          [1660653595.179438][58143:58148] CHIP:DMG:
+          [1660653595.179499][58143:58148] CHIP:DMG:                 },
+          [1660653595.179587][58143:58148] CHIP:DMG:
+          [1660653595.179639][58143:58148] CHIP:DMG:         ],
+          [1660653595.179705][58143:58148] CHIP:DMG:
+          [1660653595.179894][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653595.179952][58143:58148] CHIP:DMG: }
+          [1660653595.180163][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190839
+          [1660653595.180235][58143:58148] CHIP:TOO:   NodeLabel: "newnode"
+          [1660653595.180511][58143:58148] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xc15110c4 Peer = 02:0000000000000002
+
+
+          [1660653646.567549][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653646.567570][58143:58148] CHIP:DMG: {
+          [1660653646.567587][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
+          [1660653646.567605][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653646.567628][58143:58148] CHIP:DMG:         [
+          [1660653646.567646][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653646.567670][58143:58148] CHIP:DMG:                 {
+          [1660653646.567689][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653646.567709][58143:58148] CHIP:DMG:                         {
+          [1660653646.567731][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f8,
+          [1660653646.567780][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653646.567806][58143:58148] CHIP:DMG:                                 {
+          [1660653646.567829][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653646.567854][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653646.568334][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653646.568364][58143:58148] CHIP:DMG:                                 }
+          [1660653646.568726][58143:58148] CHIP:DMG:
+          [1660653646.568769][58143:58148] CHIP:DMG:                                 Data = "in" (2 chars),
+          [1660653646.569119][58143:58148] CHIP:DMG:                         },
+          [1660653646.569313][58143:58148] CHIP:DMG:
+          [1660653646.569337][58143:58148] CHIP:DMG:                 },
+          [1660653646.569518][58143:58148] CHIP:DMG:
+          [1660653646.569538][58143:58148] CHIP:DMG:         ],
+          [1660653646.569566][58143:58148] CHIP:DMG:
+          [1660653646.569588][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653646.569610][58143:58148] CHIP:DMG: }
+          [1660653646.569682][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190840
+          [1660653646.569713][58143:58148] CHIP:TOO:   Location: in
+          [1660653646.569762][58143:58148] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xfed77bda Peer = 02:0000000000000002
+
+
+          [1660653666.030382][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653666.030401][58143:58148] CHIP:DMG: {
+          [1660653666.030419][58143:58148] CHIP:DMG:         SubscriptionId = 0x60feee4d,
+          [1660653666.030438][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653666.030461][58143:58148] CHIP:DMG:         [
+          [1660653666.030478][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653666.030502][58143:58148] CHIP:DMG:                 {
+          [1660653666.030521][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653666.030542][58143:58148] CHIP:DMG:                         {
+          [1660653666.030564][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f9,
+          [1660653666.030586][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653666.030609][58143:58148] CHIP:DMG:                                 {
+          [1660653666.030647][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653666.030672][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653666.030696][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653666.030718][58143:58148] CHIP:DMG:                                 }
+          [1660653666.030742][58143:58148] CHIP:DMG:
+          [1660653666.030778][58143:58148] CHIP:DMG:                                 Data = true,
+          [1660653666.030803][58143:58148] CHIP:DMG:                         },
+          [1660653666.030827][58143:58148] CHIP:DMG:
+          [1660653666.030846][58143:58148] CHIP:DMG:                 },
+          [1660653666.030868][58143:58148] CHIP:DMG:
+          [1660653666.030885][58143:58148] CHIP:DMG:         ],
+          [1660653666.030908][58143:58148] CHIP:DMG:
+          [1660653666.030926][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653666.030944][58143:58148] CHIP:DMG: }
+          [1660653666.031027][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190841
+          [1660653666.031058][58143:58148] CHIP:TOO:   LocalConfigDisabled: TRUE
+          [1660653666.031092][58143:58148] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x60feee4d Peer = 02:0000000000000002
+
+
+          on the 3rd reference device verify the ReportDataMessage with the attribute value change
+          onic time: 000000000199A0AE msec
+          [1660653545.654422][58149:58154] CHIP:EM: Flushed pending ack for MessageCounter:144882910 on exchange 34402i
+          [1660653595.178474][58149:58154] CHIP:EM: Received message of type 0x5 with protocolId (0, 1) and MessageCounter:144882911 on exchange 9002r
+          [1660653595.178564][58149:58154] CHIP:EM: Handling via exchange: 9002r, Delegate: 0xaaaade55d718
+          [1660653595.178743][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653595.178805][58149:58154] CHIP:DMG: {
+          [1660653595.178858][58149:58154] CHIP:DMG:         SubscriptionId = 0xff93c648,
+          [1660653595.178912][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653595.178980][58149:58154] CHIP:DMG:         [
+          [1660653595.179033][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653595.179106][58149:58154] CHIP:DMG:                 {
+          [1660653595.179163][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653595.179225][58149:58154] CHIP:DMG:                         {
+          [1660653595.179291][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f7,
+          [1660653595.179355][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653595.179422][58149:58154] CHIP:DMG:                                 {
+          [1660653595.179498][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653595.179640][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653595.179718][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653595.179864][58149:58154] CHIP:DMG:                                 }
+          [1660653595.179939][58149:58154] CHIP:DMG:
+          [1660653595.180012][58149:58154] CHIP:DMG:                                 Data = ""newnode"" (9 chars),
+          [1660653595.180077][58149:58154] CHIP:DMG:                         },
+          [1660653595.180148][58149:58154] CHIP:DMG:
+          [1660653595.180204][58149:58154] CHIP:DMG:                 },
+          [1660653595.180276][58149:58154] CHIP:DMG:
+          [1660653595.180328][58149:58154] CHIP:DMG:         ],
+          [1660653595.180395][58149:58154] CHIP:DMG:
+          [1660653595.180462][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653595.180513][58149:58154] CHIP:DMG: }
+          [1660653595.180721][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190839
+          [1660653595.180792][58149:58154] CHIP:TOO:   NodeLabel: "newnode"
+          [1660653595.180894][58149:58154] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId =
+
+
+          [1660653646.568849][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653646.568878][58149:58154] CHIP:DMG: {
+          [1660653646.568903][58149:58154] CHIP:DMG:         SubscriptionId = 0xb129bd8c,
+          [1660653646.568926][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653646.568955][58149:58154] CHIP:DMG:         [
+          [1660653646.568974][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653646.569004][58149:58154] CHIP:DMG:                 {
+          [1660653646.569027][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653646.569054][58149:58154] CHIP:DMG:                         {
+          [1660653646.569082][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f8,
+          [1660653646.569109][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653646.569138][58149:58154] CHIP:DMG:                                 {
+          [1660653646.569165][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653646.569194][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653646.569225][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653646.569253][58149:58154] CHIP:DMG:                                 }
+          [1660653646.569282][58149:58154] CHIP:DMG:
+          [1660653646.569313][58149:58154] CHIP:DMG:                                 Data = "in" (2 chars),
+          [1660653646.569339][58149:58154] CHIP:DMG:                         },
+          [1660653646.569368][58149:58154] CHIP:DMG:
+          [1660653646.569392][58149:58154] CHIP:DMG:                 },
+          [1660653646.569419][58149:58154] CHIP:DMG:
+          [1660653646.569441][58149:58154] CHIP:DMG:         ],
+          [1660653646.569469][58149:58154] CHIP:DMG:
+          [1660653646.569492][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653646.569510][58149:58154] CHIP:DMG: }
+          [1660653646.569596][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190840
+          [1660653646.569638][58149:58154] CHIP:TOO:   Location: in
+          [1660653646.569738][58149:58154] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xb129bd8c Peer = 03:0000000000000003
+
+          MessageCounter:144882915 on exchange 9008r
+          [1660653666.030877][58149:58154] CHIP:EM: Handling via exchange: 9008r, Delegate: 0xaaaade55d718
+          [1660653666.030942][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653666.030968][58149:58154] CHIP:DMG: {
+          [1660653666.030986][58149:58154] CHIP:DMG:         SubscriptionId = 0x5310d542,
+          [1660653666.031004][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653666.031028][58149:58154] CHIP:DMG:         [
+          [1660653666.031045][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653666.031069][58149:58154] CHIP:DMG:                 {
+          [1660653666.031089][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653666.031111][58149:58154] CHIP:DMG:                         {
+          [1660653666.031133][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f9,
+          [1660653666.031155][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653666.031178][58149:58154] CHIP:DMG:                                 {
+          [1660653666.031202][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653666.031226][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653666.031251][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653666.031274][58149:58154] CHIP:DMG:                                 }
+          [1660653666.031308][58149:58154] CHIP:DMG:
+          [1660653666.031334][58149:58154] CHIP:DMG:                                 Data = true,
+          [1660653666.031355][58149:58154] CHIP:DMG:                         },
+          [1660653666.031379][58149:58154] CHIP:DMG:
+          [1660653666.031398][58149:58154] CHIP:DMG:                 },
+          [1660653666.031421][58149:58154] CHIP:DMG:
+          [1660653666.031438][58149:58154] CHIP:DMG:         ],
+          [1660653666.031462][58149:58154] CHIP:DMG:
+          [1660653666.031480][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653666.031503][58149:58154] CHIP:DMG: }
+          [1660653666.031584][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190841
+          [1660653666.031617][58149:58154] CHIP:TOO:   LocalConfigDisabled: TRUE
+          [1660653666.031655][58149:58154] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x5310d542 Peer = 03:0000000000
+
+
+
+          on the 4th reference device verify the ReportDataMessage with the attribute value change
+
+          [1660653595.182209][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 378219084
+          [1660653595.182295][58131:58136] CHIP:TOO:   NodeLabel: "newnode"
+          [1660653595.182400][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x50d4249f Peer = 01:0000000000000001
+
+          [1660653646.569682][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190840
+          [1660653646.569713][58143:58148] CHIP:TOO:   Location: in
+          [1660653646.569762][58143:58148] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xfed77bda Peer = 02:0000000000000002
+
+
+          [1660653666.031584][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 37821909841
+          [1660653666.031617][58149:58154] CHIP:TOO:   LocalConfigDisabled: TRUE
+          [1660653666.031655][58149:58154] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x5310d57o2 Peer = 03:0000000000
+
+
+
+
+
+
+          on the 5th reference device verify the ReportDataMessage with the attribute value change
+
+          [1660653595.182209][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 378218970
+          [1660653595.182295][58131:58136] CHIP:TOO:   NodeLabel: "newnode"
+          [1660653595.182400][58131:58136] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x50d42ftc Peer = 01:0000000000000001
+
+
+          [1660653646.569682][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190840
+          [1660653646.569713][58143:58148] CHIP:TOO:   Location: in
+          [1660653646.569762][58143:58148] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0xfed77bda Peer = 02:0000000000000002
+
+
+          [1660653666.031584][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190981
+          [1660653666.031617][58149:58154] CHIP:TOO:   LocalConfigDisabled: TRUE
+          [1660653666.031655][58149:58154] CHIP:DMG: Refresh LivenessCheckTime for 1025000 milliseconds with SubscriptionId = 0x5310d5l0 Peer = 03:0000000000
       disabled: true
 
     - label:
-          "All Reference Devices send a Read Request Message to the DUT. They
-          can read different attributes and events."
+          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe Request Messages to
+          DUT.(Total - 15 active subscriptions) Each subscribe requests should
+          contain 3 different paths. The subscription request from RD1 should
+          contain 4 paths."
       verification: |
+          After provisioning again the values are been set to default values such as node label= " ". so in VS mentioned as node-label="", location=XX and local-config-disabled=FALSE but if your going to verify 3 steps contentiously you will get the attribute value as node-label="newlabel", location=in and local-config-disabled=TRUE.
 
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
+          Example commands given below are using 5 reference devices (User can use 5 reference devices and send the below command in from each reference device)
+
+          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT
+          and verify all the subscription requests are succes. and in The subscription request from RD1 should contain 4 paths, Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
+
+          on the first reference device(RD1)  send 3 Subscribe Request Messages to DUT.
+           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+          [1660652952.537644][58131:58136] CHIP:EM: Removed CHIP MessageCounter:11153878 from RetransTable on exchange 57366i
+          [1660652952.537721][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660652952.537759][58131:58136] CHIP:DMG: {
+          [1660652952.537794][58131:58136] CHIP:DMG:         SubscriptionId = 0x50d4243c,
+          [1660652952.537829][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660652952.537873][58131:58136] CHIP:DMG:         [
+          [1660652952.537907][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660652952.537964][58131:58136] CHIP:DMG:                 {
+          [1660652952.538008][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660652952.538055][58131:58136] CHIP:DMG:                         {
+          [1660652952.538106][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660652952.538152][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660652952.538205][58131:58136] CHIP:DMG:                                 {
+          [1660652952.538254][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660652952.538308][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660652952.538358][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660652952.538409][58131:58136] CHIP:DMG:                                 }
+          [1660652952.538465][58131:58136] CHIP:DMG:
+          [1660652952.538517][58131:58136] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660652952.538562][58131:58136] CHIP:DMG:                         },
+          [1660652952.538615][58131:58136] CHIP:DMG:
+          [1660652952.538654][58131:58136] CHIP:DMG:                 },
+          [1660652952.538700][58131:58136] CHIP:DMG:
+          [1660652952.538734][58131:58136] CHIP:DMG:         ],
+          [1660652952.538777][58131:58136] CHIP:DMG:
+          [1660652952.538811][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660652952.538844][58131:58136] CHIP:DMG: }
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+          [1660653005.341371][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660653005.341441][58131:58136] CHIP:DMG: {
+          [1660653005.341503][58131:58136] CHIP:DMG:         SubscriptionId = 0xea4facb0,
+          [1660653005.341568][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653005.341648][58131:58136] CHIP:DMG:         [
+          [1660653005.341711][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653005.341808][58131:58136] CHIP:DMG:                 {
+          [1660653005.341881][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653005.341972][58131:58136] CHIP:DMG:                         {
+          [1660653005.342065][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653005.342148][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653005.342244][58131:58136] CHIP:DMG:                                 {
+          [1660653005.342340][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653005.342436][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653005.342528][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653005.342616][58131:58136] CHIP:DMG:                                 }
+          [1660653005.342708][58131:58136] CHIP:DMG:
+          [1660653005.342801][58131:58136] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653005.342883][58131:58136] CHIP:DMG:                         },
+          [1660653005.342972][58131:58136] CHIP:DMG:
+          [1660653005.343045][58131:58136] CHIP:DMG:                 },
+          [1660653005.343129][58131:58136] CHIP:DMG:
+          [1660653005.343191][58131:58136] CHIP:DMG:         ],
+          [1660653005.343270][58131:58136] CHIP:DMG:
+          [1660653005.343331][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653005.343392][58131:58136] CHIP:DMG: }
+          [1660653005.343616][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653005.343884][58131:58136] CHIP:TOO:   Location: XX
+          [1660653005.343983][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa00129b0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+          [1660653043.575397][58131:58136] CHIP:DMG: ReportDataMessage =
+          [1660653043.575423][58131:58136] CHIP:DMG: {
+          [1660653043.575445][58131:58136] CHIP:DMG:         SubscriptionId = 0x1ff9dbc5,
+          [1660653043.575467][58131:58136] CHIP:DMG:         AttributeReportIBs =
+          [1660653043.575504][58131:58136] CHIP:DMG:         [
+          [1660653043.575526][58131:58136] CHIP:DMG:                 AttributeReportIB =
+          [1660653043.575556][58131:58136] CHIP:DMG:                 {
+          [1660653043.575579][58131:58136] CHIP:DMG:                         AttributeDataIB =
+          [1660653043.575605][58131:58136] CHIP:DMG:                         {
+          [1660653043.575633][58131:58136] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653043.575658][58131:58136] CHIP:DMG:                                 AttributePathIB =
+          [1660653043.575686][58131:58136] CHIP:DMG:                                 {
+          [1660653043.575713][58131:58136] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653043.575743][58131:58136] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653043.575806][58131:58136] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653043.575833][58131:58136] CHIP:DMG:                                 }
+          [1660653043.575863][58131:58136] CHIP:DMG:
+          [1660653043.575892][58131:58136] CHIP:DMG:                                 Data = false,
+          [1660653043.575917][58131:58136] CHIP:DMG:                         },
+          [1660653043.575944][58131:58136] CHIP:DMG:
+          [1660653043.575966][58131:58136] CHIP:DMG:                 },
+          [1660653043.575993][58131:58136] CHIP:DMG:
+          [1660653043.576013][58131:58136] CHIP:DMG:         ],
+          [1660653043.576041][58131:58136] CHIP:DMG:
+          [1660653043.576063][58131:58136] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653043.576084][58131:58136] CHIP:DMG: }
+          [1660653043.576169][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653043.576207][58131:58136] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653043.576240][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0012b40]: Moving to [AwaitingSu]
+
+
+
+          on the 2nd reference device(RD2)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653125.592310][58143:58148] CHIP:DMG: {
+          [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
+          [1660653125.592387][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653125.592435][58143:58148] CHIP:DMG:         [
+          [1660653125.592472][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653125.592527][58143:58148] CHIP:DMG:                 {
+          [1660653125.592568][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653125.592618][58143:58148] CHIP:DMG:                         {
+          [1660653125.592675][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653125.592726][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653125.592785][58143:58148] CHIP:DMG:                                 {
+          [1660653125.592839][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653125.592896][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653125.592946][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653125.592997][58143:58148] CHIP:DMG:                                 }
+          [1660653125.593051][58143:58148] CHIP:DMG:
+          [1660653125.593109][58143:58148] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653125.593158][58143:58148] CHIP:DMG:                         },
+          [1660653125.593212][58143:58148] CHIP:DMG:
+          [1660653125.593255][58143:58148] CHIP:DMG:                 },
+          [1660653125.593305][58143:58148] CHIP:DMG:
+          [1660653125.593342][58143:58148] CHIP:DMG:         ],
+          [1660653125.593390][58143:58148] CHIP:DMG:
+          [1660653125.593428][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653125.593464][58143:58148] CHIP:DMG: }
+          [1660653125.593640][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653125.593706][58143:58148] CHIP:TOO:   NodeLabel:
+          [1660653125.593776][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff6800df30]: Moving to [AwaitingSu]
+
+
+
+
+           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653198.460359][58143:58148] CHIP:DMG: {
+          [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
+          [1660653198.460487][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653198.460567][58143:58148] CHIP:DMG:         [
+          [1660653198.460630][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653198.460718][58143:58148] CHIP:DMG:                 {
+          [1660653198.460786][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653198.460871][58143:58148] CHIP:DMG:                         {
+          [1660653198.460966][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653198.461058][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653198.461147][58143:58148] CHIP:DMG:                                 {
+          [1660653198.461244][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653198.461335][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653198.461427][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653198.461513][58143:58148] CHIP:DMG:                                 }
+          [1660653198.461604][58143:58148] CHIP:DMG:
+          [1660653198.461699][58143:58148] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653198.461782][58143:58148] CHIP:DMG:                         },
+          [1660653198.461880][58143:58148] CHIP:DMG:
+          [1660653198.461952][58143:58148] CHIP:DMG:                 },
+          [1660653198.462037][58143:58148] CHIP:DMG:
+          [1660653198.462099][58143:58148] CHIP:DMG:         ],
+          [1660653198.462176][58143:58148] CHIP:DMG:
+          [1660653198.462241][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653198.462303][58143:58148] CHIP:DMG: }
+          [1660653198.462524][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653198.462606][58143:58148] CHIP:TOO:   Location: XX
+          [1660653198.462695][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68010fa0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
+          [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653260.633387][58143:58148] CHIP:DMG: {
+          [1660653260.633442][58143:58148] CHIP:DMG:         SubscriptionId = 0x60feee4d,
+          [1660653260.633493][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653260.633560][58143:58148] CHIP:DMG:         [
+          [1660653260.633615][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653260.633691][58143:58148] CHIP:DMG:                 {
+          [1660653260.633755][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653260.633820][58143:58148] CHIP:DMG:                         {
+          [1660653260.633891][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653260.633964][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653260.634046][58143:58148] CHIP:DMG:                                 {
+          [1660653260.634130][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653260.634212][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653260.634292][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653260.634366][58143:58148] CHIP:DMG:                                 }
+          [1660653260.634445][58143:58148] CHIP:DMG:
+          [1660653260.634523][58143:58148] CHIP:DMG:                                 Data = false,
+          [1660653260.634600][58143:58148] CHIP:DMG:                         },
+          [1660653260.634674][58143:58148] CHIP:DMG:
+          [1660653260.634736][58143:58148] CHIP:DMG:                 },
+          [1660653260.634802][58143:58148] CHIP:DMG:
+          [1660653260.634855][58143:58148] CHIP:DMG:         ],
+          [1660653260.635066][58143:58148] CHIP:DMG:
+          [1660653260.635128][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653260.635181][58143:58148] CHIP:DMG: }
+          [1660653260.635371][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653260.635446][58143:58148] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653260.635523][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68011170]: Moving to [AwaitingSu]
+
+
+
+
+          on the 3rd reference device(RD3)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
+          [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653438.741143][58149:58154] CHIP:DMG: {
+          [1660653438.741236][58149:58154] CHIP:DMG:         SubscriptionId = 0xff93c648,
+          [1660653438.741262][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653438.741294][58149:58154] CHIP:DMG:         [
+          [1660653438.741318][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653438.741352][58149:58154] CHIP:DMG:                 {
+          [1660653438.741380][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653438.741415][58149:58154] CHIP:DMG:                         {
+          [1660653438.741448][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653438.741479][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653438.741517][58149:58154] CHIP:DMG:                                 {
+          [1660653438.741553][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653438.741592][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653438.741627][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653438.741660][58149:58154] CHIP:DMG:                                 }
+          [1660653438.741695][58149:58154] CHIP:DMG:
+          [1660653438.741732][58149:58154] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653438.741764][58149:58154] CHIP:DMG:                         },
+          [1660653438.741800][58149:58154] CHIP:DMG:
+          [1660653438.741828][58149:58154] CHIP:DMG:                 },
+          [1660653438.741859][58149:58154] CHIP:DMG:
+          [1660653438.741883][58149:58154] CHIP:DMG:         ],
+          [1660653438.741913][58149:58154] CHIP:DMG:
+          [1660653438.741938][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653438.741961][58149:58154] CHIP:DMG: }
+          [1660653438.742081][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653438.742125][58149:58154] CHIP:TOO:   NodeLabel:
+          [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 4th reference device(RD4)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 5th reference device(RD5)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          : }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          Once all 15 subscriptions are active send one more subscriptiopn command in RD1 and Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
+          basic subscribe product-id 100 1000 1  0  --keepSubscriptions 1
+          [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
+          [1660654945.477932][58149:58154] CHIP:TOO:   ProductID: 32769
+          [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label:
+          "RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with each
+          of them having 3 different paths. Verify that the subscription request
+          messages from all reference devices succeed. Once all the Subscription
+          Requests are activated, RD1 sends 6 subscription request messages with
+          each of them having 3 different paths."
+      verification: |
+          After provisioning again the values are been set to default values such as node label= " ". so in VS mentioned as node-label="", location=XX and local-config-disabled=FALSE but if your going to verify 3 steps contentiously you will get the attribute value as node-label="newlabel", location=in and local-config-disabled=TRUE.
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
+          Example commands given below are using 5 reference devices (User can use 5 reference devices and send the below command in from each reference device)
+
+          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT
+          and verify all the subscription requests are succes. and in The subscription request
+          from RD1 should contain 6 paths, Verify that the subscriptions from RD2, RD3, RD4 and
+           RD5 are not affected.
+
+          on the 2nd reference device(RD2)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653125.592268][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653125.592310][58143:58148] CHIP:DMG: {
+          [1660653125.592348][58143:58148] CHIP:DMG:         SubscriptionId = 0xc15110c4,
+          [1660653125.592387][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653125.592435][58143:58148] CHIP:DMG:         [
+          [1660653125.592472][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653125.592527][58143:58148] CHIP:DMG:                 {
+          [1660653125.592568][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653125.592618][58143:58148] CHIP:DMG:                         {
+          [1660653125.592675][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653125.592726][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653125.592785][58143:58148] CHIP:DMG:                                 {
+          [1660653125.592839][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653125.592896][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653125.592946][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653125.592997][58143:58148] CHIP:DMG:                                 }
+          [1660653125.593051][58143:58148] CHIP:DMG:
+          [1660653125.593109][58143:58148] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653125.593158][58143:58148] CHIP:DMG:                         },
+          [1660653125.593212][58143:58148] CHIP:DMG:
+          [1660653125.593255][58143:58148] CHIP:DMG:                 },
+          [1660653125.593305][58143:58148] CHIP:DMG:
+          [1660653125.593342][58143:58148] CHIP:DMG:         ],
+          [1660653125.593390][58143:58148] CHIP:DMG:
+          [1660653125.593428][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653125.593464][58143:58148] CHIP:DMG: }
+          [1660653125.593640][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653125.593706][58143:58148] CHIP:TOO:   NodeLabel:
+          [1660653125.593776][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff6800df30]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653198.460290][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653198.460359][58143:58148] CHIP:DMG: {
+          [1660653198.460423][58143:58148] CHIP:DMG:         SubscriptionId = 0xfed77bda,
+          [1660653198.460487][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653198.460567][58143:58148] CHIP:DMG:         [
+          [1660653198.460630][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653198.460718][58143:58148] CHIP:DMG:                 {
+          [1660653198.460786][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653198.460871][58143:58148] CHIP:DMG:                         {
+          [1660653198.460966][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653198.461058][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653198.461147][58143:58148] CHIP:DMG:                                 {
+          [1660653198.461244][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653198.461335][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653198.461427][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653198.461513][58143:58148] CHIP:DMG:                                 }
+          [1660653198.461604][58143:58148] CHIP:DMG:
+          [1660653198.461699][58143:58148] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653198.461782][58143:58148] CHIP:DMG:                         },
+          [1660653198.461880][58143:58148] CHIP:DMG:
+          [1660653198.461952][58143:58148] CHIP:DMG:                 },
+          [1660653198.462037][58143:58148] CHIP:DMG:
+          [1660653198.462099][58143:58148] CHIP:DMG:         ],
+          [1660653198.462176][58143:58148] CHIP:DMG:
+          [1660653198.462241][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653198.462303][58143:58148] CHIP:DMG: }
+          [1660653198.462524][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653198.462606][58143:58148] CHIP:TOO:   Location: XX
+          [1660653198.462695][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68010fa0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 2  0  --commissioner-name beta  --keepSubscriptions 1
+          [1660653260.633215][58143:58148] CHIP:EM: Removed CHIP MessageCounter:178377836 from RetransTable on exchange 25360i
+          [1660653260.633327][58143:58148] CHIP:DMG: ReportDataMessage =
+          [1660653260.633387][58143:58148] CHIP:DMG: {
+          [1660653260.633442][58143:58148] CHIP:DMG:         SubscriptionId = 0x60feee4d,
+          [1660653260.633493][58143:58148] CHIP:DMG:         AttributeReportIBs =
+          [1660653260.633560][58143:58148] CHIP:DMG:         [
+          [1660653260.633615][58143:58148] CHIP:DMG:                 AttributeReportIB =
+          [1660653260.633691][58143:58148] CHIP:DMG:                 {
+          [1660653260.633755][58143:58148] CHIP:DMG:                         AttributeDataIB =
+          [1660653260.633820][58143:58148] CHIP:DMG:                         {
+          [1660653260.633891][58143:58148] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653260.633964][58143:58148] CHIP:DMG:                                 AttributePathIB =
+          [1660653260.634046][58143:58148] CHIP:DMG:                                 {
+          [1660653260.634130][58143:58148] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653260.634212][58143:58148] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653260.634292][58143:58148] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1660653260.634366][58143:58148] CHIP:DMG:                                 }
+          [1660653260.634445][58143:58148] CHIP:DMG:
+          [1660653260.634523][58143:58148] CHIP:DMG:                                 Data = false,
+          [1660653260.634600][58143:58148] CHIP:DMG:                         },
+          [1660653260.634674][58143:58148] CHIP:DMG:
+          [1660653260.634736][58143:58148] CHIP:DMG:                 },
+          [1660653260.634802][58143:58148] CHIP:DMG:
+          [1660653260.634855][58143:58148] CHIP:DMG:         ],
+          [1660653260.635066][58143:58148] CHIP:DMG:
+          [1660653260.635128][58143:58148] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653260.635181][58143:58148] CHIP:DMG: }
+          [1660653260.635371][58143:58148] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653260.635446][58143:58148] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653260.635523][58143:58148] CHIP:DMG: MoveToState ReadClient[0xffff68011170]: Moving to [AwaitingSu]
+
+
+
+
+          on the 3nd reference device(RD3)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653438.741061][58149:58154] CHIP:EM: Removed CHIP MessageCounter:141916359 from RetransTable on exchange 34400i
+          [1660653438.741116][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653438.741143][58149:58154] CHIP:DMG: {
+          [1660653438.741236][58149:58154] CHIP:DMG:         SubscriptionId = 0xff93c648,
+          [1660653438.741262][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653438.741294][58149:58154] CHIP:DMG:         [
+          [1660653438.741318][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653438.741352][58149:58154] CHIP:DMG:                 {
+          [1660653438.741380][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653438.741415][58149:58154] CHIP:DMG:                         {
+          [1660653438.741448][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653438.741479][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653438.741517][58149:58154] CHIP:DMG:                                 {
+          [1660653438.741553][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653438.741592][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653438.741627][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1660653438.741660][58149:58154] CHIP:DMG:                                 }
+          [1660653438.741695][58149:58154] CHIP:DMG:
+          [1660653438.741732][58149:58154] CHIP:DMG:                                 Data = "" (0 chars),
+          [1660653438.741764][58149:58154] CHIP:DMG:                         },
+          [1660653438.741800][58149:58154] CHIP:DMG:
+          [1660653438.741828][58149:58154] CHIP:DMG:                 },
+          [1660653438.741859][58149:58154] CHIP:DMG:
+          [1660653438.741883][58149:58154] CHIP:DMG:         ],
+          [1660653438.741913][58149:58154] CHIP:DMG:
+          [1660653438.741938][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653438.741961][58149:58154] CHIP:DMG: }
+          [1660653438.742081][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660653438.742125][58149:58154] CHIP:TOO:   NodeLabel:
+          [1660653438.742171][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740129e0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653500.501007][58149:58154] CHIP:DMG: {
+          [1660653500.501077][58149:58154] CHIP:DMG:         SubscriptionId = 0xb129bd8c,
+          [1660653500.501126][58149:58154] CHIP:DMG:         AttributeReportIBs =
+          [1660653500.501204][58149:58154] CHIP:DMG:         [
+          [1660653500.501253][58149:58154] CHIP:DMG:                 AttributeReportIB =
+          [1660653500.501323][58149:58154] CHIP:DMG:                 {
+          [1660653500.501397][58149:58154] CHIP:DMG:                         AttributeDataIB =
+          [1660653500.501466][58149:58154] CHIP:DMG:                         {
+          [1660653500.501550][58149:58154] CHIP:DMG:                                 DataVersion = 0xe16fa6f6,
+          [1660653500.501615][58149:58154] CHIP:DMG:                                 AttributePathIB =
+          [1660653500.501698][58149:58154] CHIP:DMG:                                 {
+          [1660653500.501765][58149:58154] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660653500.501835][58149:58154] CHIP:DMG:                                         Cluster = 0x28,
+          [1660653500.501905][58149:58154] CHIP:DMG:                                         Attribute = 0x0000_0006,
+          [1660653500.501971][58149:58154] CHIP:DMG:                                 }
+          [1660653500.502041][58149:58154] CHIP:DMG:
+          [1660653500.502111][58149:58154] CHIP:DMG:                                 Data = "XX" (2 chars),
+          [1660653500.502176][58149:58154] CHIP:DMG:                         },
+          [1660653500.502249][58149:58154] CHIP:DMG:
+          [1660653500.502303][58149:58154] CHIP:DMG:                 },
+          [1660653500.502367][58149:58154] CHIP:DMG:
+          [1660653500.502414][58149:58154] CHIP:DMG:         ],
+          [1660653500.502473][58149:58154] CHIP:DMG:
+          [1660653500.502520][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653500.502567][58149:58154] CHIP:DMG: }
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 3  0  --commissioner-name 4  --keepSubscriptions 1
+          [1660653545.650817][58149:58154] CHIP:DMG: ReportDataMessage =
+          [1660653545.650842][58149:58154] CHIP:DMG: {
+          [1660653545.650864][58149:58154] CHIP:DMG:         SubscriptionId = 0x5310d542,
+          .
+          .
+          .
+          [1660653545.651494][58149:58154] CHIP:DMG:         InteractionModelRevision = 1
+          [1660653545.651514][58149:58154] CHIP:DMG: }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 4nd reference device(RD4)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 4  0  --commissioner-name 5   --keepSubscriptions 1
+          : }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+
+          on the 5th reference device(RD5)  send 3 Subscribe Request Messages to DUT.
+          basic subscribe node-label 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe location 100 1000 5  0  --commissioner-name 6   --keepSubscriptions 1
+
+          [1660653500.502738][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653500.502801][58149:58154] CHIP:TOO:   Location: XX
+          [1660653500.502870][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff7400adb0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 5  0  --commissioner-name 6  --keepSubscriptions 1
+          : }
+          [1660653545.651601][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653545.651636][58149:58154] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653545.651669][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff74009a20]: Moving to [AwaitingSu]
+
+
+          on the 1st reference device(RD1)  send 6 Subscribe Request Messages to DUT, and Verify that the Subscriptions from RD2, RD3, RD4, RD5 are not affected.
+           basic subscribe node-label 100 1000 1  0  --keepSubscriptions 1
+          [1660652952.539010][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3782190838
+          [1660652952.539073][58131:58136] CHIP:TOO:   NodeLabel:
+          [1660652952.539140][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0004bc0]: Moving to [AwaitingSu]
+
+
+           basic subscribe location 100 1000 1  0   --keepSubscriptions 1
+          [1660653005.343616][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 3782190838
+          [1660653005.343884][58131:58136] CHIP:TOO:   Location: XX
+          [1660653005.343983][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa00129b0]: Moving to [AwaitingSu]
+
+
+
+           basic subscribe  local-config-disabled 100 1000 1  0   --keepSubscriptions 1
+          [1660653043.576169][58131:58136] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 3782190838
+          [1660653043.576207][58131:58136] CHIP:TOO:   LocalConfigDisabled: FALSE
+          [1660653043.576240][58131:58136] CHIP:DMG: MoveToState ReadClient[0xffffa0012b40]: Moving to [AwaitingSu]
+
+
+
+
+          basic subscribe product-id 100 1000 1  0  --keepSubscriptions 1
+
+          [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
+          [1660654945.477932][58149:58154] CHIP:TOO:   ProductID: 32769
+          [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
+
+
+          basic subscribe software-version 100 1000 1  0  --keepSubscriptions 1
+
+          [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
+          [1660654945.477932][58149:58154] CHIP:TOO:   software-version:
+          [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
+
+
+
+
+          basic subscribe  hardware-version  100 1000 1  0  --keepSubscriptions 1
+          [1660654945.477837][58149:58154] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0004 DataVersion: 3782190841
+          [1660654945.477932][58149:58154] CHIP:TOO: hardware-version:
+          [1660654945.478023][58149:58154] CHIP:DMG: MoveToState ReadClient[0xffff740127c0]: Moving to [AwaitingSu]
+      disabled: true
+
+    - label:
+          "RD1, RD2, RD3, RD4, RD5 send 3 Subscribe request messages each with
+          each of them having 3 different paths. Verify that the subscription
+          request messages from RD1, RD2, RD3, RD4 and RD5 succeed. Once all the
+          Subscription Requests are activated, send a Subscribe request messages
+          having 3 different paths from RD1A to the DUT."
+      verification: |
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true

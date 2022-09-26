@@ -30,6 +30,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

@@ -58,3 +58,6 @@ CONFIG_USE_TEST_SETUP_DISCRIMINATOR=0xF01
 
 # Enable chip shell
 CONFIG_ENABLE_CHIP_SHELL=y
+
+# Disable softap support by default
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n

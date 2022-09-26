@@ -134,20 +134,16 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
 
 void CastingServer::ReadServerClusters(EndpointId endpointId)
 {
-    OperationalDeviceProxy * operationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
+    const OperationalDeviceProxy * deviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+    if (deviceProxy == nullptr)
     {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
+        ChipLogError(AppServer, "Failed in getting an instance of DeviceProxy");
         return;
     }
 
-    chip::Controller::DescriptorCluster cluster;
-    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, endpointId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    // GetOperationalDeviceProxy only passes us a deviceProxy if we can get a SessionHandle.
+    chip::Controller::DescriptorCluster cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(),
+                                                endpointId);
 
     TargetEndpointInfo * endpointInfo = mTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 
@@ -183,41 +179,13 @@ void CastingServer::OnDescriptorReadFailureResponse(void * context, CHIP_ERROR e
     ChipLogError(AppServer, "Descriptor: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
-                                                   std::function<void(CHIP_ERROR)> launchURLResponseCallback)
+[[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] CHIP_ERROR
+CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+                                        std::function<void(CHIP_ERROR)> launchURLResponseCallback)
 {
-    OperationalDeviceProxy * operationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
-    {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-        return CHIP_ERROR_PEER_NODE_NOT_FOUND;
-    }
-
-    ContentLauncherCluster cluster;
-    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    CastingServer::GetInstance()->mLaunchURLResponseCallback = launchURLResponseCallback;
-    LaunchURL::Type request;
-    request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
-    request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
-    request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-    cluster.InvokeCommand(request, nullptr, CastingServer::OnContentLauncherSuccessResponse,
-                          CastingServer::OnContentLauncherFailureResponse);
-    return CHIP_NO_ERROR;
-}
-
-void CastingServer::OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
-{
-    CastingServer::GetInstance()->mLaunchURLResponseCallback(CHIP_NO_ERROR);
-}
-
-void CastingServer::OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
-{
-    CastingServer::GetInstance()->mLaunchURLResponseCallback(error);
+    return ContentLauncher_LaunchURL(contentUrl, contentDisplayStr,
+                                     MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type()),
+                                     launchURLResponseCallback);
 }
 
 void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -312,4 +280,313 @@ void CastingServer::SetDefaultFabricIndex()
         return;
     }
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
+}
+
+/**
+ * @brief Content Launcher cluster
+ */
+CHIP_ERROR CastingServer::ContentLauncher_LaunchURL(
+    const char * contentUrl, const char * contentDisplayStr,
+    chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+    std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchURLCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchURLCommand.Invoke(contentUrl, contentDisplayStr, brandingInformation, responseCallback);
+}
+
+CHIP_ERROR CastingServer::ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                                        bool autoPlay, chip::Optional<chip::CharSpan> data,
+                                                        std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchContentCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchContentCommand.Invoke(search, autoPlay, data, responseCallback);
+}
+
+/**
+ * @brief Level Control cluster
+ */
+CHIP_ERROR CastingServer::LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize,
+                                            uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                                            std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStepCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+
+    app::DataModel::Nullable<uint16_t> nullableTransitionTime;
+    nullableTransitionTime.SetNonNull(transitionTime);
+
+    return mStepCommand.Invoke(stepMode, stepSize, nullableTransitionTime, optionMask, optionOverride, responseCallback);
+}
+
+CHIP_ERROR CastingServer::LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                                   uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mMoveToLevelCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+
+    app::DataModel::Nullable<uint16_t> nullableTransitionTime;
+    nullableTransitionTime.SetNonNull(transitionTime);
+
+    return mMoveToLevelCommand.Invoke(level, nullableTransitionTime, optionMask, optionOverride, responseCallback);
+}
+
+CHIP_ERROR CastingServer::LevelControl_SubscribeToCurrentLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::LevelControl_SubscribeToMinLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mMinLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mMinLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::LevelControl_SubscribeToMaxLevel(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mMaxLevelSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mMaxLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+/**
+ * @brief Media Playback cluster
+ */
+CHIP_ERROR CastingServer::MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPlayCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPlayCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Pause(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPauseCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPauseCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_StopPlayback(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStopPlaybackCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStopPlaybackCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Next(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mNextCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mNextCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Seek(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSeekCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekCommand.Invoke(position, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SkipForward(uint64_t deltaPositionMilliseconds,
+                                                    std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSkipForwardCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSkipForwardCommand.Invoke(deltaPositionMilliseconds, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SkipBackward(uint64_t deltaPositionMilliseconds,
+                                                     std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSkipBackwardCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSkipBackwardCommand.Invoke(deltaPositionMilliseconds, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToCurrentState(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentStateSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentStateSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToStartTime(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mStartTimeSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStartTimeSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                   onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToDuration(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mDurationSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mDurationSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                  onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSampledPosition(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSampledPositionSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSampledPositionSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                         onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToPlaybackSpeed(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mPlaybackSpeedSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPlaybackSpeedSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                       onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSeekRangeEnd(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSeekRangeEndSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekRangeEndSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                      onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SubscribeToSeekRangeStart(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mSeekRangeStartSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekRangeStartSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                        onSubscriptionEstablished);
+}
+
+/**
+ * @brief Application Launcher cluster
+ */
+CHIP_ERROR
+CastingServer::ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchAppCommand.Invoke(application, data, responseCallback);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationLauncher_StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStopAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStopAppCommand.Invoke(application, responseCallback);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mHideAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mHideAppCommand.Invoke(application, responseCallback);
+}
+
+CHIP_ERROR CastingServer::ApplicationLauncher_SubscribeToCurrentApp(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentAppSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentAppSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                    onSubscriptionEstablished);
+}
+
+/**
+ * @brief Target Navigator cluster
+ */
+CHIP_ERROR CastingServer::TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
+                                                         std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mNavigateTargetCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mNavigateTargetCommand.Invoke(target, data, responseCallback);
+}
+
+CHIP_ERROR CastingServer::TargetNavigator_SubscribeToTargetList(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType> successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mTargetListSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mTargetListSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                    onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::TargetNavigator_SubscribeToCurrentTarget(
+    void * context,
+    ReadResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType>
+        successFn,
+    ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mCurrentTargetSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mCurrentTargetSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
+                                                       onSubscriptionEstablished);
+}
+
+/**
+ * @brief Keypad Input cluster
+ */
+CHIP_ERROR CastingServer::KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+                                              std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSendKeyCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSendKeyCommand.Invoke(keyCode, responseCallback);
+}
+
+/**
+ * @brief Channel cluster
+ */
+CHIP_ERROR CastingServer::Channel_ChangeChannelCommand(const chip::CharSpan & match,
+                                                       std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mChangeChannelCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mChangeChannelCommand.Invoke(match, responseCallback);
+}
+
+CHIP_ERROR CastingServer::Channel_SubscribeToLineup(
+    void * context,
+    chip::Controller::ReadResponseSuccessCallback<chip::app::Clusters::Channel::Attributes::Lineup::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+    chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished)
+{
+    ReturnErrorOnFailure(mLineupSubscriber.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLineupSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval, onSubscriptionEstablished);
 }

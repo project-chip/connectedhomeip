@@ -21,7 +21,7 @@ RUN apt-get update \
   ca-certificates=20211016~20.04.1 \
   dhcpcd5=7.1.0-2build1 \
   gdb=9.2-0ubuntu1~20.04.1 \
-  git=1:2.25.1-1ubuntu3.4 \
+  git=1:2.25.1-1ubuntu3.5 \
   iproute2=5.5.0-1ubuntu1 \
   libavahi-client3=0.7-4ubuntu7.1 \
   libcairo2-dev=1.16.0-4ubuntu1 \

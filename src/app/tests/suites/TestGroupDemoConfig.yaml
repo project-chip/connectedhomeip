@@ -27,7 +27,7 @@ name: Group Messaging Demo - Configuration
 
 config:
     nodeId: 0x12344321
-    cluster: "Groups"
+    cluster: "Group Key Management"
     endpoint: 0
 
 tests:
@@ -39,23 +39,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Add Group 1 - endpoint 1"
-      command: "AddGroup"
-      endpoint: 1
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0101
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0101
-
-    - label: "KeySet Write 1"
+    - label: "KeySet Write 1 (endpoint 0)"
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -74,32 +58,49 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-    - label: "Map Group Key Set to group ID on a given fabric"
+    - label: "Write Group Keys (endpoint 0)"
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value: [{ FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]
+          value: [{ FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]
 
-    - label: "Install ACLs for test"
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "Install ACLs"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value: [
-                  # Any CASE can admin
+                  # Any CASE can administer
                   {
                       FabricIndex: 1,
-                      Privilege: 5,
-                      AuthMode: 2,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,
                   },
-                  # These groups can operate
+                  # Any group can operate
                   {
                       FabricIndex: 1,
-                      Privilege: 3,
-                      AuthMode: 3,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
                       Subjects: [0x0101],
                       Targets: null,
                   },

@@ -19,10 +19,10 @@ config:
     cluster: "Test Cluster"
     endpoint: 1
     arg1:
-        type: INT8U
+        type: int8u
         defaultValue: 5
     returnValueWithArg1:
-        type: INT8U
+        type: int8u
         defaultValue: 25
 
 tests:

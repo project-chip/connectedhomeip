@@ -76,9 +76,9 @@ using chip::ASN1::OID;
 #endif
 
 #define COPYRIGHT_STRING                                                                                                           \
-    "Copyright (c) 2021-2022 Project CHIP Authors"                                                                                 \
-    "Copyright (c) 2019 Google LLC."                                                                                               \
-    "Copyright (c) 2013-2017 Nest Labs, Inc."                                                                                      \
+    "Copyright (c) 2021-2022 Project CHIP Authors. "                                                                               \
+    "Copyright (c) 2019 Google LLC. "                                                                                              \
+    "Copyright (c) 2013-2017 Nest Labs, Inc. "                                                                                     \
     "All rights reserved.\n"
 
 enum
@@ -93,8 +93,12 @@ enum CertFormat
     kCertFormat_Unknown = 0,
     kCertFormat_X509_DER,
     kCertFormat_X509_PEM,
+    kCertFormat_X509_Hex,
     kCertFormat_Chip_Raw,
-    kCertFormat_Chip_Base64
+    kCertFormat_Chip_Base64,
+    kCertFormat_Chip_Hex,
+
+    kCertFormat_Default = kCertFormat_Chip_Base64,
 };
 
 enum KeyFormat
@@ -102,10 +106,32 @@ enum KeyFormat
     kKeyFormat_Unknown = 0,
     kKeyFormat_X509_DER,
     kKeyFormat_X509_PEM,
-    kKeyFormat_X509_PUBKEY_PEM,
+    kKeyFormat_X509_Hex,
+    kKeyFormat_X509_Pubkey_PEM,
     kKeyFormat_Chip_Raw,
-    kKeyFormat_Chip_Base64
+    kKeyFormat_Chip_Base64,
+    kKeyFormat_Chip_Hex,
+    kKeyFormat_Chip_Pubkey_Raw,
+    kKeyFormat_Chip_Pubkey_Base64,
+    kKeyFormat_Chip_Pubkey_Hex,
+
+    kKeyFormat_Default = kKeyFormat_Chip_Base64,
 };
+
+enum DataFormat
+{
+    kDataFormat_Unknown = 0,
+    kDataFormat_Raw,
+    kDataFormat_Hex,
+    kDataFormat_Base64,
+};
+
+extern bool IsChipCertFormat(CertFormat certFormat);
+extern bool IsX509PrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsChipPrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsPrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsChipPublicKeyFormat(KeyFormat keyFormat);
+extern bool IsPublicKeyFormat(KeyFormat keyFormat);
 
 enum AttCertType
 {
@@ -115,7 +141,7 @@ enum AttCertType
     kAttCertType_DAC,              /**< Device Attestation Certificate (DAC). */
 };
 
-struct FutureExtension
+struct FutureExtensionWithNID
 {
     int nid;
     const char * info;
@@ -279,6 +305,7 @@ public:
     bool IsSignatureError() { return (mEnabled && mFlags.Has(CertErrorFlags::kSignature)); }
 
     bool IsCertOversized() { return (mEnabled && mFlags.Has(CertErrorFlags::kCertOversized)); }
+    uint32_t GetExtraCertLength() { return IsCertOversized() ? kExtraBufferLengthForOvesizedCert : 0; }
     bool IsSerialNumberPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSerialNumberMissing)); }
     bool IsIssuerPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kIssuerMissing)); }
     bool IsValidityNotBeforePresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kValidityNotBeforeMissing)); }
@@ -347,6 +374,8 @@ private:
         kExtExtendedKeyUsageMissing = 0x0000800000000000,
     };
 
+    static constexpr uint32_t kExtraBufferLengthForOvesizedCert = 300;
+
     bool mEnabled = false;
     chip::BitFlags<CertErrorFlags> mFlags;
 };
@@ -369,24 +398,25 @@ extern bool Cmd_ResignCert(int argc, char * argv[]);
 extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
+extern bool Cmd_PrintCD(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
-extern bool ReadCert(const char * fileName, X509 * cert);
-extern bool ReadCert(const char * fileName, X509 * cert, CertFormat & origCertFmt);
-extern bool ReadCertDERRaw(const char * fileName, chip::MutableByteSpan & cert);
-extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert);
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCertDER(const char * fileNameOrStr, chip::MutableByteSpan & cert);
+extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);
 
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
 extern bool WriteChipCert(const char * fileName, const chip::ByteSpan & cert, CertFormat certFmt);
 
 extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-                     uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
-                     EVP_PKEY * newKey, CertStructConfig & certConfig);
+                     uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
+                     X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
-                                  const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtension * futureExts,
-                                  uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
-                                  chip::MutableByteSpan & chipCert);
+                                  const struct tm & validFrom, uint32_t validDays, int pathLen,
+                                  const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * x509Cert,
+                                  EVP_PKEY * newKey, CertStructConfig & certConfig, chip::MutableByteSpan & chipCert);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
 extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
@@ -394,8 +424,9 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
-extern bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve = false);
-extern bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
+extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
+                    bool ignorErrorIfUnsupportedCurve = false);
+extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
 extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
 
 extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
@@ -407,6 +438,7 @@ extern bool IsBase64String(const char * str, uint32_t strLen);
 extern bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataLen);
 extern bool ParseDateTime(const char * str, struct tm & date);
 extern bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen);
+extern bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataLen, DataFormat dataFmt);
 extern bool OpenFile(const char * fileName, FILE *& file, bool toWrite = false);
 extern void CloseFile(FILE *& file);
 

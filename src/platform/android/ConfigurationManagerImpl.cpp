@@ -215,5 +215,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
     return ReadConfigValueStr(AndroidConfig::kConfigKey_UniqueId, buf, bufSize, dateLen);
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

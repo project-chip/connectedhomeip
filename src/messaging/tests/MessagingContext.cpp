@@ -16,10 +16,12 @@
  */
 
 #include "MessagingContext.h"
+#include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace Test {
@@ -35,7 +37,17 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mTransport = transport;
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
-    ReturnErrorOnFailure(mFabricTable.Init(&mStorage));
+
+    ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+    ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = &mStorage;
+    initParams.operationalKeystore = &mOpKeyStore;
+    initParams.opCertStore         = &mOpCertStore;
+
+    ReturnErrorOnFailure(mFabricTable.Init(initParams));
+
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
@@ -43,16 +55,8 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     if (mInitializeNodes)
     {
-        FabricInfo aliceFabric;
-        FabricInfo bobFabric;
-
-        ReturnErrorOnFailure(aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                             GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey));
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(aliceFabric, &mAliceFabricIndex));
-
-        bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                      GetNodeA2CertAsset().mKey);
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(bobFabric, &mBobFabricIndex));
+        ReturnErrorOnFailure(CreateAliceFabric());
+        ReturnErrorOnFailure(CreateBobFabric());
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
@@ -66,14 +70,16 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 }
 
 // Shutdown all layers, finalize operations
-CHIP_ERROR MessagingContext::Shutdown()
+void MessagingContext::Shutdown()
 {
-    VerifyOrReturnError(mInitialized == true, CHIP_ERROR_INTERNAL);
+    VerifyOrDie(mInitialized);
     mInitialized = false;
 
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
-    return CHIP_NO_ERROR;
+    mFabricTable.Shutdown();
+    mOpCertStore.Finish();
+    mOpKeyStore.Finish();
 }
 
 CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
@@ -81,13 +87,73 @@ CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
     return Init(existing.mTransport, existing.mIOContext);
 }
 
-CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
+void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
 {
-    CHIP_ERROR err = Shutdown();
+    Shutdown();
     // Point the transport back to the original session manager, since we had
     // pointed it to ours.
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
-    return err;
+}
+
+using namespace System::Clock::Literals;
+
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveIdleRetransTimeout;
+constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveActiveRetransTimeout;
+
+void MessagingContext::SetMRPMode(MRPMode mode)
+{
+    if (mode == MRPMode::kDefault)
+    {
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        ClearLocalMRPConfigOverride();
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
+    }
+    else
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        OverrideLocalMRPConfig(MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout);
+#else
+        //
+        // A test is calling this function assuming the overrides above are going to work
+        // when in fact, they won't because the compile flag is not set correctly.
+        //
+        VerifyOrDie(false);
+#endif
+
+        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+            MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
+    }
+}
+
+CHIP_ERROR MessagingContext::CreateAliceFabric()
+{
+    return mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                              GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey,
+                                                              &mAliceFabricIndex);
+}
+
+CHIP_ERROR MessagingContext::CreateBobFabric()
+{
+    return mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                              GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey,
+                                                              &mBobFabricIndex);
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
@@ -186,14 +252,25 @@ Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(M
         delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate, isInitiator);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator)
 {
-    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate, isInitiator);
+}
+
+void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                        const SessionHandle & session, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
+{
+    if (mCaptureStandaloneAcks || !payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        mCapturedMessages.emplace_back(Message{ packetHeader, payloadHeader, isDuplicate, msgBuf.CloneData() });
+    }
+    mOriginalDelegate.OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msgBuf));
 }
 
 } // namespace Test

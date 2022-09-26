@@ -24,7 +24,9 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
+    "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
     "main-common.cpp",
@@ -35,6 +37,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   include_dirs =
@@ -118,4 +121,8 @@ group("linux") {
   } else {
     deps += [ ":chip-all-clusters-app" ]
   }
+}
+
+group("default") {
+  deps = [ ":linux" ]
 }

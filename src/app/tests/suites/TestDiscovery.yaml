@@ -18,16 +18,16 @@ config:
     nodeId: 0x12344321
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     vendorId:
-        type: INT16U
+        type: int16u
         defaultValue: 65521
     productId:
-        type: INT16U
+        type: int16u
         defaultValue: 32769
     deviceType:
-        type: INT16U
+        type: int16u
         defaultValue: 5
 
 tests:

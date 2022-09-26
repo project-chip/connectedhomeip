@@ -50,7 +50,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 ChipError::StorageType
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl)
 {
-    *outCommissionableNodeCtrl = new chip::Controller::CommissionableNodeController();
+    *outCommissionableNodeCtrl = new (std::nothrow) chip::Controller::CommissionableNodeController();
     VerifyOrReturnError(*outCommissionableNodeCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
     return CHIP_NO_ERROR.AsInteger();
 }

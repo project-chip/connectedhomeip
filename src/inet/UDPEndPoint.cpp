@@ -125,8 +125,8 @@ void UDPEndPoint::Close()
 {
     if (mState != State::kClosed)
     {
-        CloseImpl();
         mState = State::kClosed;
+        CloseImpl();
     }
 }
 

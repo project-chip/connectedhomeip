@@ -26,7 +26,7 @@ void CASEClient::SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & rem
     mCASESession.SetRemoteMRPConfig(remoteMRPConfig);
 }
 
-CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
+CHIP_ERROR CASEClient::EstablishSession(const ScopedNodeId & peer, const Transport::PeerAddress & peerAddress,
                                         const ReliableMessageProtocolConfig & remoteMRPConfig,
                                         SessionEstablishmentDelegate * delegate)
 {
@@ -46,9 +46,9 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
-    ReturnErrorOnFailure(mCASESession.EstablishSession(
-        *mInitParams.sessionManager, mInitParams.fabricTable, ScopedNodeId{ peer.GetNodeId(), mInitParams.fabricIndex }, exchange,
-        mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy, delegate, mInitParams.mrpLocalConfig));
+    ReturnErrorOnFailure(mCASESession.EstablishSession(*mInitParams.sessionManager, mInitParams.fabricTable, peer, exchange,
+                                                       mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
+                                                       delegate, mInitParams.mrpLocalConfig));
 
     return CHIP_NO_ERROR;
 }

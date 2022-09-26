@@ -29,7 +29,7 @@
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
-    MatterBridgedActionsPluginServerInitCallback();                                                                                \
+    MatterActionsPluginServerInitCallback();                                                                                       \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterPowerSourceConfigurationPluginServerInitCallback();                                                                      \
     MatterPowerSourcePluginServerInitCallback();                                                                                   \

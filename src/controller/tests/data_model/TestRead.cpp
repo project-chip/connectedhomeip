@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "system/SystemClock.h"
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
@@ -25,6 +26,7 @@
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -60,7 +62,14 @@ uint8_t expectedAttribute4[256]             = {
 enum ResponseDirective
 {
     kSendDataResponse,
-    kSendDataError
+    kSendManyDataResponses,          // Many data blocks, for a single concrete path
+                                     // read, simulating a malicious server.
+    kSendManyDataResponsesWrongPath, // Many data blocks, all using the wrong
+                                     // path, for a single concrete path
+                                     // read, simulating a malicious server.
+    kSendDataError,
+    kSendTwoDataErrors, // Multiple errors, for a single concrete path,
+                        // simulating a malicious server.
 };
 
 ResponseDirective responseDirective;
@@ -80,6 +89,28 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     if (aPath.mEndpointId >= Test::kMockEndpointMin)
     {
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+    }
+
+    if (responseDirective == kSendManyDataResponses || responseDirective == kSendManyDataResponsesWrongPath)
+    {
+        if (aPath.mClusterId != Clusters::TestCluster::Id || aPath.mAttributeId != Clusters::TestCluster::Attributes::Boolean::Id)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            ConcreteAttributePath path(aPath);
+            // Use an incorrect attribute id for some of the responses.
+            path.mAttributeId = path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath);
+            AttributeValueEncoder::AttributeEncodeState state =
+                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, path,
+                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            ReturnErrorOnFailure(valueEncoder.Encode(true));
+        }
+
+        return CHIP_NO_ERROR;
     }
 
     if (responseDirective == kSendDataResponse)
@@ -163,20 +194,24 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
-    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-    ReturnErrorOnFailure(aAttributeReports.GetError());
-    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePath.GetError());
+    for (size_t i = 0; i < (responseDirective == kSendTwoDataErrors ? 2 : 1); ++i)
+    {
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
+        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
 
-    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-    ReturnErrorOnFailure(attributeStatus.GetError());
-    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-    attributeStatus.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatus.GetError());
+        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+        attributeStatus.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB().GetError());
+    }
 
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    return CHIP_NO_ERROR;
 }
 
 bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
@@ -197,6 +232,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
+
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -211,6 +252,7 @@ public:
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestResubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext);
@@ -236,6 +278,11 @@ public:
     static void TestReadHandler_ParallelReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -258,6 +305,11 @@ private:
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
     static void MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount);
+
+    // Helper for MultipleReadHelper that does not spin the event loop, so we
+    // don't end up with nested event loops.
+    static void MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                           uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls);
 
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
@@ -1435,67 +1487,196 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// After client initiated subscription request, test expire session so that subscription fails to establish, and trigger the timeout
-// error. Client would automatically try to resubscribe and bump the value for numResubscriptionAttemptedCalls.
+class TestResubscriptionCallback : public app::ReadClient::Callback
+{
+public:
+    TestResubscriptionCallback() {}
+
+    void SetReadClient(app::ReadClient * apReadClient) { mpReadClient = apReadClient; }
+
+    void OnDone(app::ReadClient *) override { mOnDone++; }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mOnError++;
+        mLastError = aError;
+    }
+
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mOnResubscriptionsAttempted++;
+        mLastError = aTerminationCause;
+        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
+    }
+
+    void ClearCounters()
+    {
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+        mOnError                        = 0;
+        mOnResubscriptionsAttempted     = 0;
+        mLastError                      = CHIP_NO_ERROR;
+    }
+
+    int32_t mAttributeCount                 = 0;
+    int32_t mOnReportEnd                    = 0;
+    int32_t mOnSubscriptionEstablishedCount = 0;
+    int32_t mOnResubscriptionsAttempted     = 0;
+    int32_t mOnDone                         = 0;
+    int32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+    app::ReadClient * mpReadClient          = nullptr;
+};
+
+//
+// This validates the re-subscription logic within ReadClient. This achieves it by overriding the timeout for the liveness
+// timer within ReadClient to be a smaller value than the nominal max interval of the subscription. This causes the
+// subscription to fail on the client side, triggering re-subscription.
+//
+// TODO: This does not validate the CASE establishment pathways since we're limited by the PASE-centric TestContext.
+//
+//
+void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
+
+        //
+        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
+        //
+        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
+        //
+        ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500),
+                                        [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
+
+        ctx.GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 0);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+//
+// This validates a vanilla subscription with re-susbcription disabled timing out correctly on the client
+// side and triggering the OnError callback with the right error code.
+//
 void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
-    auto sessionHandle      = ctx.GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    responseDirective                        = kSendDataError;
-    uint32_t numSubscriptionEstablishedCalls = 0, numResubscriptionAttemptedCalls = 0;
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        onSuccessCbInvoked = true;
-    };
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);
-        onFailureCbInvoked = true;
-    };
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
-        numSubscriptionEstablishedCalls++;
-    };
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
 
-    auto onSubscriptionAttemptedCb = [&numResubscriptionAttemptedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
-                                                                        uint32_t aNextResubscribeIntervalMsec) {
-        numResubscriptionAttemptedCalls++;
-    };
+        callback.SetReadClient(&readClient);
 
-    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20, onSubscriptionEstablishedCb,
-        onSubscriptionAttemptedCb, false, true);
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
 
-    ctx.ExpireSessionAliceToBob();
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
-    ctx.DrainAndServiceIO();
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+        auto err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.ExpireSessionBobToAlice();
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
 
-    ctx.DrainAndServiceIO();
+        //
+        // Request we drop all further messages.
+        //
+        ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
 
-    NL_TEST_ASSERT(apSuite,
-                   !onSuccessCbInvoked && !onFailureCbInvoked && numSubscriptionEstablishedCalls == 0 &&
-                       numResubscriptionAttemptedCalls == 1);
+        //
+        // Drive IO until we get an error on the subscription, which should be caused
+        // by the liveness timer firing within ~1s of the establishment of the subscription.
+        //
+        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500), [&]() { return callback.mOnError >= 1; });
 
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-
-    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
-
-    //
-    // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
-    // can function correctly.
-    //
-    ctx.CreateSessionAliceToBob();
-    ctx.CreateSessionBobToAlice();
-
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
@@ -1562,6 +1743,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
 }
 
@@ -2317,6 +2499,9 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
+    uint32_t numReadSuccessCalls = 0;
+    uint32_t numReadFailureCalls = 0;
+
     responseDirective = kSendDataResponse;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
@@ -2334,12 +2519,12 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount,
-                                        aReadCount](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount,
+                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
-            MultipleReadHelper(apSuite, aCtx, aReadCount);
+            MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
         }
     };
 
@@ -2355,40 +2540,50 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == aSubscribeCount);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == aSubscribeCount);
+    NL_TEST_ASSERT(apSuite, numReadSuccessCalls == aReadCount);
+    NL_TEST_ASSERT(apSuite, numReadFailureCalls == 0);
 }
 
-void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+// The guts of MultipleReadHelper which take references to the success/failure
+// counts to modify and assume the consumer will be spinning the event loop.
+void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount,
+                                                     uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
 {
-    auto sessionHandle       = aCtx.GetSessionBobToAlice();
-    uint32_t numSuccessCalls = 0;
-    uint32_t numFailureCalls = 0;
+    NL_TEST_ASSERT(apSuite, aNumSuccessCalls == 0);
+    NL_TEST_ASSERT(apSuite, aNumFailureCalls == 0);
+
+    auto sessionHandle = aCtx.GetSessionBobToAlice();
 
     responseDirective = kSendDataResponse;
 
     uint16_t firstExpectedResponse = totalReadCount + 1;
 
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
+    auto onFailureCb = [apSuite, &aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        aNumFailureCalls++;
 
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
     for (size_t i = 0; i < aReadCount; ++i)
     {
-        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise,
-        // it's not safe to do so.
-        auto onSuccessCb = [&numSuccessCalls, &apSuite, firstExpectedResponse,
+        auto onSuccessCb = [&aNumSuccessCalls, apSuite, firstExpectedResponse,
                             i](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
             NL_TEST_ASSERT(apSuite, dataResponse == firstExpectedResponse + i);
-            numSuccessCalls++;
+            aNumSuccessCalls++;
         };
 
         NL_TEST_ASSERT(apSuite,
                        Controller::ReadAttribute<TestCluster::Attributes::Int16u::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
     }
+}
+
+void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+{
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    MultipleReadHelperInternal(apSuite, aCtx, aReadCount, numSuccessCalls, numFailureCalls);
 
     aCtx.DrainAndServiceIO();
 
@@ -2699,6 +2894,47 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
 }
 
 } // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        SubscriptionPathQuotaHelpers::TestReadCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
@@ -4115,6 +4351,153 @@ void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlT
     engine->SetForceHandlerQuota(false);
 }
 
+void TestReadInteraction::TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendManyDataResponses;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 1);
+    NL_TEST_ASSERT(apSuite, failureCalls == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendManyDataResponsesWrongPath;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendTwoDataErrors;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+//
+// This validates the KeepSubscriptions flag by first setting up a valid subscription, then sending
+// a subsequent SubcribeRequest with empty attribute AND event paths with KeepSubscriptions = false.
+//
+// This should evict the previous subscription before sending back an error.
+//
+void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    TestReadCallback readCallback;
+    app::AttributePathParams pathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+
+    app::ReadPrepareParams readParam(ctx.GetSessionAliceToBob());
+    readParam.mpAttributePathParamsList    = &pathParams;
+    readParam.mAttributePathParamsListSize = 1;
+    readParam.mMaxIntervalCeilingSeconds   = 1;
+    readParam.mKeepSubscriptions           = false;
+
+    std::unique_ptr<app::ReadClient> readClient = std::make_unique<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+        app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 1);
+
+    ChipLogProgress(DataManagement, "Issue another subscription that will evict the first sub...");
+
+    readParam.mAttributePathParamsListSize = 0;
+    readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, readCallback.mOnError != 0);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -4131,7 +4514,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
-    NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest1", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest2", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest3", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3),
@@ -4147,6 +4529,13 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_ParallelReads", TestReadInteraction::TestReadHandler_ParallelReads),
     NL_TEST_DEF("TestReadHandler_TooManyPaths", TestReadInteraction::TestReadHandler_TooManyPaths),
     NL_TEST_DEF("TestReadHandler_TwoParallelReadsSecondTooManyPaths", TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths),
+    NL_TEST_DEF("TestReadAttribute_ManyDataValues", TestReadInteraction::TestReadAttribute_ManyDataValues),
+    NL_TEST_DEF("TestReadAttribute_ManyDataValuesWrongPath", TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath),
+    NL_TEST_DEF("TestReadAttribute_ManyErrors", TestReadInteraction::TestReadAttribute_ManyErrors),
+    NL_TEST_DEF("TestSubscribeAttributeDeniedNotExistPath", TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath),
+    NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
+    NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
+    NL_TEST_DEF("TestReadHandler_KeepSubscriptionTest", TestReadInteraction::TestReadHandler_KeepSubscriptionTest),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -4165,9 +4554,7 @@ nlTestSuite sSuite =
 
 int TestReadInteractionTest()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReadInteractionTest)

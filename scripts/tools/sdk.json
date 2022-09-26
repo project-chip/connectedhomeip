@@ -1,0 +1,290 @@
+{
+    "meta": {
+        "sdkRoot": "../..",
+        "description": "Matter SDK",
+        "requiredFeatureLevel": 77
+    },
+    "zcl": {
+        "main": "src/app/zap-templates/zcl/zcl.json",
+        "main_ext": "src/app/zap-templates/zcl/zcl-with-test-extensions.json"
+    },
+    "templates": {
+        "app-zap": "src/app/zap-templates/app-templates.json",
+        "placeholder": "examples/placeholder/templates/templates.json",
+        "chip-tool-test": "examples/chip-tool/templates/tests/templates.json",
+        "darwin-test": "examples/darwin-framework-tool/templates/tests/templates.json",
+        "app-common": "src/app/common/templates/templates.json",
+        "app-test": "src/app/tests/suites/templates/templates.json",
+        "chip-tool": "examples/chip-tool/templates/templates.json",
+        "darwin": "examples/darwin-framework-tool/templates/templates.json",
+        "python": "src/controller/python/templates/templates.json",
+        "darwin-chip": "src/darwin/Framework/CHIP/templates/templates.json",
+        "java": "src/controller/java/templates/templates.json"
+    },
+    "zapFiles": {
+        "thermostat": "examples/thermostat/thermostat-common/thermostat.zap",
+        "bridge-app": "examples/bridge-app/bridge-common/bridge-app.zap",
+        "log-source-app": "examples/log-source-app/log-source-common/log-source-app.zap",
+        "lock-app": "examples/lock-app/lock-common/lock-app.zap",
+        "lighting-app": "examples/lighting-app/lighting-common/lighting-app.zap",
+        "all-clusters-minimal-app": "examples/all-clusters-minimal-app/all-clusters-common/all-clusters-minimal-app.zap",
+        "temperature-measurement": "examples/temperature-measurement-app/esp32/main/temperature-measurement.zap",
+        "all-clusters-app": "examples/all-clusters-app/all-clusters-common/all-clusters-app.zap",
+        "pump-controller-app": "examples/pump-controller-app/pump-controller-common/pump-controller-app.zap",
+        "tv-app": "examples/tv-app/tv-common/tv-app.zap",
+        "light-switch-app": "examples/light-switch-app/light-switch-common/light-switch-app.zap",
+        "ota-provider-app": "examples/ota-provider-app/ota-provider-common/ota-provider-app.zap",
+        "pump-app": "examples/pump-app/pump-common/pump-app.zap",
+        "ota-requestor-app": "examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap",
+        "tv-casting-app": "examples/tv-casting-app/tv-casting-common/tv-casting-app.zap",
+        "window-app": "examples/window-app/common/window-app.zap",
+        "app2": "examples/placeholder/linux/apps/app2/config.zap",
+        "app1": "examples/placeholder/linux/apps/app1/config.zap",
+        "chef_dimmablelight": "examples/chef/devices/rootnode_dimmablelight_bCwGYSDpoe.zap",
+        "chef_contactsensor": "examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.zap",
+        "chef_humiditysensor": "examples/chef/devices/rootnode_humiditysensor_Xyj4gda6Hb.zap",
+        "chef_speaker": "examples/chef/devices/rootnode_speaker_RpzeXdimqA.zap",
+        "chef_temperaturesensor": "examples/chef/devices/rootnode_temperaturesensor_Qy1zkNW7c3.zap",
+        "chef_flowsensor": "examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.zap",
+        "chef_thermostat": "examples/chef/devices/rootnode_thermostat_bm3fb8dhYi.zap",
+        "chef_onofflightswitch": "examples/chef/devices/rootnode_onofflightswitch_FsPlMr090Q.zap",
+        "chef_heatingcoolingunit": "examples/chef/devices/rootnode_heatingcoolingunit_ncdGai1E5a.zap",
+        "chef_occupancysensor": "examples/chef/devices/rootnode_occupancysensor_iHyVgifZuo.zap",
+        "chef_onofflight": "examples/chef/devices/rootnode_onofflight_bbs1b7IaOV.zap",
+        "chef_pressuresensor": "examples/chef/devices/rootnode_pressuresensor_s0qC9wLH4k.zap",
+        "chef_windowcovering": "examples/chef/devices/rootnode_windowcovering_RLCxaGi9Yx.zap",
+        "chef_onoffpluginunit": "examples/chef/devices/rootnode_onoffpluginunit_Wtf8ss5EBY.zap",
+        "chef_lightsensor": "examples/chef/devices/rootnode_lightsensor_lZQycTFcJK.zap",
+        "controller": "src/controller/data_model/controller-clusters.zap"
+    },
+    "generation": [
+        {
+            "zapFile": "all-clusters-app",
+            "output": "zzz_generated/all-clusters-app/zap-generated",
+            "zcl": "main_ext",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "all-clusters-minimal-app",
+            "output": "zzz_generated/all-clusters-minimal-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "app1",
+            "output": "zzz_generated/placeholder/app1/zap-generated",
+            "zcl": "main",
+            "template": ["app-zap", "placeholder"]
+        },
+        {
+            "zapFile": "app2",
+            "output": "zzz_generated/placeholder/app2/zap-generated",
+            "zcl": "main",
+            "template": ["app-zap", "placeholder"]
+        },
+        {
+            "zapFile": "bridge-app",
+            "output": "zzz_generated/bridge-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_contactsensor",
+            "output": "zzz_generated/chef-rootnode_contactsensor_lFAGG1bfRO/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_dimmablelight",
+            "output": "zzz_generated/chef-rootnode_dimmablelight_bCwGYSDpoe/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_flowsensor",
+            "output": "zzz_generated/chef-rootnode_flowsensor_1zVxHedlaV/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_heatingcoolingunit",
+            "output": "zzz_generated/chef-rootnode_heatingcoolingunit_ncdGai1E5a/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_humiditysensor",
+            "output": "zzz_generated/chef-rootnode_humiditysensor_Xyj4gda6Hb/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_lightsensor",
+            "output": "zzz_generated/chef-rootnode_lightsensor_lZQycTFcJK/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_occupancysensor",
+            "output": "zzz_generated/chef-rootnode_occupancysensor_iHyVgifZuo/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_onofflight",
+            "output": "zzz_generated/chef-rootnode_onofflight_bbs1b7IaOV/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_onofflightswitch",
+            "output": "zzz_generated/chef-rootnode_onofflightswitch_FsPlMr090Q/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_onoffpluginunit",
+            "output": "zzz_generated/chef-rootnode_onoffpluginunit_Wtf8ss5EBY/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_pressuresensor",
+            "output": "zzz_generated/chef-rootnode_pressuresensor_s0qC9wLH4k/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_speaker",
+            "output": "zzz_generated/chef-rootnode_speaker_RpzeXdimqA/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_temperaturesensor",
+            "output": "zzz_generated/chef-rootnode_temperaturesensor_Qy1zkNW7c3/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_thermostat",
+            "output": "zzz_generated/chef-rootnode_thermostat_bm3fb8dhYi/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "chef_windowcovering",
+            "output": "zzz_generated/chef-rootnode_windowcovering_RLCxaGi9Yx/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "controller",
+            "output": "",
+            "zcl": "main",
+            "template": ["python", "darwin-chip", "java"]
+        },
+        {
+            "zapFile": "controller",
+            "output": "zzz_generated/app-common/app-common/zap-generated",
+            "zcl": "main",
+            "template": ["app-common", "app-test"]
+        },
+        {
+            "zapFile": "controller",
+            "output": "zzz_generated/chip-tool/zap-generated",
+            "zcl": "main",
+            "template": ["chip-tool-test", "chip-tool"]
+        },
+        {
+            "zapFile": "controller",
+            "output": "zzz_generated/controller-clusters/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "controller",
+            "output": "zzz_generated/darwin-framework-tool/zap-generated",
+            "zcl": "main",
+            "template": ["darwin-test", "darwin"]
+        },
+        {
+            "zapFile": "light-switch-app",
+            "output": "zzz_generated/light-switch-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "lighting-app",
+            "output": "zzz_generated/lighting-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "lock-app",
+            "output": "zzz_generated/lock-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "log-source-app",
+            "output": "zzz_generated/log-source-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "ota-provider-app",
+            "output": "zzz_generated/ota-provider-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "ota-requestor-app",
+            "output": "zzz_generated/ota-requestor-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "pump-app",
+            "output": "zzz_generated/pump-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "pump-controller-app",
+            "output": "zzz_generated/pump-controller-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "temperature-measurement",
+            "output": "zzz_generated/temperature-measurement-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "thermostat",
+            "output": "zzz_generated/thermostat/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "tv-app",
+            "output": "zzz_generated/tv-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "tv-casting-app",
+            "output": "zzz_generated/tv-casting-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "window-app",
+            "output": "zzz_generated/window-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        }
+    ]
+}

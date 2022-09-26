@@ -1,0 +1,182 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.4. [TC-ACT-3.2] Functionality with client as DUT
+
+PICS:
+    - ACT.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Preparation: TH as server exposes an Actions server cluster on EP 1,
+          with one action (supporting all possible commands) and corresponding
+          ActionLists and EndpointLists attributes: ActionList: contains one
+          list element (ActionListStruct):   ActionIO = 0x1001   Name = some
+          test   Type = other   EndpointListID = 0xE001   SupportedCommands =
+          0x0fff // suppports all commands   State = Inactive EndpointLists:
+          contains one list element (EndpointListStruct):   EndpointListID =
+          0xE001   Name = test room   Type = room   Endpoints = [3]
+          SetupURL:  (empty string)"
+      verification: |
+          pre-condition :
+          Please use the below chip-tool commmands as example on how this TC can be performed using chip-tool. The DUT vendor to use commands per the DUT implemetnation
+
+          1. First read action-list by following command
+
+          ./chip-tool actions read action-list 1 1
+
+          [1662053538.864044][37149:37154] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3676955533
+          [1662053538.864116][37149:37154] CHIP:TOO:   ActionList: 2 entries
+          [1662053538.864180][37149:37154] CHIP:TOO:     [1]: {
+          [1662053538.864202][37149:37154] CHIP:TOO:       ActionID: 4097
+          [1662053538.864221][37149:37154] CHIP:TOO:       Name: Room 1 On
+          [1662053538.864240][37149:37154] CHIP:TOO:       Type: 3
+          [1662053538.864259][37149:37154] CHIP:TOO:       EndpointListID: 57345
+          [1662053538.864276][37149:37154] CHIP:TOO:       SupportedCommands: 1
+          [1662053538.864295][37149:37154] CHIP:TOO:       State: 0
+          [1662053538.864313][37149:37154] CHIP:TOO:      }
+          [1662053538.864342][37149:37154] CHIP:TOO:     [2]: {
+          [1662053538.864360][37149:37154] CHIP:TOO:       ActionID: 4098
+          [1662053538.864377][37149:37154] CHIP:TOO:       Name: Turn On Room 2
+          [1662053538.864395][37149:37154] CHIP:TOO:       Type: 3
+          [1662053538.864413][37149:37154] CHIP:TOO:       EndpointListID: 57346
+          [1662053538.864431][37149:37154] CHIP:TOO:       SupportedCommands: 1
+          [1662053538.864449][37149:37154] CHIP:TOO:       State: 0
+          [1662053538.864466][37149:37154] CHIP:TOO:      }
+
+          2. Use the above obtained ActionID to verify the following commands
+           ./chip-tool actions instant-action 4097 1 1
+      disabled: true
+
+    - label: "DUT issues an InstantAction command to TH"
+      PICS: ACT.C.C00.Tx
+      verification: |
+          ./chip-tool actions instant-action 4097 1 1
+
+          Verify command is successfully sent on TH(bridge-app)
+
+          [1658848801.832452][10096:10101] CHIP:EM: Removed CHIP MessageCounter:163269462 from RetransTable on exchange 54295i
+          [1658848801.832487][10096:10101] CHIP:DMG: ICR moving to [ResponseRe]
+          [1658848801.832544][10096:10101] CHIP:DMG: InvokeResponseMessage =
+          [1658848801.832574][10096:10101] CHIP:DMG: {
+          [1658848801.832603][10096:10101] CHIP:DMG:         suppressResponse = false,
+          [1658848801.832637][10096:10101] CHIP:DMG:         InvokeResponseIBs =
+          [1658848801.832675][10096:10101] CHIP:DMG:         [
+          [1658848801.832705][10096:10101] CHIP:DMG:                 InvokeResponseIB =
+          [1658848801.832744][10096:10101] CHIP:DMG:                 {
+          [1658848801.832775][10096:10101] CHIP:DMG:                         CommandStatusIB =
+          [1658848801.832813][10096:10101] CHIP:DMG:                         {
+          [1658848801.832849][10096:10101] CHIP:DMG:                                 CommandPathIB =
+          [1658848801.832890][10096:10101] CHIP:DMG:                                 {
+          [1658848801.832931][10096:10101] CHIP:DMG:                                         EndpointId = 0x1,
+          [1658848801.832972][10096:10101] CHIP:DMG:                                         ClusterId = 0x25,
+          [1658848801.833017][10096:10101] CHIP:DMG:                                         CommandId = 0x0,
+          [1658848801.833055][10096:10101] CHIP:DMG:                                 },
+          [1658848801.833100][10096:10101] CHIP:DMG:
+          [1658848801.833133][10096:10101] CHIP:DMG:                                 StatusIB =
+          [1658848801.833176][10096:10101] CHIP:DMG:                                 {
+          [1658848801.833217][10096:10101] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1658848801.833256][10096:10101] CHIP:DMG:                                 },
+          [1658848801.833292][10096:10101] CHIP:DMG:
+          [1658848801.833326][10096:10101] CHIP:DMG:                         },
+          [1658848801.833371][10096:10101] CHIP:DMG:
+          [1658848801.833402][10096:10101] CHIP:DMG:                 },
+          [1658848801.833438][10096:10101] CHIP:DMG:
+          [1658848801.833466][10096:10101] CHIP:DMG:         ],
+          [1658848801.833502][10096:10101] CHIP:DMG:
+          [1658848801.833530][10096:10101] CHIP:DMG:         InteractionModelRevision = 1
+          [1658848801.833559][10096:10101] CHIP:DMG: },
+          [1658848801.833627][10096:10101] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0025 Command=0x0000_0000 Status=0x0
+          [1658848801.833676][10096:10101] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658848801.833742][10096:10101] CHIP:EM: Sending Standalone Ack for MessageCounter:266293997 on exchange 54295i
+      disabled: true
+
+    - label: "DUT issues an StartAction command to TH"
+      PICS: ACT.C.C02.Tx
+      verification: |
+          ./chip-tool actions start-action 0 1 1
+
+          Note: Message log similar as in step 1
+      disabled: true
+
+    - label: "DUT issues an StopAction command to TH"
+      PICS: ACT.C.C04.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an PauseAction command to TH"
+      PICS: ACT.C.C05.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an ResumeAction command to TH"
+      PICS: ACT.C.C07.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an EnableAction command to TH"
+      PICS: ACT.C.C08.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an DisableAction command to TH"
+      PICS: ACT.C.C0a.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an StartActionWithDuration command to TH"
+      PICS: ACT.C.C03.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an PauseActionWithDuration command to TH"
+      PICS: ACT.C.C06.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an EnableActionWithDuration command to TH"
+      PICS: ACT.C.C09.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an DisableActionWithDuration command to TH"
+      PICS: ACT.C.C0b.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true
+
+    - label: "DUT issues an InstantActionWithTransition command to TH"
+      PICS: ACT.C.C01.Tx
+      verification: |
+          Out of scope for V1.0, The reference app doesn"t have implementation for this command
+      disabled: true

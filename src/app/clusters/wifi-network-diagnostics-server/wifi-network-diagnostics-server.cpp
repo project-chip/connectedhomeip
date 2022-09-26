@@ -47,8 +47,8 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
+    template <typename T, typename Type>
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), Type & data, AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSecurityType(AttributeValueEncoder & aEncoder);
@@ -57,19 +57,20 @@ private:
     CHIP_ERROR ReadWiFiRssi(AttributeValueEncoder & aEncoder);
 };
 
-template <typename T>
-CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
+template <typename T, typename Type>
+CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), Type & data,
                                                      AttributeValueEncoder & aEncoder)
 {
-    T data;
-    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    T value;
+    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(value);
+
+    if (err == CHIP_NO_ERROR)
     {
-        data = 0;
+        data.SetNonNull(value);
     }
-    else if (err != CHIP_NO_ERROR)
+    else
     {
-        return err;
+        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
     }
 
     return aEncoder.Encode(data);
@@ -197,28 +198,36 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
         return ReadWiFiRssi(aEncoder);
     }
     case BeaconLostCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconLostCount, aEncoder);
+        Attributes::BeaconLostCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconLostCount, count, aEncoder);
     }
     case BeaconRxCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconRxCount, aEncoder);
+        Attributes::BeaconRxCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconRxCount, count, aEncoder);
     }
     case PacketMulticastRxCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, aEncoder);
+        Attributes::PacketMulticastRxCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, count, aEncoder);
     }
     case PacketMulticastTxCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, aEncoder);
+        Attributes::PacketMulticastTxCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, count, aEncoder);
     }
     case PacketUnicastRxCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, aEncoder);
+        Attributes::PacketUnicastRxCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, count, aEncoder);
     }
     case PacketUnicastTxCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, aEncoder);
+        Attributes::PacketUnicastTxCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, count, aEncoder);
     }
     case CurrentMaxRate::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiCurrentMaxRate, aEncoder);
+        Attributes::CurrentMaxRate::TypeInfo::Type rate;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiCurrentMaxRate, rate, aEncoder);
     }
     case OverrunCount::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, aEncoder);
+        Attributes::OverrunCount::TypeInfo::Type count;
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, count, aEncoder);
     }
     default: {
         break;

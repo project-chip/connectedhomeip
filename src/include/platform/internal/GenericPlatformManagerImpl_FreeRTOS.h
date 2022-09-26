@@ -60,9 +60,9 @@ class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<Im
 protected:
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
-    SemaphoreHandle_t mChipStackLock;
-    QueueHandle_t mChipEventQueue;
-    TaskHandle_t mEventLoopTask;
+    SemaphoreHandle_t mChipStackLock = NULL;
+    QueueHandle_t mChipEventQueue    = NULL;
+    TaskHandle_t mEventLoopTask      = NULL;
     bool mChipTimerActive;
 
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -76,7 +76,7 @@ protected:
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown(void);
+    void _Shutdown(void);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const;

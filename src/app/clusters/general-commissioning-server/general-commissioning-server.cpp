@@ -155,7 +155,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -178,8 +178,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() &&
-            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
             commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningError::kBusyWithOtherAdmin;
@@ -219,9 +218,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 {
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe              = server->GetFailSafeContext();
-    auto & fabricTable           = Server::GetInstance().GetFabricTable();
+    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -249,6 +248,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
                 CHIP_ERROR err = fabricTable.CommitPendingFabricData();
                 if (err != CHIP_NO_ERROR)
                 {
+                    // No need to revert on error: CommitPendingFabricData always reverts if not fully successful.
                     ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
                                  err.Format());
                 }
@@ -266,7 +266,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
              */
             failSafe.DisarmFailSafe();
             CheckSuccess(
-                server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
                 Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);

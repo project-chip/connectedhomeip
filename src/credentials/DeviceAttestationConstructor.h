@@ -23,6 +23,9 @@
 namespace chip {
 namespace Credentials {
 
+// As per specifications section 11.22.5.1. Constant RESP_MAX
+constexpr size_t kMaxRspLen = 900;
+
 // CSRNonce and AttestationNonce need to be this size
 constexpr size_t kExpectedAttestationNonceSize = 32;
 
@@ -31,12 +34,12 @@ constexpr size_t kExpectedAttestationNonceSize = 32;
  *         All output data stays valid while attestationElements buffer is valid.
  *
  *  @param[in]    attestationElements ByteSpan containing source of Attestation Elements data.
- *  @param[out]   certificationDeclaration
- *  @param[out]   attestationNonce
- *  @param[out]   timestamp
+ *  @param[out]   certificationDeclaration Valid Certification Declaration data.
+ *  @param[out]   attestationNonce Attestation Nonce - 32 octets required.
+ *  @param[out]   timestamp Timestamp data in epoch time format.
  *  @param[out]   firmwareInfo ByteSpan containing Firmware Information data if present within attestationElements.
  *                             Empty ByteSpan if not present in attestationElements.
- *  @param[out]   VendorReserved  Placeholder to for client to examine VendorReserved elements later
+ *  @param[out]   vendorReserved  Placeholder to for client to examine vendorReserved elements later
  */
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
@@ -49,7 +52,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
  *  @param[in]  attestationNonce Attestation Nonce - 32 octets required.
  *  @param[in]  timestamp Timestamp data in epoch time format.
  *  @param[in]  firmwareInfo Optional Firmware Information data - Can be empty.
- *  @param[in]  VendorReserved    Prefilled-in vendor reserved elements to be put into DA elements.
+ *  @param[in]  vendorReserved    Prefilled-in vendor reserved elements to be put into DA elements.
  *  @param[out] attestationElements Buffer used to write all AttestationElements data, formed with all the data fields above.
  *                                  Provided buffer needs to be capable to handle all data fields + tags.
  */
@@ -62,7 +65,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
  *  @brief Count the number of VendorReservedElements in a DeviceAttestation blob
  *
  *  @param[in]   attestationElements ByeSpan conitaining source of Attestation Elements data
- *  @param[out]
+ *  @param[out]   numElements Count of vendor reserved elements in the DeviceAttestation
  *  @returns CHIP_NO_ERROR on success
  */
 CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numElements);

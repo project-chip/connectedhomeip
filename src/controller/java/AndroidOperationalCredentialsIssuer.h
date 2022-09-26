@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <controller/AutoCommissioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
@@ -51,6 +52,14 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                 Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+
+    void SetUseJavaCallbackForNOCRequest(bool useJavaCallbackForNOCRequest)
+    {
+        mUseJavaCallbackForNOCRequest = useJavaCallbackForNOCRequest;
+    }
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -69,7 +78,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize(PersistentStorageDelegate & storage, jobject javaObjectRef);
+    CHIP_ERROR Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner, jobject javaObjectRef);
 
     void SetIssuerId(uint32_t id) { mIssuerId = id; }
 
@@ -87,6 +96,15 @@ public:
                                                MutableByteSpan & noc);
 
 private:
+    CHIP_ERROR CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                        const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
+                                        Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                     const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
+                                     Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
     Crypto::P256Keypair mIssuer;
     bool mInitialized  = false;
     uint32_t mIssuerId = 0;
@@ -97,12 +115,16 @@ private:
 
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
+    AutoCommissioner * mAutoCommissioner = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
 
     jobject mJavaObjectRef = nullptr;
+
+    bool mUseJavaCallbackForNOCRequest                                  = false;
+    Callback::Callback<OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 
 } // namespace Controller

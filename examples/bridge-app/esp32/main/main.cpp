@@ -22,21 +22,51 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <common/Esp32AppServer.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/ZclString.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+} // namespace
 
 const char * TAG = "bridge-app";
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Platform;
+using namespace ::chip::Credentials;
+using namespace ::chip::app::Clusters;
 
 static AppDeviceCallbacks AppCallback;
 
@@ -128,7 +158,7 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage)
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -140,7 +170,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+                ret =
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -182,19 +213,6 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     return CHIP_ERROR_INTERNAL;
 }
 
-// ZCL format -> (len, string)
-uint8_t * ToZclCharString(uint8_t * zclString, const char * cString, uint8_t maxLength)
-{
-    size_t len = strlen(cString);
-    if (len > maxLength)
-    {
-        len = maxLength;
-    }
-    zclString[0] = static_cast<uint8_t>(len);
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
-}
-
 EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
                                                     uint16_t maxReadLength)
 {
@@ -206,7 +224,8 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_NODE_LABEL_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
-        ToZclCharString(buffer, dev->GetName(), static_cast<uint8_t>(maxReadLength - 1));
+        MutableByteSpan zclNameSpan(buffer, maxReadLength);
+        MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
@@ -290,33 +309,49 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
+namespace {
+void CallReportingCallback(intptr_t closure)
+{
+    auto path = reinterpret_cast<app::ConcreteAttributePath *>(closure);
+    MatterReportingAttributeChangeCallback(*path);
+    Platform::Delete(path);
+}
+
+void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
+{
+    auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
+    DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+}
+} // anonymous namespace
+
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_State)
     {
-        uint8_t isOn = dev->IsOn() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        uint8_t zclName[kNodeLabelSize + 1];
-        ToZclCharString(zclName, dev->GetName(), kNodeLabelSize);
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclName);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
     }
 }
 
-const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-                                                      { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
+bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Actions::Commands::InstantAction::DecodableType & commandData)
+{
+    // No actions are implemented, just return status NotFound.
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
+    return true;
+}
+
+const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
+const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
@@ -335,30 +370,28 @@ static void InitServer(intptr_t context)
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
-    //
-    // By default, ZAP only supports specifying a single device type in the UI. However for bridges, they are both
-    // a Bridge and Matter Root Node device on EP0. Consequently, over-ride the generated value to correct this.
-    //
-    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gBridgedRootDeviceTypes));
+    // A bridge has root node device type on EP0 and aggregate node device type (bridge) at EP1
+    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
+    emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 
-    // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
+    // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
     AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions));
+                      Span<DataVersion>(gLight1DataVersions), 1);
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
+                      Span<DataVersion>(gLight2DataVersions), 1);
     AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions));
+                      Span<DataVersion>(gLight3DataVersions), 1);
 
-    // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
+    // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
     RemoveDeviceEndpoint(&gLight2);
 
-    // Add Light 4 -- > will be mapped to ZCL endpoint 5
+    // Add Light 4 -- > will be mapped to ZCL endpoint 6
     AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions));
+                      Span<DataVersion>(gLight4DataVersions), 1);
 
-    // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
+    // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
+                      Span<DataVersion>(gLight2DataVersions), 1);
 }
 
 extern "C" void app_main()
@@ -377,16 +410,18 @@ extern "C" void app_main()
     // Clear database
     memset(gDevices, 0, sizeof(gDevices));
 
+    gLight1.SetReachable(true);
+    gLight2.SetReachable(true);
+    gLight3.SetReachable(true);
+    gLight4.SetReachable(true);
+
     // Whenever bridged device changes its state
     gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
 
-    gLight1.SetReachable(true);
-    gLight2.SetReachable(true);
-    gLight3.SetReachable(true);
-    gLight4.SetReachable(true);
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
@@ -396,6 +431,16 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

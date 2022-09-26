@@ -61,10 +61,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
@@ -380,7 +377,7 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr, size_t size = 0) {
         DeviceLayer::StackLock lock;
         DnssdBrowseCallback callback = reinterpret_cast<DnssdBrowseCallback>(callbackHandle);
-        callback(reinterpret_cast<void *>(contextHandle), service, size, error);
+        callback(reinterpret_cast<void *>(contextHandle), service, size, true, error);
     };
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

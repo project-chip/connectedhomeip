@@ -190,21 +190,8 @@ CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 13 && Value[12] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
-    for (int i = 0; i < 12; i++)
-    {
-        VerifyOrReturnError(isdigit(Value[i]), ASN1_ERROR_INVALID_ENCODING);
-    }
 
-    outTime.Year   = static_cast<uint16_t>((Value[0] - '0') * 10 + (Value[1] - '0'));
-    outTime.Month  = static_cast<uint8_t>((Value[2] - '0') * 10 + (Value[3] - '0'));
-    outTime.Day    = static_cast<uint8_t>((Value[4] - '0') * 10 + (Value[5] - '0'));
-    outTime.Hour   = static_cast<uint8_t>((Value[6] - '0') * 10 + (Value[7] - '0'));
-    outTime.Minute = static_cast<uint8_t>((Value[8] - '0') * 10 + (Value[9] - '0'));
-    outTime.Second = static_cast<uint8_t>((Value[10] - '0') * 10 + (Value[11] - '0'));
-
-    outTime.Year = static_cast<uint16_t>(outTime.Year + ((outTime.Year >= 50) ? 1900 : 2000));
-
-    return CHIP_NO_ERROR;
+    return outTime.ImportFrom_ASN1_TIME_string(CharSpan(reinterpret_cast<const char *>(Value), ValueLen));
 }
 
 CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
@@ -214,20 +201,8 @@ CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(ValueLen == 15 && Value[14] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
-    for (int i = 0; i < 14; i++)
-    {
-        VerifyOrReturnError(isdigit(Value[i]), ASN1_ERROR_INVALID_ENCODING);
-    }
 
-    outTime.Year =
-        static_cast<uint16_t>((Value[0] - '0') * 1000 + (Value[1] - '0') * 100 + (Value[2] - '0') * 10 + (Value[3] - '0'));
-    outTime.Month  = static_cast<uint8_t>((Value[4] - '0') * 10 + (Value[5] - '0'));
-    outTime.Day    = static_cast<uint8_t>((Value[6] - '0') * 10 + (Value[7] - '0'));
-    outTime.Hour   = static_cast<uint8_t>((Value[8] - '0') * 10 + (Value[9] - '0'));
-    outTime.Minute = static_cast<uint8_t>((Value[10] - '0') * 10 + (Value[11] - '0'));
-    outTime.Second = static_cast<uint8_t>((Value[12] - '0') * 10 + (Value[13] - '0'));
-
-    return CHIP_NO_ERROR;
+    return outTime.ImportFrom_ASN1_TIME_string(CharSpan(reinterpret_cast<const char *>(Value), ValueLen));
 }
 
 static uint8_t ReverseBits(uint8_t v)

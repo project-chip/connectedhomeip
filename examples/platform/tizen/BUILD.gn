@@ -14,11 +14,14 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 config("config") {
   include_dirs = [ "." ]
@@ -26,6 +29,14 @@ config("config") {
 
 pkg_config("capi-appfw-service-application") {
   packages = [ "capi-appfw-service-application" ]
+}
+
+tizen_sdk_certificate("author-certificate-CHIP") {
+  # Data for dummy author certificate.
+  author_certificate_name = "Matter Example"
+  author_certificate_email = "matter@tizen.org"
+  author_certificate_password = "0123456789"
+  sign_security_profile = "CHIP"
 }
 
 source_set("app-main") {

@@ -45,7 +45,9 @@ public:
 
     void Animate();
     void SetColor(uint8_t Hue, uint8_t Saturation);
-
+    void Toggle();
+    uint8_t GetLevel();
+    bool IsTurnedOn();
     void HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t & red, uint8_t & green, uint8_t & blue);
 
 private:
@@ -62,7 +64,7 @@ private:
     bool mError;
     TimerHandle_t errorTimer;
 
-    void DoSet(bool state);
+    void DoSet();
 
     friend void ClearErrorState(TimerHandle_t);
 };

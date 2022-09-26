@@ -24,6 +24,7 @@ shared_library("jni") {
 
   sources = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
+    "App/app/src/main/jni/cpp/Constants.h",
     "App/app/src/main/jni/cpp/JNIDACProvider.cpp",
     "App/app/src/main/jni/cpp/JNIDACProvider.h",
     "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.cpp",

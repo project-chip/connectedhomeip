@@ -1,0 +1,82 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.7.5. [TC-CHANNEL-5.5] Change Channel By Number Verification (DUT as
+    Client)
+
+PICS:
+    - CHANNEL.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
+    - label: "DUT sends ChangeChannelByNumber command to TH"
+      PICS: CHANNEL.C.C02.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          If the DUT knows the MajorNumber and MinorNumber in channel InputList then those can be sent as the argument. Else User needs to execute the following command to know the MajorNumber and MinorNumber to change the channel
+
+           ./chip-tool channel read channel-list 1 1
+
+          By sending above command user can select the MajorNumber and MinorNumber instead of 9 1 which are listed in chanel list.
+
+          ./chip-tool channel change-channel-by-number 9  1 1 1
+          ./chip-tv-casting-app channel change-channel-by-number 9 1 1 1
+
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1661515240.201737][4433:4433] CHIP:DMG: InvokeRequestMessage =
+          [1661515240.201782][4433:4433] CHIP:DMG: {
+          [1661515240.201816][4433:4433] CHIP:DMG:         suppressResponse = false,
+          [1661515240.201855][4433:4433] CHIP:DMG:         timedRequest = false,
+          [1661515240.201975][4433:4433] CHIP:DMG:         InvokeRequests =
+          [1661515240.202024][4433:4433] CHIP:DMG:         [
+          [1661515240.202060][4433:4433] CHIP:DMG:                 CommandDataIB =
+          [1661515240.202100][4433:4433] CHIP:DMG:                 {
+          [1661515240.202141][4433:4433] CHIP:DMG:                         CommandPathIB =
+          [1661515240.202193][4433:4433] CHIP:DMG:                         {
+          [1661515240.202245][4433:4433] CHIP:DMG:                                 EndpointId = 0x1,
+          [1661515240.202294][4433:4433] CHIP:DMG:                                 ClusterId = 0x504,
+          [1661515240.202338][4433:4433] CHIP:DMG:                                 CommandId = 0x2,
+          [1661515240.202382][4433:4433] CHIP:DMG:                         },
+          [1661515240.202436][4433:4433] CHIP:DMG:
+          [1661515240.202477][4433:4433] CHIP:DMG:                         CommandFields =
+          [1661515240.202523][4433:4433] CHIP:DMG:                         {
+          [1661515240.202571][4433:4433] CHIP:DMG:                                 0x0 = 9,
+          [1661515240.202619][4433:4433] CHIP:DMG:                                 0x1 = 1,
+          [1661515240.202671][4433:4433] CHIP:DMG:                         },
+          [1661515240.202712][4433:4433] CHIP:DMG:                 },
+          [1661515240.202753][4433:4433] CHIP:DMG:
+          [1661515240.202786][4433:4433] CHIP:DMG:         ],
+          [1661515240.202827][4433:4433] CHIP:DMG:
+          [1661515240.202860][4433:4433] CHIP:DMG:         InteractionModelRevision = 1
+          [1661515240.202892][4433:4433] CHIP:DMG: },
+          [1661515240.202975][4433:4433] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0504 e=1 p=o
+          [1661515240.203023][4433:4433] CHIP:DMG: AccessControl: allowed
+
+
+          Enter the below command to read the current input. ./chip-tool channel read current-channel 1 1
+      disabled: true

@@ -29,10 +29,13 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 
+#include <algorithm>
 #include <math.h>
+#include <string>
 
 using namespace chip;
 
@@ -63,8 +66,8 @@ bool CheckGenerator(const PayloadContents & payload, std::string expectedResult,
 PayloadContents GetDefaultPayload()
 {
     PayloadContents payload;
-    payload.setUpPINCode  = 12345679;
-    payload.discriminator = 2560;
+    payload.setUpPINCode = 12345679;
+    payload.discriminator.SetLongValue(2560);
 
     return payload;
 }
@@ -126,8 +129,8 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
 void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
 {
     PayloadContents payload;
-    payload.setUpPINCode  = 0;
-    payload.discriminator = 0;
+    payload.setUpPINCode = 0;
+    payload.discriminator.SetLongValue(0);
 
     std::string expectedResult;
 
@@ -137,8 +140,8 @@ void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
 void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
 {
     PayloadContents payload;
-    payload.setUpPINCode      = 0x7FFFFFF;
-    payload.discriminator     = 0xFFF;
+    payload.setUpPINCode = 0x7FFFFFF;
+    payload.discriminator.SetLongValue(0xFFF);
     payload.commissioningFlow = CommissioningFlow::kCustom;
     payload.vendorID          = 65535;
     payload.productID         = 65535;
@@ -148,18 +151,8 @@ void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult, /*allowInvalidPayload*/ true));
 }
 
-void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inContext)
-{
-    PayloadContents payload = GetDefaultPayload();
-    payload.discriminator   = 0x1f00;
-
-    ManualSetupPayloadGenerator generator(payload);
-    std::string result;
-    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
-}
-
 void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, const PayloadContents & payload,
-                         uint32_t pinCode, uint16_t discriminator, uint16_t vendorID, uint16_t productID)
+                         uint32_t pinCode, const SetupDiscriminator & discriminator, uint16_t vendorID, uint16_t productID)
 {
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
     NL_TEST_ASSERT(inSuite, payload.setUpPINCode == pinCode);
@@ -171,7 +164,7 @@ void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERR
 void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * inSuite, void * inContext)
 {
     PayloadContents payload = GetDefaultPayload();
-    payload.discriminator   = 0xa1f;
+    payload.discriminator.SetLongValue(0xa1f);
 
     {
         // Test short 11 digit code
@@ -181,14 +174,18 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xa00, payload.vendorID,
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        SetupDiscriminator discriminator;
+        discriminator.SetShortValue(0xa);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
                             payload.productID);
     }
 
     payload.vendorID          = 1;
     payload.productID         = 1;
     payload.commissioningFlow = CommissioningFlow::kCustom;
-    payload.discriminator     = 0xb1f;
+    payload.discriminator.SetLongValue(0xb1f);
 
     {
         // Test long 21 digit code
@@ -198,9 +195,21 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xb00, payload.vendorID,
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        SetupDiscriminator discriminator;
+        discriminator.SetShortValue(0xb);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
                             payload.productID);
     }
+}
+
+char ComputeCheckChar(const std::string & str)
+{
+    // Strip out dashes, if any, from the string before computing the checksum.
+    std::string copy(str);
+    copy.erase(std::remove(copy.begin(), copy.end(), '-'), copy.end());
+    return Verhoeff10::ComputeCheckChar(copy.c_str());
 }
 
 void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
@@ -211,17 +220,36 @@ void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
     decimalString = "63610875354536714526";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     CHIP_ERROR err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 45367, 14526);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SetupDiscriminator discriminator;
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 45367, 14526);
+
+    // The same thing, but with dashes separating digit groups.
+    decimalString = "6361-0875-3545-3671-4526";
+    decimalString += ComputeCheckChar(decimalString.c_str());
+    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 45367, 14526);
 
     decimalString = "52927623630456200032";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 38728284, 1280, 4562, 32);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0x5);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 38728284, discriminator, 4562, 32);
 
     decimalString = "40000100000000100001";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 0, 1, 1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, discriminator, 1, 1);
 }
 
 void TestGenerateAndParser_FullPayload(nlTestSuite * inSuite, void * inContext)
@@ -237,7 +265,11 @@ void TestGenerateAndParser_FullPayload(nlTestSuite * inSuite, void * inContext)
 
     SetupPayload outPayload;
     CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, payload.discriminator, payload.vendorID,
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SetupDiscriminator discriminator;
+    discriminator.SetShortValue(payload.discriminator.GetShortValue());
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
                         payload.productID);
 }
 
@@ -251,7 +283,11 @@ void TestGenerateAndParser_PartialPayload(nlTestSuite * inSuite, void * inContex
 
     SetupPayload outPayload;
     CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, payload.discriminator, payload.vendorID,
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SetupDiscriminator discriminator;
+    discriminator.SetShortValue(payload.discriminator.GetShortValue());
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
                         payload.productID);
 }
 
@@ -265,19 +301,39 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 11);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 0, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SetupDiscriminator discriminator;
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 0, 0);
+
+    // The same thing, but with dashes separating digit groups.
+    decimalString = "236-108753-5";
+    decimalString += ComputeCheckChar(decimalString.c_str());
+    NL_TEST_ASSERT(inSuite, decimalString.length() == 13);
+    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 0, 0);
 
     decimalString = "0000010000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 11);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 0, 0, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, discriminator, 0, 0);
 
     decimalString = "63610875350000000000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     NL_TEST_ASSERT(inSuite, decimalString.length() == 21);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
-    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, 2560, 0, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 0, 0);
 
     // no discriminator (= 0)
     decimalString = "0033407535";
@@ -304,6 +360,7 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
 void TestShortCodeReadWrite(nlTestSuite * inSuite, void * context)
 {
     PayloadContents inPayload = GetDefaultPayload();
+
     SetupPayload outPayload;
 
     std::string result;
@@ -311,6 +368,9 @@ void TestShortCodeReadWrite(nlTestSuite * inSuite, void * context)
     generator.payloadDecimalStringRepresentation(result);
     ManualSetupPayloadParser(result).populatePayload(outPayload);
 
+    // Override the discriminator in the input payload with the short version,
+    // since that's what we will produce.
+    inPayload.discriminator.SetShortValue(inPayload.discriminator.GetShortValue());
     NL_TEST_ASSERT(inSuite, inPayload == outPayload);
 }
 
@@ -320,6 +380,7 @@ void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
     inPayload.commissioningFlow = CommissioningFlow::kCustom;
     inPayload.vendorID          = 1;
     inPayload.productID         = 1;
+
     SetupPayload outPayload;
 
     std::string result;
@@ -327,6 +388,9 @@ void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
     generator.payloadDecimalStringRepresentation(result);
     ManualSetupPayloadParser(result).populatePayload(outPayload);
 
+    // Override the discriminator in the input payload with the short version,
+    // since that's what we will produce.
+    inPayload.discriminator.SetShortValue(inPayload.discriminator.GetShortValue());
     NL_TEST_ASSERT(inSuite, inPayload == outPayload);
 }
 
@@ -335,7 +399,8 @@ void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, 
 {
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
     NL_TEST_ASSERT(inSuite,
-                   payload.setUpPINCode == 0 && payload.discriminator == 0 && payload.productID == 0 && payload.vendorID == 0);
+                   payload.setUpPINCode == 0 && payload.discriminator.GetLongValue() == 0 && payload.productID == 0 &&
+                       payload.vendorID == 0);
 }
 
 void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
@@ -523,7 +588,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("Generate Decimal Representation from Full Payload with Zeros",         TestDecimalRepresentation_FullPayloadWithZeros),
     NL_TEST_DEF("Decimal Representation from Full Payload without Zeros",               TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow),
     NL_TEST_DEF("Decimal Representation from Full Payload without Zeros (Custom Flow)", TestDecimalRepresentation_FullPayloadWithoutZeros),
-    NL_TEST_DEF("Test Decimal Representation - Invalid Payload",                        TestDecimalRepresentation_InvalidPayload),
     NL_TEST_DEF("Test 12 bit discriminator for manual setup code",                      TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator),
     NL_TEST_DEF("Test Decimal Representation - All Zeros",                              TestDecimalRepresentation_AllZeros),
     NL_TEST_DEF("Test Decimal Representation - All Ones",                               TestDecimalRepresentation_AllOnes),
@@ -544,11 +608,6 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-};
-
 } // namespace
 
 /**
@@ -565,17 +624,10 @@ int TestManualSetupCode()
         nullptr
     };
     // clang-format on
-    TestContext context;
-
-    context.mSuite = &theSuite;
-
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    // Run Test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return nlTestRunnerStats(&theSuite);
+    return chip::ExecuteTestsWithoutContext(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestManualSetupCode);

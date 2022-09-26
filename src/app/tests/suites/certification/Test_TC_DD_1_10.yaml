@@ -17,16 +17,22 @@ name:
     3.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.SCAN_NFC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Power up the TH Device and put the TH Device in pairing mode"
+    - label:
+          "Power up the TH Device and put the TH Device in commissioning mode"
       verification: |
-          sudo ./chip-all-clusters-app
-
+          1. Launch TH that has NFC tag
+          $ sudo ./chip-all-clusters-app
+          ...
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
           [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
           [1646286638.376016][11651:11651] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
@@ -38,12 +44,12 @@ tests:
           [1646286638.377664][11651:11651] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1646286638.377771][11651:11651] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
           [1646286638.377865][11651:11651] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1646286638.377915][11651:11651] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1646286638.377915][11651:11651] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1646286638.377986][11651:11651] CHIP:SVR: Manual pairing code: [34970112332]
           [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
       disabled: true
 
     - label: "Bring the DUT close to the NFC tag for the TH Device"
       verification: |
-          Vendor specific field testcase
+          Vendor specific field testcase as chip-all-clusters-app does not have an NFC tag to scan
       disabled: true

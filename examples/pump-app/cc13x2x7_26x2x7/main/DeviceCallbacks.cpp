@@ -56,10 +56,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
                  event->ServiceProvisioningChange.ServiceConfigUpdated);
         break;
 
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         PLAT_LOG("CHIPoBLE connection established");
         break;
@@ -190,14 +186,6 @@ void DeviceCallbacks::OnThreadConnectivityChange(const ChipDeviceEvent * event)
     else if (event->ThreadConnectivityChange.Result == kConnectivity_NoChange)
     {
         PLAT_LOG("## No change in Thread connectivity...");
-    }
-}
-
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        PLAT_LOG("Commissioner detected!");
     }
 }
 

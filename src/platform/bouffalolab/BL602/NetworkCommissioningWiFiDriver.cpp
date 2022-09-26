@@ -71,10 +71,7 @@ CHIP_ERROR BLWiFiDriver::Init()
     return err;
 }
 
-CHIP_ERROR BLWiFiDriver::Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void BLWiFiDriver::Shutdown() {}
 
 CHIP_ERROR BLWiFiDriver::CommitConfiguration()
 {

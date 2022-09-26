@@ -87,5 +87,12 @@ static_library("telink") {
     }
   }
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
   public_deps += [ "${chip_root}/src/crypto" ]
 }

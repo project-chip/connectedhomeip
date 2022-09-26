@@ -17,6 +17,7 @@
 
 #include "MediaPlaybackManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <cstdint>
 #include <jni.h>
@@ -74,8 +75,8 @@ uint64_t MediaPlaybackManager::HandleGetDuration()
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
-    uint64_t ret = HandleMediaRequestGetAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SPEED);
-    return static_cast<float>(ret) / 10000.0f;
+    long ret = HandleMediaRequestGetLongAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SPEED);
+    return static_cast<float>(ret);
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
@@ -172,7 +173,7 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
     }
 
     mGetPositionMethod =
-        env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()[Lcom/matter/tv/server/tvapp/MediaPlaybackPosition;");
+        env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()Lcom/matter/tv/server/tvapp/MediaPlaybackPosition;");
     if (mGetPositionMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getPosition' method");
@@ -209,6 +210,38 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     {
         err = CHIP_ERROR_INCORRECT_STATE;
     }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
+    }
+
+    return ret;
+}
+
+long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute)
+{
+    long ret              = 0;
+    jlong jAttributeValue = -1;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
+    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        goto exit;
+    }
+
+    ret = static_cast<long>(jAttributeValue);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -286,8 +319,8 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
         jclass inputClass    = env->GetObjectClass(positionObj);
         jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
         jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetIntField(positionObj, positionId)));
-        response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
+        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetLongField(positionObj, positionId)));
+        response.updatedAt   = static_cast<uint64_t>(env->GetLongField(positionObj, updatedAtId));
     }
 
 exit:
@@ -297,4 +330,16 @@ exit:
     }
 
     return aEncoder.Encode(response);
+}
+
+uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

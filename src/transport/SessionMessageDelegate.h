@@ -17,6 +17,7 @@
 #pragma once
 
 #include <transport/SessionHandle.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 

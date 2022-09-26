@@ -26,6 +26,7 @@ on:
 
 jobs:
     check-reviewdog:
+        name: Check Spelling - reviewdog
         runs-on: ubuntu-latest
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
@@ -40,6 +41,7 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
     check-spellcheck:
+        name: Check Spelling - pyspelling
         runs-on: ubuntu-latest
         steps:
             - uses: Wandalen/wretry.action@v1.0.15

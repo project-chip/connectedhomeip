@@ -1,0 +1,188 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    111.2.4. [TC-DRLK-2.4] Verification for Unlock with Timeout command
+    [DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new user"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: 1
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Verify created PIN credential"
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "credentialExists"
+                value: true
+              - name: "userIndex"
+                value: 1
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: null
+
+    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
+      PICS: DRLK.S.A0023
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 60
+
+    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
+      PICS: " !DRLK.S.A0023 "
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 60
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH sends the Unlock with Timeout argument value as 60 seconds"
+      PICS: DRLK.S.C03.Rsp
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 60
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Wait 60s"
+      PICS: DRLK.S.C03.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 60000
+
+    - label: "TH reads LockState attribute"
+      PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Cleanup the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+
+    - label: "Clean the created credential"
+      PICS: DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

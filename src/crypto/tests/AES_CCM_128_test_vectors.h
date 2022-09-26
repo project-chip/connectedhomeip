@@ -25,6 +25,10 @@
 
 #include <lib/core/CHIPError.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif // CHIP_HAVE_CONFIG_H
+
 struct ccm_128_test_vector
 {
     const uint8_t * pt;
@@ -951,17 +955,481 @@ static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_266 = 
                                                                                   .tag_len   = 16,
                                                                                   .tcId      = 37,
                                                                                   .result    = CHIP_ERROR_INTERNAL };
-static const struct ccm_128_test_vector * ccm_128_test_vectors[]              = {
-    &chiptest_dac9e1195a0d_test_vector_7,   &chiptest_dac9e1195a0d_test_vector_14,  &chiptest_dac9e1195a0d_test_vector_21,
-    &chiptest_dac9e1195a0d_test_vector_28,  &chiptest_dac9e1195a0d_test_vector_35,  &chiptest_dac9e1195a0d_test_vector_42,
-    &chiptest_dac9e1195a0d_test_vector_49,  &chiptest_dac9e1195a0d_test_vector_56,  &chiptest_dac9e1195a0d_test_vector_63,
-    &chiptest_dac9e1195a0d_test_vector_70,  &chiptest_dac9e1195a0d_test_vector_77,  &chiptest_dac9e1195a0d_test_vector_84,
-    &chiptest_dac9e1195a0d_test_vector_91,  &chiptest_dac9e1195a0d_test_vector_98,  &chiptest_dac9e1195a0d_test_vector_105,
-    &chiptest_dac9e1195a0d_test_vector_112, &chiptest_dac9e1195a0d_test_vector_119, &chiptest_dac9e1195a0d_test_vector_126,
-    &chiptest_dac9e1195a0d_test_vector_133, &chiptest_dac9e1195a0d_test_vector_140, &chiptest_dac9e1195a0d_test_vector_147,
-    &chiptest_dac9e1195a0d_test_vector_154, &chiptest_dac9e1195a0d_test_vector_161, &chiptest_dac9e1195a0d_test_vector_168,
-    &chiptest_dac9e1195a0d_test_vector_175, &chiptest_dac9e1195a0d_test_vector_182, &chiptest_dac9e1195a0d_test_vector_189,
-    &chiptest_dac9e1195a0d_test_vector_196, &chiptest_dac9e1195a0d_test_vector_203, &chiptest_dac9e1195a0d_test_vector_210,
-    &chiptest_dac9e1195a0d_test_vector_217, &chiptest_dac9e1195a0d_test_vector_224, &chiptest_dac9e1195a0d_test_vector_231,
-    &chiptest_dac9e1195a0d_test_vector_238, &chiptest_dac9e1195a0d_test_vector_245, &chiptest_dac9e1195a0d_test_vector_252
+
+static const uint8_t test_vector_2ef53070ae20_key[16] = {
+    0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
+};
+
+static const uint8_t test_vector_2ef53070ae20_nonce[13] = {
+    0x00, 0x80, 0x00, 0x00, 0x01, 0x12, 0x01, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_2ef53070ae20_in[13] = {
+    0xff, 0xfd, 0x03, 0x4b, 0x50, 0x05, 0x7e, 0x40, 0x00, 0x00, 0x01, 0x00, 0x00,
+};
+
+static const uint8_t test_vector_2ef53070ae20_ad[0] = {};
+
+static const uint8_t test_vector_2ef53070ae20_ct[13] = {
+    0xb5, 0xe5, 0xbf, 0xda, 0xcb, 0xaf, 0x6c, 0xb7, 0xfb, 0x6b, 0xff, 0x87, 0x1f,
+};
+
+static const uint8_t test_vector_2ef53070ae20_tag[16] = {
+    0xb0, 0xd6, 0xdd, 0x82, 0x7d, 0x35, 0xbf, 0x37, 0x2f, 0xa6, 0x42, 0x5d, 0xcd, 0x17, 0xd3, 0x56,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_2ef53070ae20_test_vector_0 = {
+    .pt        = test_vector_2ef53070ae20_in,
+    .pt_len    = 13,
+    .aad       = test_vector_2ef53070ae20_ad,
+    .aad_len   = 0,
+    .key       = test_vector_2ef53070ae20_key,
+    .key_len   = 16,
+    .nonce     = test_vector_2ef53070ae20_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_2ef53070ae20_ct,
+    .ct_len    = 13,
+    .tag       = test_vector_2ef53070ae20_tag,
+    .tag_len   = 16,
+    .tcId      = 0,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_91c8d337cf46_key[16] = {
+    0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
+};
+
+static const uint8_t test_vector_91c8d337cf46_nonce[13] = {
+    0x00, 0x80, 0x01, 0x48, 0x20, 0x23, 0x45, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_91c8d337cf46_in[9] = {
+    0x12, 0x01, 0x04, 0x32, 0x03, 0x08, 0xba, 0x07, 0x2f,
+};
+
+static const uint8_t test_vector_91c8d337cf46_ad[0] = {};
+
+static const uint8_t test_vector_91c8d337cf46_ct[9] = {
+    0x79, 0xd7, 0xdb, 0xc0, 0xc9, 0xb4, 0xd4, 0x3e, 0xeb,
+};
+
+static const uint8_t test_vector_91c8d337cf46_tag[16] = {
+    0x28, 0x15, 0x08, 0xe5, 0x0d, 0x58, 0xdb, 0xbd, 0x27, 0xc3, 0x95, 0x97, 0x80, 0x0f, 0x47, 0x33,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_91c8d337cf46_test_vector_1 = {
+    .pt        = test_vector_91c8d337cf46_in,
+    .pt_len    = 9,
+    .aad       = test_vector_91c8d337cf46_ad,
+    .aad_len   = 0,
+    .key       = test_vector_91c8d337cf46_key,
+    .key_len   = 16,
+    .nonce     = test_vector_91c8d337cf46_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_91c8d337cf46_ct,
+    .ct_len    = 9,
+    .tag       = test_vector_91c8d337cf46_tag,
+    .tag_len   = 16,
+    .tcId      = 1,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_37fc295e3601_key[16] = {
+    0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
+};
+
+static const uint8_t test_vector_37fc295e3601_nonce[13] = {
+    0x00, 0x80, 0x2b, 0x38, 0x32, 0x2f, 0xe3, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_37fc295e3601_in[9] = {
+    0x12, 0x01, 0x04, 0xfa, 0x02, 0x05, 0xa6, 0x00, 0x0a,
+};
+
+static const uint8_t test_vector_37fc295e3601_ad[0] = {};
+
+static const uint8_t test_vector_37fc295e3601_ct[9] = {
+    0x53, 0x27, 0x30, 0x86, 0xb8, 0xc5, 0xee, 0x00, 0xbd,
+};
+
+static const uint8_t test_vector_37fc295e3601_tag[16] = {
+    0xd5, 0x2b, 0x87, 0xa8, 0xce, 0x62, 0x90, 0xa7, 0x72, 0xd4, 0x72, 0xb8, 0xc6, 0x2b, 0xdc, 0x13,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_37fc295e3601_test_vector_2 = {
+    .pt        = test_vector_37fc295e3601_in,
+    .pt_len    = 9,
+    .aad       = test_vector_37fc295e3601_ad,
+    .aad_len   = 0,
+    .key       = test_vector_37fc295e3601_key,
+    .key_len   = 16,
+    .nonce     = test_vector_37fc295e3601_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_37fc295e3601_ct,
+    .ct_len    = 9,
+    .tag       = test_vector_37fc295e3601_tag,
+    .tag_len   = 16,
+    .tcId      = 2,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_8bab3993e4d1_key[16] = {
+    0xbe, 0x63, 0x51, 0x05, 0x43, 0x48, 0x59, 0xf4, 0x84, 0xfc, 0x79, 0x8e, 0x04, 0x3c, 0xe4, 0x0e,
+};
+
+static const uint8_t test_vector_8bab3993e4d1_nonce[13] = {
+    0x00, 0x80, 0x00, 0x00, 0x02, 0x12, 0x01, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_8bab3993e4d1_in[4] = {
+    0x23,
+    0x45,
+    0x01,
+    0x00,
+};
+
+static const uint8_t test_vector_8bab3993e4d1_ad[0] = {};
+
+static const uint8_t test_vector_8bab3993e4d1_ct[4] = {
+    0xb0,
+    0xe5,
+    0xd0,
+    0xad,
+};
+
+static const uint8_t test_vector_8bab3993e4d1_tag[16] = {
+    0x60, 0x78, 0xe0, 0xdd, 0xbb, 0x7c, 0xd4, 0x3f, 0xae, 0xa5, 0x7c, 0x70, 0x51, 0xe5, 0xb4, 0xae,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_8bab3993e4d1_test_vector_3 = {
+    .pt        = test_vector_8bab3993e4d1_in,
+    .pt_len    = 4,
+    .aad       = test_vector_8bab3993e4d1_ad,
+    .aad_len   = 0,
+    .key       = test_vector_8bab3993e4d1_key,
+    .key_len   = 16,
+    .nonce     = test_vector_8bab3993e4d1_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_8bab3993e4d1_ct,
+    .ct_len    = 4,
+    .tag       = test_vector_8bab3993e4d1_tag,
+    .tag_len   = 16,
+    .tcId      = 3,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_76dbd8e42344_key[16] = {
+    0xbe, 0x63, 0x51, 0x05, 0x43, 0x48, 0x59, 0xf4, 0x84, 0xfc, 0x79, 0x8e, 0x04, 0x3c, 0xe4, 0x0e,
+};
+
+static const uint8_t test_vector_76dbd8e42344_nonce[13] = {
+    0x00, 0x80, 0x01, 0x48, 0x34, 0x23, 0x45, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_76dbd8e42344_in[9] = {
+    0x12, 0x01, 0x02, 0x00, 0x12, 0x34, 0x56, 0x78, 0x00,
+};
+
+static const uint8_t test_vector_76dbd8e42344_ad[0] = {};
+
+static const uint8_t test_vector_76dbd8e42344_ct[9] = {
+    0x5c, 0x39, 0xda, 0x17, 0x92, 0xb1, 0xfe, 0xe9, 0xec,
+};
+
+static const uint8_t test_vector_76dbd8e42344_tag[16] = {
+    0xa9, 0x23, 0x39, 0x58, 0xac, 0xed, 0x64, 0xf2, 0x34, 0x3b, 0x9d, 0x61, 0x0e, 0x87, 0x64, 0x40,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_76dbd8e42344_test_vector_4 = {
+    .pt        = test_vector_76dbd8e42344_in,
+    .pt_len    = 9,
+    .aad       = test_vector_76dbd8e42344_ad,
+    .aad_len   = 0,
+    .key       = test_vector_76dbd8e42344_key,
+    .key_len   = 16,
+    .nonce     = test_vector_76dbd8e42344_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_76dbd8e42344_ct,
+    .ct_len    = 9,
+    .tag       = test_vector_76dbd8e42344_tag,
+    .tag_len   = 16,
+    .tcId      = 4,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_ea145e3af464_key[16] = {
+    0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
+};
+
+static const uint8_t test_vector_ea145e3af464_nonce[13] = {
+    0x00, 0x8b, 0x01, 0x48, 0x35, 0x23, 0x45, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_ea145e3af464_in[9] = {
+    0x00, 0x03, 0x00, 0xa6, 0xac, 0x00, 0x00, 0x00, 0x02,
+};
+
+static const uint8_t test_vector_ea145e3af464_ad[0] = {};
+
+static const uint8_t test_vector_ea145e3af464_ct[9] = {
+    0x0d, 0x0d, 0x73, 0x0f, 0x94, 0xd7, 0xf3, 0x50, 0x9d,
+};
+
+static const uint8_t test_vector_ea145e3af464_tag[16] = {
+    0xdd, 0xa1, 0x69, 0x4a, 0xdb, 0x79, 0x16, 0x52, 0xfb, 0x6a, 0xe0, 0x46, 0x82, 0xf1, 0x9b, 0x29,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_ea145e3af464_test_vector_5 = {
+    .pt        = test_vector_ea145e3af464_in,
+    .pt_len    = 9,
+    .aad       = test_vector_ea145e3af464_ad,
+    .aad_len   = 0,
+    .key       = test_vector_ea145e3af464_key,
+    .key_len   = 16,
+    .nonce     = test_vector_ea145e3af464_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_ea145e3af464_ct,
+    .ct_len    = 9,
+    .tag       = test_vector_ea145e3af464_tag,
+    .tag_len   = 16,
+    .tcId      = 5,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_08f3cd0b35d1_key[16] = {
+    0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
+};
+
+static const uint8_t test_vector_08f3cd0b35d1_nonce[13] = {
+    0x00, 0x8b, 0x01, 0x48, 0x36, 0x23, 0x45, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_08f3cd0b35d1_in[9] = {
+    0x00, 0x03, 0x00, 0xa6, 0xac, 0x00, 0x00, 0x00, 0x03,
+};
+
+static const uint8_t test_vector_08f3cd0b35d1_ad[0] = {};
+
+static const uint8_t test_vector_08f3cd0b35d1_ct[9] = {
+    0xd8, 0x5d, 0x80, 0x6b, 0xbe, 0xd2, 0x48, 0x61, 0x4f,
+};
+
+static const uint8_t test_vector_08f3cd0b35d1_tag[16] = {
+    0xef, 0x7f, 0x4d, 0x55, 0xe4, 0x7d, 0x21, 0x52, 0x2e, 0xbe, 0x3d, 0x5b, 0xc7, 0x35, 0xa5, 0xc5,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_08f3cd0b35d1_test_vector_6 = {
+    .pt        = test_vector_08f3cd0b35d1_in,
+    .pt_len    = 9,
+    .aad       = test_vector_08f3cd0b35d1_ad,
+    .aad_len   = 0,
+    .key       = test_vector_08f3cd0b35d1_key,
+    .key_len   = 16,
+    .nonce     = test_vector_08f3cd0b35d1_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_08f3cd0b35d1_ct,
+    .ct_len    = 9,
+    .tag       = test_vector_08f3cd0b35d1_tag,
+    .tag_len   = 16,
+    .tcId      = 6,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_70d7d4a1f8ea_key[16] = {
+    0xbe, 0x63, 0x51, 0x05, 0x43, 0x48, 0x59, 0xf4, 0x84, 0xfc, 0x79, 0x8e, 0x04, 0x3c, 0xe4, 0x0e,
+};
+
+static const uint8_t test_vector_70d7d4a1f8ea_nonce[13] = {
+    0x00, 0x80, 0x00, 0x00, 0x03, 0x12, 0x01, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_70d7d4a1f8ea_in[4] = {
+    0x23,
+    0x45,
+    0x01,
+    0x01,
+};
+
+static const uint8_t test_vector_70d7d4a1f8ea_ad[0] = {};
+
+static const uint8_t test_vector_70d7d4a1f8ea_ct[4] = {
+    0x77,
+    0x77,
+    0xed,
+    0x35,
+};
+
+static const uint8_t test_vector_70d7d4a1f8ea_tag[16] = {
+    0x35, 0xd8, 0x4e, 0x18, 0x78, 0x4c, 0x4b, 0xf3, 0xcb, 0x1b, 0x4c, 0x19, 0x1d, 0xc5, 0x55, 0xcc,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_70d7d4a1f8ea_test_vector_7 = {
+    .pt        = test_vector_70d7d4a1f8ea_in,
+    .pt_len    = 4,
+    .aad       = test_vector_70d7d4a1f8ea_ad,
+    .aad_len   = 0,
+    .key       = test_vector_70d7d4a1f8ea_key,
+    .key_len   = 16,
+    .nonce     = test_vector_70d7d4a1f8ea_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_70d7d4a1f8ea_ct,
+    .ct_len    = 4,
+    .tag       = test_vector_70d7d4a1f8ea_tag,
+    .tag_len   = 16,
+    .tcId      = 7,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_56f7e4096627_key[16] = {
+    0xbe, 0x63, 0x51, 0x05, 0x43, 0x48, 0x59, 0xf4, 0x84, 0xfc, 0x79, 0x8e, 0x04, 0x3c, 0xe4, 0x0e,
+};
+
+static const uint8_t test_vector_56f7e4096627_nonce[13] = {
+    0x00, 0x80, 0x00, 0x00, 0x04, 0x12, 0x01, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_56f7e4096627_in[4] = {
+    0x23,
+    0x45,
+    0x01,
+    0x01,
+};
+
+static const uint8_t test_vector_56f7e4096627_ad[0] = {};
+
+static const uint8_t test_vector_56f7e4096627_ct[4] = {
+    0xae,
+    0x21,
+    0x46,
+    0x60,
+};
+
+static const uint8_t test_vector_56f7e4096627_tag[16] = {
+    0xd1, 0x46, 0xb2, 0x8b, 0xea, 0xfe, 0x7f, 0x98, 0x4f, 0x94, 0x30, 0x50, 0x2d, 0x07, 0xaa, 0xfe,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_56f7e4096627_test_vector_8 = {
+    .pt        = test_vector_56f7e4096627_in,
+    .pt_len    = 4,
+    .aad       = test_vector_56f7e4096627_ad,
+    .aad_len   = 0,
+    .key       = test_vector_56f7e4096627_key,
+    .key_len   = 16,
+    .nonce     = test_vector_56f7e4096627_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_56f7e4096627_ct,
+    .ct_len    = 4,
+    .tag       = test_vector_56f7e4096627_tag,
+    .tag_len   = 16,
+    .tcId      = 8,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_02112b4a46d8_key[16] = {
+    0xbe, 0x63, 0x51, 0x05, 0x43, 0x48, 0x59, 0xf4, 0x84, 0xfc, 0x79, 0x8e, 0x04, 0x3c, 0xe4, 0x0e,
+};
+
+static const uint8_t test_vector_02112b4a46d8_nonce[13] = {
+    0x00, 0x80, 0x00, 0x00, 0x05, 0x12, 0x01, 0x00, 0x00, 0x12, 0x34, 0x56, 0x78,
+};
+
+static const uint8_t test_vector_02112b4a46d8_in[4] = {
+    0x23,
+    0x45,
+    0x01,
+    0x00,
+};
+
+static const uint8_t test_vector_02112b4a46d8_ad[0] = {};
+
+static const uint8_t test_vector_02112b4a46d8_ct[4] = {
+    0x7d,
+    0x3a,
+    0xe6,
+    0x2a,
+};
+
+static const uint8_t test_vector_02112b4a46d8_tag[16] = {
+    0x52, 0xee, 0x03, 0xab, 0x84, 0xe1, 0xa3, 0x33, 0x65, 0xe8, 0xa6, 0x12, 0x75, 0x66, 0x5f, 0x71,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_02112b4a46d8_test_vector_9 = {
+    .pt        = test_vector_02112b4a46d8_in,
+    .pt_len    = 4,
+    .aad       = test_vector_02112b4a46d8_ad,
+    .aad_len   = 0,
+    .key       = test_vector_02112b4a46d8_key,
+    .key_len   = 16,
+    .nonce     = test_vector_02112b4a46d8_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_02112b4a46d8_ct,
+    .ct_len    = 4,
+    .tag       = test_vector_02112b4a46d8_tag,
+    .tag_len   = 16,
+    .tcId      = 9,
+    .result    = CHIP_NO_ERROR,
+};
+static const uint8_t test_vector_ac063659d220_key[16] = {
+    0x63, 0x96, 0x47, 0x71, 0x73, 0x4f, 0xbd, 0x76, 0xe3, 0xb4, 0x05, 0x19, 0xd1, 0xd9, 0x4a, 0x48,
+};
+
+static const uint8_t test_vector_ac063659d220_nonce[13] = {
+    0x01, 0x00, 0x07, 0x08, 0x0d, 0x12, 0x34, 0x97, 0x36, 0x12, 0x34, 0x56, 0x77,
+};
+
+static const uint8_t test_vector_ac063659d220_in[8] = {
+    0xea, 0x0a, 0x00, 0x57, 0x6f, 0x72, 0x6c, 0x64,
+};
+
+static const uint8_t test_vector_ac063659d220_ad[16] = {
+    0xf4, 0xa0, 0x02, 0xc7, 0xfb, 0x1e, 0x4c, 0xa0, 0xa4, 0x69, 0xa0, 0x21, 0xde, 0x0d, 0xb8, 0x75,
+};
+
+static const uint8_t test_vector_ac063659d220_ct[8] = {
+    0xde, 0x15, 0x47, 0x11, 0x84, 0x63, 0x12, 0x3e,
+};
+
+static const uint8_t test_vector_ac063659d220_tag[16] = {
+    0x14, 0x60, 0x4c, 0x1d, 0xdb, 0x4f, 0x59, 0x87, 0x06, 0x4b, 0x17, 0x36, 0xf3, 0x92, 0x39, 0x62,
+};
+
+static const struct ccm_128_test_vector aesccm128_matter_ac063659d220_test_vector_10 = {
+    .pt        = test_vector_ac063659d220_in,
+    .pt_len    = 8,
+    .aad       = test_vector_ac063659d220_ad,
+    .aad_len   = 16,
+    .key       = test_vector_ac063659d220_key,
+    .key_len   = 16,
+    .nonce     = test_vector_ac063659d220_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_ac063659d220_ct,
+    .ct_len    = 8,
+    .tag       = test_vector_ac063659d220_tag,
+    .tag_len   = 16,
+    .tcId      = 10,
+    .result    = CHIP_NO_ERROR,
+};
+
+static const struct ccm_128_test_vector * ccm_128_test_vectors[] = {
+// All test cases in the ifdef do NOT follow the crypto primitive constraints for
+// Matter: they use different tag length and nonce length than the mandatory primitives.
+// The set outside the #if is using mandatory lengths. BoringSSL *only* supports
+// the exact mapping of the spec and the SDK only uses the exact mapping of the spec.
+#if !CHIP_CRYPTO_BORINGSSL
+    &chiptest_dac9e1195a0d_test_vector_7,          &chiptest_dac9e1195a0d_test_vector_14,
+    &chiptest_dac9e1195a0d_test_vector_21,         &chiptest_dac9e1195a0d_test_vector_28,
+    &chiptest_dac9e1195a0d_test_vector_35,         &chiptest_dac9e1195a0d_test_vector_42,
+    &chiptest_dac9e1195a0d_test_vector_49,         &chiptest_dac9e1195a0d_test_vector_56,
+    &chiptest_dac9e1195a0d_test_vector_63,         &chiptest_dac9e1195a0d_test_vector_70,
+    &chiptest_dac9e1195a0d_test_vector_77,         &chiptest_dac9e1195a0d_test_vector_84,
+    &chiptest_dac9e1195a0d_test_vector_91,         &chiptest_dac9e1195a0d_test_vector_98,
+    &chiptest_dac9e1195a0d_test_vector_105,        &chiptest_dac9e1195a0d_test_vector_112,
+    &chiptest_dac9e1195a0d_test_vector_119,        &chiptest_dac9e1195a0d_test_vector_126,
+    &chiptest_dac9e1195a0d_test_vector_133,        &chiptest_dac9e1195a0d_test_vector_140,
+    &chiptest_dac9e1195a0d_test_vector_147,        &chiptest_dac9e1195a0d_test_vector_154,
+    &chiptest_dac9e1195a0d_test_vector_161,        &chiptest_dac9e1195a0d_test_vector_168,
+    &chiptest_dac9e1195a0d_test_vector_175,        &chiptest_dac9e1195a0d_test_vector_182,
+    &chiptest_dac9e1195a0d_test_vector_189,        &chiptest_dac9e1195a0d_test_vector_196,
+    &chiptest_dac9e1195a0d_test_vector_203,        &chiptest_dac9e1195a0d_test_vector_210,
+    &chiptest_dac9e1195a0d_test_vector_217,        &chiptest_dac9e1195a0d_test_vector_224,
+    &chiptest_dac9e1195a0d_test_vector_231,        &chiptest_dac9e1195a0d_test_vector_238,
+    &chiptest_dac9e1195a0d_test_vector_245,        &chiptest_dac9e1195a0d_test_vector_252,
+#endif // !CHIP_CRYPTO_BORINGSSL
+    &aesccm128_matter_2ef53070ae20_test_vector_0,  &aesccm128_matter_91c8d337cf46_test_vector_1,
+    &aesccm128_matter_37fc295e3601_test_vector_2,  &aesccm128_matter_8bab3993e4d1_test_vector_3,
+    &aesccm128_matter_76dbd8e42344_test_vector_4,  &aesccm128_matter_ea145e3af464_test_vector_5,
+    &aesccm128_matter_08f3cd0b35d1_test_vector_6,  &aesccm128_matter_70d7d4a1f8ea_test_vector_7,
+    &aesccm128_matter_56f7e4096627_test_vector_8,  &aesccm128_matter_02112b4a46d8_test_vector_9,
+    &aesccm128_matter_ac063659d220_test_vector_10,
 };

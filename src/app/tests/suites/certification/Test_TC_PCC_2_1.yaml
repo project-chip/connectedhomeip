@@ -14,6 +14,9 @@
 
 name: 15.2.1. [TC-PCC-2.1] Attributes with server as DUT
 
+PICS:
+    - PCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pump Configuration and Control"
@@ -29,143 +32,147 @@ tests:
                 value: nodeId
 
     - label: "Read the mandatory attribute: MaxPressure"
+      PICS: PCC.S.A0000
       command: "readAttribute"
       attribute: "MaxPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the mandatory attribute: MaxSpeed"
+      PICS: PCC.S.A0001
       command: "readAttribute"
       attribute: "MaxSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the mandatory attribute: MaxFlow"
+      PICS: PCC.S.A0002
       command: "readAttribute"
       attribute: "MaxFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstPressure"
-      optional: true
+      PICS: PCC.S.A0003
       command: "readAttribute"
       attribute: "MinConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxConstPressure"
-      optional: true
+      PICS: PCC.S.A0004
       command: "readAttribute"
       attribute: "MaxConstPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: MinCompPressure"
-      optional: true
+      PICS: PCC.S.A0005
       command: "readAttribute"
       attribute: "MinCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxCompPressure"
-      optional: true
+      PICS: PCC.S.A0006
       command: "readAttribute"
       attribute: "MaxCompPressure"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: MinConstSpeed"
-      optional: true
+      PICS: PCC.S.A0007
       command: "readAttribute"
       attribute: "MinConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: MaxConstSpeed"
-      optional: true
+      PICS: PCC.S.A0008
       command: "readAttribute"
       attribute: "MaxConstSpeed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstFlow"
-      optional: true
+      PICS: PCC.S.A0009
       command: "readAttribute"
       attribute: "MinConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: MaxConstFlow"
-      optional: true
+      PICS: PCC.S.A000a
       command: "readAttribute"
       attribute: "MaxConstFlow"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstTemp"
-      optional: true
+      PICS: PCC.S.A000b
       command: "readAttribute"
       attribute: "MinConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxConstTemp"
-      optional: true
+      PICS: PCC.S.A000c
       command: "readAttribute"
       attribute: "MaxConstTemp"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: PumpStatus"
-      optional: true
+      PICS: PCC.S.A0010
       command: "readAttribute"
       attribute: "PumpStatus"
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 8
 
     - label: "Read attribute: EffectiveOperationMode"
+      PICS: PCC.S.A0011
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       response:
@@ -175,6 +182,7 @@ tests:
               maxValue: 3
 
     - label: "Read attribute: EffectiveControlMode"
+      PICS: PCC.S.A0012
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       response:
@@ -184,55 +192,57 @@ tests:
               maxValue: 7
 
     - label: "Read attribute: Capacity"
+      PICS: PCC.S.A0013
       command: "readAttribute"
       attribute: "Capacity"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
     - label: "Read the optional attribute: Speed"
-      optional: true
+      PICS: PCC.S.A0014
       command: "readAttribute"
       attribute: "Speed"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     - label: "Read the optional attribute: LifetimeRunningHours"
-      optional: true
+      PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
     - label: "Read the optional attribute: Power"
-      optional: true
+      PICS: PCC.S.A0016
       command: "readAttribute"
       attribute: "Power"
       response:
           constraints:
-              type: uint24
+              type: int24u
               minValue: 0
               maxValue: 16777215
 
     - label: "Read the optional attribute: LifetimeEnergyConsumed"
-      optional: true
+      PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
           constraints:
-              type: uint32
+              type: int32u
               minValue: 0
               maxValue: 4294967295
 
     - label: "Read optional attribute: OperationMode"
+      PICS: PCC.S.A0020
       command: "readAttribute"
       attribute: "OperationMode"
       response:
@@ -242,7 +252,7 @@ tests:
               maxValue: 3
 
     - label: "Read optional attribute: ControlMode"
-      optional: true
+      PICS: PCC.S.A0021
       command: "readAttribute"
       attribute: "ControlMode"
       response:

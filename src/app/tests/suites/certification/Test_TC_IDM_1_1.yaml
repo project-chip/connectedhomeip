@@ -13,8 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    19.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
+name: 3.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}]
+
+PICS:
+    - MCORE.IDM.C.InvokeRequest
 
 config:
     nodeId: 0x12344321
@@ -22,14 +24,55 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
     - label:
           "DUT sends the Invoke Request Message to the TH. The Message should
           contain one valid CommandDataIB, which has the specific Endpoint,
           Specific Cluster and Specific Command."
       verification: |
-          In case of chip tool, here is an example command to use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          sudo ./chip-tool identify  identify 0 1 1
+          ./chip-tool onoff on 1 1
+
+          On TH all-clusters-app,  Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+          [1655717373.046081][10909:10909] CHIP:DMG: InvokeRequestMessage =
+          [1655717373.046137][10909:10909] CHIP:DMG: {
+          [1655717373.046185][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655717373.046240][10909:10909] CHIP:DMG:         timedRequest = false,
+          [1655717373.046291][10909:10909] CHIP:DMG:         InvokeRequests =
+          [1655717373.046356][10909:10909] CHIP:DMG:         [
+          [1655717373.046407][10909:10909] CHIP:DMG:                 CommandDataIB =
+          [1655717373.046464][10909:10909] CHIP:DMG:                 {
+          [1655717373.046518][10909:10909] CHIP:DMG:                         CommandPathIB =
+          [1655717373.046583][10909:10909] CHIP:DMG:                         {
+          [1655717373.046649][10909:10909] CHIP:DMG:                                 EndpointId = 0x1,
+          [1655717373.046720][10909:10909] CHIP:DMG:                                 ClusterId = 0x6,
+          [1655717373.046782][10909:10909] CHIP:DMG:                                 CommandId = 0x1,
+          [1655717373.046885][10909:10909] CHIP:DMG:                         },
+          [1655717373.046961][10909:10909] CHIP:DMG:
+          [1655717373.047017][10909:10909] CHIP:DMG:                         CommandFields =
+          [1655717373.047080][10909:10909] CHIP:DMG:                         {
+          [1655717373.047143][10909:10909] CHIP:DMG:                         },
+          [1655717373.047211][10909:10909] CHIP:DMG:                 },
+          [1655717373.047272][10909:10909] CHIP:DMG:
+          [1655717373.047322][10909:10909] CHIP:DMG:         ],
+          [1655717373.047383][10909:10909] CHIP:DMG:
+          [1655717373.047433][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
+          [1655717373.047482][10909:10909] CHIP:DMG: },
+          [1655717373.047599][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1655717373.047665][10909:10909] CHIP:DMG: AccessControl: allowed
+
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
+
+          [1657867897.521090][2728:2733] CHIP:DMG: },
+          [1657867897.521162][2728:2733] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1657867897.521212][2728:2733] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657867897.521275][2728:2733] CHIP:EM: Sending Standalone Ack for MessageCounter:30068876 on exchange 7104i
       disabled: true
 
     - label:
@@ -55,16 +98,50 @@ tests:
           Specific Cluster and Specific Command. Send 2 more Invoke Request
           Messages to the TH."
       verification: |
-          In case of chip tool, here is an example command to use
-          sudo ./chip-tool  identify identify 10 1 1
-          sudo ./chip-tool  identify identify 10 1 1
-      disabled: true
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          ./chip-tool onoff off 1 1
 
-    - label:
-          "DUT sends the Invoke Request Message to the TH. The message should
-          contain a command that will return a data type of list as a response."
-      verification: |
-          In case of chip tool, here is an example command to use
+          On TH all-clusters-app, verify that we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+          [1655717456.105815][10909:10909] CHIP:DMG: InvokeRequestMessage =
+          [1655717456.105853][10909:10909] CHIP:DMG: {
+          [1655717456.105887][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655717456.105933][10909:10909] CHIP:DMG:         timedRequest = false,
+          [1655717456.105970][10909:10909] CHIP:DMG:         InvokeRequests =
+          [1655717456.106015][10909:10909] CHIP:DMG:         [
+          [1655717456.106051][10909:10909] CHIP:DMG:                 CommandDataIB =
+          [1655717456.106091][10909:10909] CHIP:DMG:                 {
+          [1655717456.106129][10909:10909] CHIP:DMG:                         CommandPathIB =
+          [1655717456.106173][10909:10909] CHIP:DMG:                         {
+          [1655717456.106220][10909:10909] CHIP:DMG:                                 EndpointId = 0x1,
+          [1655717456.106274][10909:10909] CHIP:DMG:                                 ClusterId = 0x6,
+          [1655717456.106327][10909:10909] CHIP:DMG:                                 CommandId = 0x0,
+          [1655717456.106373][10909:10909] CHIP:DMG:                         },
+          [1655717456.106420][10909:10909] CHIP:DMG:
+          [1655717456.106462][10909:10909] CHIP:DMG:                         CommandFields =
+          [1655717456.106507][10909:10909] CHIP:DMG:                         {
+          [1655717456.106551][10909:10909] CHIP:DMG:                         },
+          [1655717456.106594][10909:10909] CHIP:DMG:                 },
+          [1655717456.106636][10909:10909] CHIP:DMG:
+          [1655717456.106671][10909:10909] CHIP:DMG:         ],
+          [1655717456.106714][10909:10909] CHIP:DMG:
+          [1655717456.106749][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
+          [1655717456.106783][10909:10909] CHIP:DMG: },
+          [1655717456.106904][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1655717456.106954][10909:10909] CHIP:DMG: AccessControl: allowed
 
-          sudo ./chip-tool modeselect read  supported-modes 1 1
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
+          [1657868210.442226][2746:2751] CHIP:DMG:
+          [1657868210.442265][2746:2751] CHIP:DMG:         InteractionModelRevision = 1
+          [1657868210.442306][2746:2751] CHIP:DMG: },
+          [1657868210.442398][2746:2751] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
+          [1657868210.442463][2746:2751] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657868210.442539][2746:2751] CHIP:EM: Sending Standalone Ack for MessageCounter:19470563 on exchange 18884i
+
+
+
+          ./chip-tool onoff off 1 1
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+          ./chip-tool onoff off 1 1
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
       disabled: true

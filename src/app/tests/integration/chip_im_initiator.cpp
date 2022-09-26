@@ -146,7 +146,6 @@ public:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override {}
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
                          const chip::app::StatusIB & status) override
     {}
@@ -655,6 +654,11 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     return &stub;
 }
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler *)
 {
@@ -705,9 +709,6 @@ int main(int argc, char * argv[])
     static_assert(gMessageInterval > gMessageTimeout, "Interval period too small");
 
     InitializeChip();
-
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6)

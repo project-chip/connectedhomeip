@@ -30,8 +30,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}")
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_PLATFORM_NRFCONNECT=1")
+if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
+  set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"")
+endif()
 message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
 message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
+message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
 
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
 set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
@@ -72,8 +76,6 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     ${CHEF}/shell_common/globals.cpp
     ${CHEF}/shell_common/cmd_misc.cpp
     ${CHEF}/shell_common/cmd_otcli.cpp
-    ${CHEF}/shell_common/cmd_ping.cpp
-    ${CHEF}/shell_common/cmd_send.cpp
   )
 
   target_include_directories(app PRIVATE
@@ -86,7 +88,6 @@ target_sources(app PRIVATE
     ${CHEF}/common/stubs.cpp
     ${GEN_DIR}/callback-stub.cpp
     ${GEN_DIR}/IMClusterCommandHandler.cpp
-    ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
@@ -95,17 +96,6 @@ chip_configure_data_model(app
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
     GEN_DIR ${GEN_DIR}
 )
-
-
-# 1) The example needs be linked with openthread command line interpreter (required by cmd_otcli.cpp)
-# 2) Zephyr shell must be disabled not to interfere with the example
-# We can't achieve 1 and 2 with Kconfig since CONFIG_OPENTHREAD_SHELL implies CONFIG_SHELL.
-# Hence the workaround below.
-if(CONFIG_OPENTHREAD_FTD)
-    target_link_libraries(app INTERFACE openthread-cli-ftd)
-elseif(CONFIG_OPENTHREAD_MTD)
-    target_link_libraries(app INTERFACE openthread-cli-mtd)
-endif()
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 

@@ -16,6 +16,7 @@
  */
 
 #include "ChannelManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <vector>
 
 using namespace chip;
@@ -171,4 +172,16 @@ bool ChannelManager::HandleSkipChannel(const uint16_t & count)
     mCurrentChannelIndex     = newChannelIndex;
     mCurrentChannel          = mChannels[mCurrentChannelIndex];
     return true;
+}
+
+uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

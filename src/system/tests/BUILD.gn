@@ -31,10 +31,15 @@ chip_test_suite("tests") {
     "TestTimeSource.cpp",
   ]
 
+  if (chip_device_platform != "fake") {
+    test_sources += [ "TestSystemScheduleWork.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
     "${nlunit_test_root}:nlunit-test",

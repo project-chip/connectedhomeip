@@ -18,7 +18,13 @@
 
 /**
  *    @file
- *      This file defines object for a CHIP IM Invoke Command Handler
+ *      A handler for incoming Invoke interactions.
+ *
+ *      Allows adding responses to be sent in an InvokeResponse: see the various
+ *      "Add*" methods.
+ *
+ *      Allows adding the responses asynchronously.  See the documentation
+ *      for the CommandHandler::Handle class below.
  *
  */
 
@@ -33,7 +39,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
@@ -46,16 +52,9 @@
 namespace chip {
 namespace app {
 
-class CommandHandler
+class CommandHandler : public Messaging::ExchangeDelegate
 {
 public:
-    /*
-     * Destructor - as part of destruction, it will abort the exchange context
-     * if a valid one still exists.
-     *
-     * See Abort() for details on when that might occur.
-     */
-    virtual ~CommandHandler() { Abort(); }
     class Callback
     {
     public:
@@ -84,6 +83,29 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
+    /**
+     * Class that allows asynchronous command processing before sending a
+     * response.  When such processing is desired:
+     *
+     * 1) Create a Handle initialized with the CommandHandler that delivered the
+     *    incoming command.
+     * 2) Ensure the Handle, or some Handle it's moved into via the move
+     *    constructor or move assignment operator, remains alive during the
+     *    course of the asynchronous processing.
+     * 3) Ensure that the ConcreteCommandPath involved will be known when
+     *    sending the response.
+     * 4) When ready to send the response:
+     *    * Ensure that no other Matter tasks are running in parallel (e.g. by
+     *      running on the Matter event loop or holding the Matter stack lock).
+     *    * Call Get() to get the CommandHandler.
+     *    * Check that Get() did not return null.
+     *    * Add the response to the CommandHandler via one of the Add* methods.
+     *    * Let the Handle get destroyed, or manually call Handle::Release() if
+     *      destruction of the Handle is not desirable for some reason.
+     *
+     * The Invoke Response will not be sent until all outstanding Handles have
+     * been destroyed or have had Release called.
+     */
     class Handle
     {
     public:
@@ -146,15 +168,15 @@ public:
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
@@ -221,17 +243,51 @@ public:
     /**
      * Gets the inner exchange context object, without ownership.
      *
+     * WARNING: This is dangerous, since it is directly interacting with the
+     *          exchange being managed automatically by mExchangeCtx and
+     *          if not done carefully, may end up with use-after-free errors.
+     *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mExchangeCtx.Get(); }
 
-    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
+    /**
+     * @brief Flush acks right away for a slow command
+     *
+     * Some commands that do heavy lifting of storage/crypto should
+     * ack right away to improve reliability and reduce needless retries. This
+     * method can be manually called in commands that are especially slow to
+     * immediately schedule an acknowledgement (if needed) since the delayed
+     * stand-alone ack timer may actually not hit soon enough due to blocking command
+     * execution.
+     *
+     */
+    void FlushAcksRightAwayOnSlowCommand()
+    {
+        VerifyOrReturn(mExchangeCtx);
+        auto * msgContext = mExchangeCtx->GetReliableMessageContext();
+        VerifyOrReturn(msgContext != nullptr);
+        msgContext->FlushAcks();
+    }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
+
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
+
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
+    {
+        //
+        // We're not expecting responses to any messages we send out on this EC.
+        //
+        VerifyOrDie(false);
+    }
 
     enum class State
     {
@@ -294,13 +350,13 @@ private:
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
      * It requires the endpointId in its command path to be able to dispatch the command
      */
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
 
     /**
      * ProcessGroupCommandDataIB is only called when a group invoke command request is received
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
-    CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
@@ -324,13 +380,15 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    Callback * mpCallback                      = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
+    Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
+
+    bool mSentStatusResponse = false;
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;

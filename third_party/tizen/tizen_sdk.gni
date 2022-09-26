@@ -18,8 +18,17 @@ import("//build_overrides/tizen.gni")
 
 import("${build_root}/config/tizen/config.gni")
 
-tizen_manifest_parser = rebase_path("tizen_manifest_parser.py")
+tizen_dev_certificate = get_path_info("tizen_dev_certificate.py", "abspath")
+tizen_manifest_parser = get_path_info("tizen_manifest_parser.py", "abspath")
 
+# Run Tizen Studio CLI as a project builder.
+#
+# Parameters:
+#   project_build_dir: Directory to build the project in.
+#   project_app_name: Name of the application within the project.
+#   args: List of arguments to pass to the CLI.
+#   outputs: List of created output files.
+#   deps: List of dependencies.
 template("tizen_sdk") {
   forward_variables_from(invoker,
                          [
@@ -59,7 +68,47 @@ template("tizen_sdk") {
   }
 }
 
+# Generate author certificate and security profile.
+#
+# Parameters:
+#   author_certificate_name: Author certificate name field.
+#   author_certificate_email: Author certificate email field.
+#   author_certificate_password: Password for the author certificate.
+#   sign_security_profile: Name of the security profile to add.
+template("tizen_sdk_certificate") {
+  assert(defined(invoker.author_certificate_password),
+         "It is required to specify `author_certificate_password`.")
+  assert(defined(invoker.sign_security_profile),
+         "It is required to specify a `sign_security_profile` which " +
+             "should be added to Tizen security profiles.")
+  stamp_file = "${root_build_dir}/.tizen_sdk_dev_certificate_stamp"
+  action(target_name) {
+    forward_variables_from(invoker, [ "deps" ])
+    script = tizen_dev_certificate
+    args = [
+      "--author-certificate-name=" + invoker.author_certificate_name,
+      "--author-certificate-email=" + invoker.author_certificate_email,
+      "--author-certificate-password=" + invoker.author_certificate_password,
+      "--sign-security-profile=" + invoker.sign_security_profile,
+      "--stamp-file=" + stamp_file,
+    ]
+    outputs = [ stamp_file ]
+  }
+}
+
+# Package Tizen application as a TPK bundle.
+#
+# Parameters:
+#   manifest: The path to Tizen XML manifest file to use.
+#   sign_security_profile: Name of the security profile to use for signing.
+#   deps: List of dependencies.
 template("tizen_sdk_package") {
+  assert(defined(invoker.manifest),
+         "It is required to specify Tizen `manifest` XML file.")
+  assert(defined(invoker.sign_security_profile),
+         "It is required to specify a `sign_security_profile` which " +
+             "should be used for signing TPK package.")
+
   # Output directory where packaging will occur. We need a separate directory
   # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
   # "lib" directories for items to pack. In our case it could include in the
@@ -67,14 +116,10 @@ template("tizen_sdk_package") {
   tizen_package_dir = "${root_build_dir}/package"
   tizen_package_out_dir = "${tizen_package_dir}/out"
 
-  assert(defined(invoker.manifest),
-         "It is required to specify Tizen `manifest` XML file.")
-  assert(defined(invoker.sign_security_profile),
-         "It is required to specify a `sign_security_profile` which " +
-             "should be used for signing TPK package.")
-
   # Extract data from Tizen XML manifest.
-  manifest = exec_script(tizen_manifest_parser, [ invoker.manifest ], "json")
+  manifest = exec_script(tizen_manifest_parser,
+                         [ rebase_path(invoker.manifest, root_build_dir) ],
+                         "json")
   manifest_package = manifest["package"]
   manifest_apps = manifest["apps"]
 

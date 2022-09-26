@@ -14,6 +14,9 @@
 
 name: 42.1.1. [TC-TSTAT-1.1] Global attributes with server as DUT
 
+PICS:
+    - TSTAT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thermostat"
@@ -34,43 +37,178 @@ tests:
       response:
           value: 5
           constraints:
-              type: uint16
+              type: int16u
 
-    ##if condition needed #Issue 10988
-    - label: "Read the optional global attribute constraints: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS:
-          PICS_SKIP_SAMPLE_APP && (TSTAT_HEAT || TSTAT_COOL || TSTAT_OCC ||
-          TSTAT_SCH || TSTAT_SB || TSTAT_AUTO)
+          "!TSTAT.S.F00 && !TSTAT.S.F01 && !TSTAT.S.F02 && !TSTAT.S.F03 &&
+          !TSTAT.S.F04 && !TSTAT.S.F05"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
+          value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
-    #if condition needed #Issue 10988
+    - label: "Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Given TSTAT.S.F01(COOL) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label: "Given TSTAT.S.F04(SB) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label: "Given TSTAT.S.F05(AUTO) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
+
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
 
-    #issue #15011 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label:
+          "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+    - label:
+          "Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F00(HEAT) & TSTAT.S.F02(OCC))
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC))
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F05
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 18, 25]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [32, 33, 34]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
+          AttributeList"
+      PICS: TSTAT.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [52, 53, 54]
+
+    - label:
+          "Read the Feature dependent(TSTAT.S.F04(SB) & TSTAT.S.F02(OCC))
+          attribute in AttributeList"
+      PICS: TSTAT.S.F04 && TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [55, 56, 57]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -78,6 +216,18 @@ tests:
       response:
           constraints:
               type: list
+              contains: [0]
+
+    - label:
+          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          AcceptedCommandList"
+      PICS: TSTAT.S.F03
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
@@ -85,3 +235,17 @@ tests:
       response:
           constraints:
               type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    # - label: "Read the global attribute: EventList"
+    #   disabled: true
+    #   verification: |
+    #       Not implemented in chip-tool
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   PICS: PICS_USER_PROMPT
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Please enter 'y' for success"
+    #           - name: "expectedValue"
+    #             value: "y"

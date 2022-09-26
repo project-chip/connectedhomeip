@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -89,14 +89,45 @@ enum ASN1UniversalTags : uint8_t
     kASN1UniversalTag_UniversalString = 28
 };
 
+/**
+ *  @struct ASN1UniversalTime
+ *
+ *  @brief
+ *    A data structure representing ASN1 universal time in a calendar format.
+ */
 struct ASN1UniversalTime
 {
-    uint16_t Year;
-    uint8_t Month;
-    uint8_t Day;
-    uint8_t Hour;
-    uint8_t Minute;
-    uint8_t Second;
+    uint16_t Year;  /**< Year component. Legal interval is 0..9999. */
+    uint8_t Month;  /**< Month component. Legal interval is 1..12. */
+    uint8_t Day;    /**< Day of month component. Legal interval is 1..31. */
+    uint8_t Hour;   /**< Hour component. Legal interval is 0..23. */
+    uint8_t Minute; /**< Minute component. Legal interval is 0..59. */
+    uint8_t Second; /**< Second component. Legal interval is 0..59. */
+
+    static constexpr size_t kASN1UTCTimeStringLength         = 13;
+    static constexpr size_t kASN1GeneralizedTimeStringLength = 15;
+    static constexpr size_t kASN1TimeStringMaxLength         = 15;
+
+    /**
+     * @brief Set time from ASN1_TIME string.
+     *        Two string formats are supported:
+     *            YYMMDDHHMMSSZ - for years in the range 1950 - 2049
+     *          YYYYMMDDHHMMSSZ - other years
+     **/
+    CHIP_ERROR ImportFrom_ASN1_TIME_string(const CharSpan & asn1_time);
+
+    /**
+     * @brief Encode time as an ASN1_TIME string.
+     *        Two string formats are supported:
+     *            YYMMDDHHMMSSZ - for years in the range 1950 - 2049
+     *          YYYYMMDDHHMMSSZ - other years
+     **/
+    CHIP_ERROR ExportTo_ASN1_TIME_string(MutableCharSpan & asn1_time) const;
+
+    /**
+     * @brief Encode time as Unix epoch time.
+     **/
+    bool ExportTo_UnixTime(uint32_t & unixEpoch);
 };
 
 class DLL_EXPORT ASN1Reader

@@ -17,6 +17,7 @@
 
 #include <platform_stdlib.h>
 
+#include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
@@ -34,6 +35,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/FactoryDataProvider.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -41,7 +43,11 @@
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
+#include <Rpc.h>
+#endif
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <shell/launch_shell.h>
 #endif
 
 using namespace ::chip;
@@ -67,11 +73,35 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        break;
+    }
+    return;
+}
+
 Identify gIdentify0 = {
     chip::EndpointId{ 0 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
 };
 
 Identify gIdentify1 = {
@@ -79,6 +109,7 @@ Identify gIdentify1 = {
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
 };
 
 #ifdef CONFIG_PLATFORM_8721D
@@ -91,6 +122,7 @@ Identify gIdentify1 = {
 
 static DeviceCallbacks EchoCallbacks;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 static void InitServer(intptr_t context)
 {
@@ -101,8 +133,6 @@ static void InitServer(intptr_t context)
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
@@ -110,6 +140,8 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+
+    InitBindingHandler();
 }
 
 extern "C" void ChipTest(void)
@@ -123,6 +155,11 @@ extern "C" void ChipTest(void)
 
     initPref();
 
+    // Initialize device attestation, commissionable data and device instance info
+    // TODO: Use our own DeviceInstanceInfoProvider
+    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -138,6 +175,10 @@ extern "C" void ChipTest(void)
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif
 }
 
 bool lowPowerClusterSleep()

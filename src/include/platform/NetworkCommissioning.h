@@ -135,7 +135,7 @@ public:
     public:
         /**
          * @brief Callback for the network driver pushing the event of network status change to the network commissioning cluster.
-         * The platforms is explected to push the status from operations such as autonomous connection after loss of connectivity or
+         * The platforms is expected to push the status from operations such as autonomous connection after loss of connectivity or
          * during initial establishment.
          *
          * This function must be called in a thread-safe manner with CHIP stack.
@@ -154,7 +154,7 @@ public:
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.
      */
-    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+    virtual void Shutdown() {}
 
     /**
      * @brief Returns maximum number of network configs can be added to the driver.

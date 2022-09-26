@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.1.1. [TC-BINFO-1.1] Global Attributes for Basic Information Cluster
+    12.1.1. [TC-BINFO-1.1] Global Attributes for Basic Information Cluster
     [DUT-Server]
+
+PICS:
+    - BINFO.S
 
 config:
     nodeId: 0x12344321
@@ -23,80 +26,156 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool basic read cluster-revision 1 0
-
-
-          [1651214669.313397][2666:2671] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 158558310
-          [1651214669.313472][2666:2671] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool basic read feature-map 1 0
-
-          [1653459580.065669][29174:29179] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFC DataVersion: 46104872
-          [1653459580.065758][29174:29179] CHIP:TOO:   FeatureMap: 0
-          [1653459580.065936][29174:29179] CHIP:EM: Sending Standalone Ack for MessageCounter:14961519 on exchange 31457i
-      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
     - label: "TH reads AttributeList from DUT"
-      verification: |
-          ./chip-tool basic read attribute-list 1 0
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      19,
+                      65528,
+                      65529,
+                      65531,
+                      65532,
+                      65533,
+                  ]
 
-          [1651214730.462010][2685:2690] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFB DataVersion: 158558310
-          [1651214730.462091][2685:2690] CHIP:TOO:   AttributeList: 24 entries
-          [1651214730.462123][2685:2690] CHIP:TOO:     [1]: 0
-          [1651214730.462158][2685:2690] CHIP:TOO:     [2]: 1
-          [1651214730.462183][2685:2690] CHIP:TOO:     [3]: 2
-          [1651214730.462207][2685:2690] CHIP:TOO:     [4]: 3
-          [1651214730.462241][2685:2690] CHIP:TOO:     [5]: 4
-          [1651214730.462266][2685:2690] CHIP:TOO:     [6]: 5
-          [1651214730.462300][2685:2690] CHIP:TOO:     [7]: 6
-          [1651214730.462325][2685:2690] CHIP:TOO:     [8]: 7
-          [1651214730.462349][2685:2690] CHIP:TOO:     [9]: 8
-          [1651214730.462383][2685:2690] CHIP:TOO:     [10]: 9
-          [1651214730.462407][2685:2690] CHIP:TOO:     [11]: 10
-          [1651214730.462441][2685:2690] CHIP:TOO:     [12]: 11
-          [1651214730.462465][2685:2690] CHIP:TOO:     [13]: 12
-          [1651214730.462499][2685:2690] CHIP:TOO:     [14]: 13
-          [1651214730.462523][2685:2690] CHIP:TOO:     [15]: 14
-          [1651214730.462556][2685:2690] CHIP:TOO:     [16]: 15
-          [1651214730.462580][2685:2690] CHIP:TOO:     [17]: 16
-          [1651214730.462615][2685:2690] CHIP:TOO:     [18]: 17
-          [1651214730.462640][2685:2690] CHIP:TOO:     [19]: 18
-          [1651214730.462676][2685:2690] CHIP:TOO:     [20]: 19
-          [1651214730.462700][2685:2690] CHIP:TOO:     [21]: 65528
-          [1651214730.462736][2685:2690] CHIP:TOO:     [22]: 65529
-          [1651214730.462761][2685:2690] CHIP:TOO:     [23]: 65531
-          [1651214730.462799][2685:2690] CHIP:TOO:     [24]: 65533
-      disabled: true
+    - label: "TH reads optional attribute(ManufacturingDate) in attributeList"
+      PICS: BINFO.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
 
-    - label: "TH reads EventList from DUT"
-      verification: |
-          out of scope for V1.0
-      disabled: true
+    - label: "TH reads optional attribute(PartNumber) in attributeList"
+      PICS: BINFO.S.A000c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
 
-    - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool basic read accepted-command-list 1 0
+    - label: "TH reads optional attribute(ProductURL) in attributeList"
+      PICS: BINFO.S.A000d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [13]
 
+    - label: "TH reads optional attribute(ProductLabel) in attributeList"
+      PICS: BINFO.S.A000e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [14]
 
-          [1651214820.355561][2695:2700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9 DataVersion: 158558310
-          [1651214820.355673][2695:2700] CHIP:TOO:   AcceptedCommandList: 0 entries
-      disabled: true
+    - label: "TH reads optional attribute(SerialNumber) in attributeList"
+      PICS: BINFO.S.A000f
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [15]
 
-    - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool basic read generated-command-list 1 0
+    - label: "TH reads optional attribute(LocalConfigDisabled) in attributeList"
+      PICS: BINFO.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
 
+    - label: "TH reads optional attribute(Reachable) in attributeList"
+      PICS: BINFO.S.A0011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
 
-          [1651214861.208575][2702:2707] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF8 DataVersion: 158558310
-          [1651214861.208682][2702:2707] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
+    - label: "TH reads optional attribute(UniqueID) in attributeList"
+      PICS: BINFO.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label: "TH1 reads AcceptedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "TH1 reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

@@ -62,7 +62,10 @@ declare_args() {
   disable_lcd = false
 
   # Argument to Disable IPv4 for wifi(rs911)
-  chip_disable_wifi_ipv4 = false
+  chip_enable_wifi_ipv4 = false
+
+  # Argument to force enable WPA3 security
+  rs91x_wpa3_only = false
 }
 
 declare_args() {
@@ -79,10 +82,12 @@ assert(!(use_rs911x && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
+  enable_openthread_cli = false
 }
 
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
+if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
+    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -123,7 +128,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
@@ -169,19 +174,23 @@ efr32_executable("light_switch_app") {
   defines = []
 
   sources = [
-    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
-    "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/binding-handler.cpp",
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (use_wstk_leds) {
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
@@ -196,30 +205,20 @@ efr32_executable("light_switch_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-    if (chip_openthread_ftd) {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
+  }
+
+  # Attestation Credentials
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
   }
 
   if (chip_enable_ota_requestor) {
     defines += [ "EFR32_OTA_ENABLED" ]
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
-
-  if (chip_disable_wifi_ipv4) {
-    defines += [ "WIFI_IPV4_DISABLED" ]
   }
 
   # WiFi Settings
@@ -249,11 +248,27 @@ efr32_executable("light_switch_app") {
       sources += wf200_plat_src
       include_dirs += wf200_plat_incs
     }
+
+    if (chip_enable_wifi_ipv4) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
+    }
+
+    if (rs91x_wpa3_only) {
+      # TODO: Change this macro once WF200 support is provided
+      defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
+    }
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-    defines += [ "DISPLAY_ENABLED" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_SWITCH=1",
+    ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
       deps += [ "${chip_root}/examples/common/QRCode" ]
@@ -302,7 +317,7 @@ efr32_executable("light_switch_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

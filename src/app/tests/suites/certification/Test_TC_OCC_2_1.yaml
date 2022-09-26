@@ -14,6 +14,9 @@
 
 name: 30.2.1. [TC-OCC-2.1] Attributes with server as DUT
 
+PICS:
+    - OCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Occupancy Sensing"
@@ -34,7 +37,7 @@ tests:
       attribute: "occupancy"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 1
 
@@ -54,27 +57,29 @@ tests:
       attribute: "occupancy sensor type bitmap"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 1
-              maxValue: 273
+              maxValue: 7
 
     - label: "Reads optional attribute: PIROccupiedToUnoccupiedDelay"
       PICS: OCC.S.A0010
       command: "readAttribute"
       attribute: "PIR occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads optional attribute constrains: PIRUnoccupiedToOccupiedDelay"
       PICS: OCC.S.A0011
       command: "readAttribute"
       attribute: "PIR unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains: PIRUnoccupiedToOccupiedThreshold"
@@ -82,9 +87,8 @@ tests:
       command: "readAttribute"
       attribute: "PIR unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
-              type: uint8
+              type: int8u
               minValue: 1
               maxValue: 254
 
@@ -93,27 +97,28 @@ tests:
       command: "readAttribute"
       attribute: "ultrasonic occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read attribute: UltrasonicUnoccupiedToOccupiedDelay"
       PICS: OCC.S.A0021
       command: "readAttribute"
       attribute: "ultrasonic unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read attribute: UltrasonicUnoccupiedToOccupiedThreshold"
       PICS: OCC.S.A0022
       command: "readAttribute"
       attribute: "ultrasonic unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
-              type: uint16
+              type: int8u
               minValue: 1
               maxValue: 254
 
@@ -124,9 +129,10 @@ tests:
       command: "readAttribute"
       attribute: "physical contact occupied to unoccupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains:
@@ -135,9 +141,10 @@ tests:
       command: "readAttribute"
       attribute: "physical contact unoccupied to occupied delay"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains:
@@ -146,8 +153,7 @@ tests:
       command: "readAttribute"
       attribute: "physical contact unoccupied to occupied threshold"
       response:
-          value: 1
           constraints:
-              type: uint8
+              type: int8u
               minValue: 1
               maxValue: 254

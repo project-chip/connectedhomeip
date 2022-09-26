@@ -1,0 +1,74 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 7.2.1. [TC-TMP-2.1] Attributes with server as DUT
+
+PICS:
+    - TMP.S
+    - TMP.S.Am
+    - TMP.S.Ao
+
+config:
+    nodeId: 0x12344321
+    cluster: "Temperature Measurement"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the mandatory attribute: MinMeasuredValue"
+      PICS: TMP.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27315
+              maxValue: 32767
+
+    - label: "Read the mandatory attribute: MaxMeasuredValue"
+      PICS: TMP.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27314
+              maxValue: 32767
+
+    - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: TMP.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27315
+              maxValue: 32767
+
+    - label: "Read the optional attribute: Tolerance"
+      PICS: TMP.S.A0003
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 2048

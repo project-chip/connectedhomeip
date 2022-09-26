@@ -15,12 +15,4 @@
  *    limitations under the License.
  */
 
-#include <transport/SecureSession.h>
 #include <transport/SessionHandle.h>
-#include <transport/SessionManager.h>
-
-namespace chip {
-
-using namespace Transport;
-
-} // namespace chip

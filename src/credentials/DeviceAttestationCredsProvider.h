@@ -80,16 +80,14 @@ public:
     virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) = 0;
 
     /**
-     * @brief Signs a SHA256 digest using the device attestation private key
+     * @brief Signs a message using the device attestation private key
      *
-     * @param[in] digest_to_sign The SHA256 digest to sign using the attestation private key. Must
-     *                           be exactly chip::Crypto::kSHA256_Hash_Length.
+     * @param[in] message_to_sign The message to sign using the attestation private key.
      * @param[in,out] out_signature_buffer Buffer to receive the signature in raw <r,s> format.
-     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if `digest_to_sign` is wrong size,
-     *          CHIP_ERROR_BUFFER_TOO_SMALL if `out_signature_buffer` is too small,
+     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_signature_buffer` is too small,
      *          or another CHIP_ERROR from the underlying implementation if signature fails.
      */
-    virtual CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) = 0;
+    virtual CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) = 0;
 };
 
 /**

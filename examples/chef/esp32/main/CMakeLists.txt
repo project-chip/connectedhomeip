@@ -108,7 +108,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       SRC_DIRS ${SRC_DIRS_LIST})
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
@@ -154,7 +154,7 @@ pw_proto_library(descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(device_service
@@ -178,7 +178,7 @@ pw_proto_library(wifi_service
   PREFIX
     wifi_service
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
 )

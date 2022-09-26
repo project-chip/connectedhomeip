@@ -131,8 +131,6 @@ extern "C" void main_task(void const * argument)
     }
 
     // cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 
     shellTaskHandle = xTaskCreate(shell_task, "shell_task", shell_task_size / sizeof(StackType_t), NULL, shell_task_priority, NULL);
     if (!shellTaskHandle)

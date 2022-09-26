@@ -36,6 +36,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 
 #include <transport/TransportMgr.h>
@@ -68,8 +69,8 @@ namespace Controller {
 
 struct DeviceControllerSystemStateParams
 {
-    using OperationalDevicePool = OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
-    using CASEClientPool        = chip::CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS>;
+    using SessionSetupPool = OperationalSessionSetupPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
+    using CASEClientPool   = chip::CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS>;
 
     // Params that can outlive the DeviceControllerSystemState
     System::Layer * systemLayer                                   = nullptr;
@@ -84,7 +85,7 @@ struct DeviceControllerSystemStateParams
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr = nullptr;
-    Platform::UniquePtr<SessionResumptionStorage> sessionResumptionStorage;
+    Platform::UniquePtr<SimpleSessionResumptionStorage> sessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
@@ -92,7 +93,7 @@ struct DeviceControllerSystemStateParams
     secure_channel::MessageCounterManager * messageCounterManager                 = nullptr;
     CASEServer * caseServer                                                       = nullptr;
     CASESessionManager * caseSessionManager                                       = nullptr;
-    OperationalDevicePool * operationalDevicePool                                 = nullptr;
+    SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
 };
@@ -106,8 +107,8 @@ struct DeviceControllerSystemStateParams
 // owned by DeviceControllerFactory.
 class DeviceControllerSystemState
 {
-    using OperationalDevicePool = DeviceControllerSystemStateParams::OperationalDevicePool;
-    using CASEClientPool        = DeviceControllerSystemStateParams::CASEClientPool;
+    using SessionSetupPool = DeviceControllerSystemStateParams::SessionSetupPool;
+    using CASEClientPool   = DeviceControllerSystemStateParams::CASEClientPool;
 
 public:
     ~DeviceControllerSystemState()
@@ -123,7 +124,7 @@ public:
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mUnsolicitedStatusHandler(params.unsolicitedStatusHandler), mExchangeMgr(params.exchangeMgr),
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
-        mCASESessionManager(params.caseSessionManager), mOperationalDevicePool(params.operationalDevicePool),
+        mCASESessionManager(params.caseSessionManager), mSessionSetupPool(params.sessionSetupPool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
         mFabricTableDelegate(params.fabricTableDelegate), mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
     {
@@ -163,8 +164,8 @@ public:
     {
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
-            mFabrics != nullptr && mCASESessionManager != nullptr && mOperationalDevicePool != nullptr &&
-            mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
+            mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
+            mGroupDataProvider != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -199,11 +200,11 @@ private:
     FabricTable * mFabrics                                                         = nullptr;
     CASEServer * mCASEServer                                                       = nullptr;
     CASESessionManager * mCASESessionManager                                       = nullptr;
-    OperationalDevicePool * mOperationalDevicePool                                 = nullptr;
+    SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
-    Platform::UniquePtr<SessionResumptionStorage> mSessionResumptionStorage;
+    Platform::UniquePtr<SimpleSessionResumptionStorage> mSessionResumptionStorage;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be

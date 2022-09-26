@@ -22,7 +22,9 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
@@ -36,7 +38,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "AllInterfaceListener.h"
 #include "PacketReporter.h"
 
 using namespace chip;
@@ -198,6 +199,10 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    // This forces the global MDNS instance to be loaded in, effectively setting
+    // built in policies for addresses.
+    (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
+
     printf("Running on port %d using %s...\n", gOptions.listenPort, gOptions.enableIpV4 ? "IPv4 AND IPv6" : "IPv6 ONLY");
 
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
@@ -265,9 +270,9 @@ int main(int argc, char ** args)
     gMdnsServer.SetDelegate(&delegate);
 
     {
-        MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
+        auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
 
-        if (gMdnsServer.Listen(DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
+        if (gMdnsServer.Listen(DeviceLayer::UDPEndPointManager(), endpoints.get(), gOptions.listenPort) != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces\n");
             return 1;

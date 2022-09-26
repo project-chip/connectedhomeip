@@ -32,7 +32,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Callback;

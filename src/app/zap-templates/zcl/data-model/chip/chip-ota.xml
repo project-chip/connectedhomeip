@@ -108,11 +108,10 @@ limitations under the License.
         <item name="TimeOut" value="0x3"/>
         <item name="DelayByProvider" value="0x4"/>
     </enum>
-    <struct name="ProviderLocation">
+    <struct name="ProviderLocation" isFabricScoped="true">
         <cluster code="0x002a"/>
         <item fieldId="1" name="ProviderNodeID" type="node_id"/>
         <item fieldId="2" name="Endpoint" type="endpoint_no"/>
-        <item fieldId="0xFE" name="FabricIndex" type="fabric_idx"/>
     </struct>
     <cluster>
         <name>OTA Software Update Requestor</name>

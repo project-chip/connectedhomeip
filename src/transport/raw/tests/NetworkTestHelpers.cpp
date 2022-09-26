@@ -44,15 +44,11 @@ CHIP_ERROR IOContext::Init()
 }
 
 // Shutdown all layers, finalize operations
-CHIP_ERROR IOContext::Shutdown()
+void IOContext::Shutdown()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ShutdownNetwork();
     ShutdownSystemLayer();
     Platform::MemoryShutdown();
-
-    return err;
 }
 
 void IOContext::DriveIO()

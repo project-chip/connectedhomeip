@@ -32,12 +32,11 @@ extern "C" {
 
 //#define APP_LIGHT_BUTTON (34)
 #define APP_FUNCTION_BUTTON (35)
-
+#define APP_LOCK_BUTTON (8)
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-
+#define APP_BUTTON_LONGPRESSED 1
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000

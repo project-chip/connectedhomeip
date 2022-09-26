@@ -202,7 +202,7 @@ struct EmberAfAttributeMetadata
      * Check whether this attribute is automatically stored in non-volatile
      * memory.
      */
-    bool IsNonVolatile() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
+    bool IsAutomaticallyPersisted() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
 };
 
 /** @brief Returns true if the given attribute type is a string. */

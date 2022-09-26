@@ -106,7 +106,7 @@ for arg; do
         enable_p6_builds=true)
             p6_builds_enabled=1
             ;;
-        p6_board=*)
+        psoc6_board=*)
             p6_board_selected=1
             ;;
     esac
@@ -141,27 +141,27 @@ fi
 
 echo
 
-# P6 Build setup
+# PSoC6 Build setup
 if [[ -z "$p6_builds_enabled" ]]; then
     echo "Hint: Pass enable_p6_builds=true to this script to enable building for PSoC6-43012"
 else
-    p6_sdk_args=""
+    psoc6_sdk_args=""
     if [[ -z "$p6_board_selected" ]]; then
-        p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
+        psoc6_sdk_args="psoc6_board=\"CY8CKIT-062S2-43012\""
     fi
 fi
 
 # K32W SDK setup
 k32w_sdk_args=""
 
-if [[ -d "$NXP_K32W061_SDK_ROOT" ]]; then
-    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W061_SDK_ROOT\""
+if [[ -d "$NXP_K32W0_SDK_ROOT" ]]; then
+    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W0_SDK_ROOT\""
     extra_args+=" $k32w0_sdk_args enable_k32w_builds=true"
 fi
 
 echo
-if [[ ! -d "$NXP_K32W061_SDK_ROOT" ]]; then
-    echo "Hint: Set \$NXP_K32W061_SDK_ROOT to enable building for K32W061"
+if [[ ! -d "$NXP_K32W0_SDK_ROOT" ]]; then
+    echo "Hint: Set \$NXP_K32W0_SDK_ROOT to enable building for K32W061"
 else
     echo 'To build the K32W lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"

@@ -4,13 +4,13 @@ FROM connectedhomeip/chip-build:${VERSION} as build
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    git=1:2.25.1-1ubuntu3.4 \
+    git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
-    && git clone --recursive -b v4.4.1 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
+    && git clone --recursive -b v4.4.2 --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git /tmp/esp-idf \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}

@@ -124,6 +124,14 @@ class ClusterObjectTests:
 
     @classmethod
     @base.test_case
+    async def TestReadWriteOnlyAttribute(cls, devCtrl):
+        logger.info("Test wildcard read of attributes containing write-only attribute")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.TestCluster)])
+        if Clusters.TestCluster.Attributes.WriteOnlyInt8u in res[1][Clusters.TestCluster]:
+            raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
+
+    @classmethod
+    @base.test_case
     async def TestWriteRequest(cls, devCtrl):
         logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
@@ -137,7 +145,7 @@ class ClusterObjectTests:
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
                             AttributeId=5), Status=chip.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=6), Status=chip.interaction_model.Status.InvalidValue)
+                            AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -313,8 +321,6 @@ class ClusterObjectTests:
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=1))
 
     @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
@@ -330,6 +336,24 @@ class ClusterObjectTests:
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
         await cls._TriggerEvent(devCtrl)
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
+
+    @classmethod
+    @base.test_case
+    async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl):
+        logger.info("Running TestGenerateUndefinedFabricScopedEventRequests")
+        try:
+            res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+            raise ValueError(f"Unexpected Failure")
+        except chip.interaction_model.InteractionModelError as ex:
+            logger.info(f"Recevied {ex} from server.")
+        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=[
+            (1, Clusters.TestCluster.Events.TestFabricScopedEvent, 0),
+        ])
+        logger.info(f"return result is {res}")
+        if len(res) != 0:
+            raise AssertionError("failure: not expect to receive fabric-scoped event when fabric is undefined")
+        else:
+            logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
 
     @classmethod
     @base.test_case
@@ -544,6 +568,7 @@ class ClusterObjectTests:
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
+            await cls.TestReadWriteOnlyAttribute(devCtrl)
             await cls.TestCommandRoundTrip(devCtrl)
             await cls.TestCommandRoundTripWithBadEndpoint(devCtrl)
             await cls.TestCommandWithResponse(devCtrl)
@@ -557,6 +582,7 @@ class ClusterObjectTests:
             await cls.TestWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
             await cls.TestTimedRequestTimeout(devCtrl)
+            await cls.TestGenerateUndefinedFabricScopedEventRequests(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

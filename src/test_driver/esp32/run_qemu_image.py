@@ -17,6 +17,7 @@ import coloredlogs
 import click
 import logging
 import os
+import re
 import sys
 import subprocess
 
@@ -104,18 +105,40 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                                 (path, status.returncode))
 
             # Parse output of the unit test. Generally expect things like:
+            # I (3034) CHIP-tests: Starting CHIP tests!
+            # ...
+            # Various test lines, none ending with "] : FAILED"
+            # ...
             # Failed Tests:   0 / 5
             # Failed Asserts: 0 / 77
             # I (3034) CHIP-tests: CHIP test status: 0
+            in_test = False
             for line in output.split('\n'):
+                if line.endswith('CHIP-tests: Starting CHIP tests!'):
+                    in_test = True
+
                 if line.startswith('Failed Tests:') and not line.startswith('Failed Tests:   0 /'):
                     raise Exception("Tests seem failed: %s" % line)
 
                 if line.startswith('Failed Asserts:') and not line.startswith('Failed Asserts: 0 /'):
                     raise Exception("Asserts seem failed: %s" % line)
 
-                if 'CHIP test status: ' in line and 'CHIP test status: 0' not in line:
+                if 'CHIP-tests: CHIP test status: 0' in line:
+                    in_test = False
+                elif 'CHIP-tests: CHIP test status: ' in line:
                     raise Exception("CHIP test status is NOT 0: %s" % line)
+
+                # Ignore FAILED messages not in the middle of a test, to reduce
+                # the chance of false posisitves from other logging.
+                if in_test and re.match('.*] : FAILED$', line):
+                    raise Exception("Step failed: %s" % line)
+
+                # TODO: Figure out why exit(0) in man_app.cpp's tester_task is aborting and fix that.
+                if in_test and line.startswith('abort() was called at PC'):
+                    raise Exception("Unexpected crash: %s" % line)
+
+            if in_test:
+                raise Exception('Not expected to be in the middle of a test when the log ends')
 
             if verbose:
                 print("========== TEST OUTPUT BEGIN ============")
@@ -125,7 +148,9 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
             logging.info("Image %s PASSED", path)
         except:
             # make sure output is visible in stdout
+            print("========== TEST OUTPUT BEGIN ============")
             print(output)
+            print("========== TEST OUTPUT END   ============")
             raise
 
 

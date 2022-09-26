@@ -34,7 +34,13 @@ protected:
 
     bool CheckConstraintType(const char * itemName, const char * current, const char * expected)
     {
-        ChipLogError(chipTool, "Warning: %s type checking is not implemented yet. Expected type: '%s'", itemName, expected);
+        if (strcmp(current, expected) != 0)
+        {
+            Exit(std::string(itemName) + " type (" + std::string(current) + ") is different than the expected type (" +
+                 std::string(expected) + ").");
+            return false;
+        }
+
         return true;
     }
 
@@ -59,11 +65,49 @@ protected:
     {
         if (current > expected)
         {
-            Exit(std::string(itemName) + " length > minLength: " + std::to_string(current) + " > " + std::to_string(expected));
+            Exit(std::string(itemName) + " length > maxLength: " + std::to_string(current) + " > " + std::to_string(expected));
             return false;
         }
 
         return true;
+    }
+
+    template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, uint64_t expected)
+    {
+        size_t size;
+        CHIP_ERROR err = current.ComputeSize(&size);
+        if (err != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " length cannot be extracted: " + err.AsString());
+            return false;
+        }
+        return CheckConstraintMinLength(itemName, size, expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::app::DataModel::DecodableList<T> & current, uint64_t expected)
+    {
+        size_t size;
+        CHIP_ERROR err = current.ComputeSize(&size);
+        if (err != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " length cannot be extracted: " + err.AsString());
+            return false;
+        }
+        return CheckConstraintMaxLength(itemName, size, expected);
     }
 
     bool CheckConstraintStartsWith(const char * itemName, const chip::CharSpan current, const char * expected)
@@ -509,5 +553,53 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksSet(const char * itemName, const T & current, const U & expected)
+    {
+        if (current & expected)
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to be set but it is not.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksSet(const char * itemName, const chip::BitMask<T> & current, const U & expected)
+    {
+        if (current.Has(static_cast<T>(expected)))
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to be set but it is not.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksClear(const char * itemName, const T & current, const U & expected)
+    {
+        if ((current & expected) == 0)
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to not be set but it is.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksClear(const char * itemName, const chip::BitMask<T> & current, const U & expected)
+    {
+        if (!current.Has(static_cast<T>(expected)))
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to not be set but it is.");
+        return false;
     }
 };

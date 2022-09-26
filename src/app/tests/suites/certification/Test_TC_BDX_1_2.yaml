@@ -15,12 +15,21 @@
 
 name: 28.1.2. [TC-BDX-1.2] Receiver Initiated BDX Transfer session
 
+PICS:
+    - MCORE.BDX.Receiver
+    - MCORE.BDX.Initiator
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-2.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+      disabled: true
+
     - label: "DUT sends a ReceiveInit message to TH"
       verification: |
           1. Verify that the OTA Reference Provider App logs show ReceiveInit message from DUT

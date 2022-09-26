@@ -42,6 +42,10 @@ public:
     PersistentStorageOperationalKeystore() = default;
     virtual ~PersistentStorageOperationalKeystore() { Finish(); }
 
+    // Non-copyable
+    PersistentStorageOperationalKeystore(PersistentStorageOperationalKeystore const &) = delete;
+    void operator=(PersistentStorageOperationalKeystore const &) = delete;
+
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
      *
@@ -81,6 +85,8 @@ public:
     void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
 protected:
     void ResetPendingKey()

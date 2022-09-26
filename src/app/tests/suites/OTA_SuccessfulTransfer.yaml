@@ -17,34 +17,34 @@ name: Test OTA Software Update Successful Transfer
 config:
     endpoint: 0
     requestorNodeId:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x12344321
     providerNodeId:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xC0FFEE
     providerPayload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
     providerDiscriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 50
     providerPort:
-        type: INT16U
+        type: int16u
         defaultValue: 5560
     providerKvs:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "/tmp/chip_kvs_provider"
     otaImageFilePath:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "/tmp/otaImage"
     rawImageFilePath:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "/tmp/rawImage"
     rawImageContent:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "Have a hootenanny!"
     downloadImageFilePath:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "/tmp/downloadedImage"
 
 tests:

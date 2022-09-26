@@ -62,24 +62,45 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
+In Matter, the following types of light switch devices are available:
+
+-   Group 1: On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control
+    Bridge
+-   Group 2: Generic Switch
+
+The first type (here referred to as Group 1) uses client application clusters
+(for example, Level Control) and bindings to send commands to the server
+clusters. This type of switch is on the endpoint 1 of this example.
+
+With the second type (Group 2), controllers can use event subscriptions to be
+informed about changes on the switch server cluster. This type of switch is on
+the endpoint 2 of this example.
+
+### Group 1 light switch devices overview
+
 A light switch device is a simple embedded controller, which has the ability to
 control lighting devices, such as light bulbs or LEDs. After commissioning into
 a Matter network, the light switch device does not know what it can control. In
 other words, it has no information about another device being connected to the
 same network. You must provide this information to the light switch through the
 process called binding, which links clusters and endpoints on both devices, so
-that the devices can interact with each other.
+that the devices can interact with each other. This functionality is on the
+endpoint 1 and triggered by **Button 2**.
+
+### Generic Switch
+
+The Generic Switch on the endpoint 2 offers the switch server cluster. It
+implements the Momentary Switch (`MS`) and Momentary Switch Release (`MSR`)
+features. For this reason, it sends event notifications `InitialPress` and
+`ShortRelease` if **Button 3** of the DK is pressed and released.
+
+### Common example settings
 
 The Matter device that runs the light switch application is controlled by the
 Matter controller device over the Thread protocol. By default, the Matter device
 has Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
-
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
 
 The example can be configured to use the secure bootloader and utilize it for
 performing over-the-air Device Firmware Upgrade using Bluetooth LE.
@@ -272,6 +293,11 @@ platform image.
     example) (dimmer functionality). The brightness is changing from 0% to 100%
     with 1% increments every 300 milliseconds as long as **Button 2** is
     pressed.
+
+**Button 3** can be used for the following purposes:
+
+-   _Pressed once_ &mdash; Changes the value of the attribute `CurrentPosition`
+    and (if subscribed) sends the event notifications to the controller.
 
 **Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
 advertising for the predefined period of time (15 minutes by default).
@@ -669,35 +695,20 @@ To perform the unicast binding process, complete the following steps:
 1.  Build the CHIP Tool according to the steps from the
     [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
 2.  Go to the CHIP Tool build directory.
-3.  Add an ACL to the [lighting endpoint](../../lighting-app/nrfconnect/)
-    permissions by running the following command:
 
-         chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
-
-    In this command:
-
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
-        is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
-        is an ACL for binding (cluster `no. 6` is the On/Off cluster and the
-        cluster `no. 8` is the Level Control cluster).
-
-    This allows the lighting application device to receive commands from the
-    light switch device.
-
-4.  Add the light switch device to the multicast group by running the following
+3.  Add the light switch device to the multicast group by running the following
     command:
 
         chip-tool tests TestGroupDemoConfig --nodeId 1
 
-5.  Add all light bulbs to the same multicast group by applying command below
+4.  Add all light bulbs to the same multicast group by applying command below
     for each of the light bulbs, using the appropriate `<node_id>` (the
     user-defined ID of the node being commissioned except `2` due to use this
     `<node_id>` for light-switch) for each of them:
 
         chip-tool tests TestGroupDemoConfig --nodeId <node_id>
 
-6.  Add Binding commands for group multicast:
+5.  Add Binding commands for group multicast:
 
         chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 2 1
 
@@ -707,6 +718,24 @@ To test the communication between the light switch device and the bound devices,
 use [light switch buttons](#buttons) or
 [Matter CLI commands](#matter-cli-commands), as described in the
 [Device UI](#device-ui) section.
+
+### Testing the Generic Switch
+
+To test the Generic Switch, complete the following steps:
+
+1.  Enter the interactive mode of the CHIP Tool:
+
+        chip-tool interactive start
+
+2.  Subscribe to the `InitialPress` and `ShortRelease` event notifications:
+
+```shell
+switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
+switch subscribe-event short-release 1 20 <node_id> 2 --is-urgent true --keepSubscriptions true
+```
+
+3.  Press **Button 3** to test the new configuration. When pressing and
+    releasing **Button 3**, both events should be sent to the controller.
 
 ### Testing Device Firmware Upgrade
 

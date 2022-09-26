@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <inttypes.h>
+#include <stddef.h>
+
 /**
  * CHIP_DEVICE_INTERACTION_MODEL_REVISION
  *

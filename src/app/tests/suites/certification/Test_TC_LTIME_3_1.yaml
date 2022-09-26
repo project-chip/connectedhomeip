@@ -1,0 +1,248 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.3.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster
+    Attributes [DUT as Server]
+
+PICS:
+    - LTIME.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH reads HourFormat attribute from DUT"
+      PICS: LTIME.S.A0000
+      verification: |
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool), verify that  HourFormat attribute value is of Enum8 datatype
+
+          [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
+          [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0
+      disabled: true
+
+    - label: "If (LTIME.S.A0000.12HR) TH writes 0 to HourFormat attribute"
+      PICS: LTIME.S.A0000.12HR
+      verification: |
+          ./chip-tool timeformatlocalization write hour-format 0 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
+          [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
+          [1651192743588] [14026:192208] CHIP: [DMG] {
+          [1651192743588] [14026:192208] CHIP: [DMG]         AttributeStatusIBs =
+          [1651192743588] [14026:192208] CHIP: [DMG]         [
+          [1651192743588] [14026:192208] CHIP: [DMG]                 AttributeStatusIB =
+          [1651192743588] [14026:192208] CHIP: [DMG]                 {
+          [1651192743588] [14026:192208] CHIP: [DMG]                         AttributePathIB =
+          [1651192743588] [14026:192208] CHIP: [DMG]                         {
+          [1651192743588] [14026:192208] CHIP: [DMG]                                 Endpoint = 0x0,
+          [1651192743588] [14026:192208] CHIP: [DMG]                                 Cluster = 0x2c,
+          [1651192743588] [14026:192208] CHIP: [DMG]                                 Attribute = 0x0000_0000,
+          [1651192743588] [14026:192208] CHIP: [DMG]                         }
+          [1651192743588] [14026:192208] CHIP: [DMG]
+          [1651192743588] [14026:192208] CHIP: [DMG]                         StatusIB =
+          [1651192743588] [14026:192208] CHIP: [DMG]                         {
+          [1651192743588] [14026:192208] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+          [1651192743588] [14026:192208] CHIP: [DMG]                         },
+          [1651192743588] [14026:192208] CHIP: [DMG]
+          [1651192743588] [14026:192208] CHIP: [DMG]                 },
+          [1651192743588] [14026:192208] CHIP: [DMG]
+          [1651192743588] [14026:192208] CHIP: [DMG]         ],
+          [1651192743588] [14026:192208] CHIP: [DMG]
+          [1651192743588] [14026:192208] CHIP: [DMG]         InteractionModelRevision = 1
+          [1651192743588] [14026:192208] CHIP: [DMG] }
+      disabled: true
+
+    - label: "TH reads HourFormat attribute"
+      PICS: LTIME.S.A0000
+      verification: |
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  0
+          [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
+          [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 0
+      disabled: true
+
+    - label: "If (LTIME.S.A0000.24HR) TH writes 1 to HourFormat attribute"
+      PICS: LTIME.S.A0000.24HR
+      verification: |
+          ./chip-tool timeformatlocalization write hour-format 1 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
+          [1651193043035] [14140:195730] CHIP: [DMG] WriteResponseMessage =
+          [1651193043035] [14140:195730] CHIP: [DMG] {
+          [1651193043035] [14140:195730] CHIP: [DMG]         AttributeStatusIBs =
+          [1651193043035] [14140:195730] CHIP: [DMG]         [
+          [1651193043035] [14140:195730] CHIP: [DMG]                 AttributeStatusIB =
+          [1651193043035] [14140:195730] CHIP: [DMG]                 {
+          [1651193043035] [14140:195730] CHIP: [DMG]                         AttributePathIB =
+          [1651193043035] [14140:195730] CHIP: [DMG]                         {
+          [1651193043035] [14140:195730] CHIP: [DMG]                                 Endpoint = 0x0,
+          [1651193043035] [14140:195730] CHIP: [DMG]                                 Cluster = 0x2c,
+          [1651193043035] [14140:195730] CHIP: [DMG]                                 Attribute = 0x0000_0000,
+          [1651193043035] [14140:195730] CHIP: [DMG]                         }
+          [1651193043035] [14140:195730] CHIP: [DMG]
+          [1651193043035] [14140:195730] CHIP: [DMG]                         StatusIB =
+          [1651193043035] [14140:195730] CHIP: [DMG]                         {
+          [1651193043035] [14140:195730] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+          [1651193043035] [14140:195730] CHIP: [DMG]                         },
+          [1651193043035] [14140:195730] CHIP: [DMG]
+          [1651193043035] [14140:195730] CHIP: [DMG]                 },
+          [1651193043035] [14140:195730] CHIP: [DMG]
+          [1651193043035] [14140:195730] CHIP: [DMG]         ],
+          [1651193043035] [14140:195730] CHIP: [DMG]
+          [1651193043036] [14140:195730] CHIP: [DMG]         InteractionModelRevision = 1
+          [1651193043036] [14140:195730] CHIP: [DMG] }
+          [1651193043036] [14140:195730] CHIP: [DMG] WriteClient moving to [AwaitingDe]
+      disabled: true
+
+    - label: "TH reads HourFormat attribute"
+      PICS: LTIME.S.A0000
+      verification: |
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          On TH(chip-tool) verify that  HourFormat attribute value changed as  1
+          [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
+          [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
+      disabled: true
+
+    - label: "TH reads ActiveCalendarType attribute from DUT"
+      PICS: LTIME.S.A0001
+      verification: |
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          On TH(chip-tool), verify that  ActiveCalendarType attribute value is in between 0 to 11
+          [1651193250602] [14215:198406] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 3316530443
+          [1651193250602] [14215:198406] CHIP: [TOO]   ActiveCalendarType: 0
+      disabled: true
+
+    - label: "TH reads SupportedCalendarTypes attribute from DUT"
+      PICS: LTIME.S.A0002
+      verification: |
+          ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+          On TH(chip-tool), verify that  SupportedCalendarTypes attribute value is in between 0 to 11
+          [1651194334793] [14653:210647] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 3316530443
+          [1651194334794] [14653:210647] CHIP: [TOO]   SupportedCalendarTypes: 12 entries
+          [1651194334794] [14653:210647] CHIP: [TOO]     [1]: 0
+          [1651194334794] [14653:210647] CHIP: [TOO]     [2]: 1
+          [1651194334794] [14653:210647] CHIP: [TOO]     [3]: 2
+          [1651194334794] [14653:210647] CHIP: [TOO]     [4]: 3
+          [1651194334794] [14653:210647] CHIP: [TOO]     [5]: 4
+          [1651194334794] [14653:210647] CHIP: [TOO]     [6]: 5
+          [1651194334794] [14653:210647] CHIP: [TOO]     [7]: 6
+          [1651194334794] [14653:210647] CHIP: [TOO]     [8]: 7
+          [1651194334794] [14653:210647] CHIP: [TOO]     [9]: 8
+          [1651194334794] [14653:210647] CHIP: [TOO]     [10]: 9
+          [1651194334794] [14653:210647] CHIP: [TOO]     [11]: 10
+          [1651194334794] [14653:210647] CHIP: [TOO]     [12]: 11
+      disabled: true
+
+    - label:
+          "TH writes value in PIXIT.LTIME.SCT to ActiveCalendarType attribute,
+          followed by reading the ActiveCalendarType attribute value"
+      PICS: LTIME.S.A0001
+      verification: |
+          ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+
+          On TH(chip-tool) verify that DUT sends a success response
+          [1651194449245] [14699:212201] CHIP: [DMG] WriteResponseMessage =
+          [1651194449245] [14699:212201] CHIP: [DMG] {
+          [1651194449245] [14699:212201] CHIP: [DMG]         AttributeStatusIBs =
+          [1651194449245] [14699:212201] CHIP: [DMG]         [
+          [1651194449245] [14699:212201] CHIP: [DMG]                 AttributeStatusIB =
+          [1651194449246] [14699:212201] CHIP: [DMG]                 {
+          [1651194449246] [14699:212201] CHIP: [DMG]                         AttributePathIB =
+          [1651194449246] [14699:212201] CHIP: [DMG]                         {
+          [1651194449246] [14699:212201] CHIP: [DMG]                                 Endpoint = 0x0,
+          [1651194449246] [14699:212201] CHIP: [DMG]                                 Cluster = 0x2c,
+          [1651194449246] [14699:212201] CHIP: [DMG]                                 Attribute = 0x0000_0001,
+          [1651194449246] [14699:212201] CHIP: [DMG]                         }
+          [1651194449246] [14699:212201] CHIP: [DMG]
+          [1651194449246] [14699:212201] CHIP: [DMG]                         StatusIB =
+          [1651194449246] [14699:212201] CHIP: [DMG]                         {
+          [1651194449246] [14699:212201] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+          [1651194449246] [14699:212201] CHIP: [DMG]                         },
+          [1651194449246] [14699:212201] CHIP: [DMG]
+          [1651194449246] [14699:212201] CHIP: [DMG]                 },
+          [1651194449246] [14699:212201] CHIP: [DMG]
+          [1651194449246] [14699:212201] CHIP: [DMG]         ],
+          [1651194449246] [14699:212201] CHIP: [DMG]
+          [1651194449246] [14699:212201] CHIP: [DMG]         InteractionModelRevision = 1
+          [1651194449246] [14699:212201] CHIP: [DMG] }
+
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          On TH verify that ActiveCalendarType attribute value changed as  0
+
+          [1658149303.936031][9227:9232] CHIP:DMG: }
+          [1658149303.936185][9227:9232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2364893025
+          [1658149303.936302][9227:9232] CHIP:TOO:   ActiveCalendarType: 0
+          [1658149303.936385][9227:9232] CHIP:EM: Sending Standalone Ack for MessageCounter:70392442 on exchange 10288i
+      disabled: true
+
+    - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"
+      PICS: LTIME.S.A0001
+      verification: |
+          Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
+      disabled: true
+
+    - label: "TH writes 50 to ActiveCalendarType attribute"
+      PICS: LTIME.S.A0001
+      verification: |
+          ./chip-tool timeformatlocalization write  active-calendar-type 50 1 0
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
+          [1658742658.653019][3572:3577] CHIP:DMG:         ],
+          [1658742658.653047][3572:3577] CHIP:DMG:
+          [1658742658.653071][3572:3577] CHIP:DMG:         InteractionModelRevision = 1
+          [1658742658.653098][3572:3577] CHIP:DMG: }
+          [1658742658.653166][3572:3577] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658742658.653198][3572:3577] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1658742658.653254][3572:3577] CHIP:EM: Sending Standalone Ack for MessageCounter:51762667 on exchange 55831i
+      disabled: true
+
+    - label: "TH writes 5 to HourFormat attribute"
+      PICS: LTIME.S.A0000
+      verification: |
+          ./chip-tool timeformatlocalization write   hour-format  5 1 0
+          On TH(chip-tool) verify that DUT sends a CONSTRAINT_ERROR response
+
+          [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
+          [1656934321.911025][6387:6392] CHIP:DMG: {
+          [1656934321.911054][6387:6392] CHIP:DMG:         AttributeStatusIBs =
+          [1656934321.911096][6387:6392] CHIP:DMG:         [
+          [1656934321.911129][6387:6392] CHIP:DMG:                 AttributeStatusIB =
+          [1656934321.911165][6387:6392] CHIP:DMG:                 {
+          [1656934321.911200][6387:6392] CHIP:DMG:                         AttributePathIB =
+          [1656934321.911242][6387:6392] CHIP:DMG:                         {
+          [1656934321.911285][6387:6392] CHIP:DMG:                                 Endpoint = 0x0,
+          [1656934321.911330][6387:6392] CHIP:DMG:                                 Cluster = 0x2c,
+          [1656934321.911375][6387:6392] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1656934321.911417][6387:6392] CHIP:DMG:                         }
+          [1656934321.911463][6387:6392] CHIP:DMG:
+          [1656934321.911503][6387:6392] CHIP:DMG:                         StatusIB =
+          [1656934321.911574][6387:6392] CHIP:DMG:                         {
+          [1656934321.911618][6387:6392] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
+          [1656934321.911658][6387:6392] CHIP:DMG:                         },
+          [1656934321.911699][6387:6392] CHIP:DMG:
+          [1656934321.911733][6387:6392] CHIP:DMG:                 },
+          [1656934321.911772][6387:6392] CHIP:DMG:
+          [1656934321.911804][6387:6392] CHIP:DMG:         ],
+          [1656934321.911842][6387:6392] CHIP:DMG:
+          [1656934321.911875][6387:6392] CHIP:DMG:         InteractionModelRevision = 1
+          [1656934321.911906][6387:6392] CHIP:DMG: }
+          [1656934321.911992][6387:6392] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1656934321.912033][6387:6392] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1656934321.912104][6387:6392] CHIP:EM: Sending Standalone Ack for MessageCounter:9709501 on exchange 15031i
+      disabled: true

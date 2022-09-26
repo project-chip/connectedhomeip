@@ -18,6 +18,7 @@
 
 #include "KeypadInputManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -85,4 +86,16 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access KeypadInputManager 'sendKey' method");
         env->ExceptionClear();
     }
+}
+
+uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

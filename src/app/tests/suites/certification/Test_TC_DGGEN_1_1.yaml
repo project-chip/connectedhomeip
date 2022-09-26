@@ -15,6 +15,9 @@
 
 name: 85.1.1. [TC-DGGEN-1.1] Global attributes with server as DUT
 
+PICS:
+    - DGGEN.S
+
 config:
     nodeId: 0x12344321
     cluster: "General Diagnostics"
@@ -35,7 +38,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint16
+              type: int16u
 
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -43,41 +46,77 @@ tests:
       response:
           value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 8, 65528, 65529, 65531, 65533]
           constraints:
               type: list
+              contains: [0, 1, 8, 65528, 65529, 65531, 65532, 65533]
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      disabled: true
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read optional attribute(UpTime) in AttributeList"
+      PICS: DGGEN.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Read optional attribute(TotalOperationalHours) in AttributeList"
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read optional attribute(BootReason) in AttributeList"
+      PICS: DGGEN.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Read optional attribute(ActiveHardwareFaults) in AttributeList"
+      PICS: DGGEN.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Read optional attribute(ActiveRadioFaults) in AttributeList"
+      PICS: DGGEN.S.A0006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "Read optional attribute(ActiveNetworkFaults) in AttributeList"
+      PICS: DGGEN.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0]
           constraints:
               type: list
+              contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
@@ -86,3 +125,18 @@ tests:
           value: []
           constraints:
               type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

@@ -141,8 +141,6 @@ CHIP_ERROR main()
 
     cmd_misc_init();
     cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 #endif
 
 #if CHIP_SHELL_ENABLE_CMD_SERVER

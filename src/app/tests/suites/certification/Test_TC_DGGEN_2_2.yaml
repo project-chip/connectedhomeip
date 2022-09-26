@@ -1,0 +1,148 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.2. [TC-DGGEN-2.2] Event functionality test with server as DUT
+
+PICS:
+    - DGGEN.S
+    - DGGEN.S.E
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          "https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+           Events to be executed as following
+           1. Compile app using below command in connectedhomeip folder
+           a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+           2. Build respective app (all-clusters-app)
+           3. Commission DUT to TH
+           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+           ps  -aef|grep all-clusters-app
+           5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Induce a DUT hardware failure two times as addressed in HardwareFault
+          ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off causing power
+          source failure, and rejoin DUT back to previous TH fabric. Next,
+          repeat power plug off and rejoining DUT back to previous TH fabric one
+          more time.)"
+      PICS: DGGEN.S.E00
+      verification: |
+          Optional attribute so its not compulsory to get the expected outcome
+
+          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
+
+          On TH(chip-tool) verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
+          detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
+          “HardwareFault enum”
+
+          [1659530031.316459][4951:4956] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
+          [1659530031.316486][4951:4956] CHIP:TOO:   Event number: 6
+          [1659530031.316505][4951:4956] CHIP:TOO:   Priority: Critical
+          [1659530031.316524][4951:4956] CHIP:TOO:   Timestamp: 32093879
+          [1659530031.316629][4951:4956] CHIP:TOO:   HardwareFaultChange: {
+          [1659530031.316697][4951:4956] CHIP:TOO:     Current: 0 entries
+          [1659530031.316752][4951:4956] CHIP:TOO:     Previous: 0 entries
+          [1659530031.316778][4951:4956] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in RadioFault ENUM
+          table 11.11.6.2. (Ex. Put the DUT under metallic cover causing WiFi
+          failure. Uncover DUT and make DUT rejoining DUT back to previous TH
+          fabric. Repeat the radio failure one more time and rejoin DUT back to
+          previous TH fabric."
+      PICS: DGGEN.S.E01
+      verification: |
+          Optional attribute so its not compulsory to get the expected outcome
+
+          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
+
+          On TH (chip-tool) verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
+          by the Node.
+
+          [1659530181.319598][4969:4975] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
+          [1659530181.319628][4969:4975] CHIP:TOO:   Event number: 7
+          [1659530181.319652][4969:4975] CHIP:TOO:   Priority: Critical
+          [1659530181.319675][4969:4975] CHIP:TOO:   Timestamp: 32245892
+          [1659530181.319768][4969:4975] CHIP:TOO:   RadioFaultChange: {
+          [1659530181.319814][4969:4975] CHIP:TOO:     Current: 0 entries
+          [1659530181.319848][4969:4975] CHIP:TOO:     Previous: 0 entries
+          [1659530181.319878][4969:4975] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in NetworkFault
+          ENUM table 11.11.6.3. (Ex. Put the DUT under metallic cover causing
+          network failure. Uncover DUT and rejoin DUT back to previous TH
+          fabric. Pull the DUT power plug off causing power source failure.
+          rejoining DUT back to previous TH fabric.)"
+      PICS: DGGEN.S.E02
+      verification: |
+          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+           ./chip-tool generaldiagnostics read-event network-fault-change 1 0
+          On TH(chip-tool) verify that read  response  of NetworkFault event is shown
+
+          [1659530237.352498][4985:4990] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
+          [1659530237.352541][4985:4990] CHIP:TOO:   Event number: 8
+          [1659530237.352573][4985:4990] CHIP:TOO:   Priority: Critical
+          [1659530237.352604][4985:4990] CHIP:TOO:   Timestamp: 32301872
+          [1659530237.352728][4985:4990] CHIP:TOO:   NetworkFaultChange: {
+          [1659530237.352786][4985:4990] CHIP:TOO:     Current: 0 entries
+          [1659530237.352831][4985:4990] CHIP:TOO:     Previous: 0 entries
+          [1659530237.352874][4985:4990] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
+          TH fabric."
+      PICS: DGGEN.S.E03
+      verification: |
+          Optional attribute so its not compulsory to get the expected outcome
+
+          On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+          echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+
+          On TH(chip-tool) verify that The NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
+          detected by the Node.
+          [1659530352.583608][4993:4998] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1659530352.583636][4993:4998] CHIP:TOO:   Event number: 0
+          [1659530352.583656][4993:4998] CHIP:TOO:   Priority: Critical
+          [1659530352.583675][4993:4998] CHIP:TOO:   Timestamp: 29669541
+          [1659530352.583750][4993:4998] CHIP:TOO:   BootReason: {
+          [1659530352.583789][4993:4998] CHIP:TOO:     BootReason: 0
+          [1659530352.583813][4993:4998] CHIP:TOO:    }
+      disabled: true

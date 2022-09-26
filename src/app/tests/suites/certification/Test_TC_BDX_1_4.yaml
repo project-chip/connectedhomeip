@@ -15,12 +15,21 @@
 
 name: 28.1.4. [TC-BDX-1.4] Response to Receiver Initiated BDX Transfer session
 
+PICS:
+    - MCORE.BDX.Sender
+    - MCORE.BDX.Responder
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-3.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+      disabled: true
+
     - label:
           "TH sends a ReceiveInit message to DUT + DUT sends a ReceiveAccept
           message back to TH"

@@ -23,7 +23,11 @@ import("${chip_root}/third_party/nxp/k32w0_sdk/k32w0_sdk.gni")
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_k32w0_config") {
-  include_dirs = [ "${openthread_nxp_root}/src/k32w0/k32w061" ]
+  include_dirs = [
+    "${openthread_nxp_root}/src/k32w0/k32w061",
+    "${openthread_nxp_root}/src/k32w0/platform",
+    "${openthread_nxp_root}/src/common",
+  ]
   include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w0" ]
 
   if (is_clang) {
@@ -52,14 +56,16 @@ source_set("openthread_mbedtls_config_k32w0") {
 
 source_set("libopenthread-k32w0") {
   sources = [
+    "${openthread_nxp_root}/src/common/ram_storage.c",
     "${openthread_nxp_root}/src/k32w0/platform/alarm.c",
     "${openthread_nxp_root}/src/k32w0/platform/diag.c",
     "${openthread_nxp_root}/src/k32w0/platform/entropy.c",
     "${openthread_nxp_root}/src/k32w0/platform/flash.c",
+    "${openthread_nxp_root}/src/k32w0/platform/flash_pdm.c",
     "${openthread_nxp_root}/src/k32w0/platform/logging.c",
     "${openthread_nxp_root}/src/k32w0/platform/misc.c",
+    "${openthread_nxp_root}/src/k32w0/platform/pdm_ram_storage_glue.c",
     "${openthread_nxp_root}/src/k32w0/platform/radio.c",
-    "${openthread_nxp_root}/src/k32w0/platform/settings_k32w.c",
     "${openthread_nxp_root}/src/k32w0/platform/system.c",
     "${openthread_nxp_root}/src/k32w0/platform/uart.c",
   ]

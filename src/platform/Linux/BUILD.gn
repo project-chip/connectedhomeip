@@ -17,9 +17,14 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
+
+if (chip_use_pw_logging) {
+  import("//build_overrides/pigweed.gni")
+}
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -65,26 +70,30 @@ static_library("Linux") {
     "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
-    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
-    "bluez/AdapterIterator.cpp",
-    "bluez/AdapterIterator.h",
-    "bluez/ChipDeviceScanner.cpp",
-    "bluez/ChipDeviceScanner.h",
-    "bluez/Helper.cpp",
-    "bluez/Helper.h",
-    "bluez/MainLoop.cpp",
-    "bluez/MainLoop.h",
-    "bluez/Types.h",
   ]
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
+  }
+
+  if (chip_enable_ble) {
+    sources += [
+      "bluez/AdapterIterator.cpp",
+      "bluez/AdapterIterator.h",
+      "bluez/ChipDeviceScanner.cpp",
+      "bluez/ChipDeviceScanner.h",
+      "bluez/Helper.cpp",
+      "bluez/Helper.h",
+      "bluez/MainLoop.cpp",
+      "bluez/MainLoop.h",
+      "bluez/Types.h",
+    ]
   }
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -125,8 +134,15 @@ static_library("Linux") {
     public_deps += [ "dbus/openthread" ]
   }
 
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
   if (chip_enable_wifi) {
-    sources += [ "GlibTypeDeleter.h" ]
+    sources += [
+      "GlibTypeDeleter.h",
+      "NetworkCommissioningWiFiDriver.cpp",
+    ]
 
     public_deps += [ "dbus/wpa" ]
   }

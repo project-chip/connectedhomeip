@@ -30,12 +30,25 @@
 #include "shell_extension/launch.h"
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -45,8 +58,14 @@ static AppDeviceCallbacks EchoCallbacks;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-ESP32FactoryDataProvider sFactoryDataProvider;
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
 static void InitServer(intptr_t context)
@@ -66,26 +85,38 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-light-example starting");
     ESP_LOGI(TAG, "==================================================");
 
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetCommissionableDataProvider(&sFactoryDataProvider);
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {

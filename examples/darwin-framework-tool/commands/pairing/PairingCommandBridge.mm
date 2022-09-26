@@ -16,24 +16,26 @@
  *
  */
 
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
-#include "PairingDelegateBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
+
+#import "MTRError_Utils.h"
 
 using namespace ::chip;
 using namespace ::chip::Controller;
 
-void PairingCommandBridge::SetUpPairingDelegate()
+void PairingCommandBridge::SetUpDeviceControllerDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
-    CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] init];
-    CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+    CHIPToolDeviceControllerDelegate * deviceControllerDelegate = [[CHIPToolDeviceControllerDelegate alloc] init];
+    MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
+    MTRDeviceController * commissioner = CurrentCommissioner();
 
-    [pairing setDeviceID:mNodeId];
+    [deviceControllerDelegate setDeviceID:mNodeId];
     switch (mNetworkType) {
     case PairingNetworkType::None:
     case PairingNetworkType::Ethernet:
@@ -47,11 +49,11 @@ void PairingCommandBridge::SetUpPairingDelegate()
         break;
     }
 
-    [pairing setCommandBridge:this];
-    [pairing setParams:params];
-    [pairing setCommissioner:CurrentCommissioner()];
+    [deviceControllerDelegate setCommandBridge:this];
+    [deviceControllerDelegate setParams:params];
+    [deviceControllerDelegate setCommissioner:commissioner];
 
-    [CurrentCommissioner() setPairingDelegate:pairing queue:callbackQueue];
+    [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
 CHIP_ERROR PairingCommandBridge::RunCommand()
@@ -63,9 +65,6 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
         break;
     case PairingMode::Code:
         PairWithPayload(&error);
-        break;
-    case PairingMode::Ethernet:
-        PairWithIPAddress(&error);
         break;
     case PairingMode::Ble:
         PairWithCode(&error);
@@ -80,72 +79,54 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 {
-    SetUpPairingDelegate();
-    [CurrentCommissioner() pairDevice:mNodeId discriminator:mDiscriminator setupPINCode:mSetupPINCode error:error];
+    SetUpDeviceControllerDelegate();
+    auto * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(mSetupPINCode) discriminator:@(mDiscriminator)];
+    MTRDeviceController * commissioner = CurrentCommissioner();
+    [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
 }
 
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 {
-    NSString * payload = [NSString stringWithUTF8String:mOnboardingPayload];
-
-    SetUpPairingDelegate();
-    [CurrentCommissioner() pairDevice:mNodeId onboardingPayload:payload error:error];
-}
-
-void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
-{
-    SetUpPairingDelegate();
-    [CurrentCommissioner() pairDevice:mNodeId
-                              address:[NSString stringWithUTF8String:ipAddress]
-                                 port:mRemotePort
-                         setupPINCode:mSetupPINCode
-                                error:error];
+    NSString * onboardingPayload = [NSString stringWithUTF8String:mOnboardingPayload];
+    SetUpDeviceControllerDelegate();
+    auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:error];
+    if (payload == nil) {
+        return;
+    }
+    MTRDeviceController * commissioner = CurrentCommissioner();
+    [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
 }
 
 void PairingCommandBridge::Unpair()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
-    [CurrentCommissioner()
-        getConnectedDevice:mNodeId
-                     queue:callbackQueue
-         completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-             CHIP_ERROR err = CHIP_NO_ERROR;
-             if (error) {
-                 err = [CHIPError errorToCHIPErrorCode:error];
-                 LogNSError("Error: ", error);
-                 SetCommandExitStatus(err);
-             } else if (device == nil) {
-                 ChipLogError(chipTool, "Error: %s", chip::ErrorStr(CHIP_ERROR_INTERNAL));
-                 SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-             } else {
-                 ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
-                 CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
-                                                                                                         endpoint:0
-                                                                                                            queue:callbackQueue];
-                 [opCredsCluster readAttributeCurrentFabricIndexWithCompletionHandler:^(
-                     NSNumber * _Nullable value, NSError * _Nullable readError) {
-                     if (readError) {
-                         CHIP_ERROR readErr = [CHIPError errorToCHIPErrorCode:readError];
-                         LogNSError("Failed to get current fabric: ", readError);
-                         SetCommandExitStatus(readErr);
-                         return;
-                     }
-                     CHIPOperationalCredentialsClusterRemoveFabricParams * params =
-                         [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
-                     params.fabricIndex = value;
-                     [opCredsCluster removeFabricWithParams:params
-                                          completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                              NSError * _Nullable removeError) {
-                                              CHIP_ERROR removeErr = CHIP_NO_ERROR;
-                                              if (removeError) {
-                                                  removeErr = [CHIPError errorToCHIPErrorCode:removeError];
-                                                  LogNSError("Failed to remove current fabric: ", removeError);
-                                              } else {
-                                                  ChipLogProgress(chipTool, "Successfully unpaired deviceId %llu", mNodeId);
-                                              }
-                                              SetCommandExitStatus(removeErr);
-                                          }];
-                 }];
-             }
-         }];
+    MTRDeviceController * commissioner = CurrentCommissioner();
+    auto * device = [MTRBaseDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
+
+    ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
+    MTRBaseClusterOperationalCredentials * opCredsCluster =
+        [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:@(0) queue:callbackQueue];
+    [opCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
+        if (readError) {
+            CHIP_ERROR readErr = MTRErrorToCHIPErrorCode(readError);
+            LogNSError("Failed to get current fabric: ", readError);
+            SetCommandExitStatus(readErr);
+            return;
+        }
+        MTROperationalCredentialsClusterRemoveFabricParams * params =
+            [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+        params.fabricIndex = value;
+        [opCredsCluster removeFabricWithParams:params
+                                    completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                        NSError * _Nullable removeError) {
+                                        CHIP_ERROR removeErr = CHIP_NO_ERROR;
+                                        if (removeError) {
+                                            removeErr = MTRErrorToCHIPErrorCode(removeError);
+                                            LogNSError("Failed to remove current fabric: ", removeError);
+                                        } else {
+                                            ChipLogProgress(chipTool, "Successfully unpaired deviceId %llu", mNodeId);
+                                        }
+                                        SetCommandExitStatus(removeErr);
+                                    }];
+    }];
 }

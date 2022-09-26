@@ -15,6 +15,11 @@
 
 name: 123.2.1. [TC-S-2.1] Attributes with server as DUT
 
+PICS:
+    - S.S
+    - S.S.AM
+    - S.S.AO
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

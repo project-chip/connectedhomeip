@@ -21,7 +21,6 @@ import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
-import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_pw_tokenizer_logging) {
@@ -66,7 +65,7 @@ k32w0_sdk("sdk") {
 }
 
 k32w0_executable("light_app") {
-  output_name = "chip-k32w061-light-example"
+  output_name = "chip-k32w0x-light-example"
 
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
@@ -103,11 +102,20 @@ k32w0_executable("light_app") {
 
   cflags = [ "-Wconversion" ]
 
-  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
 
   inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_enable_ota_requestor) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,__app_load_address__=0x4000",
+      "-Wl,--defsym",
+      "-Wl,__app_stated_size__=0x99A00",
+    ]
+  }
 
   if (chip_enable_ota_requestor) {
     ldflags += [
@@ -123,10 +131,10 @@ k32w0_executable("light_app") {
 
 if (chip_pw_tokenizer_logging) {
   pw_tokenizer_database("light_app.database") {
-    database = "$root_build_dir/chip-k32w061-light-example-database.bin"
+    database = "$root_build_dir/chip-k32w0x-light-example-database.bin"
     create = "binary"
     deps = [ ":light_app" ]
-    optional_paths = [ "$root_build_dir/chip-k32w061-light-example" ]
+    optional_paths = [ "$root_build_dir/chip-k32w0x-light-example" ]
   }
 }
 

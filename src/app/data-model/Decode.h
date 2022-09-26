@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums-check.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
@@ -28,6 +29,13 @@
 
 namespace chip {
 namespace app {
+namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(chip::VendorId val)
+{
+    return val;
+}
+} // namespace Clusters
+
 namespace DataModel {
 
 //
@@ -48,7 +56,9 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
-    return reader.Get(x);
+    ReturnErrorOnFailure(reader.Get(x));
+    x = Clusters::EnsureKnownEnumValue(x);
+    return CHIP_NO_ERROR;
 }
 
 template <typename X>

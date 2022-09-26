@@ -42,7 +42,7 @@ class Status(enum.IntEnum):
     Deprecated84 = 0x84
     InvalidCommand = 0x85
     UnsupportedAttribute = 0x86
-    InvalidValue = 0x87
+    ConstraintError = 0x87
     UnsupportedWrite = 0x88
     ResourceExhausted = 0x89
     Deprecated8a = 0x8a
@@ -62,7 +62,6 @@ class Status(enum.IntEnum):
     Reserved98 = 0x98
     Reserved99 = 0x99
     Reserved9a = 0x9a
-    ConstraintError = 0x9b
     Busy = 0x9c
     Deprecatedc0 = 0xc0
     Deprecatedc1 = 0xc1
@@ -70,16 +69,20 @@ class Status(enum.IntEnum):
     UnsupportedCluster = 0xc3
     Deprecatedc4 = 0xc4
     NoUpstreamSubscription = 0xc5
-    InvalidArgument = 0xc6
+    NeedsTimedInteraction = 0xc6
+    UnsupportedEvent = 0xc7
+    PathsExhausted = 0xc8
+    TimedRequestMismatch = 0xc9
+    FailsafeRequired = 0xca
 
 
 class InteractionModelError(ChipStackException):
-    def __init__(self, state: Status):
-        self._state = state
+    def __init__(self, status: Status):
+        self._status = status
 
     def __str__(self):
-        return f"InteractionModelError: {self._state.name} (0x{self._state.value:x})"
+        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
 
     @property
-    def state(self) -> Status:
-        return self._state
+    def status(self) -> Status:
+        return self._status

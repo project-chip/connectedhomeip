@@ -40,7 +40,9 @@
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
+#endif
 #include "host/ble_hs.h"
 #include "host/ble_hs_pvcy.h"
 #include "host/ble_uuid.h"
@@ -92,10 +94,13 @@ const ble_uuid128_t UUID_CHIPoBLEChar_C3 = {
 
 SemaphoreHandle_t semaphoreHandle = NULL;
 
+// LE Random Device Address
+// (see Bluetooth® Core Specification 4.2 Vol 6, Part B, Section 1.3.2.1 "Static device address")
+uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
+
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
-constexpr System::Clock::Timeout BLEManagerImpl::kAdvertiseTimeout;
 constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
@@ -112,7 +117,7 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
               {
                   .uuid       = (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                   .access_cb  = gatt_svr_chr_access,
-                  .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+                  .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_INDICATE,
                   .val_handle = &sInstance.mTXCharCCCDAttrHandle,
               },
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -149,28 +154,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     mNumGAPCons = 0;
-    memset(mCons, 0, sizeof(mCons));
+    memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (val != mServiceMode)
-    {
-        mServiceMode = val;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
 
 exit:
     return err;
@@ -185,7 +173,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
 
@@ -196,22 +183,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
 exit:
     return err;
-}
-
-void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
-{
-    static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
-}
-
-void BLEManagerImpl::HandleAdvertisementTimer()
-{
-    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
-
-    if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
-    {
-        mFlags.Set(Flags::kAdvertisingEnabled, 0);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
 }
 
 void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
@@ -314,20 +285,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kServiceProvisioningChange:
-    case DeviceEventType::kAccountPairingChange:
     case DeviceEventType::kWiFiConnectivityChange:
-
-        // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
-        // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
-        // is now fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
         ChipLogProgress(DeviceLayer, "Updating advertising data");
         mFlags.Clear(Flags::kAdvertisingConfigured);
@@ -397,10 +355,10 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
         ExitNow();
     }
 
-    err = MapBLEError(ble_gattc_notify_custom(conId, mTXCharCCCDAttrHandle, om));
+    err = MapBLEError(ble_gattc_indicate_custom(conId, mTXCharCCCDAttrHandle, om));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ble_gattc_notify_custom() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "ble_gattc_indicate_custom() failed: %s", ErrorStr(err));
         ExitNow();
     }
 
@@ -473,16 +431,6 @@ void BLEManagerImpl::DriveBLEState(void)
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     }
 
     // Initializes the ESP BLE layer if needed.
@@ -607,6 +555,34 @@ void BLEManagerImpl::bleprph_on_reset(int reason)
     ESP_LOGE(TAG, "Resetting state; reason=%d\n", reason);
 }
 
+CHIP_ERROR BLEManagerImpl::bleprph_set_random_addr(void)
+{
+    ble_addr_t addr;
+
+    // Generates a new static random address
+    int rc = ble_hs_id_gen_rnd(0, &addr);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to generate random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Set generated address
+    rc = ble_hs_id_set_rnd(addr.val);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to set random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Try to configure the device with random static address
+    rc = ble_hs_util_ensure_addr(1);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to configure random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
 void BLEManagerImpl::bleprph_on_sync(void)
 {
     ESP_LOGI(TAG, "BLE host-controller synced");
@@ -639,9 +615,10 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     {
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
-
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
     err = MapBLEError(esp_nimble_hci_and_controller_init());
     SuccessOrExit(err);
+#endif
 
     nimble_port_init();
 
@@ -683,6 +660,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     sInstance.mFlags.Set(Flags::kESPBLELayerInitialized);
     sInstance.mFlags.Set(Flags::kGATTServiceStarted);
 
+    err = bleprph_set_random_addr();
 exit:
     return err;
 }
@@ -799,19 +777,17 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool indicationsEnabled;
-    bool notificationsEnabled;
 
     ChipLogProgress(DeviceLayer,
                     "Write request/command received for CHIPoBLE TX CCCD characteristic (con %u"
-                    " ) indicate = %d notify = %d",
-                    gapEvent->subscribe.conn_handle, gapEvent->subscribe.cur_indicate, gapEvent->subscribe.cur_notify);
+                    " ) indicate = %d",
+                    gapEvent->subscribe.conn_handle, gapEvent->subscribe.cur_indicate);
 
-    // Determine if the client is enabling or disabling indications/notification.
-    indicationsEnabled   = gapEvent->subscribe.cur_indicate;
-    notificationsEnabled = gapEvent->subscribe.cur_notify;
+    // Determine if the client is enabling or disabling indications.
+    indicationsEnabled = gapEvent->subscribe.cur_indicate;
 
-    // If the client has requested to enabled indications/notifications
-    if (indicationsEnabled || notificationsEnabled)
+    // If the client has requested to enabled indications
+    if (indicationsEnabled)
     {
         // If indications are not already enabled for the connection...
         if (!IsSubscribed(gapEvent->subscribe.conn_handle))
@@ -834,14 +810,12 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = gapEvent->subscribe.conn_handle;
         err                           = PlatformMgr().PostEvent(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
-                    (indicationsEnabled || notificationsEnabled) ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", (indicationsEnabled) ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -859,7 +833,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
                     gapEvent->notify_tx.conn_handle, gapEvent->notify_tx.status);
 
     // Signal the BLE Layer that the outstanding indication is complete.
-    if (gapEvent->notify_tx.status == 0 || gapEvent->notify_tx.status == BLE_HS_EDONE)
+    if (gapEvent->notify_tx.status == BLE_HS_EDONE)
     {
         // Post an event to the Chip queue to process the indicate confirmation.
         ChipDeviceEvent event;
@@ -1038,8 +1012,11 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         break;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
-        err = sInstance.HandleTXComplete(event);
-        SuccessOrExit(err);
+        if (event->notify_tx.status != 0)
+        {
+            err = sInstance.HandleTXComplete(event);
+            SuccessOrExit(err);
+        }
         break;
 
     case BLE_GAP_EVENT_MTU:
@@ -1178,11 +1155,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     CHIP_ERROR err;
     ble_gap_adv_params adv_params;
     memset(&adv_params, 0, sizeof(adv_params));
-#ifdef CONFIG_BT_NIMBLE_HOST_BASED_PRIVACY
-    uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
-#else
-    uint8_t own_addr_type = BLE_OWN_ADDR_RPA_PUBLIC_DEFAULT;
-#endif
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
 
     mFlags.Clear(Flags::kAdvertisingRefreshNeeded);

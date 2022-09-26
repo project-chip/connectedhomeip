@@ -23,14 +23,13 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-
     chef_linux:
         name: Chef - Linux CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.99
             options: --user root
 
         steps:
@@ -42,10 +41,15 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
             - name: CI Examples Linux
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
@@ -53,7 +57,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.79
+            image: connectedhomeip/chip-build-esp32:0.5.99
             options: --user root
 
         steps:
@@ -65,10 +69,15 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform esp32
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
             - name: CI Examples ESP32
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
 
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
@@ -76,7 +85,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.79
+            image: connectedhomeip/chip-build-nrf-platform:0.5.99
             options: --user root
 
         steps:
@@ -88,6 +97,11 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform nrfconnect
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
             - name: CI Examples NRFConnect
               shell: bash
               run: |

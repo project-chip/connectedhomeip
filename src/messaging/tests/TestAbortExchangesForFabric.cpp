@@ -21,6 +21,7 @@
  *      one) for a fabric.
  */
 
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/ExchangeContext.h>
@@ -224,12 +225,7 @@ nlTestSuite sSuite =
  */
 int TestAbortExchangesForFabric()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestAbortExchangesForFabric);

@@ -40,6 +40,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
 
     public_deps = [
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/platform",
       "${chip_root}/src/system",
       "${nlunit_test_root}:nlunit-test",
@@ -87,10 +88,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     }
 
     if (chip_device_platform == "linux") {
-      test_sources += [
-        "TestConnectivityMgr.cpp",
-        "TestFailSafeContext.cpp",
-      ]
+      test_sources += [ "TestConnectivityMgr.cpp" ]
     }
   }
 } else {

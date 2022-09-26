@@ -18,7 +18,12 @@
 #pragma once
 
 #include <FreeRTOS.h>
-#include <LEDWidget.h>
+
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
+#include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
+
 #include <WindowApp.h>
 #include <queue.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -26,6 +31,9 @@
 #include <string>
 #include <task.h>
 #include <timers.h>
+#ifdef DISPLAY_ENABLED
+#include <LcdPainter.h>
+#endif
 
 class WindowAppImpl : public WindowApp
 {
@@ -76,11 +84,16 @@ private:
     void DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute);
     TaskHandle_t mHandle = nullptr;
     QueueHandle_t mQueue = nullptr;
+
+#ifdef ENABLE_WSTK_LEDS
     LEDWidget mStatusLED;
     LEDWidget mActionLED;
+#endif // ENABLE_WSTK_LEDS
 
     // Get QR Code and emulate its content using NFC tag
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+#ifdef DISPLAY_ENABLED
     Timer mIconTimer;
     LcdIcon mIcon = LcdIcon::None;
+#endif
 };

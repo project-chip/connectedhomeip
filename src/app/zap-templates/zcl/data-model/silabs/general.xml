@@ -89,91 +89,6 @@ limitations under the License.
       <arg name="writeStructuredAttributeStatusRecords" type="WriteStructuredAttributeStatusRecord" array="true"/>
     </command>
   </global>
-  <cluster singleton="true">
-    <name>Power Configuration</name>
-    <domain>General</domain>
-    <description>Attributes for determining more detailed information about a device's power source(s), and for configuring under/over voltage alarms.</description>
-    <code>0x0001</code>
-    <define>POWER_CONFIG_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="MAINS_VOLTAGE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">mains voltage</attribute>
-    <attribute side="server" code="0x0001" define="MAINS_FREQUENCY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">mains frequency</attribute>
-    <attribute side="server" code="0x0010" define="MAINS_ALARM_MASK" type="BITMAP8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">mains alarm mask</attribute>
-    <attribute side="server" code="0x0011" define="MAINS_VOLTAGE_MIN_THRESHOLD" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">mains voltage min threshold</attribute>
-    <attribute side="server" code="0x0012" define="MAINS_VOLTAGE_MAX_THRESHOLD" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0xFFFF" optional="true">mains voltage max threshold</attribute>
-    <attribute side="server" code="0x0013" define="MAINS_VOLTAGE_DWELL_TRIP_POINT" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">mains voltage dwell trip</attribute>
-    <attribute side="server" code="0x0020" define="BATTERY_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">battery voltage</attribute>
-    <attribute side="server" code="0x0021" define="BATTERY_PERCENTAGE_REMAINING" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery percentage remaining</attribute>
-    <attribute side="server" code="0x0030" define="BATTERY_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" default="" optional="true">battery manufacturer</attribute>
-    <attribute side="server" code="0x0031" define="BATTERY_SIZE" type="ENUM8" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true">battery size</attribute>
-    <attribute side="server" code="0x0032" define="BATTERY_AHR_RATING" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="true">battery ahr rating</attribute>
-    <attribute side="server" code="0x0033" define="BATTERY_QUANTITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">battery quantity</attribute>
-    <attribute side="server" code="0x0034" define="BATTERY_RATED_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">battery rated voltage</attribute>
-    <attribute side="server" code="0x0035" define="BATTERY_ALARM_MASK" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">battery alarm mask</attribute>
-    <attribute side="server" code="0x0036" define="BATTERY_VOLTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true">battery voltage min threshold</attribute>
-    <attribute side="server" code="0x0037" define="BATTERY_VOLTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery voltage threshold 1</attribute>
-    <attribute side="server" code="0x0038" define="BATTERY_VOLTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery voltage threshold 2</attribute>
-    <attribute side="server" code="0x0039" define="BATTERY_VOLTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery voltage threshold 3</attribute>
-    <attribute side="server" code="0x003a" define="BATTERY_PERCENTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery percentage min threshold</attribute>
-    <attribute side="server" code="0x003b" define="BATTERY_PERCENTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery percentage threshold 1</attribute>
-    <attribute side="server" code="0x003c" define="BATTERY_PERCENTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery percentage threshold 2</attribute>
-    <attribute side="server" code="0x003d" define="BATTERY_PERCENTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery percentage threshold 3</attribute>
-    <attribute side="server" code="0x003e" define="BATTERY_ALARM_STATE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="false" reportable="true" default="0x00000000" optional="true" introducedIn="ha-1.2-05-3520-29">battery alarm state</attribute>
-    <attribute side="server" code="0x0040" define="BATTERY_2_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 voltage</attribute>
-    <attribute side="server" code="0x0041" define="BATTERY_2_PERCENTAGE_REMAINING" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 percentage remaining</attribute>
-    <attribute side="server" code="0x0050" define="BATTERY_2_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" default="" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 manufacturer</attribute>
-    <attribute side="server" code="0x0051" define="BATTERY_2_SIZE" type="ENUM8" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 size</attribute>
-    <attribute side="server" code="0x0052" define="BATTERY_2_AHR_RATING" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 ahr rating</attribute>
-    <attribute side="server" code="0x0053" define="BATTERY_2_QUANTITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 quantity</attribute>
-    <attribute side="server" code="0x0054" define="BATTERY_2_RATED_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 rated voltage</attribute>
-    <attribute side="server" code="0x0055" define="BATTERY_2_ALARM_MASK" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 alarm mask</attribute>
-    <attribute side="server" code="0x0056" define="BATTERY_2_VOLTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 voltage min threshold</attribute>
-    <attribute side="server" code="0x0057" define="BATTERY_2_VOLTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 voltage threshold 1</attribute>
-    <attribute side="server" code="0x0058" define="BATTERY_2_VOLTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 voltage threshold 2</attribute>
-    <attribute side="server" code="0x0059" define="BATTERY_2_VOLTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 voltage threshold 3</attribute>
-    <attribute side="server" code="0x005a" define="BATTERY_2_PERCENTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 percentage min threshold</attribute>
-    <attribute side="server" code="0x005b" define="BATTERY_2_PERCENTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 percentage threshold 1</attribute>
-    <attribute side="server" code="0x005c" define="BATTERY_2_PERCENTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 percentage threshold 2</attribute>
-    <attribute side="server" code="0x005d" define="BATTERY_2_PERCENTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 percentage threshold 3</attribute>
-    <attribute side="server" code="0x005e" define="BATTERY_2_ALARM_STATE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true" introducedIn="ha-1.2-05-3520-29">battery 2 alarm state</attribute>
-    <attribute side="server" code="0x0060" define="BATTERY_3_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 voltage</attribute>
-    <attribute side="server" code="0x0061" define="BATTERY_3_PERCENTAGE_REMAINING" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 percentage remaining</attribute>
-    <attribute side="server" code="0x0070" define="BATTERY_3_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" default="" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 manufacturer</attribute>
-    <attribute side="server" code="0x0071" define="BATTERY_3_SIZE" type="ENUM8" min="0x00" max="0xFF" writable="true" default="0xFF" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 size</attribute>
-    <attribute side="server" code="0x0072" define="BATTERY_3_AHR_RATING" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 ahr rating</attribute>
-    <attribute side="server" code="0x0073" define="BATTERY_3_QUANTITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 quantity</attribute>
-    <attribute side="server" code="0x0074" define="BATTERY_3_RATED_VOLTAGE" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 rated voltage</attribute>
-    <attribute side="server" code="0x0075" define="BATTERY_3_ALARM_MASK" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 alarm mask</attribute>
-    <attribute side="server" code="0x0076" define="BATTERY_3_VOLTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 voltage min threshold</attribute>
-    <attribute side="server" code="0x0077" define="BATTERY_3_VOLTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 voltage threshold 1</attribute>
-    <attribute side="server" code="0x0078" define="BATTERY_3_VOLTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 voltage threshold 2</attribute>
-    <attribute side="server" code="0x0079" define="BATTERY_3_VOLTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 voltage threshold 3</attribute>
-    <attribute side="server" code="0x007a" define="BATTERY_3_PERCENTAGE_MIN_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 percentage min threshold</attribute>
-    <attribute side="server" code="0x007b" define="BATTERY_3_PERCENTAGE_THRESHOLD_1" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 percentage threshold 1</attribute>
-    <attribute side="server" code="0x007c" define="BATTERY_3_PERCENTAGE_THRESHOLD_2" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 percentage threshold 2</attribute>
-    <attribute side="server" code="0x007d" define="BATTERY_3_PERCENTAGE_THRESHOLD_3" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 percentage threshold 3</attribute>
-    <attribute side="server" code="0x007e" define="BATTERY_3_ALARM_STATE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true" introducedIn="ha-1.2-05-3520-29">battery 3 alarm state</attribute>
-  </cluster>
-  <cluster>
-    <name>Device Temperature Configuration</name>
-    <domain>General</domain>
-    <description>Attributes for determining information about a device's internal temperature, and for configuring under/over temperature alarms.</description>
-    <code>0x0002</code>
-    <define>DEVICE_TEMP_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <attribute side="server" code="0x0000" define="CURRENT_TEMPERATURE" type="INT16S" min="-200" max="200" writable="false" optional="false">current temperature</attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMP_EXPERIENCED" type="INT16S" min="-200" max="200" writable="false" optional="true">min temp experienced</attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMP_EXPERIENCED" type="INT16S" min="-200" max="200" writable="false" optional="true">max temp experienced</attribute>
-    <attribute side="server" code="0x0003" define="OVER_TEMP_TOTAL_DWELL" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">over temp total dwell</attribute>
-    <attribute side="server" code="0x0010" define="DEVICE_TEMP_ALARM_MASK" type="BITMAP8" min="0x00" max="0x03" writable="true" default="0x00" optional="true">device temp alarm mask</attribute>
-    <attribute side="server" code="0x0011" define="LOW_TEMP_THRESHOLD" type="INT16S" min="-200" max="200" writable="true" optional="true">low temp threshold</attribute>
-    <attribute side="server" code="0x0012" define="HIGH_TEMP_THRESHOLD" type="INT16S" min="-200" max="200" writable="true" optional="true">high temp threshold</attribute>
-    <attribute side="server" code="0x0013" define="LOW_TEMP_DWELL_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFF" writable="true" optional="true">low temp dwell trip point</attribute>
-    <attribute side="server" code="0x0014" define="HIGH_TEMP_DWELL_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFF" writable="true" optional="true">high temp dwell trip point</attribute>
-  </cluster>
   <cluster>
     <name>Groups</name>
     <domain>General</domain>
@@ -185,7 +100,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" optional="false" cli="zcl groups add">
+    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
@@ -193,32 +108,32 @@ limitations under the License.
       <arg name="groupName" type="CHAR_STRING"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" optional="false" cli="zcl groups view">
+    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
       <arg name="groupId" type="group_id"/>
     </command>
-    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
+    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
       <arg name="groupList" type="group_id" array="true"/>
     </command>
-    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" optional="false" cli="zcl groups remove">
+    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
       <arg name="groupId" type="group_id"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x04" name="RemoveAllGroups" optional="false" cli="zcl groups rmall">
+    <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
       <description>
         Command description for RemoveAllGroups
       </description>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x05" name="AddGroupIfIdentifying" optional="false" cli="zcl groups add-if-id">
+    <command source="client" code="0x05" name="AddGroupIfIdentifying" isFabricScoped="true" optional="false" cli="zcl groups add-if-id">
       <description>
         Command description for AddGroupIfIdentifying
       </description>
@@ -276,22 +191,22 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="5"/>
-    <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
-    <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
-    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
-    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFE" optional="true">max level</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current frequency</attribute>
-    <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">min frequency</attribute>
-    <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>
+    <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="INT8U"  isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
+    <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
+    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">CurrentFrequency</attribute>
+    <attribute side="server" code="0x0005" define="MIN_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MinFrequency</attribute>
+    <attribute side="server" code="0x0006" define="MAX_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MaxFrequency</attribute>
     
-    <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="INT16U" writable="true" default="0x0000" optional="true">on off transition time</attribute>
-    <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" isNullable="true" writable="true" optional="false">on level</attribute>
-    <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="INT16U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">on transition time</attribute>
-    <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME" type="INT16U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">off transition time</attribute>
-    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE" type="INT8U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">default move rate</attribute>
-    <attribute side="server" code="0x000F" define="OPTIONS" type="BITMAP8" min="0x00" max="0x03" writable="true" default="0x00" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">options</attribute>
-    <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL" type="INT8U" isNullable="true" writable="true" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">
-      <description>start up current level</description>
+    <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME"        type="INT16U"                             writable="true"  default="0x0000" optional="true">OnOffTransitionTime</attribute>
+    <attribute side="server" code="0x0011" define="ON_LEVEL"                      type="INT8U"    isNullable="true"         writable="true"                   optional="false">OnLevel</attribute>
+    <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME"            type="INT16U"   isNullable="true"         writable="true"                   optional="true">OnTransitionTime</attribute>
+    <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME"           type="INT16U"   isNullable="true"         writable="true"                   optional="true">OffTransitionTime</attribute>
+    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="INT8U"    isNullable="true"         writable="true"                   optional="true">DefaultMoveRate</attribute>
+    <attribute side="server" code="0x000F" define="OPTIONS"                       type="BITMAP8"  min="0x00" max="0x03"     writable="true"  default="0x00"   optional="false">Options</attribute>
+    <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL"        type="INT8U"    isNullable="true"         writable="true"                   optional="true">
+      <description>StartUpCurrentLevel</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
@@ -299,139 +214,79 @@ limitations under the License.
       <description>
         Command description for MoveToLevel
       </description>
-      <arg name="level" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="Level"           type="INT8U"/>
+      <arg name="TransitionTime"  type="INT16U" isNullable="true"/>
+      <arg name="OptionsMask"     type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x01" name="Move" optional="false" cli="zcl level-control move">
       <description>
         Command description for Move
       </description>
-      <arg name="moveMode" type="MoveMode"/>
-      <arg name="rate" type="INT8U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="MoveMode" type="MoveMode"/>
+      <arg name="Rate" type="INT8U" isNullable="true"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x02" name="Step" optional="false" cli="zcl level-control step">
       <description>
         Command description for Step
       </description>
-      <arg name="stepMode" type="StepMode"/>
-      <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="StepMode" type="StepMode"/>
+      <arg name="StepSize" type="INT8U"/>
+      <arg name="TransitionTime" type="INT16U" isNullable="true"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x03" name="Stop" optional="false" cli="zcl level-control stop">
       <description>
         Command description for Stop
       </description>
-      <arg name="optionMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
-      <arg name="optionOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x04" name="MoveToLevelWithOnOff" optional="false" cli="zcl level-control o-mv-to-level">
       <description>
         Command description for MoveToLevelWithOnOff
       </description>
-      <arg name="level" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
+      <arg name="Level"           type="INT8U"/>
+      <arg name="TransitionTime"  type="INT16U" isNullable="true"/>
+      <arg name="OptionsMask"     type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x05" name="MoveWithOnOff" optional="false" cli="zcl level-control o-move">
       <description>
         Command description for MoveWithOnOff
       </description>
-      <arg name="moveMode" type="MoveMode"/>
-      <arg name="rate" type="INT8U"/>
+      <arg name="MoveMode" type="MoveMode"/>
+      <arg name="Rate" type="INT8U" isNullable="true"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x06" name="StepWithOnOff" optional="false" cli="zcl level-control o-step">
       <description>
         Command description for StepWithOnOff
       </description>
-      <arg name="stepMode" type="StepMode"/>
-      <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
+      <arg name="StepMode" type="StepMode"/>
+      <arg name="StepSize" type="INT8U"/>
+      <arg name="TransitionTime" type="INT16U" isNullable="true"/>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x07" name="StopWithOnOff" optional="false" cli="zcl level-control o-stop">
       <description>
         Command description for StopWithOnOff
       </description>
+      <arg name="OptionsMask" type="BITMAP8"/>
+      <arg name="OptionsOverride" type="BITMAP8"/>
     </command>
     <command source="client" code="0x08" name="MoveToClosestFrequency" optional="true">
       <description>
         Change the currrent frequency to the provided one, or a close
         approximation if the exact provided one is not possible.
       </description>
-      <arg name="Frequency" type="int16u"/>
+      <arg name="Frequency" type="INT16U"/>
     </command>
-  </cluster>
-  <cluster>
-    <name>Alarms</name>
-    <domain>General</domain>
-    <description>Attributes and commands for sending notifications and configuring alarm functionality.</description>
-    <code>0x0009</code>
-    <define>ALARM_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="ALARM_COUNT" type="INT16U" min="0x00" writable="false" default="0x00" optional="true">alarm count</attribute>
-    <command source="client" code="0x00" name="ResetAlarm" optional="false">
-      <description>
-        Command description for ResetAlarm
-      </description>
-      <arg name="alarmCode" type="ENUM8"/>
-      <arg name="clusterId" type="CLUSTER_ID"/>
-    </command>
-    <command source="client" code="0x01" name="ResetAllAlarms" optional="false">
-      <description>
-        Command description for ResetAllAlarms
-      </description>
-    </command>
-    <command source="client" code="0x02" name="GetAlarm" response="GetAlarmResponse" optional="true">
-      <description>
-        Command description for GetAlarm
-      </description>
-    </command>
-    <command source="client" code="0x03" name="ResetAlarmLog" optional="true">
-      <description>
-        Command description for ResetAlarmLog
-      </description>
-    </command>
-    <command source="server" code="0x00" name="Alarm" optional="false">
-      <description>
-        Command description for Alarm
-      </description>
-      <arg name="alarmCode" type="ENUM8"/>
-      <arg name="clusterId" type="CLUSTER_ID"/>
-    </command>
-    <command source="server" code="0x01" name="GetAlarmResponse" optional="true" disableDefaultResponse="true">
-      <description>
-        Command description for GetAlarmResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="alarmCode" type="ENUM8"/>
-      <arg name="clusterId" type="CLUSTER_ID"/>
-      <arg name="timeStamp" type="epoch_s"/>
-    </command>
-  </cluster>
-  <cluster singleton="true">
-    <name>Time</name>
-    <domain>General</domain>
-    <description>Attributes and commands that provide a basic interface to a real-time clock.</description>
-    <code>0x000A</code>
-    <define>TIME_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="false">time</attribute>
-    <attribute side="server" code="0x0001" define="TIME_STATUS" type="BITMAP8" min="0x00" max="0x0F" writable="true" default="0x00" optional="false">time status</attribute>
-    <attribute side="server" code="0x0002" define="TIME_ZONE" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">time zone</attribute>
-    <attribute side="server" code="0x0003" define="DST_START" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="true">dst start</attribute>
-    <attribute side="server" code="0x0004" define="DST_END" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="true">dst end</attribute>
-    <attribute side="server" code="0x0005" define="DST_SHIFT" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">dst shift</attribute>
-    <attribute side="server" code="0x0006" define="STANDARD_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">standard time</attribute>
-    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">local time</attribute>
-    <attribute side="server" code="0x0008" define="LAST_SET_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0xFFFFFFFF" optional="true">last set time</attribute>
-    <attribute side="server" code="0x0009" define="VALID_UNTIL_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" default="0xFFFFFFFF" optional="true">valid until time</attribute>
   </cluster>
   <cluster>
     <name>Binary Input (Basic)</name>
@@ -456,5 +311,9 @@ limitations under the License.
       <field name="OnOff" mask="0x1"/>
       <field name="Lighting" mask="0x2"/>
       <field name="Frequency" mask="0x4"/>
-    </bitmap>  
+  </bitmap>  
+  <bitmap name="GroupClusterFeature" type="BITMAP32">
+      <cluster code="0x0004"/>
+      <field name="GroupNames" mask="0x1"/>
+  </bitmap>
 </configurator>

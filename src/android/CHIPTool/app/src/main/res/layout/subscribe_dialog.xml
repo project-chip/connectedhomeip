@@ -36,6 +36,30 @@
       app:layout_constraintTop_toBottomOf="@id/minIntervalEd"
       app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
 
+  <EditText
+      android:id="@+id/keepSubscriptionsEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_keep_subscriptions_hint"
+      android:inputType="text"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsEd"
+      app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
+
+  <EditText
+      android:id="@+id/isFabricFilteredEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_is_fabric_filtered_hint"
+      android:inputType="text"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/isFabricFilteredEd"
+      app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
+
   <Button
       android:id="@+id/subscribeBtn"
       android:layout_width="wrap_content"

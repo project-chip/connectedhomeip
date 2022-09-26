@@ -1,0 +1,79 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+#import <stdint.h>
+
+#pragma mark - Clusters IDs
+
+typedef NS_ENUM(uint32_t, MTRClusterIDType) {
+{{#zcl_clusters}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+MTRClusterIDType{{>cluster}}ID = {{asMEI manufacturerCode code}},
+{{/zcl_clusters}}
+};
+
+#pragma mark - Attributes IDs
+
+typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
+// Global attributes
+{{#zcl_attributes_server}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#unless clusterRef}}
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
+{{/unless}}
+{{/zcl_attributes_server}}
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+// Cluster {{>cluster}} attributes
+{{/first}}
+{{#if clusterRef}}
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
+{{else}}
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID,
+{{/if}}
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Commands IDs
+
+typedef NS_ENUM(uint32_t, MTRCommandIDType) {
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+// Cluster {{>cluster}} commands
+{{/first}}
+MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID = {{asMEI manufacturerCode code}},
+{{#last}}
+
+{{/last}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Events IDs
+
+typedef NS_ENUM(uint32_t, MTREventIDType) {
+{{#zcl_clusters}}
+{{#zcl_events}}
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+// Cluster {{>cluster}} events
+{{/first}}
+MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID = {{asMEI manufacturerCode code}},
+{{#last}}
+
+{{/last}}
+{{/zcl_events}}
+{{/zcl_clusters}}
+};

@@ -13,7 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 57.3.1. [TC-I-3.1] Attributes with client as DUT
+name: 59.3.1. [TC-I-3.1] Attributes with Client as DUT
+
+PICS:
+    - I.C
+    - I.C.AM-READ
+    - I.C.AO-READ
+    - I.C.AM-WRITE
+    - I.C.AO-WRITE
 
 config:
     nodeId: 0x12344321
@@ -21,11 +28,18 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+    - label: "Note"
       verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
           ./chip-tool identify read identify-time 1 1
+          Verify DUT receives  identify-time attribute response on the TH(all-clusters-app) Log:
 
           [1648015371.159715][2506:2506] CHIP:IM: Received Read request
           [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
@@ -45,7 +59,10 @@ tests:
           [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
           [1648015371.160324][2506:2506] CHIP:DMG: },
 
+
            ./chip-tool identify  read   identify-type 1 1
+          Verify DUT receives   identify-type attribute response on the TH(all-clusters-app) Log:
+
           [1648015519.017225][2506:2506] CHIP:IM: Received Read request
           [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
           [1648015519.017332][2506:2506] CHIP:DMG: {
@@ -66,18 +83,21 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
+          "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          see above
+          There is no optional attibute for this cluster
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received write request looks like this (f.e identify-time (id 0) value 60):
-           ./chip-tool identify  write   identify-time  1 1 1
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool identify  write   identify-time  1 1 1
+
+          Verify DUT receives  identify-time attribute write response on the TH(all-clusters-app) Log:
           [1646012277.591912][33190:33190] CHIP:IM: Received Write request
           [1646012277.591936][33190:33190] CHIP:DMG: IM WH moving to [Initialized]
           [1646012277.591987][33190:33190] CHIP:DMG: WriteRequestMessage =
@@ -108,7 +128,73 @@ tests:
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
-          see above
+          There is no write optional attibute for this cluster
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool identify read identify-time 1 1
+          Verify DUT receives  identify-time attribute response on theTH(all-clusters-minimal-app)
+
+          [1648015371.159715][2506:2506] CHIP:IM: Received Read request
+          [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
+          [1648015371.159840][2506:2506] CHIP:DMG: {
+          [1648015371.159866][2506:2506] CHIP:DMG:         AttributePathIBs =
+          [1648015371.159903][2506:2506] CHIP:DMG:         [
+          [1648015371.159932][2506:2506] CHIP:DMG:                 AttributePathIB =
+          [1648015371.159968][2506:2506] CHIP:DMG:                 {
+          [1648015371.160006][2506:2506] CHIP:DMG:                         Endpoint = 0x1,
+          [1648015371.160047][2506:2506] CHIP:DMG:                         Cluster = 0x3,
+          [1648015371.160087][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1648015371.160127][2506:2506] CHIP:DMG:                 }
+          [1648015371.160164][2506:2506] CHIP:DMG:
+          [1648015371.160201][2506:2506] CHIP:DMG:         ],
+          [1648015371.160238][2506:2506] CHIP:DMG:
+          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true,
+          [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
+          [1648015371.160324][2506:2506] CHIP:DMG: },
+
+
+           ./chip-tool identify  read   identify-type 1 1
+          Verify DUT receives  identify-type attribute response on theTH(all-clusters-minimal-app)
+
+          [1648015519.017225][2506:2506] CHIP:IM: Received Read request
+          [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
+          [1648015519.017332][2506:2506] CHIP:DMG: {
+          [1648015519.017363][2506:2506] CHIP:DMG:         AttributePathIBs =
+          [1648015519.017403][2506:2506] CHIP:DMG:         [
+          [1648015519.017437][2506:2506] CHIP:DMG:                 AttributePathIB =
+          [1648015519.017577][2506:2506] CHIP:DMG:                 {
+          [1648015519.017624][2506:2506] CHIP:DMG:                         Endpoint = 0x1,
+          [1648015519.017673][2506:2506] CHIP:DMG:                         Cluster = 0x3,
+          [1648015519.017721][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1648015519.017768][2506:2506] CHIP:DMG:                 }
+          [1648015519.017813][2506:2506] CHIP:DMG:
+          [1648015519.017853][2506:2506] CHIP:DMG:         ],
+          [1648015519.017894][2506:2506] CHIP:DMG:
+          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
+          [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
+          [1648015519.018003][2506:2506] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          There is no optional attibute for this cluster
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          There is no optional write attibute for this cluster
       disabled: true

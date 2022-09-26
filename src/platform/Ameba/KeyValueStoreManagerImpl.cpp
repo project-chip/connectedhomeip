@@ -21,6 +21,7 @@
  *          Platform-specific key value storage implementation for Ameba
  */
 /* this file behaves like a config.h, comes first */
+#include "FreeRTOS.h"
 #include "chip_porting.h"
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
@@ -49,18 +50,35 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return (err = CHIP_ERROR_NOT_IMPLEMENTED);
     }
 
-    ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
-
-    if (TRUE == ret)
+    if (read_bytes_size)
     {
-        err = CHIP_NO_ERROR;
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
     }
     else
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        size_t * dummy_read_bytes_size = (size_t *) pvPortMalloc(sizeof(size_t));
+        if (!dummy_read_bytes_size)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, dummy_read_bytes_size);
+        vPortFree(dummy_read_bytes_size);
+    }
+    switch (ret)
+    {
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
     }
 
-    return err;
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
@@ -85,14 +103,22 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int32_t ret = deleteKey(key, key);
+    switch (ret)
+    {
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
+    }
 
-    if (TRUE == deleteKey(key, key))
-        err = CHIP_NO_ERROR;
-    else
-        err = CHIP_ERROR_INTERNAL;
-
-    return err;
+    return CHIP_ERROR_INTERNAL;
 }
 
 } // namespace PersistedStorage

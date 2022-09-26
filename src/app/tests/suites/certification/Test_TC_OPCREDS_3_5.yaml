@@ -1,0 +1,209 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 12.3.5. [TC-OPCREDS-3.5] NOC Check for UpdateNOC [DUT-Server]
+
+PICS:
+    - OPCREDS.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 fully commissions the DUT"
+      verification: |
+          "DUT side:
+          sudo ./chip-all-clusters-app --wifi
+
+          TH side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0 --fabric-filtered 1
+
+          Verify  NOC lists and verify the returned lists has single entry in TH(chip-tool) Log
+
+          [1658736497.592132][3787:3792] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 999376603
+          [1658736497.595396][3787:3792] CHIP:TOO:   NOCs: 1 entries
+          [1658736497.595477][3787:3792] CHIP:TOO:     [1]: {
+          [1658736497.595519][3787:3792] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A3706241501241101182407012408013009410410C15281FE7A04637C46E47E30948152C5F9481B6D62D08C9D476A3D44D26E20C704DCAE97FCA4612B17A2A9B16A2D78BF9220F63E9CD19C6589CFC4CE09FF90370A350128011824020136030402040118300414C8FF1A09BE17C6824D61DA88A603A7B180804009300514574F6879804602B57796FB2D6F7212969A171E7118300B40A969CA49361A3F69E3220B19583F05F6D6B2D156AFE1992FDAD8A67A22049A0A7F62E7F303BA0B8AFDC2826A77AC94A3D042F4C611FDE66B41E34B812CEB3CFB18
+          [1658736497.595588][3787:3792] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104650A6D674CF5E46402644A71D2BD59888911C9B997F5797369BAA8545057A2379DDA08AF05269B0C009AF76F940EA120DCBAF0E7720921A44C22DC07BF1BD44C370A3501290118240260300414574F6879804602B57796FB2D6F7212969A171E713005142D48B9286C5E218E5AD7EFFC31E492E297FCA12818300B40604E48C301208B4CA077AD7EEAB2DAFA2A728556A86D610234AD8200E7AE0D85836279320D5F3EFF97D573D53FC9D88B44103602FC3CA8574C844A8379BCC52C18
+          [1658736497.595621][3787:3792] CHIP:TOO:       FabricIndex: 1
+          [1658736497.595662][3787:3792] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH1 reads the TrustedRootCertificates attribute from the Node
+          Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates    1 0
+
+          Verify the value returned has a single entry
+
+          [1658736567.913921][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 999376603
+          [1658736567.914057][3938:3943] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1658736567.914145][3938:3943] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A3706241400182407012408013009410470D319542F3A50625EF977E66A1277F3E50FCFF4516A5162E25016CB4E170A4D62562797E12184EB9A88A0160697122C9E473B7AA7F776E239CCB4420A82D4FE370A35012901182402603004142D48B9286C5E218E5AD7EFFC31E492E297FCA1283005142D48B9286C5E218E5AD7EFFC31E492E297FCA12818300B40C7EB3A1BA993A52EBC1D2E16C763CD9C9E4BDD82B166084FA72B5DF73437E9EB257271E09C69A8DEB6A2C09D42F833A788FD0E4092F0DA7229992B31587EE9DF18
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 900"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
+
+          Verify the ArmFailSafeResponse with the ErrorCode set to OK is returned
+
+          [1658736675.488274][4129:4134] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1658736675.488329][4129:4134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1658736675.488401][4129:4134] CHIP:TOO:   ArmFailSafeResponse: {
+          [1658736675.488441][4129:4134] CHIP:TOO:     errorCode: 0
+          [1658736675.488471][4129:4134] CHIP:TOO:     debugText:
+          [1658736675.488496][4129:4134] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
+          true"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+          To get csr nonce give below command 2 times in TH(chip-tool)
+           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+
+          ./chip-tool operationalcredentials csrrequest hex:C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F 1 0 --IsForUpdateNOC 0
+
+          Verify that the DUT returns a CSRResponse in TH(chip-tool) log
+          [1658743641.233113][9670:9675] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          [1658743641.233162][9670:9675] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0005
+          [1658743641.233226][9670:9675] CHIP:TOO:   CSRResponse: {
+          [1658743641.233269][9670:9675] CHIP:TOO:     NOCSRElements: 153001CA3081C73070020100300E310C300A060355040A0C034353523059301306072A8648CE3D020106082A8648CE3D03010703420004D3C12FD39A573184AC822E12F9D76C43EA3872B8D541BF0DCF68FF33AF7E62E71ADB4D4F35AA9E206D00CC290CCA1BAD557537A05BA8D3BAD1B7F3EE323B2CE9A000300A06082A8648CE3D04030203470030440220232B91662198D24E57F5967A06C0A554991CAA02D958D507AAAABB41450AD39002204575858E909DCE43563F33725928FF2AA01A176CECF611F9B248CD9D2CBC76CA300220C11D6EAA00A54066220DA7F3FC5DC0F684C13D8B8FD3758B51163C2AEDD6F10F18
+          [1658743641.233306][9670:9675] CHIP:TOO:     attestationSignature: 2D4052E30061B78A79B5C2D392C93BEFADE17BA5F3547776A545D4913EC935CF446C9105E9F203BF898BF17F87106E63AD8E93E894C5398CAC344F7D6ECE27F6
+      disabled: true
+
+    - label:
+          "TH1 generates a new NOC and ICAC with the following properties: new
+          NOC is generated from the NOCSR returned in csr_update1. The subject
+          is set to match noc_original. The NOC is signed by the new ICA. Save
+          as noc_update1 new ICAC must be distinguishable from icac_original.
+          This can be accomplished by changing any of the following: the
+          subject, subject public key or validity. The certificate must be
+          valid. ICAC is signed by the original key for trusted_root_original.
+          Save as icac_update1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to noc_update1
+          ICACValue is to set icac_update1"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 0"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 Sends CSRRequest command with the IsForUpdateNOC field set to
+          true"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 generates a new NOC and ICAC with the following properties: new
+          NOC is generated from the NOCSR returned in csr_update2. The subject
+          is set to match noc_original. The NOC is signed by new ICA. Save as
+          noc_update2 new ICAC must be distinguishable from icac_original and
+          icac_update1. This can be accomplished by changing any of the
+          following: the subject, subject public key or validity. The
+          certificate must be valid. ICAC is signed by the original key for
+          trusted_root_original. Save as icac_update2"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends the UpdateNOC command to the Node Operational Credentials
+          cluster with the following fields: NOCValue is set to noc_update2
+          ICACValue is to set icac_update2"
+      PICS: OPCREDS.S.C07.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends the CommissioningComplete command to the General
+          Commissioning cluster"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 0 to verify that the CommissioningComplete command
+          successfully persisted the failsafe context."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads the NOCs attribute from the Node Operational Credentials
+          cluster using a fabric-filtered read"
+      verification: |
+
+      disabled: true

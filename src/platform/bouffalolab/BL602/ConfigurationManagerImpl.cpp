@@ -31,11 +31,10 @@
 #include <platform/bouffalolab/BL602/BL602Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-//#include "esp_wifi.h"
-//#include "nvs.h"
-//#include "nvs_flash.h"
 extern "C" {
 #include <bl602_hal/hal_sys.h>
+#include <bl_efuse.h>
+#include <easyflash.h>
 }
 
 namespace chip {
@@ -66,25 +65,30 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
+    uint32_t rebootCount;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<BL602Config>::Init();
     SuccessOrExit(err);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
+    if (BL602Config::ConfigValueExists(BL602Config::kCounterKey_RebootCount))
     {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kInternalSRAM12Start = (uint8_t *) 0x3FFAE000;
-        uint8_t * const kInternalSRAM12End   = kInternalSRAM12Start + (328 * 1024) - 1;
-
-        // Scan ESP32 Internal SRAM regions 1 and 2 for injected provisioning data and save
-        // to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kInternalSRAM12Start, kInternalSRAM12End);
+        err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
     }
+    else
+    {
+        rebootCount = 0;
+    }
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
+    err = StoreRebootCount(rebootCount + 1);
+    SuccessOrExit(err);
+
+    if (!BL602Config::ConfigValueExists(BL602Config::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
@@ -107,6 +111,26 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return BL602Config::ReadConfigValue(BL602Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return BL602Config::WriteConfigValue(BL602Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(BL602Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(BL602Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
@@ -192,26 +216,21 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    // 3R: TODO
-
-    // // Erase all values in the chip-config NVS namespace.
-    // err = ClearNamespace(kConfigNamespace_ChipConfig);
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
-    // }
-
-    // // Restore WiFi persistent settings to default values.
-    // err = esp_wifi_restore();
-    // if (err != ESP_OK)
-    // {
-    //     ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
-    // }
-
-    // Restart the system.
+    ef_env_set_default();
     ChipLogProgress(DeviceLayer, "System restarting");
     hal_reboot();
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+    bl_efuse_read_mac(buf);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

@@ -53,6 +53,7 @@ struct FactoryData
     struct FactoryDataString spake2_verifier;
     uint16_t discriminator;
     uint32_t passcode;
+    struct FactoryDataString enable_key;
     struct FactoryDataString user;
 
     bool vendorIdPresent;

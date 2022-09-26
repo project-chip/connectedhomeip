@@ -37,7 +37,6 @@ namespace {
 
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -62,7 +61,6 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AppButton.Init();
-
     AppButton.SetButtonPressCallback(ButtonPressCallback);
 
     return err;

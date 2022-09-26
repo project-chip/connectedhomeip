@@ -151,7 +151,7 @@ To prepare the accessory device for commissioning, complete the following steps:
 3.  Find a message similar to the following one in the application logs:
 
         I: 615 [SVR]Copy/paste the below URL in a browser to see the QR Code:
-        I: 621 [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+        I: 621 [SVR]https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 
 4.  Open the URL in a web browser to have the commissioning QR code generated.
 5.  Press the appropriate button on the device to start the Bluetooth LE

@@ -49,7 +49,6 @@
 #include <task.h>
 
 #include <lwip/netifapi.h>
-#include <mdns_server.h>
 #include <wifi_mgmr_ext.h>
 
 #include <FreeRTOS.h>
@@ -153,6 +152,27 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     UpdateInternetConnectivityState();
 #endif
+}
+
+void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
+{
+    if (mWiFiStationState != newState)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
+                        WiFiStationStateToStr(newState));
+        mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+    }
+}
+
+void ConnectivityManagerImpl::OnIPv6AddressAvailable()
+{
+    ChipLogProgress(DeviceLayer, "IPv6 addr available.");
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 } // namespace DeviceLayer

@@ -23,6 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -68,6 +69,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+    ReturnErrorOnFailure(ConfigurationMgr().GetBootReason(reason));
+
+    VerifyOrReturnError(CanCastTo<BootReasonType>(reason), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    bootReason = static_cast<BootReasonType>(reason);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
@@ -75,6 +87,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // On Darwin, overide with non-op to pass CI.
 
     return CHIP_NO_ERROR;
+}
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

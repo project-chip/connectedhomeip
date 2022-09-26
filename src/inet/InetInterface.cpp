@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -423,7 +423,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, intfName, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, intfName);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)
@@ -698,7 +698,7 @@ CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mIntfArray[mCurIntf].if_name);
     return CHIP_NO_ERROR;
 }
 
@@ -723,8 +723,7 @@ short InterfaceIterator::GetFlags()
 
     if (!mIntfFlagsCached && HasCurrent())
     {
-        strncpy(intfData.ifr_name, mIntfArray[mCurIntf].if_name, IFNAMSIZ);
-        intfData.ifr_name[IFNAMSIZ - 1] = '\0';
+        Platform::CopyString(intfData.ifr_name, mIntfArray[mCurIntf].if_name);
 
         int res = ioctl(GetIOCTLSocket(), SIOCGIFFLAGS, &intfData);
         if (res == 0)
@@ -843,7 +842,7 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mCurAddr->ifa_name);
     return CHIP_NO_ERROR;
 }
 
@@ -868,6 +867,8 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
 
     struct ifaddrs * ifaddr;
     const int rv = getifaddrs(&ifaddr);
+    bool found   = false;
+
     if (rv == -1)
     {
         return INET_ERROR_ADDRESS_NOT_FOUND;
@@ -881,9 +882,10 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
                 ((mPlatformInterface == 0) || (mPlatformInterface == if_nametoindex(ifaddr_iter->ifa_name))))
             {
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
-                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
+                if ((sin6_addr->s6_addr[0] == 0xfe) && ((sin6_addr->s6_addr[1] & 0xc0) == 0x80)) // Link Local Address
                 {
                     (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    found     = true;
                     break;
                 }
             }
@@ -891,7 +893,7 @@ CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr) const
     }
     freeifaddrs(ifaddr);
 
-    return CHIP_NO_ERROR;
+    return (found) ? CHIP_NO_ERROR : INET_ERROR_ADDRESS_NOT_FOUND;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -913,7 +915,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, name, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, name);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <platform/android/ConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
 namespace chip {
@@ -30,15 +31,15 @@ public:
     CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
 
-private:
-    friend DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl();
-    static DeviceInstanceInfoProviderImpl sInstance;
+    DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl & configManager) :
+        Internal::GenericDeviceInstanceInfoProvider<Internal::AndroidConfig>(configManager)
+    {}
 };
 
 inline DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl()
 {
-    return DeviceInstanceInfoProviderImpl::sInstance;
+    static DeviceInstanceInfoProviderImpl sInstance(ConfigurationManagerImpl::GetDefaultInstance());
+    return sInstance;
 }
-
 } // namespace DeviceLayer
 } // namespace chip

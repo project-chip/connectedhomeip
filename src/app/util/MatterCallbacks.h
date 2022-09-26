@@ -19,6 +19,10 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+
 void MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath);
 void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath);
 void MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath);
@@ -29,11 +33,13 @@ void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & a
  * This callback is called once the message has been determined to be a command, and
  * before the command is dispatched to the receiver.
  */
-CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath);
+CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::Access::SubjectDescriptor & subjectDescriptor);
 
 /** @brief Matter Post Command Received
  *
  * This callback is called once the message has been determined to be a command, but
  * after it being dispatched to the receiver.
  */
-void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath);
+void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor);

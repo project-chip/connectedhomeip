@@ -65,14 +65,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     VerifyOrReturnError(buf.Alloc(read_size), CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(mStorage.ReadValueBin(key, buf.Get(), read_size, read_size));
 
-    size_t copy_size = std::min(value_size, read_size - offset_bytes);
+    size_t total_size_to_read = read_size - offset_bytes;
+    size_t copy_size          = std::min(value_size, total_size_to_read);
     if (read_bytes_size != nullptr)
     {
         *read_bytes_size = copy_size;
     }
     ::memcpy(value, buf.Get() + offset_bytes, copy_size);
 
-    return CHIP_NO_ERROR;
+    return (value_size < total_size_to_read) ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)

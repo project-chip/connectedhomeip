@@ -1,0 +1,38 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.2.1. [TC-LOWPOWER-2.1] Low Power Mode Verification (DUT as Server)
+
+PICS:
+    - LOWPOWER.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Low Power"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH sends Sleep command to DUT"
+      PICS: LOWPOWER.S.C00.Rsp
+      command: "Sleep"
+      response:
+          error: 0

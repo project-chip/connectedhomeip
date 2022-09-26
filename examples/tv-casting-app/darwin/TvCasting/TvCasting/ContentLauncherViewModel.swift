@@ -32,15 +32,17 @@ class ContentLauncherViewModel: ObservableObject {
             if let castingServerBridge = CastingServerBridge.getSharedInstance()
             {
                 castingServerBridge
-                    .contentLauncherLaunchUrl(contentUrl!,
+                    .contentLauncher_launchUrl(contentUrl!,
                                               contentDisplayStr: contentDisplayStr!,
-                                              launchUrlResponseCallback:
+                                              responseCallback:
                                                 { (result: Bool) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launchUrlResponseCallback result \(result)")
-                        self.status = result ? "Launched URL successfully" : "Launch URL failure!"
+                        DispatchQueue.main.async {
+                            self.status = result ? "Launched URL successfully" : "Launch URL failure!"
+                        }
                     },
                                               clientQueue: DispatchQueue.main,
-                                              launchUrlRequestSentHandler:
+                                              requestSentHandler:
                                                 { (result: Bool) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launcUrlRequestSentHandler result \(result)")
                         self.status = result ? "Sent Launch URL request" : "Failed to send Launch URL request!"

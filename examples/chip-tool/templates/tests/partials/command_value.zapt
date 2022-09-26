@@ -46,7 +46,7 @@
       {{else if (isCharString type)}}
         chip::Span<const char>("{{chip_tests_config_get_default_value definedValue}}", {{utf8StringLength (chip_tests_config_get_default_value definedValue)}});
       {{else if (isOctetString type)}}
-        {{!-- TODO Extract the length of the default value for ByteSpan--}}
+        {{> octetStringValue value=(chip_tests_config_get_default_value definedValue)}};
       {{else}}
         {{#if_is_strongly_typed_bitmap type}}
           static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral (chip_tests_config_get_default_value definedValue) type}});
@@ -60,11 +60,7 @@
       {{else if (isCharString type)}}
         chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{utf8StringLength definedValue}});
       {{else if (isOctetString type)}}
-        {{~#if (isHexString definedValue)}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringFromHexString definedValue}}garbage: not in length on purpose"), {{octetStringLengthFromHexString definedValue}});
-        {{else}}
-          chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral definedValue}}garbage: not in length on purpose"), {{definedValue.length}});
-        {{/if}}
+        {{> octetStringValue value=definedValue extraGarbage="garbage: not in length on purpose"}};
       {{else}}
         {{#if_is_strongly_typed_bitmap type}}
           static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral definedValue type}});

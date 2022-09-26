@@ -36,12 +36,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
+void ApplicationInit() {}
+
 int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;
-    app.Init(argc, argv);
+    VerifyOrDie(app.Init(argc, argv) == 0);
 
-    LightingMgr().Init();
+    VerifyOrDie(LightingMgr().Init() == CHIP_NO_ERROR);
 
     return app.RunMainLoop();
 }

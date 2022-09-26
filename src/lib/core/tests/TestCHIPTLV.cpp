@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -36,6 +36,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
@@ -200,9 +202,11 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 
 struct TestTLVContext
 {
-    nlTestSuite * mSuite;
-    int mEvictionCount;
-    uint32_t mEvictedBytes;
+    nlTestSuite * mSuite   = nullptr;
+    int mEvictionCount     = 0;
+    uint32_t mEvictedBytes = 0;
+
+    TestTLVContext(nlTestSuite * suite) : mSuite(suite) {}
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
@@ -237,13 +241,15 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const cha
     size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<char> valBuffer;
-    char * val = valBuffer.Alloc(expectedLen + 1).Get();
-
+    char * val     = nullptr;
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -253,12 +259,15 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> valBuffer;
-    uint8_t * val  = valBuffer.Alloc(expectedLen).Get();
+    uint8_t * val  = nullptr;
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, const System::PacketBufferHandle & buffer, const uint8_t * expectedVal,
@@ -1666,6 +1675,56 @@ void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
     reader.Init(buf, encodedLen);
     reader.ImplicitProfileId = TestProfile_2;
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+}
+
+static char gStringDumpWriterBuf[128]        = { 0 };
+static size_t gStringDumpWriterLengthWritten = 0;
+
+/**
+ *  Log the specified message in the form of @a aFormat.
+ *
+ *  @param[in]     aFormat   A pointer to a NULL-terminated C string with
+ *                           C Standard Library-style format specifiers
+ *                           containing the log message to be formatted and
+ *                           logged.
+ *  @param[in]     ...       An argument list whose elements should correspond
+ *                           to the format specifiers in @a aFormat.
+ *
+ */
+void ENFORCE_FORMAT(1, 2) StringDumpWriter(const char * aFormat, ...)
+{
+    va_list args;
+
+    va_start(args, aFormat);
+
+    gStringDumpWriterLengthWritten +=
+        static_cast<size_t>(vsprintf(&gStringDumpWriterBuf[gStringDumpWriterLengthWritten], aFormat, args));
+
+    va_end(args);
+}
+
+/**
+ *  Test Octet String Pretty Printer
+ */
+void CheckOctetStringPrettyPrinter(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t testOctetString[] = { 0x62, 0xFA, 0x82, 0x33, 0x59, 0xAC, 0xFA, 0xA9 };
+    const char expectedPrint[] =
+        "0x04, tag[Common Profile (2 Bytes)]: 0x0::0x0::0x0, type: Octet String (0x10), length: 8, value: hex:62FA823359ACFAA9\n";
+    uint8_t encodedBuf[128] = { 0 };
+
+    TLVWriter writer;
+    writer.Init(encodedBuf);
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.PutBytes(CommonTag(0), testOctetString, sizeof(testOctetString)));
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.Finalize());
+
+    TLVReader reader;
+    reader.Init(encodedBuf, writer.GetLengthWritten());
+
+    chip::TLV::Debug::Dump(reader, StringDumpWriter);
+
+    NL_TEST_ASSERT(inSuite, strlen(expectedPrint) == strlen(gStringDumpWriterBuf));
+    NL_TEST_ASSERT(inSuite, strcmp(expectedPrint, gStringDumpWriterBuf) == 0);
 }
 
 /**
@@ -4389,6 +4448,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Inet Buffer Test",                    CheckPacketBuffer),
     NL_TEST_DEF("Buffer Overflow Test",                CheckBufferOverflow),
     NL_TEST_DEF("Pretty Print Test",                   CheckPrettyPrinter),
+    NL_TEST_DEF("Pretty Octet String Print Test",      CheckOctetStringPrettyPrinter),
     NL_TEST_DEF("Data Macro Test",                     CheckDataMacro),
     NL_TEST_DEF("Strict Aliasing Test",                CheckStrictAliasing),
     NL_TEST_DEF("CHIP TLV Basics",                     CheckCHIPTLVBasics),
@@ -4448,14 +4508,8 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context;
 
-    context.mSuite = &theSuite;
-
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestTLVContext>(&theSuite, &theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

@@ -28,6 +28,7 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>

@@ -1,10 +1,8 @@
 {
     "deps_info": {
         "name": "child_library_2.json",
-        "jar_path": "python/lib/build/chip/java/tests/child_library_2.jar",
-        "deps_configs": [
-            "python/gen/build/chip/java/tests/grandchild_library.json"
-        ],
-        "deps_jars": ["python/lib/build/chip/java/tests/grandchild_library.jar"]
+        "jar_path": "lib/build/chip/java/tests/child_library_2.jar",
+        "deps_configs": ["gen/build/chip/java/tests/grandchild_library.json"],
+        "deps_jars": ["lib/build/chip/java/tests/grandchild_library.jar"]
     }
 }

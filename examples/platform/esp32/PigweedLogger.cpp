@@ -39,7 +39,7 @@ bool uartInitialised;
 
 void send()
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 

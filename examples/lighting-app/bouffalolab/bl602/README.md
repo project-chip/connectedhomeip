@@ -1,124 +1,138 @@
 # BL602
 
 This example functions as a wifi light bulb device type, with on/off
-capabilities. The steps were verified on BL602-IoT-DVK-3S board.
+capabilities. The steps were verified on BL602-IoT-Matter-V1 board.
 
-BL602-IoT-DVK-3S
-<img src="../../../platform/bouffalolab/bl602/doc/images/bl602_iot_3S_v2.jpg" style="zoom:25%;" />
+BL602-IoT-Matter-V1 board and
+[purchase link](https://www.amazon.com/dp/B0B9ZVGXD8):
+<img src="../../../platform/bouffalolab/bl602/doc/images/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## Initial setup
 
--   Setting up the environment on ubuntu 20.04 or 18.04
+The steps in this document were validated on Ubuntu 18.04 and 20.04.
 
-```
-$ sudo apt-get update
-$ sudo apt-get upgrade
-$ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev bluez avahi-daemon
-$ sudo apt-get install pi-bluetooth (if not raspberry pi, sudo apt-get install bluetooth)
-$ reboot
+-   Install dependencies as specified in the connectedhomeip repository:
+    [Building Matter](https://github.com/project-chip/connectedhomeip/blob/interop_testing_te9/docs/guides/BUILDING.md).
+-   Install other dependencies:
 
-```
+    ```
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt-get install bluez avahi-daemon bluetooth
+    reboot
+    ```
 
 -   Clone and initialize the connectedhomeip repo
 
-```
-git clone https://github.com/project-chip/connectedhomeip.git
-cd connectedhomeip
-git submodule update --init --recursive
-```
-
--   Install packets
-
-```
-$ cd {path-to-connectedhomeip}
-connectedhomeip$ source ./scripts/bootstrap.sh
-connectedhomeip$ source ./scripts/activate.sh
-
-```
-
-## Build the image
-
--   Build the example application:
-
-    `connectedhomeip$ ./scripts/build/build_examples.py --target bl602-light build`
-
-    Generated files
-
-    `connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin`
-
-    -   To delete generated executable, libraries and object files use:
-
     ```
-    $ cd ~/connectedhomeip/
-    $ rm -rf out/
+    git clone https://github.com/project-chip/connectedhomeip.git
+    cd connectedhomeip
+    git submodule update --init --recursive
+    source ./scripts/activate.sh
     ```
 
-## Flash the board
+## Build the image and flash the board
 
--   Download [Bouffalo Lab Dev Cube](https://dev.bouffalolab.com/download/).
+-   Build the
+    [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/bouffalolab/bl602)
 
-    Log in to the site as a guest.
+    ```
+    ./scripts/build/build_examples.py --target bl602-light build
+    ```
 
-    <img src="../../../platform/bouffalolab/bl602/doc/images/image-web-login.png" style="zoom:30%;" align=left />
+-   Build the lighting-app with Pigweed RPC:
 
-    <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube.png" style="zoom:30%;" align=left />
+    ```
+    ./scripts/examples/gn_bl602_example.sh lighting-app ./out/bl602-light 'import("//with_pw_rpc.gni")'
+    ```
 
-run the software :
+-   Connect the board to your flashing station (MacOS, Ubuntu, Windows).
 
-  <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-home.png" style="zoom:70%;" align=left />
+-   Set the board to the download mode:
 
-  <img src="../../../platform/bouffalolab/bl602/doc/images/dev-cube-iot.png" style="zoom:70%;" />
+    -   Press and hold the BOOT button.
+    -   Press the RESET button and release it.
+    -   Release the BOOT button.
 
-The following picture shows the burning interface. To download the firmware, you
-need to enter the download mode: press and hold the Boot (IO8) pin of the
-development board, press the **RST** button, and then release the Boot button to
-enter the burning and downloading mode.
+-   The device should present itself as a USB serial device on your computer.
+    You may look it up in /dev/ttyACM0
 
-<img src="../../../platform/bouffalolab/bl602/doc/images/image-dev-cube.png" style="zoom:70%;" align=left />
+    ```
+    ls -la /dev/tty*
+    ```
 
-Notice: Latest version Bouffalolab dev cube is recommended.
+    If the device is at /dev/ttyACM0, flash the board using the following
+    commands:
 
-Factory Params:
-`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts`
+    ```
+    cd third_party/bouffalolab/repo/tools/flash_tool
 
-Partition Table:
-`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/partition/partition_cfg_2M.toml`
+    ./bflb_iot_tool-ubuntu --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../out/bl602-light/chip-bl602-lighting-example.bin
+    ```
 
-Boot2 Bin:
-`BouffaloLabDevCube-1.7.2-linux-x86/chips/bl602/builtin_imgs/boot2_iap_v5.5/boot2_iap_release.bin`
-
-Firmware Bin: `connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin`
-
-Partition Table：
-
-1. FW: The size of FW size0 must be larger than the bin size, we can do it by
-   reducing the size of FW size1 and media partition size0.
-
-COM Port:
-
-```
-   ls -la /dev/ttyUSB*
-```
-
-select the big one.
+    ```
+    If you want to erase previous network information in flash, you can add --erase parameters to the bflb_iot_tool-ubuntu18 command. For Windows and MacOS, replace bflb_iot_tool-ubuntu18 with bflb_iot_tool.exe and bflb_iot_tool-macos, respectively.
+    ```
 
 ## Validate the example
 
-1.The device should present itself as a USB serial device on your computer. You
-may look it up in `/dev/`:
+1.You can open the serial console. For example, if the device is at
+`/dev/ttyACM0`:
 
 ```
-ls -la /dev/tty*
+picocom -b 115200 /dev/ttyACM0
 ```
 
-You can open the serial console. For example, if the device is at `/dev/USB1`:
+2.To reset the board, press the RESET button, and you will see the log in the
+`picocom terminal`.
 
 ```
-picocom -b 2000000 /dev/ttyUSB1
+Starting bl602 now....
+Booting BL602 Chip...
 ```
 
-To reset the board, press the **RST** button. And you will see the log from the
-demo board.
+3.To control the development board after successfully debugging the development
+board, press the BOOT button and you should see the following output in the
+terminal:
+
+```
+[    404197][:588238200] Short press
+[    404198][:588238200] receiving event type: 0
+[    404203][:588238200] sending event type: 0
+[    404207][:588238200] receiving event type: 0
+[    404211][:588238200] Turning light ON
+[    406211][:588238200] sending event type: 1
+[    406212][:588238200] receiving event type: 1
+[    406217][:588238200] Light ON
+[    406220][:588238200] updating on/off = 1
+```
+
+4.To restore the board to factory Settings, press and hold the BOOT button for 5
+seconds, and you should see the following output in the terminal:
+
+```
+[     37268][:588238200] LongLong press
+[     37269][:588238200] receiving event type: 0
+[     37274][:588238200] FactoryReset! please release button!!!
+[     37279][:588238200] Toggling state to 1
+[     37283][:588238200] brightness: 255, mHue: 0, mSaturation: 0, red: 255, green: 255, blue: 255
+[     37292][:588238200] red level: 10000
+[     38296][:588238200] Toggling state to 0
+[     38297][:588238200] brightness: 0, mHue: 0, mSaturation: 0, red: 0, green: 0, blue: 0
+[     38305][:588238200] red level: 0
+[     39308][:588238200] Toggling state to 1
+[     39309][:588238200] brightness: 255, mHue: 0, mSaturation: 0, red: 255, green: 255, blue: 255
+[     39318][:588238200] red level: 10000
+[     42323][:588238200] [DL] Easyflash erase: f/1/n
+[     42327][:588238200] [DL] Easyflash erase: f/1/i
+[     42332][:588238200] [DL] Easyflash erase: f/1/r
+[     42335][:588238200] [DL] Easyflash erase: f/1/m
+[     42340][:588238200] [DL] Easyflash erase: f/1/o
+[     42349][:588238200] [DIS] Fabric (0x1) deleted. Calling OnFabricDeletedFromStorage
+[     42403][:588238200] [DL] Easyflash erase: f/1/k/0
+[     42462][:588238200] [DL] Easyflash erase: f/1/g
+[     42465][:588238200] [DMG] AccessControl: removing fabric 1
+```
 
 ## Commission a device using chip-tool
 
@@ -133,16 +147,16 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the BL602 lighting-app to commission it onto a Wi-Fi network:
 
-```
-$ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
+    ```
+    $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
 
- Parameters:
- 1. Discriminator: 3840
- 2. Setup-pin-code: 20202021
- 3. Node ID: 1
- 4. SSID : Wi-Fi SSID
- 5. PASSWORD : Wi-Fi Password
-```
+    Parameters:
+    1. Discriminator: 3840
+    2. Setup-pin-code: 20202021
+    3. Node ID: 1
+    4. SSID : Wi-Fi SSID
+    5. PASSWORD : Wi-Fi Password
+    ```
 
 ### Cluster control
 
@@ -150,8 +164,29 @@ $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
     the OnOff attribute. This allows you to toggle a parameter implemented by
     the device to be On or Off.
 
-    `$ sudo ./chip-tool onoff on 1 1`
+    ```
+    $ sudo ./chip-tool onoff on 1 1
+    ```
 
 -   Use ColorControl cluster command to control the color attributes:
 
-    `$ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1`
+    ```
+    $ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1
+    ```
+
+### Running RPC Console
+
+-   Build chip-console following this
+    [guide](../../../common/pigweed/rpc_console/README.md)
+
+-   Start the console
+
+    ```
+    $ chip-console --device /dev/ttyUSB0 -b 2000000
+    ```
+
+-   Get or Set the light state
+
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128)`

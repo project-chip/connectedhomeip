@@ -1,0 +1,40 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Options from standalone-chip.mk that differ from configure defaults. These
+# options are used from examples/.
+
+import("//build_overrides/chip.gni")
+
+chip_device_platform = "beken"
+
+chip_project_config_include = ""
+chip_system_project_config_include = ""
+chip_ble_project_config_include = ""
+
+mbedtls_target = "${chip_root}/config/beken/mbedtls:mbedtls"
+lwip_platform = "external"
+
+chip_build_tests = false
+
+chip_inet_config_enable_tcp_endpoint = true
+chip_inet_config_enable_udp_endpoint = true
+
+chip_config_network_layer_ble = true
+chip_config_memory_management = "platform"
+chip_enable_additional_data_advertising = true
+chip_enable_rotating_device_id = true
+chip_enable_ota_requestor = true
+
+custom_toolchain = "${chip_root}/config/beken/toolchain:beken"

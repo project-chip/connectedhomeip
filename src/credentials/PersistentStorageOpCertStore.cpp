@@ -67,22 +67,15 @@ bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabr
         return false;
     }
 
-    uint16_t keySize = 0;
-    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, nullptr, keySize);
+    // TODO(#16958): need to actually read the cert to know if it's there due to platforms not
+    //               properly enforcing CHIP_ERROR_BUFFER_TOO_SMALL behavior needed by
+    //               PersistentStorageDelegate.
+    uint8_t placeHolderCertBuffer[kMaxCHIPCertLength];
 
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        // Obviously not found
-        return false;
-    }
+    uint16_t keySize = sizeof(placeHolderCertBuffer);
+    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, &placeHolderCertBuffer[0], keySize);
 
-    if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-    {
-        // On found, we actually expect an "error", since we didn't want to read it out.
-        return true;
-    }
-
-    return false;
+    return (err == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element,
@@ -286,7 +279,7 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
                       CHIP_ERROR_INCORRECT_STATE);
 
     // Can't have already pending NOC from UpdateOpCerts not yet committed
-    ReturnErrorCodeIf(mStateFlags.HasAny(StateFlags::kUpdateOpCertsCalled), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mStateFlags.Has(StateFlags::kUpdateOpCertsCalled), CHIP_ERROR_INCORRECT_STATE);
 
     // Need to have trusted roots installed to make the chain valid
     ReturnErrorCodeIf(!StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kRcac), CHIP_ERROR_INCORRECT_STATE);

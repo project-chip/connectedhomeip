@@ -111,7 +111,7 @@ limitations under the License.
     <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="BITMAP16" writable="false" optional="true">ThermostatRunningState</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="ENUM8" writable="false" optional="true">SetpointChangeSource</attribute>
     <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="INT16S" writable="false" default="0x8000" optional="true" isNullable="true">SetpointChangeAmount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true">SetpointChangeSourceTimestamp</attribute>
+    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="utc" writable="false" optional="true">SetpointChangeSourceTimestamp</attribute>
     <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true">
       <description>OccupiedSetback</description>
       <access op="read" privilege="view"/>

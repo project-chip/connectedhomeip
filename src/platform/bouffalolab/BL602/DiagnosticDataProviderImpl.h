@@ -47,7 +47,32 @@ public:
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
+
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+    CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiVersion(uint8_t & wifiVersion) override;
+    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
+    CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
+    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
+    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
+    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

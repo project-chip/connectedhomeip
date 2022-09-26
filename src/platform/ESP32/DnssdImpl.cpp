@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -131,10 +131,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 static const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
@@ -288,12 +285,9 @@ CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
             servicesIndex = 0;
             while (currentResult)
             {
-                strncpy(ctx->mServices[servicesIndex].mName, currentResult->instance_name,
-                        strnlen(currentResult->instance_name, Common::kInstanceNameMaxLength));
-                strncpy(ctx->mServices[servicesIndex].mHostName, currentResult->hostname,
-                        strnlen(currentResult->hostname, kHostNameMaxLength));
-                strncpy(ctx->mServices[servicesIndex].mType, currentResult->service_type,
-                        strnlen(currentResult->service_type, kDnssdTypeMaxSize));
+                Platform::CopyString(ctx->mServices[servicesIndex].mName, currentResult->instance_name);
+                Platform::CopyString(ctx->mServices[servicesIndex].mHostName, currentResult->hostname);
+                Platform::CopyString(ctx->mServices[servicesIndex].mType, currentResult->service_type);
                 ctx->mServices[servicesIndex].mProtocol      = ctx->mProtocol;
                 ctx->mServices[servicesIndex].mAddressType   = MapAddressType(currentResult->ip_protocol);
                 ctx->mServices[servicesIndex].mTransportType = ctx->mAddressType;
@@ -317,7 +311,7 @@ CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
         }
     }
 exit:
-    ctx->mBrowseCb(ctx->mCbContext, ctx->mServices, ctx->mServiceSize, error);
+    ctx->mBrowseCb(ctx->mCbContext, ctx->mServices, ctx->mServiceSize, true, error);
     return RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
 }
 
@@ -344,10 +338,9 @@ CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
     {
         ctx->mService = static_cast<DnssdService *>(chip::Platform::MemoryAlloc(sizeof(DnssdService)));
         VerifyOrExit(ctx->mService != nullptr, error = CHIP_ERROR_NO_MEMORY);
-        strncpy(ctx->mService->mName, ctx->mResult->instance_name,
-                strnlen(ctx->mResult->instance_name, Common::kInstanceNameMaxLength));
-        strncpy(ctx->mService->mHostName, ctx->mResult->hostname, strnlen(ctx->mResult->hostname, kHostNameMaxLength));
-        strncpy(ctx->mService->mType, ctx->mResult->service_type, strnlen(ctx->mResult->service_type, kDnssdTypeMaxSize));
+        Platform::CopyString(ctx->mService->mName, ctx->mResult->instance_name);
+        Platform::CopyString(ctx->mService->mHostName, ctx->mResult->hostname);
+        Platform::CopyString(ctx->mService->mType, ctx->mResult->service_type);
         ctx->mService->mProtocol      = ctx->mProtocol;
         ctx->mService->mAddressType   = MapAddressType(ctx->mResult->ip_protocol);
         ctx->mService->mTransportType = ctx->mService->mAddressType;

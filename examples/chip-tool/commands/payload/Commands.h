@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "AdditionalDataParseCommand.h"
-#include "SetupPayloadGenerateCommand.h"
-#include "SetupPayloadParseCommand.h"
-#include "SetupPayloadVerhoeff.h"
+#include "commands/common/Commands.h"
+#include "commands/payload/AdditionalDataParseCommand.h"
+#include "commands/payload/SetupPayloadGenerateCommand.h"
+#include "commands/payload/SetupPayloadParseCommand.h"
+#include "commands/payload/SetupPayloadVerhoeff.h"
 
 void registerCommandsPayload(Commands & commands)
 {

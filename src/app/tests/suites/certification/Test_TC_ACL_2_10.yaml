@@ -1,0 +1,566 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 131.2.10. [TC-ACL-2.10] Persistence
+
+PICS:
+    - ACL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Pre-Conditions"
+      verification: |
+          1.N1 is the node ID of TH1
+
+          2.N2 is the node ID of TH2
+
+          2.D_OK_EMPTY:"1718" which is an octstr of length 2 containing valid TLV:
+
+          - top-level anonymous list (empty)
+          3.D_OK_SINGLE:"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018" which is an octstr of length 50-100 containing valid TLV:
+
+          - top-level anonymous list, containing - one element with profile-specific tag in fully-qualified form
+      disabled: true
+
+    - label: "TH1 commissions DUT using admin node ID N1"
+      verification: |
+          DUT
+          sudo ./chip-all-clusters-app --wifi
+
+          TH1
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 OperationalCredentials cluster
+          CurrentFabricIndex attribute"
+      verification: |
+          ./chip-tool operationalcredentials read current-fabric-index 1 0
+          On TH1(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 1
+          [1658329512.220471][3036:3041] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 1369963572
+          [1658329512.220529][3036:3041] CHIP:TOO:   CurrentFabricIndex: 1
+          [1658329512.220601][3036:3041] CHIP:EM: Sending Standalone Ack for MessageCounter:23447431 on exchange 2287i
+      disabled: true
+
+    - label:
+          "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
+          node ID N2"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
+          On TH1(Chiptool), verify DUT is commissioned On TH2(Chiptool) fabric
+
+          [1657286379.420840][4724:4729] CHIP:DMG: InvokeResponseMessage =
+          [1657286379.420894][4724:4729] CHIP:DMG: {
+          [1657286379.420937][4724:4729] CHIP:DMG:         suppressResponse = false,
+          [1657286379.421000][4724:4729] CHIP:DMG:         InvokeResponseIBs =
+          [1657286379.421068][4724:4729] CHIP:DMG:         [
+          [1657286379.421120][4724:4729] CHIP:DMG:                 InvokeResponseIB =
+          [1657286379.421208][4724:4729] CHIP:DMG:                 {
+          [1657286379.421264][4724:4729] CHIP:DMG:                         CommandStatusIB =
+          [1657286379.421344][4724:4729] CHIP:DMG:                         {
+          [1657286379.421407][4724:4729] CHIP:DMG:                                 CommandPathIB =
+          [1657286379.421493][4724:4729] CHIP:DMG:                                 {
+          [1657286379.421581][4724:4729] CHIP:DMG:                                         EndpointId = 0x0,
+          [1657286379.421656][4724:4729] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1657286379.421754][4724:4729] CHIP:DMG:                                         CommandId = 0x1,
+          [1657286379.421838][4724:4729] CHIP:DMG:                                 },
+          [1657286379.421916][4724:4729] CHIP:DMG:
+          [1657286379.421998][4724:4729] CHIP:DMG:                                 StatusIB =
+          [1657286379.422084][4724:4729] CHIP:DMG:                                 {
+          [1657286379.422159][4724:4729] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657286379.422251][4724:4729] CHIP:DMG:                                 },
+          [1657286379.422336][4724:4729] CHIP:DMG:
+          [1657286379.422397][4724:4729] CHIP:DMG:                         },
+          [1657286379.422483][4724:4729] CHIP:DMG:
+          [1657286379.422537][4724:4729] CHIP:DMG:                 },
+          [1657286379.422616][4724:4729] CHIP:DMG:
+          [1657286379.422666][4724:4729] CHIP:DMG:         ],
+          [1657286379.422745][4724:4729] CHIP:DMG:
+          [1657286379.422796][4724:4729] CHIP:DMG:         InteractionModelRevision = 1
+          [1657286379.422861][4724:4729] CHIP:DMG: },
+          [1657286379.422975][4724:4729] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1657286379.423058][4724:4729] CHIP:DMG: ICR moving to [AwaitingDe]
+
+
+
+          CommissiOn TH(Chiptool)2 to DUT using below command
+
+          ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta --commissioner-nodeid 223344
+
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "TH2 reads DUT Endpoint 0 OperationalCredentials cluster
+          CurrentFabricIndex attribute"
+      verification: |
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+          On TH2(Chiptool), verify  to CurrentFabricIndex attribute of operationalCredential cluster  as 2
+
+          1658329570.828165][4563:4568] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 1369963572
+          [1658329570.831838][4563:4568] CHIP:TOO:   CurrentFabricIndex: 2
+          [1658329570.831929][4563:4568] CHIP:EM: Sending Standalone Ack for MessageCounter:4928928 on exchange 29185i
+      disabled: true
+
+    - label:
+          "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value
+          is list of AccessControlEntryStruct containing 2 elements 1.struct
+          Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
+          field: [N1, 1111] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: Group (3) Subjects field: [3333] Targets
+          field: null"
+      PICS: ACL.S.A0000
+      verification: |
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets": null},
+           { "privilege": 3, "authMode": 3, "subjects":[3333] , "targets": null}]" 1 0
+          On TH1(Chiptool) , Verify Successfully   AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements
+
+          [1658329787.635523][3056:3061] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1658329787.635615][3056:3061] CHIP:DMG: WriteResponseMessage =
+          [1658329787.635661][3056:3061] CHIP:DMG: {
+          [1658329787.635701][3056:3061] CHIP:DMG:         AttributeStatusIBs =
+          [1658329787.635758][3056:3061] CHIP:DMG:         [
+          [1658329787.635804][3056:3061] CHIP:DMG:                 AttributeStatusIB =
+          [1658329787.635864][3056:3061] CHIP:DMG:                 {
+          [1658329787.635913][3056:3061] CHIP:DMG:                         AttributePathIB =
+          [1658329787.635971][3056:3061] CHIP:DMG:                         {
+          [1658329787.636030][3056:3061] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329787.636093][3056:3061] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329787.636157][3056:3061] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329787.636216][3056:3061] CHIP:DMG:                         }
+          [1658329787.636280][3056:3061] CHIP:DMG:
+          [1658329787.636334][3056:3061] CHIP:DMG:                         StatusIB =
+          [1658329787.636395][3056:3061] CHIP:DMG:                         {
+          [1658329787.636452][3056:3061] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329787.636509][3056:3061] CHIP:DMG:                         },
+          [1658329787.636566][3056:3061] CHIP:DMG:
+          [1658329787.636613][3056:3061] CHIP:DMG:                 },
+          [1658329787.636678][3056:3061] CHIP:DMG:
+          [1658329787.636723][3056:3061] CHIP:DMG:                 AttributeStatusIB =
+          [1658329787.636774][3056:3061] CHIP:DMG:                 {
+          [1658329787.636822][3056:3061] CHIP:DMG:                         AttributePathIB =
+          [1658329787.636880][3056:3061] CHIP:DMG:                         {
+          [1658329787.636937][3056:3061] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329787.636998][3056:3061] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329787.637066][3056:3061] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329787.637131][3056:3061] CHIP:DMG:                                 ListIndex = Null,
+          [1658329787.637194][3056:3061] CHIP:DMG:                         }
+          [1658329787.637263][3056:3061] CHIP:DMG:
+          [1658329787.637319][3056:3061] CHIP:DMG:                         StatusIB =
+          [1658329787.637376][3056:3061] CHIP:DMG:                         {
+          [1658329787.637626][3056:3061] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329787.637691][3056:3061] CHIP:DMG:                         },
+          [1658329787.637750][3056:3061] CHIP:DMG:
+          [1658329787.637801][3056:3061] CHIP:DMG:                 },
+          [1658329787.637868][3056:3061] CHIP:DMG:
+          [1658329787.637913][3056:3061] CHIP:DMG:                 AttributeStatusIB =
+          [1658329787.637966][3056:3061] CHIP:DMG:                 {
+          [1658329787.638017][3056:3061] CHIP:DMG:                         AttributePathIB =
+          [1658329787.638074][3056:3061] CHIP:DMG:                         {
+          [1658329787.638131][3056:3061] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329787.638193][3056:3061] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329787.638256][3056:3061] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329787.638322][3056:3061] CHIP:DMG:                                 ListIndex = Null,
+          [1658329787.638382][3056:3061] CHIP:DMG:                         }
+          [1658329787.638444][3056:3061] CHIP:DMG:
+          [1658329787.638505][3056:3061] CHIP:DMG:                         StatusIB =
+          [1658329787.638562][3056:3061] CHIP:DMG:                         {
+          [1658329787.638639][3056:3061] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329787.638698][3056:3061] CHIP:DMG:                         },
+          [1658329787.638754][3056:3061] CHIP:DMG:
+          [1658329787.638801][3056:3061] CHIP:DMG:                 },
+          [1658329787.638854][3056:3061] CHIP:DMG:
+          [1658329787.638899][3056:3061] CHIP:DMG:         ],
+          [1658329787.638965][3056:3061] CHIP:DMG:
+          [1658329787.639009][3056:3061] CHIP:DMG:         InteractionModelRevision = 1
+          [1658329787.639053][3056:3061] CHIP:DMG: }
+          [1658329787.639281][3056:3061] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658329787.639370][3056:3061] CHIP:EM: Sending Standalone Ack for MessageCounter:32017076 on exchange 14424i
+      disabled: true
+
+    - label:
+          "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute value
+          is list of AccessControlEntryStruct containing 2 elements 1.struct
+          Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
+          field: [N2, 2222] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: Group (3) Subjects field: [4444] Targets
+          field: null"
+      PICS: ACL.S.A0000
+      verification: |
+          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets": null},
+           { "privilege": 3, "authMode": 3, "subjects":[4444] , "targets": null}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+
+
+          On TH2(Chiptool), Verify  AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 2 elements
+
+
+          [1658329868.113411][4587:4592] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1658329868.113469][4587:4592] CHIP:DMG: WriteResponseMessage =
+          [1658329868.113496][4587:4592] CHIP:DMG: {
+          [1658329868.113537][4587:4592] CHIP:DMG:         AttributeStatusIBs =
+          [1658329868.113568][4587:4592] CHIP:DMG:         [
+          [1658329868.113602][4587:4592] CHIP:DMG:                 AttributeStatusIB =
+          [1658329868.113646][4587:4592] CHIP:DMG:                 {
+          [1658329868.113672][4587:4592] CHIP:DMG:                         AttributePathIB =
+          [1658329868.113712][4587:4592] CHIP:DMG:                         {
+          [1658329868.113745][4587:4592] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329868.113788][4587:4592] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329868.113833][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329868.113868][4587:4592] CHIP:DMG:                         }
+          [1658329868.113914][4587:4592] CHIP:DMG:
+          [1658329868.113951][4587:4592] CHIP:DMG:                         StatusIB =
+          [1658329868.113984][4587:4592] CHIP:DMG:                         {
+          [1658329868.114028][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329868.114091][4587:4592] CHIP:DMG:                         },
+          [1658329868.114124][4587:4592] CHIP:DMG:
+          [1658329868.114160][4587:4592] CHIP:DMG:                 },
+          [1658329868.114197][4587:4592] CHIP:DMG:
+          [1658329868.114229][4587:4592] CHIP:DMG:                 AttributeStatusIB =
+          [1658329868.114266][4587:4592] CHIP:DMG:                 {
+          [1658329868.114294][4587:4592] CHIP:DMG:                         AttributePathIB =
+          [1658329868.114335][4587:4592] CHIP:DMG:                         {
+          [1658329868.114367][4587:4592] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329868.114411][4587:4592] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329868.114458][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329868.114491][4587:4592] CHIP:DMG:                                 ListIndex = Null,
+          [1658329868.114529][4587:4592] CHIP:DMG:                         }
+          [1658329868.114563][4587:4592] CHIP:DMG:
+          [1658329868.114604][4587:4592] CHIP:DMG:                         StatusIB =
+          [1658329868.114645][4587:4592] CHIP:DMG:                         {
+          [1658329868.114677][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329868.114716][4587:4592] CHIP:DMG:                         },
+          [1658329868.114747][4587:4592] CHIP:DMG:
+          [1658329868.114782][4587:4592] CHIP:DMG:                 },
+          [1658329868.114826][4587:4592] CHIP:DMG:
+          [1658329868.114850][4587:4592] CHIP:DMG:                 AttributeStatusIB =
+          [1658329868.114884][4587:4592] CHIP:DMG:                 {
+          [1658329868.114910][4587:4592] CHIP:DMG:                         AttributePathIB =
+          [1658329868.114948][4587:4592] CHIP:DMG:                         {
+          [1658329868.114980][4587:4592] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658329868.115024][4587:4592] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658329868.115067][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658329868.115102][4587:4592] CHIP:DMG:                                 ListIndex = Null,
+          [1658329868.115145][4587:4592] CHIP:DMG:                         }
+          [1658329868.115188][4587:4592] CHIP:DMG:
+          [1658329868.115222][4587:4592] CHIP:DMG:                         StatusIB =
+          [1658329868.115260][4587:4592] CHIP:DMG:                         {
+          [1658329868.115291][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658329868.115333][4587:4592] CHIP:DMG:                         },
+          [1658329868.115371][4587:4592] CHIP:DMG:
+          [1658329868.115398][4587:4592] CHIP:DMG:                 },
+          [1658329868.115438][4587:4592] CHIP:DMG:
+          [1658329868.115463][4587:4592] CHIP:DMG:         ],
+          [1658329868.115507][4587:4592] CHIP:DMG:
+          [1658329868.115531][4587:4592] CHIP:DMG:         InteractionModelRevision = 1
+          [1658329868.115565][4587:4592] CHIP:DMG: }
+          [1658329868.115702][4587:4592] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658329868.115764][4587:4592] CHIP:EM: Sending Standalone Ack for MessageCounter:240702602 on exchange 57878i
+      disabled: true
+
+    - label:
+          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
+          value is list of AccessControlExtensionStruct containing 1 element 1.
+          struct Data field: D_OK_EMPTY"
+      PICS: ACL.S.A0001
+      verification: |
+          ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
+          On TH1(Chiptool) , Verify  Successfully to extension attribute list containg one element
+          [1658330105.863185][3079:3084] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1658330105.863237][3079:3084] CHIP:DMG: WriteResponseMessage =
+          [1658330105.863262][3079:3084] CHIP:DMG: {
+          [1658330105.863284][3079:3084] CHIP:DMG:         AttributeStatusIBs =
+          [1658330105.863315][3079:3084] CHIP:DMG:         [
+          [1658330105.863339][3079:3084] CHIP:DMG:                 AttributeStatusIB =
+          [1658330105.863367][3079:3084] CHIP:DMG:                 {
+          [1658330105.863393][3079:3084] CHIP:DMG:                         AttributePathIB =
+          [1658330105.863428][3079:3084] CHIP:DMG:                         {
+          [1658330105.863460][3079:3084] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658330105.863495][3079:3084] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658330105.863529][3079:3084] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658330105.863589][3079:3084] CHIP:DMG:                         }
+          [1658330105.863670][3079:3084] CHIP:DMG:
+          [1658330105.863745][3079:3084] CHIP:DMG:                         StatusIB =
+          [1658330105.863812][3079:3084] CHIP:DMG:                         {
+          [1658330105.863877][3079:3084] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658330105.863945][3079:3084] CHIP:DMG:                         },
+          [1658330105.864010][3079:3084] CHIP:DMG:
+          [1658330105.864068][3079:3084] CHIP:DMG:                 },
+          [1658330105.864146][3079:3084] CHIP:DMG:
+          [1658330105.864197][3079:3084] CHIP:DMG:                 AttributeStatusIB =
+          [1658330105.864257][3079:3084] CHIP:DMG:                 {
+          [1658330105.864315][3079:3084] CHIP:DMG:                         AttributePathIB =
+          [1658330105.864379][3079:3084] CHIP:DMG:                         {
+          [1658330105.864444][3079:3084] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658330105.864516][3079:3084] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658330105.864592][3079:3084] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658330105.864669][3079:3084] CHIP:DMG:                                 ListIndex = Null,
+          [1658330105.864736][3079:3084] CHIP:DMG:                         }
+          [1658330105.864808][3079:3084] CHIP:DMG:
+          [1658330105.864871][3079:3084] CHIP:DMG:                         StatusIB =
+          [1658330105.864936][3079:3084] CHIP:DMG:                         {
+          [1658330105.865001][3079:3084] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658330105.865068][3079:3084] CHIP:DMG:                         },
+          [1658330105.865134][3079:3084] CHIP:DMG:
+          [1658330105.865188][3079:3084] CHIP:DMG:                 },
+          [1658330105.865251][3079:3084] CHIP:DMG:
+          [1658330105.865302][3079:3084] CHIP:DMG:         ],
+          [1658330105.865370][3079:3084] CHIP:DMG:
+          [1658330105.865421][3079:3084] CHIP:DMG:         InteractionModelRevision = 1
+          [1658330105.865472][3079:3084] CHIP:DMG: }
+          [1658330105.865672][3079:3084] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658330105.865769][3079:3084] CHIP:EM: Sending Standalone Ack for MessageCounter:104745751 on exchange 216i
+      disabled: true
+
+    - label:
+          "TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute
+          value is list of AccessControlExtensionStruct containing 1 element
+          1.struct Data field: D_OK_SINGLE"
+      PICS: ACL.S.A0001
+      verification: |
+          ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+
+          On TH2(Chiptool), Verify Successfully  extension attribute list containg one element .
+
+          [1658819083.842765][8349:8354] CHIP:EM: Removed CHIP MessageCounter:249057275 from RetransTable on exchange 59888i
+          [1658819083.842800][8349:8354] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1658819083.842907][8349:8354] CHIP:DMG: WriteResponseMessage =
+          [1658819083.842939][8349:8354] CHIP:DMG: {
+          [1658819083.842963][8349:8354] CHIP:DMG:         AttributeStatusIBs =
+          [1658819083.843000][8349:8354] CHIP:DMG:         [
+          [1658819083.843026][8349:8354] CHIP:DMG:                 AttributeStatusIB =
+          [1658819083.843057][8349:8354] CHIP:DMG:                 {
+          [1658819083.843086][8349:8354] CHIP:DMG:                         AttributePathIB =
+          [1658819083.843120][8349:8354] CHIP:DMG:                         {
+          [1658819083.843161][8349:8354] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658819083.843201][8349:8354] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658819083.843242][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658819083.843277][8349:8354] CHIP:DMG:                         }
+          [1658819083.843319][8349:8354] CHIP:DMG:
+          [1658819083.843355][8349:8354] CHIP:DMG:                         StatusIB =
+          [1658819083.843393][8349:8354] CHIP:DMG:                         {
+          [1658819083.843431][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658819083.843466][8349:8354] CHIP:DMG:                         },
+          [1658819083.843504][8349:8354] CHIP:DMG:
+          [1658819083.843534][8349:8354] CHIP:DMG:                 },
+          [1658819083.843575][8349:8354] CHIP:DMG:
+          [1658819083.843604][8349:8354] CHIP:DMG:                 AttributeStatusIB =
+          [1658819083.843636][8349:8354] CHIP:DMG:                 {
+          [1658819083.843666][8349:8354] CHIP:DMG:                         AttributePathIB =
+          [1658819083.843700][8349:8354] CHIP:DMG:                         {
+          [1658819083.843734][8349:8354] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658819083.843774][8349:8354] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658819083.843814][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1658819083.843853][8349:8354] CHIP:DMG:                                 ListIndex = Null,
+          [1658819083.843888][8349:8354] CHIP:DMG:                         }
+          [1658819083.843926][8349:8354] CHIP:DMG:
+          [1658819083.843962][8349:8354] CHIP:DMG:                         StatusIB =
+          [1658819083.843996][8349:8354] CHIP:DMG:                         {
+          [1658819083.844030][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658819083.844065][8349:8354] CHIP:DMG:                         },
+          [1658819083.844103][8349:8354] CHIP:DMG:
+          [1658819083.844133][8349:8354] CHIP:DMG:                 },
+          [1658819083.844168][8349:8354] CHIP:DMG:
+          [1658819083.844194][8349:8354] CHIP:DMG:         ],
+          [1658819083.844230][8349:8354] CHIP:DMG:
+          [1658819083.844256][8349:8354] CHIP:DMG:         InteractionModelRevision = 1
+          [1658819083.844282][8349:8354] CHIP:DMG: }
+          [1658819083.844389][8349:8354] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658819083.844452][8349:8354] CHIP:EM: Sending Standalone Ack for MessageCounter:27055873 on exchange 59888i
+      disabled: true
+
+    - label: "Reboot the DUT"
+      verification: |
+          Follow the below procedure for rebooting (Only applicable on raspi)
+
+          1. create a file using touch command , something like touch mytest.txt
+          2. chmod 777 mytest.txt
+          3. launch the app sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt
+          4. commission DUT with TH using above steps
+
+          And in this step use kill DUT and launch again, without commission follow the next steps
+      disabled: true
+
+    - label: "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      verification: |
+          ./chip-tool accesscontrol read acl  1 0
+
+          On TH1(Chiptool) , Verify  AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F2
+
+          [1657289627.393651][5251:5256] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
+          [1657289627.393731][5251:5256] CHIP:TOO:   ACL: 2 entries
+          [1657289627.393798][5251:5256] CHIP:TOO:     [1]: {
+          [1657289627.393858][5251:5256] CHIP:TOO:       Privilege: 5
+          [1657289627.393889][5251:5256] CHIP:TOO:       AuthMode: 2
+          [1657289627.393935][5251:5256] CHIP:TOO:       Subjects: 2 entries
+          [1657289627.393970][5251:5256] CHIP:TOO:         [1]: 112233
+          [1657289627.394013][5251:5256] CHIP:TOO:         [2]: 1111
+          [1657289627.394044][5251:5256] CHIP:TOO:       Targets: null
+          [1657289627.394085][5251:5256] CHIP:TOO:       FabricIndex: 1
+          [1657289627.394110][5251:5256] CHIP:TOO:      }
+          [1657289627.394157][5251:5256] CHIP:TOO:     [2]: {
+          [1657289627.394183][5251:5256] CHIP:TOO:       Privilege: 3
+          [1657289627.394212][5251:5256] CHIP:TOO:       AuthMode: 3
+          [1657289627.394243][5251:5256] CHIP:TOO:       Subjects: 1 entries
+          [1657289627.394286][5251:5256] CHIP:TOO:         [1]: 3333
+          [1657289627.394318][5251:5256] CHIP:TOO:       Targets: null
+          [1657289627.394356][5251:5256] CHIP:TOO:       FabricIndex: 1
+          [1657289627.394385][5251:5256] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+      PICS: ACL.S.A0001
+      verification: |
+          ./chip-tool accesscontrol read extension 1 0
+          On TH1(Chiptool) , Verify  Successfully AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
+
+
+          [1657289676.947323][5260:5265] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
+          [1657289676.947388][5260:5265] CHIP:TOO:   Extension: 1 entries
+          [1657289676.947438][5260:5265] CHIP:TOO:     [1]: {
+          [1657289676.947467][5260:5265] CHIP:TOO:       Data: 1718
+          [1657289676.947504][5260:5265] CHIP:TOO:       FabricIndex: 1
+          [1657289676.947528][5260:5265] CHIP:TOO:      }
+      disabled: true
+
+    - label: "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      verification: |
+          ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+          On TH2(Chiptool) , Verify AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F1
+
+
+          [1657289713.626327][19279:19284] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
+          [1657289713.626381][19279:19284] CHIP:TOO:   ACL: 2 entries
+          [1657289713.626417][19279:19284] CHIP:TOO:     [1]: {
+          [1657289713.626431][19279:19284] CHIP:TOO:       Privilege: 5
+          [1657289713.626443][19279:19284] CHIP:TOO:       AuthMode: 2
+          [1657289713.626457][19279:19284] CHIP:TOO:       Subjects: 2 entries
+          [1657289713.626472][19279:19284] CHIP:TOO:         [1]: 223344
+          [1657289713.626485][19279:19284] CHIP:TOO:         [2]: 2222
+          [1657289713.626497][19279:19284] CHIP:TOO:       Targets: null
+          [1657289713.626508][19279:19284] CHIP:TOO:       FabricIndex: 2
+          [1657289713.626519][19279:19284] CHIP:TOO:      }
+          [1657289713.626537][19279:19284] CHIP:TOO:     [2]: {
+          [1657289713.626547][19279:19284] CHIP:TOO:       Privilege: 3
+          [1657289713.626556][19279:19284] CHIP:TOO:       AuthMode: 3
+          [1657289713.626568][19279:19284] CHIP:TOO:       Subjects: 1 entries
+          [1657289713.626580][19279:19284] CHIP:TOO:         [1]: 4444
+          [1657289713.626591][19279:19284] CHIP:TOO:       Targets: null
+          [1657289713.626601][19279:19284] CHIP:TOO:       FabricIndex: 2
+          [1657289713.626611][19279:19284] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+      PICS: ACL.S.A0001
+      verification: |
+          ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+          On TH2(Chiptool) , Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
+
+          [1657289746.737641][19293:19298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
+          [1657289746.737713][19293:19298] CHIP:TOO:   Extension: 1 entries
+          [1657289746.737778][19293:19298] CHIP:TOO:     [1]: {
+          [1657289746.737803][19293:19298] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
+          [1657289746.737844][19293:19298] CHIP:TOO:       FabricIndex: 2
+          [1657289746.737862][19293:19298] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "If DUT is an app on host, examine persistent storage in /tmp/chip_kvs
+          text file"
+      verification: |
+          sudo vi kvs text file
+      disabled: true
+
+    - label: "TH1 removes fabric F2 from DUT"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
+
+
+          On TH1(Chiptool), Verify successfully removed fabric F2 with statusCode as 0(Success)
+
+          [1661404505.702969][18706:18711] CHIP:DMG:
+          [1661404505.702979][18706:18711] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661404505.702987][18706:18711] CHIP:DMG: },
+          [1661404505.703020][18706:18711] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1661404505.703047][18706:18711] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1661404505.703081][18706:18711] CHIP:TOO:   NOCResponse: {
+          [1661404505.703104][18706:18711] CHIP:TOO:     statusCode: 0
+          [1661404505.703126][18706:18711] CHIP:TOO:     fabricIndex: 2
+          [1661404505.703139][18706:18711] CHIP:TOO:    }
+      disabled: true
+
+    - label: "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      verification: |
+          ./chip-tool accesscontrol read acl  1 0
+          On TH1(Chiptool) , Verify AccessControlEntryStruct containing 2 elements, and MUST NOT contain an element with FabricIndex F2
+
+
+
+          [1657289848.956276][5274:5279] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1884338152
+          [1657289848.956366][5274:5279] CHIP:TOO:   ACL: 2 entries
+          [1657289848.956445][5274:5279] CHIP:TOO:     [1]: {
+          [1657289848.956502][5274:5279] CHIP:TOO:       Privilege: 5
+          [1657289848.956538][5274:5279] CHIP:TOO:       AuthMode: 2
+          [1657289848.956578][5274:5279] CHIP:TOO:       Subjects: 2 entries
+          [1657289848.956620][5274:5279] CHIP:TOO:         [1]: 112233
+          [1657289848.956659][5274:5279] CHIP:TOO:         [2]: 1111
+          [1657289848.956696][5274:5279] CHIP:TOO:       Targets: null
+          [1657289848.956730][5274:5279] CHIP:TOO:       FabricIndex: 1
+          [1657289848.956764][5274:5279] CHIP:TOO:      }
+          [1657289848.956811][5274:5279] CHIP:TOO:     [2]: {
+          [1657289848.956846][5274:5279] CHIP:TOO:       Privilege: 3
+          [1657289848.956879][5274:5279] CHIP:TOO:       AuthMode: 3
+          [1657289848.956916][5274:5279] CHIP:TOO:       Subjects: 1 entries
+          [1657289848.956954][5274:5279] CHIP:TOO:         [1]: 3333
+          [1657289848.956990][5274:5279] CHIP:TOO:       Targets: null
+          [1657289848.957023][5274:5279] CHIP:TOO:       FabricIndex: 1
+          [1657289848.957055][5274:5279] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+      PICS: ACL.S.A0001
+      verification: |
+          ./chip-tool accesscontrol read extension 1 0
+          On TH1(Chiptool), Verify   Successfully to AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F2
+
+
+          [1657289881.142883][5283:5288] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
+          [1657289881.142955][5283:5288] CHIP:TOO:   Extension: 1 entries
+          [1657289881.143019][5283:5288] CHIP:TOO:     [1]: {
+          [1657289881.143056][5283:5288] CHIP:TOO:       Data: 1718
+          [1657289881.143107][5283:5288] CHIP:TOO:       FabricIndex: 1
+          [1657289881.143138][5283:5288] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "If DUT is an app on host, examine persistent storage in /tmp/chip_kvs
+          text file"
+      verification: |
+          sudo vi kvs text file
+      disabled: true

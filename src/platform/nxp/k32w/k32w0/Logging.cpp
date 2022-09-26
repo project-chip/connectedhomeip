@@ -28,7 +28,6 @@ static constexpr uint8_t category_max_len_bytes = 3;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 static bool isLogInitialized;
-extern uint8_t gOtLogUartInstance;
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
@@ -108,8 +107,7 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
 
     if (!isLogInitialized)
     {
-        isLogInitialized   = true;
-        gOtLogUartInstance = 0;
+        isLogInitialized = true;
         otPlatUartEnable();
     }
 

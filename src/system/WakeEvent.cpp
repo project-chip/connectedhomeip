@@ -101,7 +101,8 @@ void WakeEvent::Confirm() const
         res = ::read(mReadFD, buffer, sizeof(buffer));
         if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
         {
-            ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
+            ChipLogError(chipSystemLayer, "System wake event confirm failed: %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_POSIX(errno).Format());
             return;
         }
     } while (res == sizeof(buffer));
@@ -149,7 +150,7 @@ void WakeEvent::Confirm() const
 
     if (::read(mReadFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
+        ChipLogError(chipSystemLayer, "System wake event confirm failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
     }
 }
 

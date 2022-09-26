@@ -25,6 +25,7 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -124,6 +125,7 @@ private:
     CHIP_ERROR ReadPlaybackSpeedAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSeekRangeStartAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSeekRangeEndAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 MediaPlaybackAttrAccess gMediaPlaybackAttrAccess;
@@ -161,12 +163,22 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
     case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
         return ReadSeekRangeEndAttribute(aEncoder, delegate);
     }
+    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
+        return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                             Delegate * delegate)
+{
+    uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureFlag);
 }
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

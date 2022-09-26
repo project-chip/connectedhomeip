@@ -15,6 +15,9 @@
 
 name: 14.3.4. [TC-SC-3.4] CASE Error Handling [DUT - Responder]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

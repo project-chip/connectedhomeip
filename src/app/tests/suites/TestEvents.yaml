@@ -112,7 +112,7 @@ tests:
               - name: "arg1"
                 value: 4
               - name: "arg2"
-                value: 5
+                value: 3
               - name: "arg3"
                 value: true
       response:
@@ -126,4 +126,4 @@ tests:
       response:
           values:
               - name: "TestEvent"
-                value: { arg1: 4, arg2: 5, arg3: true }
+                value: { arg1: 4, arg2: 3, arg3: true }

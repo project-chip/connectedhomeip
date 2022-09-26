@@ -13,28 +13,49 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 98.2. [TC-FLABEL-2.1] Fixed Label cluster [DUT-server]
+name: 98.2.1. [TC-FLABEL-2.1] Fixed Label cluster [DUT-server]
+
+PICS:
+    - FLABEL.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Fixed Label"
+    endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads LabelList from the DUT"
+      PICS: FLABEL.S.A0000
+      command: "readAttribute"
+      attribute: "label list"
+      response:
+          constraints:
+              type: list
+
     - label:
           "TH tries to write LabelList attribute of the DUT by setting Label =
-          'Test_Label', Value= 'Test_Value'"
-      verification: |
-          ./chip-tool fixedlabel write-by-id  0x00 '["label":"Testlabel", "value":"testvalue"]' 1 0
-
-          [1654000813.726531][7713:7718] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1654000813.726603][7713:7718] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-          [1654000813.726707][7713:7718] CHIP:EM: Sending Standalone Ack for MessageCounter:11245962 on exchange 35967i
-      disabled: true
+          Test_Label, Value= Test_Value"
+      PICS: FLABEL.S.A0000
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value: [{ label: "Test_Label", value: "Test_Value" }]
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads LabelList from the DUT"
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
+
+          On TH(all-clusters-app) Verify that the LabelList value is same as value from step 1
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
           [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries
@@ -55,4 +76,12 @@ tests:
           [1651124649.821008][2819:2824] CHIP:TOO:       Value: up
           [1651124649.821039][2819:2824] CHIP:TOO:      }
           [1651124649.821193][2819:2824] CHIP:EM: Sending Standalone Ack for MessageCounter:2439070 on exchange 10798i
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && FLABEL.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

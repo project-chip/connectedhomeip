@@ -27,7 +27,7 @@
       }
       listFreer.add(listHolder_{{depth}});
       for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
-        if (![{{source}}[i_{{depth}}] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
+        if ( ! [{{source}}[i_{{depth}}] isKindOfClass: [{{asObjectiveCClass type cluster forceNotList=true}} class]] ) {
           // Wrong kind of value.
           {{errorCode}}
         }

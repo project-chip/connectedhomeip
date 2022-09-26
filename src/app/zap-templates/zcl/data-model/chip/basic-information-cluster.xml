@@ -75,6 +75,7 @@ limitations under the License.
     </event>
     <event side="server" code="0x02" name="Leave" priority="info" optional="false">
       <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
+      <field id="0" name="FabricIndex" type="fabric_idx"/>
     </event>
     <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="true">
       <description>This event (when supported) SHALL be generated when there is a change in the Reachable attribute.</description>

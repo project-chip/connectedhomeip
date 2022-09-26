@@ -16,7 +16,6 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 

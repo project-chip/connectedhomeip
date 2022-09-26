@@ -66,10 +66,9 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     return err;
 }
 
-CHIP_ERROR ESPWiFiDriver::Shutdown()
+void ESPWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESPWiFiDriver::CommitConfiguration()

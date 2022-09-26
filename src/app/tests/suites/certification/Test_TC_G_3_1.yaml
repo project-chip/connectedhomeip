@@ -1,0 +1,64 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 121.3.1. [TC-G-3.1] Attributes [DUT-Client]
+
+PICS:
+    - G.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "DUT reads NameSupport attribute from TH"
+      PICS: G.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          ./chip-tool groups read name-support 1 1
+
+          Verify the "NameSupport attribute response" on the TH(Allcluster-app) Log:
+
+          [1659609024.739969][3355:3355] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:210252834 on exchange 15944r
+          [1659609024.740058][3355:3355] CHIP:EM: Handling via exchange: 15944r, Delegate: 0xaaaac00e4f08
+          [1659609024.740133][3355:3355] CHIP:IM: Received Read request
+          [1659609024.740275][3355:3355] CHIP:DMG: ReadRequestMessage =
+          [1659609024.740330][3355:3355] CHIP:DMG: {
+          [1659609024.740375][3355:3355] CHIP:DMG:         AttributePathIBs =
+          [1659609024.740429][3355:3355] CHIP:DMG:         [
+          [1659609024.740479][3355:3355] CHIP:DMG:                 AttributePathIB =
+          [1659609024.740535][3355:3355] CHIP:DMG:                 {
+          [1659609024.740594][3355:3355] CHIP:DMG:                         Endpoint = 0x1,
+          [1659609024.740659][3355:3355] CHIP:DMG:                         Cluster = 0x4,
+          [1659609024.740725][3355:3355] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659609024.740810][3355:3355] CHIP:DMG:                 }
+          [1659609024.740872][3355:3355] CHIP:DMG:
+          [1659609024.740925][3355:3355] CHIP:DMG:         ],
+          [1659609024.740983][3355:3355] CHIP:DMG:
+          [1659609024.741037][3355:3355] CHIP:DMG:         isFabricFiltered = true,
+          [1659609024.741091][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609024.741140][3355:3355] CHIP:DMG: },
+          [1659609024.741283][3355:3355] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659609024.741436][3355:3355] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659609024.741494][3355:3355] CHIP:DMG: <RE:Run> Cluster 4, Attribute 0 is dirty
+      disabled: true

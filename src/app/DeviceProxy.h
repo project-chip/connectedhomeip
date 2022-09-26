@@ -27,7 +27,6 @@
 #pragma once
 
 #include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
@@ -43,11 +42,11 @@ public:
     /**
      *  Mark any open session with the device as expired.
      */
-    virtual CHIP_ERROR Disconnect() = 0;
+    virtual void Disconnect() = 0;
 
     virtual NodeId GetDeviceId() const = 0;
 
-    virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual void ShutdownSubscriptions() = 0;
 
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj, chip::Optional<System::Clock::Timeout> timeout = NullOptional);
 

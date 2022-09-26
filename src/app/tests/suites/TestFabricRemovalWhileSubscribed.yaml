@@ -1,0 +1,102 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Validate removal of a fabric while another fabric is subscribed to the
+    fabrics list does not crash
+
+config:
+    nodeId: 0x12344321
+    cluster: "Operational Credentials"
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read number of commissioned fabrics"
+      command: "readAttribute"
+      attribute: "CommissionedFabrics"
+      response:
+          value: 1
+          constraints:
+              type: int8u
+
+    - label: "Read current fabric index"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: ourFabricIndex
+          constraints:
+              type: int8u
+              # 0 is not a valid value, but past that we have no idea what the
+              # other side will claim here.
+              minValue: 1
+
+    - label: "Open commissioning window from alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: 0x12345
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: 0x12345
+
+    - label: "Subscribe Fabrics Attribute from beta"
+      identity: "beta"
+      command: "subscribeAttribute"
+      attribute: "Fabrics"
+      minInterval: 2
+      maxInterval: 5
+      response:
+          constraints:
+              type: list
+
+    - label: "Remove single own fabric"
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: ourFabricIndex

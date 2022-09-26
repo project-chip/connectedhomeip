@@ -70,51 +70,68 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
 
 CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
 {
-    ChipLogProgress(SetupPayload, "Version:       %u", payload.version);
-    ChipLogProgress(SetupPayload, "VendorID:      %u", payload.vendorID);
-    ChipLogProgress(SetupPayload, "ProductID:     %u", payload.productID);
-    ChipLogProgress(SetupPayload, "Custom flow:   %u    (%s)", to_underlying(payload.commissioningFlow),
+    ChipLogProgress(SetupPayload, "Version:             %u", payload.version);
+    ChipLogProgress(SetupPayload, "VendorID:            %u", payload.vendorID);
+    ChipLogProgress(SetupPayload, "ProductID:           %u", payload.productID);
+    ChipLogProgress(SetupPayload, "Custom flow:         %u    (%s)", to_underlying(payload.commissioningFlow),
                     CustomFlowString(payload.commissioningFlow));
     {
         StringBuilder<128> humanFlags;
 
-        if (payload.rendezvousInformation.HasAny())
+        if (!payload.rendezvousInformation.HasValue())
         {
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kSoftAP))
-            {
-                humanFlags.Add("Soft-AP");
-            }
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kBLE))
-            {
-                if (!humanFlags.Empty())
-                {
-                    humanFlags.Add(", ");
-                }
-                humanFlags.Add("BLE");
-            }
-            if (payload.rendezvousInformation.Has(RendezvousInformationFlag::kOnNetwork))
-            {
-                if (!humanFlags.Empty())
-                {
-                    humanFlags.Add(", ");
-                }
-                humanFlags.Add("On IP network");
-            }
+            ChipLogProgress(SetupPayload, "Discovery Bitmask:   UNKNOWN");
         }
         else
         {
-            humanFlags.Add("NONE");
-        }
+            if (payload.rendezvousInformation.Value().HasAny())
+            {
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kSoftAP))
+                {
+                    humanFlags.Add("Soft-AP");
+                }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kBLE))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("BLE");
+                }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kOnNetwork))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("On IP network");
+                }
+            }
+            else
+            {
+                humanFlags.Add("NONE");
+            }
 
-        ChipLogProgress(SetupPayload, "Capabilities:  0x%02X (%s)", payload.rendezvousInformation.Raw(), humanFlags.c_str());
+            ChipLogProgress(SetupPayload, "Discovery Bitmask:   0x%02X (%s)", payload.rendezvousInformation.Value().Raw(),
+                            humanFlags.c_str());
+        }
     }
-    ChipLogProgress(SetupPayload, "Discriminator: %u", payload.discriminator);
-    ChipLogProgress(SetupPayload, "Passcode:      %u", payload.setUpPINCode);
+    if (payload.discriminator.IsShortDiscriminator())
+    {
+        ChipLogProgress(SetupPayload, "Short discriminator: %u   (0x%x)", payload.discriminator.GetShortValue(),
+                        payload.discriminator.GetShortValue());
+    }
+    else
+    {
+        ChipLogProgress(SetupPayload, "Long discriminator:  %u   (0x%x)", payload.discriminator.GetLongValue(),
+                        payload.discriminator.GetLongValue());
+    }
+    ChipLogProgress(SetupPayload, "Passcode:            %u", payload.setUpPINCode);
 
     std::string serialNumber;
     if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
     {
-        ChipLogProgress(SetupPayload, "SerialNumber: %s", serialNumber.c_str());
+        ChipLogProgress(SetupPayload, "SerialNumber:        %s", serialNumber.c_str());
     }
 
     std::vector<OptionalQRCodeInfo> optionalVendorData = payload.getAllOptionalVendorData();
@@ -126,11 +143,11 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
 
         if (isTypeString)
         {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,string value=%s", info.tag, info.data.c_str());
+            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", info.tag, info.data.c_str());
         }
         else
         {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,int value=%u", info.tag, info.int32);
+            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%u", info.tag, info.int32);
         }
     }
 

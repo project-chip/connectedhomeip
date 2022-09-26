@@ -22,8 +22,8 @@
  * Implements all the callbacks to the application from the CHIP Stack
  *
  **/
-#include "DeviceCallbacks.h"
 
+#include "DeviceCallbacks.h"
 #include "CHIPDeviceManager.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
@@ -71,9 +72,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         OnInternetConnectivityChange(event);
         break;
 
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -124,6 +122,9 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+
+        ChipLogProgress(DeviceLayer, "Initializing route hook...");
+        ameba_route_hook_init();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
         if (!isOTAInitialized)
@@ -137,14 +138,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
         ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
-    }
-}
-
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        ChipLogProgress(DeviceLayer, "Commissioner detected!");
     }
 }
 

@@ -1,0 +1,440 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    24.1.10. [TC-CADMIN-1.10] Device exit commissioning mode after 20 failed
+    commission attempts [BCM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
+config:
+    nodeId: 0x12344321
+    timeout: 700
+    nodeIdForDuplicateCommissioning:
+        type: node_id
+        defaultValue: 0x11
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    correctPayload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    incorrectSetupCodePayload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00I.0648G00"
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 900
+
+    #Check for DNS-SD advertisement CM is not possible in YAML
+    - label: "Verify that the DNS-SD advertisement shows CM=1"
+      verification: |
+          On TH_CR1 send the below command
+
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+          =   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+      response:
+          error: FAILURE
+
+    # This step must match the verification step above where we checked `correctPayload`
+    - label:
+          "TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
+          payload"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: correctPayload
+      response:
+          error: FAILURE

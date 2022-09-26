@@ -29,12 +29,14 @@ limitations under the License.
         <tag name="RID" description="RFID Credential" />
         <tag name="FGP" description="Finger Credentials" />
         <tag name="LOG" description="Logging" />
-        <tag name="SCH" description="Access Schedules" />
+        <tag name="WDSCH" description="Week Day Access Schedules" />
         <tag name="DPS" description="Door Position Sensor" />
         <tag name="FACE" description="Face Credentials" />
         <tag name="COTA" description="Credential Over-the-Air Access" />
         <tag name="USR" description="User" />
         <tag name="NOT" description="Notification" />
+        <tag name="YDSCH" description="Year Day Access Schedules" />
+        <tag name="HDSCH" description="Holiday Schedules" />
 
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
@@ -47,12 +49,14 @@ limitations under the License.
             <featureBit tag="RID" bit="1">false</featureBit>
             <featureBit tag="FGP" bit="2">false</featureBit>
             <featureBit tag="LOG" bit="3">false</featureBit>
-            <featureBit tag="SCH" bit="4">true</featureBit>
+            <featureBit tag="WDSCH" bit="4">true</featureBit>
             <featureBit tag="DPS" bit="5">true</featureBit>
             <featureBit tag="FACE" bit="6">false</featureBit>
             <featureBit tag="COTA" bit="7">true</featureBit>
             <featureBit tag="USR" bit="8">true</featureBit> <!-- TODO: Depend on PIN | RID | FGP | FACE -->
             <featureBit tag="NOT" bit="9">false</featureBit>
+            <featureBit tag="YDSCH" bit="10">true</featureBit>
+            <featureBit tag="HDSCH" bit="11">true</featureBit>
         </globalAttribute>
 
         <!-- The principle behind  mandatory/optional is the following:
@@ -92,11 +96,11 @@ limitations under the License.
         <attribute side="server" code="18" define="NUM_PIN_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfPINUsersSupported</attribute>
         <!-- Conformance feature RFID - for now optional -->
         <attribute side="server" code="19" define="NUM_RFID_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfRFIDUsersSupported</attribute>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature WDSCH - for now optional -->
         <attribute side="server" code="20" define="NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfWeekDaySchedulesSupportedPerUser</attribute>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature YDSCH - for now optional -->
         <attribute side="server" code="21" define="NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfYearDaySchedulesSupportedPerUser</attribute>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature HDSCH - for now optional -->
         <attribute side="server" code="22" define="NUM_HOLIDAY_SCHEDULES_SUPPORTED" type="INT8U" default="0" writable="false" optional="true">NumberOfHolidaySchedulesSupported</attribute>
         <!-- Conformance feature PIN - for now optional -->
         <attribute side="server" code="23" define="MAX_PIN_LENGTH" type="INT8U" writable="false" optional="true">MaxPINCodeLength</attribute>
@@ -212,7 +216,7 @@ limitations under the License.
             <!-- Conformance feature [COTA & PIN] - for now optional -->
             <arg name="pinCode" type="OCTET_STRING" optional="true" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature WDSCH - for now optional -->
         <command source="client" code="11" name="SetWeekDaySchedule" optional="true">
             <description>Set a weekly repeating schedule for a specified user.</description>
             <access op="invoke" role="administer" />
@@ -224,14 +228,14 @@ limitations under the License.
             <arg name="endHour" type="INT8U" />
             <arg name="endMinute" type="INT8U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature WDSCH - for now optional -->
         <command source="client" code="12" name="GetWeekDaySchedule" response="GetWeekDayScheduleResponse" optional="true">
             <description>Retrieve the specific weekly schedule for the specific user.</description>
             <access op="invoke" role="administer" />
             <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature WDSCH - for now optional -->
         <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
             <access op="invoke" role="administer" />
@@ -244,14 +248,14 @@ limitations under the License.
             <arg name="endHour" type="INT8U" optional="true" />
             <arg name="endMinute" type="INT8U" optional="true" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature WDSCH - for now optional -->
         <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
             <description>Clear the specific weekly schedule or all weekly schedules for the specific user.</description>
             <access op="invoke" role="administer" />
             <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature YDSCH - for now optional -->
         <command source="client" code="14" name="SetYearDaySchedule" optional="true">
             <description>Set a time-specific schedule ID for a specified user.</description>
             <access op="invoke" role="administer" />
@@ -260,14 +264,14 @@ limitations under the License.
             <arg name="localStartTime" type="epoch_s" />
             <arg name="localEndTime" type="epoch_s" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature YDSCH - for now optional -->
         <command source="client" code="15" name="GetYearDaySchedule" response="GetYearDayScheduleResponse" optional="true">
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
             <access op="invoke" role="administer" />
             <arg name="yearDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature YDSCH - for now optional -->
         <command source="server" code="15" name="GetYearDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
             <access op="invoke" role="administer" />
@@ -277,14 +281,14 @@ limitations under the License.
             <arg name="localStartTime" type="epoch_s" optional="true" />
             <arg name="localEndTime" type="epoch_s" optional="true" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature YDSCH - for now optional -->
         <command source="client" code="16" name="ClearYearDaySchedule" optional="true">
             <description>Clears the specific year day schedule or all year day schedules for the specific user.</description>
             <access op="invoke" role="administer" />
             <arg name="yearDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature HDSCH - for now optional -->
         <command source="client" code="17" name="SetHolidaySchedule" optional="true">
             <description>Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode.</description>
             <access op="invoke" role="administer" />
@@ -293,13 +297,13 @@ limitations under the License.
             <arg name="localEndTime" type="epoch_s" />
             <arg name="operatingMode" type="DlOperatingMode" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature HDSCH - for now optional -->
         <command source="client" code="18" name="GetHolidaySchedule" response="GetHolidayScheduleResponse" optional="true">
             <description>Get the holiday schedule for the specified index.</description>
             <access op="invoke" role="administer" />
             <arg name="holidayIndex" type="INT8U" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature HDSCH - for now optional -->
         <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
             <access op="invoke" role="administer" />
@@ -309,7 +313,7 @@ limitations under the License.
             <arg name="localEndTime" type="epoch_s" optional="true" />
             <arg name="operatingMode" type="DlOperatingMode" optional="true" />
         </command>
-        <!-- Conformance feature SCH - for now optional -->
+        <!-- Conformance feature HDSCH - for now optional -->
         <command source="client" code="19" name="ClearHolidaySchedule" optional="true">
             <description>Clears the holiday schedule or all holiday schedules.</description>
             <access op="invoke" role="administer" />
@@ -750,11 +754,13 @@ limitations under the License.
         <field name="RFIDCredentials" mask="0x02" />
         <field name="FingerCredentials" mask="0x04" />
         <field name="Logging" mask="0x08" />
-        <field name="AccessSchedules" mask="0x10" />
+        <field name="WeekDaySchedules" mask="0x10" />
         <field name="DoorPositionSensor" mask="0x20" />
         <field name="FaceCredentials" mask="0x40" />
         <field name="CredentialsOTA" mask="0x80" />
         <field name="UsersManagement" mask="0x100" />
         <field name="Notifications" mask="0x200" />
+        <field name="YearDaySchedules" mask="0x400" />
+        <field name="HolidaySchedules" mask="0x800" />
     </bitmap>
 </configurator>

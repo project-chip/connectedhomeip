@@ -1,18 +1,27 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: gcr.io/cloud-builders/git
+      args:
+          - submodule
+          - update
+          - "--init"
+          - "--recursive"
+      id: Submodules
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
           - source ./scripts/bootstrap.sh
       id: Bootstrap
+      waitFor:
+          - Submodules
       entrypoint: /usr/bin/bash
       volumes:
           - name: pwenv
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -28,7 +37,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -45,45 +54,41 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    # Disabled until EFR32 builds work on vscode image (changes in #19778
-    # resulted in git-lfs needed in docker image and build steps)
-    #
-    # - name: "connectedhomeip/chip-build-vscode:0.5.79"
-    #   id: EFR32
-    #   env:
-    #       - PW_ENVIRONMENT_ROOT=/pwenv
-    #   args:
-    #       - >-
-    #           ./scripts/build/build_examples.py --enable-flashbundle
-    #           --target-glob '*-brd4161a-{lock,light,unit-test}*' build
-    #           --create-archives /workspace/artifacts/
-    #   waitFor:
-    #       - Bootstrap
-    #       - NRFConnect
-    #   entrypoint: ./scripts/run_in_build_env.sh
-    #   volumes:
-    #       - name: pwenv
-    #         path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+      id: EFR32
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*-brd4161a-{lock,light,unit-test}*' build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - NRFConnect
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob 'linux-*' --skip-target-glob '*-tests' build
+              --target-glob 'linux-*' --skip-target-glob '*-tests*' build
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
-          - NRFConnect
-          # - EFR32
+          - EFR32
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -104,6 +109,7 @@ logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
 timeout: 9000s
+queueTtl: 21600s
 
 artifacts:
     objects:
@@ -114,4 +120,4 @@ artifacts:
 # building instead of docker download/checkout/bootstrap)
 options:
     machineType: "E2_HIGHCPU_32"
-    diskSizeGb: 200
+    diskSizeGb: 500

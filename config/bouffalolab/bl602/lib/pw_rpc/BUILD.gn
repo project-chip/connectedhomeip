@@ -16,6 +16,17 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/target_types.gni")
 
+config("pw_string_config") {
+  defines = [
+    "_GLIBCXX_USE_C99_MATH_TR1",
+    "_LDBL_EQ_DBL",
+  ]
+}
+
+pw_source_set("pw_string_dep") {
+  public_configs = [ ":pw_string_config" ]
+}
+
 static_library("pw_rpc") {
   output_name = "libPwRpc"
 
@@ -24,7 +35,7 @@ static_library("pw_rpc") {
   public_deps = [
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
-    "${chip_root}/examples/platform/bl602/pw_sys_io:pw_sys_io_bl602",
+    "${chip_root}/examples/platform/bouffalolab/bl602/pw_sys_io:pw_sys_io_bl602",
     "${dir_pigweed}/pw_hdlc:pw_rpc",
     dir_pw_assert,
     dir_pw_checksum,

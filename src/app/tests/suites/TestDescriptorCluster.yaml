@@ -30,13 +30,13 @@ tests:
 
     - label: "Read attribute Device list"
       command: "readAttribute"
-      attribute: "Device List"
+      attribute: "DeviceTypeList"
       response:
           value: [{ type: 22, revision: 1 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"
-      attribute: "Server List"
+      attribute: "ServerList"
       response:
           value: [
                   0x0003, # Identify
@@ -65,11 +65,12 @@ tests:
                   0x0040, # Fixed Label
                   0x0041, # User Label
                   0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0xFFF1FC06, # Fault Injection
               ]
 
     - label: "Read attribute Client list"
       command: "readAttribute"
-      attribute: "Client List"
+      attribute: "ClientList"
       response:
           value: [
                   0x0029, # OTA Software Update Provider
@@ -77,6 +78,6 @@ tests:
 
     - label: "Read attribute Parts list"
       command: "readAttribute"
-      attribute: "Parts List"
+      attribute: "PartsList"
       response:
           value: [1, 2]

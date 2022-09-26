@@ -22,6 +22,7 @@
 #include "AppImpl.h"
 
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -85,11 +86,12 @@ MyPincodeService gMyPincodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+                                SessionHandle & sessionHandle) override
     {
 
-        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(
+            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
@@ -118,6 +120,11 @@ class MyPostCommissioningListener : public PostCommissioningListener
 MyPostCommissioningListener gMyPostCommissioningListener;
 ContentAppFactoryImpl gFactory;
 
+ContentAppFactoryImpl * GetContentAppFactoryImpl()
+{
+    return &gFactory;
+}
+
 namespace chip {
 namespace AppPlatform {
 
@@ -138,6 +145,12 @@ static const int kDescriptorAttributeArraySize = 254;
 // CONTENT APP ENDPOINT: contains the following clusters:
 //   - Descriptor
 //   - Application Basic
+//   - Keypad Input
+//   - Application Launcher
+//   - Account Login
+//   - Content Launcher
+//   - Target Navigator
+//   - Channel
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
@@ -148,23 +161,27 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttrib
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Application Basic information cluster attributes
-// TODO: add missing attributes once schema is updated
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(applicationBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_VENDOR_NAME_ATTRIBUTE_ID, CHAR_STRING, kNameSize, 0), /* VendorName */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_VENDOR_ID_ATTRIBUTE_ID, INT16U, 1, 0),            /* VendorID */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_NAME_ATTRIBUTE_ID, CHAR_STRING, kNameSize, 0),    /* ApplicationName */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_PRODUCT_ID_ATTRIBUTE_ID, INT16U, 1, 0),           /* ProductID */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_STATUS_ATTRIBUTE_ID, INT8U, 1, 0),                /* ApplicationStatus */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, CHAR_STRING, kNameSize, 0), /* ApplicationVersion */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_ALLOWED_VENDOR_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* AllowedVendorList */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Keypad Input cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(keypadInputAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0), /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Application Launcher cluster attributes
-// TODO: add missing attributes once schema is updated
+// NOTE: Does not make sense for content app to be able to set the AP feature flag
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(applicationLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* catalog list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_APPLICATION_LAUNCHER_CURRENT_APP_ATTRIBUTE_ID, STRUCT, 1, 0),                 /* current app */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Account Login cluster attributes
@@ -176,18 +193,20 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(contentLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CONTENT_LAUNCHER_ACCEPT_HEADER_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize,
                           0), /* accept header list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID, BITMAP32, 1,
-                              0), /* streaming protocols */
+                              0),                                                   /* streaming protocols */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Media Playback cluster attributes
-// TODO: add missing attributes once schema is updated
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(mediaPlaybackAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID, ENUM8, 1, 0),                          /* current state */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_START_TIME_ATTRIBUTE_ID, EPOCH_US, 1, 0),              /* start time */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID, INT64U, 1, 0),                  /* duration */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID, STRUCT, 1, 0),         /* playback speed */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID, SINGLE, 1, 0),            /* playback speed */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END_ATTRIBUTE_ID, INT64U, 1, 0),   /* seek range end */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START_ATTRIBUTE_ID, INT64U, 1, 0), /* seek range start */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),                     /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Target Navigator cluster attributes
@@ -201,6 +220,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(channelAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* channel list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_LINEUP_ATTRIBUTE_ID, STRUCT, 1, 0),                      /* lineup */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID, STRUCT, 1, 0),             /* current channel */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, BITMAP32, 4, 0),                /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 constexpr CommandId keypadInputIncomingCommands[] = {
@@ -367,6 +387,24 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
                     vendorApp.applicationId);
 
     return nullptr;
+}
+
+void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
+{
+    mAdminVendorIds.push_back(vendorId);
+}
+
+Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
+{
+    for (size_t i = 0; i < mAdminVendorIds.size(); ++i)
+    {
+        auto & vendor = mAdminVendorIds.at(i);
+        if (vendorId == vendor)
+        {
+            return Access::Privilege::kAdminister;
+        }
+    }
+    return Access::Privilege::kOperate;
 }
 
 } // namespace AppPlatform

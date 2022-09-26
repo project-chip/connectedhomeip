@@ -40,7 +40,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     return JNI_VERSION_1_6;
 }
 
-JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj)
+JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     const char * qrString = NULL;
@@ -50,6 +50,13 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
 
     err = QRCodeSetupPayloadParser(qrString).populatePayload(payload);
     env->ReleaseStringUTFChars(qrCodeObj, qrString);
+
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidQRCodePayload())
+    {
+        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
+        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return nullptr;
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -64,16 +71,23 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     return TransformSetupPayload(env, payload);
 }
 
-JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode)
+JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode, jboolean allowInvalidPayload)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     const char * entryCodeString = NULL;
     SetupPayload payload;
 
     entryCodeString = env->GetStringUTFChars(entryCode, 0);
-    env->ReleaseStringUTFChars(entryCode, entryCodeString);
 
     err = ManualSetupPayloadParser(entryCodeString).populatePayload(payload);
+    env->ReleaseStringUTFChars(entryCode, entryCodeString);
+
+    if (allowInvalidPayload == JNI_FALSE && !payload.isValidManualCode())
+    {
+        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
+        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return nullptr;
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -106,10 +120,24 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
     env->SetIntField(setupPayload, productId, payload.productID);
     env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
-    env->SetIntField(setupPayload, discriminator, payload.discriminator);
+    // TODO: The API we have here does not handle short discriminators in any
+    // sane way.  Just do what we used to do, which is pretend that a short
+    // discriminator is actually a long discriminator with the low bits all 0.
+    uint16_t discriminatorValue;
+    if (payload.discriminator.IsShortDiscriminator())
+    {
+        discriminatorValue = static_cast<uint16_t>(payload.discriminator.GetShortValue())
+            << (SetupDiscriminator::kLongBits - SetupDiscriminator::kShortBits);
+    }
+    else
+    {
+        discriminatorValue = payload.discriminator.GetLongValue();
+    }
+    env->SetIntField(setupPayload, discriminator, discriminatorValue);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
 
-    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.rendezvousInformation));
+    env->SetObjectField(setupPayload, discoveryCapabilities,
+                        CreateCapabilitiesHashSet(env, payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone)));
 
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
@@ -130,12 +158,8 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         jclass enumClass  = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType");
         jfieldID enumType = nullptr;
 
-        switch (info.tag)
+        switch (info.type)
         {
-        case optionalQRCodeInfoTypeUnknown:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
-            break;
         case optionalQRCodeInfoTypeString:
             enumType =
                 env->GetStaticFieldID(enumClass, "TYPE_STRING", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
@@ -156,12 +180,18 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
             enumType =
                 env->GetStaticFieldID(enumClass, "TYPE_UINT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
-        default:
+        case optionalQRCodeInfoTypeUnknown:
+        default: // Optional Type variable has to set any value.
+            enumType =
+                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         }
 
-        jobject enumObj = env->GetStaticObjectField(enumClass, enumType);
-        env->SetObjectField(optionalInfo, type, enumObj);
+        if (enumType != nullptr)
+        {
+            jobject enumObj = env->GetStaticObjectField(enumClass, enumType);
+            env->SetObjectField(optionalInfo, type, enumObj);
+        }
 
         env->SetObjectField(optionalInfo, data, env->NewStringUTF(info.data.c_str()));
         env->SetIntField(optionalInfo, int32, info.int32);
@@ -257,11 +287,12 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
     payload.vendorID          = env->GetIntField(jPayload, vendorId);
     payload.productID         = env->GetIntField(jPayload, productId);
     payload.commissioningFlow = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
-    payload.discriminator     = env->GetIntField(jPayload, discriminator);
-    payload.setUpPINCode      = env->GetLongField(jPayload, setUpPinCode);
+    payload.discriminator.SetLongValue(env->GetIntField(jPayload, discriminator));
+    payload.setUpPINCode = env->GetLongField(jPayload, setUpPinCode);
 
     jobject discoveryCapabilitiesObj = env->GetObjectField(jPayload, discoveryCapabilities);
-    CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj, payload.rendezvousInformation);
+    CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj,
+                                  payload.rendezvousInformation.Emplace(RendezvousInformationFlag::kNone));
 }
 
 void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags)

@@ -57,7 +57,7 @@ private:
     {
         NoneSelected = 0,
         SoftwareUpdate,
-        FactoryReset
+        FactoryReset,
     };
     TimerFunction mFunction = TimerFunction::NoneSelected;
 

@@ -89,9 +89,8 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     // If enabled, override the generated session key with a known key pair
     // to allow man-in-the-middle session key recovery for testing purposes.
 
-#define TEST_SECRET_SIZE 32
-    constexpr uint8_t kTestSharedSecret[TEST_SECRET_SIZE] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == TEST_SECRET_SIZE,
+    constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
                   "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
     const ByteSpan & testSalt = ByteSpan(nullptr, 0);
     (void) info;
@@ -104,8 +103,8 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
                  "and NodeID=0 in NONCE. "
                  "Node can only communicate with other nodes built with this flag set.");
 
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
-                                           sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH, testSalt.data(),
+                                           testSalt.size(), SEKeysInfo, sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
 #else
 
     ReturnErrorOnFailure(
@@ -144,6 +143,16 @@ CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uin
     bbuf.Put64(nodeId);
 #endif
 
+    return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR CryptoContext::BuildPrivacyNonce(NonceView nonce, uint16_t sessionId, const MessageAuthenticationCode & mac)
+{
+    const uint8_t * micFragment = &mac.GetTag()[kPrivacyNonceMicFragmentOffset];
+    Encoding::BigEndian::BufferWriter bbuf(nonce.data(), nonce.size());
+
+    bbuf.Put16(sessionId);
+    bbuf.Put(micFragment, kPrivacyNonceMicFragmentLength);
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
@@ -187,7 +196,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan ciphertext(output, input_length);
         MutableByteSpan mic(tag, taglen);
 
-        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), nonce, mic, ciphertext));
+        ReturnErrorOnFailure(mKeyContext->MessageEncrypt(plaintext, ByteSpan(AAD, aadLen), nonce, mic, ciphertext));
     }
     else
     {
@@ -231,7 +240,7 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan plaintext(output, input_length);
         ByteSpan mic(tag, taglen);
 
-        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), nonce, mic, plaintext);
+        CHIP_ERROR err = mKeyContext->MessageDecrypt(ciphertext, ByteSpan(AAD, aadLen), nonce, mic, plaintext);
         ReturnErrorOnFailure(err);
     }
     else
@@ -251,6 +260,42 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
                                              Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output));
     }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CryptoContext::PrivacyEncrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                         MessageAuthenticationCode & mac) const
+{
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on unicast session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    ByteSpan plaintext(input, input_length);
+    MutableByteSpan privacytext(output, input_length);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+
+    return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
+}
+
+CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                         const MessageAuthenticationCode & mac) const
+{
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    const ByteSpan privacytext(input, input_length);
+    MutableByteSpan plaintext(output, input_length);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+
+    return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }
 
 } // namespace chip

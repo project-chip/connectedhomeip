@@ -72,9 +72,9 @@ class NrfApp(Enum):
 
     def _FlashBundlePrefix(self):
         if self == NrfApp.ALL_CLUSTERS:
-            return 'chip-nrfconnect-all-clusters-example'
+            return 'chip-nrfconnect-all-clusters-app-example'
         elif self == NrfApp.ALL_CLUSTERS_MINIMAL:
-            return 'chip-nrfconnect-all-clusters-minimal-example'
+            return 'chip-nrfconnect-all-clusters-minimal-app-example'
         elif self == NrfApp.LIGHT:
             return 'chip-nrfconnect-lighting-example'
         elif self == NrfApp.LOCK:

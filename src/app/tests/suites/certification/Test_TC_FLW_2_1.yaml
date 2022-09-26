@@ -14,6 +14,9 @@
 
 name: 33.2.1. [TC-FLW-2.1] Attributes with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"
@@ -28,33 +31,42 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
     - label: "Read the mandatory attribute: MinMeasuredValue"
+      PICS: FLW.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65533
 
     - label: "Read the mandatory attribute: MaxMeasuredValue"
+      PICS: FLW.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
-    - label: "read the optional attribute: Tolerance"
-      optional: true
+    - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: FLW.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH reads from the DUT the Tolerance attribute"
+      PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048

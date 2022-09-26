@@ -35,6 +35,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
         emberAfAccountLoginClusterInitCallback(endpoint);
         break;
+    case ZCL_ACTIONS_CLUSTER_ID:
+        emberAfActionsClusterInitCallback(endpoint);
+        break;
     case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID:
         emberAfAdministratorCommissioningClusterInitCallback(endpoint);
         break;
@@ -62,9 +65,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BOOLEAN_STATE_CLUSTER_ID:
         emberAfBooleanStateClusterInitCallback(endpoint);
         break;
-    case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
-        emberAfBridgedActionsClusterInitCallback(endpoint);
-        break;
     case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
         break;
@@ -91,6 +91,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_FAN_CONTROL_CLUSTER_ID:
         emberAfFanControlClusterInitCallback(endpoint);
+        break;
+    case ZCL_FAULT_INJECTION_CLUSTER_ID:
+        emberAfFaultInjectionClusterInitCallback(endpoint);
         break;
     case ZCL_FIXED_LABEL_CLUSTER_ID:
         emberAfFixedLabelClusterInitCallback(endpoint);
@@ -234,6 +237,11 @@ void __attribute__((weak)) emberAfAccountLoginClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -279,11 +287,6 @@ void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfBridgedActionsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -325,6 +328,11 @@ void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfFanControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFaultInjectionClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

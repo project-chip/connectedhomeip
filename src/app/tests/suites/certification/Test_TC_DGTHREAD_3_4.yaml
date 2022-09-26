@@ -1,0 +1,85 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 50.3.4. [TC-DGTHREAD-3.4] ResetCounts Command[DUT-Client]
+
+PICS:
+    - DGTHREAD.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT sends ResetCounts Command to TH"
+      PICS: DGTHREAD.C.C00.Tx
+      verification: |
+          ./chip-tool threadnetworkdiagnostics reset-counts 54 0
+          Verify "success response"  on the TH(All-cluster-app) Log:
+
+          D: 6932849 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
+          I: 6932856 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:25984238 on exchanr
+          D: 6932866 [EM]Handling via exchange: 5441r, Delegate: 0x200070ec
+          D: 6932873 [DMG]Received command for Endpoint=0 Cluster=0x0000_0035 Command=0x0000_0000
+          D: 6932881 [DMG]ICR moving to [ Preparing]
+          D: 6932884 [DMG]ICR moving to [AddingComm]
+          D: 6932888 [DMG]ICR moving to [AddedComma]
+          D: 6932894 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 6932901 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId .
+          I: 6932916 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:151760493 to 0x000000000001B669 (1) c
+          D: 6932930 [DMG]ICR moving to [CommandSen]
+          D: 6932934 [DMG]ICR moving to [AwaitingDe]
+          D: 6932938 [EM]Retransmitting MessageCounter:53367992 on exchange 5440r Send Cnt 1
+          I: 6932946 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367992 to 0x0000000000000000c
+          I: 6932962 [EM]Received message of type 0x10 with protocolId (0, 0) and MessageCounter:229191096 on exchr
+          D: 6932972 [EM]Found matching exchange: 5440r, Delegate: (nil)
+          D: 6932979 [EM]Rxd Ack; Removing MessageCounter:53367992 from Retrans Table on exchange 5440r
+          D: 6932988 [EM]Removed CHIP MessageCounter:53367992 from RetransTable on exchange 5440r
+          D: 6932998 [IN]Received a duplicate message with MessageCounter:25984238 on exchange 5441r
+          I: 6933006 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:25984238 on exchanr
+          D: 6933016 [EM]Found matching exchange: 5441r, Delegate: (nil)
+          D: 6933022 [EM]Forcing tx of solitary ack for duplicate MessageCounter:25984238 on exchange 5441r
+          D: 6933030 [EM]Sending Standalone Ack for MessageCounter:25984238 on exchange 5441r
+      disabled: true
+
+    - label: "DUT reads OverrunCount attribute from TH"
+      PICS: DGTHREAD.C.A0006
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read overrun-count 54 0
+           Verify "OverrunCount response" on the TH(All-cluster-app) Log:
+
+          D: 7011179 [SC]Allocated SecureSession (0x20003008) - waiting for Sigma1 msg
+          I: 7011187 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:245187273 on exchar
+          D: 7011197 [EM]Handling via exchange: 37861r, Delegate: 0x200070ec
+          D: 7011203 [IM]Received Read request
+          D: 7011207 [DMG]IM RH moving to [GeneratingReports]
+          D: 7011212 [EM]Retransmitting MessageCounter:53367996 on exchange 37860r Send Cnt 1
+          I: 7011219 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367996 to 0x0000000000000000c
+          D: 7011235 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 7011244 [DMG]<RE:Run> Cluster 35, Attribute 6 is dirty
+          D: 7011250 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0006 (expanded=0)
+          D: 7011260 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true

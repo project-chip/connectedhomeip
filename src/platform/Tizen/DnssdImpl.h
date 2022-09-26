@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include <lib/dnssd/platform/Dnssd.h>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
 #include <sys/param.h>
 #include <vector>
+
+#include <lib/dnssd/platform/Dnssd.h>
 
 #include <dns-sd.h>
 #include <glib.h>
@@ -80,6 +81,9 @@ struct BrowseContext : public GenericContext
     void * mCbContext;
 
     dnssd_browser_h mBrowserHandle = 0;
+    // The timeout source used to stop browsing
+    GSource * mTimeoutSource = nullptr;
+
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
@@ -112,7 +116,7 @@ public:
     DnssdTizen & operator=(const DnssdTizen &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     CHIP_ERROR RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR UnregisterAllServices();

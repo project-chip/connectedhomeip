@@ -18,7 +18,6 @@
 
 #include "LockManager.h"
 
-#include <cstring>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -110,6 +109,29 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
                     numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules);
 
     return true;
+}
+
+bool LockManager::SetDoorState(chip::EndpointId endpointId, DlDoorState doorState)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to toggle the door state - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return false;
+    }
+    return lockEndpoint->SetDoorState(doorState);
+}
+
+bool LockManager::SendLockAlarm(chip::EndpointId endpointId, DlAlarmCode alarmCode)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to send lock alarm - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
+        return false;
+    }
+    return lockEndpoint->SendLockAlarm(alarmCode);
 }
 
 bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)

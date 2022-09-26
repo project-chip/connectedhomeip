@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-3.3] StopMotion Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-3.3] StopMotion command & OperationalStatus
+    attribute Verification [DUT_Server]
+
+PICS:
+    - WNCV.S
 
 # TC-WNCV tests featuremap conditional dependencies -> use PICS
 
@@ -37,6 +42,7 @@ tests:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     - label: "1b: TH Waits for 6-8 seconds movement(s) on the device"
       cluster: "DelayCommands"
@@ -50,6 +56,23 @@ tests:
           "1c: TH sends UpOrOpen command to preposition the DUT in the opposite
           direction"
       command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
+
+    - label: "1d: TH Waits for 2 seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "1e: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          constraints:
+              notValue: 0
 
     - label: "1d: TH Waits for 2 seconds movement(s) on the device"
       cluster: "DelayCommands"
@@ -69,11 +92,12 @@ tests:
       maxInterval: 5
       response:
           constraints:
-              type: map8
+              type: bitmap8
 
     ### MANDATORY Command
     - label: "2a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
 
     ### DUT Slow down and stop
     - label:
@@ -89,10 +113,10 @@ tests:
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
     - label:
-          "2c: Verify DUT reports OperationalStatus attribute to TH after a
-          StopMotion"
-      command: "waitForReport"
+          "2c: TH reads OperationalStatus attribute from DUT after a StopMotion"
+      command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -109,6 +133,7 @@ tests:
     - label: "2e: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -122,7 +147,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLift
           constraints:
@@ -136,7 +161,7 @@ tests:
           3c: it Must be equal with CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && WNCV.S.A000e
       response:
           value: attrCurrentPositionLift
 
@@ -150,7 +175,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           saveAs: attrCurrentPositionTilt
           constraints:
@@ -164,6 +189,8 @@ tests:
           4c: it Must be equal with CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS:
+          WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000c && WNCV.S.A000f &&
+          PICS_SKIP_SAMPLE_APP
       response:
           value: attrCurrentPositionTilt

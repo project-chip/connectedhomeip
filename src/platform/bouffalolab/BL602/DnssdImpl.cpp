@@ -77,10 +77,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return error;
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 static const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
@@ -226,18 +223,6 @@ int mdns_responder_ops(struct netif * netif)
     mdns.slot[mdns.slot_idx] = slot;
     mdns.slot_idx++;
     mdns_resp_announce(netif);
-
-#if 0
-    // for ota
-    slot =
-        mdns_resp_add_service(netif, "MATTER OTA", "_ota", static_cast<uint8_t>(glservice->mProtocol), 3333, 1000, ota_txt, NULL);
-    if (slot < 0)
-    {
-        mdns_resp_remove_netif(netif);
-        mdns_resp_deinit();
-        log_info("ota mdns fail.\r\n");
-    }
-#endif
 
     return slot;
 }

@@ -18,9 +18,8 @@
 
 #pragma once
 
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h> // For NSObjectFromCHIPTLV
-#include <lib/support/UnitTestUtils.h>
+#import "MTRError_Utils.h"
+#import <Matter/Matter.h>
 
 #include "ModelCommandBridge.h"
 
@@ -46,7 +45,7 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -67,7 +66,7 @@ public:
         return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, commandFields);
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
         chip::CommandId commandId, id _Nonnull commandFields)
     {
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
@@ -75,14 +74,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
         while (repeatCount--) {
-            [device invokeCommandWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                                      clusterId:[NSNumber numberWithUnsignedInteger:clusterId]
-                                      commandId:[NSNumber numberWithUnsignedInteger:commandId]
+            [device invokeCommandWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                                      clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
+                                      commandID:[NSNumber numberWithUnsignedInteger:commandId]
                                   commandFields:commandFields
                              timedInvokeTimeout:mTimedInteractionTimeoutMs.HasValue()
                                  ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                                  : nil
-                                    clientQueue:callbackQueue
+                                          queue:callbackQueue
                                      completion:^(
                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                          responsesNeeded--;
@@ -96,10 +95,16 @@ public:
                                      }];
 
             if (mRepeatDelayInMs.HasValue()) {
-                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
+                [NSThread sleepForTimeInterval:((double) mRepeatDelayInMs.Value()) / 1000];
             }
         }
         return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() override
+    {
+        mError = nil;
+        ModelCommand::Shutdown();
     }
 
 protected:

@@ -43,6 +43,8 @@ extern InitFunc __init_array_end;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
+extern "C" void sched_enable();
+
 extern "C" void main_task(void const * argument)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -84,6 +86,11 @@ extern "C" void main_task(void const * argument)
         K32W_LOG("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
+
+    /* Enable the MAC scheduler after BLEManagerImpl::_Init() and V2MMAC_Enable().
+     * This is needed to register properly the active protocols.
+     */
+    sched_enable();
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (err != CHIP_NO_ERROR)

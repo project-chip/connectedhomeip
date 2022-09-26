@@ -187,12 +187,14 @@ struct WaitForCommissioningCommand
 struct WaitForCommissioneeCommand
 {
     chip::NodeId nodeId;
+    Optional<bool> expireExistingSession;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
         chip::TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), expireExistingSession));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -211,6 +213,9 @@ struct WaitForCommissioneeCommand
             {
             case 0:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, nodeId));
+                break;
+            case 1:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, expireExistingSession));
                 break;
             default:
                 break;

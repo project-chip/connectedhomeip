@@ -15,6 +15,9 @@
 
 name: 14.3.2. [TC-SC-3.2] CASE Session Resumption [DUT - Responder]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

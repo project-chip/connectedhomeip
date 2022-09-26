@@ -136,7 +136,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
 
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
-    generator_dir = getDirPath('third_party/zap/repo')
+    generator_dir = os.getenv('ZAP_PATH', getDirPath('third_party/zap/repo'))
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
                           zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])

@@ -1,0 +1,79 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
+
+import("${cyw30739_sdk_build_root}/cyw30739_executable.gni")
+import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
+
+cyw30739_project_dir = "${chip_root}/examples/lighting-app/infineon/cyw30739"
+examples_plat_dir = "${chip_root}/examples/platform/infineon/cyw30739"
+
+declare_args() {
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+}
+
+cyw30739_sdk("sdk") {
+  sources = [ "${cyw30739_project_dir}/include/CHIPProjectConfig.h" ]
+
+  include_dirs = [
+    "${cyw30739_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+  ]
+}
+
+cyw30739_executable("lighting_app") {
+  output_name = "chip-cyw30739-lighting-example.elf"
+
+  sources = [
+    "src/AppShellCommands.cpp",
+    "src/ButtonHandler.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [ "include" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "${examples_plat_dir}/OTAConfig.cpp",
+      "${examples_plat_dir}/OTAConfig.h",
+    ]
+  }
+}
+
+group("cyw30739") {
+  deps = [ ":lighting_app" ]
+}
+
+group("default") {
+  deps = [ ":cyw30739" ]
+}

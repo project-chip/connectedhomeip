@@ -82,9 +82,15 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
-;
 
 AppTask AppTask::sAppTask;
+
+static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
+                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::OnTriggerEffect,
+                              // Use invalid value for identifiers to enable TriggerEffect command
+                              // to stop Identify command for each effect
+                              (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
+                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -415,15 +421,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = kFunction_NoneSelected;
 
-        /* restore initial state for the LED indicating Lighting state */
-        if (LightingMgr().IsTurnedOff())
-        {
-            sLightLED.Set(false);
-        }
-        else
-        {
-            sLightLED.Set(true);
-        }
+        RestoreLightingState();
 
         K32W_LOG("Factory Reset was cancelled!");
     }
@@ -680,6 +678,127 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 
     sAppTask.mFunction = kFunction_NoneSelected;
+}
+
+void AppTask::RestoreLightingState(void)
+{
+    /* restore initial state for the LED indicating Lighting state */
+    if (LightingMgr().IsTurnedOff())
+    {
+        sLightLED.Set(false);
+    }
+    else
+    {
+        sLightLED.Set(true);
+    }
+}
+
+void AppTask::OnIdentifyStart(Identify * identify)
+{
+    if ((kFunction_NoneSelected != sAppTask.mFunction) && (kFunction_TriggerEffect != sAppTask.mFunction))
+    {
+        K32W_LOG("Another function is scheduled. Could not initiate Identify process!");
+        return;
+    }
+
+    if (kFunction_TriggerEffect == sAppTask.mFunction)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
+    }
+
+    ChipLogProgress(Zcl, "Identify process has started. Status LED should blink with a period of 0.5 seconds.");
+    sAppTask.mFunction = kFunction_Identify;
+    sLightLED.Set(false);
+    sLightLED.Blink(250);
+}
+
+void AppTask::OnIdentifyStop(Identify * identify)
+{
+    if (kFunction_Identify == sAppTask.mFunction)
+    {
+        ChipLogProgress(Zcl, "Identify process has stopped.");
+        sAppTask.mFunction = kFunction_NoneSelected;
+
+        RestoreLightingState();
+    }
+}
+
+void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState)
+{
+    // Let Identify command take over if called during TriggerEffect already running
+    if (kFunction_TriggerEffect == sAppTask.mFunction)
+    {
+        ChipLogProgress(Zcl, "TriggerEffect has stopped.");
+        sAppTask.mFunction = kFunction_NoneSelected;
+
+        // TriggerEffect finished - reset identifiers
+        // Use invalid value for identifiers to enable TriggerEffect command
+        // to stop Identify command for each effect
+        gIdentify.mCurrentEffectIdentifier =
+            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
+        gIdentify.mTargetEffectIdentifier =
+            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
+        gIdentify.mEffectVariant = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT;
+
+        RestoreLightingState();
+    }
+}
+
+void AppTask::OnTriggerEffect(Identify * identify)
+{
+    // Allow overlapping TriggerEffect calls
+    if ((kFunction_NoneSelected != sAppTask.mFunction) && (kFunction_TriggerEffect != sAppTask.mFunction))
+    {
+        K32W_LOG("Another function is scheduled. Could not initiate Identify process!");
+        return;
+    }
+
+    sAppTask.mFunction  = kFunction_TriggerEffect;
+    uint16_t timerDelay = 0;
+
+    ChipLogProgress(Zcl, "TriggerEffect has started.");
+
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        timerDelay = 2;
+        break;
+
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        timerDelay = 15;
+        break;
+
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        timerDelay = 4;
+        break;
+
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
+        timerDelay = 2;
+        break;
+
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        timerDelay = 1;
+        break;
+
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
+        break;
+
+    default:
+        ChipLogProgress(Zcl, "Invalid effect identifier.");
+    }
+
+    if (timerDelay)
+    {
+        sLightLED.Set(false);
+        sLightLED.Blink(500);
+
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timerDelay), OnTriggerEffectComplete, identify);
+    }
 }
 
 void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction)

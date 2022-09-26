@@ -21,6 +21,8 @@
  *
  */
 
+#include <protocols/secure_channel/MessageCounterManager.h>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPKeyIds.h>
@@ -32,7 +34,6 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 
 namespace chip {
 namespace secure_channel {
@@ -219,7 +220,8 @@ exit:
             exchangeContext->Close();
         }
         state->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
-        ChipLogError(SecureChannel, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to send message counter synchronization request with error:%" CHIP_ERROR_FORMAT,
+                     err.Format());
     }
 
     return err;
@@ -263,7 +265,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeCon
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncReq message with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncReq message with error:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -303,7 +305,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncResp message with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncResp message with error:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;

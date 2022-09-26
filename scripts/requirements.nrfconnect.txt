@@ -1,2 +1,2 @@
 jsonschema>=4.4.0
-cbor2>=5.4.0
+cbor2>=5.4.3

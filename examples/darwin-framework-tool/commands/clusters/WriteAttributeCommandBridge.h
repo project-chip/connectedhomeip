@@ -22,6 +22,9 @@
 
 #include "ModelCommandBridge.h"
 
+#import "MTRError_Utils.h"
+#import <Matter/Matter.h>
+
 class WriteAttribute : public ModelCommand {
 public:
     WriteAttribute()
@@ -44,7 +47,7 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -66,19 +69,19 @@ public:
         return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
         chip::AttributeId attributeId, id _Nonnull value)
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         [device
-            writeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                               clusterId:[NSNumber numberWithUnsignedInteger:clusterId]
-                             attributeId:[NSNumber numberWithUnsignedInteger:attributeId]
+            writeAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                               clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
+                             attributeID:[NSNumber numberWithUnsignedInteger:attributeId]
                                    value:value
                        timedWriteTimeout:mTimedInteractionTimeoutMs.HasValue()
                            ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                            : nil
-                             clientQueue:callbackQueue
+                                   queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error != nil) {
                                       LogNSError("Error writing attribute", error);

@@ -49,13 +49,13 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (unsafe_unretained, nonatomic) bool found;
-@property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
+@property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
 @property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
-- (id)initWithDiscriminator:(uint16_t)deviceDiscriminator;
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
@@ -67,9 +67,11 @@ namespace DeviceLayer {
     namespace Internal {
         BleConnection * ble;
 
-        void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
+        void BleConnectionDelegateImpl::NewConnection(
+            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
+            CancelConnection();
             ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
@@ -81,8 +83,10 @@ namespace DeviceLayer {
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
-            [ble stop];
-            ble = nil;
+            if (ble) {
+                [ble stop];
+                ble = nil;
+            }
             return CHIP_NO_ERROR;
         }
     } // namespace Internal
@@ -94,7 +98,7 @@ namespace DeviceLayer {
 
 @implementation BleConnection
 
-- (id)initWithDiscriminator:(uint16_t)deviceDiscriminator
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
 {
     self = [super init];
     if (self) {
@@ -108,13 +112,28 @@ namespace DeviceLayer {
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
-            _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
+            [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         });
         dispatch_source_set_timer(
             _timer, dispatch_walltime(nullptr, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
     }
 
     return self;
+}
+
+// All our callback dispatch must happen on _chipWorkQueue
+- (void)dispatchConnectionError:(CHIP_ERROR)error
+{
+    dispatch_async(_chipWorkQueue, ^{
+        self.onConnectionError(self.appState, error);
+    });
+}
+
+- (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
+{
+    dispatch_async(_chipWorkQueue, ^{
+        self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+    });
 }
 
 // Start CBCentralManagerDelegate
@@ -129,7 +148,7 @@ namespace DeviceLayer {
     case CBManagerStatePoweredOff:
         ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
-        _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
+        [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         break;
     case CBManagerStateUnauthorized:
         ChipLogDetail(Ble, "CBManagerState: Unauthorized");
@@ -159,7 +178,7 @@ namespace DeviceLayer {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
                 NSUInteger length = [serviceData length];
-                if (length >= 7) {
+                if (length == 8) {
                     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
@@ -179,15 +198,7 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    // If the manual setup discriminator was passed in, only match the most significant 4 bits from the BLE advertisement
-    constexpr uint16_t manualSetupDiscriminatorOffsetInBits
-        = chip::kPayloadDiscriminatorFieldLengthInBits - chip::kManualSetupDiscriminatorFieldLengthInBits;
-    constexpr uint16_t maxManualDiscriminatorValue = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
-    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
-    if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
-        return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
-    } // else compare the entire thing
-    return _deviceDiscriminator == discriminator;
+    return _deviceDiscriminator.MatchesLongDiscriminator(discriminator);
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -216,7 +227,7 @@ namespace DeviceLayer {
 
     if (!self.found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
-        _onConnectionError(_appState, CHIP_ERROR_INCORRECT_STATE);
+        [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
     }
 }
 
@@ -228,7 +239,7 @@ namespace DeviceLayer {
     }
 
     // XXX error ?
-    _onConnectionComplete(_appState, (__bridge void *) peripheral);
+    [self dispatchConnectionComplete:peripheral];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral
@@ -371,7 +382,7 @@ namespace DeviceLayer {
         return;
     }
 
-    [_centralManager cancelPeripheralConnection:_peripheral];
+    _mBleLayer->CloseAllBleConnections();
     _peripheral = nil;
 }
 

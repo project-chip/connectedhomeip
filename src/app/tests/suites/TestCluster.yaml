@@ -1038,13 +1038,28 @@ tests:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
+                value: 1
+      response:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: 1
+
+    - label: "Send a command with a vendor_id and invalid enum"
+      command: "TestEnumsRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
                 value: 101
       response:
           values:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: 4
 
     # Tests for Struct
 
@@ -2766,13 +2781,13 @@ tests:
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 254
+          value: 3
 
     - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          value: 254
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
       command: "writeAttribute"
@@ -2786,8 +2801,8 @@ tests:
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          saveAs: nullableEnumAttr254
-          value: 254
+          saveAs: nullableEnumAttr3
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
       command: "writeAttribute"
@@ -2801,12 +2816,12 @@ tests:
       response:
           value: null
 
-    - label: "Read attribute NULLABLE_SIMPLE_ENUM not 254 Value"
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM not 3 Value"
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
           constraints:
-              notValue: nullableEnumAttr254
+              notValue: nullableEnumAttr3
 
     # Tests for Octet String attribute
 

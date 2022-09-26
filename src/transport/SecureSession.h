@@ -148,9 +148,6 @@ public:
     void MarkAsDefunct();
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
-#if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "secure"; };
-#endif
 
     ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
 
@@ -292,6 +289,8 @@ private:
     void MoveToState(State targetState);
 
     friend class SecureSessionDeleter;
+    friend class TestSecureSessionTable;
+
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
@@ -302,8 +301,13 @@ private:
     uint16_t mPeerSessionId = 0;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime     = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last tx or rx
-    System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last rx
+
+    /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
+    System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();
+
+    /// Timestamp of last rx. @see ActiveTimestamp in the spec
+    System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+
     ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;

@@ -51,6 +51,8 @@ public:
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 protected:
     std::list<std::string> mAcceptHeaderList;
     uint32_t mSupportedStreamingProtocols;
@@ -58,4 +60,6 @@ protected:
 
 private:
     EndpointId mEndpointId;
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 3;
 };

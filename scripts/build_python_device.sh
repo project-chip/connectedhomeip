@@ -41,7 +41,6 @@ ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 declare chip_detail_logging=false
 declare enable_pybindings=false
 declare chip_mdns
-declare clusters=true
 
 help() {
 
@@ -54,8 +53,6 @@ Input Options:
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -c, --clusters_for_ip_commissioning  true/false           Specify whether to use clusters for IP commissioning.
-                                                            By default it is true.
   -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
 "
 }
@@ -74,10 +71,6 @@ while (($#)); do
             ;;
         --chip_mdns | -m)
             chip_mdns=$2
-            shift
-            ;;
-        --clusters_for_ip_commissioning | -c)
-            clusters=$2
             shift
             ;;
         --enable_pybindings | -p)
@@ -104,14 +97,14 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 chip_data_model_arg="chip_data_model=\"///examples/lighting-app/lighting-common\""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg chip_controller=false $chip_data_model_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings $chip_mdns_arg chip_controller=false $chip_data_model_arg"
 
 # Compiles python files
 # Check pybindings was requested
 if [ "$enable_pybindings" == true ]; then
     ninja -v -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -v -C "$OUTPUT_ROOT" python
+    ninja -v -C "$OUTPUT_ROOT" chip-core
 fi
 
 # Create a virtual environment that has access to the built python tools
@@ -120,14 +113,14 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 # Activate the new environment to register the python WHL
 
 if [ "$enable_pybindings" == true ]; then
-    WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
 else
-    WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
 fi
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$WHEEL"
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "

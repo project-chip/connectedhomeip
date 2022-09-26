@@ -17,6 +17,9 @@ name:
     92.5. [TC-ULABEL-2.4] User Label cluster empty entry verification
     [DUT-server]
 
+PICS:
+    - ULABEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "User Label"
@@ -32,6 +35,7 @@ tests:
                 value: nodeId
 
     - label: "TH writes LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "label list"
       arguments:
@@ -42,6 +46,7 @@ tests:
               ]
 
     - label: "TH reads LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "label list"
       response:
@@ -52,13 +57,15 @@ tests:
               ]
 
     - label: "TH writes LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "label list"
       arguments:
-          value: []
+          value: [{ label: "", value: "" }]
 
     - label: "TH reads LabelList attribute of the DUT"
+      PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "label list"
       response:
-          value: []
+          value: [{ label: "", value: "" }]

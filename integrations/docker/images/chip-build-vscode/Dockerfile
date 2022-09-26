@@ -41,11 +41,11 @@ COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aar
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
-COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
+COPY --from=k32w /opt/sdk /opt/k32w_sdk
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
+COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
 
 COPY --from=zap /opt/zap /opt/zap
 
@@ -66,16 +66,21 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/* \
     && : # last line
 
+# Required for the Bouffalolab platform
+RUN set -x \
+    && pip3 install bflb-iot-tool \
+    && : # last line
+
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV EFR32_BOARD=BRD4161A
+ENV SILABS_BOARD=BRD4161A
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
-ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.15-kirkstone/
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
-ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks
+ENV NXP_K32W0_SDK_ROOT=/opt/k32w_sdk
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
@@ -83,7 +88,7 @@ ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.11.0
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 

@@ -130,7 +130,7 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
         chip::Platform::Delete(this);
     }
 
-    return (kDNSServiceErr_NoError == err) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return Error::ToChipError(err);
 }
 
 MdnsContexts::~MdnsContexts()
@@ -157,7 +157,7 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     if (kDNSServiceErr_NoError != err)
     {
         chip::Platform::Delete(context);
-        return CHIP_ERROR_INTERNAL;
+        return Error::ToChipError(err);
     }
 
     context->serviceRef = sdRef;
@@ -251,26 +251,31 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
+RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
     context  = cbContext;
     callback = cb;
 
-    mType = sType;
+    mType         = sType;
+    mInstanceName = instanceName;
 }
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Register (%s)", Error::ToString(err));
-    callback(context, nullptr, CHIP_ERROR_INTERNAL);
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
+    callback(context, nullptr, nullptr, Error::ToChipError(err));
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
 {
     std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
-    callback(context, typeWithoutSubTypes.c_str(), CHIP_NO_ERROR);
+    callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
+
+    // Once a service has been properly published it is normally unreachable because the hostname has not yet been
+    // registered against the dns daemon. Register the records mapping the hostname to our IP.
+    mHostNameRegistrar.Register();
 }
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
@@ -283,14 +288,14 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Browse (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, CHIP_ERROR_INTERNAL);
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
+    callback(context, nullptr, 0, true, Error::ToChipError(err));
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), CHIP_NO_ERROR);
+    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -302,15 +307,12 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     protocol = GetProtocol(cbAddressType);
 }
 
-ResolveContext::~ResolveContext()
-{
-    RemoveInterfaces();
-}
+ResolveContext::~ResolveContext() {}
 
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Resolve (%s)", Error::ToString(err));
-    callback(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
+    callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -326,6 +328,7 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
+        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
@@ -342,7 +345,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 #ifdef CHIP_DETAIL_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(DeviceLayer, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
 #endif // CHIP_DETAIL_LOGGING
 
     return CHIP_NO_ERROR;
@@ -376,8 +379,40 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(DeviceLayer, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32, __func__, hostnameWithDomain, fullname,
-                  interfaceId);
+#if CHIP_DETAIL_LOGGING
+    std::string txtString;
+    auto txtRecordIter  = txtRecord;
+    size_t remainingLen = txtLen;
+    while (remainingLen > 0)
+    {
+        size_t len = *txtRecordIter;
+        ++txtRecordIter;
+        --remainingLen;
+        len = min(len, remainingLen);
+        chip::Span<const unsigned char> bytes(txtRecordIter, len);
+        if (txtString.size() > 0)
+        {
+            txtString.push_back(',');
+        }
+        for (auto & byte : bytes)
+        {
+            if ((std::isalnum(byte) || std::ispunct(byte)) && byte != '\\' && byte != ',')
+            {
+                txtString.push_back(static_cast<char>(byte));
+            }
+            else
+            {
+                char hex[5];
+                snprintf(hex, sizeof(hex), "\\x%02x", byte);
+                txtString.append(hex);
+            }
+        }
+        txtRecordIter += len;
+        remainingLen -= len;
+    }
+#endif // CHIP_DETAIL_LOGGING
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);
@@ -405,7 +440,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::pair<uint32_t, InterfaceInfo>(interfaceId, interface));
+    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()
@@ -413,21 +448,37 @@ bool ResolveContext::HasInterface()
     return interfaces.size();
 }
 
-void ResolveContext::RemoveInterfaces()
+InterfaceInfo::InterfaceInfo()
 {
-    for (auto & interface : interfaces)
+    service.mTextEntrySize = 0;
+    service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
+    service(std::move(other.service)), addresses(std::move(other.addresses)),
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName))
+{
+    // Make sure we're not trying to free any state from the other DnssdService,
+    // since we took over ownership of its allocated bits.
+    other.service.mTextEntrySize = 0;
+    other.service.mTextEntries   = nullptr;
+}
+
+InterfaceInfo::~InterfaceInfo()
+{
+    if (service.mTextEntries == nullptr)
     {
-        size_t count = interface.second.service.mTextEntrySize;
-        for (size_t i = 0; i < count; i++)
-        {
-            const auto & textEntry = interface.second.service.mTextEntries[i];
-            free(const_cast<char *>(textEntry.mKey));
-            free(const_cast<uint8_t *>(textEntry.mData));
-        }
-        Platform::MemoryFree(const_cast<TextEntry *>(interface.second.service.mTextEntries));
+        return;
     }
 
-    interfaces.clear();
+    const size_t count = service.mTextEntrySize;
+    for (size_t i = 0; i < count; i++)
+    {
+        const auto & textEntry = service.mTextEntries[i];
+        free(const_cast<char *>(textEntry.mKey));
+        free(const_cast<uint8_t *>(textEntry.mData));
+    }
+    Platform::MemoryFree(const_cast<TextEntry *>(service.mTextEntries));
 }
 
 } // namespace Dnssd

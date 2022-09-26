@@ -21,6 +21,7 @@
  *
  */
 
+#include <errno.h>
 #include <inttypes.h>
 
 #include <messaging/ReliableMessageMgr.h>
@@ -34,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <platform/ConnectivityManager.h>
 
 using namespace chip::System::Clock::Literals;
 
@@ -51,7 +53,7 @@ ReliableMessageMgr::RetransTableEntry::~RetransTableEntry()
     ec->SetMessageNotAcked(false);
 }
 
-ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+ReliableMessageMgr::ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr)
 {}
 
@@ -134,7 +136,19 @@ void ReliableMessageMgr::ExecuteActions()
 
             // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
             // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            SessionHandle session = entry->ec->GetSessionHandle();
+
+            // If the exchange is expecting a response, it will handle sending
+            // this notification once it detects that it has not gotten a
+            // response.  Otherwise, we need to do it.
+            if (!entry->ec->IsResponseExpected())
+            {
+                if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+                {
+                    session->AsSecureSession()->MarkAsDefunct();
+                }
+                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
@@ -190,40 +204,65 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount)
+System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
 {
-    static constexpr uint32_t MRP_BACKOFF_JITTER_BASE      = 1024;
-    static constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
-    static constexpr uint32_t MRP_BACKOFF_BASE_DENOMENATOR = 10;
-    static constexpr uint32_t MRP_BACKOFF_THRESHOLD        = 1;
+    // See section "4.11.8. Parameters and Constants" for the parameters below:
+    // MRP_BACKOFF_JITTER = 0.25
+    constexpr uint32_t MRP_BACKOFF_JITTER_BASE = 1024;
+    // MRP_BACKOFF_MARGIN = 1.1
+    constexpr uint32_t MRP_BACKOFF_MARGIN_NUMERATOR   = 1127;
+    constexpr uint32_t MRP_BACKOFF_MARGIN_DENOMINATOR = 1024;
+    // MRP_BACKOFF_BASE = 1.6
+    constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
+    constexpr uint32_t MRP_BACKOFF_BASE_DENOMINATOR = 10;
+    constexpr int MRP_BACKOFF_THRESHOLD             = 1;
 
-    System::Clock::Timestamp backoff = backoffBase;
+    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.11.2.1. Retransmissions", where:
+    //   i == baseInterval
+    baseInterval = baseInterval * MRP_BACKOFF_MARGIN_NUMERATOR / MRP_BACKOFF_MARGIN_DENOMINATOR;
 
-    // Implement `t = i⋅MRP_BACKOFF_BASE^max(0,n−MRP_BACKOFF_THRESHOLD)` from Section 4.11.2.1. Retransmissions
+    // Implement:
+    //   mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD)) * (1.0 + random(0,1) * MRP_BACKOFF_JITTER)
+    // from section "4.11.2.1. Retransmissions", where:
+    //   i == baseInterval
+    //   n == sendCount
 
-    // Generate fixed point equivalent of `retryCount = max(0,n−MRP_BACKOFF_THRESHOLD)`
-    int retryCount = sendCount - MRP_BACKOFF_THRESHOLD;
-    if (retryCount < 0)
-        retryCount = 0; // Enforce floor
-    if (retryCount > 4)
-        retryCount = 4; // Enforce reasonable maximum after 5 tries
+    // 1. Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
+    int exponent = sendCount - MRP_BACKOFF_THRESHOLD;
+    if (exponent < 0)
+        exponent = 0; // Enforce floor
+    if (exponent > 4)
+        exponent = 4; // Enforce reasonable maximum after 5 tries
 
-    // Generate fixed point equivalent of `backoff = i⋅1.6^retryCount`
+    // 2. Calculate `mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD))`
     uint32_t backoffNum   = 1;
     uint32_t backoffDenom = 1;
-    for (int i = 0; i < retryCount; i++)
+
+    for (int i = 0; i < exponent; i++)
     {
         backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
-        backoffDenom *= MRP_BACKOFF_BASE_DENOMENATOR;
+        backoffDenom *= MRP_BACKOFF_BASE_DENOMINATOR;
     }
-    backoff = backoff * backoffNum / backoffDenom;
 
-    // Implement jitter scaler: `t *= (1.0+random(0,1)⋅MRP_BACKOFF_JITTER)`
-    // where jitter is random multiplier from 1.000 to 1.250:
+    System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
+
+    // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8();
-    backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
+    mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
-    return backoff;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    // Implement:
+    //   "A sleepy sender SHOULD increase t to also account for its own sleepy interval
+    //   required to receive the acknowledgment"
+    DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
+
+    if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)
+    {
+        mrpBackoffTime += System::Clock::Timestamp(sedIntervals.ActiveIntervalMS);
+    }
+#endif
+
+    return mrpBackoffTime;
 }
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
@@ -273,20 +312,25 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     auto * sessionManager = entry->ec->GetExchangeMgr()->GetSessionManager();
     CHIP_ERROR err        = sessionManager->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
+    err                   = MapSendError(err, entry->ec->GetExchangeId(), entry->ec->IsInitiator());
 
     if (err == CHIP_NO_ERROR)
     {
+#if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
         // context with mExchangeMgr==nullptr is used.
         if (exchangeMgr)
         {
             // After the first failure notify session manager to refresh device data
-            if (entry->sendCount == 1)
+            if (entry->sendCount == 1 && mSessionUpdateDelegate != nullptr && entry->ec->GetSessionHandle()->IsSecureSession() &&
+                entry->ec->GetSessionHandle()->AsSecureSession()->IsCASESession())
             {
-                entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnFirstMessageDeliveryFailed);
+                ChipLogDetail(ExchangeManager, "Notify session manager to update peer address");
+                mSessionUpdateDelegate->UpdatePeerAddress(entry->ec->GetSessionHandle()->GetPeer());
             }
         }
+#endif // CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
     }
     else
     {
@@ -369,6 +413,39 @@ void ReliableMessageMgr::StartTimer()
 void ReliableMessageMgr::StopTimer()
 {
     mSystemLayer->CancelTimer(Timeout, this);
+}
+
+void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * sessionUpdateDelegate)
+{
+    mSessionUpdateDelegate = sessionUpdateDelegate;
+}
+
+CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator)
+{
+    if (
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        error == System::MapErrorLwIP(ERR_MEM)
+#else
+        error == CHIP_ERROR_POSIX(ENOBUFS)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    )
+    {
+        // sendmsg on BSD-based systems never blocks, no matter how the
+        // socket is configured, and will return ENOBUFS in situation in
+        // which Linux, for example, blocks.
+        //
+        // This is typically a transient situation, so we pretend like this
+        // packet drop happened somewhere on the network instead of inside
+        // sendmsg and will just resend it in the normal MRP way later.
+        //
+        // Similarly, on LwIP an ERR_MEM on send indicates a likely
+        // temporary lack of TX buffers.
+        ChipLogError(ExchangeManager, "Ignoring transient send error: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
+                     error.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
+        error = CHIP_NO_ERROR;
+    }
+
+    return error;
 }
 
 #if CHIP_CONFIG_TEST

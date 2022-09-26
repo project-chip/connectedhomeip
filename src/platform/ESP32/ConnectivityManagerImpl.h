@@ -96,6 +96,11 @@ private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    CHIP_ERROR InitEthernet(void);
+    void OnEthernetPlatformEvent(const ChipDeviceEvent * event);
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -109,15 +114,6 @@ private:
     CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
-    WiFiAPMode _GetWiFiAPMode(void);
-    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
-    bool _IsWiFiAPActive(void);
-    bool _IsWiFiAPApplicationControlled(void);
-    void _DemandStartWiFiAP(void);
-    void _StopOnDemandWiFiAP(void);
-    void _MaintainOnDemandWiFiAP(void);
-    System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
-    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
@@ -126,13 +122,9 @@ private:
     // ===== Private members reserved for use by this class only.
 
     System::Clock::Timestamp mLastStationConnectFailTime;
-    System::Clock::Timestamp mLastAPDemandTime;
     WiFiStationMode mWiFiStationMode;
     WiFiStationState mWiFiStationState;
-    WiFiAPMode mWiFiAPMode;
-    WiFiAPState mWiFiAPState;
     System::Clock::Timeout mWiFiStationReconnectInterval;
-    System::Clock::Timeout mWiFiAPIdleTimeout;
     BitFlags<Flags> mFlags;
 
     CHIP_ERROR InitWiFi(void);
@@ -144,10 +136,27 @@ private:
     void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    WiFiAPMode _GetWiFiAPMode(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+    bool _IsWiFiAPActive(void);
+    void _DemandStartWiFiAP(void);
+    void _StopOnDemandWiFiAP(void);
+    void _MaintainOnDemandWiFiAP(void);
+    System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
+    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    bool _IsWiFiAPApplicationControlled(void);
+
+    System::Clock::Timestamp mLastAPDemandTime;
+    WiFiAPMode mWiFiAPMode;
+    WiFiAPState mWiFiAPState;
+    System::Clock::Timeout mWiFiAPIdleTimeout;
+
     void DriveAPState(void);
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
@@ -174,16 +183,12 @@ inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     return mWiFiStationState == kWiFiStationState_Connected;
 }
 
-inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
-{
-    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
-}
-
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval(void)
 {
     return mWiFiStationReconnectInterval;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
 {
     return mWiFiAPMode;
@@ -198,6 +203,12 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout(voi
 {
     return mWiFiAPIdleTimeout;
 }
+
+inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
+{
+    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {

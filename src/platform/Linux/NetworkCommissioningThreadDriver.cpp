@@ -53,10 +53,9 @@ CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * net
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxThreadDriver::Shutdown()
+void LinuxThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxThreadDriver::CommitConfiguration()

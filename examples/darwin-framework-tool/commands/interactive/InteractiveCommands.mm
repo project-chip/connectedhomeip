@@ -17,10 +17,10 @@
  */
 
 #include "InteractiveCommands.h"
+#import <Matter/Matter.h>
 
+#include <editline.h>
 #include <iomanip>
-#include <readline/history.h>
-#include <readline/readline.h>
 #include <sstream>
 
 char kInteractiveModeName[] = "";
@@ -31,7 +31,37 @@ constexpr const char * kInteractiveModeStopCommand = "quit()";
 
 namespace {
 
-bool gIsCommandRunning = NO;
+class RestartCommand : public CHIPCommandBridge {
+public:
+    RestartCommand()
+        : CHIPCommandBridge("restart")
+    {
+    }
+
+    CHIP_ERROR RunCommand() override
+    {
+        RestartCommissioners();
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+};
+
+class StopCommand : public CHIPCommandBridge {
+public:
+    StopCommand()
+        : CHIPCommandBridge("stop")
+    {
+    }
+
+    CHIP_ERROR RunCommand() override
+    {
+        StopCommissioners();
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
+};
 
 void ClearLine()
 {
@@ -43,10 +73,6 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     ClearLine();
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
-
-    if (gIsCommandRunning == NO) {
-        rl_forced_update_display();
-    }
 }
 } // namespace
 
@@ -68,6 +94,20 @@ char * GetCommand(char * command)
     return command;
 }
 
+el_status_t RestartFunction()
+{
+    RestartCommand cmd;
+    cmd.RunCommand();
+    return CSstay;
+}
+
+el_status_t StopFunction()
+{
+    StopCommand cmd;
+    cmd.RunCommand();
+    return CSstay;
+}
+
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(kInteractiveModeHistoryFilePath);
@@ -76,12 +116,20 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
+    el_bind_key(CTL('^'), RestartFunction);
+    el_bind_key(CTL('_'), StopFunction);
+
     char * command = nullptr;
     while (YES) {
         command = GetCommand(command);
         if (command != nullptr && !ParseCommand(command)) {
             break;
         }
+    }
+
+    if (command != nullptr) {
+        free(command);
+        command = nullptr;
     }
 
     SetCommandExitStatus(CHIP_NO_ERROR);
@@ -101,11 +149,9 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     std::string arg;
 
     std::stringstream ss(command);
-    while (ss >> std::quoted(arg)) {
+    while (ss >> std::quoted(arg, '\'')) {
         if (argsCount == kInteractiveModeArgumentsMaxLength) {
-            gIsCommandRunning = YES;
             ChipLogError(chipTool, "Too many arguments. Ignoring.");
-            gIsCommandRunning = NO;
             return YES;
         }
 
@@ -115,9 +161,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     }
 
     ClearLine();
-    gIsCommandRunning = YES;
     mHandler->RunInteractive(argsCount, args);
-    gIsCommandRunning = NO;
 
     // Do not delete arg[0]
     while (--argsCount)

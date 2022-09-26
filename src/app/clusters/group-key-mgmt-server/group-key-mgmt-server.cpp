@@ -306,7 +306,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
-    CHIP_ERROR err = fabric->GetCompressedId(compressed_fabric_id);
+    CHIP_ERROR err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
     if (CHIP_NO_ERROR != err)
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);

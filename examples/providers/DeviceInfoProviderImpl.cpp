@@ -149,6 +149,13 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
                                      static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
+CHIP_ERROR DeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
+{
+    DefaultStorageKeyAllocator keyAlloc;
+
+    return mStorage->SyncDeleteKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index));
+}
+
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
     return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);

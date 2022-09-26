@@ -32,7 +32,7 @@
     MatterDescriptorPluginClientInitCallback();                                                                                    \
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterAccessControlPluginClientInitCallback();                                                                                 \
-    MatterBridgedActionsPluginClientInitCallback();                                                                                \
+    MatterActionsPluginClientInitCallback();                                                                                       \
     MatterBasicPluginClientInitCallback();                                                                                         \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginClientInitCallback();                                                                    \
@@ -66,6 +66,7 @@
     MatterFanControlPluginClientInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
     MatterColorControlPluginClientInitCallback();                                                                                  \
+    MatterBallastConfigurationPluginClientInitCallback();                                                                          \
     MatterIlluminanceMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \

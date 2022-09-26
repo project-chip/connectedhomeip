@@ -45,6 +45,18 @@ void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsD
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
+    if (params.GetFailsafeTimerSeconds().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting failsafe timer from parameters");
+        mParams.SetFailsafeTimerSeconds(params.GetFailsafeTimerSeconds().Value());
+    }
+
+    if (params.GetAdminSubject().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting adminSubject from parameters");
+        mParams.SetAdminSubject(params.GetAdminSubject().Value());
+    }
+
     if (params.GetThreadOperationalDataset().HasValue())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
@@ -57,6 +69,13 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
+
+    if (params.GetAttemptThreadNetworkScan().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting attempt thread scan from parameters");
+        mParams.SetAttemptThreadNetworkScan(params.GetAttemptThreadNetworkScan().Value());
+    }
+
     if (params.GetWiFiCredentials().HasValue())
     {
         WiFiCredentials creds = params.GetWiFiCredentials().Value();
@@ -71,6 +90,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Setting wifi credentials from parameters");
         mParams.SetWiFiCredentials(
             WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
+    }
+
+    if (params.GetAttemptWiFiNetworkScan().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting attempt wifi scan from parameters");
+        mParams.SetAttemptWiFiNetworkScan(params.GetAttemptWiFiNetworkScan().Value());
     }
 
     if (params.GetCountryCode().HasValue())
@@ -114,6 +139,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
+    if (params.GetSkipCommissioningComplete().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting PASE-only commissioning from parameters");
+        mParams.SetSkipCommissioningComplete(params.GetSkipCommissioningComplete().Value());
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -140,6 +171,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    if (mStopCommissioning)
+    {
+        return CommissioningStage::kCleanup;
+    }
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
@@ -159,6 +194,27 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
+        if (mNeedsNetworkSetup)
+        {
+            // if there is a WiFi or a Thread endpoint, then perform scan
+            if ((mParams.GetAttemptWiFiNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
+                (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId))
+            {
+                return CommissioningStage::kScanNetworks;
+            }
+            ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
+        }
+        else
+        {
+            ChipLogProgress(Controller, "Not a BLE connection, skipping ScanNetworks");
+        }
+        // skip scan step
+        return CommissioningStage::kConfigRegulatory;
+    case CommissioningStage::kScanNetworks:
+        return CommissioningStage::kNeedsNetworkCreds;
+    case CommissioningStage::kNeedsNetworkCreds:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kSendPAICertificateRequest;
@@ -206,6 +262,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
+            if (mParams.GetSkipCommissioningComplete().ValueOr(false))
+            {
+                return CommissioningStage::kCleanup;
+            }
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kWiFiNetworkSetup:
@@ -234,11 +294,19 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
+        else if (mParams.GetSkipCommissioningComplete().ValueOr(false))
+        {
+            return CommissioningStage::kCleanup;
+        }
         else
         {
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
+        if (mParams.GetSkipCommissioningComplete().ValueOr(false))
+        {
+            return CommissioningStage::kCleanup;
+        }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
         return CommissioningStage::kSendComplete;
@@ -281,6 +349,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
@@ -430,6 +499,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
                 .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
                 .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
+            if (mDeviceCommissioningInfo.nodeId != kUndefinedNodeId)
+            {
+                mParams.SetRemoteNodeId(mDeviceCommissioningInfo.nodeId);
+            }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -437,10 +510,34 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendDACCertificateRequest:
             SetDAC(report.Get<RequestedCertificate>().certificate);
             break;
-        case CommissioningStage::kSendAttestationRequest:
-            // These don't need to be deep copied to local memory because they are used in this one step then never again.
-            mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
-                .SetAttestationSignature(report.Get<AttestationResponse>().signature);
+        case CommissioningStage::kSendAttestationRequest: {
+            auto & elements  = report.Get<AttestationResponse>().attestationElements;
+            auto & signature = report.Get<AttestationResponse>().signature;
+            if (elements.size() > sizeof(mAttestationElements))
+            {
+                ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %u larger than cache size %u",
+                             static_cast<unsigned>(elements.size()), static_cast<unsigned>(sizeof(mAttestationElements)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
+            }
+            memcpy(mAttestationElements, elements.data(), elements.size());
+            mAttestationElementsLen = static_cast<uint16_t>(elements.size());
+            mParams.SetAttestationElements(ByteSpan(mAttestationElements, elements.size()));
+            ChipLogDetail(Controller, "AutoCommissioner setting attestationElements buffer size %u/%u",
+                          static_cast<unsigned>(elements.size()),
+                          static_cast<unsigned>(mParams.GetAttestationElements().Value().size()));
+
+            if (signature.size() > sizeof(mAttestationSignature))
+            {
+                ChipLogError(Controller,
+                             "AutoCommissioner attestationSignature buffer size %u larger than "
+                             "cache size %u",
+                             static_cast<unsigned>(signature.size()), static_cast<unsigned>(sizeof(mAttestationSignature)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
+            }
+            memcpy(mAttestationSignature, signature.data(), signature.size());
+            mAttestationSignatureLen = static_cast<uint16_t>(signature.size());
+            mParams.SetAttestationSignature(ByteSpan(mAttestationSignature, signature.size()));
+
             // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we wouldn't need to hold a
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
@@ -450,6 +547,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
             }
             break;
+        }
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
             nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;
@@ -469,7 +567,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             ReleasePAI();
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = nullptr;
+            mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
@@ -490,21 +588,30 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         completionStatus.err = err;
     }
+    mParams.SetCompletionStatus(completionStatus);
 
-    DeviceProxy * proxy = mCommissioneeDeviceProxy;
+    return PerformStep(nextStage);
+}
+
+DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextStage)
+{
     if (nextStage == CommissioningStage::kSendComplete ||
-        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy.GetDeviceId() != kUndefinedNodeId))
     {
-        proxy = mOperationalDeviceProxy;
+        return &mOperationalDeviceProxy;
     }
+    return mCommissioneeDeviceProxy;
+}
 
+CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
+{
+    DeviceProxy * proxy = GetDeviceProxyForStep(nextStage);
     if (proxy == nullptr)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mParams.SetCompletionStatus(completionStatus);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
     return CHIP_NO_ERROR;

@@ -53,7 +53,7 @@ typedef struct _TestFabricScoped
     chip::CharSpan fabricSensitiveCharString;
     SimpleStruct fabricSensitiveStruct;
     /* TYPE WARNING: array array defaults to */ uint8_t * fabricSensitiveInt8uList;
-    chip::FabricIndex fabricIndex;
+    chip::FabricIndex FabricIndex;
 } TestFabricScoped;
 
 // Struct for Dimension
@@ -216,7 +216,7 @@ typedef struct _ActionStruct
     uint8_t Type;
     uint16_t EndpointListID;
     uint16_t SupportedCommands;
-    uint8_t Status;
+    uint8_t State;
 } ActionStruct;
 
 // Struct for ApplicationBasicApplication
@@ -264,12 +264,12 @@ typedef struct _ChannelInfo
     chip::CharSpan affiliateCallSign;
 } ChannelInfo;
 
-// Struct for DeviceType
-typedef struct _DeviceType
+// Struct for DeviceTypeStruct
+typedef struct _DeviceTypeStruct
 {
     chip::DeviceTypeId type;
     uint16_t revision;
-} DeviceType;
+} DeviceTypeStruct;
 
 // Struct for DlCredential
 typedef struct _DlCredential
@@ -277,6 +277,14 @@ typedef struct _DlCredential
     uint8_t CredentialType;
     uint16_t CredentialIndex;
 } DlCredential;
+
+// Struct for DstOffsetType
+typedef struct _DstOffsetType
+{
+    int32_t Offset;
+    uint64_t ValidStarting;
+    uint64_t ValidUntil;
+} DstOffsetType;
 
 // Struct for EndpointListStruct
 typedef struct _EndpointListStruct
@@ -446,15 +454,6 @@ typedef struct _PlaybackPosition
     uint64_t position;
 } PlaybackPosition;
 
-// Struct for PowerProfileRecord
-typedef struct _PowerProfileRecord
-{
-    uint8_t powerProfileId;
-    uint8_t energyPhaseId;
-    bool powerProfileRemoteControl;
-    uint8_t powerProfileState;
-} PowerProfileRecord;
-
 // Struct for ProviderLocation
 typedef struct _ProviderLocation
 {
@@ -495,27 +494,12 @@ typedef struct _RouteTable
     bool LinkEstablished;
 } RouteTable;
 
-// Struct for ScheduledPhase
-typedef struct _ScheduledPhase
-{
-    uint8_t energyPhaseId;
-    uint16_t scheduledTime;
-} ScheduledPhase;
-
 // Struct for SecurityPolicy
 typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
     uint16_t Flags;
 } SecurityPolicy;
-
-// Struct for SoftwareFaultStruct
-typedef struct _SoftwareFaultStruct
-{
-    uint64_t Id;
-    chip::CharSpan Name;
-    chip::ByteSpan FaultRecording;
-} SoftwareFaultStruct;
 
 // Struct for TargetInfo
 typedef struct _TargetInfo
@@ -572,16 +556,13 @@ typedef struct _ThreadMetrics
     uint32_t StackSize;
 } ThreadMetrics;
 
-// Struct for TransferredPhase
-typedef struct _TransferredPhase
+// Struct for TimeZoneType
+typedef struct _TimeZoneType
 {
-    uint8_t energyPhaseId;
-    uint8_t macroPhaseId;
-    uint16_t expectedDuration;
-    uint16_t peakPower;
-    uint16_t energy;
-    uint16_t maxActivationDelay;
-} TransferredPhase;
+    int32_t Offset;
+    uint64_t ValidAt;
+    chip::CharSpan Name;
+} TimeZoneType;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult

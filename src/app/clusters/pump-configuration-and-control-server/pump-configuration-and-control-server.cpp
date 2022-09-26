@@ -229,6 +229,11 @@ static void updateAttributeLinks(EndpointId endpoint)
         }
     }
     break;
+
+    case PumpOperationMode::kUnknownEnumValue: {
+        // Not expected; see check in MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback.
+        break;
+    }
     }
 
     if (isPumpStatusAvailable)
@@ -354,9 +359,9 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     {
     case Attributes::ControlMode::Id: {
         PumpControlMode controlMode;
-        NumericAttributeTraits<PumpControlMode>::StorageType storage;
-        memcpy(&storage, value, size);
-        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(storage);
+        NumericAttributeTraits<PumpControlMode>::StorageType tmp;
+        memcpy(&tmp, value, size);
+        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(tmp);
         switch (controlMode)
         {
         case PumpControlMode::kConstantFlow:
@@ -384,13 +389,51 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        default:
+        case PumpControlMode::kProportionalPressure:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpControlMode::kAutomatic:
             status = Protocols::InteractionModel::Status::Success;
+            break;
+        case PumpControlMode::kUnknownEnumValue:
+            status = Protocols::InteractionModel::Status::ConstraintError;
+            break;
         }
     }
     break;
+
     case Attributes::OperationMode::Id:
-        // TODO: Implement checks on the Operation Mode values
+        PumpOperationMode operationMode;
+        NumericAttributeTraits<PumpOperationMode>::StorageType tmp;
+        memcpy(&tmp, value, size);
+        operationMode = NumericAttributeTraits<PumpOperationMode>::StorageToWorking(tmp);
+
+        switch (operationMode)
+        {
+        case PumpOperationMode::kMinimum:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpOperationMode::kMaximum:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpOperationMode::kLocal:
+        case PumpOperationMode::kNormal:
+            status = Protocols::InteractionModel::Status::Success;
+            break;
+        case PumpOperationMode::kUnknownEnumValue:
+            status = Protocols::InteractionModel::Status::ConstraintError;
+            break;
+        }
+
         break;
     default:
         status = Protocols::InteractionModel::Status::Success;

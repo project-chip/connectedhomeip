@@ -1,0 +1,109 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.1.1. [TC-BRBINFO-1.1] Global Attributes for Bridged Device Basic
+    Information Cluster Cluster [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: ""
+      verification: |
+          Validate these PICS items of attributes which are not allowed in this server cluster implementation - these PICS items should all be FALSE, if any of them is TRUE then FAIL the test
+
+          BRBINFO.S.A0000(DataModelRevision)
+
+          BRBINFO.S.A0004(ProductID)
+
+          BRBINFO.S.A0006(Location)
+
+          BRBINFO.S.A0010(LocalConfigDisabled)
+
+          BRBINFO.S.A0013(CapabilityMinima)
+      disabled: true
+
+    - label: "Commission DUT to TH (if not already done)"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool bridgeddevicebasic read cluster-revision 1 3
+
+          On TH(chip-tool), verify  DUT responsds ClusterRevision attribute has  value 1
+
+          [1657695910.794487][15411:15416] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFD DataVersion: 2577979325
+          [1657695910.794568][15411:15416] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
+
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool bridgeddevicebasic read  feature-map 1 3
+
+          On TH(chip-tool), verify at DUT responds   Featuremap  value as 0
+
+          [1658749277.166884][10254:10259] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFC DataVersion: 3297319126
+          [1658749277.166945][10254:10259] CHIP:TOO:   FeatureMap: 0
+          [1658749277.167033][10254:10259] CHIP:EM: Sending Standalone Ack for MessageCounter:190389852 on exchange 39565i
+      disabled: true
+
+    - label: "TH reads AttributeList from DUT"
+      verification: |
+          ./chip-tool bridgeddevicebasic read attribute-list 1 3
+
+          On TH(chip-tool), verify TH(chip-tool)at DUT responds as list of supported attributes as entries matching TH(chip-tool)e PICS items (see column F)
+
+          [1658833518.065647][9014:9019] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFB DataVersion: 270848876
+          [1658833518.065723][9014:9019] CHIP:TOO:   AttributeList: 7 entries
+          [1658833518.065773][9014:9019] CHIP:TOO:     [1]: 5
+          [1658833518.065804][9014:9019] CHIP:TOO:     [2]: 17
+          [1658833518.065833][9014:9019] CHIP:TOO:     [3]: 65528
+          [1658833518.065862][9014:9019] CHIP:TOO:     [4]: 65529
+          [1658833518.065891][9014:9019] CHIP:TOO:     [5]: 65531
+          [1658833518.065919][9014:9019] CHIP:TOO:     [6]: 65532
+          [1658833518.065949][9014:9019] CHIP:TOO:     [7]: 65533
+      disabled: true
+
+    - label: "TH reads EventList from DUT"
+      verification: |
+          NEED SDK Implementation
+
+          Out of scope for V1
+      disabled: true
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool bridgeddevicebasic read accepted-command-list 1 3
+
+          On TH(chip-tool), verify  DUT responds as list of Accepted Commands as 0 entries
+
+          [1657696300.165081][15447:15452] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFF9 DataVersion: 2577979325
+          [1657696300.165174][15447:15452] CHIP:TOO:   AcceptedCommandList: 0 entries
+      disabled: true
+
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool bridgeddevicebasic read generated-command-list 1 3
+
+          On TH(chip-tool), verify that DUT responds as list of GeneratedCommands as 0 entries
+
+          [1657696328.889936][15454:15459] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFF8 DataVersion: 2577979325
+          [1657696328.890017][15454:15459] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true

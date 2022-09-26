@@ -34,7 +34,7 @@ namespace Clusters {
 /** @brief
  *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
  */
-class OTAProviderDelegate
+class DLL_EXPORT OTAProviderDelegate
 {
 public:
     /**

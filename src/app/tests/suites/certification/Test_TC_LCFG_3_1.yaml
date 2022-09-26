@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    101.3.1. [TC-LCFG-3.1] Localization Configuration Cluster
+    102.3.1. [TC-LCFG-3.1] Localization Configuration Cluster
     Attributes[DUT-Client]
+
+PICS:
+    - LCFG.C
 
 config:
     nodeId: 0x12344321
@@ -23,61 +26,61 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT reads SupportedLocales attribute from TH"
+    - label: "Note"
       verification: |
-          ./chip-tool localizationconfiguration read supported-locales 1 0
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
 
-          [1651227647.876273][2825:2825] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:15793025 on exchange 646r
-          [1651227647.876333][2825:2825] CHIP:EM: Handling via exchange: 646r, Delegate: 0xaaaae659a088
-          [1651227647.876468][2825:2825] CHIP:IM: Received Read request
-          [1651227647.876540][2825:2825] CHIP:DMG: ReadRequestMessage =
-          [1651227647.876583][2825:2825] CHIP:DMG: {
-          [1651227647.876617][2825:2825] CHIP:DMG:        AttributePathIBs =
-          [1651227647.876660][2825:2825] CHIP:DMG:        [
-          [1651227647.876699][2825:2825] CHIP:DMG:                AttributePathIB =
-          [1651227647.876754][2825:2825] CHIP:DMG:                {
-          [1651227647.876801][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
-          [1651227647.876854][2825:2825] CHIP:DMG:                        Cluster = 0x2b,
-          [1651227647.876906][2825:2825] CHIP:DMG:                        Attribute = 0x0000_0002,
-          [1651227647.876954][2825:2825] CHIP:DMG:                }
-          [1651227647.877002][2825:2825] CHIP:DMG:
-          [1651227647.877046][2825:2825] CHIP:DMG:        ],
-          [1651227647.877091][2825:2825] CHIP:DMG:
-          [1651227647.877134][2825:2825] CHIP:DMG:        isFabricFiltered = true,
-          [1651227647.877175][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
-          [1651227647.877214][2825:2825] CHIP:DMG: },
+    - label: "DUT reads SupportedLocales attribute from TH"
+      PICS: LCFG.C.A0001
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool localizationconfiguration read supported-locales 1 0
+          Verify DUT receives supported-locales attribute  response on the TH(all-clusters-app) Log:
+          659616748.134098][11438:11438] CHIP:IM: Received Read request
+          [1659616748.134248][11438:11438] CHIP:DMG: ReadRequestMessage =
+          [1659616748.134307][11438:11438] CHIP:DMG: {
+          [1659616748.134355][11438:11438] CHIP:DMG:         AttributePathIBs =
+          [1659616748.134410][11438:11438] CHIP:DMG:         [
+          [1659616748.134463][11438:11438] CHIP:DMG:                 AttributePathIB =
+          [1659616748.134536][11438:11438] CHIP:DMG:                 {
+          [1659616748.134599][11438:11438] CHIP:DMG:                         Endpoint = 0x0,
+          [1659616748.134673][11438:11438] CHIP:DMG:                         Cluster = 0x2b,
+          [1659616748.134743][11438:11438] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659616748.134808][11438:11438] CHIP:DMG:                 }
+          [1659616748.134875][11438:11438] CHIP:DMG:
+          [1659616748.134936][11438:11438] CHIP:DMG:         ],
+          [1659616748.134996][11438:11438] CHIP:DMG:
+          [1659616748.135053][11438:11438] CHIP:DMG:         isFabricFiltered = true,
+          [1659616748.135109][11438:11438] CHIP:DMG:         InteractionModelRevision = 1
+          [1659616748.135160][11438:11438] CHIP:DMG: },
+          [1659616748.135322][11438:11438] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label: "DUT reads ActiveLocale attribute from the TH"
+      PICS: LCFG.C.A0000
       verification: |
-          ./chip-tool localizationconfiguration read active-locale 1 0
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          [1651564394.279517][8392:8397] CHIP:DMG: ReportDataMessage =
-          [1651564394.279566][8392:8397] CHIP:DMG: {
-          [1651564394.279606][8392:8397] CHIP:DMG:         AttributeReportIBs =
-          [1651564394.279662][8392:8397] CHIP:DMG:         [
-          [1651564394.279706][8392:8397] CHIP:DMG:                 AttributeReportIB =
-          [1651564394.279771][8392:8397] CHIP:DMG:                 {
-          [1651564394.279821][8392:8397] CHIP:DMG:                         AttributeDataIB =
-          [1651564394.279884][8392:8397] CHIP:DMG:                         {
-          [1651564394.279944][8392:8397] CHIP:DMG:                                 DataVersion = 0x66e5e842,
-          [1651564394.280008][8392:8397] CHIP:DMG:                                 AttributePathIB =
-          [1651564394.280069][8392:8397] CHIP:DMG:                                 {
-          [1651564394.280176][8392:8397] CHIP:DMG:                                         Endpoint = 0x0,
-          [1651564394.280245][8392:8397] CHIP:DMG:                                         Cluster = 0x2b,
-          [1651564394.280314][8392:8397] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1651564394.280376][8392:8397] CHIP:DMG:                                 }
-          [1651564394.280440][8392:8397] CHIP:DMG:
-          [1651564394.280509][8392:8397] CHIP:DMG:                                         Data = "en-US",
-          [1651564394.280574][8392:8397] CHIP:DMG:                         },
-          [1651564394.280641][8392:8397] CHIP:DMG:
-          [1651564394.280691][8392:8397] CHIP:DMG:                 },
-          [1651564394.280750][8392:8397] CHIP:DMG:
-          [1651564394.280797][8392:8397] CHIP:DMG:         ],
-          [1651564394.280853][8392:8397] CHIP:DMG:
-          [1651564394.280898][8392:8397] CHIP:DMG:         SuppressResponse = true,
-          [1651564394.280944][8392:8397] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564394.280986][8392:8397] CHIP:DMG: }
-          [1651564394.281211][8392:8397] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 1726343234
-          [1651564394.281289][8392:8397] CHIP:TOO:   ActiveLocale: en-US
+          ./chip-tool localizationconfiguration read active-locale 1 0
+          Verify DUT receives active-locale attribute  response on the TH(all-clusters-app) Log:
+
+          [1659616904.401632][11438:11438] CHIP:DMG: ReadRequestMessage =
+          [1659616904.401657][11438:11438] CHIP:DMG: {
+          [1659616904.401676][11438:11438] CHIP:DMG:         AttributePathIBs =
+          [1659616904.401699][11438:11438] CHIP:DMG:         [
+          [1659616904.401720][11438:11438] CHIP:DMG:                 AttributePathIB =
+          [1659616904.401754][11438:11438] CHIP:DMG:                 {
+          [1659616904.401786][11438:11438] CHIP:DMG:                         Endpoint = 0x0,
+          [1659616904.401819][11438:11438] CHIP:DMG:                         Cluster = 0x2b,
+          [1659616904.401851][11438:11438] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659616904.401880][11438:11438] CHIP:DMG:                 }
+          [1659616904.401906][11438:11438] CHIP:DMG:
+          [1659616904.401930][11438:11438] CHIP:DMG:         ],
+          [1659616904.401955][11438:11438] CHIP:DMG:
+          [1659616904.401978][11438:11438] CHIP:DMG:         isFabricFiltered = true,
+          [1659616904.402000][11438:11438] CHIP:DMG:         InteractionModelRevision = 1
+          [1659616904.402020][11438:11438] CHIP:DMG: },
+          [1659616904.402087][11438:11438] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true

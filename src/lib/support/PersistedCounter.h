@@ -30,6 +30,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {

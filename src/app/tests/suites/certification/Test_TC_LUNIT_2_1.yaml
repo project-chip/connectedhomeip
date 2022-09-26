@@ -1,0 +1,124 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    106.2.1. [TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Client]
+
+PICS:
+    - LUNIT.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool unitlocalization read temperature-unit 1 0
+          Verify DUT receives TemperatureUnit attribute response on the TH(all-clusters-app) Log:
+          [1659785506.642187][4122:4122] CHIP:EM: Handling via exchange: 35080r, Delegate: 0xaaaaeaa68fa0
+          [1659785506.642224][4122:4122] CHIP:IM: Received Read request
+          [1659785506.642300][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785506.642327][4122:4122] CHIP:DMG: {
+          [1659785506.642349][4122:4122] CHIP:DMG: 	AttributePathIBs =
+          [1659785506.642375][4122:4122] CHIP:DMG: 	[
+          [1659785506.642399][4122:4122] CHIP:DMG: 		AttributePathIB =
+          [1659785506.642428][4122:4122] CHIP:DMG: 		{
+          [1659785506.642456][4122:4122] CHIP:DMG: 			Endpoint = 0x0,
+          [1659785506.642484][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
+          [1659785506.642512][4122:4122] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1659785506.642535][4122:4122] CHIP:DMG: 		}
+          [1659785506.642565][4122:4122] CHIP:DMG:
+          [1659785506.642590][4122:4122] CHIP:DMG: 	],
+          [1659785506.642618][4122:4122] CHIP:DMG:
+          [1659785506.642645][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
+          [1659785506.642670][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785506.642693][4122:4122] CHIP:DMG: },
+          [1659785506.642766][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label: "DUT writes 3 to TemperatureUnit attribute on TH"
+      PICS: LUNIT.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool unitlocalization write temperature-unit 3 1 0
+          Verify DUT receives TemperatureUnit attribute write response on the TH(all-clusters-app) Log:
+
+          [1659785555.542655][4122:4122] CHIP:DMG: WriteRequestMessage =
+          [1659785555.542689][4122:4122] CHIP:DMG: {
+          [1659785555.542719][4122:4122] CHIP:DMG: 	suppressResponse = false,
+          [1659785555.542754][4122:4122] CHIP:DMG: 	timedRequest = false,
+          [1659785555.542787][4122:4122] CHIP:DMG: 	AttributeDataIBs =
+          [1659785555.542827][4122:4122] CHIP:DMG: 	[
+          [1659785555.542859][4122:4122] CHIP:DMG: 		AttributeDataIB =
+          [1659785555.542895][4122:4122] CHIP:DMG: 		{
+          [1659785555.542934][4122:4122] CHIP:DMG: 			AttributePathIB =
+          [1659785555.542975][4122:4122] CHIP:DMG: 			{
+          [1659785555.543017][4122:4122] CHIP:DMG: 				Endpoint = 0x0,
+          [1659785555.543062][4122:4122] CHIP:DMG: 				Cluster = 0x2d,
+          [1659785555.543107][4122:4122] CHIP:DMG: 				Attribute = 0x0000_0000,
+          [1659785555.543172][4122:4122] CHIP:DMG: 			}
+          [1659785555.543218][4122:4122] CHIP:DMG:
+          [1659785555.543260][4122:4122] CHIP:DMG: 			Data = 3,
+          [1659785555.543321][4122:4122] CHIP:DMG: 		},
+          [1659785555.543362][4122:4122] CHIP:DMG:
+          [1659785555.543395][4122:4122] CHIP:DMG: 	],
+          [1659785555.543434][4122:4122] CHIP:DMG:
+          [1659785555.543468][4122:4122] CHIP:DMG: 	moreChunkedMessages = false,
+          [1659785555.543502][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785555.543534][4122:4122] CHIP:DMG: },
+          [1659785555.543637][4122:4122] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t=
+      disabled: true
+
+    - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool unitlocalization read temperature-unit 1 0
+          Verify DUT receives TemperatureUnit attribute response on the TH(all-clusters-app) Log:
+
+          [1659785612.134440][4122:4122] CHIP:IM: Received Read request
+          [1659785612.134567][4122:4122] CHIP:DMG: ReadRequestMessage =
+          [1659785612.134616][4122:4122] CHIP:DMG: {
+          [1659785612.134656][4122:4122] CHIP:DMG: 	AttributePathIBs =
+          [1659785612.134703][4122:4122] CHIP:DMG: 	[
+          [1659785612.134746][4122:4122] CHIP:DMG: 		AttributePathIB =
+          [1659785612.134808][4122:4122] CHIP:DMG: 		{
+          [1659785612.134860][4122:4122] CHIP:DMG: 			Endpoint = 0x0,
+          [1659785612.134917][4122:4122] CHIP:DMG: 			Cluster = 0x2d,
+          [1659785612.134983][4122:4122] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1659785612.135041][4122:4122] CHIP:DMG: 		}
+          [1659785612.135093][4122:4122] CHIP:DMG:
+          [1659785612.135167][4122:4122] CHIP:DMG: 	],
+          [1659785612.135223][4122:4122] CHIP:DMG:
+          [1659785612.135272][4122:4122] CHIP:DMG: 	isFabricFiltered = true,
+          [1659785612.135320][4122:4122] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659785612.135364][4122:4122] CHIP:DMG: },
+          [1659785612.135489][4122:4122] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659785612.135628][4122:4122] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659785612.135679][4122:4122] CHIP:DMG: <RE:Run> Cluster 2d, Attribute 0 is dirty
+      disabled: true

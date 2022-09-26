@@ -59,15 +59,13 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
-    CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                    const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                    Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
-
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
         mNodeIdRequested     = true;
     }
+
+    void SetMaximallyLargeCertsUsed(bool areMaximallyLargeCertsUsed) { mUseMaximallySizedCerts = areMaximallyLargeCertsUsed; }
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
@@ -112,8 +110,8 @@ private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     bool mInitialized              = false;
-    uint32_t mIssuerId             = 0;
-    uint32_t mIntermediateIssuerId = 1;
+    uint32_t mIssuerId             = 1;
+    uint32_t mIntermediateIssuerId = 2;
     uint32_t mNow                  = 0;
 
     // By default, let's set validity to 10 years
@@ -121,6 +119,7 @@ private:
 
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
+    bool mUseMaximallySizedCerts         = false;
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;

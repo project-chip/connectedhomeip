@@ -22,16 +22,19 @@ from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
-from builders.host import HostApp, HostBoard, HostBuilder
+from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
+from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
+from builders.genio import GenioApp, GenioBuilder
 
 
 class Target:
@@ -76,6 +79,7 @@ class Target:
         builder.target = self
         builder.identifier = self.name
         builder.output_dir = os.path.join(output_prefix, self.name)
+        builder.chip_dir = repository_path
         builder.enable_flashbundle(enable_flashbundle)
 
         return builder
@@ -113,6 +117,17 @@ class AcceptNameWithSubstrings:
             if s in name:
                 return True
         return False
+
+
+class RejectNameWithSubstrings:
+    def __init__(self, substr: List[str]):
+        self.substr = substr
+
+    def Accept(self, name: str):
+        for s in self.substr:
+            if s in name:
+                return False
+        return True
 
 
 class BuildVariant:
@@ -225,7 +240,7 @@ def HostTargets():
     # x64 linux  supports cross compile
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
     if cross_compile:
-        targets.append(target.Extend('arm64', board=HostBoard.ARM64))
+        targets.append(target.Extend('arm64-clang', board=HostBoard.ARM64, use_clang=True))
 
     app_targets = []
 
@@ -259,10 +274,19 @@ def HostTargets():
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
+        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False,
+                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True)
+        app_targets.append(target.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args))
+        app_targets.append(target.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args))
+        app_targets.append(target.Extend('ota-provider-nodeps', app=HostApp.OTA_PROVIDER, **nodeps_args))
+        app_targets.append(target.Extend('ota-requestor-nodeps', app=HostApp.OTA_REQUESTOR, **nodeps_args))
+
     builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
+    builder.AppendVariant(name="libnl", validator=AcceptNameWithSubstrings(
+        ['-minmdns']), minmdns_address_policy="libnl"),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
@@ -270,14 +294,22 @@ def HostTargets():
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
+    builder.AppendVariant(name="no-thread", enable_thread=False),
+    builder.AppendVariant(name="mbedtls", conflicts=['boringssl'], crypto_library=HostCryptoLibrary.MBEDTLS),
+    builder.AppendVariant(name="boringssl", conflicts=['mbedtls'], crypto_library=HostCryptoLibrary.BORINGSSL),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
-    builder.AppendVariant(name="clang", use_clang=True),
+    if cross_compile:
+        builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
+            ['arm64']
+        )),
+    else:
+        builder.AppendVariant(name="clang", use_clang=True)
+
     builder.AppendVariant(name="test", extra_tests=True),
 
-    builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
@@ -288,12 +320,11 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
-            # Interactive builds will not compile by default on arm cross compiles
-            # because libreadline is not part of the default sysroot
-            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
-        else:
-            yield target
+        yield target
+
+    # limited subset for coverage
+    yield target_native.Extend('all-clusters-coverage', app=HostApp.ALL_CLUSTERS, use_coverage=True)
+    yield target_native.Extend('chip-tool-coverage', app=HostApp.CHIP_TOOL, use_coverage=True)
 
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
@@ -305,9 +336,16 @@ def HostTargets():
     yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
+    yield target_native.Extend('tests', app=HostApp.TESTS)
+    yield target_native.Extend('tests-mbedtls', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.MBEDTLS).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-boringssl', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.BORINGSSL).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-clang-asan', app=HostApp.TESTS, use_clang=True, use_asan=True).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-dmalloc', app=HostApp.TESTS, use_dmalloc=True).GlobBlacklist("Non-default test")
+
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    for board in [HostBoard.NATIVE, HostBoard.FAKE]:
-        yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
+    yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
 
 
 def Esp32Targets():
@@ -345,6 +383,7 @@ def Esp32Targets():
     yield devkitc.Extend('all-clusters-minimal-ipv6only', app=Esp32App.ALL_CLUSTERS_MINIMAL, enable_ipv4=False)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
     yield devkitc.Extend('light', app=Esp32App.LIGHT)
+    yield devkitc.Extend('light-rpc', app=Esp32App.LIGHT, enable_rpcs=True)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
@@ -412,7 +451,7 @@ def NrfTargets():
     ]
 
     # Enable nrf52840dongle for all-clusters and lighting app only
-    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
+    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS).GlobBlacklist('Out of flash when linking')
     yield target.Extend('nrf52840dongle-all-clusters-minimal', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
@@ -447,12 +486,12 @@ def AndroidTargets():
     yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('x86-chip-tvserver', board=AndroidBoard.X86, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('x64-chip-tvserver', board=AndroidBoard.X64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm64-chip-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TV_CASTING_APP)
-    yield target.Extend('arm-chip-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TV_CASTING_APP)
+    yield target.Extend('arm64-tv-server', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm-tv-server', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
+    yield target.Extend('x86-tv-server', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER)
+    yield target.Extend('x64-tv-server', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_CASTING_APP)
+    yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP)
 
 
 def MbedTargets():
@@ -485,12 +524,19 @@ def MbedTargets():
 
 
 def InfineonTargets():
-    target = Target('infineon', InfineonBuilder)
+    builder = VariantBuilder()
+    builder.AppendVariant(name="ota", enable_ota_requestor=True)
+    builder.AppendVariant(name="updateimage", update_image=True)
 
-    yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
-    yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
-    yield target.Extend('p6-all-clusters-minimal', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
+    target = Target('infineon-psoc6', InfineonBuilder, board=InfineonBoard.PSOC6BOARD)
+
+    builder.targets.append(target.Extend('lock', app=InfineonApp.LOCK))
+    builder.targets.append(target.Extend('light', app=InfineonApp.LIGHT))
+    builder.targets.append(target.Extend('all-clusters', app=InfineonApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=InfineonApp.ALL_CLUSTERS_MINIMAL))
+
+    for target in builder.AllVariants():
+        yield target
 
 
 def AmebaTargets():
@@ -506,7 +552,7 @@ def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
     yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
-    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True, tinycrypt=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
@@ -557,6 +603,9 @@ def TizenTargets():
 
     target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
 
+    builder.targets.append(target.Extend('all-clusters', app=TizenApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL))
+    builder.targets.append(target.Extend('chip-tool', app=TizenApp.CHIP_TOOL))
     builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
 
     for target in builder.AllVariants():
@@ -567,6 +616,14 @@ def Bl602Targets():
     target = Target('bl602', Bl602Builder)
 
     yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
+
+
+def BouffalolabTargets():
+    target = Target('bouffalolab', BouffalolabBuilder)
+
+    yield target.Extend('BL706-IoT-DVK-light', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
+    yield target.Extend('BL706-IoT-DVK-light-rpc', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL706C-22")
+    yield target.Extend('BL706-NIGHT-LIGHT-light', board=BouffalolabBoard.BL706_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
 
 
 def IMXTargets():
@@ -586,6 +643,18 @@ def IMXTargets():
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
 
+def MW320Targets():
+    target = Target('mw320', MW320Builder)
+
+    yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
+
+
+def GenioTargets():
+    target = Target('genio', GenioBuilder)
+
+    yield target.Extend('lighting-app', app=GenioApp.LIGHT)
+
+
 ALL = []
 
 target_generators = [
@@ -603,7 +672,10 @@ target_generators = [
     QorvoTargets(),
     TizenTargets(),
     Bl602Targets(),
+    BouffalolabTargets(),
     IMXTargets(),
+    MW320Targets(),
+    GenioTargets(),
 ]
 
 for generator in target_generators:
@@ -615,6 +687,8 @@ ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.SWITCH))
+ALL.append(Target('telink-tlsr9518adk80d-ota-requestor', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.OTA_REQUESTOR))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

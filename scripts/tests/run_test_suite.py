@@ -62,6 +62,7 @@ class RunContext:
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
     chip_tool: str
+    dry_run: bool
 
 
 @click.group(chain=True)
@@ -70,6 +71,11 @@ class RunContext:
     default='info',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
+@click.option(
+    '--dry-run',
+    default=False,
+    is_flag=True,
+    help='Only print out shell commands that would be executed')
 @click.option(
     '--target',
     default=['all'],
@@ -106,7 +112,7 @@ class RunContext:
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context, log_level, target, target_glob, target_skip_glob,
+def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
          no_log_timestamps, root, internal_inside_unshare, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -119,7 +125,9 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     # Figures out selected test that match the given name(s)
     all_tests = [test for test in chiptest.AllTests(chip_tool)]
-    tests = all_tests
+
+    # Default to only non-manual tests unless explicit targets are specified.
+    tests = list(filter(lambda test: not test.is_manual, all_tests))
     if 'all' not in target:
         tests = []
         for name in target:
@@ -131,6 +139,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     if target_glob:
         matcher = GlobMatcher(target_glob.lower())
+        # Globs ignore manual tests, because it's too easy to mess up otherwise.
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
@@ -148,7 +157,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
-                             chip_tool=chip_tool)
+                             chip_tool=chip_tool, dry_run=dry_run)
 
 
 @main.command(
@@ -185,8 +194,13 @@ def cmd_list(context):
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
     help='PICS file to use for test runs.')
+@click.option(
+    '--test-timeout-seconds',
+    default=None,
+    type=int,
+    help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, pics_file):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, pics_file, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -219,14 +233,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
-    # Testing prerequisites: tv app requires a config. Copy it just in case
-    shutil.copyfile(
-        os.path.join(
-            context.obj.root, ('examples/tv-app/linux/include/'
-                               'endpoint-configuration/chip_tv_config.ini')),
-        '/tmp/chip_tv_config.ini'
-    )
-
     logging.info("Each test will be executed %d times" % iterations)
 
     apps_register = AppsRegister()
@@ -237,7 +243,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         for test in context.obj.tests:
             test_start = time.monotonic()
             try:
-                test.Run(runner, apps_register, paths, pics_file)
+                if context.obj.dry_run:
+                    logging.info("Would run test %s:" % test.name)
+
+                test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run)
                 test_end = time.monotonic()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))

@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
+
+PICS:
+    - DGGEN.S
+    - DGGEN.S.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads TestEventTriggersEnabled attribute value"
+      verification: |
+          ./chip-tool generaldiagnostics read test-event-triggers-enabled 1 0
+          On TH(chip-tool) verify that the TestEventTriggersEnabled value is of bool type. If this value is set to True, then proceed with step 3, otherwise skip step 3.
+          [1659425031.608557][4213:4218] CHIP:DMG: }
+          [1659425031.608771][4213:4218] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 1691505311
+          [1659425031.608815][4213:4218] CHIP:TOO:   TestEventTriggersEnabled: TRUE
+          [1659425031.608915][4213:4218] CHIP:EM: Sending Standalone Ack for MessageCounter:126478710 on exchange 37049i
+      disabled: true
+
+    - label:
+          "Invoke the TestEventTrigger command with EnableKey field set to
+          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      verification: |
+          Based on Spec, EnableKey value is to be provided by  manufacturer
+          below mentioned the example command to verify
+           ./chip-tool generaldiagnostics  <EnableKey> test-event-trigger   0 1 0
+      disabled: true
+
+    - label:
+          "Invoke the TestEventTrigger command with EnableKey field set to 16
+          bytes of all zeroes and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generaldiagnostics  test-event-trigger hex:0000000000000000  0 1 0
+          On TH(chip-tool) Verify that DUT responds with CONSTRAINT_ERROR.
+          [1659426470.994413][4451:4456] CHIP:DMG:         InteractionModelRevision = 1
+          [1659426470.994442][4451:4456] CHIP:DMG: },
+          [1659426470.994513][4451:4456] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0033 Command=0x0000_0000 Status=0x87
+          [1659426470.994553][4451:4456] CHIP:TOO: Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1659426470.994618][4451:4456] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true

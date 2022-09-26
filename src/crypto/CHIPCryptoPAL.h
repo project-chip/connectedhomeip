@@ -24,7 +24,7 @@
 
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
-#endif
+#endif // CHIP_HAVE_CONFIG_H
 
 #include <system/SystemConfig.h>
 
@@ -78,10 +78,8 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
-
-// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
-constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
-constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
+constexpr size_t kAES_CCM128_Nonce_Length = 13;
+constexpr size_t kAES_CCM128_Tag_Length   = 16;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -361,16 +359,6 @@ public:
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
-    /**
-     * @brief A function to sign a hash using ECDSA
-     * @param hash Hash that needs to be signed
-     * @param hash_length Length of hash
-     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     * in raw <r,s> point form (see SEC1).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) const = 0;
-
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
@@ -454,16 +442,6 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
-
-    /**
-     * @brief A function to sign a hash using ECDSA
-     * @param hash Hash that needs to be signed
-     * @param hash_length Length of hash
-     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     * in raw <r,s> point form (see SEC1).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -638,10 +616,29 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
                            const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
+
+/**
+ * @brief A function that implements AES-CTR encryption/decryption
+ *
+ * This implements the AES-CTR-Encrypt/Decrypt() cryptographic primitives per sections
+ * 3.7.1 and 3.7.2 of the specification. For an empty input, the user of the API
+ * can provide an empty string, or a nullptr, and provide input as 0.
+ * The output buffer can also be an empty string, or a nullptr for this case.
+ *
+ * @param input Input text to encrypt/decrypt
+ * @param input_length Length of ciphertext
+ * @param key Decryption key
+ * @param key_length Length of Decryption key (in bytes)
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
+ * @param output Buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                         size_t nonce_length, uint8_t * output);
 
 /**
  * @brief Generate a PKCS#10 CSR, usable for Matter, from a P256Keypair.
@@ -665,7 +662,22 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span);
 
 /**
+ * @brief Common code to validate ASN.1 format/size of a CSR, used by VerifyCertificateSigningRequest.
+ *
+ * Ensures it's not obviously malformed and doesn't have trailing garbage.
+ *
+ * @param csr CSR in DER format
+ * @param csr_length The length of the CSR buffer
+ * @return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT on invalid format, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr_length);
+
+/**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
+ *
+ * The CSR is valid if the format is correct, the signature validates with the embedded public
+ * key, and there is no trailing garbage data.
+ *
  * @param csr CSR in DER format
  * @param csr_length The length of the CSR
  * @param pubkey The public key from the verified CSR
@@ -1425,20 +1437,20 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     CertificateChainValidationResult & result);
 
 /**
- * @brief Validate timestamp of a certificate (toBeEvaluatedCertificate) in comparison with other certificate's
- *        (referenceCertificate) issuing timestamp.
+ * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the
+ *        issuer certificate (issuerCertificate).
  *
  * Errors are:
- *   - CHIP_ERROR_CERT_EXPIRED if the certificate timestamp does not satisfy the reference certificate's issuing timestamp.
+ *   - CHIP_ERROR_CERT_EXPIRED if the candidateCertificate timestamp does not satisfy the issuerCertificate's timestamp.
  *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
  *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
  *
- *  @param referenceCertificate     A DER Certificate ByteSpan used as the issuing timestamp reference.
- *  @param toBeEvaluatedCertificate A DER Certificate ByteSpan used to evaluate issuance against the referenceCertificate.
+ *  @param candidateCertificate     A DER Certificate ByteSpan those notBefore timestamp to be evaluated.
+ *  @param issuerCertificate        A DER Certificate ByteSpan used to evaluate validity timestamp of the candidateCertificate.
  *
  *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
  **/
-CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate);
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, const ByteSpan & issuerCertificate);
 
 /**
  * @brief Validate a certificate's validity date against current time.
@@ -1509,6 +1521,21 @@ CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
 
 /**
+ * @brief The set of credentials needed to operate group message security with symmetric keys.
+ */
+typedef struct GroupOperationalCredentials
+{
+    /// Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
+    uint64_t start_time;
+    /// Session Id
+    uint16_t hash;
+    /// Operational group key
+    uint8_t encryption_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    /// Privacy key
+    uint8_t privacy_key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+} GroupOperationalCredentials;
+
+/**
  * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
@@ -1535,7 +1562,7 @@ public:
      * for ciphertext, and plaintext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual CHIP_ERROR MessageEncrypt(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
                                       MutableByteSpan & mic, MutableByteSpan & ciphertext) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
@@ -1547,30 +1574,26 @@ public:
      * for plaintext, and ciphertext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+    virtual CHIP_ERROR MessageDecrypt(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
                                       const ByteSpan & mic, MutableByteSpan & plaintext) const = 0;
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
-     * @param[in,out] header    Message header to encrypt
-     * @param[in] session_id    Outgoing SessionID
-     * @param[in] payload       Encrypted payload
-     * @param[in] mic       Outgoing Message Integrity Check
+     * @param[in] input         Message header to privacy encrypt
+     * @param[in] nonce         Privacy Nonce = session_id | mic
+     * @param[out] output       Message header obfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
-     * @param[in,out] header    Message header to decrypt
-     * @param[in] session_id    Incoming SessionID
-     * @param[in] payload       Encrypted payload
-     * @param[in] mic           Outgoing Message Integrity Check
+     * @param[in] input         Message header to privacy decrypt
+     * @param[in] nonce         Privacy Nonce = session_id | mic
+     * @param[out] output       Message header deobfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
@@ -1581,6 +1604,7 @@ public:
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
  * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
  * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
  The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
@@ -1596,5 +1620,26 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan 
  **/
 CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id);
 
+/**
+ *  @brief Derives the Privacy Group Key using the Key Derivation Function (KDF) from the given epoch key.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[out] out_key  Symmetric key used as the privacy key during message processing for group communication.
+ *                      The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
+
+/**
+ *  @brief Derives the complete set of credentials needed for group security.
+ *
+ * This function will derive the Encryption Key, Group Key Hash (Session Id), and Privacy Key
+ * for the given Epoch Key and Compressed Fabric Id.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
+ * @param[out] operational_credentials The set of Symmetric keys used during message processing for group communication.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id,
+                                             GroupOperationalCredentials & operational_credentials);
 } // namespace Crypto
 } // namespace chip

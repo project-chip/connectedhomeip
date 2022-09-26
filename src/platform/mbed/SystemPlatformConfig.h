@@ -43,7 +43,3 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
 // ========== Platform-specific Configuration Overrides =========
-
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS

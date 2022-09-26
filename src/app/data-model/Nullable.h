@@ -79,7 +79,7 @@ struct Nullable : protected Optional<T>
         return true;
     }
 
-    // The only fabric-scoped objects in the spec are events and structs inside lists, and neither one can be nullable.
+    // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.
     static constexpr bool kIsFabricScoped = false;
 
     bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }

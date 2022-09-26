@@ -24,12 +24,19 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 declare_args() {
   # Location of the k32w0 SDK.
-  k32w0_sdk_root = getenv("NXP_K32W061_SDK_ROOT")
+  k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
   chip_with_DK6 = true
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
   chip_with_low_power = 0
-  mbedtls_use_tinycrypt = false
+  build_for_k32w061 = 1
+  build_for_k32w041am = 0
+  build_for_k32w041a = 0
+  build_for_k32w041 = 0
+  device = "K32W061"
+  board = "k32w061dk6"
+  chip_with_ntag = 1
+  chip_with_high_power = 0
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -57,6 +64,54 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
+  if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
+      build_for_k32w041 == 1) {
+    build_for_k32w061 = 0
+  }
+
+  if (build_for_k32w061 == 1) {
+    assert(build_for_k32w061 == 1 && build_for_k32w041am == 0 &&
+               build_for_k32w041a == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
+    device = "K32W061"
+    board = "k32w061dk6"
+    chip_with_ntag = 1
+    chip_with_high_power = 0
+  }
+  if (build_for_k32w041am == 1) {
+    assert(build_for_k32w041am == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041a == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
+    device = "K32W041AM"
+    board = "k32w041amdk6"
+    chip_with_high_power = 1
+    chip_with_ntag = 0
+  }
+  if (build_for_k32w041a == 1) {
+    assert(build_for_k32w041a == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041am == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
+    device = "K32W041A"
+    board = "k32w041adk6"
+    chip_with_high_power = 1
+    chip_with_ntag = 0
+  }
+  if (build_for_k32w041 == 1) {
+    assert(build_for_k32w041 == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041am == 0 && build_for_k32w041a == 0,
+           "Please build for only one platform")
+    device = "K32W041"
+    board = "k32w041dk6"
+    chip_with_ntag = 0
+    chip_with_high_power = 0
+  }
+
+  print("device:", device)
+  print("board:", board)
+  print("ntag:", chip_with_ntag)
+  print("high power:", chip_with_high_power)
+  device_lowercase = string_replace(board, "dk6", "")
+
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
@@ -72,14 +127,23 @@ template("k32w0_sdk") {
 
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
-        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm" ]
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm" ]
       } else {
-        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm" ]
+        _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm" ]
       }
     }
 
     if (chip_with_low_power != 0) {
-      _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common" ]
+      _sdk_include_dirs += [ "${k32w0_sdk_root}/boards/${board}/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common" ]
+    }
+
+    if (chip_with_ntag != 0) {
+      _sdk_include_dirs += [
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_I2C/inc",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_NTAG/inc",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/inc",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_TMR/inc",
+      ]
     }
 
     _sdk_include_dirs += [
@@ -87,16 +151,12 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/CMSIS/Include",
       "${k32w0_sdk_root}/components/serial_manager",
       "${k32w0_sdk_root}/components/uart",
-      "${k32w0_sdk_root}/devices/K32W061",
-      "${k32w0_sdk_root}/devices/K32W061/drivers",
-      "${k32w0_sdk_root}/devices/K32W061/utilities",
-      "${k32w0_sdk_root}/devices/K32W061/utilities/debug_console",
-      "${k32w0_sdk_root}/devices/K32W061/utilities/str",
+      "${k32w0_sdk_root}/devices/${device}",
+      "${k32w0_sdk_root}/devices/${device}/drivers",
+      "${k32w0_sdk_root}/devices/${device}/utilities",
+      "${k32w0_sdk_root}/devices/${device}/utilities/debug_console",
+      "${k32w0_sdk_root}/devices/${device}/utilities/str",
       "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_I2C/inc",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_NTAG/inc",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/inc",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_TMR/inc",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/interface",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/gatt_db",
@@ -112,7 +172,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/Keyboard/Interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/LED/Interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/Lists",
-      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Interface/k32w061dk6",
+      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Interface/${board}",
       "${k32w0_sdk_root}/middleware/wireless/framework/MemManager/Interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/Messaging/Interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/ModuleInfo",
@@ -137,9 +197,9 @@ template("k32w0_sdk") {
     ]
 
     libs = [
-      "${k32w0_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller.a",
-      "${k32w0_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_peripheral_cm4_noFP.a",
-      "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Dynamic_MMAC.a",
+      "${k32w0_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller_peripheral_commissioning.a",
+      "${k32w0_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_matter_cm4_noFP.a",
+      "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
@@ -148,18 +208,20 @@ template("k32w0_sdk") {
     defines = [
       "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=5",
-      "CPU_K32W061HN",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
       "JENNIC_CHIP_FAMILY_NAME=_JN518x",
+      "MAC_PROTO_TAG=1",
+      "JENNIC_CHIP_FAMILY_JN518x",
       "gPWR_LDOMEM_0_9V_PD=0",
       "SDK_DEBUGCONSOLE=DEBUGCONSOLE_REDIRECT_TO_SDK",
+      "PRINTF_ADVANCED_ENABLE",
       "NO_SYSCORECLK_UPD=0",
       "USE_RTOS=1",
       "USE_SDK_OSA=0",
       "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
-      "gTotalHeapSize_c=0xB000",
+      "gTotalHeapSize_c=0xC8BC",
       "gUartDebugConsole_d=1",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
@@ -168,6 +230,7 @@ template("k32w0_sdk") {
       "gOtaEepromPostedOperations_d=1",
       "gOtaVerifyWrite_d=0",
       "gExternalFlashIsCiphered_d=1",
+      "PDM_USE_DYNAMIC_MEMORY=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -220,6 +283,7 @@ template("k32w0_sdk") {
         "PDM_EXT_FLASH=1",
         "gEepromType_d=gEepromDevice_MX25R8035F_c",
         "gPdmNbSegments=63",
+        "gRadioUsePdm_d=1",
       ]
 
       if (chip_with_OM15082 != 0) {
@@ -266,6 +330,34 @@ template("k32w0_sdk") {
       ]
     }
 
+    if (build_for_k32w061 == 1) {
+      defines += [ "CPU_K32W061HN" ]
+    } else if (build_for_k32w041am == 1) {
+      defines += [ "CPU_K32W041AMZ" ]
+    } else if (build_for_k32w041a == 1) {
+      defines += [ "CPU_K32W041AZ" ]
+    } else if (build_for_k32w041 == 1) {
+      defines += [ "CPU_K32W041HN" ]
+    }
+
+    if (chip_with_high_power == 1) {
+      defines += [
+        "K32WMCM_APP_BUILD",
+        "JENNIC_CHIP_FAMILY_JN518x",
+      ]
+      _sdk_include_dirs += [
+        "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/Include",
+        "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/mMac/Include",
+      ]
+    }
+
+    if (chip_with_ntag == 1) {
+      defines += [
+        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
+      ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
@@ -309,35 +401,31 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager/serial_manager.c",
       "${k32w0_sdk_root}/components/serial_manager/serial_port_uart.c",
       "${k32w0_sdk_root}/components/uart/usart_adapter.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_adc.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_aes.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_common.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_ctimer.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_flash.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_flexcomm.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_fmeas.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_gpio.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_inputmux.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_ntag.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_pint.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_rng.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_rtc.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_sha.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_spifi.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_usart.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
-      "${k32w0_sdk_root}/devices/K32W061/mcuxpresso/startup_k32w061.c",
-      "${k32w0_sdk_root}/devices/K32W061/system_K32W061.c",
-      "${k32w0_sdk_root}/devices/K32W061/utilities/debug_console/fsl_debug_console.c",
-      "${k32w0_sdk_root}/devices/K32W061/utilities/str/fsl_str.c",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_I2C/i2c_jn_fsl.c",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_NTAG/ntag_driver.c",
-      "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_TMR/timer_driver_jn.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_adc.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_aes.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_clock.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_common.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_ctimer.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flash.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flexcomm.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_fmeas.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_gpio.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c_freertos.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_inputmux.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_pint.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_power.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_reset.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rng.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rtc.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_sha.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_spifi.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_usart.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wtimer.c",
+      "${k32w0_sdk_root}/devices/${device}/mcuxpresso/startup_${device_lowercase}.c",
+      "${k32w0_sdk_root}/devices/${device}/system_${device}.c",
+      "${k32w0_sdk_root}/devices/${device}/utilities/debug_console/fsl_debug_console.c",
+      "${k32w0_sdk_root}/devices/${device}/utilities/str/fsl_str.c",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
@@ -351,9 +439,9 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/LED/Source/LED.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Lists/GenericList.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Logging/Source/dbg_logging.c",
-      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWR.c",
-      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWRLib.c",
-      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWR_setjmp.S",
+      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/${board}/PWR.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/${board}/PWRLib.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/LowPower/Source/${board}/PWR_setjmp.S",
       "${k32w0_sdk_root}/middleware/wireless/framework/MemManager/Source/MemManager.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Messaging/Source/Messaging.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/OSAbstraction/Source/fsl_os_abstraction_free_rtos.c",
@@ -379,37 +467,36 @@ template("k32w0_sdk") {
     ]
 
     if (chip_with_DK6) {
-      if (chip_with_low_power != 0) {
+      sources += [
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/hardware_init.c",
+      ]
+
+      if (chip_with_se05x != 0) {
         sources += [
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/board.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/board_utility.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/clock_config.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/hardware_init.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/lped/bm/pin_mux.c",
+          "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+          "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
         ]
       } else {
         sources += [
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
-          "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/clock_config.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
         ]
-
-        if (chip_with_se05x != 0) {
-          sources += [
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
-          ]
-        } else {
-          sources += [
-            "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/clock_config.c",
-            "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/pin_mux.c",
-          ]
-        }
       }
     }
 
     if (chip_with_low_power != 0) {
-      sources += [ "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common/app_dual_mode_low_power.c" ]
+      sources += [ "${k32w0_sdk_root}/boards/${board}/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common/app_dual_mode_low_power.c" ]
+    }
+
+    if (chip_with_ntag != 0) {
+      sources += [
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_ntag.c",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_I2C/i2c_jn_fsl.c",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_NTAG/ntag_driver.c",
+        "${k32w0_sdk_root}/middleware/ntag_i2c_plus/HAL_TMR/timer_driver_jn.c",
+      ]
     }
 
     if (!defined(public_deps)) {

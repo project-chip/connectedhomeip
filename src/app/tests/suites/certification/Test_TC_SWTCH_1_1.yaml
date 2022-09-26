@@ -11,50 +11,142 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
 
+PICS:
+    - SWTCH.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Switch"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-    - label: "Read FeatureMap (global attribute 65532)"
-      verification: |
-          ./chip-tool switch read feature-map 1 1
+    - label:
+          "Read FeatureMap  attribute and Check values of flags in this
+          FeatureMap"
+      PICS:
+          "!SWTCH.S.F00 && !SWTCH.S.F01 && !SWTCH.S.F02 && !SWTCH.S.F03 &&
+          !SWTCH.S.F04"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          [1646208136.241983][2390:2395] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFCDataVersion: 1206711661
-          [1646208136.242043][2390:2395] CHIP:TOO:   FeatureMap: 0
-      disabled: true
+    - label: "Given SWTCH.S.F00(LS) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x01]
+              hasMasksClear: [0x02, 0x04, 0x08, 0x10]
 
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+    - label: "Given SWTCH.S.F01(MS) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+              hasMasksClear: [0x1]
 
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+    - label: "Given SWTCH.S.F02(MSR) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4]
+              hasMasksClear: [0x1]
 
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+    - label: "Given SWTCH.S.F03(MSL) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4, 0x8]
+              hasMasksClear: [0x1]
 
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+    - label: "Given SWTCH.S.F04(MSM) ensure featuremap has the correct bit set"
+      PICS: SWTCH.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2, 0x4, 0x10]
+              hasMasksClear: [0x1]
 
-    - label: "Check values of flags in this FeatureMap"
-      verification: |
-          no Matter messages, but TH internal checking
-      disabled: true
+    - label: "Read the global attribute: AttributeList"
+      PICS: SWTCH.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the global attribute: AttributeList"
+      PICS: "!SWTCH.S.F04"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: []
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

@@ -17,5 +17,18 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
 pw_python_package("chip_mobly") {
-  setup = [ "setup.py" ]
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+  sources = [
+    "chip_mobly/__init__.py",
+    "chip_mobly/pigweed_device.py",
+  ]
+  tests = [ "hello_world_test.py" ]
+  python_deps = [
+    "$dir_pw_hdlc/py",
+    "$dir_pw_rpc/py",
+  ]
 }

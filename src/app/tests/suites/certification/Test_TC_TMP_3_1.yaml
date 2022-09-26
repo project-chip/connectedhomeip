@@ -1,0 +1,241 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-TMP-3.1] Attributes with client as DUT
+
+PICS:
+    - TMP.C
+    - TMP.C.AM-READ
+    - TMP.C.AO-READ
+    - TMP.C.AM-WRITE
+    - TMP.C.AO-WRITE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool temperaturemeasurement read measured-value 1 1
+
+          Verify DUT receives measured-value attribute response on the TH(all-clusters-app) Log:
+
+          1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880412.037749][15013:15013] CHIP:DMG: {
+          [1650880412.037772][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880412.037799][15013:15013] CHIP:DMG:         [
+          [1650880412.037823][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880412.037876][15013:15013] CHIP:DMG:                 {
+          [1650880412.037908][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880412.037938][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880412.037984][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650880412.038023][15013:15013] CHIP:DMG:                 }
+          [1650880412.038055][15013:15013] CHIP:DMG:
+          [1650880412.038081][15013:15013] CHIP:DMG:         ],
+          [1650880412.038110][15013:15013] CHIP:DMG:
+          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880412.038162][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880412.038186][15013:15013] CHIP:DMG: },
+          [1650880412.038259][15013:15013] CHIP:DMG: IM RH moving to [Generatin
+
+
+          ./chip-tool temperaturemeasurement read max-measured-value 1 1
+
+          Verify DUT receives max-measured-value  attribute response on the TH(all-clusters-app) Log:
+
+          [1650880462.518114][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880462.518149][15013:15013] CHIP:DMG: {
+          [1650880462.518176][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880462.518209][15013:15013] CHIP:DMG:         [
+          [1650880462.518239][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880462.518283][15013:15013] CHIP:DMG:                 {
+          [1650880462.518321][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880462.518365][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880462.518405][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1650880462.518446][15013:15013] CHIP:DMG:                 }
+          [1650880462.518483][15013:15013] CHIP:DMG:
+          [1650880462.518557][15013:15013] CHIP:DMG:         ],
+          [1650880462.518596][15013:15013] CHIP:DMG:
+          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880462.518662][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880462.518690][15013:15013] CHIP:DMG: },
+
+
+          ./chip-tool temperaturemeasurement read min-measured-value 1 1
+
+          Verify DUT receives min-measured-value  attribute response on the TH(all-clusters-app) Log:
+
+          [1650880507.409653][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880507.409703][15013:15013] CHIP:DMG: {
+          [1650880507.409727][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880507.409753][15013:15013] CHIP:DMG:         [
+          [1650880507.409778][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880507.409809][15013:15013] CHIP:DMG:                 {
+          [1650880507.409839][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880507.409874][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880507.409907][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1650880507.409936][15013:15013] CHIP:DMG:                 }
+          [1650880507.409966][15013:15013] CHIP:DMG:
+          [1650880507.409992][15013:15013] CHIP:DMG:         ],
+          [1650880507.410021][15013:15013] CHIP:DMG:
+          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880507.410073][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880507.410097][15013:15013] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool temperaturemeasurement read tolerance  1 1
+
+          Verify DUT receives  tolerance attribute response on the TH(all-clusters-app) Log:
+
+          [1658141616.808771][13946:13946] CHIP:IM: Received Read request
+          [1658141616.808855][13946:13946] CHIP:DMG: ReadRequestMessage =
+          [1658141616.808885][13946:13946] CHIP:DMG: {
+          [1658141616.808909][13946:13946] CHIP:DMG:         AttributePathIBs =
+          [1658141616.808942][13946:13946] CHIP:DMG:         [
+          [1658141616.808969][13946:13946] CHIP:DMG:                 AttributePathIB =
+          [1658141616.809001][13946:13946] CHIP:DMG:                 {
+          [1658141616.809032][13946:13946] CHIP:DMG:                         Endpoint = 0x1,
+          [1658141616.809068][13946:13946] CHIP:DMG:                         Cluster = 0x402,
+          [1658141616.809104][13946:13946] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1658141616.809138][13946:13946] CHIP:DMG:                 }
+          [1658141616.809170][13946:13946] CHIP:DMG:
+          [1658141616.809198][13946:13946] CHIP:DMG:         ],
+          [1658141616.809230][13946:13946] CHIP:DMG:
+          [1658141616.809259][13946:13946] CHIP:DMG:         isFabricFiltered = true,
+          [1658141616.809288][13946:13946] CHIP:DMG:         InteractionModelRevision = 1
+          [1658141616.809314][13946:13946] CHIP:DMG: },
+          [1658141616.809417][13946:13946] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1658141616.809511][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          There is no writable mandatory attibute for this cluster
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          There is no writable Optional attibute for this cluster
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          To verify all below steps use all-clusters-minimal-app
+
+           ./chip-tool temperaturemeasurement read measured-value 1 1
+          Verify DUT receives measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+          1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880412.037749][15013:15013] CHIP:DMG: {
+          [1650880412.037772][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880412.037799][15013:15013] CHIP:DMG:         [
+          [1650880412.037823][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880412.037876][15013:15013] CHIP:DMG:                 {
+          [1650880412.037908][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880412.037938][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880412.037984][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650880412.038023][15013:15013] CHIP:DMG:                 }
+          [1650880412.038055][15013:15013] CHIP:DMG:
+          [1650880412.038081][15013:15013] CHIP:DMG:         ],
+          [1650880412.038110][15013:15013] CHIP:DMG:
+          [1650880412.038137][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880412.038162][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880412.038186][15013:15013] CHIP:DMG: },
+          [1650880412.038259][15013:15013] CHIP:DMG: IM RH moving to [Generatin
+
+
+          ./chip-tool temperaturemeasurement read max-measured-value 1 1
+          Verify DUT receives max-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+          [1650880462.518114][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880462.518149][15013:15013] CHIP:DMG: {
+          [1650880462.518176][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880462.518209][15013:15013] CHIP:DMG:         [
+          [1650880462.518239][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880462.518283][15013:15013] CHIP:DMG:                 {
+          [1650880462.518321][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880462.518365][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880462.518405][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1650880462.518446][15013:15013] CHIP:DMG:                 }
+          [1650880462.518483][15013:15013] CHIP:DMG:
+          [1650880462.518557][15013:15013] CHIP:DMG:         ],
+          [1650880462.518596][15013:15013] CHIP:DMG:
+          [1650880462.518630][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880462.518662][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880462.518690][15013:15013] CHIP:DMG: },
+
+
+          ./chip-tool temperaturemeasurement read min-measured-value 1 1
+          Verify DUT receives min-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+          [1650880507.409653][15013:15013] CHIP:DMG: ReadRequestMessage =
+          [1650880507.409703][15013:15013] CHIP:DMG: {
+          [1650880507.409727][15013:15013] CHIP:DMG:         AttributePathIBs =
+          [1650880507.409753][15013:15013] CHIP:DMG:         [
+          [1650880507.409778][15013:15013] CHIP:DMG:                 AttributePathIB =
+          [1650880507.409809][15013:15013] CHIP:DMG:                 {
+          [1650880507.409839][15013:15013] CHIP:DMG:                         Endpoint = 0x1,
+          [1650880507.409874][15013:15013] CHIP:DMG:                         Cluster = 0x402,
+          [1650880507.409907][15013:15013] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1650880507.409936][15013:15013] CHIP:DMG:                 }
+          [1650880507.409966][15013:15013] CHIP:DMG:
+          [1650880507.409992][15013:15013] CHIP:DMG:         ],
+          [1650880507.410021][15013:15013] CHIP:DMG:
+          [1650880507.410048][15013:15013] CHIP:DMG:         isFabricFiltered = true,
+          [1650880507.410073][15013:15013] CHIP:DMG:         InteractionModelRevision = 1
+          [1650880507.410097][15013:15013] CHIP:DMG: },"
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          .Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          /chip-tool temperaturemeasurement read tolerance 1 1
+
+          Verify DUT receives tolerence attribute response on the TH(all-clusters-minimal-app) Log:
+           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          There is no writable mandatory attibute for this cluster
+      disabled: true

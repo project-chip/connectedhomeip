@@ -29,9 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
 
 using namespace chip;
 using namespace chip::TLV;

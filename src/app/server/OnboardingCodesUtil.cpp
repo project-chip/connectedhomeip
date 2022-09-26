@@ -43,7 +43,7 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
     CHIP_ERROR err = GetPayloadContents(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetPayloadContents() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     PrintOnboardingCodes(payload);
@@ -98,41 +98,44 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 
 CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    aPayload.version               = 0;
-    aPayload.rendezvousInformation = aRendezvousFlags;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    aPayload.version = 0;
+    aPayload.rendezvousInformation.SetValue(aRendezvousFlags);
 
     err = GetCommissionableDataProvider()->GetSetupPasscode(aPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %s", chip::ErrorStr(err));
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
         ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
                         static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
         aPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
 #else
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
 #endif
     }
 
-    err = GetCommissionableDataProvider()->GetSetupDiscriminator(aPayload.discriminator);
+    uint16_t discriminator = 0;
+    err                    = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupDiscriminator() failed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         return err;
     }
+    aPayload.discriminator.SetLongValue(discriminator);
 
     err = chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(aPayload.vendorID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetVendorId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetVendorId() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
     err = chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(aPayload.productID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetProductId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetProductId() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
@@ -146,7 +149,7 @@ CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, chip::RendezvousInformatio
     CHIP_ERROR err = GetPayloadContents(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetPayloadContents() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
@@ -158,7 +161,7 @@ CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContent
     CHIP_ERROR err = chip::QRCodeBasicSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Generating QR Code failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
@@ -186,7 +189,7 @@ CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, chip
     CHIP_ERROR err = GetPayloadContents(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "GetPayloadContents() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     return GetManualPairingCode(aManualPairingCode, payload);
@@ -197,7 +200,7 @@ CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, cons
     CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Generating Manual Pairing Code failed: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 

@@ -47,6 +47,8 @@ public:
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 private:
     jobject mContentLauncherManagerObject           = nullptr;
     jmethodID mGetAcceptHeaderMethod                = nullptr;

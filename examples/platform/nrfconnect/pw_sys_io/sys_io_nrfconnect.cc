@@ -61,7 +61,7 @@ Status WriteByte(std::byte b)
 StatusWithSize WriteLine(const std::string_view & s)
 {
     size_t chars_written  = 0;
-    StatusWithSize result = WriteBytes(std::as_bytes(std::span(s)));
+    StatusWithSize result = WriteBytes(pw::as_bytes(pw::span(s)));
     if (!result.ok())
     {
         return result;
@@ -69,7 +69,7 @@ StatusWithSize WriteLine(const std::string_view & s)
     chars_written += result.size();
 
     // Write trailing newline.
-    result = WriteBytes(std::as_bytes(std::span("\r\n", 2)));
+    result = WriteBytes(pw::as_bytes(pw::span("\r\n", 2)));
     chars_written += result.size();
 
     return StatusWithSize(result.status(), chars_written);

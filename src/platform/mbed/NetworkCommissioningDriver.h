@@ -94,7 +94,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
@@ -143,7 +143,6 @@ private:
 
     chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mScanCallback;

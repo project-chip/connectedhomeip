@@ -32,18 +32,18 @@
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
+#include <inttypes.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
-
-#include <inttypes.h>
 
 // Global object
 chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
@@ -65,14 +65,17 @@ uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
         return header.GetMessageCounter();
     }
 
-    ChipLogError(Inet, "Failed to decode EncryptedPacketBufferHandle header with error: %s", ErrorStr(err));
+    ChipLogError(Inet, "Failed to decode EncryptedPacketBufferHandle header with error: %" CHIP_ERROR_FORMAT, err.Format());
 
     return 0;
 }
 
 SessionManager::SessionManager() : mState(State::kNotReady) {}
 
-SessionManager::~SessionManager() {}
+SessionManager::~SessionManager()
+{
+    this->Shutdown();
+}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager,
@@ -82,6 +85,7 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(fabricTable->AddFabricDelegate(this));
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
@@ -102,9 +106,22 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
+    if (mFabricTable != nullptr)
+    {
+        mFabricTable->RemoveFabricDelegate(this);
+        mFabricTable = nullptr;
+    }
+
+    // Ensure that we don't create new sessions as we iterate our session table.
+    mState = State::kNotReady;
+
+    mSecureSessions.ForEachSession([&](auto session) {
+        session->MarkForEviction();
+        return Loop::Continue;
+    });
+
     mMessageCounterManager = nullptr;
 
-    mState        = State::kNotReady;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
     mCB           = nullptr;
@@ -112,7 +129,7 @@ void SessionManager::Shutdown()
 
 /**
  * @brief Notification that a fabric was removed.
- *        This function doesn't call ExpireAllPairingsForFabric
+ *        This function doesn't call ExpireAllSessionsForFabric
  *        since the CASE session might still be open to send a response
  *        on the removed fabric.
  */
@@ -143,13 +160,12 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
+        const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
         mGroupClientCounter.IncrementCounter(isControlMsg);
-        packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
         NodeId sourceNodeId = fabric->GetNodeId();
         packetHeader.SetSourceNodeId(sourceNodeId);
@@ -174,7 +190,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         ReturnErrorOnFailure(err);
 
 #if CHIP_PROGRESS_LOGGING
-        destination = kUndefinedNodeId;
+        destination = NodeIdFromGroupId(groupSession->GetGroupId());
         fabricIndex = groupSession->GetFabricIndex();
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -240,13 +256,42 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipLogProgress(Inet,
-                    "Prepared %s message %p to 0x" ChipLogFormatX64 " (%u)  of type " ChipLogFormatMessageType
-                    " and protocolId " ChipLogFormatProtocolId " on exchange " ChipLogFormatExchangeId
-                    " with MessageCounter:" ChipLogFormatMessageCounter ".",
-                    sessionHandle->GetSessionTypeString(), &preparedMessage, ChipLogValueX64(destination), fabricIndex,
-                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
-                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+    CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
+
+    if (fabricIndex != kUndefinedFabricIndex && mFabricTable != nullptr)
+    {
+        auto fabricInfo = mFabricTable->FindFabricWithIndex(fabricIndex);
+        if (fabricInfo)
+        {
+            compressedFabricId = fabricInfo->GetCompressedFabricId();
+        }
+    }
+
+    auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
+    auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
+
+    //
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
+    //
+    char ackBuf[20];
+    ackBuf[0] = '\0';
+    if (payloadHeader.GetAckMessageCounter().HasValue())
+    {
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+    }
+
+    //
+    // Legend that can be used to decode this log line can be found in messaging/README.md
+    //
+    ChipLogProgress(ExchangeManager,
+                    "<<< [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
+                    " [%04X] --- Type %04X:%02X (%s:%s)",
+                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
+                    Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    static_cast<uint16_t>(compressedFabricId), payloadHeader.GetProtocolID().GetProtocolId(),
+                    payloadHeader.GetMessageType(), protocolName, msgTypeName);
+#endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
@@ -268,7 +313,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     case Transport::Session::SessionType::kGroupOutgoing: {
         auto groupSession = sessionHandle->AsOutgoingGroupSession();
 
-        FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
+        const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
         multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
@@ -276,13 +321,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
-                        " at monotonic time: " ChipLogFormatX64
-                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric index of %x",
-                        "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
-                        groupSession->GetGroupId(), groupSession->GetFabricIndex());
+        ChipLogProgress(Inet, "(G) Sending msg " ChipLogFormatMessageCounter " to Multicast IPV6 address '%s'",
+                        preparedMessage.GetMessageCounter(), addressStr);
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -294,12 +334,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         destination = &secure->GetPeerAddress();
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " (%u) at monotonic time: " ChipLogFormatX64 " msec",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(secure->GetPeerNodeId()), secure->GetFabricIndex(),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
+        ChipLogProgress(Inet, "(S) Sending msg " ChipLogFormatMessageCounter " on secure session with LSID: %u",
+                        preparedMessage.GetMessageCounter(), secure->GetLocalSessionId());
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
@@ -307,12 +343,13 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at monotonic time: " ChipLogFormatX64 " msec",
-                        sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(kUndefinedNodeId),
-                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
+#if CHIP_PROGRESS_LOGGING
+        char addressStr[Transport::PeerAddress::kMaxToStringSize];
+        destination->ToString(addressStr);
+
+        ChipLogProgress(Inet, "(U) Sending msg " ChipLogFormatMessageCounter " to IP address '%s'",
+                        preparedMessage.GetMessageCounter(), addressStr);
+#endif
     }
     break;
     default:
@@ -322,6 +359,60 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
+    if (sessionHandle->GetSessionType() == Transport::Session::SessionType::kGroupOutgoing)
+    {
+        chip::Inet::InterfaceIterator interfaceIt;
+        chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
+        chip::Inet::IPAddress addr;
+        bool interfaceFound = false;
+
+        while (interfaceIt.Next())
+        {
+            char name[chip::Inet::InterfaceId::kMaxIfNameLength];
+            interfaceIt.GetInterfaceName(name, chip::Inet::InterfaceId::kMaxIfNameLength);
+            if (interfaceIt.SupportsMulticast() && interfaceIt.IsUp())
+            {
+                interfaceId = interfaceIt.GetInterfaceId();
+                if (CHIP_NO_ERROR == interfaceId.GetLinkLocalAddr(&addr))
+                {
+                    ChipLogDetail(Inet, "Interface %s has a link local address", name);
+
+                    interfaceFound             = true;
+                    PacketBufferHandle tempBuf = msgBuf.CloneData();
+                    VerifyOrReturnError(!tempBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(!tempBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+                    destination = &(multicastAddress.SetInterface(interfaceId));
+                    if (mTransportMgr != nullptr)
+                    {
+                        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &tempBuf);
+                        if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(tempBuf)))
+                        {
+                            ChipLogError(Inet, "Failed to send Multicast message on interface %s", name);
+                        }
+                        else
+                        {
+                            ChipLogDetail(Inet, "Successfully send Multicast message on interface %s", name);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!interfaceFound)
+        {
+            ChipLogError(Inet, "No valid Interface found.. Sending to the default one.. ");
+        }
+        else
+        {
+            // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
+            return CHIP_NO_ERROR;
+        }
+    }
+
+#endif // CHIP_SYSTEM_CONFIG_MULTICAST_HOMING
 
     if (mTransportMgr != nullptr)
     {
@@ -333,32 +424,38 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
+void SessionManager::ExpireAllSessions(const ScopedNodeId & node)
 {
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetPeer() == node)
-        {
-            session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
+    ChipLogDetail(Inet, "Expiring all sessions for node " ChipLogFormatScopedNodeId "!!", ChipLogValueScopedNodeId(node));
+
+    ForEachMatchingSession(node, [](auto * session) { session->MarkForEviction(); });
 }
 
-void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
+void SessionManager::ExpireAllSessionsForFabric(FabricIndex fabricIndex)
 {
-    ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetFabricIndex() == fabric)
-        {
-            session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
+    ChipLogDetail(Inet, "Expiring all sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
+
+    ForEachMatchingSession(fabricIndex, [](auto * session) { session->MarkForEviction(); });
 }
 
-void SessionManager::ExpireAllPASEPairings()
+CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(const ScopedNodeId & node)
 {
-    ChipLogDetail(Inet, "Expiring all PASE pairings");
+    ChipLogDetail(Inet, "Expiring all sessions to peer " ChipLogFormatScopedNodeId " that are on the same logical fabric!!",
+                  ChipLogValueScopedNodeId(node));
+
+    return ForEachMatchingSessionOnLogicalFabric(node, [](auto * session) { session->MarkForEviction(); });
+}
+
+CHIP_ERROR SessionManager::ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex)
+{
+    ChipLogDetail(Inet, "Expiring all sessions on the same logical fabric as fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
+
+    return ForEachMatchingSessionOnLogicalFabric(fabricIndex, [](auto * session) { session->MarkForEviction(); });
+}
+
+void SessionManager::ExpireAllPASESessions()
+{
+    ChipLogDetail(Inet, "Expiring all PASE sessions");
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
@@ -368,9 +465,35 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
+void SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type)
+{
+    mSecureSessions.ForEachSession([&node, &type](auto session) {
+        if (session->IsActiveSession() && session->GetPeer() == node &&
+            (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
+        {
+            session->MarkAsDefunct();
+        }
+        return Loop::Continue;
+    });
+}
+
+void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
+{
+    mSecureSessions.ForEachSession([&node, &addr](auto session) {
+        // Arguably we should only be updating active and defunct sessions, but there is no harm
+        // in updating evicted sessions.
+        if (session->GetPeer() == node && Transport::SecureSession::Type::kCASE == session->GetSecureSessionType())
+        {
+            session->SetPeerAddress(addr);
+        }
+        return Loop::Continue;
+    });
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
+    VerifyOrReturnValue(mState == State::kInitialized, NullOptional);
     return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }
 
@@ -386,7 +509,7 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
 
-    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
@@ -407,7 +530,7 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
 
-    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
@@ -421,7 +544,12 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     if (packetHeader.IsEncrypted())
     {

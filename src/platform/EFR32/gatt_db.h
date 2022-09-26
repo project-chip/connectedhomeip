@@ -31,13 +31,16 @@ extern "C" {
 
 extern const sli_bt_gattdb_t gattdb;
 
+#define gattdb_generic_attribute 1
 #define gattdb_service_changed_char 3
 #define gattdb_database_hash 6
 #define gattdb_client_support_features 8
 #define gattdb_device_name 11
 #define gattdb_CHIPoBLEChar_Rx 23
 #define gattdb_CHIPoBLEChar_Tx 25
-#define gattdb_ota_control 29
+#define gattdb_CHIPoBLEChar_C3 28
+#define gattdb_ota 29
+#define gattdb_ota_control 31
 
 #if __cplusplus
 }

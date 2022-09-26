@@ -26,12 +26,14 @@ static_library("helpers") {
   sources = [
     "AppTestContext.cpp",
     "AppTestContext.h",
+    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   deps = [
     "${chip_root}/src/access",
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
@@ -69,6 +71,7 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
@@ -95,6 +98,12 @@ chip_test_suite("tests") {
     "TestWriteInteraction.cpp",
   ]
 
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
+
+  test_sources += [ "TestAclAttribute.cpp" ]
+
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.
@@ -114,6 +123,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
 

@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:CHIPTool/CHIPTool.xcodeproj">
+      location = "group:Framework/Matter.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Framework/CHIP.xcodeproj">
+      location = "group:CHIPTool/CHIPTool.xcodeproj">
    </FileRef>
 </Workspace>

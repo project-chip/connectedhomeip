@@ -39,6 +39,7 @@ class App:
         self.lastLogIndex = 0
         self.kvsPathSet = {'/tmp/chip_kvs'}
         self.options = None
+        self.killed = False
 
     def start(self, options=None):
         if not self.process:
@@ -85,9 +86,13 @@ class App:
     def kill(self):
         if self.process:
             self.process.kill()
+        self.killed = True
 
     def wait(self, timeout=None):
         while True:
+            # If the App was never started, AND was killed, exit immediately
+            if self.killed:
+                return 0
             # If the App was never started, wait cannot be called on the process
             if self.process == None:
                 time.sleep(0.1)
@@ -207,8 +212,9 @@ class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
+    is_manual: bool
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -263,13 +269,20 @@ class TestDefinition:
             app = apps_register.get('default')
             app.start()
             pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
-            runner.RunSubprocess(pairing_cmd,
-                                 name='PAIR', dependencies=[apps_register])
-
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
-            runner.RunSubprocess(
-                test_cmd,
-                name='TEST', dependencies=[apps_register])
+
+            if dry_run:
+                logging.info(" ".join(pairing_cmd))
+                logging.info(" ".join(test_cmd))
+
+            else:
+                runner.RunSubprocess(pairing_cmd,
+                                     name='PAIR', dependencies=[apps_register])
+
+                runner.RunSubprocess(
+                    test_cmd,
+                    name='TEST', dependencies=[apps_register],
+                    timeout_seconds=timeout_seconds)
 
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

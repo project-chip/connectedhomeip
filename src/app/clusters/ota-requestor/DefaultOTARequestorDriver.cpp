@@ -98,7 +98,7 @@ bool DefaultOTARequestorDriver::CanConsent()
 
 uint16_t DefaultOTARequestorDriver::GetMaxDownloadBlockSize()
 {
-    return 1024;
+    return maxDownloadBlockSize;
 }
 
 void DefaultOTARequestorDriver::SetMaxDownloadBlockSize(uint16_t blockSize)
@@ -386,6 +386,13 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
+}
+
+void DefaultOTARequestorDriver::RekickPeriodicQueryTimer(void)
+{
+    ChipLogProgress(SoftwareUpdate, "Rekicking the Periodic Query timer");
+    StopPeriodicQueryTimer();
+    StartPeriodicQueryTimer();
 }
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)

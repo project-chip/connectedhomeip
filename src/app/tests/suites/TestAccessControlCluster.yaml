@@ -177,7 +177,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Verify"
       command: "readAttribute"
@@ -214,7 +214,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Verify"
       command: "readAttribute"
@@ -251,7 +251,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Verify"
       command: "readAttribute"
@@ -289,7 +289,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Verify"
       command: "readAttribute"
@@ -348,7 +348,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: FAILURE
 
     - label: "Verify"
       command: "readAttribute"
@@ -407,7 +407,7 @@ tests:
                   },
               ]
       response:
-          error: 1
+          error: FAILURE
 
     - label: "Verify"
       command: "readAttribute"

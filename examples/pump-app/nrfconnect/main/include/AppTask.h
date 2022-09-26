@@ -61,7 +61,6 @@ private:
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
     static void StartActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 

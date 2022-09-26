@@ -51,7 +51,7 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
 
     switch (aPath.mAttributeId)
     {
-    case ActiveBatteryFaults::Id:
+    case ActiveBatFaults::Id:
         // TODO: Needs implementation.
         err = aEncoder.EncodeEmptyList();
         break;

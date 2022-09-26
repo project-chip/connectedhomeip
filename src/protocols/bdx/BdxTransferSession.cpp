@@ -881,7 +881,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     mPendingMsgHandle = bbuf.Finalize();
     if (mPendingMsgHandle.IsNull())
     {
-        ChipLogError(BDX, "%s: error preparing message: %s", __FUNCTION__, ErrorStr(CHIP_ERROR_NO_MEMORY));
+        ChipLogError(BDX, "%s: error preparing message: %" CHIP_ERROR_FORMAT, __FUNCTION__, CHIP_ERROR_NO_MEMORY.Format());
         mPendingOutput = OutputEventType::kInternalError;
     }
     else

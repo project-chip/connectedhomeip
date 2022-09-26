@@ -17,6 +17,7 @@
  */
 
 #include "PICSBooleanExpressionParser.h"
+#include "PICSNormalizer.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -149,6 +150,8 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         bool expr = EvaluateSubExpression(tokens, PICS, index);
         return !expr;
     }
+
+    token = PICSNormalizer::Normalize(token);
 
     index++;
 

@@ -80,25 +80,21 @@ public:
 
     /**
      * Update the Last Known Good Time to the later of the current value and
-     * the passed value and persist to storage.  If the value is changed, also
-     * store the current value for fail-safe recovery.
-     *
-     * We can only support storage of a single fail-safe recovery value, so
-     * for nodes and fabric additions where fail-safe recovery is required, this
-     * should only be called from within a fail-safe context.
+     * the passed value and store in RAM.  This does not persist the value.
+     * Persist only happens if CommitPendingLastKnownGoodChipEpochTime is
+     * called.
      *
      * @param lastKnownGoodChipEpochTime Last Known Good Time in seconds since CHIP epoch
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
-    CHIP_ERROR UpdateLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
+    CHIP_ERROR UpdatePendingLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
 
     /*
-     * Commit the Last Known Good Time by deleting the fail-safe backup from
-     * storage.
+     * Commit the pending Last Known Good Time in RAM to storage.
      *
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
-    CHIP_ERROR CommitLastKnownGoodChipEpochTime();
+    CHIP_ERROR CommitPendingLastKnownGoodChipEpochTime();
 
     /*
      * Revert the Last Known Good Time to the fail-safe backup value in
@@ -106,7 +102,7 @@ public:
      *
      * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
      */
-    CHIP_ERROR RevertLastKnownGoodChipEpochTime();
+    CHIP_ERROR RevertPendingLastKnownGoodChipEpochTime();
 
 private:
     static constexpr size_t LastKnownGoodTimeTLVMaxSize()
@@ -125,18 +121,6 @@ private:
     void LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime);
 
     /**
-     * Load the Last Known Good Time from storage and, optionally, a fail-safe
-     * value to fall back to if any exists.
-     *
-     * @param lastKnownGoodChipEpochTime (out) Last Known Good Time as seconds from CHIP epoch
-     * @param failSafeBackup (out) an optional Fail Safe context last known good time value to fall back to, also in seconds from
-     * CHIP epoch from CHIP epoch
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime,
-                                              Optional<System::Clock::Seconds32> & failSafeBackup) const;
-
-    /**
      * Load the Last Known Good Time from storage.
      *
      * @param lastKnownGoodChipEpochTime (out) Last Known Good Time as seconds from CHIP epoch
@@ -145,19 +129,7 @@ private:
     CHIP_ERROR LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const;
 
     /**
-     * Store the Last Known Good Time to storage, and optionally, a fail-safe
-     * value to fall back to if the fail safe timer expires.
-     *
-     * @param lastKnownGoodChipEpochTime Last Known Good Time as seconds from CHIP epoch
-     * @param failSafeBackup fail safe backup of the previous Last Known Good Time
-     * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR
-     */
-    CHIP_ERROR StoreLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime,
-                                               const Optional<System::Clock::Seconds32> & failSafeBackup) const;
-
-    /**
-     * Store the Last Known Good Time to storage.  This overload also clears
-     * the fail safe Last Known Good Time from storage.
+     * Store the Last Known Good Time to storage.
      *
      * @param lastKnownGoodChipEpochTime Last Known Good Time as seconds from CHIP epoch
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP_ERROR

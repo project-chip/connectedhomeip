@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -36,12 +37,15 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return DiscoverCommissionersStatus; }
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
-    CHIP_ERROR InitStatus              = CHIP_NO_ERROR;
-    CHIP_ERROR ResolveNodeIdStatus     = CHIP_NO_ERROR;
-    CHIP_ERROR FindCommissionersStatus = CHIP_NO_ERROR;
+    CHIP_ERROR InitStatus                  = CHIP_NO_ERROR;
+    CHIP_ERROR ResolveNodeIdStatus         = CHIP_NO_ERROR;
+    CHIP_ERROR DiscoverCommissionersStatus = CHIP_NO_ERROR;
 };
 
 } // namespace
@@ -56,7 +60,7 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData inNodeData;
-    strncpy(inNodeData.resolutionData.hostName, "mockHostName", sizeof(inNodeData.resolutionData.hostName));
+    Platform::CopyString(inNodeData.resolutionData.hostName, "mockHostName");
     Inet::IPAddress::FromString("192.168.1.10", inNodeData.resolutionData.ipAddress[0]);
     inNodeData.resolutionData.numIPs++;
     inNodeData.resolutionData.port = 5540;
@@ -94,12 +98,11 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData invalidNodeData, validNodeData;
-    // strncpy(inNodeData1.hostName, "mockHostName1", sizeof inNodeData1.hostName);
     Inet::IPAddress::FromString("192.168.1.10", invalidNodeData.resolutionData.ipAddress[0]);
     invalidNodeData.resolutionData.numIPs++;
     invalidNodeData.resolutionData.port = 5540;
 
-    strncpy(validNodeData.resolutionData.hostName, "mockHostName2", sizeof validNodeData.resolutionData.hostName);
+    Platform::CopyString(validNodeData.resolutionData.hostName, "mockHostName2");
     Inet::IPAddress::FromString("192.168.1.11", validNodeData.resolutionData.ipAddress[0]);
     validNodeData.resolutionData.numIPs++;
     validNodeData.resolutionData.port = 5540;
@@ -156,10 +159,10 @@ void TestDiscoverCommissioners_InitError_ReturnsError(nlTestSuite * inSuite, voi
     NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
 }
 
-void TestDiscoverCommissioners_FindCommissionersError_ReturnsError(nlTestSuite * inSuite, void * inContext)
+void TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError(nlTestSuite * inSuite, void * inContext)
 {
     MockResolver resolver;
-    resolver.FindCommissionersStatus = CHIP_ERROR_INTERNAL;
+    resolver.DiscoverCommissionersStatus = CHIP_ERROR_INTERNAL;
     CommissionableNodeController controller(&resolver);
     NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
 }
@@ -176,7 +179,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCase", TestDiscoverCommissioners_HappyCase),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter", TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter),
     NL_TEST_DEF("TestDiscoverCommissioners_InitError_ReturnsError", TestDiscoverCommissioners_InitError_ReturnsError),
-    NL_TEST_DEF("TestDiscoverCommissioners_FindCommissionersError_ReturnsError", TestDiscoverCommissioners_FindCommissionersError_ReturnsError),
+    NL_TEST_DEF("TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError", TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError),
     NL_TEST_SENTINEL()
 };
 // clang-format on

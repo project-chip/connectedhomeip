@@ -11,18 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 """The chef package."""
 
 import setuptools  # type: ignore
 
-setuptools.setup(
-    name='chef',
-    version='0.0.1',
-    author='Project CHIP Authors',
-    description='Build custom sample apps for supported platforms',
-    packages=setuptools.find_packages(),
-    package_data={'chef': ['py.typed']},
-    zip_safe=False,
-)
+setuptools.setup()  # Package definition in setup.cfg

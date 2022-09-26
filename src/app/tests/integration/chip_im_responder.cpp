@@ -122,6 +122,11 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_NO_ERROR;
 }
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
     // Note: This test does not make use of the real attribute metadata.
@@ -186,9 +191,6 @@ int main(int argc, char * argv[])
     const chip::FabricIndex gFabricIndex = 0;
 
     InitializeChip();
-
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6));

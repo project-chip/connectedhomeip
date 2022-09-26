@@ -19,12 +19,10 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-ConfigurationManager & ConfigurationMgr()
+ConfigurationManager & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::GetDefaultInstance();
 }
-
-void SetConfigurationMgr(ConfigurationManager * configurationManager) {}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -17,22 +17,30 @@
  */
 
 #pragma once
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
 #include <string>
 
+#include "../provider/OTAProviderDelegate.h"
+
 #pragma once
 
 constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityBeta[] = "beta";
 constexpr const char kIdentityGamma[] = "gamma";
 
-class CHIPCommandBridge : public Command
-{
+class CHIPCommandBridge : public Command {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
+    CHIPCommandBridge(const char * commandName)
+        : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
+            "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
+            "directory.");
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -47,6 +55,8 @@ public:
         mCommandExitStatus = status;
         StopWaiting();
     }
+
+    static OTAProviderDelegate * mOTADelegate;
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -67,9 +77,9 @@ protected:
     void SetIdentity(const char * identity);
 
     // This method returns the commissioner instance to be used for running the command.
-    CHIPDeviceController * CurrentCommissioner();
+    MTRDeviceController * CurrentCommissioner();
 
-    CHIPDeviceController * GetCommissioner(const char * identity);
+    MTRDeviceController * GetCommissioner(const char * identity);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -91,10 +101,14 @@ protected:
 
     static std::set<CHIPCommandBridge *> sDeferredCleanups;
 
+    void StopCommissioners();
+
+    void RestartCommissioners();
+
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                      const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner();
+    CHIP_ERROR InitializeCommissioner(
+        std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);
+    void ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
@@ -103,16 +117,20 @@ private:
     void StopWaiting();
 
     CHIP_ERROR MaybeSetUpStack();
-    CHIP_ERROR MaybeTearDownStack();
+    void MaybeTearDownStack();
+
+    CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
 
     // Our three controllers: alpha, beta, gamma.
-    static std::map<std::string, CHIPDeviceController *> mControllers;
+    static std::map<std::string, MTRDeviceController *> mControllers;
 
     // The current controller; the one the current command should be using.
-    CHIPDeviceController * mCurrentController;
+    MTRDeviceController * mCurrentController;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
-    bool mWaitingForResponse{ true };
+    bool mWaitingForResponse { true };
+    static dispatch_queue_t mOTAProviderCallbackQueue;
+    chip::Optional<char *> mPaaTrustStorePath;
 };

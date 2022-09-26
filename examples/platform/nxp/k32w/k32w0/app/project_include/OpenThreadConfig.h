@@ -96,6 +96,8 @@
 
 #undef OPENTHREAD_CONFIG_PLATFORM_CSL_UNCERT
 
+#define UART_USE_SERIAL_MGR 1
+
 //#define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
 
 // Use the NXP-supplied default platform configuration for remainder

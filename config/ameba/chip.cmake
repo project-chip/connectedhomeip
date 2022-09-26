@@ -104,6 +104,13 @@ string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
+string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = false\n")
+
+# Enable persistent storage audit
+if (matter_enable_persistentstorage_audit)
+string(APPEND CHIP_GN_ARGS "chip_support_enable_storage_api_audit = true\n")
+endif (matter_enable_persistentstorage_audit)
+#endif
 
 # Build RPC
 if (matter_enable_rpc)
@@ -117,18 +124,24 @@ string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomei
 string(APPEND CHIP_GN_ARGS "pw_rpc_CONFIG = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
 endif (matter_enable_rpc)
 
+# Build Matter Shell
+if (matter_enable_shell)
+string(APPEND CHIP_GN_ARGS "chip_build_libshell = true\n")
+endif (matter_enable_shell)
+
 # Build ota-requestor
 if (matter_enable_ota_requestor)
 string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
 endif (matter_enable_ota_requestor)
 
+# Rotating ID
 if (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = true\n")
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = true\n")
-else(matter_enable_rotating_id)
+else (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = false\n")
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = false\n")
-endif(matter_enable_rotating_id)
+endif (matter_enable_rotating_id)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 

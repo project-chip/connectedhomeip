@@ -82,6 +82,7 @@ assert(!(use_rs911x && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
+  enable_openthread_cli = false
 }
 
 chip_data_model("chef-common") {
@@ -91,8 +92,9 @@ chip_data_model("chef-common") {
   is_server = true
 }
 
-# BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+# ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
+if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
+    silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
   show_qr_code = false
   disable_lcd = true
 }
@@ -133,7 +135,7 @@ efr32_sdk("sdk") {
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
+    "BOARD_ID=${silabs_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
@@ -179,7 +181,7 @@ efr32_executable("chef_app") {
   defines = []
 
   sources = [
-    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
@@ -190,7 +192,12 @@ efr32_executable("chef_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+  if (use_wstk_leds) {
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
@@ -205,21 +212,10 @@ efr32_executable("chef_app") {
   # OpenThread Settings
   if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-    if (chip_openthread_ftd) {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
   }
 
   if (chip_enable_ota_requestor) {
@@ -257,7 +253,11 @@ efr32_executable("chef_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+    sources += [
+      "${examples_plat_dir}/display/demo-ui.c",
+      "${examples_plat_dir}/display/lcd.cpp",
+    ]
+    include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
@@ -315,7 +315,7 @@ efr32_executable("chef_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
@@ -334,6 +334,11 @@ efr32_executable("chef_app") {
       "-Wl,--defsym",
       "-Wl,SILABS_WIFI=1",
     ]
+  }
+
+  # Attestation Credentials
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
   }
 
   output_dir = root_out_dir

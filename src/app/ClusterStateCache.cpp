@@ -128,6 +128,7 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
             return CHIP_NO_ERROR;
         }
         System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(handle), false);

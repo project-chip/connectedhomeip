@@ -14,6 +14,9 @@
 
 name: 36.2.1. [TC-PRS-2.1] Attributes with server as DUT
 
+PICS:
+    - PRS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pressure Measurement"
@@ -34,7 +37,7 @@ tests:
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -44,7 +47,7 @@ tests:
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -54,7 +57,7 @@ tests:
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -64,7 +67,7 @@ tests:
       attribute: "Tolerance"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 2048
 
@@ -74,7 +77,7 @@ tests:
       attribute: "ScaledValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -84,7 +87,7 @@ tests:
       attribute: "MinScaledValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -94,7 +97,7 @@ tests:
       attribute: "MaxScaledValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -32768
               maxValue: 32767
 
@@ -104,7 +107,7 @@ tests:
       attribute: "ScaledTolerance"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 2048
 
@@ -114,6 +117,6 @@ tests:
       attribute: "Scale"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: -127
               maxValue: 127

@@ -74,15 +74,12 @@ bool PayloadContents::isValidQRCodePayload() const
 
     chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
                                               RendezvousInformationFlag::kSoftAP);
-    if (!rendezvousInformation.HasOnly(allvalid))
+    if (!rendezvousInformation.HasValue() || !rendezvousInformation.Value().HasOnly(allvalid))
     {
         return false;
     }
 
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
 
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
@@ -94,21 +91,28 @@ bool PayloadContents::isValidQRCodePayload() const
 
 bool PayloadContents::isValidManualCode() const
 {
-    // The discriminator for manual setup code is 4 most significant bits
-    // in a regular 12 bit discriminator. Let's make sure that the provided
-    // discriminator fits within 12 bits (kPayloadDiscriminatorFieldLengthInBits).
-    // The manual setup code generator will only use 4 most significant bits from
-    // it.
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
+
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;
     }
 
     return CheckPayloadCommonConstraints();
+}
+
+bool PayloadContents::IsValidSetupPIN(uint32_t setupPIN)
+{
+    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal), excluding the invalid Passcode
+    // values.
+    if (setupPIN == kSetupPINCodeUndefinedValue || setupPIN > kSetupPINCodeMaximumValue || setupPIN == 11111111 ||
+        setupPIN == 22222222 || setupPIN == 33333333 || setupPIN == 44444444 || setupPIN == 55555555 || setupPIN == 66666666 ||
+        setupPIN == 77777777 || setupPIN == 88888888 || setupPIN == 12345678 || setupPIN == 87654321)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool PayloadContents::CheckPayloadCommonConstraints() const
@@ -119,11 +123,7 @@ bool PayloadContents::CheckPayloadCommonConstraints() const
         return false;
     }
 
-    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal), excluding the invalid Passcode
-    // values.
-    if (setUpPINCode < 0x0000001 || setUpPINCode > 0x5F5E0FE || setUpPINCode == 11111111 || setUpPINCode == 22222222 ||
-        setUpPINCode == 33333333 || setUpPINCode == 44444444 || setUpPINCode == 55555555 || setUpPINCode == 66666666 ||
-        setUpPINCode == 77777777 || setUpPINCode == 88888888 || setUpPINCode == 12345678 || setUpPINCode == 87654321)
+    if (!IsValidSetupPIN(setUpPINCode))
     {
         return false;
     }

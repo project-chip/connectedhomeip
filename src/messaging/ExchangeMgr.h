@@ -81,24 +81,24 @@ public:
      *     there are no active ExchangeContext objects. Furthermore, it is the
      *     onus of the application to de-allocate the ExchangeManager
      *     object after calling ExchangeManager::Shutdown().
-     *
-     *  @return #CHIP_NO_ERROR unconditionally.
      */
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /**
      *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.
      *
-     *  @param[in]    session    The identifier of the secure session (possibly
-     *                           the empty session for a non-secure exchange)
-     *                           for which the ExchangeContext is being set up.
+     *  @param[in]    session       The identifier of the secure session (possibly
+     *                              the empty session for a non-secure exchange)
+     *                              for which the ExchangeContext is being set up.
      *
-     *  @param[in]    delegate   A pointer to ExchangeDelegate.
+     *  @param[in]    delegate      A pointer to ExchangeDelegate.
+     *  @param[in]    isInitiator   Set to true if the exchange is created on the initiator. This is generally true
+     *                              except in unit tests.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const SessionHandle & session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(const SessionHandle & session, ExchangeDelegate * delegate, bool isInitiator = true);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -228,7 +228,7 @@ private:
 
     FabricIndex mFabricIndex = 0;
 
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+    ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
     SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;

@@ -1,0 +1,412 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 111.2.2. [TC-DRLK-2.2] Verification for Door lock command[DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new user"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: 1
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Verify created PIN credential"
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "credentialExists"
+                value: true
+              - name: "userIndex"
+                value: 1
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: null
+
+    - label:
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT"
+      PICS: DRLK.S.A0033
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: false
+
+    - label:
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+      PICS: "!DRLK.S.A0033"
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: false
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: false
+
+    - label: "TH sends Lock Door Command to the DUT without PINCode"
+      PICS: DRLK.S.C00.Rsp
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      response:
+          error: 0x00
+
+    - label: "TH sends Lock Door Command to the DUT with valid PINCode"
+      PICS: DRLK.S.C00.Rsp
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label:
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT"
+      PICS: DRLK.S.A0033
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: true
+
+    - label:
+          "TH writes the RequirePINforRemoteOperation attribute value as False
+          on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
+      PICS: "!DRLK.S.A0033"
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: true
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: true
+
+    - label: "TH sends Lock Door Command to the DUT with valid PINCode"
+      PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "TH sends Lock Door Command to the DUT without valid PINCode"
+      PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "645321"
+      response:
+          error: FAILURE
+
+    - label:
+          "TH sends Lock Door Command to the DUT without any argument PINCode"
+      PICS: DRLK.S.C00.Rsp && DRLK.S.A0033
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      response:
+          error: FAILURE
+
+    - label: "TH reads the WrongCodeEntryLimit attribute from the DUT"
+      PICS: DRLK.S.A0030
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      constraints:
+          minValue: 1
+          maxValue: 255
+
+    #currently for loop is not implemented in yaml framework so converted this step as user prompt
+    - label:
+          "TH sends an Unlock Door Command from the DUT with invalid PINCode.
+          Repeat this step PIXIT.DRLK.WrongCodeEntryLimit times and Verify that
+          DUT sends failure response to the TH"
+      verification: |
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 1234568
+
+          Verify " DUT sends failure response" on the TH(Chip-tool) Log:
+
+          [1659013993.892445][25432:25437] CHIP:DMG:                              CommandPathIB =
+          [1659013993.892496][25432:25437] CHIP:DMG:                              {
+          [1659013993.892546][25432:25437] CHIP:DMG:                                      EndpointId = 0x1,
+          [1659013993.892597][25432:25437] CHIP:DMG:                                      ClusterId = 0x101,
+          [1659013993.892647][25432:25437] CHIP:DMG:                                      CommandId = 0x1,
+          [1659013993.892694][25432:25437] CHIP:DMG:                              },
+          [1659013993.892747][25432:25437] CHIP:DMG:
+          [1659013993.892791][25432:25437] CHIP:DMG:                              StatusIB =
+          [1659013993.892840][25432:25437] CHIP:DMG:                              {
+          [1659013993.892890][25432:25437] CHIP:DMG:                                      status = 0x01 (FAILURE),
+          [1659013993.892938][25432:25437] CHIP:DMG:                              },
+          [1659013993.892987][25432:25437] CHIP:DMG:
+          [1659013993.893029][25432:25437] CHIP:DMG:                      },
+          [1659013993.893076][25432:25437] CHIP:DMG:
+          [1659013993.893105][25432:25437] CHIP:DMG:              },
+          [1659013993.893147][25432:25437] CHIP:DMG:
+          [1659013993.893173][25432:25437] CHIP:DMG:      ],
+          [1659013993.893203][25432:25437] CHIP:DMG:
+          [1659013993.893227][25432:25437] CHIP:DMG:      InteractionModelRevision = 1
+          [1659013993.893251][25432:25437] CHIP:DMG: },
+          [1659013993.893310][25432:25437] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x1
+          [1659013993.893344][25432:25437] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.A0030
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH sends an Unlock Door Command from User1 to the DUT with the valid
+          PINCode and verify the DUT response"
+      verification: |
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+
+          Verify " DUT sends failure response" on the TH(Chip-tool) Log:
+
+          [1659517923.875822][33902:33907] CHIP:DMG:                              StatusIB =
+          [1659517923.875858][33902:33907] CHIP:DMG:                              {
+          [1659517923.875894][33902:33907] CHIP:DMG:                                      status = 0x01 (FAILURE),
+          [1659517923.876008][33902:33907] CHIP:DMG:                              },
+          [1659517923.876048][33902:33907] CHIP:DMG:
+          [1659517923.876079][33902:33907] CHIP:DMG:                      },
+          [1659517923.876116][33902:33907] CHIP:DMG:
+          [1659517923.876145][33902:33907] CHIP:DMG:              },
+          [1659517923.876178][33902:33907] CHIP:DMG:
+          [1659517923.876233][33902:33907] CHIP:DMG:      ],
+          [1659517923.876266][33902:33907] CHIP:DMG:
+          [1659517923.876290][33902:33907] CHIP:DMG:      InteractionModelRevision = 1
+          [1659517923.876395][33902:33907] CHIP:DMG: },
+          [1659517923.876460][33902:33907] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x1
+          [1659517923.876495][33902:33907] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.A0030
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Wait for PIXIT.DRLK.UserCodeTemporaryDisableTime.TH then sends an
+          Unlock Door Command from User1 to the DUT with the valid PINCode."
+      verification: |
+          ./chip-tool doorlock read user-code-temporary-disable-time 1 1
+
+          Verify "UserCodeTemporaryDisable" on the TH(Chip-tool) Log:
+
+          [1661767967.006958][131055:131060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 683420143
+          [1661767967.006988][131055:131060] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
+
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+
+          Verify " DUT sends success response" on the TH(Chip-tool) Log:
+
+          [1659517972.769737][33910:33915] CHIP:DMG:
+          [1659517972.769774][33910:33915] CHIP:DMG:                              StatusIB =
+          [1659517972.769815][33910:33915] CHIP:DMG:                              {
+          [1659517972.769856][33910:33915] CHIP:DMG:                                      status = 0x00 (SUCCESS),
+          [1659517972.769899][33910:33915] CHIP:DMG:                              },
+          [1659517972.769939][33910:33915] CHIP:DMG:
+          [1659517972.769974][33910:33915] CHIP:DMG:                      },
+          [1659517972.770015][33910:33915] CHIP:DMG:
+          [1659517972.770045][33910:33915] CHIP:DMG:              },
+          [1659517972.770080][33910:33915] CHIP:DMG:
+          [1659517972.770109][33910:33915] CHIP:DMG:      ],
+          [1659517972.770144][33910:33915] CHIP:DMG:
+          [1659517972.770172][33910:33915] CHIP:DMG:      InteractionModelRevision = 1
+          [1659517972.770200][33910:33915] CHIP:DMG: },
+          [1659517972.770267][33910:33915] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DRLK.S.A0030
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH writes WrongCodeEntryLimit attribute value as between 1 and 255 on
+          the DUT and Verify that the DUT sends Success response"
+      PICS: DRLK.S.A0030
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 3
+
+    - label:
+          "TH writes WrongCodeEntryLimit attribute value as between 1 and 255 on
+          the DUT and verify DUT responds with UNSUPPORTED_WRITE"
+      PICS: "!DRLK.S.A0030"
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 3
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH reads the UserCodeTemporaryDisableTime attribute from the DUT"
+      PICS: DRLK.S.A0031
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      constraints:
+          minValue: 1
+          maxValue: 255
+
+    - label:
+          "TH writes UserCodeTemporaryDisableTime attribute value as between 1
+          and 255 on the DUT and Verify that the DUT sends Success response"
+      PICS: DRLK.S.A0031
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 15
+
+    - label:
+          "TH writes UserCodeTemporaryDisableTime attribute value as between 1
+          and 255 on the DUT and verify DUT responds with UNSUPPORTED_WRITE"
+      PICS: "!DRLK.S.A0031"
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 15
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Clean the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+
+    - label: "Cleanup the created credential"
+      PICS: DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.6. [TC-CC-4.2] Saturation Move functionality with server as DUT
+name: 25.3.6. [TC-CC-4.2] Saturation Move functionality with server as DUT
+
+PICS:
+    - CC.S
 
 config:
     nodeId: 0x12344321
@@ -28,32 +31,47 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      cluster: "On/Off"
-      command: "on"
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
-    - label: "Check on/off attribute value is true after on command"
+    - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
+      command: "On"
 
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "TH sends MoveToSaturation command to DUT with Saturation=150 and
+          TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C03.Rsp
+      command: "MoveToSaturation"
+      arguments:
+          values:
+              - name: "Saturation"
+                value: 150
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Move saturation up command"
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and
+          Rate=5 (units/s)"
       command: "MoveSaturation"
-      PICS: CC.S.C04.Rsp
+      PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -65,69 +83,86 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 40ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 40
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+              minValue: 170
+              maxValue: 230
 
-    - label: "Wait 45ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 45
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
+              minValue: 216
               maxValue: 254
 
-    - label: "Wait 50ms"
+    - label: "Wait 5s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 50
+                value: 5000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
+              minValue: 216
               maxValue: 254
 
-    - label: "Move saturation down command"
-      PICS: CC.S.C04.Rsp
+    - label:
+          "TH sends MoveToSaturation command to DUT with Saturation=120 and
+          TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C03.Rsp
+      command: "MoveToSaturation"
+      arguments:
+          values:
+              - name: "Saturation"
+                value: 120
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveSaturation command to DUT with MoveMode=0x03 (down) and
+          Rate=5 (units/s)"
       command: "MoveSaturation"
+      PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -139,69 +174,86 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 40ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 40
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+              minValue: 59
+              maxValue: 81
 
-    - label: "Wait 45ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 45
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+              minValue: 17
+              maxValue: 23
 
-    - label: "Wait 50ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 50
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
               minValue: 0
-              maxValue: 254
+              maxValue: 10
 
-    - label: "Move saturation up command"
-      PICS: CC.S.C04.Rsp
+    - label:
+          "TH sends MoveToSaturation command to DUT with Saturation=150 and
+          TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C03.Rsp
+      command: "MoveToSaturation"
+      arguments:
+          values:
+              - name: "Saturation"
+                value: 150
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and
+          Rate=5 (units/s)"
       command: "MoveSaturation"
+      PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -213,69 +265,28 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 40ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 40
+                value: 10000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 45ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 45
+              minValue: 170
+              maxValue: 230
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 50ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Move saturation stop command"
+          "TH sends MoveSaturation command to DUT with MoveMode=0x00 (stop) and
+          Rate=5 (units/s)"
       command: "MoveSaturation"
-      PICS: CC.S.C04.Rsp
+      PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -287,215 +298,54 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 40ms"
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 170
+              maxValue: 230
+
+    - label: "Wait 2s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 40
+                value: 2000
 
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+              minValue: 170
+              maxValue: 230
 
-    - label: "Wait 45ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 45
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
       command: "readAttribute"
-      attribute: "CurrentSaturation"
+      attribute: "ColorMode"
       response:
+          value: 0
           constraints:
-              type: uint8
               minValue: 0
-              maxValue: 254
+              maxValue: 2
 
-    - label: "Wait 50ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
-      attribute: "CurrentSaturation"
+      attribute: "EnhancedColorMode"
       response:
+          value: 0
           constraints:
-              type: uint8
               minValue: 0
-              maxValue: 254
-
-    - label: "Move saturation down command"
-      PICS: CC.S.C04.Rsp
-      command: "MoveSaturation"
-      arguments:
-          values:
-              - name: "MoveMode"
-                value: 3
-              - name: "Rate"
-                value: 5
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 40ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 40
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 45ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 45
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 50ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Move saturation stop command"
-      PICS: CC.S.C04.Rsp
-      command: "MoveSaturation"
-      arguments:
-          values:
-              - name: "MoveMode"
-                value: 0
-              - name: "Rate"
-                value: 5
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Wait 40ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 40
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 45ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 45
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Wait 50ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50
-
-    - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
-      command: "readAttribute"
-      attribute: "CurrentSaturation"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "off"
 
@@ -503,5 +353,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

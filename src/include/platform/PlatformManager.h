@@ -186,7 +186,7 @@ public:
     void LockChipStack();
     bool TryLockChipStack();
     void UnlockChipStack();
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
@@ -399,12 +399,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  *   This DOES NOT stop the chip thread or event queue from running.
  *
  */
-inline CHIP_ERROR PlatformManager::Shutdown()
+inline void PlatformManager::Shutdown()
 {
-    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
-    if (err == CHIP_NO_ERROR)
-        mInitialized = false;
-    return err;
+    static_cast<ImplClass *>(this)->_Shutdown();
+    mInitialized = false;
 }
 
 inline void PlatformManager::LockChipStack()

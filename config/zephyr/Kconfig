@@ -104,12 +104,6 @@ config CHIP_BUILD_TESTS
 	help
 	  This option enables building CHIP unit tests.
 
-config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
-	bool "Disable CHIPoBLE advertising when device is fully provisioned"
-	default y
-	help
-	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
-
 config CHIP_ENABLE_PAIRING_AUTOSTART
 	bool "Enable pairing autostart"
 	default n
@@ -228,13 +222,6 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	  RTOS.
 
 endif
-
-config CHIP_FIRMWARE_BUILD_UNIX_TIME
-	bool "Make Unix time of compilation available in source code"
-	default y
-	help
-	  When enabled, the Unix time of the firmware build is exposed to the
-	  source code and used to initialize the last known UTC time.
 
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"

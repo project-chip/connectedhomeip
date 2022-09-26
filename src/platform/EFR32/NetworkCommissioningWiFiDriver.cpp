@@ -125,12 +125,21 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
+        int32_t status = wfx_sta_discon();
+        if (status != 0)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     // Set the wifi configuration
     wfx_wifi_provision_t wifiConfig = {};
     memcpy(wifiConfig.ssid, ssid, ssidLen);
     memcpy(wifiConfig.passkey, key, keyLen);
-    wifiConfig.security = WFX_SEC_WPA2;
+    wifiConfig.security = WFX_SEC_WPA_WPA2_MIXED;
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
     // Configure the WFX WiFi interface.

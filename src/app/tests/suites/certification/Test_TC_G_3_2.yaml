@@ -1,0 +1,385 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 125.3.2. [TC-G-3.2] Commands [DUT-Client]
+
+PICS:
+    - G.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "TH is commissioned with DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          Execute the following command in DUT to generate the pre-condition to execute this test case:
+
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 1,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1662658581.933002][231145:231145] CHIP:DMG: InvokeRequestMessage =
+          [1662658581.933006][231145:231145] CHIP:DMG: {
+          [1662658581.933009][231145:231145] CHIP:DMG:         suppressResponse = false,
+          [1662658581.933013][231145:231145] CHIP:DMG:         timedRequest = false,
+          [1662658581.933015][231145:231145] CHIP:DMG:         InvokeRequests =
+          [1662658581.933023][231145:231145] CHIP:DMG:         [
+          [1662658581.933026][231145:231145] CHIP:DMG:                 CommandDataIB =
+          [1662658581.933031][231145:231145] CHIP:DMG:                 {
+          [1662658581.933037][231145:231145] CHIP:DMG:                         CommandPathIB =
+          [1662658581.933042][231145:231145] CHIP:DMG:                         {
+          [1662658581.933046][231145:231145] CHIP:DMG:                                 EndpointId = 0x0,
+          [1662658581.933049][231145:231145] CHIP:DMG:                                 ClusterId = 0x3f,
+          [1662658581.933053][231145:231145] CHIP:DMG:                                 CommandId = 0x0,
+          [1662658581.933056][231145:231145] CHIP:DMG:                         },
+          [1662658581.933061][231145:231145] CHIP:DMG:
+          [1662658581.933064][231145:231145] CHIP:DMG:                         CommandFields =
+          [1662658581.933069][231145:231145] CHIP:DMG:                         {
+          [1662658581.933072][231145:231145] CHIP:DMG:                                 0x0 =
+          [1662658581.933077][231145:231145] CHIP:DMG:                                 {
+          [1662658581.933081][231145:231145] CHIP:DMG:                                         0x0 = 1,
+          [1662658581.933085][231145:231145] CHIP:DMG:                                         0x1 = 0,
+          [1662658581.933089][231145:231145] CHIP:DMG:                                         0x2 = [
+          [1662658581.933095][231145:231145] CHIP:DMG:                                                         0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1662658581.933100][231145:231145] CHIP:DMG:                                         ] (16 bytes)
+          [1662658581.933105][231145:231145] CHIP:DMG:                                         0x3 = 2220000,
+          [1662658581.933109][231145:231145] CHIP:DMG:                                         0x4 = [
+          [1662658581.933114][231145:231145] CHIP:DMG:                                                         0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1662658581.933118][231145:231145] CHIP:DMG:                                         ] (16 bytes)
+          [1662658581.933122][231145:231145] CHIP:DMG:                                         0x5 = 2220001,
+          [1662658581.933127][231145:231145] CHIP:DMG:                                         0x6 = [
+          [1662658581.933130][231145:231145] CHIP:DMG:                                                         0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
+          [1662658581.933134][231145:231145] CHIP:DMG:                                         ] (16 bytes)
+          [1662658581.933138][231145:231145] CHIP:DMG:                                         0x7 = 2220002,
+          [1662658581.933143][231145:231145] CHIP:DMG:                                 },
+          [1662658581.933147][231145:231145] CHIP:DMG:                         },
+          [1662658581.933150][231145:231145] CHIP:DMG:                 },
+          [1662658581.933156][231145:231145] CHIP:DMG:
+          [1662658581.933159][231145:231145] CHIP:DMG:         ],
+          [1662658581.933164][231145:231145] CHIP:DMG:
+          [1662658581.933167][231145:231145] CHIP:DMG:         InteractionModelRevision = 1
+          [1662658581.933169][231145:231145] CHIP:DMG: },
+          [1662658581.933187][231145:231145] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003F e=0 p=a
+          [1662658581.933195][231145:231145] CHIP:DMG: AccessControl: allowed
+
+          Before adding the Group 0x0002,0x0003 execute this command in DUT
+
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId":2, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 3, "groupKeySetID": 1,"fabricIndex": 1} ]" 1 0
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1662658902.326559][231145:231145] CHIP:DMG: WriteRequestMessage =
+          [1662658902.326562][231145:231145] CHIP:DMG: {
+          [1662658902.326565][231145:231145] CHIP:DMG:         suppressResponse = false,
+          [1662658902.326568][231145:231145] CHIP:DMG:         timedRequest = false,
+          [1662658902.326571][231145:231145] CHIP:DMG:         AttributeDataIBs =
+          [1662658902.326575][231145:231145] CHIP:DMG:         [
+          [1662658902.326578][231145:231145] CHIP:DMG:                 AttributeDataIB =
+          [1662658902.326582][231145:231145] CHIP:DMG:                 {
+          [1662658902.326584][231145:231145] CHIP:DMG:                         AttributePathIB =
+          [1662658902.326587][231145:231145] CHIP:DMG:                         {
+          [1662658902.326590][231145:231145] CHIP:DMG:                                 Endpoint = 0x0,
+          [1662658902.326592][231145:231145] CHIP:DMG:                                 Cluster = 0x3f,
+          [1662658902.326595][231145:231145] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1662658902.326597][231145:231145] CHIP:DMG:                         }
+          [1662658902.326600][231145:231145] CHIP:DMG:
+          [1662658902.326602][231145:231145] CHIP:DMG:                         Data = [
+          [1662658902.326604][231145:231145] CHIP:DMG:
+          [1662658902.326607][231145:231145] CHIP:DMG:                         ],
+          [1662658902.326609][231145:231145] CHIP:DMG:                 },
+          [1662658902.326615][231145:231145] CHIP:DMG:
+          [1662658902.326617][231145:231145] CHIP:DMG:                 AttributeDataIB =
+          [1662658902.326620][231145:231145] CHIP:DMG:                 {
+          [1662658902.326622][231145:231145] CHIP:DMG:                         AttributePathIB =
+          [1662658902.326625][231145:231145] CHIP:DMG:                         {
+          [1662658902.326628][231145:231145] CHIP:DMG:                                 Endpoint = 0x0,
+          [1662658902.326631][231145:231145] CHIP:DMG:                                 Cluster = 0x3f,
+          [1662658902.326634][231145:231145] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1662658902.326638][231145:231145] CHIP:DMG:                                 ListIndex = Null,
+          [1662658902.326641][231145:231145] CHIP:DMG:                         }
+          [1662658902.326645][231145:231145] CHIP:DMG:
+          [1662658902.326648][231145:231145] CHIP:DMG:                         Data =
+          [1662658902.326652][231145:231145] CHIP:DMG:                         {
+          [1662658902.326656][231145:231145] CHIP:DMG:                                 0x1 = 2,
+          [1662658902.326660][231145:231145] CHIP:DMG:                                 0x2 = 1,
+          [1662658902.326664][231145:231145] CHIP:DMG:                         },
+          [1662658902.326667][231145:231145] CHIP:DMG:                 },
+          [1662658902.326670][231145:231145] CHIP:DMG:
+          [1662658902.326674][231145:231145] CHIP:DMG:                 AttributeDataIB =
+          [1662658902.326677][231145:231145] CHIP:DMG:                 {
+          [1662658902.326680][231145:231145] CHIP:DMG:                         AttributePathIB =
+          [1662658902.326685][231145:231145] CHIP:DMG:                         {
+          [1662658902.326688][231145:231145] CHIP:DMG:                                 Endpoint = 0x0,
+          [1662658902.326691][231145:231145] CHIP:DMG:                                 Cluster = 0x3f,
+          [1662658902.326694][231145:231145] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1662658902.326697][231145:231145] CHIP:DMG:                                 ListIndex = Null,
+          [1662658902.326700][231145:231145] CHIP:DMG:                         }
+          [1662658902.326703][231145:231145] CHIP:DMG:
+          [1662658902.326706][231145:231145] CHIP:DMG:                         Data =
+          [1662658902.326709][231145:231145] CHIP:DMG:                         {
+          [1662658902.326712][231145:231145] CHIP:DMG:                                 0x1 = 3,
+          [1662658902.326715][231145:231145] CHIP:DMG:                                 0x2 = 1,
+          [1662658902.326719][231145:231145] CHIP:DMG:                         },
+          [1662658902.326721][231145:231145] CHIP:DMG:                 },
+          [1662658902.326726][231145:231145] CHIP:DMG:
+          [1662658902.326728][231145:231145] CHIP:DMG:         ],
+          [1662658902.326736][231145:231145] CHIP:DMG:
+          [1662658902.326739][231145:231145] CHIP:DMG:         moreChunkedMessages = false,
+          [1662658902.326742][231145:231145] CHIP:DMG:         InteractionModelRevision = 1
+          [1662658902.326745][231145:231145] CHIP:DMG: },
+          [1662658902.326768][231145:231145] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003F e=0 p=m
+          [1662658902.326776][231145:231145] CHIP:DMG: AccessControl: allowed
+
+
+          ./chip-tool groups add-group 0x0002 gp2 1 1
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1663135868.553238][326599:326599] CHIP:DMG: InvokeRequestMessage =
+          [1663135868.553242][326599:326599] CHIP:DMG: {
+          [1663135868.553245][326599:326599] CHIP:DMG:         suppressResponse = false,
+          [1663135868.553249][326599:326599] CHIP:DMG:         timedRequest = false,
+          [1663135868.553252][326599:326599] CHIP:DMG:         InvokeRequests =
+          [1663135868.553257][326599:326599] CHIP:DMG:         [
+          [1663135868.553261][326599:326599] CHIP:DMG:                 CommandDataIB =
+          [1663135868.553266][326599:326599] CHIP:DMG:                 {
+          [1663135868.553269][326599:326599] CHIP:DMG:                         CommandPathIB =
+          [1663135868.553273][326599:326599] CHIP:DMG:                         {
+          [1663135868.553276][326599:326599] CHIP:DMG:                                 EndpointId = 0x1,
+          [1663135868.553280][326599:326599] CHIP:DMG:                                 ClusterId = 0x4,
+          [1663135868.553284][326599:326599] CHIP:DMG:                                 CommandId = 0x0,
+          [1663135868.553287][326599:326599] CHIP:DMG:                         },
+          [1663135868.553291][326599:326599] CHIP:DMG:
+          [1663135868.553294][326599:326599] CHIP:DMG:                         CommandFields =
+          [1663135868.553298][326599:326599] CHIP:DMG:                         {
+          [1663135868.553303][326599:326599] CHIP:DMG:                                 0x0 = 2,
+          [1663135868.553307][326599:326599] CHIP:DMG:                                 0x1 = "gp2" (3 chars),
+          [1663135868.553311][326599:326599] CHIP:DMG:                         },
+          [1663135868.553313][326599:326599] CHIP:DMG:                 },
+          [1663135868.553318][326599:326599] CHIP:DMG:
+          [1663135868.553320][326599:326599] CHIP:DMG:         ],
+          [1663135868.553325][326599:326599] CHIP:DMG:
+          [1663135868.553328][326599:326599] CHIP:DMG:         InteractionModelRevision = 1
+          [1663135868.553331][326599:326599] CHIP:DMG: },
+          [1663135868.553347][326599:326599] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1663135868.553353][326599:326599] CHIP:DMG: AccessControl: allowed
+
+
+          ./chip-tool groups add-group 0x0003 gp3 1 1
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1663135947.996375][326599:326599] CHIP:DMG: InvokeRequestMessage =
+          [1663135947.996379][326599:326599] CHIP:DMG: {
+          [1663135947.996382][326599:326599] CHIP:DMG:         suppressResponse = false,
+          [1663135947.996385][326599:326599] CHIP:DMG:         timedRequest = false,
+          [1663135947.996388][326599:326599] CHIP:DMG:         InvokeRequests =
+          [1663135947.996394][326599:326599] CHIP:DMG:         [
+          [1663135947.996397][326599:326599] CHIP:DMG:                 CommandDataIB =
+          [1663135947.996400][326599:326599] CHIP:DMG:                 {
+          [1663135947.996403][326599:326599] CHIP:DMG:                         CommandPathIB =
+          [1663135947.996407][326599:326599] CHIP:DMG:                         {
+          [1663135947.996411][326599:326599] CHIP:DMG:                                 EndpointId = 0x1,
+          [1663135947.996414][326599:326599] CHIP:DMG:                                 ClusterId = 0x4,
+          [1663135947.996418][326599:326599] CHIP:DMG:                                 CommandId = 0x0,
+          [1663135947.996421][326599:326599] CHIP:DMG:                         },
+          [1663135947.996425][326599:326599] CHIP:DMG:
+          [1663135947.996428][326599:326599] CHIP:DMG:                         CommandFields =
+          [1663135947.996432][326599:326599] CHIP:DMG:                         {
+          [1663135947.996436][326599:326599] CHIP:DMG:                                 0x0 = 3,
+          [1663135947.996440][326599:326599] CHIP:DMG:                                 0x1 = "gp3" (3 chars),
+          [1663135947.996444][326599:326599] CHIP:DMG:                         },
+          [1663135947.996447][326599:326599] CHIP:DMG:                 },
+          [1663135947.996451][326599:326599] CHIP:DMG:
+          [1663135947.996454][326599:326599] CHIP:DMG:         ],
+          [1663135947.996459][326599:326599] CHIP:DMG:
+          [1663135947.996462][326599:326599] CHIP:DMG:         InteractionModelRevision = 1
+          [1663135947.996465][326599:326599] CHIP:DMG: },
+          [1663135947.996481][326599:326599] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1663135947.996488][326599:326599] CHIP:DMG: AccessControl: allowed
+          [1663135947.996493][326599:326599] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0000
+
+
+          Execute the below command before adding the Group0x0004 execute this command in step-4.
+
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 4, "groupKeySetID": 1, "fabricIndex": 1}]" 1 0
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1662658956.898165][231145:231145] CHIP:DMG: WriteRequestMessage =
+          [1662658956.898167][231145:231145] CHIP:DMG: {
+          [1662658956.898170][231145:231145] CHIP:DMG:         suppressResponse = false,
+          [1662658956.898172][231145:231145] CHIP:DMG:         timedRequest = false,
+          [1662658956.898175][231145:231145] CHIP:DMG:         AttributeDataIBs =
+          [1662658956.898178][231145:231145] CHIP:DMG:         [
+          [1662658956.898180][231145:231145] CHIP:DMG:                 AttributeDataIB =
+          [1662658956.898184][231145:231145] CHIP:DMG:                 {
+          [1662658956.898186][231145:231145] CHIP:DMG:                         AttributePathIB =
+          [1662658956.898191][231145:231145] CHIP:DMG:                         {
+          [1662658956.898193][231145:231145] CHIP:DMG:                                 Endpoint = 0x0,
+          [1662658956.898196][231145:231145] CHIP:DMG:                                 Cluster = 0x3f,
+          [1662658956.898198][231145:231145] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1662658956.898201][231145:231145] CHIP:DMG:                         }
+          [1662658956.898204][231145:231145] CHIP:DMG:
+          [1662658956.898207][231145:231145] CHIP:DMG:                         Data = [
+          [1662658956.898209][231145:231145] CHIP:DMG:
+          [1662658956.898212][231145:231145] CHIP:DMG:                         ],
+          [1662658956.898214][231145:231145] CHIP:DMG:                 },
+          [1662658956.898219][231145:231145] CHIP:DMG:
+          [1662658956.898221][231145:231145] CHIP:DMG:                 AttributeDataIB =
+          [1662658956.898223][231145:231145] CHIP:DMG:                 {
+          [1662658956.898226][231145:231145] CHIP:DMG:                         AttributePathIB =
+          [1662658956.898229][231145:231145] CHIP:DMG:                         {
+          [1662658956.898231][231145:231145] CHIP:DMG:                                 Endpoint = 0x0,
+          [1662658956.898235][231145:231145] CHIP:DMG:                                 Cluster = 0x3f,
+          [1662658956.898237][231145:231145] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1662658956.898241][231145:231145] CHIP:DMG:                                 ListIndex = Null,
+          [1662658956.898243][231145:231145] CHIP:DMG:                         }
+          [1662658956.898247][231145:231145] CHIP:DMG:
+          [1662658956.898249][231145:231145] CHIP:DMG:                         Data =
+          [1662658956.898252][231145:231145] CHIP:DMG:                         {
+          [1662658956.898255][231145:231145] CHIP:DMG:                                 0x1 = 4,
+          [1662658956.898257][231145:231145] CHIP:DMG:                                 0x2 = 1,
+          [1662658956.898260][231145:231145] CHIP:DMG:                         },
+          [1662658956.898263][231145:231145] CHIP:DMG:                 },
+          [1662658956.898266][231145:231145] CHIP:DMG:
+          [1662658956.898268][231145:231145] CHIP:DMG:         ],
+          [1662658956.898272][231145:231145] CHIP:DMG:
+          [1662658956.898274][231145:231145] CHIP:DMG:         moreChunkedMessages = false,
+          [1662658956.898277][231145:231145] CHIP:DMG:         InteractionModelRevision = 1
+          [1662658956.898278][231145:231145] CHIP:DMG: },
+          [1662658956.898293][231145:231145] CHIP:DMG: AccessControl: checking
+
+          ./chip-tool groups add-group 0x0004 gp4 1 1
+
+          Verify the command response in TH (all-Clusters-app) log
+
+          [1663135947.996375][326599:326599] CHIP:DMG: InvokeRequestMessage =
+          [1663135947.996379][326599:326599] CHIP:DMG: {
+          [1663135947.996382][326599:326599] CHIP:DMG:         suppressResponse = false,
+          [1663135947.996385][326599:326599] CHIP:DMG:         timedRequest = false,
+          [1663135947.996388][326599:326599] CHIP:DMG:         InvokeRequests =
+          [1663135947.996394][326599:326599] CHIP:DMG:         [
+          [1663135947.996397][326599:326599] CHIP:DMG:                 CommandDataIB =
+          [1663135947.996400][326599:326599] CHIP:DMG:                 {
+          [1663135947.996403][326599:326599] CHIP:DMG:                         CommandPathIB =
+          [1663135947.996407][326599:326599] CHIP:DMG:                         {
+          [1663135947.996411][326599:326599] CHIP:DMG:                                 EndpointId = 0x1,
+          [1663135947.996414][326599:326599] CHIP:DMG:                                 ClusterId = 0x4,
+          [1663135947.996418][326599:326599] CHIP:DMG:                                 CommandId = 0x0,
+          [1663135947.996421][326599:326599] CHIP:DMG:                         },
+          [1663135947.996425][326599:326599] CHIP:DMG:
+          [1663135947.996428][326599:326599] CHIP:DMG:                         CommandFields =
+          [1663135947.996432][326599:326599] CHIP:DMG:                         {
+          [1663135947.996436][326599:326599] CHIP:DMG:                                 0x0 = 4,
+          [1663135947.996440][326599:326599] CHIP:DMG:                                 0x1 = "gp4" (3 chars),
+          [1663135947.996444][326599:326599] CHIP:DMG:                         },
+          [1663135947.996447][326599:326599] CHIP:DMG:                 },
+          [1663135947.996451][326599:326599] CHIP:DMG:
+          [1663135947.996454][326599:326599] CHIP:DMG:         ],
+          [1663135947.996459][326599:326599] CHIP:DMG:
+          [1663135947.996462][326599:326599] CHIP:DMG:         InteractionModelRevision = 1
+          [1663135947.996465][326599:326599] CHIP:DMG: },
+          [1663135947.996481][326599:326599] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1663135947.996488][326599:326599] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "DUT sends GetGroupMembership command to TH"
+      PICS: G.C.C02.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool groups get-group-membership "[0002]" 1 1
+
+          Verify the "GetGroupMembership command response" on the TH(Allcluster-app)  Log:
+
+
+          [1659609064.738513][3355:3355] CHIP:DMG: },
+          [1659609064.738580][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=o
+          [1659609064.738619][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609064.738648][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0002
+          [1659609064.738825][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
+      disabled: true
+
+    - label: "DUT sends RemoveGroup command to TH"
+      PICS: G.C.C03.Tx
+      verification: |
+          ./chip-tool groups remove-group 0x0002 1 1
+
+          Verify the "RemoveGroup command response" on the TH(Allcluster-app)  Log:
+          [1659609128.634829][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609128.634852][3355:3355] CHIP:DMG: },
+          [1659609128.634916][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1659609128.634952][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609128.634981][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0003
+          [1659609128.635123][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
+      disabled: true
+
+    - label: "DUT sends RemoveAllGroups command to TH"
+      PICS: G.C.C04.Tx
+      verification: |
+          ./chip-tool groups  remove-all-groups 1 1
+
+          Verify the "RemoveAllGroups command response"  on the TH(Allcluster-app)  Log:
+
+          [1659609158.078774][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609158.078797][3355:3355] CHIP:DMG: },
+          [1659609158.078876][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=1 p=m
+          [1659609158.078911][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609158.078949][3355:3355] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0004
+          [1659609158.079188][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
+      disabled: true
+
+    - label: "DUT sends AddGroupIfIdentifying command to TH"
+      PICS: G.C.C05.Tx
+      verification: |
+          ./chip-tool identify identify 0x0078 1 1
+
+          Verify the "status is success" on the TH(Chip-tool)  Log:
+
+          [1658306666.592846][3044:3049] CHIP:DMG:                                StatusIB =
+          [1658306666.592889][3044:3049] CHIP:DMG:                                {
+          [1658306666.592962][3044:3049] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1658306666.593007][3044:3049] CHIP:DMG:                                },
+
+
+          ./chip-tool groups  add-group-if-identifying 0x0004 gp4 1 0
+
+          Verify the "AddGroupIfIdentifying command response" on the TH(Allcluster-app)  Log:
+
+          [1659609228.441181][3355:3355] CHIP:DMG:
+          [1659609228.441208][3355:3355] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609228.441234][3355:3355] CHIP:DMG: },
+          [1659609228.441306][3355:3355] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0004 e=0 p=m
+          [1659609228.441346][3355:3355] CHIP:DMG: AccessControl: allowed
+          [1659609228.441378][3355:3355] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0005
+          [1659609228.441436][3355:3355] CHIP:DMG: ICR moving to [ Preparing]
+      disabled: true

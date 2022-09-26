@@ -53,6 +53,10 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize);
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
@@ -86,6 +90,14 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

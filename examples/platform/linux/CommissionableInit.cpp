@@ -59,7 +59,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 
     if (options.discriminator.HasValue())
     {
-        options.payload.discriminator = options.discriminator.Value();
+        options.payload.discriminator.SetLongValue(options.discriminator.Value());
     }
     else
     {
@@ -72,7 +72,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                      "given on command line. This is temporary and will disappear. Please update your scripts "
                      "to explicitly configure discriminator. ***",
                      static_cast<unsigned>(defaultTestDiscriminator));
-        options.payload.discriminator = defaultTestDiscriminator;
+        options.payload.discriminator.SetLongValue(defaultTestDiscriminator);
     }
 
     // Default to minimum PBKDF iterations
@@ -84,7 +84,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
 
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
-                         options.payload.discriminator);
+                         options.payload.discriminator.GetLongValue());
 }
 
 CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, LinuxDeviceOptions & options)

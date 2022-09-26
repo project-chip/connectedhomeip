@@ -109,6 +109,10 @@
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 6 // 5 fabrics + 1 for rotation slack
+#endif
+
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION

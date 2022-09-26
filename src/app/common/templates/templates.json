@@ -2,11 +2,11 @@
     "name": "CHIP Application Common templates",
     "version": "chip-v1",
     "helpers": [
-        "../../zap-templates/partials/helper.js",
-        "../../zap-templates/common/StringHelper.js",
-        "../../zap-templates/common/attributes/Accessors.js",
-        "../../zap-templates/templates/app/helper.js",
-        "../../zap-templates/templates/chip/helper.js"
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js"
     ],
     "override": "../../zap-templates/common/override.js",
     "partials": [
@@ -120,13 +120,18 @@
         },
         {
             "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
-            "name": "Cluster objects header for Interaction Model",
+            "name": "Cluster objects source for Interaction Model",
             "output": "cluster-objects.cpp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-enums.zapt",
-            "name": "Enum and bitmap definitions for clusters",
+            "name": "Enum and bitmap header for clusters",
             "output": "cluster-enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums-check.zapt",
+            "name": "Enum and bitmap method check header for clusters",
+            "output": "cluster-enums-check.h"
         }
     ]
 }

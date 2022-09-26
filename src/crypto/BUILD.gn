@@ -20,17 +20,35 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
 
+if (chip_crypto == "") {
+  if (current_os == "android" || current_os == "freertos" ||
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
+    chip_crypto = "mbedtls"
+  } else {
+    chip_crypto = "openssl"
+  }
+}
+
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
+        chip_crypto == "tinycrypt" || chip_crypto == "boringssl" ||
+        chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform")
+
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"
 
   chip_crypto_mbedtls = chip_crypto == "mbedtls"
   chip_crypto_openssl = chip_crypto == "openssl"
+  chip_crypto_boringssl = chip_crypto == "boringssl"
+  chip_crypto_platform = chip_crypto == "platform"
 
   defines = [
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
-    "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
+    "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
+    "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
   ]
 
   if (chip_with_se05x == 1) {
@@ -46,30 +64,11 @@ buildconfig_header("crypto_buildconfig") {
   }
 }
 
-if (chip_crypto == "openssl") {
-  import("${build_root}/config/linux/pkg_config.gni")
-
-  pkg_config("openssl_config") {
-    packages = [ "openssl" ]
-  }
-} else {
-  import("//build_overrides/mbedtls.gni")
-}
-
-static_library("crypto") {
-  output_name = "libChipCrypto"
-
+source_set("public_headers") {
   sources = [
-    "CHIPCryptoPAL.cpp",
     "CHIPCryptoPAL.h",
     "OperationalKeystore.h",
-    "PersistentStorageOperationalKeystore.cpp",
-    "PersistentStorageOperationalKeystore.h",
-    "RandUtils.cpp",
-    "RandUtils.h",
   ]
-
-  cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":crypto_buildconfig",
@@ -78,20 +77,84 @@ static_library("crypto") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+}
 
-  public_configs = []
+if (chip_crypto == "openssl") {
+  import("${build_root}/config/linux/pkg_config.gni")
 
-  if (chip_crypto == "mbedtls") {
-    sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
+  pkg_config("openssl_config") {
+    packages = [ "openssl" ]
+  }
+
+  source_set("cryptopal_openssl") {
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_configs = [ ":openssl_config" ]
+    public_deps = [ ":public_headers" ]
+  }
+} else if (chip_crypto == "boringssl") {
+  import("//build_overrides/boringssl.gni")
+
+  source_set("cryptopal_boringssl") {
+    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_deps = [
+      ":public_headers",
+      "${boringssl_root}:boringssl",
+    ]
+  }
+} else if (chip_crypto == "mbedtls") {
+  import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_mbedtls") {
+    sources = [ "CHIPCryptoPALmbedTLS.cpp" ]
+    public_deps = [ ":public_headers" ]
 
     external_mbedtls = current_os == "zephyr"
 
     if (!external_mbedtls) {
       public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
+  }
+} else if (chip_crypto == "tinycrypt") {
+  import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_tinycrypt") {
+    sources = [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    public_deps = [
+      ":public_headers",
+      "${mbedtls_root}:mbedtls",
+    ]
+  }
+}
+
+static_library("crypto") {
+  output_name = "libChipCrypto"
+
+  sources = [
+    "CHIPCryptoPAL.cpp",
+    "PersistentStorageOperationalKeystore.cpp",
+    "PersistentStorageOperationalKeystore.h",
+    "RandUtils.cpp",
+    "RandUtils.h",
+  ]
+
+  public_configs = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [ ":public_headers" ]
+
+  if (chip_crypto == "mbedtls") {
+    public_deps += [ ":cryptopal_mbedtls" ]
   } else if (chip_crypto == "openssl") {
-    sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
-    public_configs += [ ":openssl_config" ]
+    public_deps += [ ":cryptopal_openssl" ]
+  } else if (chip_crypto == "boringssl") {
+    public_deps += [ ":cryptopal_boringssl" ]
+  } else if (chip_crypto == "tinycrypt") {
+    public_deps += [ ":cryptopal_tinycrypt" ]
+  } else if (chip_crypto == "platform") {
+    # Platform implementation is responsible for bringing their
+    # own implementation and dependencies
   } else {
     assert(false, "Invalid CHIP crypto")
   }
@@ -104,6 +167,8 @@ static_library("crypto") {
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_PBKDF.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.cpp",
+      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.cpp",
+      "hsm/nxp/PersistentStorageOperationalKeystoreHSM.h",
     ]
     public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
     public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]

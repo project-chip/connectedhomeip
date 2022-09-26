@@ -1,0 +1,46 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.7.1. [TC-CHANNEL-5.1] List TV Channels Verification
+
+PICS:
+    - CHANNEL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Channel"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue 13029
+    #This step implicitly validating the attribute(ChannelList)constraints, as long as the payload is being parsed successfully
+    - label:
+          "TH reads the ChannelList attribute from the DUT to show list of
+          Inputs available and Verify that the response contains a list of the
+          known TV channels. Each list element should consist of the
+          following,Major number (unsigned 16-bit integer, mandatory),Minor
+          number (unsigned 16-bit integer, mandatory),Name (String,
+          optional),Call sign (String, optional),Affiliate call sign (String,
+          optional)"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "ChannelList"

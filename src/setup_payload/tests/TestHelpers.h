@@ -45,13 +45,13 @@ inline SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
-    payload.version               = 0;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.commissioningFlow     = CommissioningFlow::kStandard;
-    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    payload.version           = 0;
+    payload.vendorID          = 12;
+    payload.productID         = 1;
+    payload.commissioningFlow = CommissioningFlow::kStandard;
+    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kSoftAP);
+    payload.discriminator.SetLongValue(128);
+    payload.setUpPINCode = 2048;
 
     return payload;
 }

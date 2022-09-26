@@ -127,6 +127,14 @@ public:
      *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB if the path from the reader is not a valid concrere event path.
      */
     CHIP_ERROR GetEventPath(ConcreteEventPath * const apPath) const;
+
+    /**
+     * @brief Parse the event path into an EventPathParams object. As part of parsing,
+     * validity checks for each path item will be done as well.
+     *
+     * If any errors are encountered, an IM error of 'InvalidAction' will be returned.
+     */
+    CHIP_ERROR ParsePath(EventPathParams & aEvent) const;
 };
 
 class Builder : public ListBuilder

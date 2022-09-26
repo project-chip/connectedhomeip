@@ -25,7 +25,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInfoProvider.h>
@@ -52,6 +54,29 @@ private:
     CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
+
+/// Matches constraints on a LabelStruct.
+bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
+{
+    constexpr size_t kMaxLabelSize = 16;
+    constexpr size_t kMaxValueSize = 16;
+
+    // NOTE: spec default for label and value is empty, so empty is accepted here
+    return (entry.label.size() <= kMaxLabelSize) && (entry.value.size() <= kMaxValueSize);
+}
+
+bool IsValidLabelEntryList(const LabelList::TypeInfo::DecodableType & list)
+{
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        if (!IsValidLabelEntry(iter.GetValue()))
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 UserLabelAttrAccess gAttrAccess;
 
@@ -106,6 +131,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
+        ReturnErrorCodeIf(!IsValidLabelEntryList(decodablelist), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         auto iter = decodablelist.begin();
         while (iter.Next())
@@ -120,7 +146,10 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
+
         ReturnErrorOnFailure(aDecoder.Decode(entry));
+        ReturnErrorCodeIf(!IsValidLabelEntry(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
         return provider->AppendUserLabel(endpoint, entry);
     }
 
@@ -157,7 +186,39 @@ CHIP_ERROR UserLabelAttrAccess::Write(const ConcreteDataAttributePath & aPath, A
 
 } // anonymous namespace
 
+class UserLabelFabricTableDelegate : public chip::FabricTable::Delegate
+{
+public:
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
+        // related data on the node which was created since it was commissioned.
+        if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(Zcl, "UserLabel: Last Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+            // Delete all user label data on the node which was added since it was commissioned.
+            DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+            if (provider)
+            {
+                for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
+                {
+                    // If UserLabel cluster is implemented on this endpoint
+                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
+                    {
+                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint);
+                    }
+                }
+            }
+        }
+    }
+};
+
+UserLabelFabricTableDelegate gUserLabelFabricDelegate;
+
 void MatterUserLabelPluginServerInitCallback(void)
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);
 }

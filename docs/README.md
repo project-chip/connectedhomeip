@@ -11,6 +11,11 @@
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
 
+## Platform Guides
+
+-   Various guides are available [here](./guides/README.md) that cover platform
+    bring up, testing, and various troubleshooting things.
+
 ## Project Flow
 
 -   Documentation about general project usage of GitHub, and project tools is

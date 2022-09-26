@@ -20,6 +20,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -94,6 +95,7 @@ private:
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
+chip::Credentials::PersistentStorageOpCertStore gPersistentStorageOpCertStore;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
 } // namespace
@@ -136,6 +138,10 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         SuccessOrExit(err);
         factoryParams.groupDataProvider = &gGroupDataProvider;
 
+        err = gPersistentStorageOpCertStore.Init(&gServerStorage);
+        SuccessOrExit(err);
+        factoryParams.opCertStore = &gPersistentStorageOpCertStore;
+
         commissionerParams.pairingDelegate = &gPairingDelegate;
 
         err = ephemeralKey.Initialize();
@@ -153,7 +159,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
 
         {
-            chip::FabricInfo * fabricInfo                = nullptr;
             uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
             chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
             chip::ByteSpan defaultIpk;
@@ -176,16 +181,13 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
             err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
 
-            fabricInfo = result->GetFabricInfo();
-            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INTERNAL);
-
-            SuccessOrExit(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+            SuccessOrExit(result->GetCompressedFabricIdBytes(compressedFabricIdSpan));
             ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                            static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                            static_cast<unsigned>(result->GetFabricIndex()));
             ChipLogByteSpan(Support, compressedFabricIdSpan);
 
             defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(), defaultIpk,
                                                                   compressedFabricIdSpan));
         }
     exit:

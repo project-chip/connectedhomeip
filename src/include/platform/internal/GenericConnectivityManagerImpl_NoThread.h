@@ -143,25 +143,7 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
     AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    switch (attributeId)
-    {
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        err = encoder.EncodeEmptyList();
-        break;
-    }
-    default: {
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        break;
-    }
-    }
-
-    return err;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Internal

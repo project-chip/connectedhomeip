@@ -15,6 +15,9 @@
 
 name: 14.1.4. [TC-SC-1.4] MRP message counter and duplicate messaging
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

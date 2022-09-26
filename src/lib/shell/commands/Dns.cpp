@@ -188,7 +188,7 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
-    return sResolverProxy.FindCommissionableNodes(filter);
+    return sResolverProxy.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
@@ -203,7 +203,7 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
-    return sResolverProxy.FindCommissioners(filter);
+    return sResolverProxy.DiscoverCommissioners(filter);
 }
 
 CHIP_ERROR BrowseHandler(int argc, char ** argv)

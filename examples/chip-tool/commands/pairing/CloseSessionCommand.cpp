@@ -28,30 +28,31 @@ CHIP_ERROR CloseSessionCommand::RunCommand()
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
     if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
     {
-        return CloseSession(commissioneeDeviceProxy);
+        VerifyOrReturnError(commissioneeDeviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+        return CloseSession(*commissioneeDeviceProxy->GetExchangeManager(), commissioneeDeviceProxy->GetSecureSession().Value());
     }
 
     return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
                                                     &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR CloseSessionCommand::CloseSession(DeviceProxy * device)
+CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    VerifyOrReturnError(device->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
     // TODO perhaps factor out this code into something on StatusReport that
     // takes an exchange and maybe a SendMessageFlags?
     SecureChannel::StatusReport statusReport(SecureChannel::GeneralStatusCode::kSuccess, SecureChannel::Id,
                                              SecureChannel::kProtocolCodeCloseSession);
 
     size_t reportSize = statusReport.Size();
-    Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(reportSize), reportSize);
+    auto packetBuffer = MessagePacketBuffer::New(reportSize);
+    VerifyOrReturnError(!packetBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(packetBuffer), reportSize);
     statusReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msg = bbuf.Finalize();
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-    auto * exchange = device->GetExchangeManager()->NewContext(device->GetSecureSession().Value(), nullptr);
+    auto * exchange = exchangeMgr.NewContext(sessionHandle, nullptr);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Per spec, CloseSession reports are always sent with MRP disabled.
@@ -69,16 +70,17 @@ CHIP_ERROR CloseSessionCommand::CloseSession(DeviceProxy * device)
     return err;
 }
 
-void CloseSessionCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void CloseSessionCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                              SessionHandle & sessionHandle)
 {
     auto * command = reinterpret_cast<CloseSessionCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    CHIP_ERROR err = command->CloseSession(device);
+    CHIP_ERROR err = command->CloseSession(exchangeMgr, sessionHandle);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void CloseSessionCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void CloseSessionCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 

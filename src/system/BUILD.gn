@@ -49,10 +49,12 @@ if (chip_device_platform == "cc13x2_26x2") {
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (chip_device_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
-} else if (chip_device_platform == "p6") {
-  import("//build_overrides/p6.gni")
+} else if (chip_device_platform == "psoc6") {
+  import("//build_overrides/psoc6.gni")
 } else if (chip_device_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
+} else if (chip_device_platform == "mt793x") {
+  import("//build_overrides/mt793x_sdk.gni")
 }
 
 buildconfig_header("system_buildconfig") {
@@ -116,6 +118,14 @@ buildconfig_header("system_buildconfig") {
   } else {
     defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
   }
+
+  if (chip_system_config_use_sockets && current_os != "zephyr") {
+    defines += [
+      "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=${chip_system_config_use_sockets} ",
+    ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0 " ]
+  }
 }
 
 config("system_config") {
@@ -155,6 +165,10 @@ source_set("system_config_header") {
       # Add platform here as needed.
     }
   }
+
+  if (chip_device_platform == "mt793x") {
+    public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
+  }
 }
 
 static_library("system") {
@@ -169,7 +183,6 @@ static_library("system") {
     "SystemError.cpp",
     "SystemError.h",
     "SystemEvent.h",
-    "SystemFaultInjection.h",
     "SystemLayer.cpp",
     "SystemLayer.h",
     "SystemLayerImpl.h",
@@ -211,7 +224,10 @@ static_library("system") {
   }
 
   if (chip_with_nlfaultinjection) {
-    sources += [ "SystemFaultInjection.cpp" ]
+    sources += [
+      "SystemFaultInjection.cpp",
+      "SystemFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }

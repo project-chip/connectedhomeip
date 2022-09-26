@@ -8,7 +8,7 @@
         if ({{>actualValue}} != nil) {
     {{/if}}
 
-    {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
+    {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "{{asTestType type isArray}}", "{{expectedConstraints.type}}"));{{/if}}
 
     {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
 
@@ -22,9 +22,9 @@
 
     {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>actualValue}}, {{expectedConstraints.isHexString}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.minLength}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>actualValue}}, {{expectedConstraints.minLength}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", [{{>actualValue}} length], {{expectedConstraints.maxLength}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>actualValue}}, {{expectedConstraints.maxLength}}));{{/if}}
 
     {{~#if (hasProperty expectedConstraints "minValue")}}
     VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", [{{>actualValue}} {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}}));

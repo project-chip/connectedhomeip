@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <array>
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 
@@ -41,6 +42,8 @@
 namespace chip {
 namespace Protocols {
 namespace SecureChannel {
+
+constexpr const char * kProtocolName = "SecureChannel";
 
 /**
  * SecureChannel Protocol Message Types
@@ -60,7 +63,6 @@ enum class MsgType : uint8_t
     PASE_Pake1         = 0x22,
     PASE_Pake2         = 0x23,
     PASE_Pake3         = 0x24,
-    PASE_PakeError     = 0x2F,
 
     // Certificate-based session establishment Message Types
     CASE_Sigma1       = 0x30,
@@ -122,6 +124,29 @@ template <>
 struct MessageTypeTraits<SecureChannel::MsgType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return SecureChannel::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 13> typeToNameTable = {
+            {
+                { SecureChannel::MsgType::MsgCounterSyncReq, "MsgCounterSyncReq" },
+                { SecureChannel::MsgType::MsgCounterSyncRsp, "MsgCounterSyncRsp" },
+                { SecureChannel::MsgType::StandaloneAck, "StandaloneAck" },
+                { SecureChannel::MsgType::PBKDFParamRequest, "PBKDFParamRequest" },
+                { SecureChannel::MsgType::PBKDFParamResponse, "PBKDFParamResponse" },
+                { SecureChannel::MsgType::PASE_Pake1, "PASE_Pake1" },
+                { SecureChannel::MsgType::PASE_Pake2, "PASE_Pake2" },
+                { SecureChannel::MsgType::PASE_Pake3, "PASE_Pake3" },
+                { SecureChannel::MsgType::CASE_Sigma1, "CASE_Sigma1" },
+                { SecureChannel::MsgType::CASE_Sigma2, "CASE_Sigma2" },
+                { SecureChannel::MsgType::CASE_Sigma3, "CASE_Sigma3" },
+                { SecureChannel::MsgType::CASE_Sigma2Resume, "CASE_Sigma2Resume" },
+                { SecureChannel::MsgType::StatusReport, "StatusReport" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 
 } // namespace Protocols

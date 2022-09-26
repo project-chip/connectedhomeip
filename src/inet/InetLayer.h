@@ -68,13 +68,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Shutdown()
+    void Shutdown()
     {
         // Return to uninitialized state to permit re-initialization.
-        VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        mLayerState.ResetFromInitialized();
         mSystemLayer = nullptr;
-        return CHIP_NO_ERROR;
     }
 
     System::Layer & SystemLayer() const { return *mSystemLayer; }

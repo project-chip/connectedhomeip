@@ -18,6 +18,9 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 
+set(PROJECT_VER "v1.0")
+set(PROJECT_VER_NUMBER 1)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
 
@@ -37,13 +40,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(${CMAKE_CURRENT_LIST_DIR}/../project_include.cmake)
 message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
 message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
+message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
 idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}" APPEND)
+if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
+    idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"" APPEND)
+endif()
 idf_build_set_property(COMPILE_OPTIONS "-DCHIP_PLATFORM_ESP32=1" APPEND)
 
 project(chip-shell)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
-idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(C_COMPILE_OPTIONS "-Os" APPEND)
 
 # For the C3, project_include.cmake sets -Wno-format, but does not clear various
 # flags that depend on -Wformat
@@ -60,6 +67,9 @@ flashing_script()
 if (CONFIG_ENABLE_PW_RPC)
 get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
 include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cmake)
+
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
+
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)

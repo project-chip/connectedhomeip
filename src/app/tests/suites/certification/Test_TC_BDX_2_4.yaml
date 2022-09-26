@@ -15,6 +15,9 @@
 
 name: 29.2.4. [TC-BDX-2.4] Asynchronous file sending
 
+PICS:
+    - MCORE.BDX.AsynchronousSender
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"

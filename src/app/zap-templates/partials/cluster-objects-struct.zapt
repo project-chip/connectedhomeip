@@ -16,15 +16,15 @@ namespace {{asUpperCamelCase name}} {
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
 
-        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
-        {{#if struct_is_fabric_scoped}}
+        {{#if isFabricScoped}}
         auto GetFabricIndex() const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }};
+            return fabricIndex;
         }
 
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
-            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+            fabricIndex = fabricIndex_;
         }
 
         CHIP_ERROR EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -46,15 +46,15 @@ namespace {{asUpperCamelCase name}} {
 
         CHIP_ERROR Decode(TLV::TLVReader &reader);
 
-        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
-        {{#if struct_is_fabric_scoped}}
+        {{#if isFabricScoped}}
         auto GetFabricIndex() const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }};
+            return fabricIndex;
         }
 
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
-            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+            fabricIndex = fabricIndex_;
         }
         {{/if}}
     };
@@ -65,7 +65,7 @@ namespace {{asUpperCamelCase name}} {
 } // namespace {{asUpperCamelCase name}}
 {{else}}
 namespace {{asUpperCamelCase name}} {
-{{#if struct_is_fabric_scoped}}
+{{#if isFabricScoped}}
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const
 {
     return DoEncode(writer, tag, NullOptional);
@@ -79,12 +79,12 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
     {{#if struct_has_fabric_sensitive_fields}}
-    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == {{ asLowerCamelCase struct_fabric_idx_field }});
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     {{/if}}
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
-    {{#if (isStrEqual label ../struct_fabric_idx_field)}}
+    {{#if (is_num_equal fieldIdentifier 254)}}
     if (accessingFabricIndex.HasValue()) {
       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
     }

@@ -54,14 +54,28 @@ The EFR32 platform KVS is fully implemented
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
+        868MHz@19dBm
+    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
     -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
     -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
+        868MHz@19dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 

@@ -1,0 +1,312 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
+    Attributes [DUT as Client]
+
+PICS:
+    - LTIME.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "DUT reads HourFormat attribute from TH"
+      PICS: LTIME.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify DUT receives  HourFormat attribute  response on the TH(all-clusters-app) Log:
+
+          [1659774501.435219][17263:17263] CHIP:IM: Received Read request
+          [1659774501.435303][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659774501.435321][17263:17263] CHIP:DMG: {
+          [1659774501.435337][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659774501.435356][17263:17263] CHIP:DMG:         [
+          [1659774501.435370][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659774501.435386][17263:17263] CHIP:DMG:                 {
+          [1659774501.435402][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659774501.435418][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659774501.435438][17263:17263] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659774501.435455][17263:17263] CHIP:DMG:                 }
+          [1659774501.435476][17263:17263] CHIP:DMG:
+          [1659774501.435490][17263:17263] CHIP:DMG:         ],
+          [1659774501.435513][17263:17263] CHIP:DMG:
+          [1659774501.435529][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659774501.435547][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659774501.435561][17263:17263] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute on TH"
+      PICS: LTIME.C.A0000.12HR
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization write hour-format 0 1 0
+          Verify DUT receives  HourFormat attribute  write response on the TH(all-clusters-app) Log:
+          [1659778546.653556][17263:17263] CHIP:IM: Received Write request
+          [1659778546.653566][17263:17263] CHIP:DMG: IM WH moving to [Initialized]
+          [1659778546.653597][17263:17263] CHIP:DMG: WriteRequestMessage =
+          [1659778546.653607][17263:17263] CHIP:DMG: {
+          [1659778546.653615][17263:17263] CHIP:DMG:         suppressResponse = false,
+          [1659778546.653623][17263:17263] CHIP:DMG:         timedRequest = false,
+          [1659778546.653632][17263:17263] CHIP:DMG:         AttributeDataIBs =
+          [1659778546.653645][17263:17263] CHIP:DMG:         [
+          [1659778546.653653][17263:17263] CHIP:DMG:                 AttributeDataIB =
+          [1659778546.653664][17263:17263] CHIP:DMG:                 {
+          [1659778546.653673][17263:17263] CHIP:DMG:                         AttributePathIB =
+          [1659778546.653686][17263:17263] CHIP:DMG:                         {
+          [1659778546.653696][17263:17263] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659778546.653706][17263:17263] CHIP:DMG:                                 Cluster = 0x2c,
+          [1659778546.653717][17263:17263] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659778546.653727][17263:17263] CHIP:DMG:                         }
+          [1659778546.653739][17263:17263] CHIP:DMG:
+          [1659778546.653750][17263:17263] CHIP:DMG:                         Data = 0,
+          [1659778546.653759][17263:17263] CHIP:DMG:                 },
+          [1659778546.653774][17263:17263] CHIP:DMG:
+          [1659778546.653782][17263:17263] CHIP:DMG:         ],
+          [1659778546.653794][17263:17263] CHIP:DMG:
+          [1659778546.653803][17263:17263] CHIP:DMG:         moreChunkedMessages = false,
+          [1659778546.653813][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778546.653821][17263:17263] CHIP:DMG: },
+          [1659778546.653868][17263:17263] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002C e=0 p=o
+      disabled: true
+
+    - label: "DUT reads HourFormat attribute from TH"
+      PICS: LTIME.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify DUT receives   HourFormat attribute  response on the TH(all-clusters-app) Log:
+          [1659778596.981932][17263:17263] CHIP:IM: Received Read request
+          [1659778596.982009][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778596.982024][17263:17263] CHIP:DMG: {
+          [1659778596.982035][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778596.982051][17263:17263] CHIP:DMG:         [
+          [1659778596.982064][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778596.982079][17263:17263] CHIP:DMG:                 {
+          [1659778596.982094][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778596.982111][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778596.982127][17263:17263] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659778596.982142][17263:17263] CHIP:DMG:                 }
+          [1659778596.982162][17263:17263] CHIP:DMG:
+          [1659778596.982175][17263:17263] CHIP:DMG:         ],
+          [1659778596.982189][17263:17263] CHIP:DMG:
+          [1659778596.982206][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778596.982220][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778596.982229][17263:17263] CHIP:DMG: },
+          [1659778596.982301][17263:17263] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659778596.982362][17263:17263] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+      disabled: true
+
+    - label:
+          "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute on TH"
+      PICS: LTIME.C.A0000.24HR
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization write hour-format 1 1 0
+          Verify DUT receives   HourFormat attribute write  response on the TH(all-clusters-app) Log:
+          and MessageCounter:194900121 on exchange 38069r
+          [1659778652.656546][17263:17263] CHIP:EM: Handling via exchange: 38069r, Delegate: 0x55bc75d00d28
+          [1659778652.656587][17263:17263] CHIP:IM: Received Write request
+          [1659778652.656608][17263:17263] CHIP:DMG: IM WH moving to [Initialized]
+          [1659778652.656667][17263:17263] CHIP:DMG: WriteRequestMessage =
+          [1659778652.656690][17263:17263] CHIP:DMG: {
+          [1659778652.656708][17263:17263] CHIP:DMG:         suppressResponse = false,
+          [1659778652.656730][17263:17263] CHIP:DMG:         timedRequest = false,
+          [1659778652.656786][17263:17263] CHIP:DMG:         AttributeDataIBs =
+          [1659778652.656816][17263:17263] CHIP:DMG:         [
+          [1659778652.656835][17263:17263] CHIP:DMG:                 AttributeDataIB =
+          [1659778652.656872][17263:17263] CHIP:DMG:                 {
+          [1659778652.656889][17263:17263] CHIP:DMG:                         AttributePathIB =
+          [1659778652.656908][17263:17263] CHIP:DMG:                         {
+          [1659778652.656928][17263:17263] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659778652.656947][17263:17263] CHIP:DMG:                                 Cluster = 0x2c,
+          [1659778652.656970][17263:17263] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659778652.656989][17263:17263] CHIP:DMG:                         }
+          [1659778652.657013][17263:17263] CHIP:DMG:
+          [1659778652.657035][17263:17263] CHIP:DMG:                         Data = 1,
+          [1659778652.657053][17263:17263] CHIP:DMG:                 },
+          [1659778652.657077][17263:17263] CHIP:DMG:
+          [1659778652.657093][17263:17263] CHIP:DMG:         ],
+          [1659778652.657119][17263:17263] CHIP:DMG:
+          [1659778652.657137][17263:17263] CHIP:DMG:         moreChunkedMessages = false,
+          [1659778652.657156][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778652.657171][17263:17263] CHIP:DMG: },
+          [1659778652.657292][17263:17263] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002C e=0 p=o
+      disabled: true
+
+    - label: "DUT reads HourFormat attribute on TH"
+      PICS: LTIME.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify DUT receives   HourFormat attribut  response on the TH(all-clusters-app) Log:
+          d28
+          [1659778711.163963][17263:17263] CHIP:IM: Received Read request
+          [1659778711.164030][17263:17263] CHIP:DMG: ReadRequestMessage =
+          [1659778711.164043][17263:17263] CHIP:DMG: {
+          [1659778711.164055][17263:17263] CHIP:DMG:         AttributePathIBs =
+          [1659778711.164068][17263:17263] CHIP:DMG:         [
+          [1659778711.164079][17263:17263] CHIP:DMG:                 AttributePathIB =
+          [1659778711.164092][17263:17263] CHIP:DMG:                 {
+          [1659778711.164105][17263:17263] CHIP:DMG:                         Endpoint = 0x0,
+          [1659778711.164118][17263:17263] CHIP:DMG:                         Cluster = 0x2c,
+          [1659778711.164132][17263:17263] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659778711.164143][17263:17263] CHIP:DMG:                 }
+          [1659778711.164158][17263:17263] CHIP:DMG:
+          [1659778711.164169][17263:17263] CHIP:DMG:         ],
+          [1659778711.164184][17263:17263] CHIP:DMG:
+          [1659778711.164196][17263:17263] CHIP:DMG:         isFabricFiltered = true,
+          [1659778711.164208][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659778711.164218][17263:17263] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads ActiveCalendarType attribute on TH"
+      PICS: LTIME.C.A0001
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify DUT receives   active-calendar-type response on the TH(all-clusters-app) Log:
+          [1659783212.637408][3747:3747] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:132309637 on exchange 18527r
+          [1659783212.637454][3747:3747] CHIP:EM: Handling via exchange: 18527r, Delegate: 0xaaaadeb88fa0
+          [1659783212.637493][3747:3747] CHIP:IM: Received Read request
+          [1659783212.637569][3747:3747] CHIP:DMG: ReadRequestMessage =
+          [1659783212.637597][3747:3747] CHIP:DMG: {
+          [1659783212.637619][3747:3747] CHIP:DMG:         AttributePathIBs =
+          [1659783212.637645][3747:3747] CHIP:DMG:         [
+          [1659783212.637668][3747:3747] CHIP:DMG:                 AttributePathIB =
+          [1659783212.637697][3747:3747] CHIP:DMG:                 {
+          [1659783212.637726][3747:3747] CHIP:DMG:                         Endpoint = 0x0,
+          [1659783212.637756][3747:3747] CHIP:DMG:                         Cluster = 0x2c,
+          [1659783212.637788][3747:3747] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659783212.637817][3747:3747] CHIP:DMG:                 }
+          [1659783212.637845][3747:3747] CHIP:DMG:
+          [1659783212.637872][3747:3747] CHIP:DMG:         ],
+          [1659783212.637900][3747:3747] CHIP:DMG:
+          [1659783212.637926][3747:3747] CHIP:DMG:         isFabricFiltered = true,
+          [1659783212.637952][3747:3747] CHIP:DMG:         InteractionModelRevision = 1
+          [1659783212.637974][3747:3747] CHIP:DMG: },
+          [1659783212.638046][3747:3747] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label: "DUT reads SupportedCalendarTypes attribute TH"
+      PICS: LTIME.C.A0002
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+          Verify DUT receives supported-calendar-types response on the TH(all-clusters-app) Log:
+
+          [1659783261.108812][3747:3747] CHIP:IM: Received Read request
+          [1659783261.108892][3747:3747] CHIP:DMG: ReadRequestMessage =
+          [1659783261.108920][3747:3747] CHIP:DMG: {
+          [1659783261.108943][3747:3747] CHIP:DMG:         AttributePathIBs =
+          [1659783261.108971][3747:3747] CHIP:DMG:         [
+          [1659783261.108997][3747:3747] CHIP:DMG:                 AttributePathIB =
+          [1659783261.109029][3747:3747] CHIP:DMG:                 {
+          [1659783261.109059][3747:3747] CHIP:DMG:                         Endpoint = 0x0,
+          [1659783261.109089][3747:3747] CHIP:DMG:                         Cluster = 0x2c,
+          [1659783261.109121][3747:3747] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1659783261.109155][3747:3747] CHIP:DMG:                 }
+          [1659783261.109187][3747:3747] CHIP:DMG:
+          [1659783261.109214][3747:3747] CHIP:DMG:         ],
+          [1659783261.109243][3747:3747] CHIP:DMG:
+          [1659783261.109271][3747:3747] CHIP:DMG:         isFabricFiltered = true,
+          [1659783261.109297][3747:3747] CHIP:DMG:         InteractionModelRevision = 1
+          [1659783261.109322][3747:3747] CHIP:DMG: },
+          [1659783261.109398][3747:3747] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label:
+          "DUT writes value in PIXIT.LTIME.SCT to ActiveCalendarType attribute
+          on TH, followed by reading the ActiveCalendarType attribute from TH"
+      PICS: LTIME.C.A0001
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+          Verify DUT receives  active-calendar-type write response  on the TH(all-clusters-app) Log:
+          [1659783303.930585][3747:3747] CHIP:DMG: WriteRequestMessage =
+          [1659783303.930628][3747:3747] CHIP:DMG: {
+          [1659783303.930666][3747:3747] CHIP:DMG:         suppressResponse = false,
+          [1659783303.930724][3747:3747] CHIP:DMG:         timedRequest = false,
+          [1659783303.930765][3747:3747] CHIP:DMG:         AttributeDataIBs =
+          [1659783303.930829][3747:3747] CHIP:DMG:         [
+          [1659783303.930868][3747:3747] CHIP:DMG:                 AttributeDataIB =
+          [1659783303.930933][3747:3747] CHIP:DMG:                 {
+          [1659783303.930988][3747:3747] CHIP:DMG:                         AttributePathIB =
+          [1659783303.931039][3747:3747] CHIP:DMG:                         {
+          [1659783303.931108][3747:3747] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659783303.931187][3747:3747] CHIP:DMG:                                 Cluster = 0x2c,
+          [1659783303.931261][3747:3747] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1659783303.931334][3747:3747] CHIP:DMG:                         }
+          [1659783303.931388][3747:3747] CHIP:DMG:
+          [1659783303.931454][3747:3747] CHIP:DMG:                         Data = 0,
+          [1659783303.931521][3747:3747] CHIP:DMG:                 },
+          [1659783303.931569][3747:3747] CHIP:DMG:
+          [1659783303.931621][3747:3747] CHIP:DMG:         ],
+          [1659783303.931670][3747:3747] CHIP:DMG:
+          [1659783303.931723][3747:3747] CHIP:DMG:         moreChunkedMessages = false,
+          [1659783303.931765][3747:3747] CHIP:DMG:         InteractionModelRevision = 1
+          [1659783303.931803][3747:3747] CHIP:DMG: },
+          [1659783303.932021][3747:3747] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002C e=0 p=o
+          [1659783303.932077][3747:3747] CHIP:DMG: AccessControl: allowed
+
+
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify DUT receives  active-calendar-type response  on the TH(all-clusters-app) Log:
+          [1659783379.903757][3747:3747] CHIP:EM: Handling via exchange: 59887r, Delegate: 0xaaaadeb88fa0
+          [1659783379.903796][3747:3747] CHIP:IM: Received Read request
+          [1659783379.903873][3747:3747] CHIP:DMG: ReadRequestMessage =
+          [1659783379.903912][3747:3747] CHIP:DMG: {
+          [1659783379.903942][3747:3747] CHIP:DMG:         AttributePathIBs =
+          [1659783379.903969][3747:3747] CHIP:DMG:         [
+          [1659783379.903992][3747:3747] CHIP:DMG:                 AttributePathIB =
+          [1659783379.904020][3747:3747] CHIP:DMG:                 {
+          [1659783379.904056][3747:3747] CHIP:DMG:                         Endpoint = 0x0,
+          [1659783379.904090][3747:3747] CHIP:DMG:                         Cluster = 0x2c,
+          [1659783379.904129][3747:3747] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659783379.904158][3747:3747] CHIP:DMG:                 }
+          [1659783379.904196][3747:3747] CHIP:DMG:
+          [1659783379.904221][3747:3747] CHIP:DMG:         ],
+          [1659783379.904258][3747:3747] CHIP:DMG:
+          [1659783379.904284][3747:3747] CHIP:DMG:         isFabricFiltered = true,
+          [1659783379.904319][3747:3747] CHIP:DMG:         InteractionModelRevision = 1
+          [1659783379.904343][3747:3747] CHIP:DMG: },
+          [1659783379.904435][3747:3747] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659783379.904527][3747:3747] CHIP:DMG: Building Reports for ReadHandler with L
+      disabled: true
+
+    - label: "Repeat step 8 for all the values in PIXIT.LTIME.SCT"
+      PICS: LTIME.C.A0001
+      verification: |
+          Repeat the test step 8 for  1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 values and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
+      disabled: true

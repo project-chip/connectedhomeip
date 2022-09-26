@@ -55,6 +55,7 @@ menu "Demo"
           bool "Bypass"
       config RENDEZVOUS_MODE_SOFTAP
           bool "Soft-AP"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE
           bool "BLE"
           depends on BT_ENABLED
@@ -62,16 +63,10 @@ menu "Demo"
           bool "On-Network"
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
           bool "Soft-AP / On-Network"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE_ON_NETWORK
           bool "BLE / On-Network"
     endchoice
-
-    config ECHO_HOST_IP
-        string "IPV4 address"
-        default "127.0.0.1"
-        depends on USE_ECHO_CLIENT
-        help
-            The IPV4 Address of the ECHO Server.
 
     # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
     # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE

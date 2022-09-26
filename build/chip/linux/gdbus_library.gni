@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-glib_config = rebase_path(":glib")
-gen_dbus_wrapper = rebase_path("gen_gdbus_wrapper.py")
+glib_config = get_label_info(":glib", "label_no_toolchain")
+gen_dbus_wrapper = get_path_info("gen_gdbus_wrapper.py", "abspath")
 
 # Runs gdbus-codegen and defines the resulting library.
 #

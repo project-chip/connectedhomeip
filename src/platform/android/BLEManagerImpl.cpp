@@ -161,24 +161,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    bool has       = false;
-    CHIP_ERROR err = HasFlag(Flags::kServiceModeEnabled, has);
-
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ConnectivityManager::kCHIPoBLEServiceMode_NotSupported);
-    return has ? ConnectivityManager::kCHIPoBLEServiceMode_Enabled : ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    ReturnErrorCodeIf(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
-
-    bool isSet = (val == ConnectivityManager::kCHIPoBLEServiceMode_Enabled) ? true : false;
-
-    return SetFlag(Flags::kServiceModeEnabled, isSet);
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     bool has       = false;
@@ -467,7 +449,7 @@ exit:
 
 // ===== start implement virtual methods on BleConnectionDelegate.
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -479,7 +461,20 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const u
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(connDiscriminator));
+    // TODO: The API we have here does not handle short discriminators in any
+    // sane way.  Just do what we used to do, which is pretend that a short
+    // discriminator is actually a long discriminator with the low bits all 0.
+    uint16_t discriminator;
+    if (connDiscriminator.IsShortDiscriminator())
+    {
+        discriminator = static_cast<uint16_t>(connDiscriminator.GetShortValue())
+            << (SetupDiscriminator::kLongBits - SetupDiscriminator::kShortBits);
+    }
+    else
+    {
+        discriminator = connDiscriminator.GetLongValue();
+    }
+    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

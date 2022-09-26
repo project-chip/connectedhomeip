@@ -61,8 +61,8 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-arm-chip-tv-casting-app
-gn gen --check --fail-on-unused-args {out}/android-arm-chip-tv-casting-app '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
+# Generating android-arm-tv-casting-app
+gn gen --check --fail-on-unused-args {out}/android-arm-tv-casting-app '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -70,8 +70,8 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-arm-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+# Generating android-arm-tv-server
+gn gen --check --fail-on-unused-args {out}/android-arm-tv-server '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -97,8 +97,8 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-arm64-chip-tv-casting-app
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tv-casting-app '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
+# Generating android-arm64-tv-casting-app
+gn gen --check --fail-on-unused-args {out}/android-arm64-tv-casting-app '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-casting-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -106,8 +106,8 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-arm64-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+# Generating android-arm64-tv-server
+gn gen --check --fail-on-unused-args {out}/android-arm64-tv-server '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -124,8 +124,8 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-x64-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-x64-chip-tvserver '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+# Generating android-x64-tv-server
+gn gen --check --fail-on-unused-args {out}/android-x64-tv-server '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -142,14 +142,23 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-x86-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-x86-chip-tvserver '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+# Generating android-x86-tv-server
+gn gen --check --fail-on-unused-args {out}/android-x86-tv-server '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=bl602_board="BL-HWC-G1"' {out}/bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1"' {out}/bl602-light
+
+# Generating bouffalolab-BL706-IoT-DVK-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22"' {out}/bouffalolab-BL706-IoT-DVK-light
+
+# Generating bouffalolab-BL706-IoT-DVK-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL706-IoT-DVK-light-rpc
+
+# Generating bouffalolab-BL706-NIGHT-LIGHT-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-NIGHT-LIGHT" module_type="BL702"' {out}/bouffalolab-BL706-NIGHT-LIGHT-light
 
 # Generating cc13x2x7_26x2x7-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
@@ -158,7 +167,7 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters-minimal
 
 # Generating cc13x2x7_26x2x7-lock-ftd
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true' {out}/cc13x2x7_26x2x7-lock-ftd
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true chip_progress_logging=false' {out}/cc13x2x7_26x2x7-lock-ftd
 
 # Generating cc13x2x7_26x2x7-lock-mtd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=false' {out}/cc13x2x7_26x2x7-lock-mtd
@@ -173,352 +182,352 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-shell
 
 # Generating cyw30739-cyw930739m2evb_01-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
 
 # Generating cyw30739-cyw930739m2evb_01-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/infineon/cyw30739 {out}/cyw30739-cyw930739m2evb_01-lock
 
 # Generating cyw30739-cyw930739m2evb_01-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/infineon/cyw30739 {out}/cyw30739-cyw930739m2evb_01-ota-requestor
 
 # Generating cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/cyw30739 --args=chip_progress_logging=false {out}/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/infineon/cyw30739 --args=chip_progress_logging=false {out}/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
 
 # Generating efr32-brd4161a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-light
 
 # Generating efr32-brd4161a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
 
 # Generating efr32-brd4161a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4161a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-light-with-ota-requestor
 
 # Generating efr32-brd4161a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
 # Generating efr32-brd4161a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
 # Generating efr32-brd4161a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4161a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-lock-with-ota-requestor
 
 # Generating efr32-brd4161a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-switch
 
 # Generating efr32-brd4161a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-switch-with-ota-requestor
 
 # Generating efr32-brd4161a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
 
 # Generating efr32-brd4161a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4161a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
 # Generating efr32-brd4161a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4161A" chip_enable_ota_requestor=true' {out}/efr32-brd4161a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4163a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-light
 
 # Generating efr32-brd4163a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-light-rpc
 
 # Generating efr32-brd4163a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4163a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-light-with-ota-requestor
 
 # Generating efr32-brd4163a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-lock
 
 # Generating efr32-brd4163a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
 
 # Generating efr32-brd4163a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4163a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-lock-with-ota-requestor
 
 # Generating efr32-brd4163a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-switch
 
 # Generating efr32-brd4163a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-switch-with-ota-requestor
 
 # Generating efr32-brd4163a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
 
 # Generating efr32-brd4163a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4163a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4163A"' {out}/efr32-brd4163a-window-covering
 
 # Generating efr32-brd4163a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4163A" chip_enable_ota_requestor=true' {out}/efr32-brd4163a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4164a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-light
 
 # Generating efr32-brd4164a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-light-rpc
 
 # Generating efr32-brd4164a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4164a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-light-with-ota-requestor
 
 # Generating efr32-brd4164a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-lock
 
 # Generating efr32-brd4164a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
 
 # Generating efr32-brd4164a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4164a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-lock-with-ota-requestor
 
 # Generating efr32-brd4164a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-switch
 
 # Generating efr32-brd4164a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-switch-with-ota-requestor
 
 # Generating efr32-brd4164a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
 
 # Generating efr32-brd4164a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4164a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4164A"' {out}/efr32-brd4164a-window-covering
 
 # Generating efr32-brd4164a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4164A" chip_enable_ota_requestor=true' {out}/efr32-brd4164a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4166a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-light
 
 # Generating efr32-brd4166a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-light-rpc
 
 # Generating efr32-brd4166a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4166a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-light-with-ota-requestor
 
 # Generating efr32-brd4166a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-lock
 
 # Generating efr32-brd4166a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
 
 # Generating efr32-brd4166a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4166a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-lock-with-ota-requestor
 
 # Generating efr32-brd4166a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-switch
 
 # Generating efr32-brd4166a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-switch-with-ota-requestor
 
 # Generating efr32-brd4166a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
 
 # Generating efr32-brd4166a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4166a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4166A"' {out}/efr32-brd4166a-window-covering
 
 # Generating efr32-brd4166a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4166A" chip_enable_ota_requestor=true' {out}/efr32-brd4166a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4170a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-light
 
 # Generating efr32-brd4170a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-light-rpc
 
 # Generating efr32-brd4170a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4170a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-light-with-ota-requestor
 
 # Generating efr32-brd4170a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-lock
 
 # Generating efr32-brd4170a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
 
 # Generating efr32-brd4170a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4170a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-lock-with-ota-requestor
 
 # Generating efr32-brd4170a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-switch
 
 # Generating efr32-brd4170a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-switch-with-ota-requestor
 
 # Generating efr32-brd4170a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
 
 # Generating efr32-brd4170a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4170a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4170A"' {out}/efr32-brd4170a-window-covering
 
 # Generating efr32-brd4170a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4170A" chip_enable_ota_requestor=true' {out}/efr32-brd4170a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4186a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-light
 
 # Generating efr32-brd4186a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-light-rpc
 
 # Generating efr32-brd4186a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4186a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-light-with-ota-requestor
 
 # Generating efr32-brd4186a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-lock
 
 # Generating efr32-brd4186a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
 
 # Generating efr32-brd4186a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4186a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-lock-with-ota-requestor
 
 # Generating efr32-brd4186a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-switch
 
 # Generating efr32-brd4186a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-switch-with-ota-requestor
 
 # Generating efr32-brd4186a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
 
 # Generating efr32-brd4186a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4186a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4186A"' {out}/efr32-brd4186a-window-covering
 
 # Generating efr32-brd4186a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4186A" chip_enable_ota_requestor=true' {out}/efr32-brd4186a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4187a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-light
 
 # Generating efr32-brd4187a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-light-rpc
 
 # Generating efr32-brd4187a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4187a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-light-with-ota-requestor
 
 # Generating efr32-brd4187a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-lock
 
 # Generating efr32-brd4187a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
 
 # Generating efr32-brd4187a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4187a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-lock-with-ota-requestor
 
 # Generating efr32-brd4187a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-switch
 
 # Generating efr32-brd4187a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-switch-with-ota-requestor
 
 # Generating efr32-brd4187a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
 
 # Generating efr32-brd4187a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4187a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187A"' {out}/efr32-brd4187a-window-covering
 
 # Generating efr32-brd4187a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
 
 # Generating efr32-brd4304a-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-light
 
 # Generating efr32-brd4304a-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-light-rpc
 
 # Generating efr32-brd4304a-light-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-rpc-with-ota-requestor
 
 # Generating efr32-brd4304a-light-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-light-with-ota-requestor
 
 # Generating efr32-brd4304a-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-lock
 
 # Generating efr32-brd4304a-lock-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
 
 # Generating efr32-brd4304a-lock-rpc-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-rpc-with-ota-requestor
 
 # Generating efr32-brd4304a-lock-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-lock-with-ota-requestor
 
 # Generating efr32-brd4304a-switch
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-switch
 
 # Generating efr32-brd4304a-switch-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-switch-with-ota-requestor
 
 # Generating efr32-brd4304a-unit-test
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
 
 # Generating efr32-brd4304a-unit-test-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-unit-test-with-ota-requestor
 
 # Generating efr32-brd4304a-window-covering
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-window-covering
 
 # Generating efr32-brd4304a-window-covering-with-ota-requestor
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4304A" chip_enable_ota_requestor=true' {out}/efr32-brd4304a-window-covering-with-ota-requestor
 
 # Generating esp32-c3devkit-all-clusters
 mkdir -p {out}/esp32-c3devkit-all-clusters
@@ -611,6 +620,17 @@ rm -f examples/lighting-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
+
+# Generating esp32-devkitc-light-rpc
+mkdir -p {out}/esp32-devkitc-light-rpc
+
+cp examples/lighting-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc reconfigure'
 
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
@@ -807,6 +827,9 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
 
+# Generating genio-lighting-app
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/genio {out}/genio-lighting-app
+
 # Generating imx-all-clusters-app
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=treat_warnings_as_errors=false target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" optimize_debug=true' {out}/imx-all-clusters-app
 
@@ -843,42 +866,78 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating imx-thermostat-release
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '--args=treat_warnings_as_errors=false target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false' {out}/imx-thermostat-release
 
-# Generating infineon-p6-all-clusters
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
+# Generating infineon-psoc6-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012"' {out}/infineon-psoc6-all-clusters
 
-# Generating infineon-p6-all-clusters-minimal
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters-minimal
+# Generating infineon-psoc6-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012"' {out}/infineon-psoc6-all-clusters-minimal
 
-# Generating infineon-p6-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-light
+# Generating infineon-psoc6-all-clusters-minimal-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-psoc6-all-clusters-minimal-ota
 
-# Generating infineon-p6-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
+# Generating infineon-psoc6-all-clusters-minimal-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-psoc6-all-clusters-minimal-ota-updateimage
+
+# Generating infineon-psoc6-all-clusters-minimal-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-psoc6-all-clusters-minimal-updateimage
+
+# Generating infineon-psoc6-all-clusters-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-psoc6-all-clusters-ota
+
+# Generating infineon-psoc6-all-clusters-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-psoc6-all-clusters-ota-updateimage
+
+# Generating infineon-psoc6-all-clusters-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-psoc6-all-clusters-updateimage
+
+# Generating infineon-psoc6-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012"' {out}/infineon-psoc6-light
+
+# Generating infineon-psoc6-light-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-psoc6-light-ota
+
+# Generating infineon-psoc6-light-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-psoc6-light-ota-updateimage
+
+# Generating infineon-psoc6-light-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-psoc6-light-updateimage
+
+# Generating infineon-psoc6-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012"' {out}/infineon-psoc6-lock
+
+# Generating infineon-psoc6-lock-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true' {out}/infineon-psoc6-lock-ota
+
+# Generating infineon-psoc6-lock-ota-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" chip_enable_ota_requestor=true build_update_image=true' {out}/infineon-psoc6-lock-ota-updateimage
+
+# Generating infineon-psoc6-lock-updateimage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/infineon/psoc6 '--args=psoc6_board="CY8CKIT-062S2-43012" build_update_image=true' {out}/infineon-psoc6-lock-updateimage
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-light-ota-se
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-light-release-no-ota
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_enable_ota_requestor=false' {out}/k32w-light-release-no-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_enable_ota_requestor=false chip_crypto="tinycrypt" mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls"' {out}/k32w-light-release-no-ota
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-lock-low-power-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-lock-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-shell-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
@@ -987,6 +1046,9 @@ mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/
 
 # Generating mbed-CY8CPROTO_062_4343W-shell-release
 cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating mw320-all-clusters-app
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/nxp/mw320 {out}/mw320-all-clusters-app
 
 # Generating nrf-native-posix-64-tests
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -1114,6 +1176,85 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
 
+# Generating telink-tlsr9518adk80d-ota-requestor
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-ota-requestor -b tlsr9518adk80d {root}/examples/ota-requestor-app/telink'
+
+# Generating tizen-arm-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters
+
+# Generating tizen-arm-all-clusters-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-asan
+
+# Generating tizen-arm-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal
+
+# Generating tizen-arm-all-clusters-minimal-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-wifi
+
+# Generating tizen-arm-all-clusters-minimal-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble
+
+# Generating tizen-arm-all-clusters-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-asan
+
+# Generating tizen-arm-all-clusters-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-no-wifi
+
+# Generating tizen-arm-all-clusters-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-wifi
+
+# Generating tizen-arm-all-clusters-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-wifi-asan
+
+# Generating tizen-arm-chip-tool
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool
+
+# Generating tizen-arm-chip-tool-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-asan
+
+# Generating tizen-arm-chip-tool-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-ble
+
+# Generating tizen-arm-chip-tool-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-ble-asan
+
+# Generating tizen-arm-chip-tool-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-ble-no-wifi
+
+# Generating tizen-arm-chip-tool-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-ble-no-wifi-asan
+
+# Generating tizen-arm-chip-tool-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-wifi
+
+# Generating tizen-arm-chip-tool-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool-no-wifi-asan
+
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
 
@@ -1183,50 +1324,50 @@ cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
 
-# Building JNI android-arm-chip-tv-casting-app
-ninja -C {out}/android-arm-chip-tv-casting-app
+# Building JNI android-arm-tv-casting-app
+ninja -C {out}/android-arm-tv-casting-app
 
-# Prepare Native libs android-arm-chip-tv-casting-app
+# Prepare Native libs android-arm-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+cp {out}/android-arm-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
-cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
+cp {out}/android-arm-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
 
-cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-arm-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-arm-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
+cp {out}/android-arm-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
-# Building Example android-arm-chip-tv-casting-app
-{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tv-casting-app assembleDebug
+# Building Example android-arm-tv-casting-app
+{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-tv-casting-app assembleDebug
 
-# Building JNI android-arm-chip-tvserver
-ninja -C {out}/android-arm-chip-tvserver
+# Building JNI android-arm-tv-server
+ninja -C {out}/android-arm-tv-server
 
-# Prepare Native libs android-arm-chip-tvserver
+# Prepare Native libs android-arm-tv-server
 mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
+cp {out}/android-arm-tv-server/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
 
-cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+cp {out}/android-arm-tv-server/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
-cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvApp.so
+cp {out}/android-arm-tv-server/lib/jni/armeabi-v7a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvApp.so
 
-cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm-tv-server/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-arm-tv-server/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-arm-tv-server/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-arm-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+cp {out}/android-arm-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm-chip-tvserver, module platform-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/platform-app :platform-app:assembleDebug
+# Building Example android-arm-tv-server, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-tv-server/platform-app :platform-app:assembleDebug
 
-# Building Example android-arm-chip-tvserver, module content-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/content-app :content-app:assembleDebug
+# Building Example android-arm-tv-server, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-tv-server/content-app :content-app:assembleDebug
 
 # Building JNI android-arm64-chip-test
 ninja -C {out}/android-arm64-chip-test
@@ -1270,50 +1411,50 @@ cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {r
 # Building APP android-arm64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
 
-# Building JNI android-arm64-chip-tv-casting-app
-ninja -C {out}/android-arm64-chip-tv-casting-app
+# Building JNI android-arm64-tv-casting-app
+ninja -C {out}/android-arm64-tv-casting-app
 
-# Prepare Native libs android-arm64-chip-tv-casting-app
+# Prepare Native libs android-arm64-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm64-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
+cp {out}/android-arm64-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-arm64-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-arm64-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
+cp {out}/android-arm64-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
-# Building Example android-arm64-chip-tv-casting-app
-{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tv-casting-app assembleDebug
+# Building Example android-arm64-tv-casting-app
+{root}/examples/tv-casting-app/android/App/gradlew -p {root}/examples/tv-casting-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-tv-casting-app -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-tv-casting-app assembleDebug
 
-# Building JNI android-arm64-chip-tvserver
-ninja -C {out}/android-arm64-chip-tvserver
+# Building JNI android-arm64-tv-server
+ninja -C {out}/android-arm64-tv-server
 
-# Prepare Native libs android-arm64-chip-tvserver
+# Prepare Native libs android-arm64-tv-server
 mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+cp {out}/android-arm64-tv-server/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
 
-cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm64-tv-server/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
-cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libTvApp.so
+cp {out}/android-arm64-tv-server/lib/jni/arm64-v8a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libTvApp.so
 
-cp {out}/android-arm64-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm64-tv-server/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-arm64-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-arm64-tv-server/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-arm64-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-arm64-tv-server/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-arm64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+cp {out}/android-arm64-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm64-chip-tvserver, module platform-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/platform-app :platform-app:assembleDebug
+# Building Example android-arm64-tv-server, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-tv-server/platform-app :platform-app:assembleDebug
 
-# Building Example android-arm64-chip-tvserver, module content-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/content-app :content-app:assembleDebug
+# Building Example android-arm64-tv-server, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-tv-server/content-app :content-app:assembleDebug
 
 # Building JNI android-x64-chip-tool
 ninja -C {out}/android-x64-chip-tool
@@ -1336,31 +1477,31 @@ cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
 
-# Building JNI android-x64-chip-tvserver
-ninja -C {out}/android-x64-chip-tvserver
+# Building JNI android-x64-tv-server
+ninja -C {out}/android-x64-tv-server
 
-# Prepare Native libs android-x64-chip-tvserver
+# Prepare Native libs android-x64-tv-server
 mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64
 
-cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+cp {out}/android-x64-tv-server/lib/jni/x86_64/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
 
-cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libc++_shared.so
+cp {out}/android-x64-tv-server/lib/jni/x86_64/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libc++_shared.so
 
-cp {out}/android-x64-chip-tvserver/lib/jni/x86_64/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libTvApp.so
+cp {out}/android-x64-tv-server/lib/jni/x86_64/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86_64/libTvApp.so
 
-cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+cp {out}/android-x64-tv-server/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-x64-tv-server/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-x64-tv-server/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-x64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+cp {out}/android-x64-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x64-chip-tvserver, module platform-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/platform-app :platform-app:assembleDebug
+# Building Example android-x64-tv-server, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-tv-server/platform-app :platform-app:assembleDebug
 
-# Building Example android-x64-chip-tvserver, module content-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/content-app :content-app:assembleDebug
+# Building Example android-x64-tv-server, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-tv-server/content-app :content-app:assembleDebug
 
 # Building JNI android-x86-chip-tool
 ninja -C {out}/android-x86-chip-tool
@@ -1383,34 +1524,43 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
 
-# Building JNI android-x86-chip-tvserver
-ninja -C {out}/android-x86-chip-tvserver
+# Building JNI android-x86-tv-server
+ninja -C {out}/android-x86-tv-server
 
-# Prepare Native libs android-x86-chip-tvserver
+# Prepare Native libs android-x86-tv-server
 mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/x86
 
-cp {out}/android-x86-chip-tvserver/lib/jni/x86/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libSetupPayloadParser.so
+cp {out}/android-x86-tv-server/lib/jni/x86/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libSetupPayloadParser.so
 
-cp {out}/android-x86-chip-tvserver/lib/jni/x86/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libc++_shared.so
+cp {out}/android-x86-tv-server/lib/jni/x86/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libc++_shared.so
 
-cp {out}/android-x86-chip-tvserver/lib/jni/x86/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libTvApp.so
+cp {out}/android-x86-tv-server/lib/jni/x86/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/x86/libTvApp.so
 
-cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
+cp {out}/android-x86-tv-server/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
+cp {out}/android-x86-tv-server/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-app/android/App/app/libs/AndroidPlatform.jar
 
-cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
+cp {out}/android-x86-tv-server/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-app/android/App/app/libs/CHIPAppServer.jar
 
-cp {out}/android-x86-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
+cp {out}/android-x86-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x86-chip-tvserver, module platform-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/platform-app :platform-app:assembleDebug
+# Building Example android-x86-tv-server, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-tv-server/platform-app :platform-app:assembleDebug
 
-# Building Example android-x86-chip-tvserver, module content-app
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/content-app :content-app:assembleDebug
+# Building Example android-x86-tv-server, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-tv-server/content-app :content-app:assembleDebug
 
 # Building bl602-light
 ninja -C {out}/bl602-light
+
+# Building bouffalolab-BL706-IoT-DVK-light
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-light
+
+# Building bouffalolab-BL706-IoT-DVK-light-rpc
+ninja -C {out}/bouffalolab-BL706-IoT-DVK-light-rpc
+
+# Building bouffalolab-BL706-NIGHT-LIGHT-light
+ninja -C {out}/bouffalolab-BL706-NIGHT-LIGHT-light
 
 # Building cc13x2x7_26x2x7-all-clusters
 ninja -C {out}/cc13x2x7_26x2x7-all-clusters
@@ -1837,6 +1987,13 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
 
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc build'
+
 rm -f examples/lock-app/esp32/sdkconfig
 
 # Building esp32-devkitc-lock
@@ -1956,6 +2113,9 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
 
+# Building genio-lighting-app
+ninja -C {out}/genio-lighting-app
+
 # Building imx-all-clusters-app
 ninja -C {out}/imx-all-clusters-app
 
@@ -1992,17 +2152,53 @@ ninja -C {out}/imx-thermostat
 # Building imx-thermostat-release
 ninja -C {out}/imx-thermostat-release
 
-# Building infineon-p6-all-clusters
-ninja -C {out}/infineon-p6-all-clusters
+# Building infineon-psoc6-all-clusters
+ninja -C {out}/infineon-psoc6-all-clusters
 
-# Building infineon-p6-all-clusters-minimal
-ninja -C {out}/infineon-p6-all-clusters-minimal
+# Building infineon-psoc6-all-clusters-minimal
+ninja -C {out}/infineon-psoc6-all-clusters-minimal
 
-# Building infineon-p6-light
-ninja -C {out}/infineon-p6-light
+# Building infineon-psoc6-all-clusters-minimal-ota
+ninja -C {out}/infineon-psoc6-all-clusters-minimal-ota
 
-# Building infineon-p6-lock
-ninja -C {out}/infineon-p6-lock
+# Building infineon-psoc6-all-clusters-minimal-ota-updateimage
+ninja -C {out}/infineon-psoc6-all-clusters-minimal-ota-updateimage
+
+# Building infineon-psoc6-all-clusters-minimal-updateimage
+ninja -C {out}/infineon-psoc6-all-clusters-minimal-updateimage
+
+# Building infineon-psoc6-all-clusters-ota
+ninja -C {out}/infineon-psoc6-all-clusters-ota
+
+# Building infineon-psoc6-all-clusters-ota-updateimage
+ninja -C {out}/infineon-psoc6-all-clusters-ota-updateimage
+
+# Building infineon-psoc6-all-clusters-updateimage
+ninja -C {out}/infineon-psoc6-all-clusters-updateimage
+
+# Building infineon-psoc6-light
+ninja -C {out}/infineon-psoc6-light
+
+# Building infineon-psoc6-light-ota
+ninja -C {out}/infineon-psoc6-light-ota
+
+# Building infineon-psoc6-light-ota-updateimage
+ninja -C {out}/infineon-psoc6-light-ota-updateimage
+
+# Building infineon-psoc6-light-updateimage
+ninja -C {out}/infineon-psoc6-light-updateimage
+
+# Building infineon-psoc6-lock
+ninja -C {out}/infineon-psoc6-lock
+
+# Building infineon-psoc6-lock-ota
+ninja -C {out}/infineon-psoc6-lock-ota
+
+# Building infineon-psoc6-lock-ota-updateimage
+ninja -C {out}/infineon-psoc6-lock-ota-updateimage
+
+# Building infineon-psoc6-lock-updateimage
+ninja -C {out}/infineon-psoc6-lock-updateimage
 
 # Building k32w-light-ota-se
 ninja -C {out}/k32w-light-ota-se
@@ -2127,6 +2323,9 @@ bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-release/chip-*'
 # Building mbed-CY8CPROTO_062_4343W-shell-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release
 
+# Building mw320-all-clusters-app
+ninja -C {out}/mw320-all-clusters-app
+
 # Building nrf-native-posix-64-tests
 ninja -C {out}/nrf-native-posix-64-tests
 
@@ -2207,6 +2406,81 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building telink-tlsr9518adk80d-light-switch
 ninja -C {out}/telink-tlsr9518adk80d-light-switch
+
+# Building telink-tlsr9518adk80d-ota-requestor
+ninja -C {out}/telink-tlsr9518adk80d-ota-requestor
+
+# Building tizen-arm-all-clusters
+ninja -C {out}/tizen-arm-all-clusters
+
+# Building tizen-arm-all-clusters-asan
+ninja -C {out}/tizen-arm-all-clusters-asan
+
+# Building tizen-arm-all-clusters-minimal
+ninja -C {out}/tizen-arm-all-clusters-minimal
+
+# Building tizen-arm-all-clusters-minimal-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-asan
+
+# Building tizen-arm-all-clusters-minimal-no-ble
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble
+
+# Building tizen-arm-all-clusters-minimal-no-ble-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-asan
+
+# Building tizen-arm-all-clusters-minimal-no-ble-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi
+
+# Building tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+
+# Building tizen-arm-all-clusters-minimal-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-wifi
+
+# Building tizen-arm-all-clusters-minimal-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-wifi-asan
+
+# Building tizen-arm-all-clusters-no-ble
+ninja -C {out}/tizen-arm-all-clusters-no-ble
+
+# Building tizen-arm-all-clusters-no-ble-asan
+ninja -C {out}/tizen-arm-all-clusters-no-ble-asan
+
+# Building tizen-arm-all-clusters-no-ble-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-no-ble-no-wifi
+
+# Building tizen-arm-all-clusters-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-no-ble-no-wifi-asan
+
+# Building tizen-arm-all-clusters-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-no-wifi
+
+# Building tizen-arm-all-clusters-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-no-wifi-asan
+
+# Building tizen-arm-chip-tool
+ninja -C {out}/tizen-arm-chip-tool
+
+# Building tizen-arm-chip-tool-asan
+ninja -C {out}/tizen-arm-chip-tool-asan
+
+# Building tizen-arm-chip-tool-no-ble
+ninja -C {out}/tizen-arm-chip-tool-no-ble
+
+# Building tizen-arm-chip-tool-no-ble-asan
+ninja -C {out}/tizen-arm-chip-tool-no-ble-asan
+
+# Building tizen-arm-chip-tool-no-ble-no-wifi
+ninja -C {out}/tizen-arm-chip-tool-no-ble-no-wifi
+
+# Building tizen-arm-chip-tool-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-chip-tool-no-ble-no-wifi-asan
+
+# Building tizen-arm-chip-tool-no-wifi
+ninja -C {out}/tizen-arm-chip-tool-no-wifi
+
+# Building tizen-arm-chip-tool-no-wifi-asan
+ninja -C {out}/tizen-arm-chip-tool-no-wifi-asan
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light

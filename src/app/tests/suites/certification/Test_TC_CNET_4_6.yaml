@@ -14,8 +14,11 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.6. [TC-CNET-4.6] [Thread] UNSUPPORTED_ACCESS message Validation
+    12.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
@@ -23,40 +26,74 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH and DUT on Thread setup"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "The cluster Identifier 49 (0x0031) is present in the ServerList
+          attribute"
+      verification: |
+
+      disabled: true
+
+    - label: "The FeatureMap attribute value is 2"
+      verification: |
+
+      disabled: true
+
     - label:
           "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
-          following argument: OperationalDataset argument value as 'Userth_op'
+          following argument: OperationalDataset argument value as Userth_op
           Breadcrumb argument value as 1"
+      PICS: CNET.S.C03.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
 
-          [1650363857.368796][6969:6974] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0x7e
-          [1650363857.368875][6969:6974] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363857.368983][6969:6974] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363857.369099][6969:6974] CHIP:EM: Sending Standalone Ack for MessageCounter:11755505 on exchange 55845i
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
           "TH sends RemoveNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          value as Userth_op and Breadcrumb argument value as 1"
+      PICS: CNET.S.C04.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 1232034768527434274 51 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
-          [1650363867.634242][6975:6980] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004 Status=0x7e
-          [1650363867.634324][6975:6980] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363867.634414][6975:6980] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363867.634538][6975:6980] CHIP:EM: Sending Standalone Ack for MessageCounter:10492212 on exchange 58096i
+          Below is an example:
+
+          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(Chip-tool) Log:
+
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
           "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          value as Userth_op and Breadcrumb argument value as 1"
+      PICS: CNET.S.C06.Rsp
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
+          Below is an example:
 
-          [1650363877.624299][6983:6988] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006 Status=0x7e
-          [1650363877.624379][6983:6988] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363877.624465][6983:6988] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363877.624582][6983:6988] CHIP:EM: Sending Standalone Ack for MessageCounter:841274 on exchange 6415i
+          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
+
+          Verify  "FAILSAFE_REQUIRED status code"  on the TH(chip-tool) Log:
+
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

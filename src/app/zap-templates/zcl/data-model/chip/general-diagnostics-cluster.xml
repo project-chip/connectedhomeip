@@ -97,6 +97,7 @@ limitations under the License.
       <description>Provide a means for certification tests to trigger some test-plan-specific events</description>
       <arg name="EnableKey" type="OCTET_STRING" length="16"/>
       <arg name="EventTrigger" type="INT64U"/>
+      <access op="invoke" role="manage"/>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">

@@ -22,7 +22,6 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "PWMDevice.h"
-#include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
@@ -58,17 +57,20 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout        = 3000;
-constexpr int kFactoryResetCancelWindowTimeout   = 3000;
-constexpr int kAppEventQueueSize                 = 10;
-constexpr uint8_t kButtonPushEvent               = 1;
-constexpr uint8_t kButtonReleaseEvent            = 0;
-constexpr EndpointId kLightEndpointId            = 1;
-constexpr uint32_t kIdentifyBlinkRateMs          = 500;
-constexpr uint8_t kDefaultMinLevel               = 0;
-constexpr uint8_t kDefaultMaxLevel               = 254;
-constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+constexpr int kFactoryResetTriggerTimeout      = 3000;
+constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr int kAppEventQueueSize               = 10;
+constexpr uint8_t kButtonPushEvent             = 1;
+constexpr uint8_t kButtonReleaseEvent          = 0;
+constexpr EndpointId kLightEndpointId          = 1;
+constexpr uint32_t kIdentifyBlinkRateMs        = 500;
+constexpr uint8_t kDefaultMinLevel             = 0;
+constexpr uint8_t kDefaultMaxLevel             = 254;
+
+// NOTE! This key is for test/certification only and should not be available in production devices!
+// If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -173,12 +175,20 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
+    // Read EnableKey from the factory data.
+    MutableByteSpan enableKey(sTestEventTriggerEnableKey);
+    err = mFactoryDataProvider.GetEnableKey(enableKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("mFactoryDataProvider.GetEnableKey() failed. Could not delegate a test event trigger");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
     static CommonCaseDeviceServerInitParams initParams;
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
@@ -256,14 +266,6 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         button_event.ButtonEvent.PinNo  = FUNCTION_BUTTON;
         button_event.ButtonEvent.Action = (FUNCTION_BUTTON_MASK & button_state) ? kButtonPushEvent : kButtonReleaseEvent;
         button_event.Handler            = FunctionHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-
-    if (THREAD_START_BUTTON_MASK & button_state & has_changed)
-    {
-        button_event.ButtonEvent.PinNo  = THREAD_START_BUTTON;
-        button_event.ButtonEvent.Action = kButtonPushEvent;
-        button_event.Handler            = StartThreadHandler;
         sAppTask.PostEvent(&button_event);
     }
 
@@ -385,22 +387,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.mFunction = kFunction_NoneSelected;
             LOG_INF("Factory Reset has been Canceled");
         }
-    }
-}
-
-void AppTask::StartThreadHandler(AppEvent * aEvent)
-{
-    if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
-        return;
-
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
-    {
-        StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-    }
-    else
-    {
-        LOG_INF("Device is commissioned to a Thread network.");
     }
 }
 

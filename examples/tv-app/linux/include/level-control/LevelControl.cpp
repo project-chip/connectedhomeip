@@ -44,23 +44,32 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
-static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
-                        uint8_t optionOverride)
+static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint16_t> transitionTimeDs,
+                        uint8_t optionMask, uint8_t optionOverride)
 {
 
     EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
+    app::DataModel::Nullable<uint8_t> nullableCurrentLevel;
     uint8_t currentLevel;
 
-    status = emberAfReadServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                        (uint8_t *) &currentLevel, sizeof(currentLevel));
-
+    status = Attributes::CurrentLevel::Get(endpoint, nullableCurrentLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
         goto send_default_response;
     }
+
+    if (nullableCurrentLevel.IsNull())
+    {
+        emberAfLevelControlClusterPrintln("ERR: Current Level is null");
+        status = EMBER_ZCL_STATUS_FAILURE;
+
+        goto send_default_response;
+    }
+
+    currentLevel = nullableCurrentLevel.Value();
 
     switch (stepMode)
     {
@@ -99,8 +108,10 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
                 // TODO: Insert your code here to send volume down command
             }
         }
-        status             = emberAfWriteServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                             (uint8_t *) &currentLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+
+        nullableCurrentLevel.SetNonNull(currentLevel);
+        status = Attributes::CurrentLevel::Set(endpoint, nullableCurrentLevel);
+
         state->storedLevel = currentLevel;
         ChipLogProgress(Zcl, "Setting volume to new level %d", state->storedLevel);
     }
@@ -112,8 +123,8 @@ send_default_response:
     }
 }
 
-bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                            uint8_t optionOverride)
+bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint8_t> transitionTime,
+                                            uint8_t optionMask, uint8_t optionOverride)
 {
     stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;

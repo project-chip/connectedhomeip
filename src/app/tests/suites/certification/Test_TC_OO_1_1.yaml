@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.1.1. [TC-OO-1] Global attributes with server as DUT
+name: 4.1.1. [TC-OO-1.1] Global attributes with server as DUT
+
+PICS:
+    - OO.S
 
 config:
     nodeId: 0x12344321
@@ -28,56 +31,66 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 4
           constraints:
-              type: uint16
+              type: int16u
 
-    - label: "read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: OO_LT
+      PICS: " !OO.S.F00 "
       response:
-          value: 1
+          value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
-    #issue 17495
+    - label: "Given OO.S.F00(LT) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OO.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value:
-              [0, 16384, 16385, 16386, 16387, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the feature dependent(OO.S.F00) attribute in AttributeList"
+      PICS: OO.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16384, 16385, 16386, 16387]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
-      PICS: OO_LT
       response:
-          value: [0, 1, 2, 64, 65, 66]
           constraints:
               type: list
+              contains: [0, 1, 2]
+
+    - label:
+          "Read the feature dependent(OO.S.F00) commands in AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: OO.S.F00
+      response:
+          constraints:
+              type: list
+              contains: [64, 65, 66]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
@@ -86,3 +99,18 @@ tests:
           value: []
           constraints:
               type: list
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

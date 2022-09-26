@@ -90,7 +90,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
@@ -127,7 +127,6 @@ private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;

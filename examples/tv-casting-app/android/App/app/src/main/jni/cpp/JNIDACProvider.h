@@ -28,7 +28,7 @@ public:
     CHIP_ERROR GetFirmwareInformation(chip::MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(chip::MutableByteSpan & out_dac_buffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(chip::MutableByteSpan & out_pai_buffer) override;
-    CHIP_ERROR SignWithDeviceAttestationKey(const chip::ByteSpan & digest_to_sign,
+    CHIP_ERROR SignWithDeviceAttestationKey(const chip::ByteSpan & message_to_sign,
                                             chip::MutableByteSpan & out_signature_buffer) override;
 
 private:

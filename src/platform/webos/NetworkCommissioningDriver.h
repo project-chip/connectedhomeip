@@ -47,7 +47,7 @@ public:
 
 private:
     size_t currentIterating = 0;
-    // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable.
+    // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copyable.
     std::vector<T> * mpScanResponse;
 };
 
@@ -80,7 +80,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -102,10 +102,8 @@ public:
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
-    Optional<Status> mScanStatus;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -130,7 +128,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }

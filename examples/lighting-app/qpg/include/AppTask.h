@@ -48,11 +48,11 @@ private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
+    static void InitServer(intptr_t arg);
+    static void OpenCommissioning(intptr_t arg);
 
     static void ActionInitiated(LightingManager::Action_t aAction);
     static void ActionCompleted(LightingManager::Action_t aAction);
-
-    void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
@@ -63,6 +63,7 @@ private:
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
     void StartTimer(uint32_t aTimeoutMs);
+    void CancelTimer(void);
 
     enum Function_t
     {

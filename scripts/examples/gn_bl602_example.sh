@@ -17,27 +17,29 @@
 #
 
 set -e
-# Build script for GN BL602 examples GitHub workflow.
+
+BL602_BOARD=BL-HWC-G1
+
+# Build script for GN examples GitHub workflow.
+
+MATTER_ROOT=$(dirname "$(readlink -f "$0")")/../../
+
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-set -x
-env
+USAGE="./scripts/examples/gn_bl602_example.sh example_dir output_dir"
 
-# Build steps
-EXAMPLE_DIR=$1
-shift
-OUTPUT_DIR=out/example_app
-BL602_BOARD=BL-HWC-G1
-MATTER_BL_ROOT=$PWD
-export BL602_SDK_ROOT="$MATTER_BL_ROOT"/third_party/bouffalolab/bl602_sdk/repo
-export PATH="$BL602_SDK_ROOT/toolchain/riscv/Linux/bin:$PATH"
-
-if [[ ! -z "$1" ]]; then
-    OUTPUT_DIR=$1
-    shift
+if [ $# -lt 2 ]; then
+    echo "Usage: $USAGE"
+    exit 1
 fi
 
+EXAMPLE_DIR=examples/$1/bouffalolab/bl602/
+shift
+OUTPUT_DIR=$1
+shift
+
 GN_ARGS=()
+
 NINJA_ARGS=()
 
 for arg; do
@@ -58,6 +60,6 @@ for arg; do
     esac
 done
 
-#gn clean out/lighting_app_bl602
-gn gen "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="${GN_ARGS[*]}"
+gn gen --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]} custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:riscv_gcc\""
+
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"

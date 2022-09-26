@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include <string>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/support/UnitTestUtils.h>
 
 class TestRunner

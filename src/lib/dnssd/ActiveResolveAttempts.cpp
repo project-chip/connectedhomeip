@@ -48,9 +48,11 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
         }
     }
 
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     // This may happen during boot time adverisements: nodes come online
     // and advertise their IP without any explicit queries for them
     ChipLogProgress(Discovery, "Discovered node without a pending query");
+#endif
 }
 
 void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & data)

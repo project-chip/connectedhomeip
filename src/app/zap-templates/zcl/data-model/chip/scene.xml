@@ -52,7 +52,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
    
-    <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" optional="false" cli="chip scenes add">
+    <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
       </description>
@@ -64,7 +64,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
     </command>
    
-    <command source="client" code="0x01" name="ViewScene" response="ViewSceneResponse" optional="false" cli="chip scenes view">
+    <command source="client" code="0x01" name="ViewScene" response="ViewSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes view">
       <description>
         Retrieves the requested scene entry from its Scene table.
       </description>
@@ -72,7 +72,7 @@ limitations under the License.
       <arg name="SceneId" type="INT8U"/>
     </command>
    
-    <command source="client" code="0x02" name="RemoveScene" response="RemoveSceneResponse" optional="false" cli="chip scenes remove">
+    <command source="client" code="0x02" name="RemoveScene" response="RemoveSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes remove">
       <description>
         Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table
       </description>
@@ -81,7 +81,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
     </command>
     
-    <command source="client" code="0x03" name="RemoveAllScenes" response="RemoveAllScenesResponse" optional="false" cli="chip scenes rmall">
+    <command source="client" code="0x03" name="RemoveAllScenes" response="RemoveAllScenesResponse" isFabricScoped="true" optional="false" cli="chip scenes rmall">
       <description>
         Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table
       </description>
@@ -89,7 +89,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
     </command>
     
-    <command source="client" code="0x04" name="StoreScene" response="StoreSceneResponse" optional="false" cli="chip scenes store">
+    <command source="client" code="0x04" name="StoreScene" response="StoreSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes store">
       <description>
         Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint
       </description>
@@ -98,7 +98,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
     </command>
     
-    <command source="client" code="0x05" name="RecallScene" optional="false" cli="chip scenes recall">
+    <command source="client" code="0x05" name="RecallScene" isFabricScoped="true" optional="false" cli="chip scenes recall">
       <description>
         Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table
       </description>
@@ -107,14 +107,14 @@ limitations under the License.
       <arg name="TransitionTime" type="INT16U" optional="true" isNullable="true"/>
     </command>
    
-    <command source="client" code="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse" optional="false" cli="chip scenes get">
+    <command source="client" code="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse" isFabricScoped="true" optional="false" cli="chip scenes get">
       <description>
         Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group 
       </description>
       <arg name="GroupId" type="group_id"/>
     </command>
 
-    <command source="client" code="0x40" name="EnhancedAddScene" response="EnhancedAddSceneResponse" optional="true" cli="chip scenes eadd">
+    <command source="client" code="0x40" name="EnhancedAddScene" response="EnhancedAddSceneResponse" isFabricScoped="true" optional="true" cli="chip scenes eadd">
       <description>
         Allows a scene to be added using a finer scene transition time than the AddScene command.
       </description>
@@ -124,14 +124,14 @@ limitations under the License.
       <arg name="SceneName" type="CHAR_STRING"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true"/>
     </command>
-    <command source="client" code="0x41" name="EnhancedViewScene" response="EnhancedViewSceneResponse" optional="true" noDefaultImplementation="true" cli="chip scenes eview">
+    <command source="client" code="0x41" name="EnhancedViewScene" response="EnhancedViewSceneResponse" isFabricScoped="true" optional="true" noDefaultImplementation="true" cli="chip scenes eview">
       <description>
         Allows a scene to be retrieved using a finer scene transition time than the ViewScene command
       </description>
       <arg name="GroupId" type="group_id"/>
       <arg name="SceneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x42" name="CopyScene" response="CopySceneResponse" optional="true" cli="chip scenes copy">
+    <command source="client" code="0x42" name="CopyScene" response="CopySceneResponse" isFabricScoped="true" optional="true" cli="chip scenes copy">
       <description>
         Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
       </description>

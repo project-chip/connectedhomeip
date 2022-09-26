@@ -1,5 +1,10 @@
 {{> header}}
 
+#include <json/json.h>
+
+#include <lib/core/CHIPError.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
 {{#structs_with_cluster_name}}
 static CHIP_ERROR Setup(const char * label, {{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request, Json::Value & value);
 

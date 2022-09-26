@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -275,7 +275,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
         capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinSubscriptionsPerFabric();
+        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
 
         status = aEncoder.Encode(capabilityMinima);
         break;
@@ -304,7 +304,7 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen);
     if ((err != CHIP_NO_ERROR) || (codeLen == 0))
     {
-        strncpy(&location[0], "XX", kMaxLen + 1);
+        Platform::CopyString(location, "XX");
         codeLen = strnlen(location, kMaxLen);
         err     = CHIP_NO_ERROR;
     }

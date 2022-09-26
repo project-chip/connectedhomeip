@@ -21,7 +21,7 @@
 #include "InvokeRequestMessage.h"
 #include "MessageDefHelper.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {

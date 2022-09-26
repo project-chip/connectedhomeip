@@ -1,0 +1,2215 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.1.4. [TC-BR-4] DUT client handling of bridges (DUT client)
+
+PICS:
+    - MCORE.BRIDGECLIENT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Test Harness simulating a bridge with some bridged devices; can use the bridge-app for this purpose
+
+          2.DUT (client and commissioner)
+      disabled: true
+
+    - label:
+          "Start bridge-app on TH. Commission TH to DUT. Monitor traffic between
+          DUT and TH."
+      verification: |
+          sudo ./chip-bridge-app
+
+          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
+
+          ./chip-tool  descriptor read device-list 1 1
+
+          Verify in TH(bridge-app) Log:
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+
+
+          ./chip-tool  descriptor read device-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+
+          ./chip-tool  descriptor read device-list 1 3
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          ./chip-tool  descriptor read device-list 1 4
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 5
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x5,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 6
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x6,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 7
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x7,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 8
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x8,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 9
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x9,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 10
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x10,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          ./chip-tool  descriptor read device-list 1 11
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x11,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 12
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x12,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 13
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x13,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          Verify PartsList  for available EP
+
+          ./chip-tool  descriptor read parts-list 1 0
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 1
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 3
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 4
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+           ./chip-tool  descriptor read parts-list 1 5
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x5,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 6
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x6,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 7
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x7,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 8
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x8,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 9
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x9,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 10
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x10,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 11
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x11,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read  parts-list 1 12
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x12,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 13
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x13,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+      disabled: true
+
+    - label: "Verify DUT contains the (supported) devices from the above list"
+      PICS: MCORE.DEVLIST.UseDevices
+      verification: |
+          sudo ./chip-bridge-app
+
+          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
+
+          ./chip-tool  descriptor read device-list 1 1
+
+          Verify in TH(bridge-app) Log:
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+
+
+          ./chip-tool  descriptor read device-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+
+          ./chip-tool  descriptor read device-list 1 3
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          ./chip-tool  descriptor read device-list 1 4
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 5
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x5,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 6
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x6,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 7
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x7,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 8
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x8,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 9
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x9,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 10
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x10,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          ./chip-tool  descriptor read device-list 1 11
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x11,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 12
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x12,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+
+          ./chip-tool  descriptor read device-list 1 13
+
+          Verify in TH(bridge-app) Log:
+          [1659972745.371532][3652:3652] CHIP:IM: Received Read request
+          [1659972745.371611][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972745.371654][3652:3652] CHIP:DMG: {
+          [1659972745.371678][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972745.371716][3652:3652] CHIP:DMG:         [
+          [1659972745.371742][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972745.371781][3652:3652] CHIP:DMG:                 {
+          [1659972745.371818][3652:3652] CHIP:DMG:                         Endpoint = 0x13,
+          [1659972745.371860][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972745.371902][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972745.371933][3652:3652] CHIP:DMG:                 }
+          [1659972745.371971][3652:3652] CHIP:DMG:
+          [1659972745.371997][3652:3652] CHIP:DMG:         ],
+          [1659972745.372036][3652:3652] CHIP:DMG:
+          [1659972745.372063][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972745.372099][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972745.372124][3652:3652] CHIP:DMG: },
+          [1659972745.372217][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972745.372312][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972745.372343][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+
+
+
+          Verify PartsList  for available EP
+
+          ./chip-tool  descriptor read parts-list 1 0
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 1
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 2
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x2,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 3
+
+          Verify in TH(bridge-app) Log:
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 4
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+           ./chip-tool  descriptor read parts-list 1 5
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x5,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 6
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x6,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 7
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x7,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 8
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x8,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 9
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x9,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 10
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x10,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 11
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x11,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read  parts-list 1 12
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x12,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+
+          ./chip-tool  descriptor read parts-list 1 13
+
+          Verify in TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x13,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+      disabled: true
+
+    - label:
+          "Verify DUT has (during step 1a) read the NodeLabel attribute from the
+          Bridged Device Basic Information cluster on various endpoints ,Verify
+          DUT contains the names for the (supported) devices from the above list"
+      PICS: MCORE.DEVLIST.UseDeviceNames
+      verification: |
+          NodeLabel is supported for endpoints 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+
+          ./chip-tool bridgeddevicebasic read node-label 1 3
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 4
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 5
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x5,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 6
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x6,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 7
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x7,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 8
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x8,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 9
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x9,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 10
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x10,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 11
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x11,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 12
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x12,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+
+
+          ./chip-tool bridgeddevicebasic read node-label 1 13
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x13,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+      disabled: true
+
+    - label:
+          "Verify DUT has read or reads OnOff attribute from the On/Off cluster
+          for the various endpoints containing an On/Off light ,Verify DUT
+          contains the state for the (supported) devices from the above list"
+      PICS: MCORE.DEVLIST.UseDeviceState
+      verification: |
+          Read onoff attribute from OnOff cluster with applicable EP (refer step 1a )
+
+          ./chip-tool onoff read on-off 1 3
+
+          Verify in TH(bridge-app) Log:
+
+          [1659973152.263905][3652:3652] CHIP:IM: Received Read request
+          [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973152.264053][3652:3652] CHIP:DMG: {
+          [1659973152.264083][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973152.264130][3652:3652] CHIP:DMG:         [
+          [1659973152.264163][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973152.264214][3652:3652] CHIP:DMG:                 {
+          [1659973152.264255][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973152.264308][3652:3652] CHIP:DMG:                         Cluster = 0x6,
+          [1659973152.264350][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973152.264404][3652:3652] CHIP:DMG:                 }
+          [1659973152.264457][3652:3652] CHIP:DMG:
+          [1659973152.264494][3652:3652] CHIP:DMG:         ],
+          [1659973152.264541][3652:3652] CHIP:DMG:
+          [1659973152.264577][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973152.264622][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973152.264654][3652:3652] CHIP:DMG: },
+          [1659973152.264756][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973152.264871][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973152.264922][3652:3652] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
+      disabled: true
+
+    - label:
+          "Use TH/bridge-app to change the on/off state of one or more of the
+          bridged On/Off lights (use key c in the console to bridge-app)"
+      PICS: MCORE.DEVLIST.UseDeviceState
+      verification: |
+          Verify on TH(bridge-app) Log:
+          ./chip-tool onoff read on-off 1 3
+
+          [1659973152.263905][3652:3652] CHIP:IM: Received Read request
+          [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973152.264053][3652:3652] CHIP:DMG: {
+          [1659973152.264083][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973152.264130][3652:3652] CHIP:DMG:         [
+          [1659973152.264163][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973152.264214][3652:3652] CHIP:DMG:                 {
+          [1659973152.264255][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973152.264308][3652:3652] CHIP:DMG:                         Cluster = 0x6,
+          [1659973152.264350][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973152.264404][3652:3652] CHIP:DMG:                 }
+          [1659973152.264457][3652:3652] CHIP:DMG:
+          [1659973152.264494][3652:3652] CHIP:DMG:         ],
+          [1659973152.264541][3652:3652] CHIP:DMG:
+          [1659973152.264577][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973152.264622][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973152.264654][3652:3652] CHIP:DMG: },
+          [1659973152.264756][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973152.264871][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973152.264922][3652:3652] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
+      disabled: true
+
+    - label:
+          "Verify DUT has read or reads MeasuredValue attribute from the
+          Temperature Measurement cluster for the various endpoints containing a
+          Temperature Sensor (or receives updates because of a previously set up
+          subscription) ,Verify DUT contains the state for the (supported)
+          device from the above list"
+      PICS: MCORE.DEVLIST.UseDeviceState
+      verification: |
+          ./chip-tool temperaturemeasurement read measured-value 1 4
+
+          Verify on TH(bridge-app) Log:
+
+          [1659973227.630446][3652:3652] CHIP:IM: Received Read request
+          [1659973227.630527][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973227.630570][3652:3652] CHIP:DMG: {
+          [1659973227.630594][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973227.630633][3652:3652] CHIP:DMG:         [
+          [1659973227.630658][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973227.630699][3652:3652] CHIP:DMG:                 {
+          [1659973227.630728][3652:3652] CHIP:DMG:                         Endpoint = 0x4,
+          [1659973227.630779][3652:3652] CHIP:DMG:                         Cluster = 0x402,
+          [1659973227.630821][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973227.630853][3652:3652] CHIP:DMG:                 }
+          [1659973227.630892][3652:3652] CHIP:DMG:
+          [1659973227.630919][3652:3652] CHIP:DMG:         ],
+          [1659973227.630957][3652:3652] CHIP:DMG:
+          [1659973227.630984][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973227.631020][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973227.631044][3652:3652] CHIP:DMG: },
+          [1659973227.631126][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973227.631231][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973227.631262][3652:3652] CHIP:DMG: <RE:Run> Cluster 402, Attribute 0 is dirty
+      disabled: true
+
+    - label:
+          "Use TH/bridge-app to change the simulated temperature level of the
+          simulated temperature sensors (use key <tbd> in the console to
+          bridge-app)"
+      PICS: MCORE.DEVLIST.UseDeviceState
+      verification: |
+          Press a key "tbd" on bridge-app to change the simulated temperature
+
+
+          ./chip-tool temperaturemeasurement read measured-value 1 4
+
+          Verify on TH(bridge-app) Log:
+
+          expect to get a different value than step 7b
+          [1659351542.393349][12212:12217] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0402 Attribute 0x0000_0000 DataVersion: 2406690153
+          [1659351542.393429][12212:12217] CHIP:TOO:   MeasuredValue: 200
+          [1659351542.393552][12212:12217] CHIP:EM: Sending Standalone Ack for MessageCounter:120981971 on exchange 25924i
+      disabled: true
+
+    - label:
+          "Verify DUT has read or reads BatChargeLevel attribute from the Power
+          Source cluster from the relevant endpoint (or receives updates because
+          of a previously set up subscription) ,Verify DUT contains the state of
+          the battery of the (supported) devices from the above list"
+      PICS: MCORE.DEVLIST.UseBatInfo
+      verification: |
+          ./chip-tool powersource read bat-charge-level 1 9
+
+          Verify on TH(bridge-app) Log:
+
+          [1663150444.546356][3294:3294] CHIP:IM: Received Read request
+          [1663150444.546475][3294:3294] CHIP:DMG: ReadRequestMessage =
+          [1663150444.546520][3294:3294] CHIP:DMG: {
+          [1663150444.546556][3294:3294] CHIP:DMG: 	AttributePathIBs =
+          [1663150444.546604][3294:3294] CHIP:DMG: 	[
+          [1663150444.546646][3294:3294] CHIP:DMG: 		AttributePathIB =
+          [1663150444.546784][3294:3294] CHIP:DMG: 		{
+          [1663150444.546836][3294:3294] CHIP:DMG: 			Endpoint = 0x9,
+          [1663150444.546890][3294:3294] CHIP:DMG: 			Cluster = 0x2f,
+          [1663150444.546945][3294:3294] CHIP:DMG: 			Attribute = 0x0000_000E,
+          [1663150444.546996][3294:3294] CHIP:DMG: 		}
+          [1663150444.547047][3294:3294] CHIP:DMG:
+          [1663150444.547094][3294:3294] CHIP:DMG: 	],
+          [1663150444.547142][3294:3294] CHIP:DMG:
+          [1663150444.547190][3294:3294] CHIP:DMG: 	isFabricFiltered = true,
+          [1663150444.547233][3294:3294] CHIP:DMG: 	InteractionModelRevision = 1
+          [1663150444.547273][3294:3294] CHIP:DMG: },
+          [1663150444.547388][3294:3294] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663150444.547520][3294:3294] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663150444.547568][3294:3294] CHIP:DMG: <RE:Run> Cluster 2f, Attribute e is dirty
+          [1663150444.547603][3294:3294] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=9 AttributeId=0x0000_000E (expanded=0)
+          [1663150444.547647][3294:3294
+      disabled: true
+
+    - label:
+          "Use the DUT to change the on/off state of one or more of the bridged
+          On/Off lights"
+      verification: |
+          ./chip-tool onoff read on-off 1 3
+
+          Verify on TH(bridge-app) Log:
+
+          [1659973152.263905][3652:3652] CHIP:IM: Received Read request
+          [1659973152.264002][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973152.264053][3652:3652] CHIP:DMG: {
+          [1659973152.264083][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973152.264130][3652:3652] CHIP:DMG:         [
+          [1659973152.264163][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973152.264214][3652:3652] CHIP:DMG:                 {
+          [1659973152.264255][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973152.264308][3652:3652] CHIP:DMG:                         Cluster = 0x6,
+          [1659973152.264350][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659973152.264404][3652:3652] CHIP:DMG:                 }
+          [1659973152.264457][3652:3652] CHIP:DMG:
+          [1659973152.264494][3652:3652] CHIP:DMG:         ],
+          [1659973152.264541][3652:3652] CHIP:DMG:
+          [1659973152.264577][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973152.264622][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973152.264654][3652:3652] CHIP:DMG: },
+          [1659973152.264756][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973152.264871][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973152.264922][3652:3652] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
+      disabled: true
+
+    - label:
+          "Use TH/bridge-app to rename a bridged light (use key b in the console
+          to bridge-app to rename Light 1 to Light 1b)"
+      PICS: MCORE.DEVLIST.UseDeviceNames
+      verification: |
+          ./chip-tool bridgeddevicebasic  read node-label 1 3
+
+          Verify on TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+
+          Verify on TH(bridge-app) Log
+
+          "b
+          [1659089470.077297][12236:12241] CHIP:DL: Device[Light 1]: New Name=""Light 1b""
+
+          ./chip-tool bridgeddevicebasic  read node-label 1 3
+
+          Verify on TH(bridge-app) Log:
+
+          [1659973028.616696][3652:3652] CHIP:IM: Received Read request
+          [1659973028.616774][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659973028.616810][3652:3652] CHIP:DMG: {
+          [1659973028.616833][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659973028.616859][3652:3652] CHIP:DMG:         [
+          [1659973028.616891][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659973028.616919][3652:3652] CHIP:DMG:                 {
+          [1659973028.616955][3652:3652] CHIP:DMG:                         Endpoint = 0x3,
+          [1659973028.617095][3652:3652] CHIP:DMG:                         Cluster = 0x39,
+          [1659973028.617138][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1659973028.617166][3652:3652] CHIP:DMG:                 }
+          [1659973028.617194][3652:3652] CHIP:DMG:
+          [1659973028.617228][3652:3652] CHIP:DMG:         ],
+          [1659973028.617256][3652:3652] CHIP:DMG:
+          [1659973028.617291][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659973028.617317][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659973028.617348][3652:3652] CHIP:DMG: },
+          [1659973028.617428][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659973028.617533][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659973028.617572][3652:3652] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
+      disabled: true
+
+    - label: "Verify DUT contains the added device in the list of devices"
+      PICS: MCORE.DEVLIST.UseDeviceNames
+      verification: |
+          Verify on TH(bridge-app) Log
+
+
+          b
+          [1659089470.077297][12236:12241] CHIP:DL: Device[Light 1]: New Name="Light 1b"
+      disabled: true
+
+    - label:
+          "Use TH/bridge-app to add a bridged light (use key 2 in the console to
+          bridge-app to add Light 2)"
+      verification: |
+          Press "2" on TH(bridge-app) Log
+
+          ./chip-tool  descriptor read parts-list 1 0
+
+          Verify the endpoints listed in TH(bridge-app) Log
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          "
+          ./chip-tool  descriptor read parts-list 1 1
+          Verify the list contains 11 entries in TH(bridge-app) Log
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 14
+
+          Verify on TH(bridge-app) Log
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x14,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read device-list 1 14
+
+          Verify the list contains 11 entries in TH(bridge-app) Log
+
+          [1659972694.732632][3652:3652] CHIP:IM: Received Read request
+          [1659972694.732712][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972694.732739][3652:3652] CHIP:DMG: {
+          [1659972694.732761][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972694.732800][3652:3652] CHIP:DMG:         [
+          [1659972694.732824][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972694.732866][3652:3652] CHIP:DMG:                 {
+          [1659972694.732905][3652:3652] CHIP:DMG:                         Endpoint = 0x14,
+          [1659972694.732940][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972694.732980][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659972694.733009][3652:3652] CHIP:DMG:                 }
+          [1659972694.733066][3652:3652] CHIP:DMG:
+          [1659972694.733092][3652:3652] CHIP:DMG:         ],
+          [1659972694.733128][3652:3652] CHIP:DMG:
+          [1659972694.733154][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972694.733188][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972694.733211][3652:3652] CHIP:DMG: },
+          [1659972694.733292][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972694.733401][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972694.733429][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+          [1659972694.733460][3652:3652] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1659972694.733487][3652:3652] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=1 p=v
+          [1659972694.733520][3652:3652] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "Verify DUT contains the added device in the list of devices"
+      PICS: MCORE.DEVLIST.UseDevices
+      verification: |
+          Verify on TH(bridge-app) Log
+
+          2
+          [1659352274.915018][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918bae
+          [1659352274.915107][14237:14242] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 7561f371
+          [1659352274.915166][14237:14242] CHIP:DL: Added device Light 2 to dynamic endpoint 14 (index=11)
+      disabled: true
+
+    - label:
+          "Use TH/bridge-app to remove a bridged light (use key 4 in the console
+          to bridge-app to remove Light 1b)"
+      verification: |
+          ./chip-tool  descriptor read parts-list 1 0
+
+          Verify on TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+
+          ./chip-tool  descriptor read parts-list 1 1
+
+          Verify on TH(bridge-app) Log:
+
+          [1659972886.385225][3652:3652] CHIP:IM: Received Read request
+          [1659972886.385307][3652:3652] CHIP:DMG: ReadRequestMessage =
+          [1659972886.385353][3652:3652] CHIP:DMG: {
+          [1659972886.385377][3652:3652] CHIP:DMG:         AttributePathIBs =
+          [1659972886.385413][3652:3652] CHIP:DMG:         [
+          [1659972886.385438][3652:3652] CHIP:DMG:                 AttributePathIB =
+          [1659972886.385482][3652:3652] CHIP:DMG:                 {
+          [1659972886.385511][3652:3652] CHIP:DMG:                         Endpoint = 0x1,
+          [1659972886.385555][3652:3652] CHIP:DMG:                         Cluster = 0x1d,
+          [1659972886.385596][3652:3652] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1659972886.385630][3652:3652] CHIP:DMG:                 }
+          [1659972886.385668][3652:3652] CHIP:DMG:
+          [1659972886.385694][3652:3652] CHIP:DMG:         ],
+          [1659972886.385730][3652:3652] CHIP:DMG:
+          [1659972886.385757][3652:3652] CHIP:DMG:         isFabricFiltered = true,
+          [1659972886.385793][3652:3652] CHIP:DMG:         InteractionModelRevision = 1
+          [1659972886.385817][3652:3652] CHIP:DMG: },
+          [1659972886.385908][3652:3652] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659972886.386016][3652:3652] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659972886.386056][3652:3652] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 3 is dirty
+      disabled: true
+
+    - label:
+          "Verify DUT no longer contains the removed device in the list of
+          devices"
+      PICS: MCORE.DEVLIST.UseDevices
+      verification: |
+          Verify on TH(bridge-app) Log
+
+          4
+          [1659352426.184434][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918baf
+          [1659352426.184489][14237:14242] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 7561f372
+          [1659352426.184512][14237:14242] CHIP:DL: Removed device Light 1b from dynamic endpoint 3 (index=0)
+      disabled: true

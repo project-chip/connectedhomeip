@@ -17,6 +17,7 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "OTAImageProcessorImpl.h"
@@ -37,11 +38,25 @@ void HandleRestart(Layer * systemLayer, void * appState)
 {
     esp_restart();
 }
+
+void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
+{
+    DeviceLayer::ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = newState;
+    CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
 } // namespace
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    OTARequestorInterface * requestor = GetRequestorInstance();
     if (requestor == nullptr)
     {
         return false;
@@ -52,7 +67,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
-    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    OTARequestorInterface * requestor = GetRequestorInstance();
     if (requestor == nullptr)
     {
         return CHIP_ERROR_INTERNAL;
@@ -132,6 +147,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -153,10 +169,12 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         {
             ESP_LOGE(TAG, "esp_ota_end failed (%s)!", esp_err_to_name(err));
         }
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
     imageProcessor->ReleaseBlock();
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -172,6 +190,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         ESP_LOGE(TAG, "ESP OTA abort failed");
     }
     imageProcessor->ReleaseBlock();
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -195,6 +214,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     {
         ESP_LOGE(TAG, "Failed to process OTA image header");
         imageProcessor->mDownloader->EndDownload(error);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
 
@@ -203,6 +223,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
     imageProcessor->mParams.downloadedBytes += block.size();
@@ -211,17 +232,21 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     esp_err_t err         = esp_ota_set_boot_partition(imageProcessor->mOTAUpdatePartition);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
+        PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
         return;
     }
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
+
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
@@ -237,7 +262,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         {
             ReleaseBlock();
         }
-        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
@@ -257,7 +282,7 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 {
     if (mBlock.data() != nullptr)
     {
-        chip::Platform::MemoryFree(mBlock.data());
+        Platform::MemoryFree(mBlock.data());
     }
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;

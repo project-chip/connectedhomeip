@@ -1,8 +1,37 @@
 # Matter Linux/Mac All Clusters Example
 
+## Compiling all-clusters-app for testing on Linux and Mac
+
+To compile all-clusters-app on Intel Mac, run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan-clang build"
+```
+
+at the top level of the Matter tree.
+
+To compile on an Arm Mac, run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-arm64-all-clusters-no-ble-asan-clang build"
+```
+
+Similarly, to compile on Linux x86-64 run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-no-ble-asan-clang build"
+```
+
+And to compile on Linux ARM run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+```
+
 ## Fuzzing integration
 
-This example supports compilation with libfuzzer enabled.
+This example also supports compilation with libfuzzer enabled. This should be
+used when trying to fuzz-test the Matter SDK.
 
 ### Compiling with fuzzing enabled
 
@@ -70,3 +99,115 @@ The binary can be run with `-help=1` to see more available options.
 
 Running with `ASAN_OPTIONS="handle_abort=2"` set in the environment may produce
 nicer stack traces.
+
+### Trigger event using all-cluster-app event named pipe
+
+You can send a command to all-cluster-app to trigger specific event via
+all-cluster-app event named pipe /tmp/chip_all_clusters_fifo-<PID>.
+
+#### Trigger `SoftwareFault` events
+
+1. Generate event `SoftwareFault` when a software fault takes place on the Node.
+
+```
+$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+#### Trigger `HardwareFault` events
+
+1. Generate event `HardwareFaultChange` to indicate a change in the set of
+   hardware faults currently detected by the Node.
+
+```
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+2. Generate event `RadioFaultChange` to indicate a change in the set of radio
+   faults currently detected by the Node.
+
+```
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+3. Generate event `NetworkFaultChange` to indicate a change in the set of
+   network faults currently detected by the Node.
+
+```
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+4. Generate event `BootReason` to indicate the reason that caused the device to
+   start-up, from the following set of `BootReasons`.
+
+-   `PowerOnReboot` The Node has booted as the result of physical interaction
+    with the device resulting in a reboot.
+
+-   `BrownOutReset` The Node has rebooted as the result of a brown-out of the
+    Node’s power supply.
+
+-   `SoftwareWatchdogReset` The Node has rebooted as the result of a software
+    watchdog timer.
+
+-   `HardwareWatchdogReset` The Node has rebooted as the result of a hardware
+    watchdog timer.
+
+-   `SoftwareUpdateCompleted` The Node has rebooted as the result of a completed
+    software update.
+
+-   `SoftwareReset` The Node has rebooted as the result of a software initiated
+    reboot.
+
+```
+$ echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+#### Trigger Switch events
+
+1. Generate event `SwitchLatched`, when the latching switch is moved to a new
+   position.
+
+```
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+2. Generate event `InitialPress`, when the momentary switch starts to be
+   pressed.
+
+```
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+3. Generate event `LongPress`, when the momentary switch has been pressed for a
+   "long" time.
+
+```
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+4. Generate event `ShortRelease`, when the momentary switch has been released.
+
+```
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+5. Generate event `LongRelease` when the momentary switch has been released and
+   after having been pressed for a long time.
+
+```
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+6. Generate event `MultiPressOngoing` to indicate how many times the momentary
+   switch has been pressed in a multi-press sequence, during that sequence.
+
+```
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_all_clusters_fifo-<PID>
+```
+
+7. Generate event `MultiPressComplete` to indicate how many times the momentary
+   switch has been pressed in a multi-press sequence, after it has been detected
+   that the sequence has ended.
+
+```
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo-<PID>
+```

@@ -1,0 +1,323 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    120.2.3. [TC-BIND-2.3] Binding Cluster Attributes-TH1 enables DUT to handle
+    its Group settings [DUT-Controller]
+
+PICS:
+    - BIND.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          TH1 enables DUT to handle group communication
+          TH2 supports On/Off server on Endpoint 1
+          TH2 supports Groups server on Endpoint 1
+          TH2 should have an ACL entry with the AuthMode as Group by TH1
+          DUT supports On/Off client
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          Take 2 raspi, 1 as Lighting app and another one as chip-tool. and use [ nRF52840-DK ]Thread device as  light-switch-app.
+      disabled: true
+
+    - label: "Factory Reset DUT"
+      verification: |
+          Vendor specific action, for chip-tool run
+          rm -rf /tmp/chip*
+      disabled: true
+
+    - label: "Commission DUT to TH1s fabric"
+      verification: |
+          Advertise the [ light-switch-app ] on [ nRF52840-DK ]Thread device  and  pair the TH using below cmmd.
+
+          ./chip-tool pairing ble-thread 74 hex:0e080000000000010000000300000f35060004001fffe0020810101191022022920708fd6587bfe9821353051000112237945966880899aabbccddeeff030f7070656e5468726561644465696f6c010212340410f23d85dd55d9748cc6a1fd5fccbb1da20c0402a0fff8 20202021 3840
+      disabled: true
+
+    - label: "TH1 enables DUT as Controller"
+      verification: |
+
+      disabled: true
+
+    - label: "Commission TH2 to TH1s fabric (Node ID = 2)"
+      verification: |
+          Advertise the [Lighting-app] on Raspi and  pair the TH using below cmmd.
+
+          ./chip-tool pairing onnetwork 2 20202021
+
+          On TH1(Chip-tool), Verify the success response
+
+          [1659104612.592373][62366:62371] CHIP:DMG:         SuppressResponse = true,
+          [1659104612.592399][62366:62371] CHIP:DMG:         InteractionModelRevision = 1
+          [1659104612.592432][62366:62371] CHIP:DMG: }
+          [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step "ReadCommissioningInfo"
+      disabled: true
+
+    - label:
+          "TH1 generates fabric-unique GroupID, GroupName, random key, EpochKey0
+          and GroupKeySetID."
+      verification: |
+          As Admin generates it is not required to verify
+      disabled: true
+
+    - label:
+          "TH1 sends KeySetWrite command to GroupKeyManagement cluster to TH2 on
+          Endpoint 0."
+      verification: |
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 74 0
+
+          On TH1(Chip-tool), Verify the success response for KeySetWrite
+
+          [1657719041.075123][4541:4546] CHIP:DMG: ICR moving to [ResponseRe]
+          [1657719041.075174][4541:4546] CHIP:DMG: InvokeResponseMessage =
+          [1657719041.075200][4541:4546] CHIP:DMG: {
+          [1657719041.075224][4541:4546] CHIP:DMG:         suppressResponse = false,
+          [1657719041.075255][4541:4546] CHIP:DMG:         InvokeResponseIBs =
+          [1657719041.075287][4541:4546] CHIP:DMG:         [
+          [1657719041.075311][4541:4546] CHIP:DMG:                 InvokeResponseIB =
+          [1657719041.075347][4541:4546] CHIP:DMG:                 {
+          [1657719041.075376][4541:4546] CHIP:DMG:                         CommandStatusIB =
+          [1657719041.075408][4541:4546] CHIP:DMG:                         {
+          [1657719041.075439][4541:4546] CHIP:DMG:                                 CommandPathIB =
+          [1657719041.075473][4541:4546] CHIP:DMG:                                 {
+          [1657719041.075507][4541:4546] CHIP:DMG:                                         EndpointId = 0x0,
+          [1657719041.075542][4541:4546] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1657719041.075577][4541:4546] CHIP:DMG:                                         CommandId = 0x0,
+          [1657719041.075609][4541:4546] CHIP:DMG:                                 },
+          [1657719041.075646][4541:4546] CHIP:DMG:
+          [1657719041.075676][4541:4546] CHIP:DMG:                                 StatusIB =
+          [1657719041.075709][4541:4546] CHIP:DMG:                                 {
+          [1657719041.075743][4541:4546] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657719041.075775][4541:4546] CHIP:DMG:                                 },
+          [1657719041.075809][4541:4546] CHIP:DMG:
+          [1657719041.075840][4541:4546] CHIP:DMG:                         },
+          [1657719041.075874][4541:4546] CHIP:DMG:
+          [1657719041.075902][4541:4546] CHIP:DMG:                 },
+          [1657719041.075935][4541:4546] CHIP:DMG:
+          [1657719041.075959][4541:4546] CHIP:DMG:         ],
+          [1657719041.075988][4541:4546] CHIP:DMG:
+          [1657719041.076012][4541:4546] CHIP:DMG:         InteractionModelRevision = 1
+
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 2 0
+          [1657719041.076036][4541:4546] CHIP:DMG: }
+
+          On TH1, Verify the success response for KeySetWrite
+
+          [1657719041.075743][4541:4546] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+      disabled: true
+
+    - label:
+          "TH1 binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster to TH2 on Endpoint 0"
+      verification: |
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 74 0
+
+          On TH1(Chip-tool), Verify the success response for GroupKeySetID
+
+          [1657719130.464175][4557:4562] CHIP:DMG:                         StatusIB =
+          [1657719130.464214][4557:4562] CHIP:DMG:                         {
+          [1657719130.464256][4557:4562] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657719130.464298][4557:4562] CHIP:DMG:                         },
+          [1657719130.464342][4557:4562] CHIP:DMG:
+
+          Run this cmmd for lighting app in chip-tool:
+          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 2 0
+
+
+          On TH1(Chip-tool), Verify the success response for GroupKeySetID
+
+          [1657719130.464175][4557:4562] CHIP:DMG:                         StatusIB =
+          [1657719130.464214][4557:4562] CHIP:DMG:                         {
+          [1657719130.464256][4557:4562] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657719130.464298][4557:4562] CHIP:DMG:                         },
+          [1657719130.464342][4557:4562] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "TH1 sends AddGroup( Group Name and Group-ID) Command to TH2 on
+          Endpoint 1."
+      verification: |
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+          ./chip-tool groups add-group 0x0001 grp1 74 1
+
+          On TH1(Chip-tool), Verify the success response for AddGroup
+
+          [1657719097.788236][4548:4554] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1657719097.788325][4548:4554] CHIP:TOO:   AddGroupResponse: {
+          [1657719097.788366][4548:4554] CHIP:TOO:     status: 0
+          [1657719097.788393][4548:4554] CHIP:TOO:     groupId: 1
+          [1657719097.788418][4548:4554] CHIP:TOO:    }
+
+
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool groups add-group 0x0001 grp1 2 1
+
+          On TH1(Chip-tool), Verify the success response for AddGroup
+
+          [1657719097.788236][4548:4554] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1657719097.788325][4548:4554] CHIP:TOO:   AddGroupResponse: {
+          [1657719097.788366][4548:4554] CHIP:TOO:     status: 0
+          [1657719097.788393][4548:4554] CHIP:TOO:     groupId: 1
+          [1657719097.788418][4548:4554] CHIP:TOO:    }
+
+
+          Run this commands for both Ligh-switch-app and Lighting-app:
+
+          ./chip-tool groupsettings add-group grp1 0x0001
+
+          ./chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+
+          ./chip-tool groupsettings bind-keyset 0x0001 0x0042
+
+          ./chip-tool groupsettings show-groups
+
+            +-------------------------------------------------------------------------------------+
+            | Available Groups :                                                                  |
+            +-------------------------------------------------------------------------------------+
+            | Group Id   |  KeySet Id     |   Group Name                                          |
+            | 0x101           0x1a1            Group #1                                           |
+            | 0x102           0x1a2            Group #2                                           |
+            | 0x1               0x42              grp1                                                   |
+            +-------------------------------------------------------------------------------------+"
+      disabled: true
+
+    - label:
+          "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
+          in the AddGroup command sent from TH1 to TH2"
+      verification: |
+          Before write the binding entries run the ACL Commands:
+
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
+
+          On TH1(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 2 0
+
+          On TH1(Chip-tool), Verify the success response for Acl:
+
+          [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
+          [1659075680.944052][2687:2692] CHIP:DMG:                         {
+          [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+
+
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 74 1
+
+          On TH1(Chip-tool), Verify the success response for binding entry
+
+          [1657719251.763323][4597:4602] CHIP:DMG:                         StatusIB =
+          [1657719251.763360][4597:4602] CHIP:DMG:                         {
+          [1657719251.763402][4597:4602] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657719251.763440][4597:4602] CHIP:DMG:                         },
+      disabled: true
+
+    - label: "TH1 sets up group settings on DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT is triggered to send Multicast message On command to its binding
+          entries"
+      PICS: OO.C.C01.Tx
+      verification: |
+          Press button no.2 on nrf52840 DK thread board
+      disabled: true
+
+    - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
+      PICS: OO.C.C01.Tx
+      verification: |
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool onoff read on-off 2 1
+
+          On TH(Chip-tool), Verify the onoff value is set to ON
+
+          [1657719363.799344][4615:4620] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3526720174
+          [1657719363.799380][4615:4620] CHIP:TOO:   OnOff: TRUE
+      disabled: true
+
+    - label: "TH1 removes all the binding entries from DUT"
+      verification: |
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+
+          ./chip-tool binding write binding "[]" 74 1
+
+          On TH1(Chip-tool), Verify the success response for removing binding entry
+
+          [1659362827.431927][2469:2475] CHIP:DMG:                         StatusIB =
+          [1659362827.431996][2469:2475] CHIP:DMG:                         {
+          [1659362827.432070][2469:2475] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1659362827.432154][2469:2475] CHIP:DMG:                         },
+      disabled: true
+
+    - label:
+          "DUT is triggered to send Multicast message off command to its binding
+          entries"
+      PICS: OO.C.C00.Tx
+      verification: |
+          Press button no.2 on nrf52840 DK thread board
+      disabled: true
+
+    - label: "TH1 reads OnOff attribute from TH2 (Endpoint 1)"
+      PICS: OO.C.C01.Tx
+      verification: |
+          Run this cmmd for lighting app in chip-tool:
+
+          ./chip-tool onoff read on-off 2 1
+
+          On TH1(Chip-tool), Verify the onoff value is set to ON
+
+          [1657719448.858149][4636:4641] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3526720174
+          [1657719448.858183][4636:4641] CHIP:TOO:   OnOff: TRUE
+      disabled: true

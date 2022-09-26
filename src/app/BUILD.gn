@@ -21,8 +21,8 @@ import("common_flags.gni")
 declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
-      is_debug &&
-      (current_os == "linux" || current_os == "mac" || current_os == "android")
+      is_debug && (current_os == "linux" || current_os == "mac" ||
+                   current_os == "ios" || current_os == "android")
 
   # Logging verbosity control for Access Control implementation
   #
@@ -53,6 +53,12 @@ buildconfig_header("app_buildconfig") {
   ]
 }
 
+source_set("app_config") {
+  sources = [ "AppConfig.h" ]
+
+  public_deps = [ ":app_buildconfig" ]
+}
+
 static_library("app") {
   output_name = "libCHIPDataModel"
 
@@ -80,6 +86,8 @@ static_library("app") {
     "DeviceProxy.h",
     "EventManagement.cpp",
     "EventPathParams.h",
+    "FailSafeContext.cpp",
+    "FailSafeContext.h",
     "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
     "InteractionModelRevision.h",
@@ -157,9 +165,9 @@ static_library("app") {
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
     "OTAUserConsentCommon.h",
-    "OperationalDeviceProxy.cpp",
-    "OperationalDeviceProxy.h",
-    "OperationalDeviceProxyPool.h",
+    "OperationalSessionSetup.cpp",
+    "OperationalSessionSetup.h",
+    "OperationalSessionSetupPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
@@ -177,7 +185,7 @@ static_library("app") {
   ]
 
   public_deps = [
-    ":app_buildconfig",
+    ":app_config",
     "${chip_root}/src/access",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",

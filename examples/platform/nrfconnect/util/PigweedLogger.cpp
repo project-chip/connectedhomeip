@@ -34,9 +34,9 @@
 #include <pw_stream/sys_io_stream.h>
 #include <pw_sys_io_nrfconnect/init.h>
 
+#include "pw_span/span.h"
 #include <cassert>
 #include <cstdint>
-#include <span>
 #include <string_view>
 
 namespace PigweedLogger {
@@ -61,7 +61,7 @@ bool sIsPanicMode;
 
 void flush()
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 

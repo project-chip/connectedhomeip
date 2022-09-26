@@ -37,6 +37,7 @@
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
+#include <route_hook/bl_route_hook.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -47,7 +48,6 @@ uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
 static LEDWidget statusLED1;
-// static LEDWidget statusLED2;
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -55,10 +55,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     {
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
-        break;
-
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
@@ -71,13 +67,12 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kCommissioningComplete:
         log_info("Commissioning complete\r\n");
+        GetAppTask().LightStateInit();
         break;
 
     case DeviceEventType::kWiFiConnectivityChange:
         log_info("Got ip, start advertise\r\n");
-        // chip::app::DnssdServer::Instance().AdvertiseOperational();
         chip::app::DnssdServer::Instance().StartServer();
-        GetAppTask().OtaTask();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
         break;
 
@@ -90,6 +85,12 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
+        }
+
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ChipLogProgress(DeviceLayer, "Initializing route hook...");
+            bl_route_hook_init();
         }
         break;
     }
@@ -131,15 +132,11 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         log_info("IPv4 Server ready...\r\n");
-        // TODO
-        // wifiLED.Set(true);
         chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
         log_info("Lost IPv4 connectivity...\r\n");
-        // TODO
-        // wifiLED.Set(false);
     }
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
@@ -152,14 +149,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     }
 }
 
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        log_info("Commissioner detected!\r\n");
-    }
-}
-
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, log_info("Unhandled Attribute ID: '0x%04x\r\n", attributeId));
@@ -167,7 +156,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
 
     // At this point we can assume that value points to a bool value.
     mEndpointOnOffState[endpointId - 1] = *value;
-    statusLED1.Set(*value);
+    GetAppTask().LightStateUpdateEventHandler();
 
 exit:
     return;
@@ -182,7 +171,7 @@ void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointI
     VerifyOrExit(endpointId == 1 || endpointId == 2, log_error("Unexpected EndPoint ID: `0x%02x'\r\n", endpointId));
 
     // At this point we can assume that value points to a bool value.
-    statusLED1.SetBrightness(brightness);
+    GetAppTask().LightStateUpdateEventHandler();
 
 exit:
     return;

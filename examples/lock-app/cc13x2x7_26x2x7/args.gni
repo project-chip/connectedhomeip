@@ -40,7 +40,7 @@ chip_config_network_layer_ble = true
 # INCLUDE_xSemaphoreGetMutexHolder
 chip_stack_lock_tracking = "none"
 
-chip_openthread_ftd = true
+chip_openthread_ftd = false
 
 matter_device_vid = "0xFFF1"
 matter_device_pid = "0x8006"

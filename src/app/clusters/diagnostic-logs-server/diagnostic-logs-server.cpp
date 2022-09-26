@@ -38,6 +38,13 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
 {
     HandleCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType>(
         handlerContext, [&](auto & _u, auto & payload) {
+            if (payload.requestedProtocol == chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol::kUnknownEnumValue)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         chip::Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
             switch (payload.intent)
             {
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kEndUserSupport: {
@@ -86,6 +93,11 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
+            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kUnknownEnumValue: {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         chip::Protocols::InteractionModel::Status::InvalidCommand);
+                break;
+            }
             }
         });
 }
@@ -94,6 +106,7 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
+    // TODO: Shouldn't the default "no-op" impl return some sort of error?
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;

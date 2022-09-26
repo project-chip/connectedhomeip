@@ -21,13 +21,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
-
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-#include <platform/ESP32/ESP32FactoryDataProvider.h>
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -39,9 +33,6 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
 
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-ESP32FactoryDataProvider sFactoryDataProvider;
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
@@ -54,13 +45,6 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();

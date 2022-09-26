@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #include "AppTask.h"
 #include "LightingManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -26,29 +27,31 @@
 
 using namespace chip;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OnOff;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
+        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
         LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
                                      AppEvent::kEventType_Lighting, size, value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
-        if (size == 1)
+        ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+
+        if (LightingMgr().IsTurnedOn())
         {
             LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
         }
         else
         {
-            ChipLogError(Zcl, "wrong length for level: %d", size);
+            ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
         }
     }
 }
@@ -64,5 +67,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
+    EmberAfStatus status;
+    bool storedValue;
+
+    // Read storedValue on/off value
+    status = Attributes::OnOff::Get(1, &storedValue);
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        // Set actual state to stored before reboot
+        LightingMgr().Set(storedValue);
+    }
+
     GetAppTask().UpdateClusterState();
 }

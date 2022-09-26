@@ -13,7 +13,12 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 13.4.9. [TC-SC-4.9] Operational Discovery - RIO support
+name:
+    15.4.9. [TC-SC-4.9] Operational Discovery - RIO support [DUT as
+    Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321
@@ -21,39 +26,65 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Using TH_CR1, commission the DUT_CE onto the Matter network"
       verification: |
-          provision the DUT using chip-tool. Ref to provisioning instructions
+          Using chip-tool (TH_CR1) provision the device using cmd
+
+          ./out/debug/chip-tool pairing ble-wifi node-id ssid password setup-pin-code discriminator
+      disabled: true
+
+    - label: "Bring the TH_CR2 onto the thread network"
+      verification: |
+          Build openthread posix app with RCP and have it join the thread network that the BR is part of. If you don"t have the app, follow the below Instructions to build the posix app
+
+          if you have the RCP connected to the raspi, launch the ot-cli app with RCP
+          $ sudo ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
+          ./build/posix/src/posix/ot-cli[68007]: Running OPENTHREAD/thread-reference-20200818-1820-g095f530bd; POSIX; Jul 18 2022 22:44:35
+          ./build/posix/src/posix/ot-cli[68007]: Thread version: 4
+          ./build/posix/src/posix/ot-cli[68007]: Thread interface:
+          ./build/posix/src/posix/ot-cli[68007]: RCP version: OPENTHREAD/thread-reference-20200818-1615-gfdf3c3034; NRF52840; Jul 17 2022 17:10:13
+          > dataset set active <PROVIDE THE DATASET OF THE BR THAT YOU NEED TO JOIN>
+          > dataset commit active
+          > ifconfig up
+          > thread start
+
+          With the above set of commands, the RCP should join the thread network hosted by the BR.
+          >srp client autostart enable
+
+
+          Instructions to build the posix app.
+          1. Get Nordic nRF52840 dongle.
+          2. Attach it to the raspi/Ubuntu machine
+          Follow the instructions at https://github.com/openthread/openthread/blob/main/src/posix/README.md
+          3. git clone --recursive git@github.com:openthread/openthread.git
+          4. cd openthread/
+          5. ./script/bootstrap
+          6. ./bootstrap
+          7. ./script/cmake-build posix
+          8. follow the instructions to build the RCP dongle (or get the RCP image from README file in the test harness and flash it on the RCP)
+          8. ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
       disabled: true
 
     - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using ECM"
+          "Using TH_CR2, using ICMPv6 echo to ping with a payload >= 32 bytes to
+          the the DUT_CE that is already commissioned to the Matter network. IP
+          address is determined by operational discovery of the DNS-SD
+          operational service record (_matter._tcp service instance) of DUT_CE
+          done by TH_CR2."
       verification: |
-          Refer to Multi-admin tests (either TC-MF-1.3 OR TC-MF-1.4) on the steps to add 2nd admin on the node
-          Open Commissioning window on DUT using BCM or ECM
+          In the RCP Shell , have the TH_CR2 discover the device IP address using
+          > dns service 177AC531F48BE736-0000000000000190 _matter._tcp.default.service.arpa.
+          DNS service resolution response for 177AC531F48BE736-0000000000000190 for service _matter._tcp.default.service.arpa.
+          Port:5540, Priority:0, Weight:0, TTL:6913
+          Host:72FF282E7739731F.default.service.arpa.
+          HostAddress:fd11:66:0:0:22ae:27fe:13ac:54df TTL:6915
+          TXT:[SII=35303030, SAI=333030, T=30] TTL:6913
+          Ping the IP address of the wifi device
 
-            ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
-      disabled: true
+          > ping fd11:66:0:0:22ae:27fe:13ac:54df
+          16 bytes from fd11:66:0:0:22ae:27fe:13ac:54df : icmp_seq=2 hlim=64 time=14ms
+          1 packets transmitted, 1 packets received. Packet loss = 0.0%. Round-trip min/avg/max = 14/14.0/14 ms.
+          Done
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      verification: |
-          Refer to Multi-admin tests on the steps to add 2nd admin on the node. Get another chip-tool instance on a machine connected behind the border router. Make sure IPV4 interface are disabled on the border router. We need to make sure chip-tool on IPV6 network talk to the Wifi device with LWIP stack on the wifi network.
-          ./chip-tool pairing manualcode 1 36177160937
-      disabled: true
-
-    - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      verification: |
-          ./chip-tool basic write node-label te8 1 0
-          ./chip-tool basic read node-label  1 0
-      disabled: true
-
-    - label:
-          "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      verification: |
-          ./chip-tool basic write node-label te8 2 0
-          ./chip-tool basic read node-label  2 0
+          The ping command should be successful.
       disabled: true

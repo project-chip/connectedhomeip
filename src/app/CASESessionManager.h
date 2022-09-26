@@ -19,22 +19,25 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/OperationalDeviceProxy.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/OperationalSessionSetup.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
+#include <transport/SessionUpdateDelegate.h>
 
 #include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
+class OperationalSessionSetupPoolDelegate;
+
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
-    OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
+    OperationalSessionSetupPoolDelegate * sessionSetupPool = nullptr;
 };
 
 /**
@@ -45,11 +48,17 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager
+class CASESessionManager : public OperationalSessionReleaseDelegate, public SessionUpdateDelegate
 {
 public:
     CASESessionManager() = default;
-    virtual ~CASESessionManager() {}
+    virtual ~CASESessionManager()
+    {
+        if (mConfig.sessionInitParams.Validate() == CHIP_NO_ERROR)
+        {
+            mConfig.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(nullptr);
+        }
+    }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
     void Shutdown() {}
@@ -68,12 +77,8 @@ public:
      * The `onFailure` callback may be called before the FindOrEstablishSession
      * call returns, for error cases that are detected synchronously.
      */
-    void FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
-
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
-
-    void ReleaseSession(PeerId peerId);
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -87,10 +92,18 @@ public:
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
-    CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
+    CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
+
+    //////////// OperationalSessionReleaseDelegate Implementation ///////////////
+    void ReleaseSession(OperationalSessionSetup * device) override;
+
+    //////////// SessionUpdateDelegate Implementation ///////////////
+    void UpdatePeerAddress(ScopedNodeId peerId) override;
 
 private:
-    void ReleaseSession(OperationalDeviceProxy * device) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate = false) const;
+
+    Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
 
     CASESessionManagerConfig mConfig;
 };

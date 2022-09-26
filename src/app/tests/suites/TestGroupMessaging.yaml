@@ -23,13 +23,13 @@ config:
     cluster: "Basic"
     endpoint: 0
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x43211234
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
@@ -40,40 +40,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Add Group 1 (endpoint 1)"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 1
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0101
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0101
-
-    - label: "Add Group 2 (endpoint 0)"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 0
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0102
-              - name: "groupName"
-                value: "Group #2"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0102
 
     - label: "KeySet Write 1"
       cluster: "Group Key Management"
@@ -122,6 +88,40 @@ tests:
                   { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0102
+              - name: "groupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0102
+
     - label: "Install ACLs"
       cluster: "Access Control"
       command: "writeAttribute"
@@ -169,7 +169,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 1000
 
       # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
@@ -290,42 +290,6 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "Add Group 1 (endpoint 1) for gamma"
-      identity: "gamma"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 1
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0101
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0101
-
-    - label: "Add Group 2 (endpoint 0) for gamma"
-      identity: "gamma"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 0
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0102
-              - name: "groupName"
-                value: "Group #2"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0102
-
     - label: "KeySet Write 1 for gamma"
       identity: "gamma"
       cluster: "Group Key Management"
@@ -375,6 +339,42 @@ tests:
                   { FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
+
+    - label: "Add Group 1 (endpoint 1) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0102
+              - name: "groupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0102
 
     - label: "Install ACLs for gamma"
       identity: "gamma"

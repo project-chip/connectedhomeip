@@ -32,7 +32,14 @@ public:
     bool IsInitialized() { return mInitialized; }
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
-    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() const { return mOperationalDeviceProxy; }
+    const chip::OperationalDeviceProxy * GetOperationalDeviceProxy() const
+    {
+        if (mDeviceProxy.ConnectionReady())
+        {
+            return &mDeviceProxy;
+        }
+        return nullptr;
+    }
 
     CHIP_ERROR Initialize(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
     TargetEndpointInfo * GetOrAddEndpoint(chip::EndpointId endpointId);
@@ -41,25 +48,26 @@ public:
     void PrintInfo();
 
 private:
-    static void HandleDeviceConnected(void * context, chip::OperationalDeviceProxy * device)
+    static void HandleDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                      chip::SessionHandle & sessionHandle)
     {
-        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
-        _this->mOperationalDeviceProxy = device;
-        _this->mInitialized            = true;
+        TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mDeviceProxy           = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);
+        _this->mInitialized           = true;
         ChipLogProgress(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
     }
 
-    static void HandleDeviceConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error)
+    static void HandleDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
     {
-        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
-        _this->mOperationalDeviceProxy = nullptr;
+        TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mDeviceProxy           = chip::OperationalDeviceProxy();
     }
 
     static constexpr size_t kMaxNumberOfEndpoints = 5;
     TargetEndpointInfo mEndpoints[kMaxNumberOfEndpoints];
     chip::NodeId mNodeId;
     chip::FabricIndex mFabricIndex;
-    chip::OperationalDeviceProxy * mOperationalDeviceProxy;
+    chip::OperationalDeviceProxy mDeviceProxy;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;

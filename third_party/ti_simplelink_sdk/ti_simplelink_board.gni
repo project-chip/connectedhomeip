@@ -30,6 +30,8 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 # | CC1352R1_LAUNCHXL | cc13x2_26x2     | cc1352r1f3 | Thread MTD + no BLE |
 # | CC2652R1_LAUNCHXL | cc13x2_26x2     | cc2652r1f3 | Thread MTD + no BLE |
 # | LP_CC2652R7       | cc13x2x7_26x2x7 | cc2652r1f7 | Thread FTD + BLE    |
+# | CC3220SF_LAUNCHXL | cc32xx          | cc3220SF   | Wi-Fi               |
+# | CC3235SF_LAUNCHXL | cc32xx          | cc3235SF   | Wi-Fi               |
 
 # XXX: Can we do an array with a case statement?
 if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
@@ -56,6 +58,18 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f7"
   ti_simplelink_bim_name = "cc2652r7lp"
+} else if (ti_simplelink_board == "CC3220SF_LAUNCHXL") {
+  ti_simplelink_device_family = "cc32xx"
+  ti_simplelink_soc_family = "cc32xx"
+
+  # set -DDeviceFamily_CC3220
+  ti_simplelink_soc = "cc32xxSF"
+} else if (ti_simplelink_board == "CC3235SF_LAUNCHXL") {
+  ti_simplelink_device_family = "cc32xx"
+  ti_simplelink_soc_family = "cc32xx"
+
+  # set -DDeviceFamily_CC3220
+  ti_simplelink_soc = "cc32xxSF"
 } else {
   print("Please provide a valid value for TI_SIMPLELINK_BOARD env variable")
   assert(false, "The board ${ti_simplelink_board} is unsupported as for now.")

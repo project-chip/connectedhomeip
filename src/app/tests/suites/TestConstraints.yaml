@@ -58,6 +58,60 @@ tests:
       arguments:
           value: []
 
+    # Tests for Bitmap32 attribute
+
+    - label: "Read attribute BITMAP32 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP32 with MaskVal1 and MaskVal3"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 5 # MaskVal1 | MaskVal3
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal2 is not set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksClear: [0x02] # [MaskVal2]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal1 is set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x01] # [MaskVal1]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal3 is set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x04] # [MaskVal3]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          Maskval1 and MaskVal3 are set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x01, 0x04] # [MaskVal1, MaskVal3]
+
     # Tests for INT32U attribute
 
     - label: "Write attribute INT32U Value"

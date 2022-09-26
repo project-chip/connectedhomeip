@@ -66,6 +66,7 @@ following features are available:
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
         868MHz@19dBm
     -   BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm,
@@ -75,9 +76,18 @@ following features are available:
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 

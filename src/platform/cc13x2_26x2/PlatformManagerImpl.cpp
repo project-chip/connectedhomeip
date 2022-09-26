@@ -107,8 +107,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::CC13X2_26X2Config::Init();
     SuccessOrExit(err);
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // DMM Addition
     DMMPolicy_Params dmmPolicyParams;
@@ -146,6 +144,31 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+void PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

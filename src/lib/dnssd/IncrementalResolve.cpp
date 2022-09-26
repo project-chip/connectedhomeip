@@ -261,6 +261,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
             return CHIP_NO_ERROR;
         }
 
+#if INET_CONFIG_ENABLE_IPV4
         Inet::IPAddress addr;
         if (!ParseARecord(data.GetData(), &addr))
         {
@@ -268,6 +269,13 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
         }
 
         return OnIpAddress(interface, addr);
+#else
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        ChipLogProgress(Discovery, "Ignoring A record: IPv4 not supported");
+#endif
+        // skipping IPv4 addresses
+        return CHIP_NO_ERROR;
+#endif
     }
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())

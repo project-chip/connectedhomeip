@@ -1,0 +1,93 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.6.1. [TC-WAKEONLAN-4.1] Wake-On LAN Verification
+
+PICS:
+    - WAKEONLAN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH reads the MACAddress attribute from the DUT"
+      PICS: WAKEONLAN.S.A0000
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool wakeonlan read macaddress 1 1
+          ./chip-tv-casting-app wakeonlan read macaddress 1 1
+
+          On TH Verify that the response contains a 48-bit MAC Address. Record the MAC address.
+          [1654248817.394846][3637:3643] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0503 Attribute 0x0000_0000 DataVersion: 3900236652
+          [1654248817.394895][3637:3643] CHIP:TOO:   MACAddress: e4:5f:01:69:61:b1
+          [1654248817.394982][3637:3643] CHIP:EM: Sending Standalone Ack for MessageCounter:15292555 on exchange 12123i
+      disabled: true
+
+    - label: "TH sends a Sleep command to DUT"
+      PICS: LOWPOWER.S.C00.Rsp
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool lowpower sleep 1 1
+          ./chip-tv-casting-app lowpower sleep 1 1
+
+          On TH verify the success response received from DUT
+          [1646101689.826629][3009:3014] CHIP:DMG: InvokeResponseMessage =
+          [1646101689.826665][3009:3014] CHIP:DMG: {
+          [1646101689.826697][3009:3014] CHIP:DMG:        suppressResponse = false,
+          [1646101689.826727][3009:3014] CHIP:DMG:        InvokeResponseIBs =
+          [1646101689.826769][3009:3014] CHIP:DMG:        [
+          [1646101689.826804][3009:3014] CHIP:DMG:                InvokeResponseIB =
+          [1646101689.826848][3009:3014] CHIP:DMG:                {
+          [1646101689.826882][3009:3014] CHIP:DMG:                        CommandStatusIB =
+          [1646101689.826922][3009:3014] CHIP:DMG:                        {
+          [1646101689.826954][3009:3014] CHIP:DMG:                                CommandPathIB =
+          [1646101689.826989][3009:3014] CHIP:DMG:                                {
+          [1646101689.827031][3009:3014] CHIP:DMG:                                        EndpointId = 0x1,
+          [1646101689.827082][3009:3014] CHIP:DMG:                                        ClusterId = 0x508,
+          [1646101689.827127][3009:3014] CHIP:DMG:                                        CommandId = 0x0,
+          [1646101689.827172][3009:3014] CHIP:DMG:                                },
+          [1646101689.827223][3009:3014] CHIP:DMG:
+          [1646101689.827260][3009:3014] CHIP:DMG:                                StatusIB =
+          [1646101689.827311][3009:3014] CHIP:DMG:                                {
+          [1646101689.827360][3009:3014] CHIP:DMG:                                        status = 0x0,
+          [1646101689.827411][3009:3014] CHIP:DMG:                                },
+          [1646101689.827457][3009:3014] CHIP:DMG:
+          [1646101689.827498][3009:3014] CHIP:DMG:                        },
+          [1646101689.827540][3009:3014] CHIP:DMG:
+          [1646101689.827607][3009:3014] CHIP:DMG:                },
+          [1646101689.827658][3009:3014] CHIP:DMG:
+          [1646101689.827689][3009:3014] CHIP:DMG:        ],
+          [1646101689.827730][3009:3014] CHIP:DMG:
+          [1646101689.827761][3009:3014] CHIP:DMG:        InteractionModelRevision = 1
+          [1646101689.827792][3009:3014] CHIP:DMG: },
+          [1646101689.827875][3009:3014] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0508 Command=0x0000_0000 Status=0x0
+      disabled: true
+
+    - label:
+          "TH sends a Wake-On LAN magic packet containing the MAC address from
+          step 1"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool lowpower read accepted-command-list 1 1
+          ./chip-tv-casting-app lowpower read accepted-command-list 1 1
+
+          On TH Verify that the DUT is no longer in a low-power state by sending above command
+          [1654248854.491911][3652:3657] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804
+          [1654248854.491994][3652:3657] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1654248854.492040][3652:3657] CHIP:TOO:     [1]: 0
+          [1654248854.492157][3652:3657] CHIP:EM: Sending Standalone Ack for MessageCounter:15063522 on exchange 51389i
+      disabled: true

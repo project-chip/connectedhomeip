@@ -1,0 +1,207 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 80.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
+
+PICS:
+    - MOD.S.A0004
+    - MOD.S.A0005
+    - OO.S.A4003
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          To execute this test case set onmode to any integer value because as default it value has null.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label: "TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
+      verification: |
+          ./chip-tool modeselect read start-up-mode 1 1
+
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2.
+
+
+          [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
+          [1651099663212] [82177:7560652] CHIP: [TOO]   StartUpMode: 0
+      disabled: true
+
+    - label: "TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.A0005
+      verification: |
+          ./chip-tool modeselect read on-mode 1 1
+
+          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b.
+
+
+          [1654780979.979743][61542:61547] CHIP:DMG: }
+          [1654780979.980040][61542:61547] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 235764160
+          [1654780979.980202][61542:61547] CHIP:TOO:   OnMode: 4
+      disabled: true
+
+    - label:
+          "If the StartUpMode and OnMode attributes have the same value, proceed
+          to step 2c, Otherwise proceed to step 3."
+      PICS: MOD.S.A0004 && MOD.S.A0005
+      verification: |
+          NOTE:
+          If the StartUpMode and OnMode attributes have the same value, proceed to step 2c,  Otherwise proceed to step 3.
+      disabled: true
+
+    - label: "TH reads the SupportedModes attribute from the DUT"
+      PICS: MOD.S.A0002
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+
+          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
+
+          [1654154058.284710][3492:3497] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 694763126
+          [1654154058.284829][3492:3497] CHIP:TOO:   SupportedModes: 3 entries
+          [1654154058.284909][3492:3497] CHIP:TOO:     [1]: {
+          [1654154058.284939][3492:3497] CHIP:TOO:       Label: Black
+          [1654154058.284966][3492:3497] CHIP:TOO:       Mode: 0
+          [1654154058.284999][3492:3497] CHIP:TOO:       SemanticTags: 1 entries
+          [1654154058.285037][3492:3497] CHIP:TOO:         [1]: {
+          [1654154058.285066][3492:3497] CHIP:TOO:           MfgCode: 0
+          [1654154058.285094][3492:3497] CHIP:TOO:           Value: 0
+          [1654154058.285121][3492:3497] CHIP:TOO:          }
+          [1654154058.285150][3492:3497] CHIP:TOO:      }
+          [1654154058.285188][3492:3497] CHIP:TOO:     [2]: {
+          [1654154058.285216][3492:3497] CHIP:TOO:       Label: Cappuccino
+          [1654154058.285243][3492:3497] CHIP:TOO:       Mode: 4
+          [1654154058.285274][3492:3497] CHIP:TOO:       SemanticTags: 1 entries
+          [1654154058.285309][3492:3497] CHIP:TOO:         [1]: {
+          [1654154058.285337][3492:3497] CHIP:TOO:           MfgCode: 0
+          [1654154058.285364][3492:3497] CHIP:TOO:           Value: 0
+          [1654154058.285390][3492:3497] CHIP:TOO:          }
+          [1654154058.285418][3492:3497] CHIP:TOO:      }
+          [1654154058.285456][3492:3497] CHIP:TOO:     [3]: {
+          [1654154058.285484][3492:3497] CHIP:TOO:       Label: Espresso
+          [1654154058.285513][3492:3497] CHIP:TOO:       Mode: 7
+          [1654154058.285547][3492:3497] CHIP:TOO:       SemanticTags: 1 entries
+          [1654154058.285638][3492:3497] CHIP:TOO:         [1]: {
+          [1654154058.285671][3492:3497] CHIP:TOO:           MfgCode: 0
+          [1654154058.285701][3492:3497] CHIP:TOO:           Value: 0
+          [1654154058.285730][3492:3497] CHIP:TOO:          }
+          [1654154058.285762][3492:3497] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Select a value from the list in step 2c with a different value than
+          the StartUpMode value read in step 1. TH sends a write command for
+          OnMode to the DUT with the selected value."
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp
+      verification: |
+          ./chip-tool modeselect write on-mode 7 1 1
+
+          on TH(chip-tool),Verify that the DUT with a successful (value 0x00) status response.
+
+          [1651099941884] [84269:7567211] CHIP: [DMG] WriteResponseMessage =
+          [1651099941884] [84269:7567211] CHIP: [DMG] {
+          [1651099941884] [84269:7567211] CHIP: [DMG]         AttributeStatusIBs =
+          [1651099941884] [84269:7567211] CHIP: [DMG]         [
+          [1651099941884] [84269:7567211] CHIP: [DMG]                 AttributeStatusIB =
+          [1651099941884] [84269:7567211] CHIP: [DMG]                 {
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         AttributePathIB =
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         {
+          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Endpoint = 0x1,
+          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Cluster = 0x50,
+          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Attribute = 0x0000_0005,
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         }
+          [1651099941887] [84269:7567211] CHIP: [DMG]
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         StatusIB =
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         {
+          [1651099941887] [84269:7567211] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+          [1651099941887] [84269:7567211] CHIP: [DMG]                         },
+          [1651099941887] [84269:7567211] CHIP: [DMG]
+          [1651099941887] [84269:7567211] CHIP: [DMG]                 },
+          [1651099941887] [84269:7567211] CHIP: [DMG]
+          [1651099941887] [84269:7567211] CHIP: [DMG]         ],
+          [1651099941887] [84269:7567211] CHIP: [DMG]
+          [1651099941887] [84269:7567211] CHIP: [DMG]         InteractionModelRevision = 1
+          [1651099941887] [84269:7567211] CHIP: [DMG] }
+      disabled: true
+
+    - label: "TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0005
+      verification: |
+          ./chip-tool modeselect read on-mode 1 1
+
+          on TH(chip-tool),Verify that the DUT responds with an integer
+
+          [1651100140426] [84609:7569911] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 2609052120
+          [1651100140426] [84609:7569911] CHIP: [TOO]   OnMode: 4
+      disabled: true
+
+    - label:
+          "TH writes 1 to StartUpOnOff attribute of the OnOff Cluster of the DUT"
+      PICS: OO.S.A4003
+      verification: |
+          ./chip-tool onoff write start-up-on-off 1 1 1
+
+          on TH(chip-tool),Verify that the response status was success
+
+          [1651101661959] [90832:7598169] CHIP: [DMG] WriteResponseMessage =
+          [1651101661959] [90832:7598169] CHIP: [DMG] {
+          [1651101661959] [90832:7598169] CHIP: [DMG]         AttributeStatusIBs =
+          [1651101661959] [90832:7598169] CHIP: [DMG]         [
+          [1651101661959] [90832:7598169] CHIP: [DMG]                 AttributeStatusIB =
+          [1651101661959] [90832:7598169] CHIP: [DMG]                 {
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         AttributePathIB =
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         {
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Endpoint = 0x1,
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Cluster = 0x6,
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Attribute = 0x0000_4003,
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         }
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         StatusIB =
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         {
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+          [1651101661960] [90832:7598169] CHIP: [DMG]                         },
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG]                 },
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG]         ],
+          [1651101661960] [90832:7598169] CHIP: [DMG]
+          [1651101661960] [90832:7598169] CHIP: [DMG]         InteractionModelRevision = 1
+          [1651101661960] [90832:7598169] CHIP: [DMG] }
+      disabled: true
+
+    - label: "Physically power cycle the device."
+      verification: |
+          Physically power cycle the device.
+      disabled: true
+
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      verification: |
+          ./chip-tool modeselect read current-mode 1 1
+
+
+          on TH(chip-tool),Verify that this number is the same with the number recorded in step 3
+
+          [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 2609052120
+          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4
+      disabled: true

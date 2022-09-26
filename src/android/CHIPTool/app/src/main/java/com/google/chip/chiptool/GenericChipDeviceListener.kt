@@ -23,6 +23,14 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
+  override fun onReadCommissioningInfo(vendorId: Int,productId: Int, wifiEndpointId: Int, threadEndpointId: Int) {
+    // No op
+  }
+
+  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String, errorCode: Int) {
+    // No op
+  }
+
   override fun onNotifyChipConnectionClosed() {
     // No op
   }

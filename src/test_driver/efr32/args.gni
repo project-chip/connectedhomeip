@@ -27,6 +27,9 @@ chip_enable_openthread = true
 chip_openthread_ftd = true
 chip_monolithic_tests = true
 
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
+
 #Fix me : Test driver should use same config as examples
 # Problem : Linker issue if set to true
 chip_system_config_use_open_thread_inet_endpoints = false

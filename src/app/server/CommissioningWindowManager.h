@@ -18,8 +18,11 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
@@ -74,14 +77,31 @@ public:
         System::Clock::Seconds16 commissioningTimeout      = System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
+    /**
+     * Open the pairing window using default configured parameters, triggered by
+     * the Administrator Commmissioning cluster implementation.
+     */
+    CHIP_ERROR
+    OpenBasicCommissioningWindowForAdministratorCommissioningCluster(System::Clock::Seconds16 commissioningTimeout,
+                                                                     FabricIndex fabricIndex, VendorId vendorId);
+
     CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds16 commissioningTimeout, uint16_t discriminator,
-                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                               FabricIndex fabricIndex, VendorId vendorId);
 
     void CloseCommissioningWindow();
 
-    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatusForCluster() const;
 
-    // CommissioningModeProvider implemetation.
+    bool IsCommissioningWindowOpen() const;
+
+    const app::DataModel::Nullable<VendorId> & GetOpenerVendorId() const { return mOpenerVendorId; }
+
+    const app::DataModel::Nullable<FabricIndex> & GetOpenerFabricIndex() const { return mOpenerFabricIndex; }
+
+    void OnFabricRemoved(FabricIndex removedIndex);
+
+    // CommissioningModeProvider implementation.
     Dnssd::CommissioningMode GetCommissioningMode() const override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -181,6 +201,13 @@ private:
 
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
+
+    // Information about who opened the commissioning window.  These will only
+    // be non-null if the window was opened via the operational credentials
+    // cluster and the fabric index may be null even then if the fabric has been
+    // removed.
+    app::DataModel::Nullable<VendorId> mOpenerVendorId;
+    app::DataModel::Nullable<FabricIndex> mOpenerFabricIndex;
 };
 
 } // namespace chip

@@ -23,12 +23,15 @@ from .builder import Builder
 class TelinkApp(Enum):
     LIGHT = auto()
     SWITCH = auto()
+    OTA_REQUESTOR = auto()
 
     def ExampleName(self):
         if self == TelinkApp.LIGHT:
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
             return 'light-switch-app'
+        elif self == TelinkApp.OTA_REQUESTOR:
+            return 'ota-requestor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -37,6 +40,8 @@ class TelinkApp(Enum):
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
+        elif self == TelinkApp.OTA_REQUESTOR:
+            return 'chip-telink-ota-requestor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

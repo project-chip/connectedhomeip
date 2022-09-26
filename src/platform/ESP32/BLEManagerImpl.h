@@ -81,9 +81,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -202,16 +200,12 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
-    static constexpr System::Clock::Timeout kAdvertiseTimeout =
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
     static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
         System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     System::Clock::Timestamp mAdvertiseStartTime;
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
-    void HandleAdvertisementTimer();
 
 #if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
@@ -242,6 +236,7 @@ private:
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
 
+    static CHIP_ERROR bleprph_set_random_addr(void);
     static void bleprph_host_task(void * param);
     static void bleprph_on_sync(void);
     static void bleprph_on_reset(int);
@@ -284,11 +279,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline ::chip::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

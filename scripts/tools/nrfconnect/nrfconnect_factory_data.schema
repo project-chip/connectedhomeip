@@ -75,23 +75,30 @@
         "rd_uid": {
             "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
             "type": "string",
+            "pattern:": "^hex:{1}",
             "minLength": 20,
+            "minLength": 5,
             "maxLength": 36
         },
         "dac_cert": {
             "description": "DAC certificate in hex-string format",
             "type": "string",
+            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
+            "minLength": 5,
             "maxLength": 1204
         },
         "dac_key": {
             "description": "DAC Private Key in hex-string format",
             "type": "string",
+            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
             "minLength": 68,
             "maxLength": 68
         },
         "pai_cert": {
             "description": "PAI certificate in hex-string format",
             "type": "string",
+            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
+            "minLength": 5,
             "maxLength": 1204
         },
         "passcode": {
@@ -109,12 +116,14 @@
         "spake2_salt": {
             "description": "A key-derivation function for the Symmetric Password-Authenticated Key Exchange.",
             "type": "string",
+            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
             "minLength": 36,
             "maxLength": 68
         },
         "spake2_verifier": {
             "description": "A verifier for the Symmetric Password-Authenticated Key Exchange",
             "type": "string",
+            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
             "minLength": 97
         },
         "discriminator": {
@@ -122,6 +131,13 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 4095
+        },
+        "enable_key": {
+            "description": "The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command",
+            "type": "string",
+            "pattern": "^hex:{1}([0-9A-Fa-f]){32}",
+            "minLength": 36, 
+            "maxLength": 36
         },
         "user": {
             "description": "A user-specific additional data which should be added to factory data. This should be a Json format.",

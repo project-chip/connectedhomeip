@@ -1,0 +1,342 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 50.3.2. [TC-DGTHREAD-3.2] Attributes-Tx [DUT- Client]
+
+PICS:
+    - DGTHREAD.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT reads TxTotalCount attribute value from TH"
+      PICS: DGTHREAD.C.A0016
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-total-count 54 0
+
+          Verify "TxTotalCount response" on the TH(All-cluster-app) Log:
+
+          D: 2843340 [SC]Allocated SecureSession (0x20002e98) - waiting for Sigma1 msg
+          I: 2843348 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:148275633 on exchar
+          D: 2843358 [EM]Handling via exchange: 4328r, Delegate: 0x200070ec
+          D: 2843364 [IM]Received Read request
+          D: 2843369 [DMG]IM RH moving to [GeneratingReports]
+          D: 2843374 [EM]Retransmitting MessageCounter:53367852 on exchange 4327r Send Cnt 1
+          I: 2843382 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367852 to 0x0000000000000000c
+          D: 2843396 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 2843405 [DMG]<RE:Run> Cluster 35, Attribute 16 is dirty
+          D: 2843412 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0016 (expanded=0)
+          D: 2843421 [DMG]<RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxUnicastCount attribute value from TH"
+      PICS: DGTHREAD.C.A0017
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-unicast-count 54 0
+
+          Verify "TxUnicastCount response" on the TH(All-cluster-app) Log:
+
+          D: 3036505 [SC]Allocated SecureSession (0x20002f50) - waiting for Sigma1 msg
+          I: 3036513 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:134883675 on exchar
+          D: 3036523 [EM]Handling via exchange: 50096r, Delegate: 0x200070ec
+          D: 3036529 [IM]Received Read request
+          D: 3036533 [DMG]IM RH moving to [GeneratingReports]
+          D: 3036538 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3036546 [DMG]<RE:Run> Cluster 35, Attribute 17 is dirty
+          D: 3036552 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0017 (expanded=0)
+          D: 3036563 [DMG]<RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxBroadcastCount attribute value from TH"
+      PICS: DGTHREAD.C.A0018
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-broadcast-count 54 0
+
+          Verify "TxBroadcastCount response" on the TH(All-cluster-app) Log:
+
+          I: 3080325 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367860 to 0x0000000000000000c
+          I: 3080339 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:187366260 on exchar
+          D: 3080349 [EM]Handling via exchange: 4630r, Delegate: 0x200070ec
+          D: 3080357 [IM]Received Read request
+          D: 3080362 [DMG]IM RH moving to [GeneratingReports]
+          D: 3080367 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3080377 [DMG]<RE:Run> Cluster 35, Attribute 18 is dirty
+          D: 3080382 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0018 (expanded=0)
+          D: 3080391 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxAckRequestedCount attribute value from TH"
+      PICS: DGTHREAD.C.A0019
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 54 0
+
+          Verify "TxAckRequestedCount response" on the TH(All-cluster-app) Log:
+
+          I: 3120921 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367864 to 0x0000000000000000c
+          I: 3120937 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:2317510 on exchangr
+          D: 3120947 [EM]Handling via exchange: 48251r, Delegate: 0x200070ec
+          D: 3120954 [IM]Received Read request
+          D: 3120959 [DMG]IM RH moving to [GeneratingReports]
+          D: 3120964 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3120973 [DMG]<RE:Run> Cluster 35, Attribute 19 is dirty
+          D: 3120978 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0019 (expanded=0)
+          D: 3120988 [DMG]<RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxAckedCount attribute value from TH"
+      PICS: DGTHREAD.C.A001a
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-acked-count 54 0
+
+          Verify "TxAckedCount response" on the TH(All-cluster-app) Log:
+
+          D: 3176183 [SC]Allocated SecureSession (0x20003178) - waiting for Sigma1 msg
+          I: 3176190 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:96627054 on exchanr
+          D: 3176200 [EM]Handling via exchange: 13382r, Delegate: 0x200070ec
+          D: 3176206 [IM]Received Read request
+          D: 3176210 [DMG]IM RH moving to [GeneratingReports]
+          D: 3176217 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3176226 [DMG]<RE:Run> Cluster 35, Attribute 1a is dirty
+          D: 3176232 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001A (expanded=0)
+          D: 3176241 [DMG]<RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxNoAckRequestedCount attribute value from TH"
+      PICS: DGTHREAD.C.A001b
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 54 0
+          Verify "TxNoAckRequestedCount response" on the TH(All-cluster-app) Log:
+
+          D: 3223768 [SC]Allocated SecureSession (0x20003230) - waiting for Sigma1 msg
+          I: 3223776 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:222085508 on exchar
+          D: 3223786 [EM]Handling via exchange: 38957r, Delegate: 0x200070ec
+          D: 3223792 [IM]Received Read request
+          D: 3223796 [DMG]IM RH moving to [GeneratingReports]
+          D: 3223801 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3223809 [DMG]<RE:Run> Cluster 35, Attribute 1b is dirty
+          D: 3223815 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001B (expanded=0)
+          D: 3223824 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxDataCount attribute value from TH"
+      PICS: DGTHREAD.C.A001c
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-data-count 54 0
+          Verify "TxDataCount response" on the TH(All-cluster-app) Log:
+
+          D: 3259870 [SC]Allocated SecureSession (0x200032e8) - waiting for Sigma1 msg
+          I: 3259878 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:111520680 on exchar
+          D: 3259888 [EM]Handling via exchange: 55695r, Delegate: 0x200070ec
+          D: 3259894 [IM]Received Read request
+          D: 3259898 [DMG]IM RH moving to [GeneratingReports]
+          D: 3259903 [EM]Retransmitting MessageCounter:53367876 on exchange 55694r Send Cnt 1
+          I: 3259911 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367876 to 0x0000000000000000c
+          D: 3259925 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3259934 [DMG]<RE:Run> Cluster 35, Attribute 1c is dirty
+          D: 3259941 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001C (expanded=0)
+          D: 3259951 [DMG]<RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxDataPollCount attribute value from TH"
+      PICS: DGTHREAD.C.A001d
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 54 0
+          Verify "TxDataPollCount response" on the TH(All-cluster-app) Log:
+
+          D: 3325107 [SC]Allocated SecureSession (0x200033a0) - waiting for Sigma1 msg
+          I: 3325115 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:39487161 on exchanr
+          D: 3325125 [EM]Handling via exchange: 61775r, Delegate: 0x200070ec
+          D: 3325131 [IM]Received Read request
+          D: 3325135 [DMG]IM RH moving to [GeneratingReports]
+          D: 3325140 [EM]Retransmitting MessageCounter:53367880 on exchange 61774r Send Cnt 1
+          I: 3325148 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367880 to 0x0000000000000000c
+          D: 3325163 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3325173 [DMG]<RE:Run> Cluster 35, Attribute 1d is dirty
+          D: 3325179 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001D (expanded=0)
+          D: 3325189 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxBeaconCount attribute value from TH"
+      PICS: DGTHREAD.C.A001e
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-beacon-count 54 0
+           Verify "TxBeaconCount response" on the TH(All-cluster-app) Log:
+
+          D: 3354772 [SC]Allocated SecureSession (0x20003458) - waiting for Sigma1 msg
+          D: 3354779 [EM]Retransmitting MessageCounter:53367884 on exchange 50547r Send Cnt 1
+          I: 3354786 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367884 to 0x0000000000000000c
+          I: 3354801 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:80147352 on exchanr
+          D: 3354811 [EM]Handling via exchange: 50548r, Delegate: 0x200070ec
+          D: 3354818 [IM]Received Read request
+          D: 3354822 [DMG]IM RH moving to [GeneratingReports]
+          D: 3354828 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3354837 [DMG]<RE:Run> Cluster 35, Attribute 1e is dirty
+          D: 3354842 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001E (expanded=0)
+          D: 3354853 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxBeaconRequestCount attribute value from TH"
+      PICS: DGTHREAD.C.A001f
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 54 0
+          Verify "TxBeaconRequestCount response" on the TH(All-cluster-app) Log:
+
+          D: 3383318 [SC]Allocated SecureSession (0x20003510) - waiting for Sigma1 msg
+          I: 3383326 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:29889571 on exchanr
+          D: 3383338 [EM]Handling via exchange: 53268r, Delegate: 0x200070ec
+          D: 3383344 [IM]Received Read request
+          D: 3383348 [DMG]IM RH moving to [GeneratingReports]
+          D: 3383353 [EM]Retransmitting MessageCounter:53367888 on exchange 53267r Send Cnt 1
+          I: 3383360 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367888 to 0x0000000000000000c
+          D: 3383374 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3383383 [DMG]<RE:Run> Cluster 35, Attribute 1f is dirty
+          D: 3383389 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_001F (expanded=0)
+          D: 3383400 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxOtherCount attribute value from TH"
+      PICS: DGTHREAD.C.A0020
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-other-count 54 0
+          Verify "TxOtherCount response" on the TH(All-cluster-app) Log:
+
+          D: 3549567 [SC]Allocated SecureSession (0x200035c8) - waiting for Sigma1 msg
+          I: 3549574 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:196573482 on exchar
+          D: 3549585 [EM]Handling via exchange: 49239r, Delegate: 0x200070ec
+          D: 3549591 [IM]Received Read request
+          D: 3549595 [DMG]IM RH moving to [GeneratingReports]
+          D: 3549599 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3549608 [DMG]<RE:Run> Cluster 35, Attribute 20 is dirty
+          D: 3549613 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0020 (expanded=0)
+          D: 3549623 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxRetryCount attribute value from TH"
+      PICS: DGTHREAD.C.A0021
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-retry-count 54 0
+          Verify "TxRetryCount response" on the TH(All-cluster-app) Log:
+
+          D: 3579614 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
+          I: 3579622 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:236977137 on exchar
+          D: 3579632 [EM]Handling via exchange: 26757r, Delegate: 0x200070ec
+          D: 3579638 [IM]Received Read request
+          D: 3579642 [DMG]IM RH moving to [GeneratingReports]
+          D: 3579647 [EM]Retransmitting MessageCounter:53367896 on exchange 26756r Send Cnt 1
+          I: 3579654 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367896 to 0x0000000000000000c
+          D: 3579669 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3579678 [DMG]<RE:Run> Cluster 35, Attribute 21 is dirty
+          D: 3579684 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0021 (expanded=0)
+          D: 3579695 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxDirectMaxRetryExpiryCount attribute value from TH"
+      PICS: DGTHREAD.C.A0022
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-direct-max-retry-expiry-count 54 0
+           Verify "TxDirectMaxRetryExpiryCount response" on the TH(All-cluster-app) Log:
+
+          D: 3783161 [SC]Allocated SecureSession (0x20003738) - waiting for Sigma1 msg
+          I: 3783169 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:218163522 on exchar
+          D: 3783179 [EM]Handling via exchange: 24150r, Delegate: 0x200070ec
+          D: 3783185 [IM]Received Read request
+          D: 3783189 [DMG]IM RH moving to [GeneratingReports]
+          D: 3783194 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3783202 [DMG]<RE:Run> Cluster 35, Attribute 22 is dirty
+          D: 3783208 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0022 (expanded=0)
+          D: 3783217 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxIndirectMaxRetryExpiryCount attribute value from TH"
+      PICS: DGTHREAD.C.A0023
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-indirect-max-retry-expiry-count 54 0
+          Verify "TxIndirectMaxRetryExpiryCount response" on the TH(All-cluster-app) Log:
+
+          D: 3821837 [SC]Allocated SecureSession (0x200037f0) - waiting for Sigma1 msg
+          I: 3821844 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:265981625 on exchar
+          D: 3821855 [EM]Handling via exchange: 43311r, Delegate: 0x200070ec
+          D: 3821860 [IM]Received Read request
+          D: 3821864 [DMG]IM RH moving to [GeneratingReports]
+          D: 3821869 [EM]Retransmitting MessageCounter:53367904 on exchange 43310r Send Cnt 1
+          I: 3821877 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367904 to 0x0000000000000000c
+          D: 3821891 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3821900 [DMG]<RE:Run> Cluster 35, Attribute 23 is dirty
+          D: 3821907 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0023 (expanded=0)
+          D: 3821917 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxErrCcaCount attribute value from TH"
+      PICS: DGTHREAD.C.A0024
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-err-cca-count 54 0
+          Verify "TxErrCcaCount response" on the TH(All-cluster-app) Log:
+          D: 3851430 [SC]Allocated SecureSession (0x20002c70) - waiting for Sigma1 msg
+          I: 3851438 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:99541923 on exchanr
+          D: 3851448 [EM]Handling via exchange: 35297r, Delegate: 0x200070ec
+          D: 3851454 [IM]Received Read request
+          D: 3851458 [DMG]IM RH moving to [GeneratingReports]
+          D: 3851463 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3851472 [DMG]<RE:Run> Cluster 35, Attribute 24 is dirty
+          D: 3851477 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0024 (expanded=0)
+          D: 3851486 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxErrAbortCount attribute value from TH"
+      PICS: DGTHREAD.C.A0025
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-err-abort-count 54 0
+           Verify "TxErrAbortCount response" on the TH(All-cluster-app) Log:
+
+          I: 3878371 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367912 to 0x0000000000000000c
+          I: 3878386 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:20729896 on exchanr
+          D: 3878397 [EM]Handling via exchange: 34017r, Delegate: 0x200070ec
+          D: 3878405 [IM]Received Read request
+          D: 3878409 [DMG]IM RH moving to [GeneratingReports]
+          D: 3878414 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3878422 [DMG]<RE:Run> Cluster 35, Attribute 25 is dirty
+          D: 3878428 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0025 (expanded=0)
+          D: 3878437 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true
+
+    - label: "DUT reads TxErrBusyChannelCount attribute value from TH"
+      PICS: DGTHREAD.C.A0026
+      verification: |
+          ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 54 0
+          Verify "TxErrBusyChannelCount response" on the TH(All-cluster-app) Log:
+
+          D: 3925250 [SC]Allocated SecureSession (0x20002d28) - waiting for Sigma1 msg
+          I: 3925257 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:68236194 on exchanr
+          D: 3925267 [EM]Handling via exchange: 58143r, Delegate: 0x200070ec
+          D: 3925273 [IM]Received Read request
+          D: 3925277 [DMG]IM RH moving to [GeneratingReports]
+          D: 3925282 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3925292 [DMG]<RE:Run> Cluster 35, Attribute 26 is dirty
+          D: 3925298 [DMG]Reading attribute: Cluster=0x0000_0035 Endpoint=0 AttributeId=0x0000_0026 (expanded=0)
+          D: 3925307 [DMG]<RE> Sending report (payload has 36 bytes)...
+      disabled: true

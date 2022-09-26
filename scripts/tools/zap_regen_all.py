@@ -71,7 +71,10 @@ class ZAPGenerateTarget:
             with open(af_gen_event, "w+"):  # Empty file needed for linux
                 pass
             idl_path = self.zap_config.replace(".zap", ".matter")
-            target_path = os.path.join(self.output_dir, os.path.basename(idl_path))
+            target_path = os.path.join("examples",
+                                       "chef",
+                                       "devices",
+                                       os.path.basename(idl_path))
             os.rename(idl_path, target_path)
 
 

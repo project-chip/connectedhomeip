@@ -23,6 +23,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
+using namespace chip;
+using namespace chip::Credentials;
+
 typedef void PyObject;
 
 using namespace chip;
@@ -50,13 +53,51 @@ void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR st
                                                    const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk,
                                                    Optional<NodeId> adminSubject)
 {
-    if (pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct != nullptr)
+    if (pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct == nullptr)
     {
-        Crypto::AesCcm128KeySpan ipkData;
-        ipkData = ipk.ValueOr(Crypto::AesCcm128KeySpan());
+        return;
+    }
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipNoc;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipIcac;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipRcac;
+    MutableByteSpan chipNocSpan;
+    MutableByteSpan chipIcacSpan;
+    MutableByteSpan chipRcacSpan;
+
+    Crypto::AesCcm128KeySpan ipkData;
+    ipkData = ipk.ValueOr(Crypto::AesCcm128KeySpan());
+
+    CHIP_ERROR err = status;
+    if (err != CHIP_NO_ERROR)
+    {
+        ExitNow();
+    }
+    VerifyOrExit(chipNoc.Alloc(Credentials::kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    chipNocSpan = MutableByteSpan(chipNoc.Get(), Credentials::kMaxCHIPCertLength);
+
+    VerifyOrExit(chipIcac.Alloc(Credentials::kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    chipIcacSpan = MutableByteSpan(chipIcac.Get(), Credentials::kMaxCHIPCertLength);
+
+    VerifyOrExit(chipRcac.Alloc(Credentials::kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    chipRcacSpan = MutableByteSpan(chipRcac.Get(), Credentials::kMaxCHIPCertLength);
+
+    SuccessOrExit(err = ConvertX509CertToChipCert(noc, chipNocSpan));
+    SuccessOrExit(err = ConvertX509CertToChipCert(icac, chipIcacSpan));
+    SuccessOrExit(err = ConvertX509CertToChipCert(rcac, chipRcacSpan));
+
+exit:
+    if (err == CHIP_NO_ERROR)
+    {
         pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
-            context, status.AsInteger(), noc.data(), noc.size(), icac.data(), icac.size(), rcac.data(), rcac.size(), ipkData.data(),
-            ipk.HasValue() ? ipkData.size() : 0, adminSubject.ValueOr(kUndefinedNodeId));
+            context, err.AsInteger(), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
+            chipRcacSpan.data(), chipRcacSpan.size(), ipkData.data(), ipk.HasValue() ? ipkData.size() : 0,
+            adminSubject.ValueOr(kUndefinedNodeId));
+    }
+    else
+    {
+        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(context, err.AsInteger(), nullptr, 0, nullptr, 0, nullptr,
+                                                                         0, nullptr, 0, 0);
     }
 }
 

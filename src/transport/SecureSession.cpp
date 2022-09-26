@@ -46,6 +46,7 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     mPeerSessionId   = peerSessionId;
     mRemoteMRPConfig = config;
     SetFabricIndex(peerNode.GetFabricIndex());
+    MarkActiveRx(); // Initialize SessionTimestamp and ActiveTimestamp per spec.
 
     Retain(); // This ref is released inside MarkForEviction
     MoveToState(State::kActive);

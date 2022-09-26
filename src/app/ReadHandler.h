@@ -32,6 +32,8 @@
 #include <app/EventManagement.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributePathIBs.h>
+#include <app/MessageDef/DataVersionFilterIBs.h>
+#include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
@@ -39,7 +41,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -196,9 +198,7 @@ private:
     enum class ReadHandlerFlags : uint8_t
     {
         // mHoldReport is used to prevent subscription data delivery while we are
-        // waiting for the min reporting interval to elapse.  If we have to send a
-        // report immediately due to an urgent event being queued,
-        // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
+        // waiting for the min reporting interval to elapse.
         HoldReport = (1 << 0),
 
         // mHoldSync is used to prevent subscription empty report delivery while we
@@ -217,7 +217,6 @@ private:
         PrimingReports     = (1 << 3),
         ActiveSubscription = (1 << 4),
         FabricFiltered     = (1 << 5),
-
         // For subscriptions, we record the dirty set generation when we started to generate the last report.
         // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
         // has a meaningful value while IsReporting() is true.
@@ -225,6 +224,8 @@ private:
         // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
         // chunk of the current report.  Anything that was dirty with a generation earlier than
         // mPreviousReportsBeginGeneration has had its value sent to the client.
+        // when receiving initial request, it needs mark current handler as dirty.
+        // when there is urgent event, it needs mark current handler as dirty.
         ForceDirty = (1 << 6),
 
         // Don't need the response for report data if true
@@ -240,7 +241,7 @@ private:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnInitialRequest(System::PacketBufferHandle && aPayload);
+    void OnInitialRequest(System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -298,8 +299,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearDirty() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
-
+    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -317,11 +317,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery()
-    {
-        mFlags.Clear(ReadHandlerFlags::HoldReport);
-        mFlags.Set(ReadHandlerFlags::ForceDirty);
-    }
+    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
@@ -354,20 +350,8 @@ private:
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    /*
-     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
-     * not arise during normal message processing flows that all normally call Close() above.
-     *
-     * This will eventually call Close() to drive the process of eventually releasing this object (unless called from the
-     * destructor).
-     *
-     * This is only called by a very narrow set of external objects as needed.
-     */
-    void Abort(bool aCalledFromDestructor = false);
-
     /**
-     * Called internally to signal the completion of all work on this object, gracefully close the
-     * exchange and finally, signal to a registerd callback that it's
+     * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
      */
     void Close();
@@ -378,15 +362,14 @@ private:
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
+    CHIP_ERROR ProcessAttributePaths(AttributePathIBs::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
     CHIP_ERROR ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser);
-    CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                bool & aSendStatusResponse);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                System::PacketBufferHandle && aPayload);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
@@ -445,7 +428,7 @@ private:
     // TODO: We should shutdown the transaction when the session expires.
     SessionHolder mSessionHandle;
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
     ObjectList<EventPathParams> * mpEventPathList           = nullptr;

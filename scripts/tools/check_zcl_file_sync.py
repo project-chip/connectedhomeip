@@ -49,6 +49,11 @@ def main():
     base_data["xmlFile"].sort()
     ext_data["xmlFile"].sort()
 
+    # remove the description. That is expected to be different, so we
+    # will completely exclude it from the comparison.
+    del base_data["description"]
+    del ext_data["description"]
+
     if base_data == ext_data:
         return 0
 

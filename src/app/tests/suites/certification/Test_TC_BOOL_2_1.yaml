@@ -14,6 +14,9 @@
 
 name: 68.2.1. [TC-BOOL-2.1] Attributes with server as DUT
 
+PICS:
+    - BOOL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Boolean State"
@@ -29,9 +32,9 @@ tests:
                 value: nodeId
 
     - label: "Read mandatory non-global attribute: StateValue"
+      PICS: BOOL.S.A0000
       command: "readAttribute"
       attribute: "StateValue"
       response:
-          value: 0
           constraints:
-              type: bool
+              type: boolean

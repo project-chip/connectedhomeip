@@ -24,6 +24,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -194,12 +195,33 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     opKeystore.Finish();
 }
 
+void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
+{
+    chip::TestPersistentStorageDelegate storage;
+
+    PersistentStorageOperationalKeystore opKeyStore;
+    NL_TEST_ASSERT_SUCCESS(inSuite, opKeyStore.Init(&storage));
+
+    Crypto::P256ECDSASignature sig;
+    uint8_t message[] = { 'm', 's', 'g' };
+
+    Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
+    NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+
+    opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
+
+    opKeyStore.Finish();
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
-
-                                 NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys), NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.

@@ -1,0 +1,62 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-KEYPADINPUT-3.1] Send Key Command Verification (DUT as Client)
+
+PICS:
+    - KEYPADINPUT.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT sends SendKey command to TH"
+      PICS: KEYPADINPUT.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+          ./chip-tool keypadinput send-key 10 1 1
+          ./chip-tv-casting-app keypadinput send-key 10 1 1
+
+
+          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
+
+          [1658530264507] [21469:308294] CHIP: [DMG] InvokeRequestMessage =
+          [1658530264507] [21469:308294] CHIP: [DMG] {
+          [1658530264507] [21469:308294] CHIP: [DMG]         suppressResponse = false,
+          [1658530264507] [21469:308294] CHIP: [DMG]         timedRequest = false,
+          [1658530264507] [21469:308294] CHIP: [DMG]         InvokeRequests =
+          [1658530264507] [21469:308294] CHIP: [DMG]         [
+          [1658530264507] [21469:308294] CHIP: [DMG]                 CommandDataIB =
+          [1658530264507] [21469:308294] CHIP: [DMG]                 {
+          [1658530264507] [21469:308294] CHIP: [DMG]                         CommandPathIB =
+          [1658530264507] [21469:308294] CHIP: [DMG]                         {
+          [1658530264507] [21469:308294] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530264507] [21469:308294] CHIP: [DMG]                                 ClusterId = 0x509,
+          [1658530264507] [21469:308294] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658530264507] [21469:308294] CHIP: [DMG]                         },
+          [1658530264507] [21469:308294] CHIP: [DMG]
+          [1658530264507] [21469:308294] CHIP: [DMG]                         CommandFields =
+          [1658530264507] [21469:308294] CHIP: [DMG]                         {
+          [1658530264507] [21469:308294] CHIP: [DMG]                                 0x0 = 10,
+          [1658530264507] [21469:308294] CHIP: [DMG]                         },
+          [1658530264507] [21469:308294] CHIP: [DMG]                 },
+          [1658530264507] [21469:308294] CHIP: [DMG]
+          [1658530264507] [21469:308294] CHIP: [DMG]         ],
+          [1658530264507] [21469:308294] CHIP: [DMG]
+          [1658530264507] [21469:308294] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530264507] [21469:308294] CHIP: [DMG] },
+      disabled: true

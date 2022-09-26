@@ -1,0 +1,187 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.4.20. [TC-CNET-4.22] [Thread] Verification for ScanNetworks command
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT supports CNET.S.F01(TH)"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT has a Network Commissioning cluster on endpoint
+          PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH can communicate with the DUT on
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ScanNetworks command to the DUT with the SSID field omitted
+          and the Breadcrumb field set to 1"
+      PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
+      verification: |
+          ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 1
+
+          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool) Log:
+
+          [1658297246.000815][7679:7684] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
+          [1658297246.001029][7679:7684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
+          [1658297246.001190][7679:7684] CHIP:TOO:   ScanNetworksResponse: {
+          [1658297246.001270][7679:7684] CHIP:TOO:     networkingStatus: 0
+          [1658297246.001357][7679:7684] CHIP:TOO:     threadScanResults: 1 entries
+          [1658297246.001485][7679:7684] CHIP:TOO:       [1]: {
+          [1658297246.001548][7679:7684] CHIP:TOO:         PanId: 64206
+          [1658297246.001607][7679:7684] CHIP:TOO:         ExtendedPanId: 3861484836749312
+          [1658297246.001665][7679:7684] CHIP:TOO:         NetworkName: GRL
+          [1658297246.001721][7679:7684] CHIP:TOO:         Channel: 11
+          [1658297246.001777][7679:7684] CHIP:TOO:         Version: 4
+          [1658297246.001841][7679:7684] CHIP:TOO:         ExtendedAddress: 166E0A0000000001
+          [1658297246.001900][7679:7684] CHIP:TOO:         Rssi: -81
+          [1658297246.001955][7679:7684] CHIP:TOO:         Lqi: 48
+          [1658297246.002010][7679:7684] CHIP:TOO:        }
+          [1658297246.002070][7679:7684] CHIP:TOO:    }
+          [1658297246.002181][7679:7684] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658297246.002298][7679:7684] CHIP:EM: Sending Standalone Ack for MessageCounter:124278362 on exchange 24525i
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 54 0
+
+          Verify Breadcrumb: 1 on the TH/All-cluster-app Log:
+
+          [1657688310.986593][1613:1618] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017612
+          [1657688310.989412][1613:1618] CHIP:TOO:   Breadcrumb: 1
+          [1657688310.989586][1613:1618] CHIP:EM: Sending Standalone Ack for MessageCounter:63605306 on exchange 55886i
+      disabled: true
+
+    - label:
+          "TH sends ScanNetworks command to the DUT with the SSID field set to
+          null and the Breadcrumb field set to 2"
+      PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
+      verification: |
+          ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 2
+
+          Verify  ScanNetworksResponse and its arguments on the TH/All-cluster-app Log:
+
+          [1658297283.141075][7695:7700] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
+          [1658297283.141183][7695:7700] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
+          [1658297283.141356][7695:7700] CHIP:TOO:   ScanNetworksResponse: {
+          [1658297283.141438][7695:7700] CHIP:TOO:     networkingStatus: 0
+          [1658297283.141534][7695:7700] CHIP:TOO:     threadScanResults: 2 entries
+          [1658297283.141663][7695:7700] CHIP:TOO:       [1]: {
+          [1658297283.141729][7695:7700] CHIP:TOO:         PanId: 64206
+          [1658297283.141788][7695:7700] CHIP:TOO:         ExtendedPanId: 3861484836749312
+          [1658297283.141847][7695:7700] CHIP:TOO:         NetworkName: GRL
+          [1658297283.141904][7695:7700] CHIP:TOO:         Channel: 11
+          [1658297283.141961][7695:7700] CHIP:TOO:         Version: 4
+          [1658297283.142023][7695:7700] CHIP:TOO:         ExtendedAddress: 166E0A0000000001
+          [1658297283.142079][7695:7700] CHIP:TOO:         Rssi: -80
+          [1658297283.142134][7695:7700] CHIP:TOO:         Lqi: 52
+          [1658297283.142188][7695:7700] CHIP:TOO:        }
+          [1658297283.142271][7695:7700] CHIP:TOO:       [2]: {
+          [1658297283.142331][7695:7700] CHIP:TOO:         PanId: 64206
+          [1658297283.142386][7695:7700] CHIP:TOO:         ExtendedPanId: 3861484836749312
+          [1658297283.142443][7695:7700] CHIP:TOO:         NetworkName: GRL
+          [1658297283.142500][7695:7700] CHIP:TOO:         Channel: 11
+          [1658297283.142551][7695:7700] CHIP:TOO:         Version: 4
+          [1658297283.142609][7695:7700] CHIP:TOO:         ExtendedAddress: 166E0A0000000001
+          [1658297283.142665][7695:7700] CHIP:TOO:         Rssi: -83
+          [1658297283.142718][7695:7700] CHIP:TOO:         Lqi: 44
+          [1658297283.142771][7695:7700] CHIP:TOO:        }
+          [1658297283.142828][7695:7700] CHIP:TOO:    }
+          [1658297283.142958][7695:7700] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658297283.143074][7695:7700] CHIP:EM: Sending Standalone Ack for MessageCounter:115607423 on exchange 55136i
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 54 0
+
+          Verify "Breadcrumb: 2" on the TH(Chip-tool)  Log:
+
+
+          [1657688397.398564][1626:1631] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017613
+          [1657688397.398697][1626:1631] CHIP:TOO:   Breadcrumb: 2
+          [1657688397.398852][1626:1631] CHIP:EM: Sending Standalone Ack for MessageCounter:129342305 on exchange 25970i
+      disabled: true
+
+    - label:
+          "TH sends ScanNetworks command to the DUT with the SSID field set to a
+          random string of ASCII characters with a size of between 1 and 31
+          characters and the Breadcrumb field set to 3"
+      PICS: CNET.S.C00.Rsp && CNET.S.C01.Tx
+      verification: |
+          ./chip-tool networkcommissioning scan-networks 54 0 --Breadcrumb 3
+
+          Verify  "ScanNetworksResponse and its arguments" on the TH(Chip-tool)  Log:
+
+          [1658297312.201709][7708:7713] CHIP:DMG: },
+          [1658297312.201898][7708:7713] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0001
+          [1658297312.202021][7708:7713] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
+          [1658297312.202196][7708:7713] CHIP:TOO:   ScanNetworksResponse: {
+          [1658297312.202276][7708:7713] CHIP:TOO:     networkingStatus: 0
+          [1658297312.202359][7708:7713] CHIP:TOO:     threadScanResults: 1 entries
+          [1658297312.202481][7708:7713] CHIP:TOO:       [1]: {
+          [1658297312.202544][7708:7713] CHIP:TOO:         PanId: 64206
+          [1658297312.202604][7708:7713] CHIP:TOO:         ExtendedPanId: 3861484836749312
+          [1658297312.202663][7708:7713] CHIP:TOO:         NetworkName: GRL
+          [1658297312.202718][7708:7713] CHIP:TOO:         Channel: 11
+          [1658297312.202775][7708:7713] CHIP:TOO:         Version: 4
+          [1658297312.202838][7708:7713] CHIP:TOO:         ExtendedAddress: 166E0A0000000001
+          [1658297312.202897][7708:7713] CHIP:TOO:         Rssi: -78
+          [1658297312.202952][7708:7713] CHIP:TOO:         Lqi: 60
+          [1658297312.203007][7708:7713] CHIP:TOO:        }
+          [1658297312.203066][7708:7713] CHIP:TOO:    }
+          [1658297312.203176][7708:7713] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1658297312.203284][7708:7713] CHIP:EM: Sending Standalone Ack for MessageCounter:217378941 on exchange 37389i
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 54 0
+
+          Verify "Breadcrumb: 3" on the TH(Chip-tool)  Log:
+
+          [1657688489.553742][1639:1644] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 829017614
+          [1657688489.553897][1639:1644] CHIP:TOO:   Breadcrumb: 3
+          [1657688489.554053][1639:1644] CHIP:EM: Sending Standalone Ack for MessageCounter:86525470 on exchange 7368i
+      disabled: true

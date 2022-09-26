@@ -117,6 +117,7 @@ CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
     // we can improve this.
     //
     handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     writer.Init(std::move(handle), false);
 

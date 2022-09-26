@@ -1,0 +1,188 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.8.3. [TC-MEDIAPLAYBACK-6.3] Advanced Seek Media Playback Verification
+
+PICS:
+    - MEDIAPLAYBACK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 1
+    SeekPosition:
+        type: int64u
+        defaultValue: 100000000
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Precondition: Media content in a paused state at the beginning of the
+          content"
+      command: "Pause"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Sends a Seek command"
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      command: "Seek"
+      arguments:
+          values:
+              - name: "Position"
+                value: 10000
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label:
+          "Verify that the media has moved to 10 seconds from the starting point"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if media has moved to 10 seconds from the
+                    starting point"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Reads the SampledPosition attribute"
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0B.Rsp
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: 10000
+
+    #Issue 10988
+    - label: "TH reads the StartTime attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
+      verification: |
+          "The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback read start-time 1 1
+          ./chip-tv-casting-app mediaplayback read start-time 1 1
+
+          On TH Verify that the response is a valid start time or null.
+          [1654001778189] [97015:7707437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0001 DataVersion: 775839144
+          [1654001778190] [97015:7707437] CHIP: [TOO]   StartTime: 0"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 10988
+    - label: "TH reads the SeekRangeEnd attribute from the DUT"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback read seek-range-end 1 1
+          ./chip-tv-casting-app mediaplayback read seek-range-end 1 1
+
+          On TH Verify that the response is a valid position or Nas.
+          [1654002119527] [97409:7712444] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0005 DataVersion: 775839144
+          [1654002119527] [97409:7712444] CHIP: [TOO]   SeekRangeEnd: 80000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0005
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 10988
+    - label: "TH reads the SeekRangeStart attribute from the DUT"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback read seek-range-start 1 1
+          ./chip-tv-casting-app mediaplayback read seek-range-start 1 1
+
+          On TH Verify that the response is a valid position or Nas.
+          [1661240180.806771][2930:2935] CHIP:DMG:         SuppressResponse = true,
+          [1661240180.806809][2930:2935] CHIP:DMG:         InteractionModelRevision = 1
+          [1661240180.806844][2930:2935] CHIP:DMG: }
+          [1661240180.807024][2930:2935] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1520269522
+          [1661240180.807103][2930:2935] CHIP:TOO:   SeekRangeStart: 0
+          [1661240180.807211][2930:2935] CHIP:EM: Sending Standalone Ack for MessageCounter:164562596 on exchange 31684i
+          [1661240180.807299][2930:2935] CHIP:IN: Prepared secure message 0xffff95f5d978 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 31684i with MessageCounter:104721987.s
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 10988
+    - label: "TH reads the Duration attribute from the DUT"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback read duration 1 1
+          ./chip-tv-casting-app mediaplayback read duration 1 1
+
+          On TH Verify that the response is null or not 0.
+          [1654001869267] [97168:7708957] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0002 DataVersion: 775839144
+          [1654001869267] [97168:7708957] CHIP: [TOO]   Duration: 80000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Sends a Seek command Position value beyond the furthest valid
+          position"
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      command: "Seek"
+      arguments:
+          values:
+              - name: "position"
+                value: SeekPosition
+      response:
+          values:
+              - name: "status"
+                value: 5
+
+    - label: "verify that the media has not moved."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media has not moved"
+              - name: "expectedValue"
+                value: "y"

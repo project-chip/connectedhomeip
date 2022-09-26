@@ -173,5 +173,34 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
     return false;
 }
 
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    {{#zcl_clusters}}
+      {{#zcl_commands}}
+      {{#first}}
+      case Clusters::{{asUpperCamelCase parent.name}}::Id:
+      {
+          switch (aCommand) {
+      {{/first}}
+          {{#if isFabricScoped}}
+          case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+              return true;
+          {{/if}}
+      {{#last}}
+          default:
+              return false;
+          }
+      }
+      {{/last}}
+      {{/zcl_commands}}
+    {{/zcl_clusters}}
+    }
+    return false;
+}
+
 } // namespace app
 } // namespace chip

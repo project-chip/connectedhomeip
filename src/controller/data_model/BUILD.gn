@@ -33,24 +33,25 @@ if (current_os == "android") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = "controller-clusters.matter"
-    _output_files = exec_script("${chip_root}/scripts/codegen.py",
-                                [
-                                  "--generator",
-                                  "java",
-                                  "--log-level",
-                                  "fatal",
-                                  "--name-only",
-                                  rebase_path("controller-clusters.matter"),
-                                ],
-                                "list lines",
-                                [ "controller-clusters.matter" ])
+    _output_files =
+        exec_script("${chip_root}/scripts/codegen.py",
+                    [
+                      "--generator",
+                      "java",
+                      "--log-level",
+                      "fatal",
+                      "--name-only",
+                      rebase_path("controller-clusters.matter", root_build_dir),
+                    ],
+                    "list lines",
+                    [ "controller-clusters.matter" ])
 
     args = [
       "--generator",
       "java",
       "--output-dir",
-      rebase_path(target_gen_dir),
-      rebase_path(_idl_file),
+      rebase_path(target_gen_dir, root_build_dir),
+      rebase_path(_idl_file, root_build_dir),
     ]
 
     deps = [ "${chip_root}/scripts/idl" ]

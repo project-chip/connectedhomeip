@@ -1,0 +1,93 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.14.1. [TC-ALOGIN-12.1] Account Login Verification
+
+PICS:
+    - ALOGIN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          Test Setup: Commission DUT to TH, if not done so already. In some cases, such as with a Casting Video Player, the DUT commissions the TH (eg. tv-casting-app).
+      disabled: true
+
+    - label:
+          "Make sure there is a Content App endpoint implementing the Account
+          Login cluster. Product maker may provide pre-setup steps"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner).
+
+          The following command on the example tv-app will launch a content app on endpoint 4:
+          ./chip-tool applicationlauncher launch-app "{"catalogVendorId": 123, "applicationId": "exampleid"}" 1 1
+          ./chip-tv-casting-app applicationlauncher launch-app "{"catalogVendorId": 123, "applicationId": "exampleid"}" 1 1
+
+          Verify in TH Log:
+          [1654004240716] [9799:7814889] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_050C Command=0x0000_0003
+          [1654004240717] [9799:7814889] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_050C Command 0x0000_0003
+          [1654004240717] [9799:7814889] CHIP: [TOO]   LauncherResponse: {
+          [1654004240717] [9799:7814889] CHIP: [TOO]     status: 0
+          [1654004240717] [9799:7814889] CHIP: [TOO]     data: 64617461
+          [1654004240717] [9799:7814889] CHIP: [TOO]    }
+      disabled: true
+
+    - label:
+          "TH sends a GetSetupPIN command to the DUT with test values provided
+          by the product maker."
+      PICS: ALOGIN.S.C00.Rsp
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a valid GetSetupPINResponse.
+          [1654004273684] [9851:7821178] CHIP: [DMG] Received Command Response Data, Endpoint=4 Cluster=0x0000_050E Command=0x0000_0001
+          [1654004273684] [9851:7821178] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_050E Command 0x0000_0001
+          [1654004273684] [9851:7821178] CHIP: [TOO]   GetSetupPINResponse: {
+          [1654004273684] [9851:7821178] CHIP: [TOO]     setupPIN: 34567890
+          [1654004273684] [9851:7821178] CHIP: [TOO]    }
+      disabled: true
+
+    - label:
+          "TH sends a Login command to the DUT with test values provided by the
+          product maker."
+      PICS: ALOGIN.S.C02.Rsp
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a standard command response.
+          [1654004350009] [9951:7836487] CHIP: [DMG] Received Command Response Status for Endpoint=4 Cluster=0x0000_050E Command=0x0000_0002 Status=0x0
+      disabled: true
+
+    - label:
+          "TH sends a Logout command to the DUT with test values provided by the
+          product maker."
+      PICS: ALOGIN.S.C03.Rsp
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a standard command response.
+
+          [1654004400892] [9988:7841997] CHIP: [DMG] Received Command Response Status for Endpoint=4 Cluster=0x0000_050E Command=0x0000_0003 Status=0x0
+      disabled: true

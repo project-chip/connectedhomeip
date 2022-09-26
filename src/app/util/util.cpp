@@ -768,7 +768,7 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
     return (emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != UINT16_MAX);
 }
 
-bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
 
@@ -777,7 +777,7 @@ bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId cl
         return false;
     }
 
-    return metadata->IsNonVolatile();
+    return !metadata->IsAutomaticallyPersisted() && !metadata->IsExternal();
 }
 
 chip::Messaging::ExchangeManager * chip::ExchangeManager()

@@ -34,7 +34,8 @@ set -x
 env
 USE_WIFI=false
 
-USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]"
+SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
+USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
@@ -47,7 +48,7 @@ if [ "$#" == "0" ]; then
     <outputFolder>
         Desired location for the output files
 
-    <efr32_board_name>
+    <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
             BRD4161A
@@ -92,12 +93,18 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         OTA_periodic_query_timeout
             Periodic query timeout variable for OTA in seconds
+        rs91x_wpa3_only
+            Support for WPA3 only mode on RS91x
         Presets
         --sed
             enable sleepy end device, set thread mtd
             For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
+        --additional_data_advertising
+            enable Addition data advertissing and rotating device ID
+        --use_ot_lib
+            use the silabs openthread library
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -108,7 +115,7 @@ else
     OUTDIR=$2
 
     if [ "$#" -gt "2" ]; then
-        EFR32_BOARD=$3
+        SILABS_BOARD=$3
         shift
     fi
 
@@ -137,8 +144,20 @@ else
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
-            --chip_disable_wifi_ipv4)
-                optArgs+="chip_disable_wifi_ipv4=true "
+            --chip_enable_wifi_ipv4)
+                optArgs+="chip_enable_wifi_ipv4=true "
+                shift
+                ;;
+            --additional_data_advertising)
+                optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
+                shift
+                ;;
+            --use_ot_lib)
+                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
+                shift
+                ;;
+            --use_ot_coap_lib)
+                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
             *)
@@ -152,22 +171,22 @@ else
         esac
     done
 
-    if [ -z "$EFR32_BOARD" ]; then
-        echo "EFR32_BOARD not defined"
+    if [ -z "$SILABS_BOARD" ]; then
+        echo "SILABS_BOARD not defined"
         exit 1
     fi
 
-    BUILD_DIR=$OUTDIR/$EFR32_BOARD
+    BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\"" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/

@@ -151,7 +151,7 @@ struct HeapObjectListNode
 
 struct HeapObjectList : HeapObjectListNode
 {
-    HeapObjectList() : mIterationDepth(0) { mNext = mPrev = this; }
+    HeapObjectList() { mNext = mPrev = this; }
 
     void Append(HeapObjectListNode * node)
     {
@@ -170,7 +170,8 @@ struct HeapObjectList : HeapObjectListNode
         return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
     }
 
-    size_t mIterationDepth;
+    size_t mIterationDepth         = 0;
+    bool mHaveDeferredNodeRemovals = false;
 };
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -353,21 +354,26 @@ public:
         if (object != nullptr)
         {
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
-            if (node != nullptr)
+            // Releasing an object that is not allocated indicates likely memory
+            // corruption; better to safe-crash than proceed at this point.
+            VerifyOrDie(node != nullptr);
+
+            node->mObject = nullptr;
+            Platform::Delete(object);
+
+            // The node needs to be released immediately if we are not in the middle of iteration.
+            // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
+            if (mObjects.mIterationDepth == 0)
             {
-                node->mObject = nullptr;
-                Platform::Delete(object);
-
-                // The node needs to be released immediately if we are not in the middle of iteration.
-                // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
-                if (mObjects.mIterationDepth == 0)
-                {
-                    node->Remove();
-                    Platform::Delete(node);
-                }
-
-                DecreaseUsage();
+                node->Remove();
+                Platform::Delete(node);
             }
+            else
+            {
+                mObjects.mHaveDeferredNodeRemovals = true;
+            }
+
+            DecreaseUsage();
         }
     }
 

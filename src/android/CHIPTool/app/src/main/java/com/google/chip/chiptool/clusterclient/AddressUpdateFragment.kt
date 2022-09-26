@@ -13,7 +13,6 @@ import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.DeviceIdUtil
 import kotlinx.android.synthetic.main.address_update_fragment.deviceIdEd
 import kotlinx.android.synthetic.main.address_update_fragment.fabricIdEd
-import kotlinx.android.synthetic.main.address_update_fragment.view.updateAddressBtn
 
 /** Fragment for updating the address of a device given its fabric and node ID. */
 class AddressUpdateFragment: Fragment() {
@@ -28,9 +27,7 @@ class AddressUpdateFragment: Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    return inflater.inflate(R.layout.address_update_fragment, container, false).apply {
-      updateAddressBtn.setOnClickListener { updateAddressClick() }
-    }
+    return inflater.inflate(R.layout.address_update_fragment, container, false).apply { }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,17 +36,5 @@ class AddressUpdateFragment: Fragment() {
     val compressedFabricId = deviceController.compressedFabricId
     fabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16, '0'))
     deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
-  }
-
-  private fun updateAddressClick() {
-    try {
-      deviceController.updateDevice(
-        fabricIdEd.text.toString().toULong(16).toLong(),
-        deviceIdEd.text.toString().toULong().toLong()
-      )
-      Toast.makeText(requireContext(), "Address update started", Toast.LENGTH_SHORT).show()
-    } catch (ex: Exception) {
-      Toast.makeText(requireContext(), "Address update failed: $ex", Toast.LENGTH_SHORT).show()
-    }
   }
 }

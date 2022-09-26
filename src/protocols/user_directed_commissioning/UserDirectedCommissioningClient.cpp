@@ -47,12 +47,12 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
         err = transportMgr->SendMessage(peerAddress, payload.CloneData());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "UDC SendMessage failed, err: %s\n", chip::ErrorStr(err));
+            ChipLogError(AppServer, "UDC SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
         sleep(1);
     }
-    ChipLogProgress(Inet, "UDC msg send status %s", ErrorStr(err));
+    ChipLogProgress(Inet, "UDC msg send status %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
 

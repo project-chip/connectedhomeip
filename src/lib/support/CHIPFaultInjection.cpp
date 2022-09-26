@@ -26,8 +26,6 @@
 
 #include <string.h>
 
-#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
-
 namespace chip {
 namespace FaultInjection {
 
@@ -91,5 +89,3 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg)
 
 } // namespace FaultInjection
 } // namespace chip
-
-#endif // CHIP_CONFIG_TEST

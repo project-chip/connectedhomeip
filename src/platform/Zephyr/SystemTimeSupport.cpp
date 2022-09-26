@@ -42,15 +42,10 @@ ClockImpl gClockImpl;
 
 namespace {
 
-// Last known UTC time in Unix format.
-#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME
-Microseconds64 gRealTime = Seconds64(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME);
-#else
-Microseconds64 gRealTime = Seconds64(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD);
-#endif
+constexpr Microseconds64 kUnknownRealTime = Seconds64::zero();
 
-// Monotonic time of setting the last known UTC time.
-Microseconds64 gRealTimeSetTime;
+// Unix epoch time of boot event
+Microseconds64 gBootRealTime = kUnknownRealTime;
 
 } // namespace
 
@@ -66,7 +61,11 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-    aCurTime = GetMonotonicMicroseconds64() - gRealTimeSetTime + gRealTime;
+    // The real time can be configured by an application if it has access to a reliable time source.
+    // Otherwise, just return an error so that Matter stack can fallback to Last Known UTC Time.
+    ReturnErrorCodeIf(gBootRealTime == kUnknownRealTime, CHIP_ERROR_INCORRECT_STATE);
+
+    aCurTime = gBootRealTime + GetMonotonicMicroseconds64();
 
     return CHIP_NO_ERROR;
 }
@@ -83,8 +82,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 
 CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
-    gRealTime        = aNewCurTime;
-    gRealTimeSetTime = GetMonotonicMicroseconds64();
+    gBootRealTime = aNewCurTime - GetMonotonicMicroseconds64();
 
     return CHIP_NO_ERROR;
 }

@@ -59,16 +59,16 @@ ALL_TESTS = ['network_commissioning', 'datamodel']
 
 def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
-    address = test.TestDiscovery(discriminator=discriminator)
-    FailIfNot(address, "Failed to discover any devices.")
+    device = test.TestDiscovery(discriminator=discriminator)
+    FailIfNot(device, "Failed to discover any devices.")
+
+    address = device.addresses[0]
 
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
     if address_override:
         address = address_override
-    else:
-        address = address.decode("utf-8")
 
     logger.info("Testing commissioning")
     FailIfNot(test.TestCommissioning(ip=address,
@@ -76,23 +76,22 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                      nodeid=device_nodeid),
               "Failed to finish key exchange")
 
-    #
-    # Run this before the MultiFabric test, since it will result in the resultant CASE session
-    # on fabric2 to be evicted (due to the stressful nature of that test) on the target.
-    #
-    # It doesn't actually evict the CASE session for fabric2 on the client, since we prioritize
-    # defunct sessions for eviction first, which means our CASE session on fabric2 remains preserved
-    # throughout the stress test. This results in a mis-match later.
-    #
-    # TODO: Once we implement fabric-adjusted LRU, we should see if this issue remains (it shouldn't)
-    #
-    logger.info("Testing CASE Eviction")
-    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
+    logger.info("Testing multi-controller setup on the same fabric")
+    FailIfNot(asyncio.run(test.TestMultiControllerFabric(nodeid=device_nodeid)), "Failed the multi-controller test")
+
+    logger.info("Testing CATs used on controllers")
+    FailIfNot(asyncio.run(test.TestControllerCATValues(nodeid=device_nodeid)), "Failed the controller CAT test")
 
     ok = asyncio.run(test.TestMultiFabric(ip=address,
                                           setuppin=20202021,
                                           nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
+
+    FailIfNot(asyncio.run(test.TestAddUpdateRemoveFabric(nodeid=device_nodeid)),
+              "Failed AddUpdateRemoveFabric test")
+
+    logger.info("Testing CASE Eviction")
+    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
 
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
@@ -148,6 +147,10 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing another subscription that kills previous subscriptions")
     FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
+
+    logger.info("Testing re-subscription")
+    FailIfNot(asyncio.run(test.TestResubscription(nodeid=device_nodeid)),
+              "Failed to validated re-subscription")
 
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,

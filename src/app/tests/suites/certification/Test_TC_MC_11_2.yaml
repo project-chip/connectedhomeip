@@ -17,6 +17,9 @@ name:
     3.13.2. [TC-MC-11.2] Casting Video Player via UX Screen with PIN
     Verification (DUT as Server)
 
+PICS:
+    - MC.S.UDC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -32,17 +35,16 @@ tests:
           The shell should show a discovered commissioner, similar to the following:
 
           [1653089767279] [88361:1149415] CHIP: [SVR] Discovered Commissioner #0
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Hostname: 147dda9ac00a
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	IP Address #1: 169.254.81.148
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Port: 5650
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Mrp Interval idle: 5000 ms
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Mrp Interval active: 2000 ms
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Device Name: Test TV
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Vendor ID: 65521
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Product ID: 32769
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Device Type: 35
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Instance Name: 3DC86F5236D636CB
-          [1653089767279] [88361:1149415] CHIP: [DIS] 	Commissioning Mode: 0
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a        [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Port: 5650
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval active: 2000 ms
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Device Name: Test TV
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Vendor ID: 65521
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Product ID: 32769
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Device Type: 35
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Instance Name: 3DC86F5236D636CB
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Commissioning Mode: 0
           [1653089767279] [88361:1149415] CHIP: [SVR] 1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
           [1653089767279] [88361:1149415] CHIP: [SVR] Example: cast request 0
       disabled: true

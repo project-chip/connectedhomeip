@@ -20,6 +20,9 @@ efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_ota_requestor = true
 
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
 pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
 chip_enable_openthread = true
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

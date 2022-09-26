@@ -75,7 +75,7 @@ following states:
 
 1. Build
    [chip-tool cli](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
-1. Pair with device
+2. Pair with device
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
@@ -85,7 +85,7 @@ following states:
 
     - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
 
-1. Switch on the light:
+3. Switch on the light:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool onoff on 1
@@ -97,7 +97,7 @@ following states:
     - **on** command to the cluster
     - **1** ID of endpoint
 
-1. Switch off the light:
+4. Switch off the light:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool onoff off 1
@@ -109,7 +109,7 @@ following states:
     - **off** command to the cluster
     - **1** ID of endpoint
 
-1. Read the light state:
+5. Read the light state:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool onoff read on-off 1
@@ -122,7 +122,7 @@ following states:
     - **on-off** attribute to read
     - **1** ID of endpoint
 
-1. Change brightness of light:
+6. Change brightness of light:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool levelcontrol move-to-level 32 0 0 0 1
@@ -138,7 +138,7 @@ following states:
     - **0** option override
     - **1** ID of endpoint
 
-1. Reag brightness level:
+7. Read brightness level:
     ```
     ./chip-tool levelcontrol read current-level 1
     ```
@@ -147,3 +147,68 @@ following states:
     - **read** command to the cluster
     - **current-level** attribute to read
     - **1** ID of endpoint
+
+### OTA with Linux OTA Provider
+
+OTA feature enabled by default only for ota-requestor-app example. To enable OTA
+feature for another Telink example:
+
+-   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
+    file.
+-   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
+
+After build application with enabled OTA feature, use next binary files:
+
+-   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr-ota.bin - binary for OTA Provider
+-   zephyr.bin - ignore this file.
+-   zephyr.signed.bin - ignore this file.
+
+Usage of OTA:
+
+-   Build the [Linux OTA Provider](../../ota-provider-app/linux)
+
+    ```
+    ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
+    ```
+
+-   Run the Linux OTA Provider with OTA image.
+
+    ```
+    ./chip-ota-provider-app -f zephyr-ota.bin
+    ```
+
+-   Provision the Linux OTA Provider using chip-tool
+
+    ```
+    ./chip-tool pairing onnetwork ${OTA_PROVIDER_NODE_ID} 20202021
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Configure the ACL of the ota-provider-app to allow access
+
+    ```
+    ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' ${OTA_PROVIDER_NODE_ID} 0
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Use the chip-tool to announce the ota-provider-app to start the OTA process
+
+    ```
+    ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
+    ```
+
+    here:
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+    -   \${DEVICE_NODE_ID} is the node id of paired device
+
+Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
+OTA provider for applying the image. Device will restart on successful
+application of OTA image.

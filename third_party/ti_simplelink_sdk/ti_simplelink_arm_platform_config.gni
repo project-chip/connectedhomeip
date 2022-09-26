@@ -22,6 +22,13 @@ if (ti_simplelink_device_family == "cc13x2_26x2" ||
   arm_float_abi = "hard"
   arm_fpu = "fpv5-sp-d16"
   arm_use_thumb = true
+} else if (ti_simplelink_device_family == "cc32xx") {
+  arm_arch = "armv7e-m"
+  arm_abi = ""
+  arm_cpu = "cortex-m4"
+  arm_float_abi = "soft"
+  arm_fpu = ""
+  arm_use_thumb = true
 } else {
   assert(false, "ti_simplelink_device_family must be specified")
 }

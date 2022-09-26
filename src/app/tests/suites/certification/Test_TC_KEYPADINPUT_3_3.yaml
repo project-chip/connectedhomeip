@@ -1,0 +1,140 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.3.3. [TC-KEYPADINPUT-3.3] Number Keys Verification
+
+PICS:
+    - KEYPADINPUT.S.NK
+
+config:
+    nodeId: 0x12344321
+    cluster: "Keypad Input"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send Numbers1"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x21
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers2"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x22
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers3"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x23
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers4"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x24
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers5"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x25
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers6"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x26
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers7"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x27
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers8"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x28
+      response:
+          values:
+              - name: "status"
+                value: 0
+
+    - label: "Send Numbers9"
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      command: "SendKey"
+      arguments:
+          values:
+              - name: "keyCode"
+                value: 0x29
+      response:
+          values:
+              - name: "status"
+                value: 0

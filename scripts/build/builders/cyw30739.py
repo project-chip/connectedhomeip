@@ -44,7 +44,7 @@ class Cyw30739App(Enum):
             raise Exception("Unknown app type: %r" % self)
 
     def BuildRoot(self, root):
-        return os.path.join(root, "examples", self.ExampleName(), "cyw30739")
+        return os.path.join(root, "examples", self.ExampleName(), "infineon/cyw30739")
 
 
 class Cyw30739Board(Enum):

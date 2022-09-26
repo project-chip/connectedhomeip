@@ -760,6 +760,84 @@ void TestRevertAddNoc(nlTestSuite * inSuite, void * inContext)
     opCertStore.Finish();
 }
 
+void TestRevertPendingOpCertsExceptRoot(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    PersistentStorageOpCertStore opCertStore;
+
+    // Init succeeds
+    CHIP_ERROR err = opCertStore.Init(&storageDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Add a new pending trusted root
+    uint8_t largeBuf[400];
+    MutableByteSpan largeSpan{ largeBuf };
+
+    {
+        // Add new root
+        err = opCertStore.AddNewTrustedRootCertForFabric(kFabricIndex1, kTestRcacSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
+        NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
+
+        // Add NOC chain, with NO ICAC
+        err = opCertStore.AddNewOpCertsForFabric(kFabricIndex1, kTestNocSpan, ByteSpan{});
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingNocChain());
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
+        NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
+    }
+
+    // Make sure we get expected pending state before revert
+    {
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kRcac, largeSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestRcacSpan));
+
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kIcac, largeSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+
+        largeSpan = MutableByteSpan{ largeBuf };
+        err       = opCertStore.GetCertificate(kFabricIndex1, CertChainElement::kNoc, largeSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, largeSpan.data_equal(kTestNocSpan));
+    }
+
+    // Revert using RevertPendingOpCertsExceptRoot
+    opCertStore.RevertPendingOpCertsExceptRoot();
+    NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
+    NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
+    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
+
+    // Add again, and commit
+    {
+        // Add new root: should fail, since it should still be pending
+        err = opCertStore.AddNewTrustedRootCertForFabric(kFabricIndex1, kTestRcacSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+        NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
+        NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
+
+        // Add NOC chain, with NO ICAC
+        err = opCertStore.AddNewOpCertsForFabric(kFabricIndex1, kTestNocSpan, ByteSpan{});
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingNocChain());
+        NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
+        NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0); //< Storage count did not yet increase
+
+        err = opCertStore.CommitOpCertsForFabric(kFabricIndex1);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingRootCert());
+        NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
+        NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 2); //< We have RCAC, NOC, no ICAC
+    }
+
+    opCertStore.Finish();
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -767,7 +845,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test AddNOC-like flows PersistentStorageOpCertStore", TestAddNocFlow),
     NL_TEST_DEF("Test UpdateNOC-like flows PersistentStorageOpCertStore", TestUpdateNocFlow),
     NL_TEST_DEF("Test revert operations of PersistentStorageOpCertStore", TestReverts),
-    NL_TEST_DEF("Test revert operations with AddNOC of PersistentStorageOpCertStore", TestRevertAddNoc), NL_TEST_SENTINEL()
+    NL_TEST_DEF("Test revert operations with AddNOC of PersistentStorageOpCertStore", TestRevertAddNoc),
+    NL_TEST_DEF("Test revert operations using RevertPendingOpCertsExceptRoot", TestRevertPendingOpCertsExceptRoot),
+    NL_TEST_SENTINEL()
 };
 
 /**

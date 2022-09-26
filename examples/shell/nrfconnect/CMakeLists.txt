@@ -42,26 +42,14 @@ target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
-                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common                           
+                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/globals.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
-    ${APP_ROOT}/shell_common/cmd_ping.cpp
-    ${APP_ROOT}/shell_common/cmd_send.cpp     
     ${APP_ROOT}/standalone/main.cpp
 )
-
-# 1) The example needs be linked with openthread command line interpreter (required by cmd_otcli.cpp)
-# 2) Zephyr shell must be disabled not to interfere with the example
-# We can't achieve 1 and 2 with Kconfig since CONFIG_OPENTHREAD_SHELL implies CONFIG_SHELL.
-# Hence the workaround below.
-if(CONFIG_OPENTHREAD_FTD)
-    target_link_libraries(app INTERFACE openthread-cli-ftd)
-elseif(CONFIG_OPENTHREAD_MTD)
-    target_link_libraries(app INTERFACE openthread-cli-mtd)
-endif()
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

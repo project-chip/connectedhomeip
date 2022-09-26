@@ -78,10 +78,9 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxWiFiDriver::Shutdown()
+void LinuxWiFiDriver::Shutdown()
 {
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
@@ -180,13 +179,7 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
     {
-        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-    }
-    else
-    {
-        // On linux platform, once "scan" is started, we can say the result will always be success.
-        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 

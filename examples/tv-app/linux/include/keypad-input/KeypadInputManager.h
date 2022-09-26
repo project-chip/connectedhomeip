@@ -29,4 +29,10 @@ class KeypadInputManager : public KeypadInputDelegate
 {
 public:
     void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keyCode) override;
+
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
+private:
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 7;
 };

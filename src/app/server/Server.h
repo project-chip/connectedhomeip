@@ -24,7 +24,8 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
-#include <app/OperationalDeviceProxyPool.h>
+#include <app/FailSafeContext.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
@@ -34,6 +35,8 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/OperationalCertificateStore.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
@@ -63,6 +66,10 @@ namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
+//
+// NOTE: Please do not alter the order of template specialization here as the logic
+//       in the Server impl depends on this.
+//
 using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
@@ -118,6 +125,9 @@ struct ServerInitParams
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
     // Operational keystore with access to the operational keys: MUST be injected.
     Crypto::OperationalKeystore * operationalKeystore = nullptr;
+    // Operational certificate store with access to the operational certs in persisted storage:
+    // must not be null at timne of Server::Init().
+    Credentials::OperationalCertificateStore * opCertStore = nullptr;
 };
 
 class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
@@ -204,6 +214,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+        static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
         static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
 
@@ -228,6 +239,16 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             //          for examples and for now.
             ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
             this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+        }
+
+        // OpCertStore can be injected but default to persistent storage default
+        // for simplicity of the examples.
+        if (this->opCertStore == nullptr)
+        {
+            // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
+            //          for examples and for now, since all storage is immediate for that impl.
+            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+            this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
         // Group Data provider injection
@@ -311,9 +332,13 @@ public:
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
 
+    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+
+    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
 
     /**
      * This function send the ShutDown event before stopping
@@ -349,7 +374,7 @@ private:
 
         void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -365,7 +390,7 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -391,26 +416,12 @@ private:
 
             mServer = server;
             return CHIP_NO_ERROR;
-        };
+        }
 
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            auto & sessionManager = mServer->GetSecureSessionManager();
-            sessionManager.FabricRemoved(fabricIndex);
-
-            // Remove all CASE session resumption state
-            auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
-            if (sessionResumptionStorage != nullptr)
-            {
-                CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer,
-                                 "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
-                                 static_cast<unsigned>(fabricIndex), err.Format());
-                }
-            }
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -423,27 +434,50 @@ private:
                                  static_cast<unsigned>(fabricIndex), err.Format());
                 }
             }
-        };
 
-        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
+            // Remove access control entries in reverse order (it could be any order, but reverse order
+            // will cause less churn in persistent storage).
+            CHIP_ERROR aclErr = Access::GetAccessControl().DeleteAllEntriesForFabric(fabricIndex);
+            if (aclErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), aclErr.Format());
+            }
+
+            //  Remove ACL extension entry for the given fabricIndex.
+            auto & storage = mServer->GetPersistentStorage();
+            DefaultStorageKeyAllocator key;
+            aclErr = storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(fabricIndex));
+
+            if (aclErr != CHIP_NO_ERROR && aclErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                ChipLogError(AppServer, "Warning, failed to delete ACL extension entry for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), aclErr.Format());
+            }
+
+            mServer->GetCommissioningWindowManager().OnFabricRemoved(fabricIndex);
         }
 
-        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricUpdated(const FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
         }
 
     private:
+        void ClearCASEResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        {
+            auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
+            VerifyOrReturn(sessionResumptionStorage != nullptr);
+            CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
+            }
+        }
+
         Server * mServer = nullptr;
     };
 
@@ -457,7 +491,7 @@ private:
 
     CASESessionManager mCASESessionManager;
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
-    OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
+    OperationalSessionSetupPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mSessionSetupPool;
 
     Protocols::SecureChannel::UnsolicitedStatusHandler mUnsolicitedStatusHandler;
     Messaging::ExchangeManager mExchangeMgr;
@@ -481,6 +515,8 @@ private:
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
+    Credentials::OperationalCertificateStore * mOpCertStore;
+    app::FailSafeContext mFailSafeContext;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

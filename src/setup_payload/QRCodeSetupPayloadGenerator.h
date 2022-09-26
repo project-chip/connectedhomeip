@@ -45,7 +45,10 @@ public:
 
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 null-terminated string using CHIP TLV encoding scheme.
+     * base38 null-terminated string.
+     *
+     * If the payload has any optional data that needs to be TLV encoded, this
+     * function will fail.
      *
      * @param[out] base38Representation
      *                  The string to copy the base38 to.
@@ -60,10 +63,29 @@ public:
 
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 null-terminated string. Callers must pass a buffer of at least
-     * chip::kTotalPayloadDataInBytes or more if there is any serialNumber or
-     * any other optional data. The buffer should be big enough to hold the
-     * TLV encoded value of the payload. If not an error will be throw.
+     * base38 null-terminated string.
+     *
+     * If the payload has any optional data that needs to be TLV encoded, this
+     * function will allocate a scratch heap buffer to hold the TLV data while
+     * encoding.
+     *
+     * @param[out] base38Representation
+     *                  The string to copy the base38 to.
+     *
+     * @retval #CHIP_NO_ERROR if the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval other Other CHIP or platform-specific error codes indicating
+     *               that an error occurred preventing the function from
+     *               producing the requested string.
+     */
+    CHIP_ERROR payloadBase38RepresentationWithAutoTLVBuffer(std::string & base38Representation);
+
+    /**
+     * This function is called to encode the binary data of a payload to a
+     * base38 null-terminated string, using the caller-provided buffer as
+     * temporary scratch space for optional data that needs to be TLV-encoded.
+     * If that buffer is not big enough to hold the TLV-encoded part of the
+     * payload, this function will fail.
      *
      * @param[out] base38Representation
      *                  The string to copy the base38 to.
@@ -83,9 +105,9 @@ public:
     CHIP_ERROR payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
 
     /**
-     * This function disable internal checks about the validity of the generated payload.
-     * It allows using the generator to generates invalid payloads.
-     * Defaults is false.
+     * This function disables internal checks about the validity of the generated payload.
+     * It allows using the generator to generate invalid payloads.
+     * Default is false.
      */
     void SetAllowInvalidPayload(bool allow) { mAllowInvalidPayload = allow; }
 
@@ -112,7 +134,11 @@ public:
      * This function is called to encode the binary data of a payload to a
      * base38 null-terminated string.
      *
-     * The resulting size of the out_buf span will be the size of data written and not including the null terminator.
+     * The resulting size of the out_buf span will be the size of data written
+     * and not including the null terminator.
+     *
+     * This function will fail if the payload has any optional data requiring
+     * TLV encoding.
      *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.

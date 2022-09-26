@@ -27,9 +27,13 @@
 class LockManager
 {
 public:
-    LockManager() {}
+    LockManager() = default;
 
     bool InitEndpoint(chip::EndpointId endpointId);
+
+    bool SetDoorState(chip::EndpointId endpointId, DlDoorState doorState);
+
+    bool SendLockAlarm(chip::EndpointId endpointId, DlAlarmCode alarmCode);
 
     bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);

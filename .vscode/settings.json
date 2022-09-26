@@ -111,7 +111,18 @@
         "ratio": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "condition_variable": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "thread": "cpp"
+    },
+    // Configure paths or glob patterns to exclude from file watching.
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "out/": true,
+        "**/third_party/**": true
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,

@@ -1,0 +1,267 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    30.1.16. [TC-CADMIN-1.16] Removing Fabrics from DUT and Fabric index
+    enumeration using BCM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
+config:
+    nodeId: 0x12344321
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "TH_CR3 Commissions with DUT_CE"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned to TH_CR3"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+
+    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      PICS: OPCREDS.S.A0001
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
+
+    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
+      PICS: OPCREDS.S.C0a.Rsp
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: 2
+
+    - label:
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/21999
+    - label:
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      PICS: BINFO.S.A0005 && PICS_USER_PROMPT
+      verification: |
+          Using TH_CR2 read attribute
+
+          ./chip-tool basic read node-label 2 0  --commissioner-name beta
+
+          Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
+          [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
+          [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
+      identity: "alpha"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, nodeId: nodeId },
+                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
+                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+              ]
+          constraints:
+              type: list

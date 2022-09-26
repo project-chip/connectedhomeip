@@ -18,8 +18,8 @@
 
 #include "RpcService.h"
 
+#include "pw_span/span.h"
 #include <array>
-#include <span>
 #include <string_view>
 
 #include "pw_hdlc/rpc_channel.h"
@@ -56,7 +56,7 @@ public:
         pw::rpc::ChannelOutput(channel_name), mWriter(writer), mAddress(address)
     {}
 
-    pw::Status Send(std::span<const std::byte> buffer) override
+    pw::Status Send(pw::span<const std::byte> buffer) override
     {
         if (buffer.empty())
         {
@@ -102,7 +102,7 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
         {
             uart_mutex->Lock();
         }
-        pw::hdlc::WriteUIFrame(1, std::as_bytes(std::span(log)), sysIoWriter);
+        pw::hdlc::WriteUIFrame(1, pw::as_bytes(pw::span(log)), sysIoWriter);
         if (uart_mutex)
         {
             uart_mutex->Unlock();

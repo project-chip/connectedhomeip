@@ -123,7 +123,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
         return ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;

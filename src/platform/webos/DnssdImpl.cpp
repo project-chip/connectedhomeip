@@ -342,7 +342,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR MdnsAvahi::Shutdown()
+void MdnsAvahi::Shutdown()
 {
     if (mGroup)
     {
@@ -354,7 +354,6 @@ CHIP_ERROR MdnsAvahi::Shutdown()
         avahi_client_free(mClient);
         mClient = nullptr;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
@@ -516,11 +515,11 @@ exit:
     // The code needs to be updated to support that callback properly.
     if (CHIP_NO_ERROR == error)
     {
-        callback(context, type.c_str(), CHIP_NO_ERROR);
+        callback(context, type.c_str(), service.mName, CHIP_NO_ERROR);
     }
     else
     {
-        callback(context, nullptr, error);
+        callback(context, nullptr, nullptr, error);
     }
 
     return error;
@@ -641,7 +640,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         break;
     case AVAHI_BROWSER_ALL_FOR_NOW:
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
         avahi_service_browser_free(browser);
         chip::Platform::Delete(context);
         break;
@@ -820,9 +819,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return MdnsAvahi::GetInstance().Shutdown();
+    MdnsAvahi::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

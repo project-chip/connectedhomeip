@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/MessageDef/ArrayBuilder.h>
 #include <app/MessageDef/ArrayParser.h>
 #include <app/MessageDef/ListBuilder.h>

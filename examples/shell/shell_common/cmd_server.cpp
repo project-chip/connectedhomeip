@@ -128,7 +128,7 @@ static bool PrintServerSession(void * context, SessionHandle & session)
 
     case Session::SessionType::kUnauthenticated: {
         UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
-        streamer_printf(streamer_get(), "session type=UNSECURED id=0x0000 peerNodeId=0x%016\r\n",
+        streamer_printf(streamer_get(), "session type=UNSECURED id=0x0000 peerNodeId=0x%016" PRIx64 "\r\n",
                         unsecuredSession->GetPeerNodeId());
         break;
     }

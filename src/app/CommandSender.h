@@ -38,7 +38,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -53,23 +53,6 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
-    /*
-     * Destructor - as part of destruction, it will abort the exchange context
-     * if a valid one still exists.
-     *
-     * See Abort() for details on when that might occur.
-     */
-    ~CommandSender() override { Abort(); }
-
-    /**
-     * Gets the inner exchange context object, without ownership.
-     *
-     * @return The inner exchange context, might be nullptr if no
-     *         exchange context has been assigned or the context
-     *         has been released.
-     */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
-
     class Callback
     {
     public:
@@ -276,21 +259,13 @@ private:
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
-    // Handle a message received when we are expecting a status response to a
-    // Timed Request.  The caller is assumed to have already checked that our
-    // exchange context member is the one the message came in on.
-    //
-    // If the server returned an error status, that will be returned as an error
-    // value of CHIP_ERROR.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;

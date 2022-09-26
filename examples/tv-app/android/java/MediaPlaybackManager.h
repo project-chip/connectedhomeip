@@ -81,6 +81,8 @@ public:
     void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 private:
     jobject mMediaPlaybackManagerObject = nullptr;
     jmethodID mRequestMethod            = nullptr;
@@ -88,6 +90,10 @@ private:
     jmethodID mGetPositionMethod        = nullptr;
 
     uint64_t HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute);
+    long HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute);
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
+
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 3;
 };

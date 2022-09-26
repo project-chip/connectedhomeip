@@ -8,7 +8,7 @@ Tested on:
 
 -   macOS 10.15
 -   Debian 11
--   Ubuntu 20.04 LTS
+-   Ubuntu 22.04 LTS
 
 Build system features:
 
@@ -81,9 +81,8 @@ dependency.
 
 ### Installing prerequisites on Raspberry Pi 4
 
-Using `rpi-imager`, install the Ubuntu _21.04_ 64-bit _server_ OS for arm64
-architectures on a micro SD card. This release will have bluez 5.55 or newer
-which is required for BLE functionality.
+Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+architectures on a micro SD card.
 
 Boot the SD card, login with the default user account "ubuntu" and password
 "ubuntu", then proceed with

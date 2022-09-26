@@ -211,7 +211,7 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
+    Responder::ResetTransfer();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();

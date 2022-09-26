@@ -18,7 +18,6 @@
  */
 
 #include <LcdPainter.h>
-#include <lcd.h>
 
 using namespace chip::app::Clusters::WindowCovering;
 
@@ -202,15 +201,15 @@ PixelPainter * LcdPainter::GetCoverPainter(Type type, uint16_t lift, uint16_t ti
     return nullptr;
 }
 
-void LcdPainter::Paint(Type type, uint16_t lift, uint16_t tilt, LcdIcon icon)
+void LcdPainter::Paint(SilabsLCD & lcd, Type type, uint16_t lift, uint16_t tilt, LcdIcon icon)
 {
     FramePainter framePaint         = FramePainter(lift, tilt);
     IconPainter iconPaint           = IconPainter(lift, tilt, icon);
     PixelPainter * coverPaint       = GetCoverPainter(type, lift, tilt);
     CompositePainter compositePaint = CompositePainter(lift, tilt, &framePaint, &iconPaint, coverPaint);
-    void * context                  = LCDContext();
+    void * context                  = lcd.Context();
 
-    LCD_clear(context);
+    lcd.Clear();
 
     for (int i = 0; i < LCD_SIZE; i++)
     {
@@ -218,10 +217,10 @@ void LcdPainter::Paint(Type type, uint16_t lift, uint16_t tilt, LcdIcon icon)
         {
             if (compositePaint.Color(i, j))
             {
-                LCD_drawPixel(context, i, j);
+                lcd.DrawPixel(context, i, j);
             }
         }
     }
-    LCD_update();
+    lcd.Update();
     delete coverPaint;
 }

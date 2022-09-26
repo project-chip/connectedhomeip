@@ -1,0 +1,140 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-ULABEL-3.1] User label cluster [DUT-client]
+
+PICS:
+    - ULABEL.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "TH is commissioned with DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT reads LabelList from the TH"
+      PICS: ULABEL.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool userlabel read label-list 1 0
+
+          Verify DUT receives LabelList attribute response on the TH(all-clusters-app) Log:
+          [1659609723.950391][2409:2409] CHIP:EM: Handling via exchange: 38919r, Delegate: 0xaaaadba0fee0
+          [1659609723.950455][2409:2409] CHIP:IM: Received Read request
+          [1659609723.950570][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659609723.950611][2409:2409] CHIP:DMG: {
+          [1659609723.950644][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659609723.950685][2409:2409] CHIP:DMG:         [
+          [1659609723.950722][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659609723.950770][2409:2409] CHIP:DMG:                 {
+          [1659609723.950814][2409:2409] CHIP:DMG:                         Endpoint = 0x0,
+          [1659609723.950868][2409:2409] CHIP:DMG:                         Cluster = 0x41,
+          [1659609723.950926][2409:2409] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1659609723.950980][2409:2409] CHIP:DMG:                 }
+          [1659609723.951024][2409:2409] CHIP:DMG:
+          [1659609723.951065][2409:2409] CHIP:DMG:         ],
+          [1659609723.951111][2409:2409] CHIP:DMG:
+          [1659609723.951152][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659609723.951192][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609723.951228][2409:2409] CHIP:DMG: },
+          [1659609723.951341][2409:2409] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label:
+          "DUT sends a write request to the TH to write to an entry in the
+          LabelList"
+      PICS: ULABEL.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool userlabel write label-list '[{"label":"room", "value":"bedroom 1"}, {"label":"orientation", "value":"east"}]' 1 0
+
+          Verify DUT receives LabelList attribute response on the TH(all-clusters-app) Log:
+
+          [1659609795.578716][2409:2409] CHIP:DMG: IM WH moving to [Initialized]
+          [1659609795.578784][2409:2409] CHIP:DMG: WriteRequestMessage =
+          [1659609795.578809][2409:2409] CHIP:DMG: {
+          [1659609795.578829][2409:2409] CHIP:DMG:         suppressResponse = false,
+          [1659609795.578852][2409:2409] CHIP:DMG:         timedRequest = false,
+          [1659609795.578873][2409:2409] CHIP:DMG:         AttributeDataIBs =
+          [1659609795.578900][2409:2409] CHIP:DMG:         [
+          [1659609795.578922][2409:2409] CHIP:DMG:                 AttributeDataIB =
+          [1659609795.578951][2409:2409] CHIP:DMG:                 {
+          [1659609795.578974][2409:2409] CHIP:DMG:                         AttributePathIB =
+          [1659609795.579007][2409:2409] CHIP:DMG:                         {
+          [1659609795.579035][2409:2409] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659609795.579069][2409:2409] CHIP:DMG:                                 Cluster = 0x41,
+          [1659609795.579101][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659609795.579133][2409:2409] CHIP:DMG:                         }
+          [1659609795.579166][2409:2409] CHIP:DMG:
+          [1659609795.579197][2409:2409] CHIP:DMG:                         Data = [
+          [1659609795.579227][2409:2409] CHIP:DMG:
+          [1659609795.579345][2409:2409] CHIP:DMG:                         ],
+          [1659609795.579372][2409:2409] CHIP:DMG:                 },
+          [1659609795.579401][2409:2409] CHIP:DMG:
+          [1659609795.579422][2409:2409] CHIP:DMG:                 AttributeDataIB =
+          [1659609795.579446][2409:2409] CHIP:DMG:                 {
+          [1659609795.579468][2409:2409] CHIP:DMG:                         AttributePathIB =
+          [1659609795.579498][2409:2409] CHIP:DMG:                         {
+          [1659609795.579526][2409:2409] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659609795.579558][2409:2409] CHIP:DMG:                                 Cluster = 0x41,
+          [1659609795.579591][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659609795.579623][2409:2409] CHIP:DMG:                                 ListIndex = Null,
+          [1659609795.579653][2409:2409] CHIP:DMG:                         }
+          [1659609795.579682][2409:2409] CHIP:DMG:
+          [1659609795.579712][2409:2409] CHIP:DMG:                         Data =
+          [1659609795.579743][2409:2409] CHIP:DMG:                         {
+          [1659609795.579777][2409:2409] CHIP:DMG:                                 0x0 = "room" (4 chars),
+          [1659609795.579809][2409:2409] CHIP:DMG:                                 0x1 = "bedroom 1" (9 chars),
+          [1659609795.579841][2409:2409] CHIP:DMG:                         },
+          [1659609795.579871][2409:2409] CHIP:DMG:                 },
+          [1659609795.579903][2409:2409] CHIP:DMG:
+          [1659609795.579924][2409:2409] CHIP:DMG:                 AttributeDataIB =
+          [1659609795.579950][2409:2409] CHIP:DMG:                 {
+          [1659609795.579972][2409:2409] CHIP:DMG:                         AttributePathIB =
+          [1659609795.580002][2409:2409] CHIP:DMG:                         {
+          [1659609795.580033][2409:2409] CHIP:DMG:                                 Endpoint = 0x0,
+          [1659609795.580065][2409:2409] CHIP:DMG:                                 Cluster = 0x41,
+          [1659609795.580098][2409:2409] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1659609795.580130][2409:2409] CHIP:DMG:                                 ListIndex = Null,
+          [1659609795.580157][2409:2409] CHIP:DMG:                         }
+          [1659609795.580186][2409:2409] CHIP:DMG:
+          [1659609795.580215][2409:2409] CHIP:DMG:                         Data =
+          [1659609795.580241][2409:2409] CHIP:DMG:                         {
+          [1659609795.580270][2409:2409] CHIP:DMG:                                 0x0 = "orientation" (11 chars),
+          [1659609795.580302][2409:2409] CHIP:DMG:                                 0x1 = "east" (4 chars),
+          [1659609795.580332][2409:2409] CHIP:DMG:                         },
+          [1659609795.580357][2409:2409] CHIP:DMG:                 },
+          [1659609795.580383][2409:2409] CHIP:DMG:
+          [1659609795.580404][2409:2409] CHIP:DMG:         ],
+          [1659609795.580437][2409:2409] CHIP:DMG:
+          [1659609795.580459][2409:2409] CHIP:DMG:         moreChunkedMessages = false,
+          [1659609795.580480][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659609795.580500][2409:2409] CHIP:DMG: },
+          [1659609795.580591][2409:2409] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0041 e=0 p=m
+          [1659609795.580626][2409:2409] CHIP:DMG: AccessControl: allowed
+          [1659609795.580892][2409:2409] CHIP:DL: writing settings to file (/tmp/chip_kvs-utHZk3)
+      disabled: true

@@ -90,6 +90,7 @@ public:
     void SetStorageDelegate(PersistentStorageDelegate * storage);
 
     CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
+    CHIP_ERROR ClearUserLabelList(EndpointId endpoint);
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
     // Iterators
@@ -132,6 +133,16 @@ protected:
      *         or other CHIP_ERROR values from implementation on other errors.
      */
     virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
+
+    /**
+     * @brief Delete the UserLabel at the specified index of the UserLabelList on a given endpoint
+     *
+     * @param endpoint - id to UserLabelList on which to delete the UserLabel.
+     * @param index - index within the UserLabelList for which to remove the UserLabel.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_KEY_ID if index exceed the range (Total length - 1),
+     *         or other CHIP_ERROR values from implementation on other errors.
+     */
+    virtual CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) = 0;
 
     /**
      * @brief Set the total length of the UserLabelList on a given endpoint

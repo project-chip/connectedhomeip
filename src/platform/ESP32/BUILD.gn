@@ -18,6 +18,18 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "esp32")
 
+declare_args() {
+  # By default use default/example implementation of CommissionableDataProvider,
+  # DeviceAttestationCredentialsProvider and DeviceInstanceInforProvider
+  chip_use_factory_data_provider = false
+  chip_use_device_info_provider = false
+  chip_config_software_version_number = 0
+}
+
+defines = [
+  "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
+]
+
 static_library("ESP32") {
   sources = [
     "../SingletonConfigurationManager.cpp",
@@ -28,16 +40,13 @@ static_library("ESP32") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
+    "ConnectivityManagerImpl_Ethernet.cpp",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
     "ESP32Config.h",
-    "ESP32FactoryDataProvider.cpp",
-    "ESP32FactoryDataProvider.h",
     "ESP32Utils.cpp",
     "ESP32Utils.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -97,5 +106,19 @@ static_library("ESP32") {
       "ThreadStackManagerImpl.h",
     ]
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
+  }
+
+  if (chip_use_factory_data_provider) {
+    sources += [
+      "ESP32FactoryDataProvider.cpp",
+      "ESP32FactoryDataProvider.h",
+    ]
+  }
+
+  if (chip_use_device_info_provider) {
+    sources += [
+      "ESP32DeviceInfoProvider.cpp",
+      "ESP32DeviceInfoProvider.h",
+    ]
   }
 }

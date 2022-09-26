@@ -51,7 +51,7 @@ struct BLEScanConfig
     BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
-    uint16_t mDiscriminator = 0;
+    SetupDiscriminator mDiscriminator;
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
@@ -95,9 +95,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init();
-    CHIP_ERROR _Shutdown();
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown();
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising();
@@ -133,7 +131,7 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -248,11 +246,6 @@ inline BLEManagerImpl & BLEMgrImpl()
 inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled()

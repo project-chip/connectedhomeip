@@ -1,0 +1,206 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    116.2.6. [TC-DRLK-2.6] Verification for the following Commands - Set Holiday
+    Schedule, Get Holiday Schedule, Get Holiday Schedule Response , Clear
+    Holiday Schedule [DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Pre-Conditions"
+      verification: |
+          DUT as server
+      disabled: true
+
+    - label:
+          "TH reads NumberOfHoliday SchedulesSupported and saves for future use."
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      verification: |
+          ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
+          Verify " NumberOfHoliDay SchedulesSuppored" on the TH(Chip-tool) Log:
+
+          [1654691068.446440][4655:4660] CHIP:DMG:
+          [1654691068.446465][4655:4660] CHIP:DMG:        SuppressResponse = true,
+          [1654691068.446492][4655:4660] CHIP:DMG:        InteractionModelRevision = 1
+          [1654691068.446515][4655:4660] CHIP:DMG: }
+          [1654691068.446648][4655:4660] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0016 DataVersion: 1413324060
+          [1654691068.446726][4655:4660] CHIP:TOO:   NumberOfHolidaySchedulesSupported: 10
+      disabled: true
+
+    - label:
+          "TH sends Set Holiday Schedule Command to DUT with the following
+          values: HolidayIndex as 1 LocalStartTime as 20 Seconds LocalEndTime as
+          30 Seconds OperatingMode as 0"
+      PICS: DRLK.S.F0b && DRLK.S.C11.Rsp
+      verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
+          Verify " DUT send SUCCESS response." on the TH(Chip-tool) Log:
+
+          [1654691200.905091][4669:4674] CHIP:DMG:                                StatusIB =
+          [1654691200.905122][4669:4674] CHIP:DMG:                                {
+          [1654691200.905162][4669:4674] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1654691200.905198][4669:4674] CHIP:DMG:                                },
+          [1654691200.905236][4669:4674] CHIP:DMG:
+          [1654691200.905266][4669:4674] CHIP:DMG:                        },
+          [1654691200.905301][4669:4674] CHIP:DMG:
+          [1654691200.905326][4669:4674] CHIP:DMG:                },
+          [1654691200.905356][4669:4674] CHIP:DMG:
+          [1654691200.905380][4669:4674] CHIP:DMG:        ],
+          [1654691200.905410][4669:4674] CHIP:DMG:
+          [1654691200.905434][4669:4674] CHIP:DMG:        InteractionModelRevision = 1
+          [1654691200.905463][4669:4674] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1"
+      PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      verification: |
+          ./chip-tool doorlock get-holiday-schedule 1 1 1
+          Verify " DUT responds with Get Holiday Schedule Response" on the TH(Chip-tool) Log:
+
+          [1654691299.545647][4678:4683] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012
+          [1654691299.545701][4678:4683] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0012
+          [1654691299.545769][4678:4683] CHIP:TOO:   GetHolidayScheduleResponse: {
+          [1654691299.545807][4678:4683] CHIP:TOO:     holidayIndex: 1
+          [1654691299.545830][4678:4683] CHIP:TOO:     status: 0
+          [1654691299.545853][4678:4683] CHIP:TOO:     localStartTime: 20
+          [1654691299.545876][4678:4683] CHIP:TOO:     localEndTime: 30
+          [1654691299.545898][4678:4683] CHIP:TOO:     operatingMode: 0
+          [1654691299.545922][4678:4683] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH sends Set Holiday Schedule Command to DUT with the following
+          values: HolidayIndex as 1 LocalStartTime as 20 LocalEndTime as 30
+          OperatingMode as 5(Invalid value)"
+      PICS: DRLK.S.C11.Rsp
+      verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 5 1 1
+          Verify " DUT sends INVALID_COMMAND response" on the TH(Chip-tool) Log:
+
+          [1655373066.616542][2571:2576] CHIP:DMG: {
+          [1655373066.616583][2571:2576] CHIP:DMG:        suppressResponse = false,
+          [1655373066.616624][2571:2576] CHIP:DMG:        InvokeResponseIBs =
+          [1655373066.616692][2571:2576] CHIP:DMG:        [
+          [1655373066.616732][2571:2576] CHIP:DMG:                InvokeResponseIB =
+          [1655373066.616799][2571:2576] CHIP:DMG:                {
+          [1655373066.616854][2571:2576] CHIP:DMG:                        CommandStatusIB =
+          [1655373066.616913][2571:2576] CHIP:DMG:                        {
+          [1655373066.616981][2571:2576] CHIP:DMG:                                CommandPathIB =
+          [1655373066.617046][2571:2576] CHIP:DMG:                                {
+          [1655373066.617118][2571:2576] CHIP:DMG:                                        EndpointId = 0x1,
+          [1655373066.617200][2571:2576] CHIP:DMG:                                        ClusterId = 0x101,
+          [1655373066.617264][2571:2576] CHIP:DMG:                                        CommandId = 0x11,
+          [1655373066.617338][2571:2576] CHIP:DMG:                                },
+          [1655373066.617412][2571:2576] CHIP:DMG:
+          [1655373066.617463][2571:2576] CHIP:DMG:                                StatusIB =
+          [1655373066.617538][2571:2576] CHIP:DMG:                                {
+          [1655373066.617612][2571:2576] CHIP:DMG:                                        status = 0x85 (INVALID_COMMAND),
+          [1655373066.617672][2571:2576] CHIP:DMG:                                },
+          [1655373066.617745][2571:2576] CHIP:DMG:
+          [1655373066.617806][2571:2576] CHIP:DMG:                        },
+          [1655373066.617863][2571:2576] CHIP:DMG:
+          [1655373066.617921][2571:2576] CHIP:DMG:                },
+          [1655373066.617970][2571:2576] CHIP:DMG:
+          [1655373066.618024][2571:2576] CHIP:DMG:        ],
+          [1655373066.618073][2571:2576] CHIP:DMG:
+          [1655373066.618127][2571:2576] CHIP:DMG:        InteractionModelRevision = 1
+          [1655373066.618166][2571:2576] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "TH sends Get Holiday Schedule Command to DUT with Invalid
+          HolidayIndex as 15."
+      PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      verification: |
+          ./chip-tool doorlock get-holiday-schedule 15 1 1
+          Verify " DUT sends INVALID_COMMAND response" on the TH(Chip-tool) Log:
+
+          [1654691634.513667][4728:4733] CHIP:DMG: },
+          [1654691634.513979][4728:4733] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012
+          [1654691634.514168][4728:4733] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0012
+          [1658471936.478043][2537:2542] CHIP:DMG: },
+          [1658471936.478124][2537:2542] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012
+          [1658471936.478183][2537:2542] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0012
+          [1658471936.478270][2537:2542] CHIP:TOO:   GetHolidayScheduleResponse: {
+          [1658471936.478316][2537:2542] CHIP:TOO:     holidayIndex: 15
+          [1658471936.478363][2537:2542] CHIP:TOO:     status: 133
+          [1658471936.478395][2537:2542] CHIP:TOO:    }
+          [1654691634.514670][4728:4733] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH sends Get Holiday Schedule Command to DUT with the HolidayIndex as
+          10 (value is in the the range of step 1 but Holiday Schedule entry not
+          available)"
+      PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      verification: |
+          ./chip-tool doorlock get-holiday-schedule 10 1 1
+          Verify " DUT sends a NOT_FOUND status" on the TH(Chip-tool) Log:
+
+          [1654691928.900652][4772:4777] CHIP:DMG: },
+          [1654691928.900762][4772:4777] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012
+          [1654691928.900844][4772:4777] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0012
+          [1654691928.900944][4772:4777] CHIP:TOO:   GetHolidayScheduleResponse: {
+          [1654691928.901003][4772:4777] CHIP:TOO:     holidayIndex: 10
+          [1654691928.901047][4772:4777] CHIP:TOO:     status: 139
+          [1654691928.901093][4772:4777] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH send Clear Holiday Schedule Command to DUT with HolidayIndex as 1"
+      PICS: DRLK.S.F0b && DRLK.S.C13.Rsp
+      verification: |
+          ./chip-tool doorlock clear-holiday-schedule 1 1 1
+          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
+
+          [1654692125.827938][4791:4796] CHIP:DMG:                                StatusIB =
+          [1654692125.828009][4791:4796] CHIP:DMG:                                {
+          [1654692125.828080][4791:4796] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1654692125.828156][4791:4796] CHIP:DMG:                                },
+          [1654692125.828233][4791:4796] CHIP:DMG:
+          [1654692125.828296][4791:4796] CHIP:DMG:                        },
+          [1654692125.828367][4791:4796] CHIP:DMG:
+          [1654692125.828424][4791:4796] CHIP:DMG:                },
+          [1654692125.828488][4791:4796] CHIP:DMG:
+          [1654692125.828538][4791:4796] CHIP:DMG:        ],
+          [1654692125.828601][4791:4796] CHIP:DMG:
+          [1654692125.828652][4791:4796] CHIP:DMG:        InteractionModelRevision = 1
+          [1654692125.828701][4791:4796] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "TH sends Get Holiday Schedule Command to DUT with HolidayIndex as 1."
+      PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
+      verification: |
+          ./chip-tool doorlock get-holiday-schedule 1 1 1
+          Verify " DUT sends a NOT_FOUND status" on the TH(Chip-tool) Log:
+
+          [1658472025.923305][2560:2565] CHIP:DMG: },
+          [1658472025.923366][2560:2565] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012
+          [1658472025.923417][2560:2565] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0012
+          [1658472025.923491][2560:2565] CHIP:TOO:   GetHolidayScheduleResponse: {
+          [1658472025.923528][2560:2565] CHIP:TOO:     holidayIndex: 1
+          [1658472025.923565][2560:2565] CHIP:TOO:     status: 139
+          [1658472025.923590][2560:2565] CHIP:TOO:    }
+      disabled: true

@@ -30,6 +30,5 @@ public:
 private:
     jobject mProvider                      = nullptr;
     jmethodID mCommissioningCompleteMethod = nullptr;
-    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnCommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
 };

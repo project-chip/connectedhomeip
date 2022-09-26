@@ -49,6 +49,8 @@ public:
         TestRunner(commandName, testsCount), CHIPCommand(commandName, credsIssuerConfig),
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
+        AddArgument("continueOnFailure", 0, 1, &mContinueOnFailure,
+                    "Boolean indicating if the test runner should continue execution if a test fails. Default to false.");
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -65,11 +67,12 @@ protected:
     void OnWaitForMs() override { NextTest(); };
 
     /////////// Interaction Model Interface /////////
-    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity]; }
+    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity].get(); }
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
-    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 
@@ -92,7 +95,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
-    std::map<std::string, chip::DeviceProxy *> mDevices;
+    std::map<std::string, std::unique_ptr<chip::OperationalDeviceProxy>> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.
     // This flag exists because if an error happens while processing a response the allocated
@@ -100,4 +103,8 @@ protected:
     // as it still used by the stack afterward. So a task is scheduled to run to close the
     // test suite as soon as possible, and pending events are ignored in between.
     bool mContinueProcessing = true;
+
+    // When set to true, the test runner continue to run after a test failure.
+    chip::Optional<bool> mContinueOnFailure;
+    std::vector<std::string> mErrorMessages;
 };

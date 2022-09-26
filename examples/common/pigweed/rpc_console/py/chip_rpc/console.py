@@ -253,7 +253,8 @@ def write_to_output(data: bytes,
                      "E": logging.ERROR, "F": logging.FATAL, "V": logging.DEBUG, "D": logging.DEBUG,
                      "<inf>": logging.INFO, "<dbg>": logging.DEBUG, "<err>": logging.ERROR,
                      "<info  >": logging.INFO, "<warn  >": logging.WARNING,
-                     "<error >": logging.ERROR, "<detail>": logging.DEBUG}
+                     "<error >": logging.ERROR, "<detail>": logging.DEBUG,
+                     "ERR": logging.ERROR, "DBG": logging.DEBUG, "INF": logging.INFO}
 
     ESP_CHIP_REGEX = r"(?P<level>[IWEFV]) \((?P<time>\d+)\) (?P<mod>chip\[[a-zA-Z]+\]):\s(?P<msg>.*)"
     ESP_APP_REGEX = r"(?P<level>[IWEFVD]) \((?P<time>\d+)\) (?P<mod>[a-z\-_A-Z]+):\s(?P<msg>.*)"
@@ -267,6 +268,8 @@ def write_to_output(data: bytes,
     NXP_CHIP_REGEX = r"\[(?P<time>\d+)\]\[(?P<level>[EPDF])\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
     NXP_APP_REGEX = r"\[(?P<time>\d+)\]\[(?P<mod>[a-z\-A-Z]+)\](?P<msg>.*)"
 
+    LINUX_REGEX = r".*(?P<level>INF|DBG|ERR).*\s+\[(?P<time>[0-9]+\.?[0-9]*)\]\[(?P<pid>\d+)\:(?P<tid>\d+)\] CHIP:(?P<mod>[a-z\-A-Z]+)\: (?P<msg>.*)"
+
     LogRegexes = [RegexStruct("ESP", "CHIP", re.compile(ESP_CHIP_REGEX), 4),
                   RegexStruct("ESP", "APP", re.compile(ESP_APP_REGEX), 4),
                   RegexStruct("EFR", "CHIP", re.compile(EFR_CHIP_REGEX), 3),
@@ -274,7 +277,8 @@ def write_to_output(data: bytes,
                   RegexStruct("NRF", "CHIP", re.compile(NRF_CHIP_REGEX), 4),
                   RegexStruct("NRF", "APP", re.compile(NRF_APP_REGEX), 3),
                   RegexStruct("NXP", "CHIP", re.compile(NXP_CHIP_REGEX), 4),
-                  RegexStruct("NXP", "APP", re.compile(NXP_APP_REGEX), 3)
+                  RegexStruct("NXP", "APP", re.compile(NXP_APP_REGEX), 3),
+                  RegexStruct("LINUX", "CHIP", re.compile(LINUX_REGEX), 6)
                   ]
     for line in log_line.decode(errors="surrogateescape").splitlines():
         fields = {'level': logging.INFO, "time": "",

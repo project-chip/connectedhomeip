@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.matter.tv.server.R;
+import com.matter.tv.server.tvapp.AppPlatformShellCommands;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link TerminalFragment#newInstance} factory method
@@ -16,9 +18,23 @@ import com.matter.tv.server.R;
 public class TerminalFragment extends Fragment {
 
   private EditText terminalText;
+  private TextView terminalUsageDescription;
+  private AppPlatformShellCommands shellCommands;
+
+  private static String TERMINAL_INSTRUCTIONS =
+      "add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: add 9050\r\n"
+          + "remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: remove 6\r\n"
+          + "setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: setpin 6 34567890\r\n"
+          + "commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage:"
+          + "commission 0\r\n"
+          + "add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: "
+          + "add-admin-vendor 65521\r\n"
+          + "print-app-access     Print all ACLs for app platform fabric. Usage: print-app-access\r\n"
+          + "remove-app-access    Remove all ACLs for app platform fabric. Usage: remove-app-access\r\n";
 
   public TerminalFragment() {
     // Required empty public constructor
+    shellCommands = new AppPlatformShellCommands();
   }
 
   /**
@@ -51,6 +67,8 @@ public class TerminalFragment extends Fragment {
     super.onResume();
 
     terminalText = getView().findViewById(R.id.terminalTxt);
+    terminalUsageDescription = getView().findViewById(R.id.terminalDescriptionTxt);
+    terminalUsageDescription.setText(TERMINAL_INSTRUCTIONS);
 
     getView()
         .findViewById(R.id.OkBtn)
@@ -58,9 +76,11 @@ public class TerminalFragment extends Fragment {
             v -> {
               String message = terminalText.getText().toString();
 
+              String response = shellCommands.OnExecuteCommand(message.split(" "));
+
               AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-              builder.setMessage(message).setTitle("Response").create().show();
+              builder.setMessage(response).create().show();
             });
   }
 }

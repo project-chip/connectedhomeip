@@ -66,7 +66,6 @@ class SensorClientFragment : Fragment() {
     ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
     deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
       if (actionId == EditorInfo.IME_ACTION_DONE) {
-        updateAddress(textView.text.toString())
         resetSensorGraph() // reset the graph on device change
       }
       actionId == EditorInfo.IME_ACTION_DONE
@@ -116,23 +115,11 @@ class SensorClientFragment : Fragment() {
   override fun onStart() {
     super.onStart()
     deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
-    updateAddress(deviceIdEd.text.toString())
   }
 
   override fun onStop() {
     resetSensorGraph() // reset the graph on fragment exit
     super.onStop()
-  }
-
-  private fun updateAddress(deviceId: String) {
-    try {
-      ChipClient.getDeviceController(requireContext()).updateDevice(
-          /* fabric ID */ 5544332211,
-          deviceId.toULong().toLong()
-      )
-    } catch (ex: Exception) {
-      showMessage(R.string.update_device_address_failure, ex.toString())
-    }
   }
 
   private fun resetSensorGraph() {

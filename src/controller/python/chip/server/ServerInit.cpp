@@ -168,9 +168,6 @@ void pychip_server_native_init()
 
     // parts from ChipLinuxAppMainLoop
 
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

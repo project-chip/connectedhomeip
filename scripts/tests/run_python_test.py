@@ -22,6 +22,7 @@ import os
 import pathlib
 import pty
 import queue
+import re
 import shlex
 import signal
 import subprocess
@@ -76,9 +77,31 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
 @click.option("--script-gdb", is_flag=True, help='Run script through gdb')
 def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
     if factoryreset:
+        # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
+
+        print("Contents of test directory: %s" % os.getcwd())
+        print(subprocess.check_output(["ls -l"], shell=True).decode('us-ascii'))
+
+        # Remove native app KVS if that was used
+        kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
+        if kvs_match:
+            kvs_path_to_remove = kvs_match.group("kvs_path")
+            retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
+            print("Trying to remove KVS path %s" % kvs_path_to_remove)
+            if retcode != 0:
+                raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
+
+        # Remove Python test admin storage if provided
+        storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
+        if storage_match:
+            storage_path_to_remove = storage_match.group("storage_path")
+            retcode = subprocess.call("rm -f %s" % storage_path_to_remove, shell=True)
+            print("Trying to remove storage path %s" % storage_path_to_remove)
+            if retcode != 0:
+                raise Exception("Failed to remove %s for factory reset." % storage_path_to_remove)
 
     coloredlogs.install(level='INFO')
 
@@ -101,13 +124,19 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
                       '--log-format', '%(message)s'] + shlex.split(script_args)
 
     if script_gdb:
-        script_command = "gdb -batch -return-child-result -q -ex run -ex bt --args python3".split() + script_command
+        #
+        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument. To do that, let's use '|' as a placeholder
+        # for the space character so that the initial split will not tokenize them, and then replace that with the space char there-after.
+        #
+        script_command = "gdb -batch -return-child-result -q -ex run -ex thread|apply|all|bt --args python3".split() + script_command
     else:
         script_command = "/usr/bin/env python3".split() + script_command
 
-    logging.info(f"Execute: {script_command}")
+    final_script_command = [i.replace('|', ' ') for i in script_command]
+
+    logging.info(f"Execute: {final_script_command}")
     test_script_process = subprocess.Popen(
-        script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
                              test_script_process, log_queue)
 

@@ -15,6 +15,9 @@ from enum import Enum
 VID_NOT_PRESENT = 0xFFFF
 PID_NOT_PRESENT = 0x0000
 
+VALID_IN_PAST = "2021-06-28 14:23:43"
+VALID_IN_FUTURE = "2031-06-28 14:23:43"
+
 
 class CertType(Enum):
     PAA = 1
@@ -69,6 +72,18 @@ CERT_STRUCT_TEST_CASES = [
         "description": "Invalid certificate public key curve secp256k1",
         "test_folder": 'sig_curve_secp256k1',
         "error_flag": 'sig-curve',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "Certificate validity period starts in the past",
+        "test_folder": 'valid_in_past',
+        "error_flag": 'no-error',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "Certificate validity period starts in the future",
+        "test_folder": 'valid_in_future',
+        "error_flag": 'no-error',
         "is_success_case": 'false',
     },
     # TODO Cases:
@@ -647,13 +662,14 @@ class Names:
 
 
 class DevCertBuilder:
-    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int, pid: int, custom_cn_attribute: str):
+    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int, pid: int, custom_cn_attribute: str, valid_from: str):
         self.vid = vid
         self.pid = pid
         self.cert_type = cert_type
         self.error_type = error_type
         self.chipcert = chip_cert
         self.custom_cn_attribute = custom_cn_attribute
+        self.valid_from = valid_from
 
         if not os.path.exists(self.chipcert):
             raise Exception('Path not found: %s' % self.chipcert)
@@ -677,6 +693,10 @@ class DevCertBuilder:
         subject_name = self.custom_cn_attribute
         vid_flag = ' -V 0x{:X}'.format(self.vid)
         pid_flag = ' -P 0x{:X}'.format(self.pid)
+        if (len(self.valid_from) == 0):
+            valid_from_flag = ''
+        else:
+            valid_from_flag = ' -f "' + self.valid_from + '"'
 
         if self.cert_type == CertType.PAI:
             if (len(subject_name) == 0):
@@ -690,7 +710,7 @@ class DevCertBuilder:
             return
 
         cmd = self.chipcert + ' gen-att-cert ' + type_flag + error_type_flag + ' -c "' + subject_name + '" -C ' + self.signer.cert_pem + ' -K ' + \
-            self.signer.key_pem + vid_flag + pid_flag + ' -l 4294967295 -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
+            self.signer.key_pem + vid_flag + pid_flag + valid_from_flag + ' -l 4294967295 -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
         subprocess.run(cmd, shell=True)
         cmd = 'openssl x509 -inform pem -in ' + self.own.cert_pem + \
             ' -out ' + self.own.cert_der + ' -outform DER'
@@ -787,22 +807,34 @@ def main():
     for test_cert in ['dac', 'pai']:
         for test_case in CERT_STRUCT_TEST_CASES:
             test_case_out_dir = args.outdir + '/struct_' + test_cert + '_' + test_case["test_folder"]
+
+            if test_case["test_folder"] == 'valid_in_past':
+                valid_from = VALID_IN_PAST
+            elif test_case["test_folder"] == 'valid_in_future':
+                valid_from = VALID_IN_FUTURE
+            else:
+                valid_from = ''
+
             if test_cert == 'dac':
                 error_type_dac = test_case["error_flag"]
                 error_type_pai = 'no-error'
+                dac_valid_from = valid_from
+                pai_valid_from = ''
             else:
                 if test_case["error_flag"] == 'ext-skid-missing':
                     error_type_dac = 'ext-akid-missing'
                 else:
                     error_type_dac = 'no-error'
                 error_type_pai = test_case["error_flag"]
+                dac_valid_from = ''
+                pai_valid_from = valid_from
 
             vid = 0xFFF1
             pid = 0x8000
 
             # Generate PAI Cert/Key
             builder = DevCertBuilder(CertType.PAI, error_type_pai, args.paapath, test_case_out_dir,
-                                     chipcert, vid, PID_NOT_PRESENT, '')
+                                     chipcert, vid, PID_NOT_PRESENT, '', pai_valid_from)
             builder.make_certs_and_keys()
 
             if test_cert == 'pai':
@@ -813,7 +845,7 @@ def main():
 
             # Generate DAC Cert/Key
             builder = DevCertBuilder(CertType.DAC, error_type_dac, args.paapath, test_case_out_dir,
-                                     chipcert, vid, pid, '')
+                                     chipcert, vid, pid, '', dac_valid_from)
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
@@ -859,12 +891,12 @@ def main():
 
             # Generate PAI Cert/Key
             builder = DevCertBuilder(CertType.PAI, 'no-error', args.paapath, test_case_out_dir,
-                                     chipcert, vid_pai, pid_pai, common_name_pai)
+                                     chipcert, vid_pai, pid_pai, common_name_pai, '')
             builder.make_certs_and_keys()
 
             # Generate DAC Cert/Key
             builder = DevCertBuilder(CertType.DAC, 'no-error', args.paapath, test_case_out_dir,
-                                     chipcert, vid_dac, pid_dac, common_name_dac)
+                                     chipcert, vid_dac, pid_dac, common_name_dac, '')
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
@@ -882,12 +914,12 @@ def main():
 
         # Generate PAI Cert/Key
         builder = DevCertBuilder(CertType.PAI, 'no-error', args.paapath, test_case_out_dir,
-                                 chipcert, vid, pid, '')
+                                 chipcert, vid, pid, '', '')
         builder.make_certs_and_keys()
 
         # Generate DAC Cert/Key
         builder = DevCertBuilder(CertType.DAC, 'no-error', args.paapath, test_case_out_dir,
-                                 chipcert, vid, pid, '')
+                                 chipcert, vid, pid, '', '')
         builder.make_certs_and_keys()
 
         # Generate Certification Declaration (CD)
@@ -911,6 +943,41 @@ def main():
 
         # Generate Test Case Data Container in JSON Format
         generate_test_case_vector_json(test_case_out_dir, 'cd', test_case)
+
+    # Test case: Generate {DAC, PAI, PAA} chain with random (invalid) PAA
+    test_case_out_dir = args.outdir + '/invalid_paa'
+    paapath = test_case_out_dir + '/paa-'
+
+    if not os.path.exists(test_case_out_dir):
+        os.mkdir(test_case_out_dir)
+
+    # Generate PAA Cert/Key
+    cmd = chipcert + ' gen-att-cert -t a -c "Invalid (Not Registered in the DCL) Matter PAA" -f "' + VALID_IN_PAST + \
+        '" -l 4294967295 -o ' + paapath + 'Cert.pem -O ' + paapath + 'Key.pem'
+    subprocess.run(cmd, shell=True)
+
+    vid = 0xFFF1
+    pid = 0x8000
+
+    # Generate PAI Cert/Key
+    builder = DevCertBuilder(CertType.PAI, 'no-error', paapath, test_case_out_dir,
+                             chipcert, vid, PID_NOT_PRESENT, '', VALID_IN_PAST)
+    builder.make_certs_and_keys()
+
+    # Generate DAC Cert/Key
+    builder = DevCertBuilder(CertType.DAC, 'no-error', paapath, test_case_out_dir,
+                             chipcert, vid, pid, '', VALID_IN_PAST)
+    builder.make_certs_and_keys()
+
+    # Generate Certification Declaration (CD)
+    vid_flag = ' -V 0x{:X}'.format(vid)
+    pid_flag = ' -p 0x{:X}'.format(pid)
+    cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
+        ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+    subprocess.run(cmd, shell=True)
+
+    # Generate Test Case Data Container in JSON Format
+    generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
 
 
 if __name__ == '__main__':

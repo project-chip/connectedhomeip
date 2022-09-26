@@ -27,6 +27,8 @@
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
+using AdministratorCommissioning::CommissioningWindowStatus;
+
 namespace {
 
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
@@ -55,7 +57,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
-        mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+        mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
         mServer->GetBleLayerObject()->CloseAllBleConnections();
@@ -91,7 +93,10 @@ void CommissioningWindowManager::ResetState()
     mECMDiscriminator = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
-    mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
+    mWindowStatus     = CommissioningWindowStatus::kWindowNotOpen;
+
+    mOpenerFabricIndex.SetNull();
+    mOpenerVendorId.SetNull();
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
@@ -115,7 +120,7 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 {
     mFailedCommissioningAttempts++;
-    ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
+    ChipLogError(AppServer, "Commissioning failed (attempt %d): %" CHIP_ERROR_FORMAT, mFailedCommissioningAttempts, err.Format());
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
@@ -160,7 +165,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
 
     StopAdvertisement(/* aShuttingDown = */ false);
 
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
     // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -194,8 +199,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 {
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Dnssd::ServiceAdvertiser::Instance().UpdateCommissionableInstanceName());
 
@@ -276,9 +281,21 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 co
     return err;
 }
 
+CHIP_ERROR
+CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
+    System::Clock::Seconds16 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
+{
+    ReturnErrorOnFailure(OpenBasicCommissioningWindow(commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly));
+
+    mOpenerFabricIndex.SetNonNull(fabricIndex);
+    mOpenerVendorId.SetNonNull(vendorId);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16 commissioningTimeout, uint16_t discriminator,
                                                                        Spake2pVerifier & verifier, uint32_t iterations,
-                                                                       ByteSpan salt)
+                                                                       ByteSpan salt, FabricIndex fabricIndex, VendorId vendorId)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
@@ -303,12 +320,18 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16
     {
         Cleanup();
     }
+    else
+    {
+        mOpenerFabricIndex.SetNonNull(fabricIndex);
+        mOpenerVendorId.SetNonNull(vendorId);
+    }
+
     return err;
 }
 
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
-    if (mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    if (IsCommissioningWindowOpen())
     {
 #if CONFIG_NETWORK_LAYER_BLE
         if (mListeningForPASE)
@@ -324,6 +347,31 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     }
 }
 
+CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusForCluster() const
+{
+    if (mOpenerVendorId.IsNull())
+    {
+        // Not opened via the cluster.
+        return CommissioningWindowStatus::kWindowNotOpen;
+    }
+
+    return mWindowStatus;
+}
+
+bool CommissioningWindowManager::IsCommissioningWindowOpen() const
+{
+    return mWindowStatus != CommissioningWindowStatus::kWindowNotOpen;
+}
+
+void CommissioningWindowManager::OnFabricRemoved(FabricIndex removedIndex)
+{
+    if (!mOpenerFabricIndex.IsNull() && mOpenerFabricIndex.Value() == removedIndex)
+    {
+        // Per spec, we should clear out the stale fabric index.
+        mOpenerFabricIndex.SetNull();
+    }
+}
+
 Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() const
 {
     if (!mListeningForPASE)
@@ -336,9 +384,9 @@ Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() cons
 
     switch (mWindowStatus)
     {
-    case AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen:
+    case CommissioningWindowStatus::kEnhancedWindowOpen:
         return Dnssd::CommissioningMode::kEnabledEnhanced;
-    case AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen:
+    case CommissioningWindowStatus::kBasicWindowOpen:
         return Dnssd::CommissioningMode::kEnabledBasic;
     default:
         return Dnssd::CommissioningMode::kDisabled;
@@ -353,7 +401,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && mWindowStatus == AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    if (!mIsBLE && !IsCommissioningWindowOpen())
     {
         DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
     }
@@ -374,18 +422,18 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    if (mAppDelegate != nullptr)
-    {
-        mAppDelegate->OnCommissioningWindowOpened();
-    }
-
     if (mUseECM)
     {
-        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
+        mWindowStatus = CommissioningWindowStatus::kEnhancedWindowOpen;
     }
     else
     {
-        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
+        mWindowStatus = CommissioningWindowStatus::kBasicWindowOpen;
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningWindowOpened();
     }
 
     // reset all advertising, switching to our new commissioning mode.
@@ -403,7 +451,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     mPairingSession.Clear();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    if (!mIsBLE && IsCommissioningWindowOpen())
     {
         DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
     }
@@ -471,7 +519,7 @@ void CommissioningWindowManager::OnSessionReleased()
 
 void CommissioningWindowManager::ExpireFailSafeIfArmed()
 {
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     if (failSafeContext.IsFailSafeArmed())
     {
         failSafeContext.ForceFailSafeTimerExpiry();

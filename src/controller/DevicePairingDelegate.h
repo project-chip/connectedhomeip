@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <controller/CommissioningDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
@@ -39,6 +40,7 @@ public:
     {
         SecurePairingSuccess = 0,
         SecurePairingFailed,
+        SecurePairingDiscoveringMoreDevices,
     };
 
     /**
@@ -75,6 +77,38 @@ public:
     {}
 
     virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called with the ReadCommissioningInfo returned from the target
+     */
+    virtual void OnReadCommissioningInfo(const ReadCommissioningInfo & info) {}
+
+    /**
+     * @brief
+     *  Called with the NetworkScanResponse returned from the target.
+     *
+     * The DeviceCommissioner will be waiting in the kNeedsNetworkCreds step and not advancing the commissioning process.
+     *
+     * The implementation should set the network credentials on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.NetworkCredentialsReady()
+     * in order to resume the commissioning process.
+     */
+    virtual void
+    OnScanNetworksSuccess(const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+    {}
+
+    /**
+     * @brief
+     *  Called when the NetworkScan request fails.
+     *
+     * The DeviceCommissioner will be waiting in the kNeedsNetworkCreds step and not advancing the commissioning process.
+     *
+     * The implementation should set the network credentials on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.NetworkCredentialsReady()
+     * in order to resume the commissioning process.
+     */
+    virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
 };
 
 } // namespace Controller

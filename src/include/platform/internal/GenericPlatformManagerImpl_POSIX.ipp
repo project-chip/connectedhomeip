@@ -117,7 +117,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
 {
-    return !mMainLoopStarted || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
+    return !mHasValidChipTask || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
 }
 #endif
 
@@ -201,7 +201,6 @@ template <class ImplClass>
 void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
-    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->mMainLoopStarted = true;
     static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
     return nullptr;
 }
@@ -298,7 +297,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
     pthread_mutex_destroy(&mStateLock);
     pthread_cond_destroy(&mEventQueueStoppedCond);
@@ -307,7 +306,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

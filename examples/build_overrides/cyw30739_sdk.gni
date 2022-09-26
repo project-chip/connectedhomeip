@@ -15,5 +15,5 @@
 declare_args() {
   # Root directory for CYW30739 SDK.
   cyw30739_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/cyw30739_sdk"
+      "//third_party/connectedhomeip/third_party/infineon/cyw30739_sdk"
 }

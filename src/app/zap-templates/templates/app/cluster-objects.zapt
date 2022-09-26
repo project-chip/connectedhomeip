@@ -177,15 +177,15 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-    static constexpr bool kIsFabricScoped = {{event_is_fabric_scoped}};
+    static constexpr bool kIsFabricScoped = {{isFabricSensitive}};
 
     {{#zcl_event_fields}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
     {{/zcl_event_fields}}
 
-    {{#if event_is_fabric_scoped}}
+    {{#if isFabricSensitive}}
     auto GetFabricIndex() const {
-        return {{ asLowerCamelCase event_fabric_idx_field }};
+        return fabricIndex;
     }
     {{/if}}
 
@@ -215,6 +215,7 @@ public:
 } // namespace Clusters
 
 bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand);
 
 } // namespace app
 } // namespace chip

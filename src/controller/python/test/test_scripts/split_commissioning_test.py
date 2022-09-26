@@ -108,6 +108,10 @@ def main():
                                 nodeid=2),
               "Failed to establish PASE connection with device 2")
 
+    logger.info("Attempting to execute a fabric-scoped command during PASE before AddNOC")
+    FailIfNot(test.TestFabricScopedCommandDuringPase(nodeid=1),
+              "Did not get UNSUPPORTED_ACCESS for fabric-scoped command during PASE")
+
     FailIfNot(test.TestCommissionOnly(nodeid=1),
               "Failed to commission device 1")
 

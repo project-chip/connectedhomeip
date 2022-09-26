@@ -22,7 +22,6 @@
 
 #include <lib/shell/streamer.h>
 
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>

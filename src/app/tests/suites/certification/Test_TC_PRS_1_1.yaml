@@ -14,6 +14,9 @@
 
 name: 36.1.1. [TC-PRS-1.1] Global attributes with server as DUT
 
+PICS:
+    - PRS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pressure Measurement"
@@ -34,24 +37,87 @@ tests:
       response:
           value: 3
           constraints:
-              type: uint16
+              type: int16u
 
-    - label: "Read the global attribute constraints: FeatureMap"
-      PICS: PRS.S.F00
+    - label: "Read the global attribute: FeatureMap"
+      PICS: " !PRS.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
+          value: 0
           constraints:
-              type: map32
+              type: bitmap32
 
-    - label: "Read the global mandatory attribute constraints: AttributeList"
+    - label: "Given PRS.S.F00(EXT) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PRS.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Read the global mandatory attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(ScaledValue) in AttributeList"
+      PICS: PRS.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label: "Read the optional attribute(MinScaledValue) in AttributeList"
+      PICS: PRS.S.A0011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
+
+    - label: "Read the optional attribute(MaxScaledValue) in AttributeList"
+      PICS: PRS.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label: "Read the optional attribute(Scale) in AttributeList"
+      PICS: PRS.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label: "Read the optional attribute(Tolerance) in AttributeList"
+      PICS: PRS.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read the optional attribute(ScaledTolerance) in AttributeList"
+      PICS: PRS.S.A0013
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -68,19 +134,18 @@ tests:
           value: []
           constraints:
               type: list
-
-    #issue #15011
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"

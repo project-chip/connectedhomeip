@@ -6,7 +6,9 @@
     ],
     "virtualenv": {
         "gn_root": ".",
-        "gn_targets": [":python_packages.install"]
+        "gn_targets": [":python_packages.install"],
+        "requirements": ["scripts/requirements.txt"],
+        "constraints": ["scripts/constraints.txt"]
     },
     "required_submodules": ["third_party/pigweed/repo"],
     "rosetta": "never",

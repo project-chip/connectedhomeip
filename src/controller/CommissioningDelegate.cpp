@@ -41,6 +41,10 @@ const char * StageToString(CommissioningStage stage)
         return "ArmFailSafe";
         break;
 
+    case kScanNetworks:
+        return "ScanNetworks";
+        break;
+
     case kConfigRegulatory:
         return "ConfigRegulatory";
         break;
@@ -107,6 +111,10 @@ const char * StageToString(CommissioningStage stage)
 
     case kCleanup:
         return "Cleanup";
+        break;
+
+    case kNeedsNetworkCreds:
+        return "NeedsNetworkCreds";
         break;
 
     default:

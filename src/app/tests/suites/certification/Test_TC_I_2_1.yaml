@@ -14,6 +14,9 @@
 
 name: 57.2.1. [TC-I-2.1] Attributes with server as DUT
 
+PICS:
+    - I.S
+
 config:
     nodeId: 0x12344321
     cluster: "Identify"
@@ -33,7 +36,9 @@ tests:
       attribute: "identify time"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads the IdentifyType attribute from the DUT"
       command: "readAttribute"

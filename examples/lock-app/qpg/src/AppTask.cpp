@@ -27,6 +27,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -37,9 +38,12 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+using namespace ::chip;
+using namespace ::chip::app;
 using namespace chip::TLV;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
@@ -53,6 +57,7 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define QPG_LOCK_ENDPOINT_ID (1)
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -68,6 +73,8 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -89,15 +96,15 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (sAppEventQueue == NULL)
+    if (sAppEventQueue == nullptr)
     {
         ChipLogError(NotSpecified, "Failed to allocate app event queue");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    if (sAppTaskHandle == NULL)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -105,12 +112,38 @@ CHIP_ERROR AppTask::StartAppTask()
     return CHIP_NO_ERROR;
 }
 
+void AppTask::InitServer(intptr_t arg)
+{
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    chip::Server::GetInstance().Init(initParams);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
+}
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
+    // Init ZCL Data Model and start server
+    PlatformMgr().ScheduleWork(InitServer, 0);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    // Setup Bolt
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -119,30 +152,10 @@ CHIP_ERROR AppTask::Init()
     }
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Subscribe with our button callback to the qvCHIP button handler.
+    // Setup button handler
     qvIO_SetBtnCallback(ButtonEventHandler);
 
     qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
-
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-    chip::Server::GetInstance().Init(initParams);
-
-    // Init OTA engine
-    InitializeOTARequestor();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     UpdateClusterState();
 
@@ -160,7 +173,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        // appError(err);
     }
 
     ChipLogProgress(NotSpecified, "App Task started");
@@ -530,15 +542,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
  */
 void AppTask::UpdateClusterState(void)
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+    using namespace chip::app::Clusters;
+    auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
 
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
     }
 }

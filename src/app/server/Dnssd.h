@@ -59,12 +59,6 @@ public:
     /// Gets the interface id used for advertising
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
-    /// Sets the factory-new state commissionable node discovery timeout
-    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
-
-    /// Gets the factory-new state commissionable node discovery timeout
-    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
-
     //
     // Override the referenced fabric table from the default that is present
     // in Server::GetInstance().GetFabricTable() to something else.
@@ -78,13 +72,6 @@ public:
     // Set the commissioning mode provider to use.  Null provider will mean we
     // assume the commissioning mode is kDisabled.
     void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
-
-    /// Callback from Discovery Expiration timer
-    /// Checks if discovery has expired and if so,
-    /// kicks off extend discovery (when enabled)
-    /// otherwise, stops commissionable node advertising
-    /// Discovery Expiration refers here to commissionable node advertising when in commissioning mode
-    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
@@ -145,14 +132,6 @@ private:
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
 
-    void ClearTimeouts()
-    {
-        mDiscoveryExpiration = kTimeoutCleared;
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        mExtendedDiscoveryExpiration = kTimeoutCleared;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    }
-
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
@@ -163,16 +142,6 @@ private:
     // Ephemeral discriminator to use instead of the default if set
     Optional<uint16_t> mEphemeralDiscriminator;
 
-    /// schedule next discovery expiration
-    CHIP_ERROR ScheduleDiscoveryExpiration();
-    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
-    System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
-
-    Optional<int32_t> mExtendedDiscoveryTimeoutSecs = NullOptional;
-
-    /// return true if expirationMs is valid (not cleared and not in the future)
-    bool OnExpiration(System::Clock::Timestamp expiration);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Get the current extended discovery timeout (set by
     /// SetExtendedDiscoveryTimeoutSecs, or the configuration default if not set).
@@ -181,7 +150,16 @@ private:
     /// schedule next extended discovery expiration
     CHIP_ERROR ScheduleExtendedDiscoveryExpiration();
 
+    // mExtendedDiscoveryExpiration, if not set to kTimeoutCleared, is used to
+    // indicate that we should be advertising extended discovery right now.
     System::Clock::Timestamp mExtendedDiscoveryExpiration = kTimeoutCleared;
+    Optional<int32_t> mExtendedDiscoveryTimeoutSecs       = NullOptional;
+
+    // The commissioning mode we are advertising right now.  Used to detect when
+    // we need to start extended discovery advertisement.  We start this off as
+    // kEnabledBasic, so that when we first start up we do extended discovery
+    // advertisement if we don't enter commissioning mode.
+    Dnssd::CommissioningMode mCurrentCommissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 };
 

@@ -25,8 +25,11 @@
 #include <errno.h>
 
 #include <app/tests/integration/common.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/Constants.h>
@@ -38,10 +41,13 @@ chip::SessionManager gSessionManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::SessionHolder gSession;
 chip::TestPersistentStorageDelegate gStorage;
+chip::PersistentStorageOperationalKeystore gOperationalKeystore;
+chip::Credentials::PersistentStorageOpCertStore gOpCertStore;
 
 void InitializeChip(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::FabricTable::InitParams fabricTableInitParams;
 
     printf("Init CHIP Stack\r\n");
 
@@ -50,6 +56,23 @@ void InitializeChip(void)
     SuccessOrExit(err);
 
     // Initialize the CHIP stack.
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
+    // Basic Fabric Table Init
+    err = gOpCertStore.Init(&gStorage);
+    SuccessOrExit(err);
+
+    err = gOperationalKeystore.Init(&gStorage);
+    SuccessOrExit(err);
+
+    fabricTableInitParams.storage             = &gStorage;
+    fabricTableInitParams.operationalKeystore = &gOperationalKeystore;
+    fabricTableInitParams.opCertStore         = &gOpCertStore;
+
+    err = gFabricTable.Init(fabricTableInitParams);
+    SuccessOrExit(err);
+
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
@@ -66,6 +89,11 @@ void ShutdownChip(void)
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
+
+    gFabricTable.Shutdown();
+    gOperationalKeystore.Finish();
+    gOpCertStore.Finish();
+
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 

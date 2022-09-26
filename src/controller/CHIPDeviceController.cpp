@@ -43,7 +43,7 @@
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/util/error-mapping.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -64,6 +64,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <trace/trace.h>
@@ -96,8 +97,6 @@ using namespace chip::Encoding;
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
-
 DeviceController::DeviceController()
 {
     mState = State::NotInitialized;
@@ -105,6 +104,8 @@ DeviceController::DeviceController()
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mState == State::NotInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.systemState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -148,9 +149,15 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 {
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcacBuf;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
+    NodeId nodeId;
+    bool hasExternallyOwnedKeypair                   = false;
+    Crypto::P256Keypair * externalOperationalKeypair = nullptr;
+    VendorId newFabricVendorId                       = params.controllerVendorId;
 
     // There are three possibilities here in terms of what happens with our
     // operational key:
@@ -159,139 +166,201 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     //    serialize/deserialize.
     // 3) We have no keypair at all, and the fabric table has been initialized
     //    with a key store.
-    if (params.hasExternallyOwnedOperationalKeypair)
+    if (params.operationalKeypair != nullptr)
     {
-        ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
-    }
-    else if (params.operationalKeypair)
-    {
-        ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+        hasExternallyOwnedKeypair  = params.hasExternallyOwnedOperationalKeypair;
+        externalOperationalKeypair = params.operationalKeypair;
     }
 
-    newFabric.SetVendorId(params.controllerVendorId);
+    ReturnErrorCodeIf(!rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+    MutableByteSpan rcacSpan(rcacBuf.Get(), chipCertAllocatedLen);
 
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
-    ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
-    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(chipCertSpan, rootPublicKeySpan));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, rcacSpan));
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(rcacSpan, rootPublicKeySpan));
     Crypto::P256PublicKey rootPublicKey{ rootPublicKeySpan };
 
+    MutableByteSpan icacSpan;
     if (params.controllerICAC.empty())
     {
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
     else
     {
-        chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
-
-        ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerICAC, chipCertSpan));
-        ReturnErrorOnFailure(newFabric.SetICACert(chipCertSpan));
+        icacSpan = MutableByteSpan(icacBuf.Get(), chipCertAllocatedLen);
+        ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerICAC, icacSpan));
     }
 
-    chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
+    MutableByteSpan nocSpan = MutableByteSpan(nocBuf.Get(), chipCertAllocatedLen);
 
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, chipCertSpan));
-    ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
-    ReturnErrorOnFailure(ExtractFabricIdFromCert(chipCertSpan, &fabricId));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &nodeId, &fabricId));
 
-    mFabricInfo = params.systemState->Fabrics()->FindFabric(rootPublicKey, fabricId);
-    if (mFabricInfo != nullptr)
+    auto * fabricTable            = params.systemState->Fabrics();
+    const FabricInfo * fabricInfo = nullptr;
+
+    //
+    // When multiple controllers are permitted on the same fabric, we need to find fabrics with
+    // nodeId as an extra discriminant since we can have multiple FabricInfo objects that all
+    // collide on the same fabric. Not doing so may result in a match with an existing FabricInfo
+    // instance that matches the fabric in the provided NOC but is associated with a different NodeId
+    // that is already in use by another active controller instance. That will effectively cause it
+    // to change its identity inadvertently, which is not acceptable.
+    //
+    // TODO: Figure out how to clean up unreclaimed FabricInfos restored from persistent
+    //       storage that are not in use by active DeviceController instances. Also, figure out
+    //       how to reclaim FabricInfo slots when a DeviceController instance is deleted.
+    //
+    if (params.permitMultiControllerFabrics)
     {
-        ReturnErrorOnFailure(params.systemState->Fabrics()->UpdateFabric(mFabricInfo->GetFabricIndex(), newFabric));
+        fabricInfo = fabricTable->FindIdentity(rootPublicKey, fabricId, nodeId);
     }
     else
     {
-        FabricIndex fabricIndex;
-        ReturnErrorOnFailure(params.systemState->Fabrics()->AddNewFabric(newFabric, &fabricIndex));
-        mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(fabricIndex);
-        ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        fabricInfo = fabricTable->FindFabric(rootPublicKey, fabricId);
     }
 
-    mLocalId  = mFabricInfo->GetPeerId();
-    mFabricId = mFabricInfo->GetFabricId();
+    bool fabricFoundInTable = (fabricInfo != nullptr);
 
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64,
-                    mFabricInfo->GetFabricIndex(), ChipLogValueX64(GetCompressedFabricId()));
+    FabricIndex fabricIndex = fabricFoundInTable ? fabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    //
+    // We permit colliding fabrics when multiple controllers are present on the same logical fabric
+    // since each controller is associated with a unique FabricInfo 'identity' object and consequently,
+    // a unique FabricIndex.
+    //
+    // This sets a flag that will be cleared automatically when the fabric is committed/reverted later
+    // in this function.
+    //
+    if (params.permitMultiControllerFabrics)
+    {
+        fabricTable->PermitCollidingFabrics();
+    }
+
+    // We have 4 cases to handle legacy usage of direct operational key injection
+    if (externalOperationalKeypair)
+    {
+        // Cases 1 and 2: Injected operational keys
+
+        // CASE 1: Fabric update with injected key
+        if (fabricFoundInTable)
+        {
+            err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair,
+                                                                    hasExternallyOwnedKeypair);
+        }
+        else
+        // CASE 2: New fabric with injected key
+        {
+            err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(
+                    nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
+            }
+        }
+    }
+    else
+    {
+        // Cases 3 and 4: OperationalKeystore has the keys
+
+        // CASE 3: Fabric update with operational keystore
+        if (fabricFoundInTable)
+        {
+            VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+
+            err = fabricTable->UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan);
+        }
+        else
+        // CASE 4: New fabric with operational keystore
+        {
+            err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex);
+            }
+
+            if (err == CHIP_NO_ERROR)
+            {
+                // Now that we know our planned fabric index, verify that the
+                // keystore has a key for it.
+                if (!fabricTable->HasOperationalKeyForFabric(fabricIndex))
+                {
+                    err = CHIP_ERROR_KEY_NOT_FOUND;
+                }
+            }
+        }
+    }
+
+    // Commit after setup, error-out on failure.
+    if (err == CHIP_NO_ERROR)
+    {
+        // No need to revert on error: CommitPendingFabricData reverts internally on *any* error.
+        err = fabricTable->CommitPendingFabricData();
+    }
+    else
+    {
+        fabricTable->RevertPendingFabricData();
+    }
+
+    ReturnErrorOnFailure(err);
+    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
+
+    mFabricIndex = fabricIndex;
+
+    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
+                    ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::Shutdown()
+void DeviceController::Shutdown()
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
     mState = State::NotInitialized;
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
+        // Shut down any subscription clients for this fabric.
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex);
+
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
-        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricInfo->GetFabricIndex());
+        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricIndex);
 
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
         // we're in the middle of as initiator.  Maybe it should shut down
         // existing sessions too?
-        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
+        mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
+
+        FabricTable * fabricTable = mSystemState->Fabrics();
+        if (fabricTable != nullptr)
+        {
+            fabricTable->Forget(mFabricIndex);
+        }
     }
 
-    if (mFabricInfo != nullptr)
-    {
-        mFabricInfo->Reset();
-    }
     mSystemState->Release();
     mSystemState = nullptr;
 
     mDNSResolver.Shutdown();
     mDeviceDiscoveryDelegate = nullptr;
-
-    return CHIP_NO_ERROR;
 }
 
-void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
-{
-    VerifyOrReturn(mState == State::Initialized && mFabricInfo != nullptr,
-                   ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
-}
-
-CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
-{
-    ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
-
-    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(mFabricInfo->GetPeerIdForNode(nodeId));
-    if (proxy == nullptr)
-    {
-        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
-        return CHIP_NO_ERROR;
-    }
-
-    if (proxy->IsConnected())
-    {
-        return proxy->Disconnect();
-    }
-
-    if (proxy->IsConnecting())
-    {
-        ChipLogError(Controller, "Attempting to disconnect while connection in progress");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // TODO: logic here is unclear. Possible states are "uninitialized, needs address, initialized"
-    // and disconnecting in those states is unclear (especially for needds-address).
-    ChipLogProgress(Controller, "Disconnect attempt while not in connected/connecting state");
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(peerId, peerAddr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(peerId), peerAddr));
     addr = peerAddr.GetIPAddress();
     port = peerAddr.GetPort();
     return CHIP_NO_ERROR;
@@ -300,8 +369,8 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 CHIP_ERROR DeviceController::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(
-        PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(nodeId), addr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(nodeId), addr));
+
     return CHIP_NO_ERROR;
 }
 
@@ -392,11 +461,13 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::Shutdown()
+void DeviceCommissioner::Shutdown()
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
+
+    mSetUpCodePairer.CommissionerShuttingDown();
 
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
@@ -421,11 +492,15 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    // Release everything from the commissionee device pool here. DeviceController::Shutdown releases operational.
-    mCommissioneeDevicePool.ReleaseAll();
+    // Release everything from the commissionee device pool here.
+    // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
+    // pointers to the device objects.
+    mCommissioneeDevicePool.ForEachActiveObject([this](auto * commissioneeDevice) {
+        ReleaseCommissioneeDevice(commissioneeDevice);
+        return Loop::Continue;
+    });
 
     DeviceController::Shutdown();
-    return CHIP_NO_ERROR;
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
@@ -461,8 +536,6 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
 
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
-    // TODO: Call CloseSession here see #16440 and #16805 (blocking)
-
 #if CONFIG_NETWORK_LAYER_BLE
     if (mSystemState->BleLayer() != nullptr && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
@@ -471,12 +544,20 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
         mSystemState->BleLayer()->CloseAllBleConnections();
     }
 #endif
-    mCommissioneeDevicePool.ReleaseObject(device);
     // Make sure that there will be no dangling pointer
     if (mDeviceInPASEEstablishment == device)
     {
         mDeviceInPASEEstablishment = nullptr;
     }
+    if (mDeviceBeingCommissioned == device)
+    {
+        mDeviceBeingCommissioned = nullptr;
+    }
+
+    // Release the commissionee device after we have nulled out our pointers,
+    // because that can call back in to us with error notifications as the
+    // session is released.
+    mCommissioneeDevicePool.ReleaseObject(device);
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -491,7 +572,8 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params,
+                                          DiscoveryType discoveryType)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
     if (mDefaultCommissioner == nullptr)
@@ -500,13 +582,14 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
         return CHIP_ERROR_INCORRECT_STATE;
     }
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType);
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -524,10 +607,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return Commission(remoteDeviceId, commissioningParams);
 }
 
-CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode)
+CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -613,7 +696,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
         else if (params.HasDiscriminator())
         {
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetDiscriminator()));
+            SetupDiscriminator discriminator;
+            discriminator.SetLongValue(params.GetDiscriminator());
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(discriminator));
         }
         else
         {
@@ -690,9 +775,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
-    mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
-                                            OnSessionEstablishmentTimeoutCallback, this);
-
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
     if (device->IsSecureConnected())
     {
@@ -706,8 +788,8 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 }
 
 CHIP_ERROR
-DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
-                                                                       Credentials::AttestationVerificationResult attestationResult)
+DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device,
+                                                                Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_EVENT_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
     if (device == nullptr || device != mDeviceBeingCommissioned)
@@ -790,9 +872,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    // PASE session establishment failure.
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
@@ -821,7 +900,10 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
-    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    }
 
     if (mRunCommissioningAfterConnection)
     {
@@ -903,10 +985,20 @@ void DeviceCommissioner::OnAttestationResponse(void * context,
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
-void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * context, AttestationVerificationResult result)
+void DeviceCommissioner::OnDeviceAttestationInformationVerification(
+    void * context, const Credentials::DeviceAttestationVerifier::AttestationInfo & info, AttestationVerificationResult result)
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceAttestationInformationVerification", "DeviceCommissioner");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    if (!commissioner->mDeviceBeingCommissioned)
+    {
+        ChipLogError(Controller, "Device attestation verification result received when we're not commissioning a device");
+        return;
+    }
+
+    auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+    Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
 
     if (result != AttestationVerificationResult::kSuccess)
     {
@@ -928,14 +1020,11 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
         // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
         // understand the errors.
 
-        auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
-        Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
-
         // If a device attestation status delegate is installed, delegate handling of failure to the client and let them
         // decide on whether to proceed further or not.
         if (deviceAttestationDelegate)
         {
-            commissioner->ExtendArmFailSafeForFailedDeviceAttestation(result);
+            commissioner->ExtendArmFailSafeForDeviceAttestation(info, result);
         }
         else
         {
@@ -944,15 +1033,22 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
     }
     else
     {
-        ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+        if (deviceAttestationDelegate && deviceAttestationDelegate->ShouldWaitAfterDeviceAttestation())
+        {
+            commissioner->ExtendArmFailSafeForDeviceAttestation(info, result);
+        }
+        else
+        {
+            ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
+            commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+        }
     }
 }
 
-void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
+void DeviceCommissioner::OnArmFailSafeExtendedForDeviceAttestation(
     void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
-    // If this function starts using "data", need to fix ExtendArmFailSafeForFailedDeviceAttestation accordingly.
+    // If this function starts using "data", need to fix ExtendArmFailSafeForDeviceAttestation accordingly.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     if (!commissioner->mDeviceBeingCommissioned)
@@ -964,9 +1060,10 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
-        ChipLogProgress(Controller, "Device attestation failed, delegating error handling to client");
-        deviceAttestationDelegate->OnDeviceAttestationFailed(commissioner, commissioner->mDeviceBeingCommissioned,
-                                                             commissioner->mAttestationResult);
+        ChipLogProgress(Controller, "Device attestation completed, delegating continuation to client");
+        deviceAttestationDelegate->OnDeviceAttestationCompleted(commissioner, commissioner->mDeviceBeingCommissioned,
+                                                                *commissioner->mAttestationDeviceInfo,
+                                                                commissioner->mAttestationResult);
     }
     else
     {
@@ -977,7 +1074,7 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     }
 }
 
-void DeviceCommissioner::OnFailedToExtendedArmFailSafeFailedDeviceAttestation(void * context, CHIP_ERROR error)
+void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Failed to extend fail-safe timer to handle attestation failure %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -987,13 +1084,17 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeFailedDeviceAttestation(vo
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
-void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(AttestationVerificationResult result)
+void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
+                                                               Credentials::AttestationVerificationResult result)
 {
     mAttestationResult = result;
 
     auto & params                                                      = mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
-    auto expiryLengthSeconds                                           = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
+
+    mAttestationDeviceInfo = Platform::MakeUnique<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo>(info);
+
+    auto expiryLengthSeconds = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
     if (expiryLengthSeconds.HasValue())
     {
         GeneralCommissioning::Commands::ArmFailSafe::Type request;
@@ -1002,8 +1103,8 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
         ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", request.expiryLengthSeconds);
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
-        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForFailedDeviceAttestation,
-                                                 OnFailedToExtendedArmFailSafeFailedDeviceAttestation,
+        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForDeviceAttestation,
+                                                 OnFailedToExtendedArmFailSafeDeviceAttestation,
                                                  MakeOptional(kMinimumCommissioningStepTimeout));
     }
     else
@@ -1011,7 +1112,7 @@ void DeviceCommissioner::ExtendArmFailSafeForFailedDeviceAttestation(Attestation
         ChipLogProgress(Controller, "Proceeding without changing fail-safe timer value as delegate has not set it");
         // Callee does not use data argument.
         const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;
-        OnArmFailSafeExtendedForFailedDeviceAttestation(this, data);
+        OnArmFailSafeExtendedForDeviceAttestation(this, data);
     }
 }
 
@@ -1122,19 +1223,19 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
     MATTER_TRACE_EVENT_SCOPE("IssueNOCChain", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u",
-                    static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
+    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u", static_cast<unsigned>(mFabricIndex));
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(nodeId);
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
-    // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
-    return mOperationalCredentialsDelegate->GenerateChipNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
-                                                                 ByteSpan(), callback);
+    // Note: we don't have attestationSignature, attestationChallenge, DAC, PAI so we are just providing an empty ByteSpan
+    // for those arguments.
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                             ByteSpan(), callback);
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
@@ -1155,9 +1256,9 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
@@ -1208,12 +1309,13 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
     case OperationalCertStatus::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
-    case OperationalCertStatus::kInsufficientPrivilege:
-        return CHIP_ERROR_INSUFFICIENT_PRIVILEGE;
     case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    case OperationalCertStatus::kUnknownEnumValue:
+        // Is this a reasonable value?
+        return CHIP_ERROR_CERT_LOAD_FAILED;
     }
 
     return CHIP_ERROR_CERT_LOAD_FAILED;
@@ -1293,8 +1395,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
@@ -1316,39 +1416,19 @@ void DeviceCommissioner::ConnectBleTransportToSelf()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-CHIP_ERROR DeviceCommissioner::CloseBleConnection()
+void DeviceCommissioner::CloseBleConnection()
 {
     // It is fine since we can only commission one device at the same time.
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
-    return mSystemState->BleLayer()->CloseAllBleConnections();
+    mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
-
-void DeviceCommissioner::OnSessionEstablishmentTimeout()
-{
-    // This is called from the session establishment timer. Please see
-    // https://github.com/project-chip/connectedhomeip/issues/14650
-    VerifyOrReturn(mState == State::Initialized);
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-
-    StopPairing(mDeviceBeingCommissioned->GetDeviceId());
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
-    }
-}
-
-void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
-{
-    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
-}
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
@@ -1399,6 +1479,7 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     commissioningCompletionStatus = completionStatus;
+
     if (completionStatus.err == CHIP_NO_ERROR)
     {
 
@@ -1452,12 +1533,17 @@ void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR erro
 
 void DeviceCommissioner::DisarmDone()
 {
+    // If someone nulled out our mDeviceBeingCommissioned, there's nothing else
+    // to do here.
+    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
+
+    NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
     // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(commissionee->GetDeviceId(), commissioningCompletionStatus);
+    SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
@@ -1492,6 +1578,14 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
+    if (mDeviceBeingCommissioned == nullptr)
+    {
+        // We are getting a stray callback (e.g. due to un-cancellable
+        // operations) when we are not in fact commissioning anything.  Just
+        // ignore it.
+        return;
+    }
+
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
@@ -1500,6 +1594,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     {
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
     }
+
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1519,7 +1614,8 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     }
 }
 
-void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                             SessionHandle & sessionHandle)
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1533,7 +1629,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     }
 
     if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != device->GetDeviceId())
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != sessionHandle->GetPeer().GetNodeId())
     {
         // Not the device we are trying to commission.
         return;
@@ -1542,12 +1638,12 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     if (commissioner->mCommissioningDelegate != nullptr)
     {
         CommissioningDelegate::CommissioningReport report;
-        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
+        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
         commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
 }
 
-void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1563,12 +1659,18 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         error = CHIP_ERROR_INTERNAL;
     }
 
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
+    {
+        // Not the device we are trying to commission.
+        return;
+    }
+
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
         commissioner->mCommissioningDelegate != nullptr)
     {
         commissioner->CommissioningStageComplete(error);
     }
-    commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
 }
 
 // ClusterStateCache::Callback impl
@@ -1637,6 +1739,64 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
             return CHIP_NO_ERROR;
         }
     });
+
+    // Try to parse as much as we can here before returning, even if this is an error.
+    return_err = (err == CHIP_NO_ERROR) ? return_err : err;
+
+    err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
+        // this code is checking if the device is already on the commissioner's fabric.
+        // if a matching fabric is found, then remember the nodeId so that the commissioner
+        // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
+        // the device's nodeId on its fabric.
+        switch (path.mAttributeId)
+        {
+        case OperationalCredentials::Attributes::Fabrics::Id: {
+            OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
+            ReturnErrorOnFailure(this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
+            // this is a best effort attempt to find a matching fabric, so no error checking on iter
+            auto iter = fabrics.begin();
+            while (iter.Next())
+            {
+                auto & fabricDescriptor = iter.GetValue();
+                ChipLogProgress(Controller,
+                                "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
+                                " fabric.nodeId=0x" ChipLogFormatX64,
+                                fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
+                                ChipLogValueX64(fabricDescriptor.nodeId));
+                if (GetFabricId() == fabricDescriptor.fabricId)
+                {
+                    ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
+                    chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
+                    if (rootKeySpan.size() != Crypto::kP256_PublicKey_Length)
+                    {
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - fabric root key size mismatch %u != %u",
+                                     static_cast<unsigned>(rootKeySpan.size()),
+                                     static_cast<unsigned>(Crypto::kP256_PublicKey_Length));
+                        continue;
+                    }
+                    P256PublicKeySpan rootPubKeySpan(rootKeySpan.data());
+                    Crypto::P256PublicKey deviceRootPublicKey(rootPubKeySpan);
+
+                    Crypto::P256PublicKey commissionerRootPublicKey;
+                    if (CHIP_NO_ERROR != GetRootPublicKey(commissionerRootPublicKey))
+                    {
+                        ChipLogError(Controller, "DeviceCommissioner::OnDone - error reading commissioner root public key");
+                    }
+                    else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
+                    {
+                        ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
+                        info.nodeId = fabricDescriptor.nodeId;
+                    }
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        }
+        default:
+            return CHIP_NO_ERROR;
+        }
+    });
+
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
@@ -1655,20 +1815,27 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
+                                        path.mEndpointId);
                         info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
                     {
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: no features.");
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
                         if (info.network.thread.endpoint == kInvalidEndpointId)
                         {
@@ -1717,6 +1884,12 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     }
     mAttributeCache = nullptr;
     mReadClient     = nullptr;
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnReadCommissioningInfo(info);
+    }
+
     CommissioningDelegate::CommissioningReport report;
     report.Set<ReadCommissioningInfo>(info);
     CommissioningStageComplete(return_err, report);
@@ -1753,6 +1926,52 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "Received ScanNetworks failure response %" CHIP_ERROR_FORMAT, error.Format());
+
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // advance to the kNeedsNetworkCreds waiting step
+    // clear error so that we don't abort the commissioning when ScanNetworks fails
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksFailure(error);
+    }
+}
+
+void DeviceCommissioner::OnScanNetworksResponse(void * context,
+                                                const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+
+    ChipLogProgress(Controller, "Received ScanNetwork response, networkingStatus=%u debugText=%s",
+                    to_underlying(data.networkingStatus),
+                    (data.debugText.HasValue() ? std::string(data.debugText.Value().data(), data.debugText.Value().size()).c_str()
+                                               : "none provided"));
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // advance to the kNeedsNetworkCreds waiting step
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksSuccess(data);
+    }
+}
+
+CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
+{
+    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kNeedsNetworkCreds, CHIP_ERROR_INCORRECT_STATE);
+
+    // need to advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
@@ -1842,7 +2061,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
 
-        app::AttributePathParams readPaths[8];
+        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
+        app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
@@ -1866,6 +2086,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
         readParams.mpAttributePathParamsList    = readPaths;
         readParams.mAttributePathParamsListSize = 8;
+
+        // Read the current fabrics
+        if (params.GetCheckForMatchingFabric())
+        {
+            readParams.mAttributePathParamsListSize = 9;
+            readPaths[8] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        }
+
+        readParams.mIsFabricFiltered = false;
         if (timeout.HasValue())
         {
             readParams.mTimeout = timeout.Value();
@@ -1884,6 +2113,21 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         mReadClient     = std::move(readClient);
     }
     break;
+    case CommissioningStage::kScanNetworks: {
+        NetworkCommissioning::Commands::ScanNetworks::Type request;
+        if (params.GetWiFiCredentials().HasValue())
+        {
+            request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
+        }
+        request.breadcrumb.Emplace(breadcrumb);
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        break;
+    }
+    case CommissioningStage::kNeedsNetworkCreds: {
+        // nothing to do, the OnScanNetworksSuccess and OnScanNetworksFailure callbacks provide indication to the
+        // DevicePairingDelegate that network credentials are needed.
+        break;
+    }
     case CommissioningStage::kConfigRegulatory: {
         // To set during config phase:
         // UTC time
@@ -2049,6 +2293,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+
         err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
@@ -2133,13 +2378,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Unable to proceed to operational discovery\n");
-            CommissioningStageComplete(err);
-            return;
-        }
+        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+        auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
+                                                               &mOnDeviceConnectionFailureCallback);
     }
     break;
     case CommissioningStage::kSendComplete: {
@@ -2159,29 +2401,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
 }
 
-CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
+CHIP_ERROR DeviceController::GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const
 {
-    VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(deviceId));
-    VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
-
-    return proxy->LookupPeerAddress();
+    const auto * fabricInfo = GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->GetCompressedFabricIdBytes(outBytes);
 }
 
-OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const
 {
-    return mSystemState->CASESessionMgr()->FindExistingSession(peerId);
-}
-
-OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
-{
-    mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
-                                                           &mOnDeviceConnectionFailureCallback);
-
-    // If there is an OperationalDeviceProxy for this peerId now the call to the
-    // superclass will return it.
-    return DeviceController::GetDeviceSession(peerId);
+    const auto * fabricTable = GetFabricTable();
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
 }
 
 } // namespace Controller

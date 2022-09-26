@@ -1,0 +1,352 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-DGGEN-3.1] Attributes observed at client side as DUT
+
+PICS:
+    - DGGEN.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT reads NetworkInterfaces structure attribute from TH."
+      PICS: DGGEN.C.A0000
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read network-interfaces 1 0
+
+           verify that list of supported NetworkInterfaces structures,  Structure data includes Name, IsOperational, OffPremiseServicesReachableIPv4, OffPremiseServicesReachableIPv6,   HardwareAddress, IPv4Addresses,  IPv6Addresses and type on TH(all-clusters-app)
+
+
+          ReadRequestMessage =
+          [1661421334.265953][2362:2362] CHIP:DMG: {
+          [1661421334.266009][2362:2362] CHIP:DMG:         AttributePathIBs =
+          [1661421334.266074][2362:2362] CHIP:DMG:         [
+          [1661421334.266135][2362:2362] CHIP:DMG:                 AttributePathIB =
+          [1661421334.266206][2362:2362] CHIP:DMG:                 {
+          [1661421334.266288][2362:2362] CHIP:DMG:                         Endpoint = 0x0,
+          [1661421334.266370][2362:2362] CHIP:DMG:                         Cluster = 0x33,
+          [1661421334.266450][2362:2362] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1661421334.266528][2362:2362] CHIP:DMG:                 }
+          [1661421334.266605][2362:2362] CHIP:DMG:
+          [1661421334.266675][2362:2362] CHIP:DMG:         ],
+          [1661421334.266748][2362:2362] CHIP:DMG:
+          [1661421334.266814][2362:2362] CHIP:DMG:         isFabricFiltered = true,
+          [1661421334.266884][2362:2362] CHIP:DMG:         InteractionModelRevision = 1
+          [1661421334.266944][2362:2362] CHIP:DMG: },
+          [1661421334.267126][2362:2362] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661421334.267365][2362:2362] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661421334.267437][2362:2362] CHIP:DMG: <RE:Run> Cluster 33, Attribute 0 is dirty
+          [1661421334.267491][2362:2362] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
+          [1661421334.267558][2362:2362] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661421334.267638][2362:2362] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "DUT reads a RebootCount attribute value from TH. Then a TH (node)
+          gets rebooted more than 2 times."
+      PICS: DGGEN.C.A0001
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read reboot-count 1 0
+          verify that RebootCount attribute data type must be UINT16 and the count should match with the number of rebooted times on TH(all-clusters-app).
+
+          Received Read request
+          [1661421488.051680][2362:2362] CHIP:DMG: ReadRequestMessage =
+          [1661421488.051755][2362:2362] CHIP:DMG: {
+          [1661421488.051811][2362:2362] CHIP:DMG:         AttributePathIBs =
+          [1661421488.051876][2362:2362] CHIP:DMG:         [
+          [1661421488.051937][2362:2362] CHIP:DMG:                 AttributePathIB =
+          [1661421488.052025][2362:2362] CHIP:DMG:                 {
+          [1661421488.052098][2362:2362] CHIP:DMG:                         Endpoint = 0x0,
+          [1661421488.052185][2362:2362] CHIP:DMG:                         Cluster = 0x33,
+          [1661421488.052266][2362:2362] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1661421488.052355][2362:2362] CHIP:DMG:                 }
+          [1661421488.052430][2362:2362] CHIP:DMG:
+          [1661421488.052496][2362:2362] CHIP:DMG:         ],
+          [1661421488.052570][2362:2362] CHIP:DMG:
+          [1661421488.052637][2362:2362] CHIP:DMG:         isFabricFiltered = true,
+          [1661421488.052701][2362:2362] CHIP:DMG:         InteractionModelRevision = 1
+          [1661421488.052763][2362:2362] CHIP:DMG: },
+          [1661421488.052936][2362:2362] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661421488.053176][2362:2362] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661421488.053301][2362:2362] CHIP:DMG: <RE:Run> Cluster 33, Attribute 1 is dirty
+          [1661421488.053361][2362:2362] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0001 (expanded=0)
+          [1661421488.053431][2362:2362] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661421488.053510][2362:2362] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "TH reboots and DUT reads a UpTime attribute value of TH since some
+          arbitrary start time of TH rebooting."
+      PICS: DGGEN.C.A0002
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read up-time 1 0
+
+          Verify that UpTime attribute data type must be UINT64 and the time duratoin should be represented in seconds since DUT (node) has been rebooted on TH(all-clusters-app).
+
+          ReadRequestMessage =
+          [1661421563.809563][2362:2362] CHIP:DMG: {
+          [1661421563.809617][2362:2362] CHIP:DMG:         AttributePathIBs =
+          [1661421563.809681][2362:2362] CHIP:DMG:         [
+          [1661421563.809741][2362:2362] CHIP:DMG:                 AttributePathIB =
+          [1661421563.809812][2362:2362] CHIP:DMG:                 {
+          [1661421563.809885][2362:2362] CHIP:DMG:                         Endpoint = 0x0,
+          [1661421563.809983][2362:2362] CHIP:DMG:                         Cluster = 0x33,
+          [1661421563.810076][2362:2362] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1661421563.810155][2362:2362] CHIP:DMG:                 }
+          [1661421563.810228][2362:2362] CHIP:DMG:
+          [1661421563.810293][2362:2362] CHIP:DMG:         ],
+          [1661421563.810366][2362:2362] CHIP:DMG:
+          [1661421563.810433][2362:2362] CHIP:DMG:         isFabricFiltered = true,
+          [1661421563.810497][2362:2362] CHIP:DMG:         InteractionModelRevision = 1
+          [1661421563.810557][2362:2362] CHIP:DMG: },
+          [1661421563.810736][2362:2362] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661421563.810990][2362:2362] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661421563.811066][2362:2362] CHIP:DMG: <RE:Run> Cluster 33, Attribute 2 is dirty
+          [1661421563.811120][2362:2362] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          [1661421563.811190][2362:2362] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661421563.811271][2362:2362] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "DUT reads a TotalOperationalHours attribute value from TH."
+      PICS: DGGEN.C.A0003
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read total-operational-hours 1 0
+          verify that TotalOperationalHours attribute data type must be UINT32 and the value indicates the number of hours the node has been operational since DUT (node) has been rebooted on TH(all-clusters-app).
+
+          ReadRequestMessage =
+          [1661421632.317370][2362:2362] CHIP:DMG: {
+          [1661421632.317431][2362:2362] CHIP:DMG:         AttributePathIBs =
+          [1661421632.317490][2362:2362] CHIP:DMG:         [
+          [1661421632.317551][2362:2362] CHIP:DMG:                 AttributePathIB =
+          [1661421632.317652][2362:2362] CHIP:DMG:                 {
+          [1661421632.317733][2362:2362] CHIP:DMG:                         Endpoint = 0x0,
+          [1661421632.317830][2362:2362] CHIP:DMG:                         Cluster = 0x33,
+          [1661421632.317923][2362:2362] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1661421632.318008][2362:2362] CHIP:DMG:                 }
+          [1661421632.318090][2362:2362] CHIP:DMG:
+          [1661421632.318163][2362:2362] CHIP:DMG:         ],
+          [1661421632.318235][2362:2362] CHIP:DMG:
+          [1661421632.318304][2362:2362] CHIP:DMG:         isFabricFiltered = true,
+          [1661421632.318368][2362:2362] CHIP:DMG:         InteractionModelRevision = 1
+          [1661421632.318428][2362:2362] CHIP:DMG: },
+          [1661421632.318615][2362:2362] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661421632.318881][2362:2362] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661421632.318960][2362:2362] CHIP:DMG: <RE:Run> Cluster 33, Attribute 3 is dirty
+          [1661421632.319014][2362:2362] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          [1661421632.319081][2362:2362] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661421632.319159][2362:2362] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "TH undergoes a reboot process. DUT reads a attribute value from TH."
+      PICS: DGGEN.C.A0004
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read boot-reasons 1 0
+
+          verify that  bootreason attribute data type must match the value listed in Table 105 BootReason ENUM table in spec on TH(all-clusters-app).
+
+
+          ReadRequestMessage =
+          [1661421678.360282][2362:2362] CHIP:DMG: {
+          [1661421678.360336][2362:2362] CHIP:DMG:         AttributePathIBs =
+          [1661421678.360400][2362:2362] CHIP:DMG:         [
+          [1661421678.360461][2362:2362] CHIP:DMG:                 AttributePathIB =
+          [1661421678.360531][2362:2362] CHIP:DMG:                 {
+          [1661421678.360605][2362:2362] CHIP:DMG:                         Endpoint = 0x0,
+          [1661421678.360688][2362:2362] CHIP:DMG:                         Cluster = 0x33,
+          [1661421678.360767][2362:2362] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1661421678.360843][2362:2362] CHIP:DMG:                 }
+          [1661421678.360914][2362:2362] CHIP:DMG:
+          [1661421678.360978][2362:2362] CHIP:DMG:         ],
+          [1661421678.361048][2362:2362] CHIP:DMG:
+          [1661421678.361114][2362:2362] CHIP:DMG:         isFabricFiltered = true,
+          [1661421678.361178][2362:2362] CHIP:DMG:         InteractionModelRevision = 1
+          [1661421678.361322][2362:2362] CHIP:DMG: },
+          [1661421678.361498][2362:2362] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661421678.361719][2362:2362] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661421678.361792][2362:2362] CHIP:DMG: <RE:Run> Cluster 33, Attribute 4 is dirty
+          [1661421678.361847][2362:2362] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0004 (expanded=0)
+          [1661421678.361912][2362:2362] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661421678.361988][2362:2362] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "DUT reads ActiveHardwareFaults attribute value from TH. Subscription
+          is possible option for this attribute."
+      PICS: DGGEN.C.A0005
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
+          verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1 on TH(all-clusters-app).
+
+          [1659773303.234177][17263:17263] CHIP:DMG:
+          [1659773303.234225][17263:17263] CHIP:DMG: ReportDataMessage =
+          [1659773303.234234][17263:17263] CHIP:DMG: {
+          [1659773303.234241][17263:17263] CHIP:DMG:         AttributeReportIBs =
+          [1659773303.234256][17263:17263] CHIP:DMG:         [
+          [1659773303.234264][17263:17263] CHIP:DMG:                 AttributeReportIB =
+          [1659773303.234278][17263:17263] CHIP:DMG:                 {
+          [1659773303.234286][17263:17263] CHIP:DMG:                         AttributeDataIB =
+          [1659773303.234296][17263:17263] CHIP:DMG:                         {
+          [1659773303.234306][17263:17263] CHIP:DMG:                                 DataVersion = 0x4dcd1218,
+          [1659773303.234316][17263:17263] CHIP:DMG:                                 AttributePathIB =
+          [1659773303.234326][17263:17263] CHIP:DMG:                                 {
+          [1659773303.234336][17263:17263] CHIP:DMG:                                         Endpoint = 0x0,
+          [1659773303.234346][17263:17263] CHIP:DMG:                                         Cluster = 0x33,
+          [1659773303.234357][17263:17263] CHIP:DMG:                                         Attribute = 0x0000_0005,
+          [1659773303.234367][17263:17263] CHIP:DMG:                                 }
+          [1659773303.234378][17263:17263] CHIP:DMG:
+          [1659773303.234388][17263:17263] CHIP:DMG:                                 Data = [
+          [1659773303.234401][17263:17263] CHIP:DMG:
+          [1659773303.234417][17263:17263] CHIP:DMG:                                 ],
+          [1659773303.234428][17263:17263] CHIP:DMG:                         },
+          [1659773303.234444][17263:17263] CHIP:DMG:
+          [1659773303.234457][17263:17263] CHIP:DMG:                 },
+          [1659773303.234475][17263:17263] CHIP:DMG:
+          [1659773303.234485][17263:17263] CHIP:DMG:         ],
+          [1659773303.234503][17263:17263] CHIP:DMG:
+          [1659773303.234512][17263:17263] CHIP:DMG:         SuppressResponse = true,
+          [1659773303.234523][17263:17263] CHIP:DMG:         InteractionModelRevision = 1
+          [1659773303.234533][17263:17263] CHIP:DMG: }
+          [1659773303.234544][17263:17263] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "DUT reads ActiveRadioFaults attribute value from TH. Subscription is
+          possible option for this attribute."
+      PICS: DGGEN.C.A0006
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read active-radio-faults 1 0
+          verify that  the attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2 on TH(all-clusters-app).
+
+          [1659971190.358722][3458:3458] CHIP:IM: Received Read request
+          [1659971190.358800][3458:3458] CHIP:DMG: ReadRequestMessage =
+          [1659971190.358827][3458:3458] CHIP:DMG: {
+          [1659971190.358848][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659971190.358874][3458:3458] CHIP:DMG:         [
+          [1659971190.358897][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659971190.358924][3458:3458] CHIP:DMG:                 {
+          [1659971190.358952][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659971190.358988][3458:3458] CHIP:DMG:                         Cluster = 0x33,
+          [1659971190.359019][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1659971190.359049][3458:3458] CHIP:DMG:                 }
+          [1659971190.359077][3458:3458] CHIP:DMG:
+          [1659971190.359101][3458:3458] CHIP:DMG:         ],
+          [1659971190.359129][3458:3458] CHIP:DMG:
+          [1659971190.359154][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659971190.359178][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
+          [1659971190.359201][3458:3458] CHIP:DMG: },
+          [1659971190.359274][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659971190.359356][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659971190.359385][3458:3458] CHIP:DMG: <RE:Run> Cluster 33, Attribute 6 is dirty
+          [1659971190.359406][3458:3458] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0006 (expanded=0)
+          [1659971190.359434][3458:3458] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1659971190.359466][3458:3458] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "DUT reads ActiveNetworkFaults attribute value from TH. Subscription
+          is possible option for this attribute."
+      PICS: DGGEN.C.A0007
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
+          verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM on TH(all-clusters-app)
+
+          ReadRequestMessage =
+          [1661422339.662496][2220:2220] CHIP:DMG: {
+          [1661422339.662554][2220:2220] CHIP:DMG:         AttributePathIBs =
+          [1661422339.662619][2220:2220] CHIP:DMG:         [
+          [1661422339.662681][2220:2220] CHIP:DMG:                 AttributePathIB =
+          [1661422339.662752][2220:2220] CHIP:DMG:                 {
+          [1661422339.662825][2220:2220] CHIP:DMG:                         Endpoint = 0x0,
+          [1661422339.662926][2220:2220] CHIP:DMG:                         Cluster = 0x33,
+          [1661422339.663022][2220:2220] CHIP:DMG:                         Attribute = 0x0000_0007,
+          [1661422339.663110][2220:2220] CHIP:DMG:                 }
+          [1661422339.663184][2220:2220] CHIP:DMG:
+          [1661422339.663249][2220:2220] CHIP:DMG:         ],
+          [1661422339.663321][2220:2220] CHIP:DMG:
+          [1661422339.663389][2220:2220] CHIP:DMG:         isFabricFiltered = true,
+          [1661422339.663454][2220:2220] CHIP:DMG:         InteractionModelRevision = 1
+          [1661422339.663514][2220:2220] CHIP:DMG: },
+          [1661422339.663697][2220:2220] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661422339.663957][2220:2220] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661422339.664032][2220:2220] CHIP:DMG: <RE:Run> Cluster 33, Attribute 7 is dirty
+          [1661422339.664088][2220:2220] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0007 (expanded=0)
+          [1661422339.664157][2220:2220] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661422339.664234][2220:2220] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "TH reads TestEventTriggersEnabled attribute value. If this value is
+          set True, then a certain test mode will be performed (or triggered)
+          according to pre-provisioned client and server test mode."
+      PICS: DGGEN.C.A0008
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
+          verify that TestEventTriggersEnabled attribute value should be data type bool on TH(all-clusters-app)
+
+          ReadRequestMessage =
+          [1661422384.680672][2220:2220] CHIP:DMG: {
+          [1661422384.680728][2220:2220] CHIP:DMG:         AttributePathIBs =
+          [1661422384.680794][2220:2220] CHIP:DMG:         [
+          [1661422384.680856][2220:2220] CHIP:DMG:                 AttributePathIB =
+          [1661422384.680937][2220:2220] CHIP:DMG:                 {
+          [1661422384.681020][2220:2220] CHIP:DMG:                         Endpoint = 0x0,
+          [1661422384.681105][2220:2220] CHIP:DMG:                         Cluster = 0x33,
+          [1661422384.681189][2220:2220] CHIP:DMG:                         Attribute = 0x0000_0008,
+          [1661422384.681267][2220:2220] CHIP:DMG:                 }
+          [1661422384.681348][2220:2220] CHIP:DMG:
+          [1661422384.681421][2220:2220] CHIP:DMG:         ],
+          [1661422384.681494][2220:2220] CHIP:DMG:
+          [1661422384.681562][2220:2220] CHIP:DMG:         isFabricFiltered = true,
+          [1661422384.681627][2220:2220] CHIP:DMG:         InteractionModelRevision = 1
+          [1661422384.681688][2220:2220] CHIP:DMG: },
+          [1661422384.681857][2220:2220] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1661422384.682101][2220:2220] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1661422384.682174][2220:2220] CHIP:DMG: <RE:Run> Cluster 33, Attribute 8 is dirty
+          [1661422384.682229][2220:2220] CHIP:DMG: Reading attribute: Cluster=0x0000_0033 Endpoint=0 AttributeId=0x0000_0008 (expanded=0)
+          [1661422384.682297][2220:2220] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1661422384.682364][2220:2220] CHIP:DMG: AccessControl: allowed
+      disabled: true

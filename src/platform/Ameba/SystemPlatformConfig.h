@@ -49,10 +49,6 @@ struct ChipDeviceEvent;
 
 // NOTE: Values that are mapped to CONFIG_ #defines are settable via the Kconfig mechanism.
 
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
-
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 0
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 0
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS00

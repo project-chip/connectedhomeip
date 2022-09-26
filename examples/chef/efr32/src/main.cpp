@@ -25,12 +25,19 @@
 #include "sl_system_kernel.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <matter_config.h>
+#ifdef EFR32_ATTESTATION_CREDENTIALS
+#include <examples/platform/efr32/EFR32DeviceAttestationCreds.h>
+#else
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif
 
 #define BLE_DEV_NAME "SiLabs-Chef-App"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
@@ -49,8 +56,17 @@ int main(void)
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Initialize device attestation config
+#ifdef EFR32_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     EFR32_LOG("Starting App Task");
-    if (GetAppTask().StartAppTask() != CHIP_NO_ERROR)
+    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
     EFR32_LOG("Starting FreeRTOS scheduler");
@@ -64,5 +80,5 @@ int main(void)
 
 void sl_button_on_change(const sl_button_t * handle)
 {
-    GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
+    AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }

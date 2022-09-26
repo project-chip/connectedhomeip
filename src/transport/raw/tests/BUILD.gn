@@ -50,6 +50,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",

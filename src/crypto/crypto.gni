@@ -13,20 +13,8 @@
 # limitations under the License.
 
 declare_args() {
-  # Crypto implementation: mbedtls, openssl.
+  # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
   chip_with_se05x_da = 0
 }
-
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
-}
-
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")

@@ -115,18 +115,10 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
 {
-    bool hasFeature     = false;
-    uint32_t featureMap = 0;
-
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
-    {
-        hasFeature = (featureMap & chip::to_underlying(feature));
-    }
-
-    return hasFeature;
+    uint32_t featureMap = GetFeatureMap(endpoint);
+    return (featureMap & chip::to_underlying(feature));
 }
 
 } // namespace Channel
@@ -150,6 +142,7 @@ private:
     CHIP_ERROR ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadLineupAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ChannelAttrAccess gChannelAttrAccess;
@@ -162,7 +155,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kChannelList))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -170,7 +163,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kLineupInfo))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }
@@ -185,12 +178,27 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadCurrentChannelAttribute(aEncoder, delegate);
     }
+    case app::Clusters::Channel::Attributes::FeatureMap::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChannelAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                       Delegate * delegate)
+{
+    uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureFlag);
 }
 
 CHIP_ERROR ChannelAttrAccess::ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -247,24 +255,27 @@ exit:
 bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    auto & majorNumber = commandData.majorNumber;
-    auto & minorNumber = commandData.minorNumber;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EndpointId endpoint  = commandPath.mEndpointId;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & majorNumber   = commandData.majorNumber;
+    auto & minorNumber   = commandData.minorNumber;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (!delegate->HandleChangeChannelByNumber(majorNumber, minorNumber))
+    {
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfChannelClusterChangeChannelByNumberCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
 
-    bool success         = delegate->HandleChangeChannelByNumber(majorNumber, minorNumber);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -272,22 +283,26 @@ exit:
 bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                               const Commands::SkipChannel::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
-    auto & count        = commandData.count;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EndpointId endpoint  = commandPath.mEndpointId;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & count         = commandData.count;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (!delegate->HandleSkipChannel(count))
+    {
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfChannelClusterSkipChannelCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
 
-    bool success         = delegate->HandleSkipChannel(count);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

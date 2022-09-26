@@ -369,8 +369,10 @@ void Resolver::ReArmTimer()
 
     if (nextTimeout == kInvalidTimeout)
     {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
         // Generally this is only expected when no active lookups exist
         ChipLogProgress(Discovery, "Discovery does not require any more timeouts");
+#endif
         return;
     }
 

@@ -236,11 +236,6 @@ if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
-if (CONFIG_CHIP_FIRMWARE_BUILD_UNIX_TIME)
-    string(TIMESTAMP CHIP_FIRMWARE_BUILD_UNIX_TIME "%s")
-    chip_gn_arg_string("chip_device_config_firmware_build_unix_time" ${CHIP_FIRMWARE_BUILD_UNIX_TIME})
-endif()
-
 if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
     chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})

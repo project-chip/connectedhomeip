@@ -90,14 +90,15 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
     CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
                                                                 CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().IsNull());
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     commissionMgr.CloseCommissioningWindow();
-    NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenClose(nlTestSuite * suite, void *)
@@ -107,12 +108,44 @@ void CheckCommissioningWindowManagerBasicWindowOpenClose(nlTestSuite * suite, vo
     sleep(kTestTaskWaitSeconds);
 }
 
+void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t context)
+{
+    nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    constexpr auto fabricIndex                 = static_cast<chip::FabricIndex>(1);
+    constexpr auto vendorId                    = static_cast<chip::VendorId>(0xFFF3);
+    CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
+        commissionMgr.MaxCommissioningTimeout(), fabricIndex, vendorId);
+    NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+    NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerFabricIndex().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().Value() == fabricIndex);
+    NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerVendorId().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().Value() == vendorId);
+    NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
+    commissionMgr.CloseCommissioningWindow();
+    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().IsNull());
+}
+
+void CheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster(nlTestSuite * suite, void *)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask,
+                                                  reinterpret_cast<intptr_t>(suite));
+    sleep(kTestTaskWaitSeconds);
+}
+
 void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void * context)
 {
     nlTestSuite * suite                        = static_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
 }
 
@@ -126,9 +159,10 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);
     CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
                                                 CheckCommissioningWindowManagerWindowClosedTask, suite);
@@ -145,13 +179,15 @@ void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void * contex
 {
     nlTestSuite * suite                        = static_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() !=
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
     commissionMgr.OnSessionEstablishmentStarted();
     commissionMgr.OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() !=
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
 }
 
@@ -164,9 +200,10 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
     constexpr unsigned kSleepPadding           = 100;
     CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
-                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
                                                 CheckCommissioningWindowManagerWindowClosedTask, suite);
@@ -196,18 +233,28 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
 
+    constexpr auto fabricIndex = static_cast<chip::FabricIndex>(1);
+    constexpr auto vendorId    = static_cast<chip::VendorId>(0xFFF3);
     err = commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), newDiscriminator, verifier,
-                                                        kIterations, saltData);
+                                                        kIterations, saltData, fabricIndex, vendorId);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
+    NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerFabricIndex().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().Value() == fabricIndex);
+    NL_TEST_ASSERT(suite, !commissionMgr.GetOpenerVendorId().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().Value() == vendorId);
 
     commissionMgr.CloseCommissioningWindow();
+    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,
-                   commissionMgr.CommissioningWindowStatus() ==
+                   commissionMgr.CommissioningWindowStatusForCluster() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerFabricIndex().IsNull());
+    NL_TEST_ASSERT(suite, commissionMgr.GetOpenerVendorId().IsNull());
 }
 
 void CheckCommissioningWindowManagerEnhancedWindow(nlTestSuite * suite, void *)
@@ -225,6 +272,8 @@ void TearDownTask(intptr_t context)
 const nlTest sTests[] = {
     NL_TEST_DEF("CheckCommissioningWindowManagerEnhancedWindow", CheckCommissioningWindowManagerEnhancedWindow),
     NL_TEST_DEF("CheckCommissioningWindowManagerBasicWindowOpenClose", CheckCommissioningWindowManagerBasicWindowOpenClose),
+    NL_TEST_DEF("CheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster",
+                CheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster),
     NL_TEST_DEF("CheckCommissioningWindowManagerWindowTimeout", CheckCommissioningWindowManagerWindowTimeout),
     NL_TEST_DEF("CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors",
                 CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors),

@@ -30,6 +30,7 @@
 
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/FactoryDataProvider.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
@@ -75,6 +76,7 @@ void NetWorkCommissioningInstInit()
 
 static DeviceCallbacks EchoCallbacks;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 static void InitServer(intptr_t context)
 {
@@ -85,8 +87,6 @@ static void InitServer(intptr_t context)
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
 }
 
@@ -96,6 +96,12 @@ extern "C" void ChipTest(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     initPref();
+
+    // Initialize device attestation, commissionable data and device instance info
+    // TODO: Use our own DeviceInstanceInfoProvider
+    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     err                           = deviceMgr.Init(&EchoCallbacks);

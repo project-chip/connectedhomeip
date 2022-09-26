@@ -30,47 +30,57 @@ struct CommissioningView: View {
     var body: some View {
         VStack(alignment: .leading) {
             if(viewModel.commisisoningWindowOpened == true) {
-                Text("Commissioning window opened.")
+                Text("Commissioning window opened.").padding()
                 
+                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupPasscode)!))
+                    .border(Color.blue, width: 1)
+                    .padding()
+                Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupDiscriminator)!))
+                    .border(Color.blue, width: 1)
+                    .padding()
+
                 if(self.selectedCommissioner != nil)
                 {
                     if(viewModel.udcRequestSent == true)
                     {
                         Text("Complete commissioning on " + (selectedCommissioner?.deviceName)!)
+                            .padding()
                     }
                     else if(viewModel.udcRequestSent == false) {
                         Text("Could not send user directed commissioning request to " + (selectedCommissioner?.deviceName)! + "! Complete commissioning manually!")
                             .foregroundColor(Color.red)
+                            .padding()
                     }
                 }
                 else{
-                    Text("Complete commissioning with a commissioner manually!")
+                    Text("Complete commissioning with a commissioner manually!").padding()
                 }
-                
-                // TBD: actual values
-                Text("Onboarding PIN: ")
-                    .padding()
-                    .border(Color.black, width: 1)
-                Text("Discriminator: ")
-                    .padding()
-                    .border(Color.black, width: 1)
             }
             else if(viewModel.commisisoningWindowOpened == false) {
                 Text("Failed to open Commissioning window!")
                     .foregroundColor(Color.red)
+                    .padding()
             }
             
             if(viewModel.commisisoningComplete == true)
             {
+                Text("Commissioning finished!").padding()
                 NavigationLink(
                     destination: ContentLauncherView(),
                     label: {
                         Text("Next")
-                            .frame(width: 75, height: 30, alignment: .center)
+                            .frame(width: 100, height: 30, alignment: .center)
                             .border(Color.black, width: 1)
                     }
                 ).background(Color.blue)
                     .foregroundColor(Color.white)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .padding()
+            }
+            else if(viewModel.commisisoningComplete == false)
+            {
+                Text("Commissioning failure!")
+                    .foregroundColor(Color.red)
                     .padding()
             }
         }

@@ -255,34 +255,23 @@ CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader
     return CHIP_NO_ERROR;
 }
 
-static void itoa2(uint32_t val, uint8_t * buf)
-{
-    buf[1] = static_cast<uint8_t>('0' + (val % 10));
-    val /= 10;
-    buf[0] = static_cast<uint8_t>('0' + (val % 10));
-}
-
 CHIP_ERROR ASN1Writer::PutTime(const ASN1UniversalTime & val)
 {
-    uint8_t buf[15];
+    char buf[ASN1UniversalTime::kASN1TimeStringMaxLength];
+    MutableCharSpan bufSpan(buf);
+    uint8_t tag;
 
-    itoa2(val.Year / 100, buf);
-    itoa2(val.Year, buf + 2);
-    itoa2(val.Month, buf + 4);
-    itoa2(val.Day, buf + 6);
-    itoa2(val.Hour, buf + 8);
-    itoa2(val.Minute, buf + 10);
-    itoa2(val.Second, buf + 12);
-    buf[14] = 'Z';
+    ReturnErrorOnFailure(val.ExportTo_ASN1_TIME_string(bufSpan));
 
-    // X.509/RFC5280 mandates that times before 2050 UTC must be encoded as ASN.1 UTCTime values, while
-    // times equal or greater than 2050 must be encoded as GeneralizedTime values.  The only difference
-    // (in the context of X.509 DER) is that GeneralizedTimes are encoded with a 4 digit year, while
-    // UTCTimes are encoded with a two-digit year.
-    //
     if (val.Year >= 2050)
-        return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_GeneralizedTime, false, buf, 15);
-    return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_UTCTime, false, buf + 2, 13);
+    {
+        tag = kASN1UniversalTag_GeneralizedTime;
+    }
+    else
+    {
+        tag = kASN1UniversalTag_UTCTime;
+    }
+    return PutValue(kASN1TagClass_Universal, tag, false, reinterpret_cast<uint8_t *>(buf), static_cast<uint16_t>(bufSpan.size()));
 }
 
 CHIP_ERROR ASN1Writer::PutNull()

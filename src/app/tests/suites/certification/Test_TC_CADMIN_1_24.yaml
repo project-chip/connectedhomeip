@@ -1,0 +1,124 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    24.1.24. [TC-CADMIN-1.24] Open commissioning window - durations max and
+    max+1 [ECM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+
+config:
+    nodeId: 0x12344321
+    timeout: 200
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      cluster: "SystemCommands"
+      PICS: PICS_SDK_CI_ONLY
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Wait for commissioning Window to 181 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 181000
+
+    - label:
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 179
+              - name: "PAKEVerifier"
+                value: PakeVerifier
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0

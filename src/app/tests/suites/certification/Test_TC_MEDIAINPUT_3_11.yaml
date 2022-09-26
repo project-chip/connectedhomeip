@@ -1,0 +1,59 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.5.2. [TC-MEDIAINPUT-3.11] Select Input Verification
+
+PICS:
+    - MEDIAINPUT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Input"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue 13029
+    #This step implicitly validating the attribute(InputList)constraints, as long as the payload is being parsed successfully
+    - label:
+          "TH reads the InputList attribute from the DUT to show list of Inputs
+          available and Verify list of available inputs supported by the device
+          is provided, where each entry in the list contains an index(type:uint
+          8), InputType (InputType Enums), Name (type: Strings), and
+          Description(Type:String)"
+      PICS: MEDIAINPUT.S.A0000
+      command: "readAttribute"
+      attribute: "InputList"
+
+    - label: "Select Input Command"
+      PICS: MEDIAINPUT.S.C00.Rsp
+      command: "SelectInput"
+      arguments:
+          values:
+              - name: "index"
+                value: 1
+
+    - label: "Read current input list"
+      PICS: MEDIAINPUT.S.A0001 && MEDIAINPUT.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "CurrentInput"
+      response:
+          value: 1

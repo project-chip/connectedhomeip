@@ -56,7 +56,7 @@ public final class ChipIdLookup {
       return "AccessControl";
     }
     if (clusterId == 37L) {
-      return "BridgedActions";
+      return "Actions";
     }
     if (clusterId == 40L) {
       return "Basic";
@@ -156,6 +156,9 @@ public final class ChipIdLookup {
     }
     if (clusterId == 768L) {
       return "ColorControl";
+    }
+    if (clusterId == 769L) {
+      return "BallastConfiguration";
     }
     if (clusterId == 1024L) {
       return "IlluminanceMeasurement";
@@ -449,7 +452,7 @@ public final class ChipIdLookup {
     }
     if (clusterId == 29L) {
       if (attributeId == 0L) {
-        return "DeviceList";
+        return "DeviceTypeList";
       }
       if (attributeId == 1L) {
         return "ServerList";
@@ -536,10 +539,10 @@ public final class ChipIdLookup {
         return "ActionList";
       }
       if (attributeId == 1L) {
-        return "EndpointList";
+        return "EndpointLists";
       }
       if (attributeId == 2L) {
-        return "SetupUrl";
+        return "SetupURL";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -788,64 +791,64 @@ public final class ChipIdLookup {
         return "ActiveWiredFaults";
       }
       if (attributeId == 11L) {
-        return "BatteryVoltage";
+        return "BatVoltage";
       }
       if (attributeId == 12L) {
-        return "BatteryPercentRemaining";
+        return "BatPercentRemaining";
       }
       if (attributeId == 13L) {
-        return "BatteryTimeRemaining";
+        return "BatTimeRemaining";
       }
       if (attributeId == 14L) {
-        return "BatteryChargeLevel";
+        return "BatChargeLevel";
       }
       if (attributeId == 15L) {
-        return "BatteryReplacementNeeded";
+        return "BatReplacementNeeded";
       }
       if (attributeId == 16L) {
-        return "BatteryReplaceability";
+        return "BatReplaceability";
       }
       if (attributeId == 17L) {
-        return "BatteryPresent";
+        return "BatPresent";
       }
       if (attributeId == 18L) {
-        return "ActiveBatteryFaults";
+        return "ActiveBatFaults";
       }
       if (attributeId == 19L) {
-        return "BatteryReplacementDescription";
+        return "BatReplacementDescription";
       }
       if (attributeId == 20L) {
-        return "BatteryCommonDesignation";
+        return "BatCommonDesignation";
       }
       if (attributeId == 21L) {
-        return "BatteryANSIDesignation";
+        return "BatANSIDesignation";
       }
       if (attributeId == 22L) {
-        return "BatteryIECDesignation";
+        return "BatIECDesignation";
       }
       if (attributeId == 23L) {
-        return "BatteryApprovedChemistry";
+        return "BatApprovedChemistry";
       }
       if (attributeId == 24L) {
-        return "BatteryCapacity";
+        return "BatCapacity";
       }
       if (attributeId == 25L) {
-        return "BatteryQuantity";
+        return "BatQuantity";
       }
       if (attributeId == 26L) {
-        return "BatteryChargeState";
+        return "BatChargeState";
       }
       if (attributeId == 27L) {
-        return "BatteryTimeToFullCharge";
+        return "BatTimeToFullCharge";
       }
       if (attributeId == 28L) {
-        return "BatteryFunctionalWhileCharging";
+        return "BatFunctionalWhileCharging";
       }
       if (attributeId == 29L) {
-        return "BatteryChargingCurrent";
+        return "BatChargingCurrent";
       }
       if (attributeId == 30L) {
-        return "ActiveBatteryChargeFaults";
+        return "ActiveBatChargeFaults";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1211,7 +1214,7 @@ public final class ChipIdLookup {
         return "SecurityPolicy";
       }
       if (attributeId == 60L) {
-        return "ChannelMask";
+        return "ChannelPage0Mask";
       }
       if (attributeId == 61L) {
         return "OperationalDatasetComponents";
@@ -2075,7 +2078,7 @@ public final class ChipIdLookup {
         return "CompensationText";
       }
       if (attributeId == 7L) {
-        return "ColorTemperature";
+        return "ColorTemperatureMireds";
       }
       if (attributeId == 8L) {
         return "ColorMode";
@@ -2208,6 +2211,66 @@ public final class ChipIdLookup {
       }
       if (attributeId == 16400L) {
         return "StartUpColorTemperatureMireds";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 769L) {
+      if (attributeId == 0L) {
+        return "PhysicalMinLevel";
+      }
+      if (attributeId == 1L) {
+        return "PhysicalMaxLevel";
+      }
+      if (attributeId == 2L) {
+        return "BallastStatus";
+      }
+      if (attributeId == 16L) {
+        return "MinLevel";
+      }
+      if (attributeId == 17L) {
+        return "MaxLevel";
+      }
+      if (attributeId == 20L) {
+        return "IntrinsicBalanceFactor";
+      }
+      if (attributeId == 21L) {
+        return "BallastFactorAdjustment";
+      }
+      if (attributeId == 32L) {
+        return "LampQuantity";
+      }
+      if (attributeId == 48L) {
+        return "LampType";
+      }
+      if (attributeId == 49L) {
+        return "LampManufacturer";
+      }
+      if (attributeId == 50L) {
+        return "LampRatedHours";
+      }
+      if (attributeId == 51L) {
+        return "LampBurnHours";
+      }
+      if (attributeId == 52L) {
+        return "LampAlarmMode";
+      }
+      if (attributeId == 53L) {
+        return "LampBurnHoursTripPoint";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -3021,6 +3084,380 @@ public final class ChipIdLookup {
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";
+      }
+      return "";
+    }
+    return "";
+  }
+
+  /**
+   * Translates cluster ID and event ID to an attribute name in upper camel case. If no matching IDs
+   * are found, returns an empty string.
+   */
+  public static String eventIdToName(long clusterId, long eventId) {
+    if (clusterId == 3L) {
+      return "";
+    }
+    if (clusterId == 4L) {
+      return "";
+    }
+    if (clusterId == 5L) {
+      return "";
+    }
+    if (clusterId == 6L) {
+      return "";
+    }
+    if (clusterId == 7L) {
+      return "";
+    }
+    if (clusterId == 8L) {
+      return "";
+    }
+    if (clusterId == 15L) {
+      return "";
+    }
+    if (clusterId == 29L) {
+      return "";
+    }
+    if (clusterId == 30L) {
+      return "";
+    }
+    if (clusterId == 31L) {
+      if (eventId == 0L) {
+        return "AccessControlEntryChanged";
+      }
+      if (eventId == 1L) {
+        return "AccessControlExtensionChanged";
+      }
+      return "";
+    }
+    if (clusterId == 37L) {
+      if (eventId == 0L) {
+        return "StateChanged";
+      }
+      if (eventId == 1L) {
+        return "ActionFailed";
+      }
+      return "";
+    }
+    if (clusterId == 40L) {
+      if (eventId == 0L) {
+        return "StartUp";
+      }
+      if (eventId == 1L) {
+        return "ShutDown";
+      }
+      if (eventId == 2L) {
+        return "Leave";
+      }
+      if (eventId == 3L) {
+        return "ReachableChanged";
+      }
+      return "";
+    }
+    if (clusterId == 41L) {
+      return "";
+    }
+    if (clusterId == 42L) {
+      if (eventId == 0L) {
+        return "StateTransition";
+      }
+      if (eventId == 1L) {
+        return "VersionApplied";
+      }
+      if (eventId == 2L) {
+        return "DownloadError";
+      }
+      return "";
+    }
+    if (clusterId == 43L) {
+      return "";
+    }
+    if (clusterId == 44L) {
+      return "";
+    }
+    if (clusterId == 45L) {
+      return "";
+    }
+    if (clusterId == 46L) {
+      return "";
+    }
+    if (clusterId == 47L) {
+      return "";
+    }
+    if (clusterId == 48L) {
+      return "";
+    }
+    if (clusterId == 49L) {
+      return "";
+    }
+    if (clusterId == 50L) {
+      return "";
+    }
+    if (clusterId == 51L) {
+      if (eventId == 0L) {
+        return "HardwareFaultChange";
+      }
+      if (eventId == 1L) {
+        return "RadioFaultChange";
+      }
+      if (eventId == 2L) {
+        return "NetworkFaultChange";
+      }
+      if (eventId == 3L) {
+        return "BootReason";
+      }
+      return "";
+    }
+    if (clusterId == 52L) {
+      if (eventId == 0L) {
+        return "SoftwareFault";
+      }
+      return "";
+    }
+    if (clusterId == 53L) {
+      if (eventId == 0L) {
+        return "ConnectionStatus";
+      }
+      if (eventId == 1L) {
+        return "NetworkFaultChange";
+      }
+      return "";
+    }
+    if (clusterId == 54L) {
+      if (eventId == 0L) {
+        return "Disconnection";
+      }
+      if (eventId == 1L) {
+        return "AssociationFailure";
+      }
+      if (eventId == 2L) {
+        return "ConnectionStatus";
+      }
+      return "";
+    }
+    if (clusterId == 55L) {
+      return "";
+    }
+    if (clusterId == 57L) {
+      if (eventId == 0L) {
+        return "StartUp";
+      }
+      if (eventId == 1L) {
+        return "ShutDown";
+      }
+      if (eventId == 2L) {
+        return "Leave";
+      }
+      if (eventId == 3L) {
+        return "ReachableChanged";
+      }
+      return "";
+    }
+    if (clusterId == 59L) {
+      if (eventId == 0L) {
+        return "SwitchLatched";
+      }
+      if (eventId == 1L) {
+        return "InitialPress";
+      }
+      if (eventId == 2L) {
+        return "LongPress";
+      }
+      if (eventId == 3L) {
+        return "ShortRelease";
+      }
+      if (eventId == 4L) {
+        return "LongRelease";
+      }
+      if (eventId == 5L) {
+        return "MultiPressOngoing";
+      }
+      if (eventId == 6L) {
+        return "MultiPressComplete";
+      }
+      return "";
+    }
+    if (clusterId == 60L) {
+      return "";
+    }
+    if (clusterId == 62L) {
+      return "";
+    }
+    if (clusterId == 63L) {
+      return "";
+    }
+    if (clusterId == 64L) {
+      return "";
+    }
+    if (clusterId == 65L) {
+      return "";
+    }
+    if (clusterId == 69L) {
+      if (eventId == 0L) {
+        return "StateChange";
+      }
+      return "";
+    }
+    if (clusterId == 80L) {
+      return "";
+    }
+    if (clusterId == 257L) {
+      if (eventId == 0L) {
+        return "DoorLockAlarm";
+      }
+      if (eventId == 1L) {
+        return "DoorStateChange";
+      }
+      if (eventId == 2L) {
+        return "LockOperation";
+      }
+      if (eventId == 3L) {
+        return "LockOperationError";
+      }
+      if (eventId == 4L) {
+        return "LockUserChange";
+      }
+      return "";
+    }
+    if (clusterId == 258L) {
+      return "";
+    }
+    if (clusterId == 259L) {
+      return "";
+    }
+    if (clusterId == 512L) {
+      if (eventId == 0L) {
+        return "SupplyVoltageLow";
+      }
+      if (eventId == 1L) {
+        return "SupplyVoltageHigh";
+      }
+      if (eventId == 2L) {
+        return "PowerMissingPhase";
+      }
+      if (eventId == 3L) {
+        return "SystemPressureLow";
+      }
+      if (eventId == 4L) {
+        return "SystemPressureHigh";
+      }
+      if (eventId == 5L) {
+        return "DryRunning";
+      }
+      if (eventId == 6L) {
+        return "MotorTemperatureHigh";
+      }
+      if (eventId == 7L) {
+        return "PumpMotorFatalFailure";
+      }
+      if (eventId == 8L) {
+        return "ElectronicTemperatureHigh";
+      }
+      if (eventId == 9L) {
+        return "PumpBlocked";
+      }
+      if (eventId == 10L) {
+        return "SensorFailure";
+      }
+      if (eventId == 11L) {
+        return "ElectronicNonFatalFailure";
+      }
+      if (eventId == 12L) {
+        return "ElectronicFatalFailure";
+      }
+      if (eventId == 13L) {
+        return "GeneralFault";
+      }
+      if (eventId == 14L) {
+        return "Leakage";
+      }
+      if (eventId == 15L) {
+        return "AirDetection";
+      }
+      if (eventId == 16L) {
+        return "TurbineOperation";
+      }
+      return "";
+    }
+    if (clusterId == 513L) {
+      return "";
+    }
+    if (clusterId == 514L) {
+      return "";
+    }
+    if (clusterId == 516L) {
+      return "";
+    }
+    if (clusterId == 768L) {
+      return "";
+    }
+    if (clusterId == 769L) {
+      return "";
+    }
+    if (clusterId == 1024L) {
+      return "";
+    }
+    if (clusterId == 1026L) {
+      return "";
+    }
+    if (clusterId == 1027L) {
+      return "";
+    }
+    if (clusterId == 1028L) {
+      return "";
+    }
+    if (clusterId == 1029L) {
+      return "";
+    }
+    if (clusterId == 1030L) {
+      return "";
+    }
+    if (clusterId == 1283L) {
+      return "";
+    }
+    if (clusterId == 1284L) {
+      return "";
+    }
+    if (clusterId == 1285L) {
+      return "";
+    }
+    if (clusterId == 1286L) {
+      return "";
+    }
+    if (clusterId == 1287L) {
+      return "";
+    }
+    if (clusterId == 1288L) {
+      return "";
+    }
+    if (clusterId == 1289L) {
+      return "";
+    }
+    if (clusterId == 1290L) {
+      return "";
+    }
+    if (clusterId == 1291L) {
+      return "";
+    }
+    if (clusterId == 1292L) {
+      return "";
+    }
+    if (clusterId == 1293L) {
+      return "";
+    }
+    if (clusterId == 1294L) {
+      return "";
+    }
+    if (clusterId == 2820L) {
+      return "";
+    }
+    if (clusterId == 4294048773L) {
+      if (eventId == 1L) {
+        return "TestEvent";
+      }
+      if (eventId == 2L) {
+        return "TestFabricScopedEvent";
       }
       return "";
     }

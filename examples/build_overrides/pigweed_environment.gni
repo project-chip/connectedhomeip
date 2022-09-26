@@ -1,1 +1,29 @@
-../../build_overrides/pigweed_environment.gni
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# In order to avoid bootstrapping a separate environment for each in-tree
+# example, reuse the environment from the root of the Matter SDK. Use the
+# bootstrap script there to create the environment.
+_bootstrap_root = "//third_party/connectedhomeip"
+
+import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
+
+# Rebase paths to our root.
+dir_cipd_arm = get_path_info("${_bootstrap_root}/${dir_cipd_arm}", "abspath")
+dir_cipd_pigweed =
+    get_path_info("${_bootstrap_root}/${dir_cipd_pigweed}", "abspath")
+dir_cipd_python =
+    get_path_info("${_bootstrap_root}/${dir_cipd_python}", "abspath")
+dir_virtual_env =
+    get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}", "abspath")

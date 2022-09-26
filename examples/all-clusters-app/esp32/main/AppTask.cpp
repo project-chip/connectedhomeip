@@ -84,6 +84,7 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif
+
     return err;
 }
 

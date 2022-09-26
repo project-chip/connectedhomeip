@@ -47,9 +47,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -66,6 +64,10 @@ private:
     friend BLEManagerImpl & BLEMgrImpl(void);
 
     static BLEManagerImpl sInstance;
+
+    BleConnectionDelegate * mConnectionDelegate   = nullptr;
+    BlePlatformDelegate * mPlatformDelegate       = nullptr;
+    BleApplicationDelegate * mApplicationDelegate = nullptr;
 };
 
 /**

@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-#include "../common/Commands.h"
-
-#include "InteractiveCommands.h"
+#include "commands/common/CHIPCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/interactive/InteractiveCommands.h"
 
 void registerCommandsInteractive(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {

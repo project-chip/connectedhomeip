@@ -24,7 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -61,6 +61,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mListenPort               = params.listenPort;
     mFabricIndependentStorage = params.fabricIndependentStorage;
     mOperationalKeystore      = params.operationalKeystore;
+    mOpCertStore              = params.opCertStore;
     mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -87,6 +88,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
         params.fabricTable              = mSystemState->Fabrics();
         params.operationalKeystore      = mOperationalKeystore;
+        params.opCertStore              = mOpCertStore;
     }
 
     return InitSystemState(params);
@@ -124,6 +126,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
+    // not provided wholesale.
+    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
     stateParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
@@ -153,6 +159,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
+    // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!
     stateParams.sessionMgr                = chip::Platform::New<SessionManager>();
     stateParams.certificateValidityPolicy = params.certificateValidityPolicy;
     stateParams.unsolicitedStatusHandler  = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
@@ -160,25 +167,31 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
 
-    // This is constructed with a base class deleter so we can std::move it into
-    // stateParams without a manual conversion below.
-    auto sessionResumptionStorage =
-        std::unique_ptr<SimpleSessionResumptionStorage, Platform::Deleter<chip::SessionResumptionStorage>>(
-            Platform::New<SimpleSessionResumptionStorage>());
-
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
+    stateParams.fabricTable = params.fabricTable;
+
     FabricTable * tempFabricTable = nullptr;
-    stateParams.fabricTable       = params.fabricTable;
     if (stateParams.fabricTable == nullptr)
     {
-        stateParams.fabricTable = tempFabricTable = chip::Platform::New<FabricTable>();
-        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage, params.operationalKeystore));
+        // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
+        auto newFabricTable = Platform::MakeUnique<FabricTable>();
+        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+
+        FabricTable::InitParams fabricTableInitParams;
+        fabricTableInitParams.storage             = params.fabricIndependentStorage;
+        fabricTableInitParams.operationalKeystore = params.operationalKeystore;
+        fabricTableInitParams.opCertStore         = params.opCertStore;
+        ReturnErrorOnFailure(newFabricTable->Init(fabricTableInitParams));
+        stateParams.fabricTable = newFabricTable.release();
+        tempFabricTable         = stateParams.fabricTable;
     }
+
+    auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
     stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
+    ReturnErrorOnFailure(delegate->Init(stateParams.sessionResumptionStorage.get(), stateParams.groupDataProvider));
     stateParams.fabricTableDelegate = delegate.get();
     ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
@@ -191,8 +204,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
-
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable));
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -231,8 +242,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
-    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+    stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
+    stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager           = stateParams.sessionMgr,
@@ -246,12 +257,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .devicePool        = stateParams.operationalDevicePool,
+        .sessionSetupPool  = stateParams.sessionSetupPool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
+
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
+                                                                                stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
@@ -268,6 +282,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                        = params.controllerNOC;
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
+    controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -278,6 +293,8 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
+
     ReturnErrorOnFailure(InitSystemState());
 
     ControllerInitParams controllerParams;
@@ -290,9 +307,12 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
+
     ReturnErrorOnFailure(InitSystemState());
 
     CommissionerInitParams commissionerParams;
+
     // PopulateInitParams works against ControllerInitParams base class of CommissionerInitParams only
     PopulateInitParams(commissionerParams, params);
 
@@ -330,6 +350,7 @@ void DeviceControllerFactory::Shutdown()
     }
     mFabricIndependentStorage = nullptr;
     mOperationalKeystore      = nullptr;
+    mOpCertStore              = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -369,13 +390,13 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mCASEClientPool and mDevicePool must be deallocated
+    // mCASEClientPool and mSessionSetupPool must be deallocated
     // after mCASESessionManager, which uses them.
 
-    if (mOperationalDevicePool != nullptr)
+    if (mSessionSetupPool != nullptr)
     {
-        Platform::Delete(mOperationalDevicePool);
-        mOperationalDevicePool = nullptr;
+        Platform::Delete(mSessionSetupPool);
+        mSessionSetupPool = nullptr;
     }
 
     if (mCASEClientPool != nullptr)
@@ -397,20 +418,6 @@ void DeviceControllerSystemState::Shutdown()
         chip::Platform::Delete(mTransportMgr);
         mTransportMgr = nullptr;
     }
-
-#if CONFIG_DEVICE_LAYER
-    //
-    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
-    // expects to be called with external thread synchronization and will not try to acquire the
-    // stack lock.
-    //
-    // Actually stopping the event queue is a separable call that applications will have to sequence.
-    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
-    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
-    //
-    CHIP_ERROR error = DeviceLayer::PlatformMgr().Shutdown();
-    VerifyOrDie(error == CHIP_NO_ERROR);
-#endif
 
     if (mExchangeMgr != nullptr)
     {
@@ -463,6 +470,19 @@ void DeviceControllerSystemState::Shutdown()
         // so that SetupController/Commissioner can use it
         mFabrics = nullptr;
     }
+
+#if CONFIG_DEVICE_LAYER
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
+    DeviceLayer::PlatformMgr().Shutdown();
+#endif
 }
 
 } // namespace Controller

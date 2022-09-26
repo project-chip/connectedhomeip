@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
@@ -70,6 +70,9 @@ const BL602Config::Key BL602Config::kConfigKey_OperationalDevicePrivateKey = { "
 const BL602Config::Key BL602Config::kConfigKey_RegulatoryLocation          = { "regulatory-location" };
 const BL602Config::Key BL602Config::kConfigKey_CountryCode                 = { "country-code" };
 const BL602Config::Key BL602Config::kConfigKey_UniqueId                    = { "unique-id" };
+
+const BL602Config::Key BL602Config::kCounterKey_RebootCount           = { "reboot-count" };
+const BL602Config::Key BL602Config::kCounterKey_TotalOperationalHours = { "total-hours" };
 
 CHIP_ERROR BL602Config::Init()
 {
@@ -151,7 +154,7 @@ CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     SuccessOrExit(err);
 
     outLen = ret;
-    strncpy(buf, tmpVal, outLen);
+    Platform::CopyString(buf, outLen, tmpVal);
 
 exit:
     return err;
@@ -263,7 +266,7 @@ CHIP_ERROR BL602Config::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = BL602Config::WriteConfigValueStr(key, strCopy.Get());
 

@@ -1,25 +1,35 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: gcr.io/cloud-builders/git
+      args:
+          - submodule
+          - update
+          - "--init"
+          - "--recursive"
+      id: Submodules
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
           - source ./scripts/bootstrap.sh
       id: Bootstrap
+      waitFor:
+          - Submodules
       entrypoint: /usr/bin/bash
       volumes:
           - name: pwenv
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+    - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*' --skip-target-glob '{efr32-*,tizen-*,*-tests}'
-              build --create-archives /workspace/artifacts/
+              --target-glob '*' --skip-target-glob
+              '{imx-*,tizen-*,*-androidstudio-*,*-tests*,*-chip-test}' build
+              --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
           - Bootstrap
@@ -31,7 +41,8 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 14400s
+timeout: 21600s
+queueTtl: 21600s
 
 artifacts:
     objects:
@@ -42,4 +53,4 @@ artifacts:
 # slow.
 options:
     machineType: "E2_HIGHCPU_32"
-    diskSizeGb: 200
+    diskSizeGb: 500

@@ -897,6 +897,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPLevelControlCurrentLevelAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterCurrentLevelAttributeCallbackType>
+{
+public:
+    CHIPLevelControlCurrentLevelAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlCurrentLevelAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlCurrentLevelAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlCurrentLevelAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPLevelControlCurrentLevelAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPLevelControlOnLevelAttributeCallback
     : public chip::Callback::Callback<CHIPLevelControlClusterOnLevelAttributeCallbackType>
 {
@@ -1227,30 +1257,31 @@ private:
     bool keepAlive;
 };
 
-class CHIPDescriptorDeviceListAttributeCallback
-    : public chip::Callback::Callback<CHIPDescriptorClusterDeviceListAttributeCallbackType>
+class CHIPDescriptorDeviceTypeListAttributeCallback
+    : public chip::Callback::Callback<CHIPDescriptorClusterDeviceTypeListAttributeCallbackType>
 {
 public:
-    CHIPDescriptorDeviceListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPDescriptorDeviceTypeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPDescriptorDeviceListAttributeCallback();
+    ~CHIPDescriptorDeviceTypeListAttributeCallback();
 
-    static void maybeDestroy(CHIPDescriptorDeviceListAttributeCallback * callback)
+    static void maybeDestroy(CHIPDescriptorDeviceTypeListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPDescriptorDeviceListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPDescriptorDeviceTypeListAttributeCallback>(callback);
         }
     }
 
     static void CallbackFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> &
+            list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorDeviceListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorDeviceTypeListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1715,31 +1746,29 @@ private:
     bool keepAlive;
 };
 
-class CHIPBridgedActionsActionListAttributeCallback
-    : public chip::Callback::Callback<CHIPBridgedActionsClusterActionListAttributeCallbackType>
+class CHIPActionsActionListAttributeCallback : public chip::Callback::Callback<CHIPActionsClusterActionListAttributeCallbackType>
 {
 public:
-    CHIPBridgedActionsActionListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPActionsActionListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBridgedActionsActionListAttributeCallback();
+    ~CHIPActionsActionListAttributeCallback();
 
-    static void maybeDestroy(CHIPBridgedActionsActionListAttributeCallback * callback)
+    static void maybeDestroy(CHIPActionsActionListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBridgedActionsActionListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPActionsActionListAttributeCallback>(callback);
         }
     }
 
     static void CallbackFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedActionsActionListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsActionListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1748,31 +1777,30 @@ private:
     bool keepAlive;
 };
 
-class CHIPBridgedActionsEndpointListAttributeCallback
-    : public chip::Callback::Callback<CHIPBridgedActionsClusterEndpointListAttributeCallbackType>
+class CHIPActionsEndpointListsAttributeCallback
+    : public chip::Callback::Callback<CHIPActionsClusterEndpointListsAttributeCallbackType>
 {
 public:
-    CHIPBridgedActionsEndpointListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPActionsEndpointListsAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBridgedActionsEndpointListAttributeCallback();
+    ~CHIPActionsEndpointListsAttributeCallback();
 
-    static void maybeDestroy(CHIPBridgedActionsEndpointListAttributeCallback * callback)
+    static void maybeDestroy(CHIPActionsEndpointListsAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBridgedActionsEndpointListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPActionsEndpointListsAttributeCallback>(callback);
         }
     }
 
     static void CallbackFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-            list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedActionsEndpointListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsEndpointListsAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1781,20 +1809,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPBridgedActionsGeneratedCommandListAttributeCallback
-    : public chip::Callback::Callback<CHIPBridgedActionsClusterGeneratedCommandListAttributeCallbackType>
+class CHIPActionsGeneratedCommandListAttributeCallback
+    : public chip::Callback::Callback<CHIPActionsClusterGeneratedCommandListAttributeCallbackType>
 {
 public:
-    CHIPBridgedActionsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPActionsGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBridgedActionsGeneratedCommandListAttributeCallback();
+    ~CHIPActionsGeneratedCommandListAttributeCallback();
 
-    static void maybeDestroy(CHIPBridgedActionsGeneratedCommandListAttributeCallback * callback)
+    static void maybeDestroy(CHIPActionsGeneratedCommandListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBridgedActionsGeneratedCommandListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPActionsGeneratedCommandListAttributeCallback>(callback);
         }
     }
 
@@ -1802,7 +1830,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedActionsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1811,20 +1839,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPBridgedActionsAcceptedCommandListAttributeCallback
-    : public chip::Callback::Callback<CHIPBridgedActionsClusterAcceptedCommandListAttributeCallbackType>
+class CHIPActionsAcceptedCommandListAttributeCallback
+    : public chip::Callback::Callback<CHIPActionsClusterAcceptedCommandListAttributeCallbackType>
 {
 public:
-    CHIPBridgedActionsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPActionsAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBridgedActionsAcceptedCommandListAttributeCallback();
+    ~CHIPActionsAcceptedCommandListAttributeCallback();
 
-    static void maybeDestroy(CHIPBridgedActionsAcceptedCommandListAttributeCallback * callback)
+    static void maybeDestroy(CHIPActionsAcceptedCommandListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBridgedActionsAcceptedCommandListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPActionsAcceptedCommandListAttributeCallback>(callback);
         }
     }
 
@@ -1832,7 +1860,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedActionsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1841,20 +1869,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPBridgedActionsAttributeListAttributeCallback
-    : public chip::Callback::Callback<CHIPBridgedActionsClusterAttributeListAttributeCallbackType>
+class CHIPActionsAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPActionsClusterAttributeListAttributeCallbackType>
 {
 public:
-    CHIPBridgedActionsAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPActionsAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBridgedActionsAttributeListAttributeCallback();
+    ~CHIPActionsAttributeListAttributeCallback();
 
-    static void maybeDestroy(CHIPBridgedActionsAttributeListAttributeCallback * callback)
+    static void maybeDestroy(CHIPActionsAttributeListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBridgedActionsAttributeListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPActionsAttributeListAttributeCallback>(callback);
         }
     }
 
@@ -1862,7 +1890,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedActionsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsAttributeListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2443,6 +2471,96 @@ private:
     bool keepAlive;
 };
 
+class CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedInputVoltageAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedInputFrequencyAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceWiredAssessedCurrentAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedCurrentAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedCurrentAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedCurrentAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedCurrentAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedCurrentAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedCurrentAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPPowerSourceActiveWiredFaultsAttributeCallback
     : public chip::Callback::Callback<CHIPPowerSourceClusterActiveWiredFaultsAttributeCallbackType>
 {
@@ -2460,7 +2578,8 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -2473,28 +2592,28 @@ private:
     bool keepAlive;
 };
 
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
-    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatteryFaultsAttributeCallbackType>
+class CHIPPowerSourceBatVoltageAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatVoltageAttributeCallbackType>
 {
 public:
-    CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPPowerSourceBatVoltageAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPPowerSourceActiveBatteryFaultsAttributeCallback();
+    ~CHIPPowerSourceBatVoltageAttributeCallback();
 
-    static void maybeDestroy(CHIPPowerSourceActiveBatteryFaultsAttributeCallback * callback)
+    static void maybeDestroy(CHIPPowerSourceBatVoltageAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPPowerSourceActiveBatteryFaultsAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPPowerSourceBatVoltageAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatteryFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatVoltageAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2503,28 +2622,180 @@ private:
     bool keepAlive;
 };
 
-class CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback
-    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatteryChargeFaultsAttributeCallbackType>
+class CHIPPowerSourceBatPercentRemainingAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatPercentRemainingAttributeCallbackType>
 {
 public:
-    CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPPowerSourceBatPercentRemainingAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback();
+    ~CHIPPowerSourceBatPercentRemainingAttributeCallback();
 
-    static void maybeDestroy(CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback * callback)
+    static void maybeDestroy(CHIPPowerSourceBatPercentRemainingAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPPowerSourceBatPercentRemainingAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatPercentRemainingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatTimeRemainingAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatTimeRemainingAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatTimeRemainingAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatTimeRemainingAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatTimeRemainingAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatTimeRemainingAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatTimeRemainingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceActiveBatFaultsAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatFaultsAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceActiveBatFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceActiveBatFaultsAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceActiveBatFaultsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceActiveBatFaultsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceActiveBatFaultsAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatTimeToFullChargeAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatTimeToFullChargeAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatTimeToFullChargeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatTimeToFullChargeAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatTimeToFullChargeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatTimeToFullChargeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatTimeToFullChargeAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatChargingCurrentAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatChargingCurrentAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatChargingCurrentAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatChargingCurrentAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatChargingCurrentAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatChargingCurrentAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatChargingCurrentAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceActiveBatChargeFaultsAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatChargeFaultsAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceActiveBatChargeFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceActiveBatChargeFaultsAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceActiveBatChargeFaultsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3809,20 +4080,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback
-    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterChannelMaskAttributeCallbackType>
+class CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback
+    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterChannelPage0MaskAttributeCallbackType>
 {
 public:
-    CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback();
+    ~CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback();
 
-    static void maybeDestroy(CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback * callback)
+    static void maybeDestroy(CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback>(callback);
         }
     }
 
@@ -3830,7 +4101,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelMaskAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4106,6 +4377,246 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPWiFiNetworkDiagnosticsRssiAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterBeaconLostCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterBeaconRxCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterPacketMulticastRxCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterPacketMulticastTxCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterPacketUnicastRxCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterPacketUnicastTxCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterCurrentMaxRateAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback
+    : public chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterOverrunCountAttributeCallbackType>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback();
+
+    static void maybeDestroy(CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4613,11 +5124,41 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, chip::FabricIndex value);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::FabricIndex> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPAdministratorCommissioningAdminVendorIdAttributeCallback
+    : public chip::Callback::Callback<CHIPAdministratorCommissioningClusterAdminVendorIdAttributeCallbackType>
+{
+public:
+    CHIPAdministratorCommissioningAdminVendorIdAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAdministratorCommissioningAdminVendorIdAttributeCallback();
+
+    static void maybeDestroy(CHIPAdministratorCommissioningAdminVendorIdAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAdministratorCommissioningAdminVendorIdAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPAdministratorCommissioningAdminVendorIdAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4803,36 +5344,6 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-class CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback
-    : public chip::Callback::Callback<CHIPOperationalCredentialsClusterCurrentFabricIndexAttributeCallbackType>
-{
-public:
-    CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback();
-
-    static void maybeDestroy(CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context, chip::FabricIndex value);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7402,6 +7913,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback
+    : public chip::Callback::Callback<CHIPColorControlClusterStartUpColorTemperatureMiredsAttributeCallbackType>
+{
+public:
+    CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback();
+
+    static void maybeDestroy(CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPColorControlGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPColorControlClusterGeneratedCommandListAttributeCallbackType>
 {
@@ -7484,6 +8025,246 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPColorControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationIntrinsicBalanceFactorAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterBallastFactorAdjustmentAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationLampRatedHoursAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterLampRatedHoursAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationLampRatedHoursAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationLampRatedHoursAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationLampRatedHoursAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationLampRatedHoursAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationLampRatedHoursAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationLampBurnHoursAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterLampBurnHoursAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationLampBurnHoursAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationLampBurnHoursAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationLampBurnHoursAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationLampBurnHoursAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterLampBurnHoursTripPointAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationGeneratedCommandListAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterGeneratedCommandListAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationGeneratedCommandListAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationGeneratedCommandListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationGeneratedCommandListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationAcceptedCommandListAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterAcceptedCommandListAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationAcceptedCommandListAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationAcceptedCommandListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationAcceptedCommandListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPBallastConfigurationAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterAttributeListAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationAttributeListAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationAttributeListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationAttributeListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBallastConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9681,6 +10462,36 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPApplicationLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPApplicationBasicVendorIDAttributeCallback
+    : public chip::Callback::Callback<CHIPApplicationBasicClusterVendorIDAttributeCallbackType>
+{
+public:
+    CHIPApplicationBasicVendorIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPApplicationBasicVendorIDAttributeCallback();
+
+    static void maybeDestroy(CHIPApplicationBasicVendorIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPApplicationBasicVendorIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::VendorId value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPApplicationBasicVendorIDAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

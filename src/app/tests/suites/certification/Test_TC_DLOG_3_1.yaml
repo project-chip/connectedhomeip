@@ -15,6 +15,9 @@
 
 name: 55.3.1. [TC-DLOG-3.1] Diagnostic Logs Cluster Commands Checks[DUT-Client]
 
+PICS:
+    - DLOG.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
@@ -27,6 +30,7 @@ tests:
       disabled: true
 
     - label: "DUT sends RetrieveLogsRequest Command to TH"
+      PICS: DLOG.C.C00.Tx
       verification: |
           ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
 

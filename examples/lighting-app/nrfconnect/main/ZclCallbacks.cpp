@@ -19,6 +19,7 @@
 #include "AppTask.h"
 #include "PWMDevice.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -26,6 +27,7 @@
 
 using namespace chip;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OnOff;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -70,5 +72,17 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
+    EmberAfStatus status;
+    bool storedValue;
+
+    // Read storedValue on/off value
+    status = Attributes::OnOff::Get(endpoint, &storedValue);
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        // Set actual state to the cluster state that was last persisted
+        GetAppTask().GetLightingDevice().InitiateAction(storedValue ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+                                                        AppEvent::kEventType_Lighting, reinterpret_cast<uint8_t *>(&storedValue));
+    }
+
     GetAppTask().UpdateClusterState();
 }

@@ -34,6 +34,7 @@ chip_test_suite("data_model") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlunit_test_root}:nlunit-test",

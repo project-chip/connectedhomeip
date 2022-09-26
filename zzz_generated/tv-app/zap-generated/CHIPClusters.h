@@ -33,28 +33,37 @@ namespace Controller {
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
-    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    BindingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Binding::Id, endpoint)
+    {}
     ~BindingCluster() {}
 };
 
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
+    GeneralCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::GeneralCommissioning::Id, endpoint)
+    {}
     ~GeneralCommissioningCluster() {}
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
 {
 public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
+    NetworkCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::NetworkCommissioning::Id, endpoint)
+    {}
     ~NetworkCommissioningCluster() {}
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
+    OperationalCredentialsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OperationalCredentials::Id, endpoint)
+    {}
     ~OperationalCredentialsCluster() {}
 };
 

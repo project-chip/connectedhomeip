@@ -4,9 +4,7 @@ FROM connectedhomeip/chip-build-esp32:${VERSION}
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    ninja-build=1.10.0-1build1 \
-    git=1:2.25.1-1ubuntu3.4 \
-    libgcrypt20-dev=1.8.5-5ubuntu1.1 \
+    ninja-build git libgcrypt20-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

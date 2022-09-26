@@ -14,6 +14,9 @@
 
 name: 24.2.1. [TC-LVL-2.1] Read cluster attributes (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -28,140 +31,206 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # Temporary - see #13551
-    - label: "Reset level to 254"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
     - label: "Reads the CurrentLevel attribute"
+      PICS: LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
-          value: 254
           saveAs: CurrentLevelValue
           constraints:
-              type: uint8
-
-    - label: "Reads the RemainingTime attribute"
-      command: "readAttribute"
-      attribute: "remaining time"
-      response:
-          value: 0
-          constraints:
-              type: uint16
-
-    # For lighting Device type current level minimal value is 1
-    - label: "Reads the MinLevel attribute"
-      command: "readAttribute"
-      attribute: "min level"
-      response:
-          value: 1
-          constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 1
-
-    - label: "Reads the MaxLevel attribute"
-      command: "readAttribute"
-      attribute: "max level"
-      response:
-          constraints:
-              type: uint8
-              minValue: 1
               maxValue: 254
 
-    - label: "Reads the CurrentFrequency attribute"
+    - label: "Reads the RemainingTime attribute"
+      PICS: LVL.S.A0001
       command: "readAttribute"
-      attribute: "current frequency"
+      attribute: "RemainingTime"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Reads the MinLevel attribute"
+      PICS: LVL.S.A0002 && LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          value: 1
+          saveAs: MinLevelValue
+          constraints:
+              type: int8u
+
+    - label: "Reads the MinLevel attribute"
+      PICS: LVL.S.A0002 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: MinLevelFeatureMapNotSupportedValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label: "Reads the MaxLevel attribute"
+      PICS: LVL.S.A0003 && LVL.S.F01
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          value: 254
+          saveAs: MaxLevelValue
+          constraints:
+              type: int8u
+              minValue: MinLevelValue
+
+    - label: "Reads the MaxLevel attribute"
+      PICS: LVL.S.A0003 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          saveAs: MaxLevelFeatureMapNotSupportedValue
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: 254
+
+    - label: "Step 4b & 4C Reads the CurrentLevel attribute"
+      PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelValue
+              maxValue: MaxLevelValue
+
+    - label: "Step 4b & 4C Reads the CurrentLevel attribute"
+      PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
+
+    - label: "Reads the CurrentFrequency attribute"
+      PICS: LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the MinFrequency attribute"
+      PICS: LVL.S.A0005
       command: "readAttribute"
-      attribute: "min frequency"
+      attribute: "MinFrequency"
       response:
-          value: 0
+          saveAs: MinFrequencyValue
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the MaxFrequency attribute"
+      PICS: LVL.S.A0006
       command: "readAttribute"
-      attribute: "max frequency"
+      attribute: "MaxFrequency"
       response:
-          value: 0
+          saveAs: MaxFrequencyValue
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 7b & 7C Reads the CurrentFrequency attribute"
+      PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: MaxFrequencyValue
 
     - label: "Reads the OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
-          value: 0
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-    #Issue 13414
     - label: "Reads the OnLevel attribute "
+      PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           constraints:
-              type: uint8
+              type: int8u
+              minValue: MinLevelValue
+              maxValue: MaxLevelValue
 
-    #Issue 13414
+    - label: "Reads the OnLevel attribute "
+      PICS: LVL.S.A0011 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
+
     - label: "Reads the OnTransitionTime attribute "
+      PICS: LVL.S.A0012
       command: "readAttribute"
-      attribute: "on transition time"
+      attribute: "OnTransitionTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-    #Issue 13414
     - label: "Reads the OffTransitionTime attribute "
+      PICS: LVL.S.A0013
       command: "readAttribute"
-      attribute: "off transition time"
+      attribute: "OffTransitionTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the DefaultMoveRate attribute "
+      PICS: LVL.S.A0014
       command: "readAttribute"
-      attribute: "default move rate"
+      attribute: "DefaultMoveRate"
       response:
           constraints:
-              type: uint8
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the Options attribute "
+      PICS: LVL.S.A000f
       command: "readAttribute"
-      attribute: "options"
+      attribute: "Options"
       response:
-          value: 0
           constraints:
-              type: map8
+              type: bitmap8
 
-    #Issue 13414
     - label: "Reads the StartUpCurrentLevel attribute "
+      PICS: LVL.S.A4000
       command: "readAttribute"
-      attribute: "start up current level"
+      attribute: "StartUpCurrentLevel"
       response:
           constraints:
-              type: uint8
+              type: int8u
+              minValue: 0
+              maxValue: 255

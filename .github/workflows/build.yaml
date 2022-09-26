@@ -32,10 +32,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -57,12 +57,17 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -99,18 +104,39 @@ jobs:
             - name: Run Build Without Error Logging
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux-gcc-debug
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+            # having the job timeout.
+            #
+            # If re-enabling, some subset of this should be picked
+            #
+            # - name: Uploading objdir for debugging
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ failure() && !env.ACT }}
+            #   with:
+            #       name: crash-objdir-linux-gcc-debug
+            #       path: out/
+            #       # objdirs are big; don't hold on to them too long.
+            #       retention-days: 5
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
-        timeout-minutes: 120
+        timeout-minutes: 150
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -137,12 +163,17 @@ jobs:
             #      languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -159,31 +190,14 @@ jobs:
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 90
               run: |
-                  for BUILD_TYPE  in gcc_release clang; do
-                      case $BUILD_TYPE in
-                          "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true';;
-                      esac
-
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                      scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                      BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
-                  done
-            - name: Clang-tidy validation
-              timeout-minutes: 45
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
-                       --compile-database out/clang/compile_commands.json \
-                       check \
-                    "
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
+                  scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
+                  BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Run Tests with sanitizers
               timeout-minutes: 60
               env:
-                  LSAN_OPTIONS: detect_leaks=0
+                  LSAN_OPTIONS: detect_leaks=1
               run: |
-                  # for BUILD_TYPE in asan msan tsan ubsan; do
                     for BUILD_TYPE in asan tsan ubsan; do
                         case $BUILD_TYPE in
                             "asan") GN_ARGS='is_clang=true is_asan=true';;
@@ -192,9 +206,20 @@ jobs:
                             "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
                         esac
 
-                        scripts/build/gn_gen.sh --args="$GN_ARGS"
-                        scripts/tests/gn_tests.sh
+                        rm -rf ./out/sanitizers
+                        BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                        BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
+            - name: Clang-tidy validation
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/run-clang-tidy-on-compile-commands.py \
+                       --no-log-timestamps \
+                       --compile-database out/sanitizers/compile_commands.json \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/' \
+                       check \
+                    "
             - name: Build using build_examples.py
               timeout-minutes: 60
               run: |
@@ -211,6 +236,27 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+            # having the job timeout.
+            #
+            # If re-enabling, some subset of this should be picked
+            #
+            # - name: Uploading objdir for debugging
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ failure() && !env.ACT }}
+            #   with:
+            #       name: crash-objdir-linux
+            #       path: out/
+            #       # objdirs are big; don't hold on to them too long.
+            #       retention-days: 5
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -237,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.99
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -274,7 +320,9 @@ jobs:
             - name: Run Python library specific unit tests
               timeout-minutes: 5
               run: |
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
 
     build_darwin:
@@ -317,7 +365,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -333,6 +381,9 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 120
+              # We can't enable leak checking here in LSAN_OPTIONS, because on
+              # Darwin that's only supported with a new enough clang, and we're
+              # not building with the pigweed clang here.
               run: |
                   for BUILD_TYPE in default python_lib; do
                       case $BUILD_TYPE in
@@ -340,14 +391,10 @@ jobs:
                           # (similar to what examples-linux-standalone.yaml
                           # does), so use target_os="all" to get those picked
                           # up as part of the "unified" build.  But then to
-                          # save CI resources we want to exclude a few
-                          # redundant things:
-                          #
-                          # * the mbedtls build, since we don't really plan to
-                          #   use that on Darwin.
-                          # * the "host clang" build, which uses the pigweed
-                          #   clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_gcc_mbedtls_build=false';;
+                          # save CI resources we want to exclude the
+                          # "host clang" build, which uses the pigweed
+                          # clang.
+                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
@@ -365,7 +412,7 @@ jobs:
                     "
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/

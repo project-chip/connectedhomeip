@@ -34,7 +34,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: uint8
+              type: int8u
 
     - label: "Read current fabric index"
       command: "readAttribute"
@@ -42,7 +42,7 @@ tests:
       response:
           saveAs: ourFabricIndex
           constraints:
-              type: uint8
+              type: int8u
               # 0 is not a valid value, but past that we have no idea what the
               # other side will claim here.
               minValue: 1

@@ -170,6 +170,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ClusterErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
+    case WriteOnlyInt8u::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::UnsupportedRead).ToChipError();
+    }
     default: {
         break;
     }
@@ -797,7 +800,7 @@ bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
 {
     Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
     Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
-
+    event.fabricIndex = commandData.arg1;
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
