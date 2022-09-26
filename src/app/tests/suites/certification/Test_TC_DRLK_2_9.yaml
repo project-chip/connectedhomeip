@@ -197,45 +197,15 @@ tests:
               - name: "nextCredentialIndex"
                 value: 3
 
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: 1
-              - name: "userStatus"
-                value: null
-              - name: "userType"
-                value: null
-      response:
-          values:
-              - name: "status"
-                value: 0x02
-              - name: "userIndex"
-                value: null
-              - name: "nextCredentialIndex"
-                value: 2
-
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
-          Set Credential Response command with response as OCCUPIED if the
-          CredentialIndex is repeated"
+          Set Credential Response command with status as DUPLICATE or OCCUPIED"
       verification: |
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 1 null null  1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
-          [1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [[1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
           [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
           [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
           [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
@@ -252,41 +222,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: 1
-              - name: "userStatus"
-                value: null
-              - name: "userType"
-                value: null
-      response:
-          values:
-              - name: "status"
-                value: 0x02
-              - name: "userIndex"
-                value: null
-              - name: "nextCredentialIndex"
-                value: 2
-
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123457 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 12345 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
@@ -308,34 +249,6 @@ tests:
                 value: "y"
 
     #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 2
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 3 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: 1
-              - name: "userStatus"
-                value: null
-              - name: "userType"
-                value: null
-      response:
-          values:
-              - name: "status"
-                value: 0x02
-              - name: "userIndex"
-                value: null
-              - name: "nextCredentialIndex"
-                value: 4
-
-    #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with response as OCCUPIED if the
@@ -343,7 +256,7 @@ tests:
       verification: |
           Mark as not applicable and proceed to next step
 
-          ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 1234567 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
 

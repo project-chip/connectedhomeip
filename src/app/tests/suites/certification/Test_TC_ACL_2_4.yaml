@@ -24,6 +24,19 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Pre-conditions"
+      verification: |
+          1.N1 is the node ID of TH1
+
+          2 .CAT1 is a valid CAT with arbitrary ID and arbitrary version
+
+          3.CAT2 is a valid CAT with arbitrary ID and arbitrary version
+
+          4.CAT3 is a valid CAT with arbitrary ID and arbitrary version
+
+          5.CAT4 is a valid CAT with arbitrary ID and arbitrary version
+      disabled: true
+
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
