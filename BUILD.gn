@@ -43,6 +43,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
+
+    # Build the Linux all clusters app example with default group
+    chip_build_all_clusters_app = false
   }
 
   if (enable_fuzz_test_targets) {
@@ -204,13 +207,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         }
         deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
-      if (chip_can_build_all_clusters_app) {
-        if (is_libfuzzer) {
-          deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app-fuzzing" ]
-        } else {
-          deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app" ]
-        }
-      }
     }
 
     if (current_os == "android") {
@@ -224,6 +220,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (build_tv_casting_common_a) {
       deps += [ "${chip_root}/examples/tv-casting-app/tv-casting-common:tvCastingCommon" ]
+    }
+
+    if (chip_build_all_clusters_app) {
+      if (is_libfuzzer) {
+        deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app-fuzzing" ]
+      } else {
+        deps += [
+          "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app",
+        ]
+      }
     }
   }
 

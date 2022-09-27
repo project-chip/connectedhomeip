@@ -93,7 +93,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
 if [ "$skip_gn" == false ]; then
-    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_can_build_all_clusters_app=true'
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_build_all_clusters_app=true'
     ninja -C "$OUTPUT_ROOT"
 fi
 
