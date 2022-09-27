@@ -32,6 +32,7 @@ network.
 -   [Tinycrypt ECC operations](#tinycrypt)
     -   [Building steps](#tinycrypt-building-steps)
 -   [Low power](#low-power)
+
     -   [Known issues](#low-power-issues)
 
     </hr>
@@ -173,7 +174,8 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
+-   Download
+    [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
@@ -219,14 +221,15 @@ The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
 ## Known issues
 
--   When using Secure element and cross-compiling on Linux, log messages from the Plug&Trust middleware
-    stack may not echo to the console.
+-   When using Secure element and cross-compiling on Linux, log messages from
+    the Plug&Trust middleware stack may not echo to the console.
 
 <a name="manufacturing"></a>
 
 ## Manufacturing data
 
-See [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+See
+[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
 <a name="flashdebug"></a>
 
@@ -332,7 +335,6 @@ In order to use the tinycrypt ecc operations, use the following build arguments:
 To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
 and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
 implementation from `NXPmicro/mbedtls` library will be used.
-
 
 <a name="low-power"></a>
 
