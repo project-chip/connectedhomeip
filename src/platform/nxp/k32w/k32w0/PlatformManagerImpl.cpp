@@ -52,6 +52,10 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+extern "C" void InitLowPower();
+#endif
+
 #if defined(MBEDTLS_USE_TINYCRYPT)
 osaMutexId_t PlatformManagerImpl::rngMutexHandle = NULL;
 #endif
@@ -78,10 +82,17 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     }
     RNG_SetPseudoRandomNoSeed(NULL);
 
+    SecLib_Init();
+
     TMR_Init();
 
     /* Used for OT initializations */
     otSysInit(1, argv);
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    /* Low Power Init */
+    InitLowPower();
+#endif
 
 exit:
     return err;
@@ -129,6 +140,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
         goto exit;
     }
+
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 

@@ -83,6 +83,7 @@ k32w0_executable("lock_app") {
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",

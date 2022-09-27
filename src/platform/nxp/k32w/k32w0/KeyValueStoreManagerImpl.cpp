@@ -99,7 +99,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "KVS, error in getting the value of Matter key [%s]. Key not found in persistent storage.",
+        ChipLogProgress(DeviceLayer, "KVS, Matter key [%s] not found in persistent storage.",
                         key);
     }
 

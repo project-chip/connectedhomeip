@@ -27,13 +27,15 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-
+#include <src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h>
 #include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
+
+#include <DeviceInfoProviderImpl.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -56,6 +58,7 @@
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
+#include "CHIPProjectConfig.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -72,6 +75,7 @@ static LEDWidget sLightLED;
 
 static bool sIsThreadProvisioned = false;
 static bool sHaveBLEConnections  = false;
+static bool sIsDnssdPlatformInitialized = false;
 
 static uint32_t eventMask = 0;
 
@@ -85,12 +89,22 @@ using namespace chip;
 
 AppTask AppTask::sAppTask;
 
-static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::OnTriggerEffect,
-                              // Use invalid value for identifiers to enable TriggerEffect command
-                              // to stop Identify command for each effect
-                              (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
-                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
+// This key is for testing/certification only and should not be used in production devices.
+// For production devices this key must be provided from factory data.
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
+static Identify gIdentify = {
+    chip::EndpointId{1},
+    AppTask::OnIdentifyStart,
+    AppTask::OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+	AppTask::OnTriggerEffect,
+	//Use invalid value for identifiers to enable TriggerEffect command
+	//to stop Identify command for each effect
+	(EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
+	EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT
+};
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -122,22 +136,30 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
+// Initialize device attestation config
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+    // Initialize factory data provider
+    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&mK32W0FactoryDataProvider);
+#endif
+    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+#else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    PlatformMgr().ScheduleWork(InitOTA, 0);
-#endif
-
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+#endif
 
     /* HW init leds */
     LED_Init();
@@ -185,8 +207,20 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s", currentSoftwareVer);
 
-    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
-
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    if (gImageProcessor.IsFirstImageRun())
+    {
+        // If DNS-SD initialization was captured by MatterEventHandler, then
+        // OTA initialization will be started as soon as possible. Otherwise,
+        // a periodic timer is started until the DNS-SD initialization event
+        // is received. Configurable delay: CHIP_DEVICE_CONFIG_INIT_OTA_DELAY
+        AppTask::OnScheduleInitOTA(nullptr, nullptr);
+    }
+    else
+    {
+        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
+    }
+#endif
     return err;
 }
 
@@ -205,7 +239,13 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
+    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
+
     // Init ZCL Data Model and start server
+    static DefaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -266,7 +306,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             PlatformMgr().UnlockChipStack();
         }
 
-        // Update the status LED if factory reset has not been initiated.
+        // Update the status LED if factory reset or identify process have not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
         //
@@ -469,6 +509,8 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
+        actor = AppEvent::kEventType_Button;
+
         if (LightingMgr().IsTurnedOff())
         {
             action = LightingManager::TURNON_ACTION;
@@ -524,6 +566,27 @@ void AppTask::PostOTAResume()
     event.Handler = OTAResumeEventHandler;
     sAppTask.PostEvent(&event);
 }
+
+void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState)
+{
+    if (sIsDnssdPlatformInitialized)
+    {
+        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
+    }
+    else
+    {
+        CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
+            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY),
+            AppTask::OnScheduleInitOTA,
+            nullptr
+        );
+
+        if (error != CHIP_NO_ERROR)
+        {
+            K32W_LOG("Failed to schedule OTA initialization timer.");
+        }
+    }
+}
 #endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
@@ -536,7 +599,11 @@ void AppTask::BleHandler(AppEvent * aEvent)
         K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
         return;
     }
+    PlatformMgr().ScheduleWork(AppTask::BleStartAdvertising, 0);
+}
 
+void AppTask::BleStartAdvertising(intptr_t arg)
+{
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
@@ -557,7 +624,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
     {
@@ -575,6 +642,12 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
     if (event->Type == DeviceEventType::kOtaStateChanged && event->OtaStateChanged.newState == kOtaSpaceAvailable)
     {
         sAppTask.PostOTAResume();
+    }
+
+    if (event->Type == DeviceEventType::kDnssdPlatformInitialized)
+    {
+        K32W_LOG("Dnssd platform initialized.");
+        sIsDnssdPlatformInitialized = true;
     }
 #endif
 
@@ -774,7 +847,8 @@ void AppTask::OnTriggerEffect(Identify * identify)
         break;
 
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
+        ChipLogProgress(Zcl,"Channel Change effect not supported, using effect %d",
+				EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
         timerDelay = 2;
         break;
 
@@ -879,6 +953,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);
+    LightingMgr().SetState(onoffAttrValue);
 }
 
 extern "C" void OTAIdleActivities(void)

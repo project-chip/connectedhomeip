@@ -27,6 +27,7 @@
 
 #include "fsl_os_abstraction.h"
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include "fsl_os_abstraction.h"
 
 namespace chip {
 namespace DeviceLayer {
