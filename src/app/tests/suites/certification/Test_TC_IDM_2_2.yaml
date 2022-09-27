@@ -419,7 +419,7 @@ tests:
       verification: |
           DUT implementation required to verify read an attribute of data type Float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -581,7 +581,7 @@ tests:
           which is not readable. DUT responds with the report data action."
       verification: |
           DUT implementation required to verify read an attribute which is not having a read access
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -1044,7 +1044,7 @@ tests:
       PICS: MCORE.IDM.S.LargeData
       verification: |
           DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
