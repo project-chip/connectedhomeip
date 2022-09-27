@@ -18,16 +18,18 @@
 package chip.devicecontroller.model;
 
 import androidx.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
 /** Class for tracking CHIP cluster state in a hierarchical manner. */
 public final class ClusterState {
   private Map<Long, AttributeState> attributes;
-  private Map<Long, EventState> events;
+  private Map<Long, ArrayList<EventState>> events;
   private Optional<Integer> dataVersion;
 
-  public ClusterState(Map<Long, AttributeState> attributes, Map<Long, EventState> events) {
+  public ClusterState(
+      Map<Long, AttributeState> attributes, Map<Long, ArrayList<EventState>> events) {
     this.attributes = attributes;
     this.events = events;
     this.dataVersion = Optional.empty();
@@ -37,7 +39,7 @@ public final class ClusterState {
     return attributes;
   }
 
-  public Map<Long, EventState> getEventStates() {
+  public Map<Long, ArrayList<EventState>> getEventStates() {
     return events;
   }
 
@@ -60,12 +62,12 @@ public final class ClusterState {
   }
 
   /**
-   * Convenience utility for getting an {@code EventState}.
+   * Convenience utility for getting an {@code ArrayList<EventState> }.
    *
-   * @return the {@code EventState} for the specified id, or null if not found.
+   * @return the {@code ArrayList<EventState>} for the specified id, or null if not found.
    */
   @Nullable
-  public EventState getEventState(long eventId) {
+  public ArrayList<EventState> getEventState(long eventId) {
     return events.get(eventId);
   }
 
@@ -82,12 +84,16 @@ public final class ClusterState {
           builder.append("\n");
         });
     events.forEach(
-        (eventId, eventState) -> {
-          builder.append("Event ");
-          builder.append(eventId);
-          builder.append(": ");
-          builder.append(eventState.getValue() == null ? "null" : eventState.getValue().toString());
-          builder.append("\n");
+        (eventId, eventStates) -> {
+          eventStates.forEach(
+              (eventState) -> {
+                builder.append("Event ");
+                builder.append(eventId);
+                builder.append(": ");
+                builder.append(
+                    eventState.getValue() == null ? "null" : eventState.getValue().toString());
+                builder.append("\n");
+              });
         });
     return builder.toString();
   }
