@@ -41,7 +41,7 @@ osaMutexId_t K32WConfig::pdmMutexHandle = NULL;
 #if CHIP_DEVICE_LAYER_ENABLE_PDM_LOGS
 static void PDM_SystemCallback(uint32_t number, PDM_eSystemEventCode code)
 {
-    uint8_t capacity = PDM_u8GetSegmentCapacity();
+    uint8_t capacity  = PDM_u8GetSegmentCapacity();
     uint8_t occupancy = PDM_u8GetSegmentOccupancy();
     ChipLogProgress(DeviceLayer, "[PDM]Event (number, code): (%lu, %d)", number, code);
     ChipLogProgress(DeviceLayer, "[PDM]Capacity: %hhu", capacity);
@@ -145,8 +145,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
         err = RamStorage::Write(key, (uint8_t *) str, strLen);
         SuccessOrExit(err);
         buffer = RamStorage::GetBuffer();
-        status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer,
-                                               buffer->ramBufferLen + kRamDescHeaderSize);
+        status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
     }
 
 exit:
@@ -177,8 +176,7 @@ CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
     SuccessOrExit(err);
 
     buffer = RamStorage::GetBuffer();
-    status =
-        PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
+    status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatusToChipError(status));
 
 exit:
@@ -194,10 +192,9 @@ bool K32WConfig::ConfigValueExists(Key key)
 
     if (ValidConfigKey(key))
     {
-        err = RamStorage::Read(key, 0, NULL, &sizeToRead);
+        err   = RamStorage::Read(key, 0, NULL, &sizeToRead);
         found = (err == CHIP_NO_ERROR && sizeToRead != 0);
     }
-
 
     return found;
 }
@@ -209,7 +206,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     RamStorage::Buffer buffer;
 
     MutexLock(pdmMutexHandle, osaWaitForever_c);
-    FactoryResetConfigInternal(kMinConfigKey_ChipCounter,kMaxConfigKey_ChipCounter);
+    FactoryResetConfigInternal(kMinConfigKey_ChipCounter, kMaxConfigKey_ChipCounter);
     FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
     FactoryResetConfigInternal(kMinConfigKey_KVSKey, kMaxConfigKey_KVSKey);
     FactoryResetConfigInternal(kMinConfigKey_KVSValue, kMaxConfigKey_KVSValue);

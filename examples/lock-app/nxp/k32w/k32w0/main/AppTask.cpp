@@ -21,24 +21,24 @@
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <DeviceInfoProviderImpl.h>
-#include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
-#include "PWR_Interface.h"
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
+#include "PWR_Interface.h"
 #include "app_config.h"
 
 #if CHIP_CRYPTO_HSM
@@ -97,13 +97,13 @@ CHIP_ERROR AppTask::Init()
 
 // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-	// Initialize factory data provider
-	ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
+    // Initialize factory data provider
+    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-	SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
 #endif
-	SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-	SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -184,7 +184,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 

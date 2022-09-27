@@ -24,11 +24,11 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h>
-#include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -73,8 +73,8 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned = false;
-static bool sHaveBLEConnections  = false;
+static bool sIsThreadProvisioned        = false;
+static bool sHaveBLEConnections         = false;
 static bool sIsDnssdPlatformInitialized = false;
 
 static uint32_t eventMask = 0;
@@ -94,17 +94,12 @@ AppTask AppTask::sAppTask;
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
-static Identify gIdentify = {
-    chip::EndpointId{1},
-    AppTask::OnIdentifyStart,
-    AppTask::OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-	AppTask::OnTriggerEffect,
-	//Use invalid value for identifiers to enable TriggerEffect command
-	//to stop Identify command for each effect
-	(EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
-	EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT
-};
+static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
+                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::OnTriggerEffect,
+                              // Use invalid value for identifiers to enable TriggerEffect command
+                              // to stop Identify command for each effect
+                              (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
+                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -239,7 +234,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
@@ -576,10 +571,7 @@ void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appSta
     else
     {
         CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY),
-            AppTask::OnScheduleInitOTA,
-            nullptr
-        );
+            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY), AppTask::OnScheduleInitOTA, nullptr);
 
         if (error != CHIP_NO_ERROR)
         {
@@ -847,8 +839,7 @@ void AppTask::OnTriggerEffect(Identify * identify)
         break;
 
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl,"Channel Change effect not supported, using effect %d",
-				EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
         timerDelay = 2;
         break;
 

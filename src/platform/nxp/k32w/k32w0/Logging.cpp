@@ -170,7 +170,6 @@ extern "C" void ENFORCE_FORMAT(1, 2) LwIPLog(const char * msg, ...)
     GenericLog(msg, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 #endif
-
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -193,7 +192,6 @@ extern "C" void ENFORCE_FORMAT(3, 4) otPlatLog(otLogLevel aLogLevel, otLogRegion
     GenericLog(aFormat, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 #endif
-
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

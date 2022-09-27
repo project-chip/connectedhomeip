@@ -22,11 +22,11 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "LightingManager.h"
 #include "K32W0FactoryDataProvider.h"
+#include "LightingManager.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"

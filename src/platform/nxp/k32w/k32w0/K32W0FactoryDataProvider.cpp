@@ -21,13 +21,13 @@
 #include <credentials/examples/ExamplePAI.h>
 #endif
 
+#include "OtaUtils.h"
+#include "fsl_flash.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
-#include "OtaUtils.h"
-#include "fsl_flash.h"
 
 #include "K32W0FactoryDataProvider.h"
 
@@ -58,49 +58,46 @@ K32W0FactoryDataProvider & K32W0FactoryDataProvider::GetDefaultInstance()
 
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSalt_MaxBase64Len =
-    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-static constexpr size_t kMaxCertLen = 600;
-static constexpr size_t kMaxKeyLen = 32;
+static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+static constexpr size_t kMaxCertLen               = 600;
+static constexpr size_t kMaxKeyLen                = 32;
 
-static constexpr size_t kVerifierId = 1;
-static constexpr size_t kSaltId = 2;
-static constexpr size_t kIcId = 3;
-static constexpr size_t kDacPrivateKeyId = 4;
+static constexpr size_t kVerifierId       = 1;
+static constexpr size_t kSaltId           = 2;
+static constexpr size_t kIcId             = 3;
+static constexpr size_t kDacPrivateKeyId  = 4;
 static constexpr size_t kDacCertificateId = 5;
 static constexpr size_t kPaiCertificateId = 6;
-static constexpr size_t kDiscriminatorId = 7;
+static constexpr size_t kDiscriminatorId  = 7;
 
 static constexpr size_t kMaxId = kDiscriminatorId;
 
 static uint16_t maxLengths[kMaxId + 1];
 static uint32_t factoryDataActualSize = 0;
 
-typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes,
-                                                     uint32_t address,
-                                                     uint8_t *pInbuf);
+typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
 
-static uint8_t ReadDataMemCpy(uint16_t num, uint32_t src, uint8_t *dst)
+static uint8_t ReadDataMemCpy(uint16_t num, uint32_t src, uint8_t * dst)
 {
-    memcpy(dst, (void*)(src), num);
+    memcpy(dst, (void *) (src), num);
     return 0;
 }
 
-CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length)
+CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length)
 {
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
-    uint32_t factoryDataStartAddress = (uint32_t)__FACTORY_DATA_START;
-    uint32_t addr = factoryDataStartAddress;
-    OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData)ReadDataMemCpy;
-    uint8_t type = 0;
+    CHIP_ERROR err                               = CHIP_ERROR_NOT_FOUND;
+    uint32_t factoryDataStartAddress             = (uint32_t) __FACTORY_DATA_START;
+    uint32_t addr                                = factoryDataStartAddress;
+    OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) ReadDataMemCpy;
+    uint8_t type                                 = 0;
 
-    while (addr < (factoryDataStartAddress + (uint32_t)__FACTORY_DATA_SIZE))
+    while (addr < (factoryDataStartAddress + (uint32_t) __FACTORY_DATA_SIZE))
     {
         if (gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash(sizeof(type), addr, (uint8_t*)&type, NULL, pFunctionEepromRead) ||
+                OtaUtils_ReadFromInternalFlash(sizeof(type), addr, (uint8_t *) &type, NULL, pFunctionEepromRead) ||
             gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash(sizeof(length), addr + 1, (uint8_t*)&length, NULL, pFunctionEepromRead))
-        	break;
+                OtaUtils_ReadFromInternalFlash(sizeof(length), addr + 1, (uint8_t *) &length, NULL, pFunctionEepromRead))
+            break;
 
         if ((type > kMaxId) || (length > maxLengths[type]))
         {
@@ -115,9 +112,8 @@ CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, ui
             }
             else
             {
-                if (gOtaUtilsSuccess_c !=
-                    OtaUtils_ReadFromInternalFlash(length, addr + 3, pBuf, NULL, pFunctionEepromRead))
-                break;
+                if (gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash(length, addr + 3, pBuf, NULL, pFunctionEepromRead))
+                    break;
 
                 err = CHIP_NO_ERROR;
             }
@@ -136,13 +132,13 @@ CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, ui
 CHIP_ERROR K32W0FactoryDataProvider::Init()
 {
 
-	maxLengths[kVerifierId]       = kSpake2pSerializedVerifier_MaxBase64Len;
-	maxLengths[kSaltId]           = kSpake2pSalt_MaxBase64Len;
-	maxLengths[kIcId]             = 4;
-	maxLengths[kDacPrivateKeyId]  = kMaxKeyLen;
-	maxLengths[kDacCertificateId] = kMaxCertLen;
-	maxLengths[kPaiCertificateId] = kMaxCertLen;
-	maxLengths[kDiscriminatorId]  = 4;
+    maxLengths[kVerifierId]       = kSpake2pSerializedVerifier_MaxBase64Len;
+    maxLengths[kSaltId]           = kSpake2pSalt_MaxBase64Len;
+    maxLengths[kIcId]             = 4;
+    maxLengths[kDacPrivateKeyId]  = kMaxKeyLen;
+    maxLengths[kDacCertificateId] = kMaxCertLen;
+    maxLengths[kPaiCertificateId] = kMaxCertLen;
+    maxLengths[kDiscriminatorId]  = 4;
 
     return CHIP_NO_ERROR;
 }
@@ -189,7 +185,7 @@ CHIP_ERROR K32W0FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     uint8_t certBuf[kMaxCertLen];
     MutableByteSpan dacCertSpan(certBuf);
     uint16_t certificateSize = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
 
     err = SearchForId(kDacCertificateId, dacCertSpan.data(), dacCertSpan.size(), certificateSize);
     ReturnErrorOnFailure(err);
@@ -205,7 +201,8 @@ CHIP_ERROR K32W0FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     ReturnErrorOnFailure(SearchForId(kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize));
     dacPrivateKeySpan.reduce_size(keySize);
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()), ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
+                                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
@@ -214,24 +211,24 @@ CHIP_ERROR K32W0FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
 CHIP_ERROR K32W0FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     uint32_t discriminator = 0;
-    uint16_t temp = 0;
+    uint16_t temp          = 0;
 
-    ReturnErrorOnFailure(SearchForId(kDiscriminatorId, (uint8_t*)&discriminator, sizeof(discriminator), temp));
+    ReturnErrorOnFailure(SearchForId(kDiscriminatorId, (uint8_t *) &discriminator, sizeof(discriminator), temp));
     setupDiscriminator = (uint16_t)(discriminator & 0x0000FFFF);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider:: SetSetupDiscriminator(uint16_t setupDiscriminator)
+CHIP_ERROR K32W0FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminator)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-	uint16_t temp = 0;
+    uint16_t temp = 0;
 
-    return SearchForId(kIcId, (uint8_t*)&iterationCount, sizeof(iterationCount), temp);
+    return SearchForId(kIcId, (uint8_t *) &iterationCount, sizeof(iterationCount), temp);
 
     return CHIP_NO_ERROR;
 }
@@ -241,7 +238,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
     uint16_t saltB64Len                     = 0;
 
-    ReturnErrorOnFailure(SearchForId(kSaltId, (uint8_t*)(&saltB64[0]), sizeof(saltB64), saltB64Len));
+    ReturnErrorOnFailure(SearchForId(kSaltId, (uint8_t *) (&saltB64[0]), sizeof(saltB64), saltB64Len));
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
     ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -255,7 +252,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifi
 {
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     uint16_t verifierB64Len                                   = 0;
-    ReturnErrorOnFailure(SearchForId(kVerifierId, (uint8_t*)&verifierB64[0], sizeof(verifierB64), verifierB64Len));
+    ReturnErrorOnFailure(SearchForId(kVerifierId, (uint8_t *) &verifierB64[0], sizeof(verifierB64), verifierB64Len));
 
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
     ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);

@@ -975,8 +975,9 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
             {
                 if (msg->data.u8 == BLE_KW_MSG_2M_UPGRADE_ERROR)
                 {
-                    ChipLogProgress(DeviceLayer, "Warning. BLE is using 1Mbps. Couldn't upgrade to 2Mbps, "
-                        "maybe the peer is missing 2Mbps support.");
+                    ChipLogProgress(DeviceLayer,
+                                    "Warning. BLE is using 1Mbps. Couldn't upgrade to 2Mbps, "
+                                    "maybe the peer is missing 2Mbps support.");
                 }
                 else
                 {
@@ -1257,8 +1258,8 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
         ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
 
-        (void)Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c,
-                           gConnPhyUpdateReqRxPhySettings_c, (uint16_t)gConnPhyUpdateReqPhyOptions_c);
+        (void) Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c, gConnPhyUpdateReqRxPhySettings_c,
+                            (uint16_t) gConnPhyUpdateReqPhyOptions_c);
 #endif
 
         /* Notify App Task that the BLE is connected now */

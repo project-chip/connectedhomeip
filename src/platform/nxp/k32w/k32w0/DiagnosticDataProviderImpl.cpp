@@ -31,7 +31,7 @@
 #include <lwip/tcpip.h>
 #endif
 
-extern "C" void xPortResetHeapMinimumEverFreeHeapSize( void );
+extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
 
 #include <openthread/platform/entropy.h>
 
@@ -223,7 +223,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
-    *netifpp = ifp;
+    *netifpp             = ifp;
     return CHIP_NO_ERROR;
 }
 

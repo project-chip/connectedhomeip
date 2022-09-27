@@ -33,9 +33,9 @@
 
 #ifdef K32WMCM_APP_BUILD
 #define string string_shadow
+#include "AppApi.h"
 #include "MMAC.h"
 #include "mac_sap.h"
-#include "AppApi.h"
 #undef string
 #endif
 
@@ -53,7 +53,7 @@ uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
 extern "C" void sched_enable();
 
-#define NORMAL_PWR_LIMIT        10    /* dBm */
+#define NORMAL_PWR_LIMIT 10 /* dBm */
 
 #ifdef K32WMCM_APP_BUILD
 /* Must be called before zps_eAplAfInit() */
@@ -63,7 +63,7 @@ void APP_SetHighTxPowerMode();
 void APP_SetMaxTxPower();
 
 #undef HIGH_TX_PWR_LIMIT
-#define HIGH_TX_PWR_LIMIT 15    /* dBm */
+#define HIGH_TX_PWR_LIMIT 15 /* dBm */
 /* High Tx power */
 void APP_SetHighTxPowerMode()
 {

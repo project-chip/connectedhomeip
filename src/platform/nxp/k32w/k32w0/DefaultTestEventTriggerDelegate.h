@@ -25,7 +25,7 @@ namespace chip {
 class DefaultTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
-    static constexpr uint64_t kQueryTrigger         = 1234;
+    static constexpr uint64_t kQueryTrigger = 1234;
 
     explicit DefaultTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
 

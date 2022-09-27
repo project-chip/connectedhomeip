@@ -59,7 +59,7 @@ uint64_t GetClock_Monotonic(void)
 
 uint64_t GetClock_MonotonicMS(void)
 {
-    return (otPlatTimeGet()/1000);
+    return (otPlatTimeGet() / 1000);
 }
 
 uint64_t GetClock_MonotonicHiRes(void)
@@ -91,7 +91,6 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
     aCurTime = Clock::Milliseconds64((sBootTimeUS + GetClock_Monotonic()) / 1000);
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {

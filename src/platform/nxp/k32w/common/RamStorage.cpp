@@ -26,7 +26,7 @@ RamStorage::Buffer RamStorage::sBuffer = nullptr;
 CHIP_ERROR RamStorage::Init(uint16_t aNvmId, uint16_t aInitialSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    sBuffer = getRamBuffer(aNvmId, aInitialSize);
+    sBuffer        = getRamBuffer(aNvmId, aInitialSize);
     if (!sBuffer)
     {
         err = CHIP_ERROR_NO_MEMORY;
@@ -44,7 +44,7 @@ void RamStorage::FreeBuffer()
     }
 }
 
-CHIP_ERROR RamStorage::Read(uint16_t aKey, int aIndex, uint8_t* aValue, uint16_t* aValueLength)
+CHIP_ERROR RamStorage::Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
 {
     CHIP_ERROR err;
     rsError status;
@@ -56,7 +56,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t* aValue, uint16_t aValueLength)
+CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
     CHIP_ERROR err;
     rsError status = RS_ERROR_NONE;
@@ -71,7 +71,6 @@ CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t* aValue, uint16_t aVal
 
 exit:
     return err;
-
 }
 
 CHIP_ERROR RamStorage::Delete(uint16_t aKey, int aIndex)
@@ -100,4 +99,4 @@ CHIP_ERROR RamStorage::MapStatusToChipError(rsError rsStatus)
     return err;
 }
 
-}
+} // namespace chip::DeviceLayer::Internal

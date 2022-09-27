@@ -289,11 +289,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             // queued actions, e.g. sending events to a subscription
             SystemLayer().StartTimer(
                 chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-                [](chip::System::Layer *, void *) {
-                    OTA_SetNewImageFlag();
-                },
-                nullptr
-            );
+                [](chip::System::Layer *, void *) { OTA_SetNewImageFlag(); }, nullptr);
         }
         else
         {

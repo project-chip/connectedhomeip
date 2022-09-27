@@ -22,11 +22,11 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/k32w/common/RamStorage.h>
 #include "PDM.h"
 #include "fsl_os_abstraction.h"
 #include "pdm_ram_storage_glue.h"
 #include "ram_storage.h"
+#include <platform/nxp/k32w/common/RamStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -116,7 +116,7 @@ public:
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
     template <typename TValue>
-    static CHIP_ERROR ReadConfigValue(Key key, TValue& val);
+    static CHIP_ERROR ReadConfigValue(Key key, TValue & val);
     template <typename TValue>
     static CHIP_ERROR WriteConfigValue(Key key, TValue val);
     template <typename TValue>
@@ -169,13 +169,13 @@ inline constexpr uint8_t K32WConfig::GetRecordKey(Key key)
 }
 
 template <typename TValue>
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, TValue& val)
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, TValue & val)
 {
     CHIP_ERROR err;
     uint16_t valLen = sizeof(val);
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-    err = RamStorage::Read(key, 0, (uint8_t*)&val, &valLen);
+    err = RamStorage::Read(key, 0, (uint8_t *) &val, &valLen);
     SuccessOrExit(err);
 
 exit:
@@ -191,12 +191,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, TValue val)
 
     MutexLock(pdmMutexHandle, osaWaitForever_c);
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-    err = RamStorage::Write(key, (uint8_t*)&val, sizeof(TValue));
+    err = RamStorage::Write(key, (uint8_t *) &val, sizeof(TValue));
     SuccessOrExit(err);
 
     buffer = RamStorage::GetBuffer();
-    status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer,
-                                           buffer->ramBufferLen + kRamDescHeaderSize);
+    status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatusToChipError(status));
 
 exit:
@@ -213,14 +212,13 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, TValue val)
 
     MutexLock(pdmMutexHandle, osaWaitForever_c);
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-    err = RamStorage::Write(key, (uint8_t*)&val, sizeof(TValue));
+    err = RamStorage::Write(key, (uint8_t *) &val, sizeof(TValue));
     SuccessOrExit(err);
     // Interrupts are disabled to ensure there is no context switch during the actual
     // writing, thus avoiding race conditions.
     OSA_InterruptDisable();
     buffer = RamStorage::GetBuffer();
-    status = PDM_eSaveRecordData(kNvmIdChipConfigData, buffer,
-                                 buffer->ramBufferLen + kRamDescHeaderSize);
+    status = PDM_eSaveRecordData(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
     OSA_InterruptEnable();
     SuccessOrExit(err = MapPdmStatusToChipError(status));
 

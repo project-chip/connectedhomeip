@@ -25,14 +25,14 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 
-#include "PWR_Configuration.h"
-#include "PWR_Interface.h"
-#include "app_dual_mode_low_power.h"
-#include "app_dual_mode_switch.h"
-#include "OtaSupport.h"
 #include "Keyboard.h"
 #include "MacSched.h"
+#include "OtaSupport.h"
+#include "PWR_Configuration.h"
+#include "PWR_Interface.h"
 #include "RNG_Interface.h"
+#include "app_dual_mode_low_power.h"
+#include "app_dual_mode_switch.h"
 #include "k32w0-chip-mbedtls-config.h"
 #include <AppTask.h>
 
@@ -74,7 +74,7 @@ static sDualModeAppStates dualModeStates;
 /* 15.4 warm time must be > 0, so this value will be
  * updated when 15.4 is initialized for the first time
  */
-constexpr uint16_t kThreadWarmNotInitializedValue  = 0;
+constexpr uint16_t kThreadWarmNotInitializedValue = 0;
 
 extern "C" void otTaskletsSignalPending(otInstance * p_instance);
 
@@ -85,7 +85,7 @@ void InitLowPower()
     PWR_Init();
 
     /* Internal - MATTER-303: keep in retention the entire RAM1 for the moment */
-    PWR_vAddRamRetention((uint32_t)0x4020000, 0x10000);
+    PWR_vAddRamRetention((uint32_t) 0x4020000, 0x10000);
 
     PWR_RegisterLowPowerExitCallback(dm_switch_wakeupCallBack);
     PWR_RegisterLowPowerEnterCallback(dm_switch_preSleepCallBack);
@@ -118,7 +118,7 @@ extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, app
     event.param   = param;
 
 #if ENABLE_LOW_POWER_LOGS
-    K32W_LOG("App_PostCallbackMessage %d", (uint32_t)param);
+    K32W_LOG("App_PostCallbackMessage %d", (uint32_t) param);
 #endif
 
     GetAppTask().PostEvent(&event);
@@ -227,8 +227,8 @@ static void dm_switch_preSleepCallBack(void)
 
     EEPROM_DeInit();
     /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */
-    vOptimizeConsumption((IOCON_FUNC0 | (0x2 << 3) | IOCON_ANALOG_EN), \
-                               (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN));
+    vOptimizeConsumption((IOCON_FUNC0 | (0x2 << 3) | IOCON_ANALOG_EN),
+                         (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN));
 
     /* disable SHA clock */
     SHA_ClkDeinit(SHA_INSTANCE);
@@ -267,7 +267,7 @@ void dm_switch_init15_4AfterWakeUp(void)
         OSA_InstallIntHandler(ZIGBEE_MODEM_IRQn, vMMAC_IntHandlerPhy);
 
         /* Radio must be re-enabled after waking up from sleep.
-        * The module is completely disabled in power down mode */
+         * The module is completely disabled in power down mode */
         otPlatRadioEnable(NULL);
         sched_enable();
 

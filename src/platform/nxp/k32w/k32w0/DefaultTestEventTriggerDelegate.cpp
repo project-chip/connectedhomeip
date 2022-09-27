@@ -32,8 +32,8 @@ CHIP_ERROR DefaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTri
 {
     if (eventTrigger == kQueryTrigger)
     {
-    	ChipLogProgress(DeviceLayer, "DefaultTestEventTriggerDelegate: event triggered");
-    	return CHIP_NO_ERROR;
+        ChipLogProgress(DeviceLayer, "DefaultTestEventTriggerDelegate: event triggered");
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_INVALID_ARGUMENT;

@@ -166,7 +166,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        TickType_t xTicksToWait = pdMS_TO_TICKS(10);
+        TickType_t xTicksToWait  = pdMS_TO_TICKS(10);
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, xTicksToWait);
         while (eventReceived == pdTRUE)
         {
@@ -181,7 +181,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 

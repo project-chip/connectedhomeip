@@ -70,12 +70,12 @@ void ThreadStackManagerImpl::ProcessThreadActivity()
 {
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-   if (isThreadInitialized())
+    if (isThreadInitialized())
 #endif
-   {
-       otTaskletsProcess(OTInstance());
-       otSysProcessDrivers(OTInstance());
-   }
+    {
+        otTaskletsProcess(OTInstance());
+        otSysProcessDrivers(OTInstance());
+    }
 }
 
 bool ThreadStackManagerImpl::IsInitialized()
