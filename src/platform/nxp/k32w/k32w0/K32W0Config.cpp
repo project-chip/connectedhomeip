@@ -72,7 +72,7 @@ exit:
         {
             OSA_MutexDestroy(pdmMutexHandle);
         }
-        
+
         RamStorage::FreeBuffer();
     }
     return err;

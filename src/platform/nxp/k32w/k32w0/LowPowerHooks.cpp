@@ -186,7 +186,7 @@ void vOptimizeConsumption(uint32_t u32PIOvalue, uint32_t u32SkipIO)
                 IOCON_PinMuxSet(IOCON, 0, i, u32PIOvalue);
             }
         }
-    } 
+    }
 
     if (u8KeepIOclk == 0)
     {

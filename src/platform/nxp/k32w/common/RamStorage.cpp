@@ -68,7 +68,7 @@ CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t* aValue, uint16_t aVal
     SuccessOrExit(err = MapStatusToChipError(status));
     status = ramStorageSet(sBuffer, aKey, aValue, aValueLength);
     SuccessOrExit(err = MapStatusToChipError(status));
-  
+
 exit:
     return err;
 

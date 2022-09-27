@@ -198,7 +198,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, TValue val)
     status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer,
                                            buffer->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatusToChipError(status));
-  
+
 exit:
     MutexUnlock(pdmMutexHandle);
     return err;
@@ -223,7 +223,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, TValue val)
                                  buffer->ramBufferLen + kRamDescHeaderSize);
     OSA_InterruptEnable();
     SuccessOrExit(err = MapPdmStatusToChipError(status));
-  
+
 exit:
     MutexUnlock(pdmMutexHandle);
     return err;
