@@ -49,7 +49,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CURRENT_SCENE" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">CurrentScene</attribute>
     <attribute side="server" code="0x0002" define="CURRENT_GROUP" type="group_id" min="0x0000" max="0xFFF7" writable="false" default="0x0000" optional="false">CurrentGroup</attribute>
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">SceneValid</attribute>
-    <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
+    <attribute side="server" code="0x0004" define="NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
    
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
