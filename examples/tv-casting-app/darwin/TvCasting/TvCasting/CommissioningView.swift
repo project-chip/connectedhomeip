@@ -66,7 +66,7 @@ struct CommissioningView: View {
             {
                 Text("Commissioning finished!").padding()
                 NavigationLink(
-                    destination: ContentLauncherView(),
+                    destination: ClusterSelectorView(),
                     label: {
                         Text("Next")
                             .frame(width: 100, height: 30, alignment: .center)

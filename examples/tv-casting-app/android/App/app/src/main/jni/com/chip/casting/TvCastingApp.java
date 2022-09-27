@@ -17,6 +17,8 @@
  */
 package com.chip.casting;
 
+import java.util.ArrayList;
+
 public class TvCastingApp {
   private static final String TAG = TvCastingApp.class.getSimpleName();
 
@@ -178,7 +180,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean targetNavigator_subscribeToTargetList(
-      SuccessCallback<TargetNavigatorTypes.TargetInfo> readSuccessHandler,
+      SuccessCallback<ArrayList<TargetNavigatorTypes.TargetInfo>> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,
