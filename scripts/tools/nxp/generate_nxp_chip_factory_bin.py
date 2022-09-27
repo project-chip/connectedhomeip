@@ -101,6 +101,7 @@ def klv_to_bin(klv, out):
         size = file.seek(0, os.SEEK_END)
         print("Size of generated binary is:", size, "bytes")
 
+
 def main():
     parser = argparse.ArgumentParser(description="NXP Factory Data Generator")
 
@@ -160,6 +161,7 @@ def main():
                                            args.it, args.salt)
     klv = generate_klv(spake2_params, args)
     klv_to_bin(klv, args.out)
+
 
 if __name__ == "__main__":
     main()
