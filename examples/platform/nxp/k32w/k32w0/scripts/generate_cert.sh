@@ -30,7 +30,7 @@ fi
 CHIP_CERT_TOOL="$1"
 
 function exit_err() {
-	echo ${1}
+	echo "${1}"
 	exit 1
 }
 
