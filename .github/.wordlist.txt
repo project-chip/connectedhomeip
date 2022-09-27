@@ -694,7 +694,6 @@ ipynb
 IPython
 ISCAN
 isHexString
-IsInitiator
 isLowerCase
 isUpperCase
 itemName
