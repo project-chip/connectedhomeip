@@ -56,17 +56,17 @@ jobs:
         timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build"
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-light build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702 lighting-app \
-            out/bouffalolab-BL706-IoT-DVK-BL706C-22-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
+            out/bouffalolab-BL706-IoT-DVK-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
 
       - name: Build example BL702 Lighting App with RPCs
         timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc build"
+            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-light-rpc build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702+rpc lighting-app \
-            out/bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
+            out/bouffalolab-BL706-IoT-DVK-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
 
       - name: Uploading Size Reports
         uses: actions/upload-artifact@v2

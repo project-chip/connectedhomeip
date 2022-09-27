@@ -149,7 +149,7 @@ tests:
           multiple times)"
       PICS: CC.C.C0a.Tx && CC.C.A0007
       verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-temperature-mireds 1 1
 
 
           Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
@@ -231,7 +231,7 @@ tests:
           multiple times)"
       PICS: CC.C.C4b.Tx && CC.C.A0007
       verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-temperature-mireds 1 1
 
 
 
@@ -315,7 +315,7 @@ tests:
           multiple times)"
       PICS: CC.C.C4c.Tx & CC.C.A0007
       verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-temperature-mireds 1 1
           Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =
           [1659955633.975617][2718:2718] CHIP:DMG: {
@@ -390,7 +390,7 @@ tests:
           multiple times)"
       PICS: CC.C.C47.Tx && CC.C.A0007
       verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-temperature-mireds 1 1
 
           Verify response contains an ColorTemperatureMireds in  TH(all-clusters-app)  Logs:
           [1659955633.975562][2718:2718] CHIP:DMG: ReadRequestMessage =

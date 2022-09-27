@@ -870,15 +870,9 @@ tests:
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
-          The message flow  can expect as mentioned below
-             TH(all-clusters-app) -> DUT(chip-tool) ReadRequest
-              DUT(chip-tool) -> TH(all-clusters-app) ReportData, not last chunk
-              TH (all-clusters-app)-> DUT(chip-tool) StatusResponse
-              Possibly DUT and TH repeat  itself steps 2 & 3 a few times
-              DUT(chip-tool) -> TH(all-clusters-app) ReportData, last chunk, SuppressResponse set to true
-              TH(all-clusters-app) -> DUT(chip-tool) standalone ack
 
-          From TH(all-clusters-app) will send read request to DUT(chip-tool), Then DUT(chip-tool) will send the report data message for the request which sent from TH(All-clusters-app), this report message keep on generating  the report data until it reaches the last chuck message and for last chunk message DUT(chip-tool) will not get status response message
+          From TH(all-clusters-app) will send read request to DUT(chip-tool), Then DUT(chip-tool) will send the report data message for the request which sent from TH(All-clusters-app), this report message keep on generating  the report data until it reaches the last chuck message and for last chunk message TH(all-clusters-app) will not receive any status response.
+
           [1663148506.794519][39604:39604] CHIP:EM: Removed CHIP MessageCounter:119127068 from RetransTable on exchange 23857r
           [1663148506.794525][39604:39604] CHIP:DMG: StatusResponseMessage =
           [1663148506.794527][39604:39604] CHIP:DMG: {

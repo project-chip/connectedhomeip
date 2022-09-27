@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <DiagnosticDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
 
 #include <lwip/tcpip.h>
 
@@ -190,11 +191,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     netif = wifi_mgmr_sta_netif_get();
     if (netif)
     {
-        strncpy(ifp->Name, netif->name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-        ifp->name                                          = CharSpan::fromCharString(ifp->Name);
-        ifp->isOperational                                 = true;
-        ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        Platform::CopyString(ifp->Name, netif->name);
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
         bl_efuse_read_mac(ifp->MacAddress);

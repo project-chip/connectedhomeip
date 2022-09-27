@@ -18,6 +18,8 @@
 
 #include "SystemCommands.h"
 
+#include <lib/support/CHIPMemString.h>
+
 namespace {
 const char basePath[] = "./src/app/tests/suites/commands/system/scripts/";
 const char * getScriptsFolder()
@@ -45,8 +47,7 @@ CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Cluster
     {
         VerifyOrReturnError(value.registerKey.Value().size() < 128, CHIP_ERROR_INVALID_ARGUMENT);
         char registerKey[128];
-        memset(registerKey, '\0', sizeof(registerKey));
-        strncpy(registerKey, value.registerKey.Value().data(), value.registerKey.Value().size());
+        chip::Platform::CopyString(registerKey, value.registerKey.Value());
         builder.Add(registerKey);
     }
     else
@@ -179,8 +180,7 @@ CHIP_ERROR SystemCommands::AddSystemCommandArgument(chip::StringBuilderBase & bu
     builder.Add(" ");
 
     char arg[kArgumentMaxLen];
-    memset(arg, 0, sizeof(arg));
-    strncpy(arg, argValue.data(), argValue.size());
+    chip::Platform::CopyString(arg, argValue);
     builder.Add(arg);
 
     return CHIP_NO_ERROR;

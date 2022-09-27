@@ -294,6 +294,7 @@ tests:
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
@@ -395,6 +396,7 @@ tests:
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
@@ -460,6 +462,7 @@ tests:
                 value: "SPAKE2P Key Salt"
       response:
           error: FAILURE
+          clusterError: 2
 
     - label: "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds"
       cluster: "DelayCommands"
