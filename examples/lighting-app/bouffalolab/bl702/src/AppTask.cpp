@@ -334,6 +334,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_SYS_BLE_ADV & appEvent)
             {
                 LightingSetStatus(APP_EVENT_SYS_BLE_ADV);
+                LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
                 isStateReady = false;
             }
 

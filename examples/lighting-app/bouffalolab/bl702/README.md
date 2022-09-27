@@ -1,14 +1,14 @@
-# CHIP BL702 Lighting App Example
+# CHIP BL70X Lighting App Example
 
-## Supported Hardware
+BL70X is highly integrated BLE and IEEE 802.15.4 combo chip for IoT
+applications, and BL702 is a general name for BL70X family.
 
-Current supported develop boards:
+This example is powered by BL706 and functions as a Thread light bulb device
+type, with on/off, level and color capabilities. The steps were verified with
+following boards:
 
--   BL702-IoT-DVK
--   BL706-IoT-DVK
--   BL706-NIGHT-LIGHT
-    > Note, please make sure both of flash and `PSRAM` shipped with develop
-    > board/device are at lease 2MB.
+    -   BL706-IoT-DVK
+    -   BL706-NIGHT-LIGHT
 
 ## Build
 
@@ -49,29 +49,19 @@ Current supported develop boards:
             ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK
             ```
 
-        -   Build lighting-app for board BL702-IOT-DVK module_type is
-            `BL706C-22` by default. Please execute the following command to
-            build lighting-app for BL702-IoT-DVK with module `BL702`
-
-        ```shell
-        ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL702-IoT-DVK module_type="BL702"
-        ```
-
         -   Build lighting-app for board BL706-NIGHT-LIGHT
 
-        ```shell
-        ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT module_type="BL702"
-        ```
+            ```shell
+            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT
+            ```
 
-        > Note, please check which module is used on the board.
-
-    -   With UART shell command support:
+    -   With UART shell command enabled:
 
         ```shell
         ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
         ```
 
-    -   With pigweed RPC support:
+    -   With pigweed RPC enabled:
         ```shell
         ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK 'import("//with_pw_rpc.gni")'
         ```
@@ -79,20 +69,36 @@ Current supported develop boards:
 
 -   Build with `build_examples.py`
 
-    -   Build for BL702-IoT-DVK, BL706-IoT-DVK and BL706-NIGHT-LIGHT as
-        following commands.
+    -   Build for BL706-IoT-DVK and BL706-NIGHT-LIGHT as following commands.
 
         ```shell
-        ./scripts/build/build_examples.py --target bouffalolab-BL702-IoT-DVK-light build
         ./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build
         ./scripts/build/build_examples.py --target bouffalolab-BL706-NIGHT-LIGHT-light build
         ```
 
-    -   Build with pigweed RPC support as following commands.
+    -   Build with pigweed RPC enabled as following commands.
         ```shell
-        ./scripts/build/build_examples.py --target bouffalolab-BL702-IoT-DVK-light-rpc build
         ./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc build
         ```
+
+-   Build options
+
+    -   Build options list There are some build options for function and debug
+        purpose as below.
+        -   `chip_build_libshell`, whether to enable shell command line. It is
+            set to false by default.
+        -   `baudrate`, UART baudrate for log output or shell command line.
+        -   `enable_psram`, whether to enable `PSRAM`. It is set to true by
+            default.
+    -   How to use Before using these build options, please check whether they
+        are available to configure in BUILD.gn file under example application
+        folder.
+        -   build with `build_examples.py` Modify value of build options in
+            BUILD.gn file under example application folder.
+        -   build with gn_bouffalolab_example.sh Input build options, such as
+            ```
+            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
+            ```
 
 -   Download image
 
