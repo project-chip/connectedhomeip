@@ -43,7 +43,8 @@ steps:
     - name: "gcr.io/cloud-builders/docker"
       args:
           - "-c"
-          - COMMIT_SHA=$COMMIT_SHA SHORT_SHA=$SHORT_SHA REVISION_ID=$REVISION_ID BUILD_ID=$BUILD_ID ./examples/chef/create_docker.sh
+          - COMMIT_SHA=$COMMIT_SHA SHORT_SHA=$SHORT_SHA REVISION_ID=$REVISION_ID
+            BUILD_ID=$BUILD_ID ./examples/chef/create_docker.sh
       id: DockerAll
       entrypoint: /usr/bin/bash
       waitFor:
@@ -60,7 +61,7 @@ artifacts:
         location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
         paths: ["/workspace/artifacts/*.tar.gz"]
 images:
-- 'us.gcr.io/nest-eng/chef/dimmable-light'
+    - "us.gcr.io/nest-eng/chef/dimmable-light"
 # Using higher CPU machines generally speeds up builds, except bootstrap is always
 # slow.
 options:
