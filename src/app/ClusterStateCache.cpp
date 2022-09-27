@@ -532,5 +532,10 @@ exit:
     return err;
 }
 
+CHIP_ERROR ClusterStateCache::GetLastReportDataPath(ConcreteClusterPath & aPath)
+{
+    aPath = mLastReportDataPath;
+    return CHIP_NO_ERROR;
+}
 } // namespace app
 } // namespace chip

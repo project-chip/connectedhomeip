@@ -452,7 +452,7 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given attribute path. */
-  public void subscribeToPath(
+  public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
@@ -524,7 +524,7 @@ public class ChipDeviceController {
   }
 
   /** Read the given attribute path. */
-  public void readPath(
+  public void readAttributePath(
       ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
