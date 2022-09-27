@@ -1132,7 +1132,13 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     gboolean result;
     std::unique_ptr<GError, GErrorDeleter> err;
 
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network");
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    {
+        ChipLogError(DeviceLayer, "wpa_supplicant: CommitConfig: interface proxy not connected");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr,
                                                                        &MakeUniquePointerReceiver(err).Get());
@@ -1196,7 +1202,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
-        ChipLogError(DeviceLayer, "wpa_supplicant: _GetWiFiSecurityType: interface proxy not connected");
+        ChipLogError(DeviceLayer, "wpa_supplicant: GetWiFiSecurityType: interface proxy not connected");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
