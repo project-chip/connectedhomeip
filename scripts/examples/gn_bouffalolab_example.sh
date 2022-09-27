@@ -31,7 +31,7 @@ source "$MATTER_ROOT/scripts/activate.sh"
 # export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Darwin/bin:$PATH"
 # fi
 
-bl702_boards=("BL702-IoT-DVK" "BL706-IoT-DVK" "BL706-NIGHT-LIGHT")
+bl702_boards=("BL706-IoT-DVK" "BL706-NIGHT-LIGHT")
 bl702_modules=("BL702" "BL706C-22")
 bl702_module_type="BL706C-22"
 

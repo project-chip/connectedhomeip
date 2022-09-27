@@ -16,21 +16,21 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${efr32_sdk_build_root}/efr32_board.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_board.gni")
 
 openthread_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
 
 config("openthread_efr32_config") {
   defines = [
     "RADIO_CONFIG_DMP_SUPPORT=1",
-    "${efr32_board}=1",
-    "${efr32_mcu}",
+    "${silabs_board}=1",
+    "${silabs_mcu}",
   ]
 
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
-    "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
+    "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
     "${openthread_efr32_root}/src/src",
   ]
 }
