@@ -300,6 +300,31 @@ tests:
           [1657906380.687904][2361:2361] CHIP:DMG: },
 
 
+          ./chip-tool onoff read feature-map  1 1
+
+          verify the "  feature-map response" on the TH (all-cluster-minimal-app) log:
+
+          [1663142640.719145][5476:5476] CHIP:EM: Handling via exchange: 32627r, Delegate: 0xaaaac9e6b028
+          [1663142640.719195][5476:5476] CHIP:IM: Received Read request
+          [1663142640.719289][5476:5476] CHIP:DMG: ReadRequestMessage =
+          [1663142640.719321][5476:5476] CHIP:DMG: {
+          [1663142640.719347][5476:5476] CHIP:DMG:         AttributePathIBs =
+          [1663142640.719377][5476:5476] CHIP:DMG:         [
+          [1663142640.719406][5476:5476] CHIP:DMG:                 AttributePathIB =
+          [1663142640.719524][5476:5476] CHIP:DMG:                 {
+          [1663142640.719562][5476:5476] CHIP:DMG:                         Endpoint = 0x1,
+          [1663142640.719601][5476:5476] CHIP:DMG:                         Cluster = 0x6,
+          [1663142640.719643][5476:5476] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1663142640.719681][5476:5476] CHIP:DMG:                 }
+          [1663142640.719716][5476:5476] CHIP:DMG:
+          [1663142640.719749][5476:5476] CHIP:DMG:         ],
+          [1663142640.719782][5476:5476] CHIP:DMG:
+          [1663142640.719813][5476:5476] CHIP:DMG:         isFabricFiltered = true,
+          [1663142640.719843][5476:5476] CHIP:DMG:         InteractionModelRevision = 1
+          [1663142640.719870][5476:5476] CHIP:DMG: },
+          [1663142640.719954][5476:5476] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663142640.720064][5476:5476] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663142640.720099][5476:5476] CHIP:DMG: <RE:Run> Cluster 6, Attribute fffc is dirty
 
           ./chip-tool onoff read on-off 1 1
 

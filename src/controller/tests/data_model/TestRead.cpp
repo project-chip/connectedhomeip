@@ -232,6 +232,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
+
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -275,6 +281,8 @@ public:
     static void TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -1550,9 +1558,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-
-        attributePathParams[0].mClusterId   = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId = app::Clusters::TestCluster::Attributes::Boolean::Id;
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
@@ -1626,6 +1634,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
@@ -1667,6 +1676,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
@@ -2884,6 +2894,47 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
 }
 
 } // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        SubscriptionPathQuotaHelpers::TestReadCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
+    }
+
+    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
@@ -4402,6 +4453,51 @@ void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, vo
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+//
+// This validates the KeepSubscriptions flag by first setting up a valid subscription, then sending
+// a subsequent SubcribeRequest with empty attribute AND event paths with KeepSubscriptions = false.
+//
+// This should evict the previous subscription before sending back an error.
+//
+void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    TestReadCallback readCallback;
+    app::AttributePathParams pathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+
+    app::ReadPrepareParams readParam(ctx.GetSessionAliceToBob());
+    readParam.mpAttributePathParamsList    = &pathParams;
+    readParam.mAttributePathParamsListSize = 1;
+    readParam.mMaxIntervalCeilingSeconds   = 1;
+    readParam.mKeepSubscriptions           = false;
+
+    std::unique_ptr<app::ReadClient> readClient = std::make_unique<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+        app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 1);
+
+    ChipLogProgress(DataManagement, "Issue another subscription that will evict the first sub...");
+
+    readParam.mAttributePathParamsListSize = 0;
+    readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, readCallback.mOnError != 0);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -4436,8 +4532,10 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttribute_ManyDataValues", TestReadInteraction::TestReadAttribute_ManyDataValues),
     NL_TEST_DEF("TestReadAttribute_ManyDataValuesWrongPath", TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath),
     NL_TEST_DEF("TestReadAttribute_ManyErrors", TestReadInteraction::TestReadAttribute_ManyErrors),
+    NL_TEST_DEF("TestSubscribeAttributeDeniedNotExistPath", TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath),
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
+    NL_TEST_DEF("TestReadHandler_KeepSubscriptionTest", TestReadInteraction::TestReadHandler_KeepSubscriptionTest),
     NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -32,7 +32,7 @@ tests:
 
     - label: "Commission TH to DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads BSSID attribute from DUT."

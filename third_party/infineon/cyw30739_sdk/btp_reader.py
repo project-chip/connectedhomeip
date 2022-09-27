@@ -52,7 +52,7 @@ def main():
     items["ConfigXS1Location"] = items["ConfigDS2Location"] + ds_len
 
     if option.enable_ota:
-        items["ConfigXS1Length"] = 0x00076000
+        items["ConfigXS1Length"] = 0x00073000
         items["ConfigXS2Location"] = (
             items["ConfigXS1Location"] + items["ConfigXS1Length"]
         )

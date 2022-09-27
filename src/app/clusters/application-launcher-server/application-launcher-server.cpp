@@ -278,6 +278,16 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
         {
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
         }
+        else
+        {
+            ChipLogError(Zcl, "ApplicationLauncher target app not found");
+            LauncherResponseType response;
+            const char * buf = "data";
+            response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+            response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
+            responder.Success(response);
+            return true;
+        }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
         ChipLogError(Zcl, "ApplicationLauncher handling launch");
@@ -354,6 +364,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
+            app->GetApplicationBasicDelegate()->SetApplicationStatus(ApplicationStatusEnum::kStopped);
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 

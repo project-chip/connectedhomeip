@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRStructsObjc.h>
@@ -7,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
-@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params : NSObject <NSCopying>
+@interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
 {{! Override the getter name because some of our properties start with things
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 {{/zcl_commands}}
 {{/zcl_clusters}}

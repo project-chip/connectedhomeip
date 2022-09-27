@@ -60,9 +60,9 @@ class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<Im
 protected:
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
-    SemaphoreHandle_t mChipStackLock;
-    QueueHandle_t mChipEventQueue;
-    TaskHandle_t mEventLoopTask;
+    SemaphoreHandle_t mChipStackLock = NULL;
+    QueueHandle_t mChipEventQueue    = NULL;
+    TaskHandle_t mEventLoopTask      = NULL;
     bool mChipTimerActive;
 
     // ===== Methods that implement the PlatformManager abstract interface.

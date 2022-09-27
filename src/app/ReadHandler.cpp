@@ -315,7 +315,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        ReturnErrorOnFailure(ProcessAttributePaths(attributePathListParser));
         DataVersionFilterIBs::Parser dataVersionFilterListParser;
         err = readRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
         if (err == CHIP_END_OF_TLV)
@@ -363,75 +363,19 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser)
+CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttributePathListParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         AttributePathParams attribute;
         AttributePathIB::Parser path;
-        err = path.Init(reader);
-        SuccessOrExit(err);
-
-        err = path.GetEndpoint(&(attribute.mEndpointId));
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(!attribute.HasWildcardEndpointId(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-
-        ClusterId clusterId = kInvalidClusterId;
-        err                 = path.GetCluster(&clusterId);
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(IsValidClusterId(clusterId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-            attribute.mClusterId = clusterId;
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-
-        AttributeId attributeId = kInvalidAttributeId;
-        err                     = path.GetAttribute(&attributeId);
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(IsValidAttributeId(attributeId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-            attribute.mAttributeId = attributeId;
-        }
-        SuccessOrExit(err);
-
-        // A wildcard cluster requires that the attribute path either be
-        // wildcard or a global attribute.
-        VerifyOrExit(!attribute.HasWildcardClusterId() || attribute.HasWildcardAttributeId() ||
-                         IsGlobalAttribute(attribute.mAttributeId),
-                     err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-
-        err = path.GetListIndex(&(attribute.mListIndex));
-        if (CHIP_NO_ERROR == err)
-        {
-            VerifyOrExit(!attribute.HasWildcardAttributeId() && !attribute.HasWildcardListIndex(),
-                         err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attribute);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(path.Init(reader));
+        ReturnErrorOnFailure(path.ParsePath(attribute));
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attribute));
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -440,8 +384,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         err                          = CHIP_NO_ERROR;
     }
-
-exit:
     return err;
 }
 
@@ -487,47 +429,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         EventPathParams event;
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
-
-        err = path.GetEndpoint(&(event.mEndpointId));
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(!event.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-
-        err = path.GetCluster(&(event.mClusterId));
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(!event.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-
-        err = path.GetEvent(&(event.mEventId));
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(!event.HasWildcardEventId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
-        }
-        ReturnErrorOnFailure(err);
-
-        err = path.GetIsUrgent(&(event.mIsUrgentEvent));
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-
+        ReturnErrorOnFailure(path.ParsePath(event));
         ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, event));
     }
 
@@ -667,7 +569,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        ReturnErrorOnFailure(ProcessAttributePaths(attributePathListParser));
         DataVersionFilterIBs::Parser dataVersionFilterListParser;
         err = subscribeRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
         if (err == CHIP_END_OF_TLV)

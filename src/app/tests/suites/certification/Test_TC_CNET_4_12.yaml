@@ -28,19 +28,19 @@ config:
 tests:
     - label: "Commission TH and DUT on Thread setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "The cluster Identifier 49 (0x0031) is present in the ServerList
           attribute"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "The FeatureMap attribute value is 2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -82,7 +82,7 @@ tests:
           "TH saves the index  of the Networks  list entry from  step 2
           as  Userth_netidx"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -170,7 +170,7 @@ tests:
           "TH discovers and  connects to DUT  on
           the  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET  operational  network"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:

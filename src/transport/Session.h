@@ -174,9 +174,6 @@ public:
     };
 
     virtual SessionType GetSessionType() const = 0;
-#if CHIP_PROGRESS_LOGGING
-    virtual const char * GetSessionTypeString() const = 0;
-#endif
 
     void AddHolder(SessionHolder & holder)
     {
@@ -256,6 +253,13 @@ protected:
 private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
+
+//
+// Return a string representation of the underlying session.
+//
+// Always returns a non-null pointer.
+//
+const char * GetSessionTypeString(const SessionHandle & session);
 
 } // namespace Transport
 } // namespace chip

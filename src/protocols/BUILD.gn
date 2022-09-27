@@ -18,6 +18,7 @@ static_library("protocols") {
   output_name = "libChipProtocols"
 
   sources = [
+    "Protocols.cpp",
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",

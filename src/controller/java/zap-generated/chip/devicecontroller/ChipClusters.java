@@ -97,6 +97,25 @@ public class ChipClusters {
       chipClusterPtr = initWithDevice(devicePtr, endpointId);
     }
 
+    /**
+     * Sets the timeout, in milliseconds, after which commands sent through this cluster will fail
+     * with a timeout (regardless of whether or not a response has been received). If set to an
+     * empty optional, the default timeout will be used.
+     */
+    public void setCommandTimeout(Optional<Long> timeoutMillis) {
+      setCommandTimeout(chipClusterPtr, timeoutMillis);
+    }
+
+    private native void setCommandTimeout(long clusterPtr, Optional<Long> timeoutMillis);
+
+    /** Returns the current timeout (in milliseconds) for commands sent through this cluster. */
+    public Optional<Long> getCommandTimeout() {
+      Optional<Long> timeout = getCommandTimeout(chipClusterPtr);
+      return timeout == null ? Optional.empty() : timeout;
+    }
+
+    private native Optional<Long> getCommandTimeout(long clusterPtr);
+
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     public native void deleteCluster(long chipClusterPtr);
@@ -2473,8 +2492,8 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface DeviceListAttributeCallback {
-      void onSuccess(List<ChipStructs.DescriptorClusterDeviceType> valueList);
+    public interface DeviceTypeListAttributeCallback {
+      void onSuccess(List<ChipStructs.DescriptorClusterDeviceTypeStruct> valueList);
 
       void onError(Exception ex);
 
@@ -2529,13 +2548,13 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readDeviceListAttribute(DeviceListAttributeCallback callback) {
-      readDeviceListAttribute(chipClusterPtr, callback);
+    public void readDeviceTypeListAttribute(DeviceTypeListAttributeCallback callback) {
+      readDeviceTypeListAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeDeviceListAttribute(
-        DeviceListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDeviceListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeDeviceTypeListAttribute(
+        DeviceTypeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDeviceTypeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readServerListAttribute(ServerListAttributeCallback callback) {
@@ -2610,12 +2629,12 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readDeviceListAttribute(
-        long chipClusterPtr, DeviceListAttributeCallback callback);
+    private native void readDeviceTypeListAttribute(
+        long chipClusterPtr, DeviceTypeListAttributeCallback callback);
 
-    private native void subscribeDeviceListAttribute(
+    private native void subscribeDeviceTypeListAttribute(
         long chipClusterPtr,
-        DeviceListAttributeCallback callback,
+        DeviceTypeListAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

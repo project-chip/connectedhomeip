@@ -769,8 +769,3 @@ tests:
           CHIP:CTL: Rendezvous cleanup
           CHIP:TOO: Device commissioning completed with success
       disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true

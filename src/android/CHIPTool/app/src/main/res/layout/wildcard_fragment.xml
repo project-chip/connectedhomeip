@@ -91,6 +91,7 @@
       android:layout_margin="16dp"
       android:inputType="number"
       android:hint="@string/wildcard_help_label"/>
+
   <Button
       android:id="@+id/readBtn"
       android:layout_width="wrap_content"

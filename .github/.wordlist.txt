@@ -19,6 +19,8 @@ AccessControlEntry
 accessor
 AccountLogin
 acdbc
+ack
+ACK
 ACKed
 ACL
 ACLs
@@ -154,6 +156,7 @@ bootable
 Bootloader
 BorderRouterAP
 bouffalolab
+Bouffalolab
 BRD
 breakpoint
 bredr
@@ -253,6 +256,7 @@ ClusterTestGeneration
 cmake
 CMakeLists
 CMD
+CMS
 CMSIS
 CMVH
 cn
@@ -594,6 +598,7 @@ Gradle
 gradlew
 GroupId
 GroupKeyManagement
+Groupcast
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
@@ -647,6 +652,7 @@ ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
+IsInitiator
 imager
 imagetool
 imageUri
@@ -826,6 +832,7 @@ mdash
 MDNS
 MediaInput
 MediaPlayback
+MediaTek
 mem
 memdf
 MemMonitoring
@@ -1373,6 +1380,7 @@ unfocus
 Unicast
 UniFlash
 UnitLocalization
+Unencrypted
 unpair
 unprovisioned
 untrusted
@@ -1392,6 +1400,7 @@ userConsentState
 userguide
 USERINTERFACE
 UserLabel
+Unsecure
 usermod
 usr
 UTF

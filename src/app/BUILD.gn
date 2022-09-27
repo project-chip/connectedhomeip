@@ -21,8 +21,8 @@ import("common_flags.gni")
 declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
-      is_debug &&
-      (current_os == "linux" || current_os == "mac" || current_os == "android")
+      is_debug && (current_os == "linux" || current_os == "mac" ||
+                   current_os == "ios" || current_os == "android")
 
   # Logging verbosity control for Access Control implementation
   #

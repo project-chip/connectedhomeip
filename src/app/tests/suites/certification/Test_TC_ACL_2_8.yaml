@@ -59,45 +59,17 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
+          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
 
-          [1657286379.420840][4724:4729] CHIP:DMG: InvokeResponseMessage =
-          [1657286379.420894][4724:4729] CHIP:DMG: {
-          [1657286379.420937][4724:4729] CHIP:DMG:         suppressResponse = false,
-          [1657286379.421000][4724:4729] CHIP:DMG:         InvokeResponseIBs =
-          [1657286379.421068][4724:4729] CHIP:DMG:         [
-          [1657286379.421120][4724:4729] CHIP:DMG:                 InvokeResponseIB =
-          [1657286379.421208][4724:4729] CHIP:DMG:                 {
-          [1657286379.421264][4724:4729] CHIP:DMG:                         CommandStatusIB =
-          [1657286379.421344][4724:4729] CHIP:DMG:                         {
-          [1657286379.421407][4724:4729] CHIP:DMG:                                 CommandPathIB =
-          [1657286379.421493][4724:4729] CHIP:DMG:                                 {
-          [1657286379.421581][4724:4729] CHIP:DMG:                                         EndpointId = 0x0,
-          [1657286379.421656][4724:4729] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1657286379.421754][4724:4729] CHIP:DMG:                                         CommandId = 0x1,
-          [1657286379.421838][4724:4729] CHIP:DMG:                                 },
-          [1657286379.421916][4724:4729] CHIP:DMG:
-          [1657286379.421998][4724:4729] CHIP:DMG:                                 StatusIB =
-          [1657286379.422084][4724:4729] CHIP:DMG:                                 {
-          [1657286379.422159][4724:4729] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657286379.422251][4724:4729] CHIP:DMG:                                 },
-          [1657286379.422336][4724:4729] CHIP:DMG:
-          [1657286379.422397][4724:4729] CHIP:DMG:                         },
-          [1657286379.422483][4724:4729] CHIP:DMG:
-          [1657286379.422537][4724:4729] CHIP:DMG:                 },
-          [1657286379.422616][4724:4729] CHIP:DMG:
-          [1657286379.422666][4724:4729] CHIP:DMG:         ],
-          [1657286379.422745][4724:4729] CHIP:DMG:
-          [1657286379.422796][4724:4729] CHIP:DMG:         InteractionModelRevision = 1
-          [1657286379.422861][4724:4729] CHIP:DMG: },
-          [1657286379.422975][4724:4729] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1657286379.423058][4724:4729] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
+          [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
+          [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
 
 
+          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
 
-          CommissiOn TH2(Chiptool) to DUT using below command
-
-          ./chip-tool pairing onnetwork 2 20202021 --commissioner-nodeid 223344  --commissioner-name beta
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
 
           [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
@@ -108,6 +80,7 @@ tests:
           CurrentFabricIndex attribute"
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+
           On TH2(Chiptool),verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
 
           1658747098.843523][3024:3029] CHIP:DMG:                 },
@@ -131,7 +104,8 @@ tests:
           field: [N1, 1111] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets":null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233,1111], "targets":null}]' 1 0
+
           On TH1(Chiptool), verify AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element
 
           [1657286416.461279][4737:4742] CHIP:DMG: {
@@ -185,7 +159,7 @@ tests:
           field: [N2, 2222] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl "[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]" 2 0  --commissioner-nodeid 223344 --commissioner-name beta
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]' 2 0  --commissioner-nodeid 223344 --commissioner-name beta
           On TH2(Chiptool), verify AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element
 
 
@@ -261,8 +235,8 @@ tests:
 
           On TH2(Chiptool), verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
 
-          [1661407263.740571][2355:2360] CHIP:DMG: 	SuppressResponse = true,
-          [1661407263.740605][2355:2360] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661407263.740571][2355:2360] CHIP:DMG:         SuppressResponse = true,
+          [1661407263.740605][2355:2360] CHIP:DMG:         InteractionModelRevision = 1
           [1661407263.740640][2355:2360] CHIP:DMG: }
           [1661407263.741000][2355:2360] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 2445703657
           [1661407263.741100][2355:2360] CHIP:TOO:   ACL: 1 entries
@@ -353,6 +327,7 @@ tests:
       PICS: ACL.S.E00
       verification: |
           ./chip-tool  accesscontrol  read-event  access-control-entry-changed  2 0 --commissioner-name beta --commissioner-nodeid 223344
+
           On TH2(Chiptool), verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1
 
 

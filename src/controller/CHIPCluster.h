@@ -62,6 +62,12 @@ public:
     // TODO: remove when we start using InvokeCommand everywhere
     void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
 
+    /**
+     * Returns the current command timeout set via SetCommandTimeout, or an
+     * empty optional if no timeout has been set.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout() { return mTimeout; }
+
     ClusterId GetClusterId() const { return mClusterId; }
 
     /*
@@ -366,7 +372,7 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
             if (subscriptionEstablishedCb != nullptr)
             {
                 subscriptionEstablishedCb(context);

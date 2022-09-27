@@ -632,8 +632,7 @@ tests:
               DUT -> TH ReportData, last chunk, SuppressResponse set to true
               TH -> DUT standalone ack
 
-          On TH(chip-tool) verify that  The last chunked message should not receive any status response from the DUT
-
+          If the DUT has to provision to verify the logs, On DUT(all-cluster-app)verify that   The last chunked message should not receive any status response
           [1656510389.524811][20396:20396] CHIP:DMG: Fetched 16 events
           [1656510389.524838][20396:20396] CHIP:DMG: <RE> Sending report (payload has 973 bytes)...
           [1656510389.524864][20396:20396] CHIP:DMG: IM RH moving to [AwaitingReportResponse]

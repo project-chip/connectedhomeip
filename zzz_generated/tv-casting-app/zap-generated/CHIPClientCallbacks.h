@@ -30,9 +30,9 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-typedef void (*DescriptorDeviceListListAttributeCallback)(
+typedef void (*DescriptorDeviceTypeListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & data);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context,

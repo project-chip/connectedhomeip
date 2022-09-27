@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <pthread.h>
 #include <string>
 
 class NamedPipeCommandDelegate

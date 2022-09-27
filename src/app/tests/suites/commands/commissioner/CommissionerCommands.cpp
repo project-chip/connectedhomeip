@@ -32,7 +32,11 @@ CommissionerCommands::PairWithCode(const char * identity,
     memset(code, '\0', sizeof(code));
     memcpy(code, value.payload.data(), value.payload.size());
     ChipLogError(chipTool, "Pairing Code is %s", code);
-    return GetCommissioner(identity).PairDevice(value.nodeId, code);
+
+    // To reduce the scanning latency in some setups, and since the primary use for PairWithCode is to commission a device to
+    // another commissioner, assume that the commissionable device is available on the network.
+    chip::Controller::DiscoveryType discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
+    return GetCommissioner(identity).PairDevice(value.nodeId, code, discoveryType);
 }
 
 CHIP_ERROR CommissionerCommands::Unpair(const char * identity,

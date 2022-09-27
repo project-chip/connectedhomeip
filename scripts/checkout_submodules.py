@@ -28,6 +28,7 @@ ALL_PLATFORMS = set([
     'ameba',
     'android',
     'bl602',
+    'bouffalolab',
     'cc13x2_26x2',
     'cc32xx',
     'darwin',
@@ -43,6 +44,7 @@ ALL_PLATFORMS = set([
     'tizen',
     'webos',
     'mw320',
+    'genio',
 ])
 
 Module = namedtuple('Module', 'name path platforms')

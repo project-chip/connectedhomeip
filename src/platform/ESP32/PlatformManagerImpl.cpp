@@ -150,6 +150,8 @@ void PlatformManagerImpl::_Shutdown()
     }
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+
+    esp_event_loop_delete_default();
 }
 
 void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)

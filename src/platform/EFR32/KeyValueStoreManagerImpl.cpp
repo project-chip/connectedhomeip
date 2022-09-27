@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
  *          Platform-specific key value storage implementation for EFR32
  */
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/EFR32/EFR32Config.h>
@@ -158,7 +159,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     if (err == CHIP_NO_ERROR)
     {
         uint32_t keyIndex = nvm3Key - EFR32Config::kConfigKey_KvsFirstKeySlot;
-        strncpy(mKvsStoredKeyString[keyIndex], key, sizeof(mKvsStoredKeyString[keyIndex]) - 1);
+        Platform::CopyString(mKvsStoredKeyString[keyIndex], key);
         ScheduleKeyMapSave();
     }
 

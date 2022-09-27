@@ -415,6 +415,12 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
                                  mCluster->generatedCommandList);
     default:
+        // This function is only called if attributeCluster is non-null in
+        // ReadSingleClusterData, which only happens for attributes listed in
+        // GlobalAttributesNotInMetadata.  If we reach this code, someone added
+        // a global attribute to that list but not the above switch.
+        VerifyOrDieWithMsg(false, DataManagement, "Unexpected global attribute: " ChipLogFormatMEI,
+                           ChipLogValueMEI(aPath.mAttributeId));
         return CHIP_NO_ERROR;
     }
 }
@@ -475,6 +481,15 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
+    if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded)
+    {
+        //
+        // Set this to true to ensure our caller will return immediately without proceeding further.
+        //
+        *aTriedEncode = true;
+        return CHIP_NO_ERROR;
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
@@ -516,6 +531,18 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
 
 } // anonymous namespace
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == aPath.mAttributeId)
+        {
+            return (emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER) != nullptr);
+        }
+    }
+    return (emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != nullptr);
+}
+
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
@@ -530,16 +557,19 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
-    switch (aPath.mAttributeId)
+    bool isGlobalAttributeNotInMetadata = false;
+    for (auto & attr : GlobalAttributesNotInMetadata)
     {
-    case Clusters::Globals::Attributes::AttributeList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-        attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        break;
-    default:
+        if (attr == aPath.mAttributeId)
+        {
+            isGlobalAttributeNotInMetadata = true;
+            attributeCluster               = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+            break;
+        }
+    }
+
+    if (!isGlobalAttributeNotInMetadata)
+    {
         attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 

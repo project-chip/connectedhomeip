@@ -26,7 +26,7 @@ concurrency:
 jobs:
     cirque:
         name: Cirque
-        timeout-minutes: 75
+        timeout-minutes: 90
 
         env:
             DOCKER_RUN_VERSION: 0.5.99
@@ -111,18 +111,10 @@ jobs:
                     --volume /tmp:/tmp \
                     -- sh -c '\
                        git config --global --add safe.directory "*" \
-                       && ./gn_build.sh \
-                          chip_build_tests=false \
-                          chip_enable_wifi=false \
-                          chip_im_force_fabric_quota_check=true \
-                          enable_default_builds=false \
-                          enable_host_gcc_build=true \
-                          enable_standalone_chip_tool_build=true \
-                          enable_linux_all_clusters_app_build=true \
-                          enable_linux_lighting_app_build=true \
+                       && scripts/build/gn_gen_cirque.sh
                       '
             - name: Run Tests
-              timeout-minutes: 25
+              timeout-minutes: 45
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \

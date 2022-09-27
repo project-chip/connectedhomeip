@@ -80,14 +80,14 @@ tests:
     - label: "3b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
       response:
           value: 0
 
     - label: "3b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
       response:
           value: 0
 
@@ -106,14 +106,14 @@ tests:
     - label: "4b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C41.Rsp
       response:
           value: 1
 
     - label: "4b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C41.Rsp
       response:
           value: 1
 
@@ -138,14 +138,14 @@ tests:
     - label: "5b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 &&  OO.S.C40.Rsp
       response:
           value: 0
 
     - label: "5b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
       response:
           value: 0
 
@@ -164,14 +164,14 @@ tests:
     - label: "5d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
       response:
           value: 1
 
     - label: "5d:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C01.Rsp
       response:
           value: 1
 
@@ -196,14 +196,14 @@ tests:
     - label: "6b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
       response:
           value: 0
 
     - label: "6b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
       response:
           value: 0
 
@@ -222,14 +222,14 @@ tests:
     - label: "7b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
       response:
           value: 1
 
     - label: "7b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C01.Rsp
       response:
           value: 1
 
@@ -248,14 +248,14 @@ tests:
     - label: "7d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C41.Rsp
       response:
           value: 1
 
     - label: "7d:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: OO.S.A4000
+      PICS: OO.S.A4000 && OO.S.C41.Rsp
       response:
           value: 1
 
@@ -288,14 +288,14 @@ tests:
     - label: "9b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "9b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 255
@@ -304,7 +304,7 @@ tests:
     - label: "9b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 
@@ -383,14 +383,14 @@ tests:
     - label: "10e:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "10e:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 255
@@ -399,7 +399,7 @@ tests:
     - label: "10e:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 
@@ -424,21 +424,21 @@ tests:
     - label: "11b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
       response:
           value: 0
 
     - label: "11b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C40.Rsp
       response:
           value: 0
 
     - label: "11b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C40.Rsp
       response:
           constraints:
               minValue: 255
@@ -467,21 +467,21 @@ tests:
     - label: "12b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "12b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "12b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 170
@@ -502,21 +502,21 @@ tests:
     - label: "13b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
       response:
           value: 1
 
     - label: "13b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C01.Rsp
       response:
           value: 0
 
     - label: "13b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C01.Rsp
       response:
           value: 0
 
@@ -555,21 +555,21 @@ tests:
     - label: "14c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "14c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "14c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
               minValue: 255
@@ -627,21 +627,21 @@ tests:
     - label: "16b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "16b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "16b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 0
 
@@ -672,14 +672,14 @@ tests:
     - label: "17c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "17c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 255
@@ -688,7 +688,7 @@ tests:
     - label: "17c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 
@@ -703,21 +703,21 @@ tests:
     - label: "17d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "17d:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "17d:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 0
 
@@ -744,14 +744,14 @@ tests:
     - label: "18b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "18b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 255
@@ -760,7 +760,7 @@ tests:
     - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 
@@ -807,14 +807,14 @@ tests:
     - label: "19c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "19c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 170
@@ -823,7 +823,7 @@ tests:
     - label: "19c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 
@@ -834,21 +834,21 @@ tests:
     - label: "20b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "20b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "20b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
               minValue: 255
@@ -877,21 +877,21 @@ tests:
     - label: "21b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "21b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           value: 0
 
     - label: "21b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP
+      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 170
@@ -904,21 +904,21 @@ tests:
     - label: "22b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
       response:
           value: 1
 
     - label: "22b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C01.Rsp
       response:
           value: 0
 
     - label: "22b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C01.Rsp
       response:
           value: 0
 
@@ -949,21 +949,21 @@ tests:
     - label: "23c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "23c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "23c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
               minValue: 255
@@ -980,21 +980,21 @@ tests:
     - label: "23d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "23d:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
       response:
           value: 0
 
     - label: "23d:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           value: 0
 
@@ -1013,14 +1013,14 @@ tests:
     - label: "24b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
     - label: "24b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
               minValue: 255
@@ -1029,7 +1029,7 @@ tests:
     - label: "24b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           value: 300
 

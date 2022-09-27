@@ -72,6 +72,26 @@ namespace chip {
 #endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
+ *  @def CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
+ *
+ *  @brief
+ *    Should an address lookup of the peer happen on every first message that fails
+ *    to send on the link.
+ *
+ *  The default value to not perform lookup was selected because most implementations
+ *  of address lookup are not cache the and a request is sent on the link. Failing
+ *  to deliver the first message is far more likely to happen due to lossy link
+ *  than an actual address change where the peer did not reset. In the lossy link
+ *  situation, doing further DNS resolutions on a degraded link can exacerbate that
+ *  problem greatly. Additionally, every message that arrives from a peer updates the
+ *  address. If the peer has fallen off the link due to any other reason, a re-resolve
+ *  may not achieve an address that is reachable, even if a resolve response occurs.
+ */
+#ifndef CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
+#define CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE 0
+#endif // CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
+
+/**
  *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
  *
  *  @brief
@@ -135,5 +155,25 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig();
  *          use it when communicating with us.
  */
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+/**
+ * @brief
+ *
+ * Overrides the local idle and active retransmission timeout parameters (which are usually set through compile
+ * time defines). This is reserved for tests that need the ability to set these at runtime to make certain test scenarios possible.
+ *
+ */
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout);
+
+/**
+ * @brief
+ *
+ * Disables the overrides set previously in OverrideLocalMRPConfig().
+ *
+ */
+void ClearLocalMRPConfigOverride();
+#endif
 
 } // namespace chip

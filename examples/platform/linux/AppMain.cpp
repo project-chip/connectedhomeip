@@ -70,6 +70,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
+#include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
 
@@ -142,6 +143,53 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
+class SampleTestEventTriggerDelegate : public TestEventTriggerDelegate
+{
+public:
+    /// NOTE: If you copy this, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your trigger codes.
+    static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFF1'0000ull);
+
+    SampleTestEventTriggerDelegate() { memset(&mEnableKey[0], 0, sizeof(mEnableKey)); }
+
+    /**
+     * @brief Initialize the delegate with a key and an optional other handler
+     *
+     * The `otherDelegate` will be called if there is no match of the eventTrigger
+     * when HandleEventTrigger is called, if it is non-null.
+     *
+     * @param enableKey - EnableKey to use for this instance.
+     * @param otherDelegate - Other delegate (e.g. OTA delegate) where defer trigger. Can be nullptr
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if enableKey is wrong size.
+     */
+    CHIP_ERROR Init(ByteSpan enableKey, TestEventTriggerDelegate * otherDelegate)
+    {
+        VerifyOrReturnError(enableKey.size() == sizeof(mEnableKey), CHIP_ERROR_INVALID_ARGUMENT);
+        mOtherDelegate = otherDelegate;
+        MutableByteSpan ourEnableKeySpan(mEnableKey);
+        return CopySpanToMutableSpan(enableKey, ourEnableKeySpan);
+    }
+
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override { return enableKey.data_equal(ByteSpan(mEnableKey)); }
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
+    {
+        ChipLogProgress(Support, "Saw TestEventTrigger: " ChipLogFormatX64, ChipLogValueX64(eventTrigger));
+
+        if (eventTrigger == kSampleTestEventTriggerAlwaysSuccess)
+        {
+            // Do nothing, successfully
+            ChipLogProgress(Support, "Handling \"Always success\" internal test event");
+            return CHIP_NO_ERROR;
+        }
+
+        return (mOtherDelegate != nullptr) ? mOtherDelegate->HandleEventTrigger(eventTrigger) : CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+private:
+    uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
+    TestEventTriggerDelegate * mOtherDelegate = nullptr;
+};
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -198,17 +246,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 
     {
         ChipLogProgress(NotSpecified, "==== Onboarding payload for Standard Commissioning Flow ====");
-        PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-    }
-
-    {
-        // For testing of manual pairing code with custom commissioning flow
-        ChipLogProgress(NotSpecified, "==== Onboarding payload for Custom Commissioning Flows ====");
-        err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-        SuccessOrExit(err);
-
-        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-
         PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
     }
 
@@ -309,11 +346,19 @@ void ChipLinuxAppMainLoop()
         initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
     }
 
+    TestEventTriggerDelegate * otherDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(
+    // We want to allow triggering OTA queries if OTA requestor is enabled
+    static OTATestEventTriggerDelegate otaTestEventTriggerDelegate{ ByteSpan(
         LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    otherDelegate = &otaTestEventTriggerDelegate;
 #endif
+    // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
+    static SampleTestEventTriggerDelegate testEventTriggerDelegate;
+    VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
+                                              otherDelegate) == CHIP_NO_ERROR);
+
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 
     // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -334,7 +379,8 @@ void ChipLinuxAppMainLoop()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10,
-                                    LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort) == CHIP_NO_ERROR);
+                                    LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
+                                    LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();

@@ -198,13 +198,3 @@ tests:
           Verify in DUT as commissioner side:
           [1659491845308] [14021:5374393] CHIP: [TOO] Device commissioning completed with success
       disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true

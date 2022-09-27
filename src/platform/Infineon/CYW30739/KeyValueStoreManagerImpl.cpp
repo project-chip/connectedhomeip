@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -114,12 +114,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeyConfigIdEntry * entry;
 
-    const size_t keyLength = strnlen(key, PersistentStorageDelegate::kKeyLengthMax + 1);
+    const size_t keyLength = strnlen(key, PersistentStorageDelegate::kKeyLengthMax);
     VerifyOrExit(keyLength != 0 && keyLength <= PersistentStorageDelegate::kKeyLengthMax &&
                      value_size <= kMaxPersistedValueLengthSupported,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    entry = AllocateEntry(key, keyLength);
+    entry = AllocateEntry(key);
     VerifyOrExit(entry != nullptr, ChipLogError(DeviceLayer, "%s AllocateEntry %s", __func__, ErrorStr(err));
                  err = CHIP_ERROR_NO_MEMORY);
 
@@ -129,7 +129,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     }
 
     entry->SetValueSize(value_size);
-    SuccessOrExit(err = CYW30739Config::WriteConfigValueBin(entry->GetKeyConfigKey(), &entry->mStorage, sizeof(entry->mStorage)));
+    SuccessOrExit(err = CYW30739Config::WriteConfigValueBin(entry->GetKeyConfigKey(), &entry->mStorage, entry->mStorage.GetSize()));
 
 exit:
     return err;
@@ -149,8 +149,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     err = CYW30739Config::ClearConfigValue(entry->GetKeyConfigKey());
     VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    err = CYW30739Config::ClearConfigValue(entry->GetValueConfigKey());
-    VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    if (entry->GetValueSize() != 0)
+    {
+        err = CYW30739Config::ClearConfigValue(entry->GetValueConfigKey());
+        VerifyOrExit(ChipError::IsSuccess(err), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
 
     slist_del(entry, &mKeyConfigIdList);
     Platform::Delete(entry);
@@ -171,10 +174,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
     return CHIP_NO_ERROR;
 }
 
-KeyValueStoreManagerImpl::KeyStorage::KeyStorage(const char * key, size_t keyLength) : mValueSize(0)
+KeyValueStoreManagerImpl::KeyStorage::KeyStorage(const char * key) : mValueSize(0)
 {
-    memset(mKey, 0, sizeof(mKey));
-    memcpy(mKey, key, keyLength);
+    if (key != NULL)
+    {
+        Platform::CopyString(mKey, key);
+    }
+    else
+    {
+        mKey[0] = 0;
+    }
 }
 
 bool KeyValueStoreManagerImpl::KeyStorage::IsMatchKey(const char * key) const
@@ -182,14 +191,14 @@ bool KeyValueStoreManagerImpl::KeyStorage::IsMatchKey(const char * key) const
     return strncmp(mKey, key, sizeof(mKey)) == 0;
 }
 
-KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateEntry(const char * key, size_t keyLength)
+KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateEntry(const char * key)
 {
     Optional<uint8_t> freeConfigID;
     KeyConfigIdEntry * newEntry = FindEntry(key, &freeConfigID);
     ReturnErrorCodeIf(newEntry != nullptr, newEntry);
     ReturnErrorCodeIf(!freeConfigID.HasValue(), nullptr);
 
-    newEntry = Platform::New<KeyConfigIdEntry>(freeConfigID.Value(), KeyStorage(key, keyLength));
+    newEntry = Platform::New<KeyConfigIdEntry>(freeConfigID.Value(), KeyStorage(key));
     ReturnErrorCodeIf(newEntry == nullptr, nullptr);
 
     KeyConfigIdEntry * entry = static_cast<KeyConfigIdEntry *>(slist_tail(&mKeyConfigIdList));

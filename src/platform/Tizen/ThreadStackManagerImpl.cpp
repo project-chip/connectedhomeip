@@ -586,6 +586,17 @@ CHIP_ERROR ThreadStackManagerImpl::_ClearSrpHost(const char * aHostName)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback,
+                                               void * aContext)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 } // namespace DeviceLayer
 } // namespace chip

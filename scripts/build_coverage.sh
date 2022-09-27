@@ -18,8 +18,28 @@
 
 set -e
 
+_install_lcov() {
+    if ! lcov --version >/dev/null 2>&1; then
+        echo "lcov not installed. Installing..."
+        case "$(uname)" in
+            "Darwin")
+                brew install lcov
+                ;;
+            "Linux")
+                sudo apt-get update
+                sudo apt-get install -y lcov
+                ;;
+            *)
+                die
+                ;;
+        esac
+    fi
+}
+
+_install_lcov
+
 _normpath() {
-    python -c "import os.path; print(os.path.normpath('$@'))"
+    python3 -c "import os.path; print(os.path.normpath('$@'))"
 }
 
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
@@ -72,8 +92,11 @@ if [ "$skip_gn" == false ]; then
     ninja -C "$OUTPUT_ROOT" check
 fi
 
+# Remove unit test itself from coverage statistics
+find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
+
 mkdir -p "$COVERAGE_ROOT"
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj" --output-file "$COVERAGE_ROOT/lcov_base.info"
-lcov --capture --directory "$OUTPUT_ROOT"/obj --output-file "$COVERAGE_ROOT/lcov_test.info"
+lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"

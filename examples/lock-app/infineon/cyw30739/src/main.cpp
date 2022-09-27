@@ -255,8 +255,6 @@ void InitApp(intptr_t args)
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
-
     ConfigurationMgr().LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -277,7 +275,7 @@ void ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         ChipLogDetail(Zcl, "Unlock Action has been initiated");
     }
 
-    if (aActor == LockManager::ACTOR_BUTTON)
+    if (aActor == AppEvent::kEventType_Button)
     {
         syncClusterToButtonAction = true;
     }

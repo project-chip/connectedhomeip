@@ -35,7 +35,7 @@ tests:
     - label: "TH reads BSSID attribute from DUT"
       PICS: DGWIFI.S.A0000
       command: "readAttribute"
-      attribute: "BSSID"
+      attribute: "bssid"
       response:
           constraints:
               type: octet_string
@@ -72,7 +72,7 @@ tests:
     - label: "Reads RSSI attribute constraints"
       PICS: DGWIFI.S.A0004
       command: "readAttribute"
-      attribute: "RSSI"
+      attribute: "rssi"
       response:
           constraints:
               type: int8s

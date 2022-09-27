@@ -261,24 +261,8 @@ tests:
           "TH1 writes Binding entry into DUT with Entry 1: Group = The Group ID
           in the AddGroup command sent from DUT to TH2"
       verification: |
-          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
+          Before write the binding entries run the ACL Commands:
 
-          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 74 1
-
-          On TH, Verify the success response for binding entry
-
-          [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =
-          [1657717436.184940][4353:4358] CHIP:DMG:                         {
-          [1657717436.184981][4353:4358] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1657717436.185022][4353:4358] CHIP:DMG:                         },
-          [1657717436.185062][4353:4358] CHIP:DMG:
-      disabled: true
-
-    - label:
-          "DUT is triggered to send Multicast message On command to its binding
-          entries"
-      PICS: OO.C.C01.Tx
-      verification: |
           Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
 
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]" 74 0
@@ -298,7 +282,24 @@ tests:
           [1659075680.943991][2687:2692] CHIP:DMG:                         StatusIB =
           [1659075680.944052][2687:2692] CHIP:DMG:                         {
           [1659075680.944116][2687:2692] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          Run this cmmd for [ nRF52840-DK ]Thread device in chip-tool:
 
+          ./chip-tool binding write binding "[{"group" : "0x0001"}]" 74 1
+
+          On TH, Verify the success response for binding entry
+
+          [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =
+          [1657717436.184940][4353:4358] CHIP:DMG:                         {
+          [1657717436.184981][4353:4358] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657717436.185022][4353:4358] CHIP:DMG:                         },
+          [1657717436.185062][4353:4358] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "DUT is triggered to send Multicast message On command to its binding
+          entries"
+      PICS: OO.C.C01.Tx
+      verification: |
           Press button no.2 on [ nRF52840-DK ]thread board
       disabled: true
 

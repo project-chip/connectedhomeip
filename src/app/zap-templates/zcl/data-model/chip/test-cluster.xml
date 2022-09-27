@@ -232,6 +232,8 @@ limitations under the License.
     <attribute side="server" code="0x4028" define="NULLABLE_RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" isNullable="true" optional="false" default="200">nullable_range_restricted_int16u</attribute>
     <attribute side="server" code="0x4029" define="NULLABLE_RANGE_RESTRICTED_INT16S" type="int16s" min="-150" max="200" writable="true" isNullable="true" optional="false" default="-5">nullable_range_restricted_int16s</attribute>
 
+    <attribute side="server" code="0x402A" define="WRITE_ONLY_INT8U" type="INT8U" writable="true" default="0" optional="true">write_only_int8u</attribute>
+
     <!-- This attribute should not be enabled on the server side -->
     <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="true">unsupported</attribute>
 

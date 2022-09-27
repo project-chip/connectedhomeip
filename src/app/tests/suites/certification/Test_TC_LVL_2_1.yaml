@@ -222,7 +222,6 @@ tests:
       command: "readAttribute"
       attribute: "Options"
       response:
-          value: 0
           constraints:
               type: bitmap8
 

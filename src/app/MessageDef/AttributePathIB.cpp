@@ -227,6 +227,63 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
     return err;
 }
 
+CHIP_ERROR AttributePathIB::Parser::ParsePath(AttributePathParams & aAttribute) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = GetEndpoint(&(aAttribute.mEndpointId));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aAttribute.HasWildcardEndpointId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetCluster(&aAttribute.mClusterId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidClusterId(aAttribute.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetAttribute(&aAttribute.mAttributeId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidAttributeId(aAttribute.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    // A wildcard cluster requires that the attribute path either be
+    // wildcard or a global attribute.
+    VerifyOrReturnError(!aAttribute.HasWildcardClusterId() || aAttribute.HasWildcardAttributeId() ||
+                            IsGlobalAttribute(aAttribute.mAttributeId),
+                        CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetListIndex(&aAttribute.mListIndex);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aAttribute.HasWildcardAttributeId() && !aAttribute.HasWildcardListIndex(),
+                            CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    return CHIP_NO_ERROR;
+}
+
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
 {
     // skip if error has already been set

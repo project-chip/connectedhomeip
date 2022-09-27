@@ -69,7 +69,7 @@ jobs:
     efr32:
         name: EFR32
         env:
-            EFR32_BOARD: BRD4161A
+            SILABS_BOARD: BRD4161A
             BUILD_DIRECTORY: out/lock_app_debug/BRD4161A
 
         runs-on: ubuntu-latest
@@ -100,7 +100,7 @@ jobs:
                       .environment/pigweed-venv/*.log
             - name: Build example EFR32 Lock App
               run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
-                  out/lock_app_debug $EFR32_BOARD
+                  out/lock_app_debug $SILABS_BOARD
 
             - name: Upload artifact
               run: |
@@ -110,4 +110,4 @@ jobs:
                      --release-tag "${{ github.event.inputs.releaseTag }}"    \
                      --bundle-files $BUILD_DIRECTORY/lock_app.flashbundle.txt \
                      --working-directory $BUILD_DIRECTORY                     \
-                     --bundle-name efr32-$EFR32_BOARD-chip-lock-example
+                     --bundle-name efr32-$SILABS_BOARD-chip-lock-example

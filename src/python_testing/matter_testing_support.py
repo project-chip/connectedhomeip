@@ -122,6 +122,7 @@ class MatterTestConfig:
     logs_path: pathlib.Path = None
     paa_trust_store_path: pathlib.Path = None
     ble_interface_id: int = None
+    commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
     case_admin_subject: int = None
@@ -428,6 +429,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         return True
 
     config.commissioning_method = args.commissioning_method
+    config.commission_only = args.commission_only
 
     if args.dut_node_id is None:
         print("error: When --commissioning-method present, --dut-node-id is mandatory!")
@@ -585,6 +587,9 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT", help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
 
+    commission_group.add_argument('--commission-only', action="store_true", default=False,
+                                  help="If true, test exits after commissioning without running subsequent tests")
+
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
@@ -731,7 +736,10 @@ def default_matter_test_main(argv=None, **kwargs):
         if matter_test_config.commissioning_method is not None:
             runner.add_test_class(test_config, CommissionDeviceTest, None)
 
-        runner.add_test_class(test_config, test_class, tests)
+        # Add the tests selected unless we have a commission-only request
+        if not matter_test_config.commission_only:
+            runner.add_test_class(test_config, test_class, tests)
+
         try:
             runner.run()
             ok = runner.results.is_all_pass and ok

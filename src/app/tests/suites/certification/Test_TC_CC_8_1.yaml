@@ -109,7 +109,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 215
+              minValue: 216
               maxValue: 254
 
     - label: "Wait 2s"
@@ -126,7 +126,7 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 215
+              minValue: 216
               maxValue: 254
 
     - label:
@@ -192,7 +192,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          saveAs: CurrentSaturationValue
           constraints:
               minValue: 170
               maxValue: 230
@@ -211,7 +210,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: CurrentSaturationValue
+              minValue: 170
               maxValue: 230
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
@@ -309,11 +308,8 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep4f
           constraints:
-              minValue:
-                  ( ColorTempPhysicalMaxMireds + ColorTempPhysicalMinMireds ) /
-                  2
+              minValue: ColorTempPhysicalMinMireds
               maxValue: ColorTempPhysicalMaxMireds
 
     - label: "Wait 2s"
@@ -329,7 +325,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          value: ColorTemperatureMiredsStep4f
+          constraints:
+              minValue: ColorTempPhysicalMinMireds
+              maxValue: ColorTempPhysicalMaxMireds
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=20000,
@@ -396,7 +394,6 @@ tests:
       PICS: CC.S.A4000 && CC.S.C47.Rsp
       attribute: "EnhancedCurrentHue"
       response:
-          saveAs: EnhancedCurrentHueValue
           constraints:
               minValue: 21250
               maxValue: 28750
@@ -415,7 +412,7 @@ tests:
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              minValue: EnhancedCurrentHueValue
+              minValue: 21250
               maxValue: 28750
 
     - label: "Turn Off light that we turned on"

@@ -31,7 +31,7 @@ chip_test_suite("tests") {
     "TestTimeSource.cpp",
   ]
 
-  if (chip_device_platform != "esp32" && chip_device_platform != "fake") {
+  if (chip_device_platform != "fake") {
     test_sources += [ "TestSystemScheduleWork.cpp" ]
   }
 

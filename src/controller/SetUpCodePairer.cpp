@@ -36,12 +36,14 @@ constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISC
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
+                                       DiscoveryType discoveryType)
 {
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     SetupPayload payload;
     mConnectionType = commission;
+    mDiscoveryType  = discoveryType;
 
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     if (isQRCode)
@@ -73,7 +75,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 
     bool searchOverAll = !payload.rendezvousInformation.HasValue();
 
-    if (mConnectionType != SetupCodePairerBehaviour::kCommissionOnNetwork)
+    if (mDiscoveryType == DiscoveryType::kAll)
     {
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kBLE))
         {
@@ -229,8 +231,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         ExpectPASEEstablishment();
 
         CHIP_ERROR err;
-        if (mConnectionType == SetupCodePairerBehaviour::kCommission ||
-            mConnectionType == SetupCodePairerBehaviour::kCommissionOnNetwork)
+        if (mConnectionType == SetupCodePairerBehaviour::kCommission)
         {
             err = mCommissioner->PairDevice(mRemoteId, params);
         }

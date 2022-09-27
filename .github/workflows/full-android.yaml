@@ -23,7 +23,7 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    android:
+    full_android:
         name: Run
         timeout-minutes: 75
 
@@ -40,14 +40,25 @@ jobs:
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
+              if: ${{ !env.ACT }}
               name: Checkout
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            # To use act like:
+            #   act -j full_android
+            #
+            # Note you likely still need to have non submodules setup for the
+            # local machine, like:
+            #   git submodule deinit --all
+            - uses: actions/checkout@v3
+              if: ${{ env.ACT }}
+              name: Checkout (ACT for local build)
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform android
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -59,16 +70,38 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Build Android CHIPTool and CHIPTest (ARM)
+            - name: Build Android arm-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm-*' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-chip-tool build"
             - name: Clean out build output
               run: rm -rf ./out
-            - name: Build Android CHIPTool and CHIPTest (ARM64)
+            - name: Build Android arm-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-*' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-tv-casting-app build"
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build Android arm-tv-server
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-tv-server build"
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build Android arm64-tv-casting-app
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-tv-casting-app build"
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build Android arm64-tv-server
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-tv-server build"
+            - name: Build Android arm64-chip-tool
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-chip-tool build"
             - name: Run Android build rule tests
               run: |
                   ./scripts/run_in_build_env.sh \

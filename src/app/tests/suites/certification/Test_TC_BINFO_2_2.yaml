@@ -32,7 +32,7 @@ tests:
 
           3. BINFO.S.A0011(Reachable) - TH reads Reachable attribute from DUT and saves for future use(should be true)
 
-          4. BINFO.S.E00(StartUp) && BINFO.S.E01(ShutDown) && BINFO.S.E02(Leave) - TH subscribes to StartUp, ShutDown, Leave and ReachableChanged events on the Basic Information cluster of the DUT
+          4. BINFO.S.E00(StartUp) | BINFO.S.E01(ShutDown) && BINFO.S.E02(Leave) - TH subscribes to StartUp, ShutDown, Leave and ReachableChanged events on the Basic Information cluster of the DUT
 
           5. TH saves the FabricIndex during commissioning
       disabled: true

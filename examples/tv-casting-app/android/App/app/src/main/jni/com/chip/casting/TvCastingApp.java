@@ -78,7 +78,7 @@ public class TvCastingApp {
    * APPLICATION LAUNCHER CLUSTER
    */
   public native boolean applicationLauncher_launchApp(
-      short catalogVendorId, String applicationId, String data, Object responseHandler);
+      short catalogVendorId, String applicationId, byte[] data, Object responseHandler);
 
   public native boolean applicationLauncher_stopApp(
       short catalogVendorId, String applicationId, Object responseHandler);

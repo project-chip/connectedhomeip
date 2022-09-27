@@ -74,14 +74,14 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
         while (repeatCount--) {
-            [device invokeCommandWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                                      clusterId:[NSNumber numberWithUnsignedInteger:clusterId]
-                                      commandId:[NSNumber numberWithUnsignedInteger:commandId]
+            [device invokeCommandWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                                      clusterID:[NSNumber numberWithUnsignedInteger:clusterId]
+                                      commandID:[NSNumber numberWithUnsignedInteger:commandId]
                                   commandFields:commandFields
                              timedInvokeTimeout:mTimedInteractionTimeoutMs.HasValue()
                                  ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                                  : nil
-                                    clientQueue:callbackQueue
+                                          queue:callbackQueue
                                      completion:^(
                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                          responsesNeeded--;

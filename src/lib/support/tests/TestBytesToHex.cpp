@@ -17,15 +17,25 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
+#include <vector>
 
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <nlunit-test.h>
 
 namespace {
 
+using namespace chip;
 using namespace chip::Encoding;
+
+// To accumulate redirected logs for some tests
+std::vector<std::string> gRedirectedLogLines;
 
 void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
 {
@@ -328,12 +338,102 @@ void TestHexToBytesAndUint(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test16Out == test16OutExpected);
 }
 
+ENFORCE_FORMAT(3, 0) void AccumulateLogLineCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    (void) module;
+    (void) category;
+
+    char line[256];
+    memset(&line[0], 0, sizeof(line));
+    vsnprintf(line, sizeof(line), msg, args);
+    gRedirectedLogLines.push_back(std::string(line));
+}
+
+void ValidateTextMatches(nlTestSuite * inSuite, const char ** expected, size_t numLines, const std::vector<std::string> & candidate)
+{
+    NL_TEST_ASSERT(inSuite, candidate.size() == numLines);
+    if (candidate.size() != numLines)
+    {
+        return;
+    }
+    for (size_t idx = 0; idx < numLines; idx++)
+    {
+        printf("Checking '%s' against '%s'\n", candidate.at(idx).c_str(), expected[idx]);
+        NL_TEST_ASSERT(inSuite, candidate.at(idx) == expected[idx]);
+        if (candidate.at(idx) != expected[idx])
+        {
+            return;
+        }
+    }
+}
+
+void TestLogBufferAsHex(nlTestSuite * inSuite, void * inContext)
+{
+    const char * kExpectedText1[] = {
+        ">>>A54A39294B28886E8BFC15B44105A3FD22745225983A753E6BB82DA7C62493BF",
+        ">>>02C3ED03D41B6F7874E7E887321DE7B4872CEB9F080B6ECE14A8ABFA260573A3",
+        ">>>8D759C",
+    };
+
+    const char * kExpectedText2[] = {
+        "label>>>A54A39294B28886E8BFC15B44105A3FD22745225983A753E6BB82DA7C62493BF",
+        "label>>>02C3ED03D41B6F7874E7E887321DE7B4872CEB9F080B6ECE14A8ABFA260573A3",
+        "label>>>8D759C",
+    };
+
+    const char * kExpectedText3[] = {
+        "label>>>",
+    };
+
+    const char * kExpectedText4[] = {
+        "label>>>A54A39",
+    };
+
+    const uint8_t buffer[67] = { 0xa5, 0x4a, 0x39, 0x29, 0x4b, 0x28, 0x88, 0x6e, 0x8b, 0xfc, 0x15, 0xb4, 0x41, 0x05,
+                                 0xa3, 0xfd, 0x22, 0x74, 0x52, 0x25, 0x98, 0x3a, 0x75, 0x3e, 0x6b, 0xb8, 0x2d, 0xa7,
+                                 0xc6, 0x24, 0x93, 0xbf, 0x02, 0xc3, 0xed, 0x03, 0xd4, 0x1b, 0x6f, 0x78, 0x74, 0xe7,
+                                 0xe8, 0x87, 0x32, 0x1d, 0xe7, 0xb4, 0x87, 0x2c, 0xeb, 0x9f, 0x08, 0x0b, 0x6e, 0xce,
+                                 0x14, 0xa8, 0xab, 0xfa, 0x26, 0x05, 0x73, 0xa3, 0x8d, 0x75, 0x9c };
+
+    struct TestCase
+    {
+        const char * label;
+        chip::ByteSpan buffer;
+        const char ** expectedText;
+        size_t numLines;
+    };
+
+    const TestCase kTestCases[] = {
+        // Basic cases
+        { "", ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
+        { nullptr, ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
+        { "label", ByteSpan(buffer), kExpectedText2, ArraySize(kExpectedText2) },
+
+        // Empty buffer leads to a single label
+        { "label", ByteSpan(), kExpectedText3, ArraySize(kExpectedText3) },
+        // Less than full single line works
+        { "label", ByteSpan(&buffer[0], 3), kExpectedText4, ArraySize(kExpectedText4) },
+    };
+
+    for (auto testCase : kTestCases)
+    {
+        chip::Logging::SetLogRedirectCallback(&AccumulateLogLineCallback);
+        gRedirectedLogLines.clear();
+        {
+            LogBufferAsHex(testCase.label, testCase.buffer);
+        }
+        chip::Logging::SetLogRedirectCallback(nullptr);
+        ValidateTextMatches(inSuite, testCase.expectedText, testCase.numLines, gRedirectedLogLines);
+    }
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestBytesToHexNotNullTerminated", TestBytesToHexNotNullTerminated), //
     NL_TEST_DEF("TestBytesToHexNullTerminated", TestBytesToHexNullTerminated),       //
     NL_TEST_DEF("TestBytesToHexErrors", TestBytesToHexErrors),                       //
     NL_TEST_DEF("TestBytesToHexUint64", TestBytesToHexUint64),                       //
     NL_TEST_DEF("TestHexToBytesAndUint", TestHexToBytesAndUint),                     //
+    NL_TEST_DEF("TestLogBufferAsHex", TestLogBufferAsHex),                           //
     NL_TEST_SENTINEL()                                                               //
 };
 

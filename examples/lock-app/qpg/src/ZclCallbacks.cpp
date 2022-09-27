@@ -45,14 +45,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     default:
         break;
     }
-
-    if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
-        return;
-    }
-
-    BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
 }
 
 bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -83,13 +75,27 @@ bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credenti
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool returnValue = false;
+
+    if (BoltLockMgr().ValidatePIN(pinCode, err))
+    {
+        returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+    }
+
+    return returnValue;
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                               DlOperationError & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool returnValue = false;
+
+    if (BoltLockMgr().ValidatePIN(pinCode, err))
+    {
+        returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+    }
+
+    return returnValue;
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
