@@ -21,17 +21,16 @@
 #      This is a utility script that creates PAA, PAI and DAC certificates for NXP factory data.
 #
 
-if [ -z "$1" ]
-then
-	echo "Usage: ./generate_cert.sh chip-cert-path"
-	exit 1
+if [ -z "$1" ]; then
+    echo "Usage: ./generate_cert.sh chip-cert-path"
+    exit 1
 fi
 
 CHIP_CERT_TOOL="$1"
 
 function exit_err() {
-	echo "${1}"
-	exit 1
+    echo "${1}"
+    exit 1
 }
 
 DATE="2022-06-21 12:35:00"
@@ -60,7 +59,7 @@ DAC_KEY="Chip-DAC-NXP-"$DAC_VID"-"$DAC_PID"-Key.pem"
 DAC_KEY_DER="Chip-DAC-NXP-"$DAC_VID"-"$DAC_PID"-Key.der"
 
 # Remove certificates if present
-rm -rf "$PAA_CERT" "$PAA_KEY" "$PAI_CERT" "$PAI_KEY" "$DAC_CERT" "$DAC_KEY" "$PAI_CERT_DER" "$DAC_CERT_DER" "$DAC_KEY_DER"> /dev/null 2>&1
+rm -rf "$PAA_CERT" "$PAA_KEY" "$PAI_CERT" "$PAI_KEY" "$DAC_CERT" "$DAC_KEY" "$PAI_CERT_DER" "$DAC_CERT_DER" "$DAC_KEY_DER" >/dev/null 2>&1
 
 # Generate certificates
 echo "Generate certificates"
