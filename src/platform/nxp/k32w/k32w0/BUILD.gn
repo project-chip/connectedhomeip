@@ -58,6 +58,13 @@ static_library("k32w0") {
     "ble_function_mux.c",
   ]
 
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+  ]
+
   if (chip_with_low_power != 0) {
     sources += [
       "LowPowerHooks.cpp",

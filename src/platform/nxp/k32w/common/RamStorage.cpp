@@ -61,7 +61,7 @@ CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t* aValue, uint16_t aVal
     CHIP_ERROR err;
     rsError status = RS_ERROR_NONE;
 
-    // Delete all occurences of "key" and resize buffer if needed
+    // Delete all occurrences of "key" and resize buffer if needed
     // before scheduling writing of new value.
     ramStorageDelete(sBuffer, aKey, -1);
     status = ramStorageResize(&sBuffer, aKey, aValue, aValueLength);
