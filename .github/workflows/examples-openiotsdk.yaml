@@ -26,7 +26,7 @@ concurrency:
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 90
+        timeout-minutes: 140
 
         env:
             TEST_NETWORK_NAME: OIStest
@@ -87,6 +87,12 @@ jobs:
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build unit tests
+              id: build_unit_tests
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh unit-tests
+
             - name: Test shell example
               if: steps.build_shell.outcome == 'success'
               timeout-minutes: 5
@@ -100,3 +106,9 @@ jobs:
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh -C test -n ${TEST_NETWORK_NAME}tap lock-app
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+            
+            - name: Run unit tests
+              if: steps.build_unit_tests.outcome == 'success' && github.event_name == 'pull_request'
+              timeout-minutes: 90
+              run: |
+                  scripts/examples/openiotsdk_example.sh -C run unit-tests
