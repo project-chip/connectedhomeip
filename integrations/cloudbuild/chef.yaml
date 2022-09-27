@@ -41,7 +41,7 @@ steps:
             path: /pwenv
 
     - name: "gcr.io/cloud-builders/docker"
-      args: 
+      args:
           - "-c"
           - COMMIT_SHA=$COMMIT_SHA SHORT_SHA=$SHORT_SHA REVISION_ID=$REVISION_ID BUILD_ID=$BUILD_ID ./examples/chef/create_docker.sh
       id: DockerAll
