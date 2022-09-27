@@ -66,9 +66,7 @@ static_library("k32w0") {
   ]
 
   if (chip_with_low_power != 0) {
-    sources += [
-      "LowPowerHooks.cpp",
-    ]
+    sources += [ "LowPowerHooks.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {

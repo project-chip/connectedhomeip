@@ -44,7 +44,6 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/util/include",
   ]
 
-
   defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
