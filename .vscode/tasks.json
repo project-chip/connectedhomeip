@@ -263,6 +263,21 @@
             }
         },
         {
+            "label": "Build Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Cbuild", "-d${input:openiotsdkDebugMode}", "unit-tests"],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
             "label": "Run Open IoT SDK example",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
@@ -271,6 +286,21 @@
                 "-n${input:openiotsdkNetwork}",
                 "${input:openiotsdkExample}"
             ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Crun", "unit-tests", "${input:openiotsdkUnitTest}"],
             "group": "test",
             "problemMatcher": {
                 "pattern": {
@@ -309,6 +339,32 @@
                 "-n${input:openiotsdkNetwork}",
                 "-dtrue",
                 "${input:openiotsdkExample}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Crun",
+                "-dtrue",
+                "unit-tests",
+                "${input:openiotsdkUnitTest}"
             ],
             "group": "none",
             "isBackground": true,
@@ -383,6 +439,40 @@
             "description": "What Open IoT SDK example application do you want to use?",
             "options": ["shell", "lock-app"],
             "default": "shell"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkUnitTest",
+            "description": "What unit test do you want to use?",
+            "options": [
+                "all",
+                "accesstest",
+                "AppTests",
+                "ASN1Tests",
+                "BDXTests",
+                "ChipCryptoTests",
+                "ControllerTests",
+                "CoreTests",
+                "CredentialsTest",
+                "DataModelTests",
+                "InetLayerTests",
+                "MdnsTests",
+                "MessagingLayerTests",
+                "MinimalMdnsCoreTests",
+                "MinimalMdnsRecordsTests",
+                "MinimalMdnsRespondersTests",
+                "PlatformTests",
+                "RawTransportTests",
+                "RetransmitTests",
+                "SecureChannelTests",
+                "SetupPayloadTests",
+                "SupportTests",
+                "SystemLayerTests",
+                "TestShell",
+                "TransportLayerTests",
+                "UserDirectedCommissioningTests"
+            ],
+            "default": "all"
         },
         {
             "type": "promptString",

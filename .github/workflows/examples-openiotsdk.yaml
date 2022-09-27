@@ -26,7 +26,7 @@ concurrency:
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 90
+        timeout-minutes: 140
 
         env:
             NETWORK_TAP_DEVICE_NAME: ARMfmtap
@@ -96,6 +96,13 @@ jobs:
                     openiotsdk release lock-app \
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
+
+            - name: Build and run unit tests
+              if: github.event_name == 'push' || steps.changed_paths.outputs.openiotsdk == 'true'
+              timeout-minutes: 90
+              run: |
+                  scripts/examples/openiotsdk_example.sh unit-tests
+                  scripts/examples/openiotsdk_example.sh -C run unit-tests
 
             - name: Test shell example
               if: steps.build_shell.outcome == 'success'

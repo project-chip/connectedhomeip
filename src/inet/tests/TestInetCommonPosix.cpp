@@ -287,7 +287,9 @@ void InitNetwork()
         }
     }
 #endif // CHIP_TARGET_STYLE_UNIX
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     tcpip_init(OnLwIPInitComplete, NULL);
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -457,6 +459,11 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
+#if defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
+            // Terminate event loop after performance single loop
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+#endif // CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
         }

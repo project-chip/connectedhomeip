@@ -625,12 +625,14 @@ static int TestSetup(void * aContext)
         return FAILURE;
     }
 
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     sLayer.Init();
 
@@ -650,9 +652,11 @@ static int TestTeardown(void * aContext)
 
     lContext.mLayer->Shutdown();
 
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
     tcpip_finish(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     ::chip::Platform::MemoryShutdown();
     return (SUCCESS);

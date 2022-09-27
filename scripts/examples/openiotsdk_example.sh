@@ -40,11 +40,13 @@ TELNET_TERMINAL_PORT=5000
 FAILED_TESTS=0
 FVP_NETWORK="user"
 
+readarray -t TEST_NAMES <$CHIP_ROOT/src/test_driver/openiotsdk/unit-tests/testnames.txt
+
 function show_usage {
     cat <<EOF
-Usage: $0 [options] example
+Usage: $0 [options] example [test_name]
 
-Build, run or test the Open IoT SDK example.
+Build, run or test the Open IoT SDK examples and unit-tests.
 
 Options:
     -h,--help                       Show this help
@@ -58,6 +60,18 @@ Options:
 Examples:
     shell
     lock-app
+    unit-tests
+
+You can run individual test suites of unit tests by using their names [test_name] with the run command:
+
+EOF
+    cat $CHIP_ROOT/src/test_driver/openiotsdk/unit-tests/testnames.txt
+    echo ""
+    cat <<EOF
+Or you can use all tests suites with <all> parameter as [test_name]
+
+The "test" command can be used for all supported examples expect the unit-tests. 
+
 EOF
 }
 
@@ -107,7 +121,11 @@ function run_fvp {
         exit 1
     fi
 
-    EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    if [[ $IS_TEST -eq 0 ]]; then
+        EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
+    else
+        EXAMPLE_EXE_PATH="$BUILD_PATH/$EXAMPLE.elf"
+    fi
 
     # Check if executable file exists
     if ! [ -f "$EXAMPLE_EXE_PATH" ]; then
@@ -132,10 +150,30 @@ function run_fvp {
     $FVP_BIN $OPTIONS -f $FVP_CONFIG_FILE --application $EXAMPLE_EXE_PATH >/dev/null 2>&1 &
     FVP_PID=$!
     sleep 1
-    telnet localhost ${TELNET_TERMINAL_PORT}
+
+    if [[ $IS_TEST -eq 1 ]]; then
+        set +e
+        expect <<EOF
+        set timeout 1200
+        set retcode -1
+        spawn telnet localhost ${TELNET_TERMINAL_PORT}
+        expect -re {Test status: (-?\d+)} {
+            set retcode \$expect_out(1,string)
+        }
+        expect "Open IoT SDK unit-tests completed"
+        set retcode [expr -1*\$retcode]
+        exit \$retcode
+EOF
+        RETCODE=$?
+        FAILED_TESTS=$(expr $FAILED_TESTS + $RETCODE)
+        echo "$(jq '. += {($testname): {failed: $result}}' --arg testname ${EXAMPLE} --arg result ${RETCODE} ${EXAMPLE_PATH}/test_report.json)" >$EXAMPLE_PATH/test_report.json
+    else
+        telnet localhost ${TELNET_TERMINAL_PORT}
+    fi
 
     # stop the fvp
     kill -9 $FVP_PID || true
+    set -e
     sleep 1
 }
 
@@ -240,7 +278,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 case "$1" in
-shell | lock-app)
+shell | unit-tests | lock-app)
     EXAMPLE=$1
     ;;
 *)
@@ -249,6 +287,29 @@ shell | lock-app)
     exit 2
     ;;
 esac
+
+if [[ "$EXAMPLE" == "unit-tests" ]]; then
+    if [ ! -z "$2" ]; then
+        if [[ " ${TEST_NAMES[*]} " =~ " $2 " ]]; then
+            if [[ "$COMMAND" != *"run"* ]]; then
+                echo "Test suites can only accept --command run"
+                show_usage
+                exit 2
+            fi
+            EXAMPLE=$2
+            echo "Run specific unit test $EXAMPLE"
+        elif [[ "$2" == "all" ]]; then
+            echo "Use all unit tests"
+        else
+            echo " Wrong unit test name"
+            show_usage
+            exit 2
+        fi
+    else
+        echo "Use all unit tests"
+    fi
+    IS_TEST=1
+fi
 
 case "$COMMAND" in
 build | run | test | build-run) ;;
@@ -260,7 +321,16 @@ build | run | test | build-run) ;;
 esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
-EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
+
+if [[ $IS_TEST -eq 0 ]]; then
+    EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
+else
+    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/unit-tests"
+    if [[ -f $EXAMPLE_PATH/test_report.json ]]; then
+        rm -rf $EXAMPLE_PATH/test_report.json
+    fi
+    echo "{}" >$EXAMPLE_PATH/test_report.json
+fi
 
 if [ -z "${BUILD_PATH}" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
@@ -271,12 +341,35 @@ if [[ "$COMMAND" == *"build"* ]]; then
 fi
 
 if [[ "$COMMAND" == *"run"* ]]; then
-    run_fvp
+    # If user wants to run unit-tests we need to loop through all test names
+    if [[ "$EXAMPLE" == "unit-tests" ]]; then
+        if $DEBUG; then
+            echo "You have to specify the test suites to run in debug mode"
+            show_usage
+            exit 2
+        else
+            for NAME in "${TEST_NAMES[@]}"; do
+                EXAMPLE=$NAME
+                echo "$EXAMPLE_PATH"
+                echo "Run specific unit test $EXAMPLE"
+                run_fvp
+            done
+            echo "Failed tests total: $FAILED_TESTS"
+        fi
+    else
+        run_fvp
+    fi
 fi
 
 if [[ "$COMMAND" == *"test"* ]]; then
-    IS_TEST=1
-    run_test
+    if [[ "$EXAMPLE" == "unit-tests" ]]; then
+        echo "The test command can not be applied to the unit-tests example"
+        show_usage
+        exit 2
+    else
+        IS_TEST=1
+        run_test
+    fi
 fi
 
 if [[ $IS_TEST -eq 1 ]]; then
