@@ -633,6 +633,7 @@ CHIP_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
  */
 void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 {
+
 #if CHIP_ENABLE_CHIPOBLE_TEST
     ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
     mBtpEngine.PushPacketTag(data, type);
@@ -1094,7 +1095,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
 
     // Select BLE transport protocol version from those supported by central, or none if no supported version found.
     resp.mSelectedProtocolVersion = BleLayer::GetHighestSupportedProtocolVersion(req);
-    ChipLogProgress(Ble, "selected BTP version %d", resp.mSelectedProtocolVersion);
+    ChipLogDebugBleEndPoint(Ble, "selected BTP version %d", resp.mSelectedProtocolVersion);
 
     if (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_None)
     {
@@ -1226,6 +1227,7 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
                 // Ensure end point's in the right state before continuing.
                 VerifyOrExit(mState == kState_Connecting, err = CHIP_ERROR_INCORRECT_STATE);
                 mConnStateFlags.Set(ConnectionStateFlag::kCapabilitiesMsgReceived);
+
 
                 err = HandleCapabilitiesResponseReceived(std::move(data));
                 SuccessOrExit(err);

@@ -383,11 +383,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
                     interfaceFound             = true;
                     PacketBufferHandle tempBuf = msgBuf.CloneData();
-                    VerifyOrReturnError(!tempBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-                    VerifyOrReturnError(!tempBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+	 VerifyOrReturnError(!tempBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+	 VerifyOrReturnError(!tempBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
                     destination = &(multicastAddress.SetInterface(interfaceId));
-                    if (mTransportMgr != nullptr)
+
+		    if (mTransportMgr != nullptr)
                     {
                         CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &tempBuf);
                         if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(tempBuf)))
@@ -409,7 +410,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         }
         else
         {
-            // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
+	  // Always return No error, because we expect some interface to fails and others to always succeed (e.g. lo interface)
             return CHIP_NO_ERROR;
         }
     }

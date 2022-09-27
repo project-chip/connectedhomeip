@@ -57,6 +57,11 @@ static_library("ESP32") {
     "SystemTimeSupport.h",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
+    "nimble/blecent.h",
+    "nimble/misc.c",
+    "nimble/peer.c",
+    "nimble/ChipDeviceScanner.h",
+    "nimble/ChipDeviceScanner.cpp",
   ]
 
   deps = [

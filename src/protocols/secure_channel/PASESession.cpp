@@ -225,7 +225,6 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
     mLocalMRPConfig = mrpLocalConfig;
-
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
 
@@ -234,7 +233,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Clear();
+     Clear();
     }
     return err;
 }
@@ -270,6 +269,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
+
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len   = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
                                                            sizeof(uint16_t),            // initiatorSessionId
@@ -288,7 +288,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId().Value()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
+ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     if (mLocalMRPConfig.HasValue())
     {
@@ -297,7 +297,6 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     }
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
-
     // Update commissioning hash with the pbkdf2 param request that's being sent.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ req->Start(), req->DataLength() }));
 
@@ -381,7 +380,6 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len =
         TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                                // initiatorRandom

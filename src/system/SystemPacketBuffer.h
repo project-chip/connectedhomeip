@@ -434,7 +434,7 @@ public:
     {
         if (mBuffer != nullptr)
         {
-            PacketBuffer::Free(mBuffer);
+        PacketBuffer::Free(mBuffer);
         }
         mBuffer        = aOther.mBuffer;
         aOther.mBuffer = nullptr;
