@@ -117,15 +117,14 @@ void AddCluster(const std::vector<std::string> & tokens)
         return;
     }
 
-    for (const auto & cluster : clusters::kKnownClusters)
+    auto c = CreateCluster(cluster_name.c_str());
+    if (c)
     {
-        if (cluster_name == cluster.name)
-        {
-            g_pending->AddCluster(
-                std::make_unique<DynamicCluster>(std::unique_ptr<GeneratedCluster>(cluster.ctor(::operator new(cluster.size)))));
-            printf("Added cluster %s/%d\n", cluster.name, cluster.id);
-            return;
-        }
+        g_pending->AddCluster(std::make_unique<DynamicCluster>(std::move(c)));
+    }
+    else
+    {
+        printf("No such cluster '%s'\n", cluster_name.c_str());
     }
 }
 
@@ -242,17 +241,12 @@ ClusterInterface * FindCluster(DynamicDevice * dev, const std::string & clusterI
     const char * end   = start + clusterId.size();
     if (std::from_chars(start, end, id).ptr != end)
     {
-        id = 0;
-        for (const auto & c : clusters::kKnownClusters)
+        auto r = LookupClusterByName(clusterId.c_str());
+        if (r.HasValue())
         {
-            if (clusterId == c.name)
-            {
-                id = c.id;
-                break;
-            }
-        }
-        if (!id)
             return nullptr;
+        }
+        id = r.Value();
     }
 
     for (auto * c : dev->clusters())
@@ -388,7 +382,7 @@ void SetValue(const std::vector<std::string> & tokens)
     rd.Init(data.data(), data.size());
     rd.Next();
 
-    if (!cluster->Push(attr->attributeId, rd))
+    if (!cluster->Write(attr->attributeId, rd))
     {
         printf("Write failed\n");
     }

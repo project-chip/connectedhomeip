@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "Device.h"
+#include "ActionCluster.h"
 #include "main.h"
 
 using namespace chip;

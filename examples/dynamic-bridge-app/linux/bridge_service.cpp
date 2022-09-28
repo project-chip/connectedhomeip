@@ -24,18 +24,6 @@
 namespace chip {
 namespace rpc {
 
-namespace {
-const clusters::ClusterInfo * FindCluster(uint32_t id)
-{
-    for (const auto & cluster : clusters::kKnownClusters)
-    {
-        if (id == cluster.id)
-            return &cluster;
-    }
-    return nullptr;
-}
-} // namespace
-
 ::pw::Status Bridge::Add(const ::chip_rpc_bridge_AddDevice & request, ::chip_rpc_bridge_AddDeviceResponse & response)
 {
     std::unique_ptr<DynamicDevice> pending;
@@ -47,14 +35,13 @@ const clusters::ClusterInfo * FindCluster(uint32_t id)
     {
         const chip_rpc_bridge_Cluster & c = request.clusters[i];
 
-        auto cluster = FindCluster(c.cluster_id);
+        auto cluster = CreateCluster(c.cluster_id);
         if (!cluster)
         {
             return pw::Status::InvalidArgument();
         }
 
-        pending->AddCluster(
-            std::make_unique<DynamicCluster>(std::unique_ptr<GeneratedCluster>(cluster->ctor(::operator new(cluster->size)))));
+        pending->AddCluster(std::make_unique<DynamicCluster>(std::move(cluster)));
     }
 
     for (pb_size_t i = 0; i < request.device_types_count; i++)

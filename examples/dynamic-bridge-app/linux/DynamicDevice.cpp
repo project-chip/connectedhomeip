@@ -19,6 +19,10 @@
 
 #include "DynamicDevice.h"
 
+#define DEVICE_TYPE_BRIDGED_NODE 0x0013
+// Device Version for dynamic endpoints:
+#define DEVICE_VERSION_DEFAULT 1
+
 DynamicDevice::DynamicDevice() {}
 
 void DynamicDevice::AddDeviceType(EmberAfDeviceType type)

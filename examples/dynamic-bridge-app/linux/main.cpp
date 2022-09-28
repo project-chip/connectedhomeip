@@ -41,8 +41,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "ActionCluster.h"
 #include "Backend.h"
-
 #include "CommissionableInit.h"
 #include "Device.h"
 #include "main.h"
@@ -50,13 +50,14 @@
 
 #include "AppMain.h"
 
+#include "bridge/BridgeClustersImpl.h"
+
 #ifdef PW_RPC_ENABLED
-#include "bridge_service.h"
 #include "Rpc.h"
+#include "bridge_service.h"
 #include "pw_rpc_system_server/rpc_server.h"
 static chip::rpc::Bridge bridge_service;
 #endif
-
 
 #include <cassert>
 #include <iostream>
@@ -73,6 +74,108 @@ static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 Room gRooms[kMaxRooms];
+
+struct CommonAttributeAccessInterface : public chip::app::AttributeAccessInterface
+{
+    using chip::app::AttributeAccessInterface::AttributeAccessInterface;
+
+    // Find a cluster given a specific endpoint/cluster. Returns nullptr if no such
+    // cluster exists at that path.
+    static CommonCluster * FindCluster(const chip::app::ConcreteClusterPath & path);
+
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
+
+    void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override;
+    void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override;
+};
+
+CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::ConcreteClusterPath & path)
+{
+    Device * dev = FindDeviceEndpoint(path.mEndpointId);
+    if (dev)
+    {
+        for (auto c : dev->clusters())
+        {
+            if (c->GetClusterId() == path.mClusterId)
+                return static_cast<CommonCluster *>(c);
+        }
+    }
+    return nullptr;
+}
+
+CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAttributePath & aPath,
+                                                chip::app::AttributeValueEncoder & aEncoder)
+{
+    CommonCluster * c = FindCluster(aPath);
+    if (!c)
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
+    if (!a)
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    return a->Read(aPath, aEncoder);
+}
+
+CHIP_ERROR CommonAttributeAccessInterface::Write(const chip::app::ConcreteDataAttributePath & aPath,
+                                                 chip::app::AttributeValueDecoder & aDecoder)
+{
+    CommonCluster * c = FindCluster(aPath);
+    if (!c)
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+}
+
+void CommonAttributeAccessInterface::OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath)
+{
+    CommonCluster * c = FindCluster(aPath);
+    if (c)
+    {
+        AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
+        if (a)
+            a->ListWriteBegin(aPath);
+    }
+}
+
+void CommonAttributeAccessInterface::OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful)
+{
+    CommonCluster * c = FindCluster(aPath);
+    if (c)
+    {
+        AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
+        if (a)
+            a->ListWriteEnd(aPath, aWriteWasSuccessful);
+    }
+}
+
+chip::Optional<chip::ClusterId> LookupClusterByName(const char * name)
+{
+    for (const auto & cluster : clusters::kKnownClusters)
+    {
+        if (!strcmp(name, cluster.name))
+        {
+            return chip::Optional<chip::ClusterId>(cluster.id);
+        }
+    }
+    return chip::Optional<chip::ClusterId>();
+}
+
+std::unique_ptr<GeneratedCluster> CreateCluster(const char * name)
+{
+    auto id = LookupClusterByName(name);
+    return id.HasValue() ? CreateCluster(id.Value()) : nullptr;
+}
+
+std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
+{
+    for (const auto & cluster : clusters::kKnownClusters)
+    {
+        if (id == cluster.id)
+        {
+            return std::unique_ptr<GeneratedCluster>(cluster.ctor(::operator new(cluster.size)));
+        }
+    }
+    return nullptr;
+}
 
 bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                 const Actions::Commands::InstantAction::DecodableType & commandData)
@@ -188,7 +291,8 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
     std::vector<CommonAttributeAccessInterface> clusterAccess;
-    for(auto& entry : clusters::kKnownClusters) {
+    for (auto & entry : clusters::kKnownClusters)
+    {
         clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
     }
 

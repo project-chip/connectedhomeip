@@ -1,40 +1,63 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
-#include <app/data-model/Encode.h>
 #include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
 
+#include <iterator>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
-template<typename X>
+// Container requirements.
+// To encode and decode as a list the following must be present
+// void clear();
+// size_type size();
+// T& back();
+// void emplace_back();
+// iterator_type begin();
+// iterator_type end();
+// iterator_type must conform to LegacyForwardIterator
+// The contained type must be default-constructible
+template <typename X>
 class IsList
 {
     typedef char yes;
     typedef long no;
 
-    template <typename U> static yes test(decltype(&U::size)) ;
-    template <typename U> static no test(...);
+    template <typename U>
+    static yes test(decltype(&U::size));
+    template <typename U>
+    static no test(...);
 
 public:
     static constexpr bool value = sizeof(test<X>(0)) == sizeof(yes);
 };
 
-template<typename X>
-struct IsOptionalOrNullable { static constexpr bool value = false; };
-template<typename X>
-struct IsOptionalOrNullable<Optional<X>> { static constexpr bool value = true; };
-template<typename X>
-struct IsOptionalOrNullable<Nullable<X>> { static constexpr bool value = true; };
+template <typename X>
+struct IsOptionalOrNullable
+{
+    static constexpr bool value = false;
+};
+template <typename X>
+struct IsOptionalOrNullable<Optional<X>>
+{
+    static constexpr bool value = true;
+};
+template <typename X>
+struct IsOptionalOrNullable<Nullable<X>>
+{
+    static constexpr bool value = true;
+};
 
 static_assert(IsList<std::vector<unsigned char>>::value);
 
-template<typename X, std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
-CHIP_ERROR Encode(const ConcreteReadAttributePath&, AttributeValueEncoder & aEncoder, const X& x)
+template <typename X,
+          std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
+CHIP_ERROR Encode(const ConcreteReadAttributePath &, AttributeValueEncoder & aEncoder, const X & x)
 {
     return aEncoder.Encode(x);
 }
@@ -43,12 +66,13 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath&, AttributeValueEncoder & aEnc
  * @brief
  * Lists that are string-like should be encoded as char/byte spans.
  */
-template<typename X, std::enable_if_t<IsList<std::decay_t<X>>::value && sizeof(std::decay_t<typename X::pointer>) == sizeof(char), bool> = true>
-CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder & aEncoder, const X& x)
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && sizeof(std::decay_t<typename X::pointer>) == sizeof(char), bool> = true>
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const X & x)
 {
     return aEncoder.Encode(Span<std::decay_t<typename X::pointer>>(x.data(), x.size()));
 }
-
 
 /*
  * @brief
@@ -62,8 +86,10 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder 
  * This is const X& instead of X&& because it is "more specialized" and so this overload will
  * be chosen if possible.
  */
-template<typename X, std::enable_if_t<IsList<std::decay_t<X>>::value && (sizeof(std::decay_t<typename X::pointer>) > sizeof(char)), bool> = true>
-CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder & aEncoder, const X& x)
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && (sizeof(std::decay_t<typename X::pointer>) > sizeof(char)), bool> = true>
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const X & x)
 {
     if (aPath.mListIndex.HasValue())
     {
@@ -71,11 +97,14 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder 
         if (index >= x.size())
             return CHIP_ERROR_INVALID_ARGUMENT;
 
-        return aEncoder.Encode(x.data()[index]);
+        auto it = x.begin();
+        std::advance(it, index);
+        return aEncoder.Encode(*it);
     }
     return aEncoder.EncodeList([x](const auto & encoder) {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        for(auto& v : x) {
+        for (auto & v : x)
+        {
             err = encoder.Encode(v);
             if (err != CHIP_NO_ERROR)
                 break;
@@ -89,7 +118,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder 
  * Set of overloaded encode methods that can be called from AttributeAccessInterface::Read
  */
 template <typename X>
-CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder & aEncoder, const Optional<X> & x)
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const Optional<X> & x)
 {
     if (x.HasValue())
     {
@@ -105,7 +134,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder 
  * Encodes a nullable value.
  */
 template <typename X>
-CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder & aEncoder, const Nullable<X> & x)
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const Nullable<X> & x)
 {
     if (x.IsNull())
     {
@@ -133,9 +162,9 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath& aPath, AttributeValueEncoder 
 #pragma GCC diagnostic pop
 }
 
-
-template<typename X, std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
-CHIP_ERROR Decode(const ConcreteDataAttributePath&, AttributeValueDecoder & aDecoder, X& x)
+template <typename X,
+          std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
+CHIP_ERROR Decode(const ConcreteDataAttributePath &, AttributeValueDecoder & aDecoder, X & x)
 {
     return aDecoder.Decode(x);
 }
@@ -144,33 +173,49 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath&, AttributeValueDecoder & aDec
  * @brief
  * Lists that are string-like should be decoded as char/byte spans.
  */
-template<typename X, std::enable_if_t<IsList<std::decay_t<X>>::value && sizeof(std::decay_t<typename X::pointer>) == sizeof(char), bool> = true>
-CHIP_ERROR Decode(const ConcreteDataAttributePath& aPath, AttributeValueDecoder & aDecoder, X& x)
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && sizeof(std::decay_t<typename X::pointer>) == sizeof(char), bool> = true>
+CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, X & x)
 {
     Span<std::decay_t<typename X::pointer>> span;
     CHIP_ERROR err = aDecoder.Decode(span);
-    if (err = CHIP_NO_ERROR) {
+    if (err = CHIP_NO_ERROR)
+    {
         x = X(span.data(), span.size());
     }
     return err;
 }
 
-
-template<typename X, std::enable_if_t<IsList<std::decay_t<X>>::value && (sizeof(std::decay_t<typename X::pointer>) > sizeof(char)), bool> = true>
-CHIP_ERROR Decode(const ConcreteDataAttributePath& aPath, AttributeValueDecoder & aDecoder, X& x)
+template <
+    typename X,
+    std::enable_if_t<IsList<std::decay_t<X>>::value && (sizeof(std::decay_t<typename X::pointer>) > sizeof(char)), bool> = true>
+CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, X & x)
 {
-    switch(aPath.mListOp) {
+    switch (aPath.mListOp)
+    {
     case ConcreteDataAttributePath::ListOperation::DeleteItem:
-        if (aPath.mListIndex >= x.size())
+        if (aPath.mListIndex >= x.size()) {
             return CHIP_ERROR_INVALID_LIST_LENGTH;
-        x.erase(x.begin() + aPath.mListIndex);
-        return CHIP_NO_ERROR;
+        } else {
+            auto it = x.begin();
+            std::advance(it, aPath.mListIndex);
+            x.erase(it);
+            return CHIP_NO_ERROR;
+        }
 
     case ConcreteDataAttributePath::ListOperation::ReplaceItem:
-        if (aPath.mListIndex >= x.size())
+        if (aPath.mListIndex >= x.size()) {
             return CHIP_ERROR_INVALID_LIST_LENGTH;
-        return aDecoder.Decode(x.begin()[aPath.mListIndex]);
+        } else {
+            auto it = x.begin();
+            std::advance(it, aPath.mListIndex);
+            return aDecoder.Decode(*it);
+        }
 
+    case ConcreteDataAttributePath::ListOperation::ReplaceAll:
+        x.clear();
+        // fallthrough
     default:
         x.emplace_back();
         return aDecoder.Decode(x.back());
@@ -213,6 +258,6 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
     return CHIP_NO_ERROR;
 }
 
-}  // namespace DataModel
-}  // namespace app
-}  // namespace chip
+} // namespace DataModel
+} // namespace app
+} // namespace chip

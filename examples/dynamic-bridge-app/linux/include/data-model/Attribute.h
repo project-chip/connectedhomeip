@@ -4,7 +4,8 @@
 
 #include "DataModel.h"
 
-// This is the interface to the attribute implementation
+// This is the interface to the attribute implementation that permits retrieval of metadata about
+// the attribute as well as set/get the underlying value.
 class AttributeInterface
 {
 public:
@@ -13,7 +14,7 @@ public:
     // Get the ID of this attribute. Shortcut for GetMetadata().attributeId
     virtual chip::AttributeId GetId() = 0;
     // Get the metadata of this attribute, suitable for advertising.
-    virtual const EmberAfAttributeMetadata& GetMetadata() = 0;
+    virtual const EmberAfAttributeMetadata & GetMetadata() = 0;
 
     virtual chip::CharSpan GetName() = 0;
 
@@ -32,13 +33,14 @@ public:
 template <typename Type>
 struct Attribute : public AttributeInterface
 {
-    Attribute(chip::CharSpan name, chip::AttributeId id, EmberAfAttributeMask mask, EmberAfAttributeType type, size_t size, Type value = Type())
-    	: mMetadata(EmberAfAttributeMetadata{id, type, (uint16_t)size, mask, ZAP_EMPTY_DEFAULT()}), mData(value), mName(name)
-    {
-    }
+    Attribute(chip::CharSpan name, chip::AttributeId id, EmberAfAttributeMask mask, EmberAfAttributeType type, size_t size,
+              Type value = Type()) :
+        mMetadata(EmberAfAttributeMetadata{ id, type, (uint16_t) size, mask, ZAP_EMPTY_DEFAULT() }),
+        mData(value), mName(name)
+    {}
 
     chip::AttributeId GetId() override { return mMetadata.attributeId; }
-    const EmberAfAttributeMetadata& GetMetadata() override { return mMetadata; }
+    const EmberAfAttributeMetadata & GetMetadata() override { return mMetadata; }
     chip::CharSpan GetName() override { return mName; }
 
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
@@ -50,8 +52,8 @@ struct Attribute : public AttributeInterface
         return chip::app::DataModel::Encode(aPath, aEncoder, mData);
     }
 
-    void operator=(const Type& value) { mData = value; }
-    const Type& Peek() const { return mData; }
+    void operator=(const Type & value) { mData = value; }
+    const Type & Peek() const { return mData; }
 
 protected:
     EmberAfAttributeMetadata mMetadata;
@@ -60,20 +62,22 @@ protected:
 };
 
 // This specialization handles list writes and reverts if the write fails.
-template<typename Type>
+template <typename Type>
 struct ListAttribute : public Attribute<Type>
 {
-	using Attribute<Type>::Attribute;
+    using Attribute<Type>::Attribute;
 
-    void ListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
-    {
-        mBackup = std::move(this->mData);
-    }
+    void ListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override { mBackup = this->mData; }
     void ListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
     {
-        if (!aWriteWasSuccessful)
+        if (aWriteWasSuccessful)
+        {
+            mBackup = Type();
+        }
+        else
+        {
             this->mData = std::move(mBackup);
-        mBackup = Type();
+        }
     }
 
     Type mBackup;

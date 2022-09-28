@@ -29,7 +29,8 @@
 
 #include <functional>
 
-#include "Attribute.h"
+#include "data-model/Attribute.h"
+#include "GeneratedClusters.h"
 
 // This is the interface to cluster implementations, providing access to manipulate attributes.
 class ClusterInterface
@@ -49,10 +50,8 @@ public:
     virtual AttributeInterface * FindAttributeByName(chip::CharSpan name) = 0;
     // Write the given TLV encoded value to the given attribute. Can write
     // normally read-only values. Nofitied matter that the value has changed.
-    virtual bool Push(chip::AttributeId attr, chip::TLV::TLVReader & reader) = 0;
+    virtual bool Write(chip::AttributeId attr, chip::TLV::TLVReader & reader) = 0;
 };
-
-class GeneratedCluster;
 
 struct CommonCluster;
 typedef std::function<CHIP_ERROR(CommonCluster *, const chip::app::ConcreteDataAttributePath &, chip::app::AttributeValueDecoder &)>
@@ -88,7 +87,7 @@ struct CommonCluster : public ClusterInterface
 
     // Force a write of a given attribute. Can write normally read-only values.
     // Calls OnUpdated after the write finishes.
-    bool Push(chip::AttributeId attr, chip::TLV::TLVReader & reader) override;
+    bool Write(chip::AttributeId attr, chip::TLV::TLVReader & reader) override;
 
     // Push an attribute update notification to the matter stack.
     void OnUpdated(chip::AttributeId attr);

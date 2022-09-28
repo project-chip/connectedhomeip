@@ -2,63 +2,6 @@
 
 #include "Device.h"
 
-CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::ConcreteClusterPath & path)
-{
-    Device * dev = FindDeviceEndpoint(path.mEndpointId);
-    if (dev)
-    {
-        for (auto c : dev->clusters())
-        {
-            if (c->GetClusterId() == path.mClusterId)
-                return static_cast<CommonCluster *>(c);
-        }
-    }
-    return nullptr;
-}
-
-CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAttributePath & aPath,
-                                                chip::app::AttributeValueEncoder & aEncoder)
-{
-    CommonCluster * c = FindCluster(aPath);
-    if (!c)
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
-    if (!a)
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    return a->Read(aPath, aEncoder);
-}
-
-CHIP_ERROR CommonAttributeAccessInterface::Write(const chip::app::ConcreteDataAttributePath & aPath,
-                                                 chip::app::AttributeValueDecoder & aDecoder)
-{
-    CommonCluster * c = FindCluster(aPath);
-    if (!c)
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    return c->ForwardWriteToBridge(aPath, aDecoder);
-}
-
-void CommonAttributeAccessInterface::OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath)
-{
-    CommonCluster * c = FindCluster(aPath);
-    if (c)
-    {
-        AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
-        if (a)
-            a->ListWriteBegin(aPath);
-    }
-}
-
-void CommonAttributeAccessInterface::OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful)
-{
-    CommonCluster * c = FindCluster(aPath);
-    if (c)
-    {
-        AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
-        if (a)
-            a->ListWriteEnd(aPath, aWriteWasSuccessful);
-    }
-}
-
 CommonCluster::CommonCluster(std::unique_ptr<GeneratedCluster> cluster) :
     mAttributes(cluster->GetAttributes()), mStorage(std::move(cluster))
 {}
@@ -133,7 +76,7 @@ void CommonCluster::OnUpdated(chip::AttributeId attr)
         MatterReportingAttributeChangeCallback(GetEndpointId(), GetClusterId(), attr);
 }
 
-bool CommonCluster::Push(chip::AttributeId attr, chip::TLV::TLVReader & reader)
+bool CommonCluster::Write(chip::AttributeId attr, chip::TLV::TLVReader & reader)
 {
     chip::app::AttributeValueDecoder decoder(reader, chip::Access::SubjectDescriptor());
     if (WriteFromBridge(chip::app::ConcreteDataAttributePath(GetEndpointId(), GetClusterId(), attr), decoder) != CHIP_NO_ERROR)

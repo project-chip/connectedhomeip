@@ -18,7 +18,13 @@
 
 #pragma once
 
+#include <lib/core/Optional.h>
+
+#include "ActionList.h"
 #include "Device.h"
+#include "GeneratedClusters.h"
+
+#include <memory>
 
 class Room
 {
@@ -52,3 +58,7 @@ extern Room gRooms[kMaxRooms];
 Room * FindRoom(const std::string & name);
 
 chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId);
+
+chip::Optional<chip::ClusterId> LookupClusterByName(const char * name);
+std::unique_ptr<GeneratedCluster> CreateCluster(const char * name);
+std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id);
