@@ -381,7 +381,14 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     return;
 
 exit:
-    rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    if (err == CHIP_NO_ERROR)
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    }
+    else
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
+    }
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
