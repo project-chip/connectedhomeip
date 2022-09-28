@@ -121,6 +121,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
+ * Get a session for the commissionee device with the given device id.  This may
+ * be called on any queue (including the Matter event queue) and will always
+ * call the provided connection callback on the Matter queue, asynchronously.
+ * Consumers must be prepared to run on the Matter queue (an in particular must
+ * not use any APIs that will try to do sync dispatch to the Matter queue).
+ *
+ * If the controller is not running when this function is called, will return NO
+ * and never invoke the completion.  If the controller is not running when the
+ * async dispatch on the Matter queue would happen, an error will be dispatched
+ * to the completion handler.
+ */
+- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
  * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
  * the Matter event queue.

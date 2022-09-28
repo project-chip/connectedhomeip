@@ -489,18 +489,19 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 {
     VerifyOrReturnValue([self checkIsRunning:error], nil);
 
-    __block chip::CommissioneeDeviceProxy * deviceProxy;
-
+    __block MTRBaseDevice * device;
     __block BOOL success = NO;
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning:error]);
 
+        chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([nodeID unsignedLongLongValue], &deviceProxy);
         success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     });
     VerifyOrReturnValue(success, nil);
 
-    return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
+    return device;
 }
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
@@ -703,6 +704,38 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         // MTRDeviceConnectionBridge always delivers errors async via
         // completion.
         connectionBridge->connect(self->_cppCommissioner, nodeID);
+    });
+
+    return YES;
+}
+
+- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    if (![self checkIsRunning]) {
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            completion(nullptr, chip::NullOptional, error);
+            return;
+        }
+
+        chip::CommissioneeDeviceProxy * deviceProxy;
+        CHIP_ERROR err = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
+        if (err != CHIP_NO_ERROR) {
+            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+            return;
+        }
+
+        chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
+        if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
+            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+            return;
+        }
+
+        completion(deviceProxy->GetExchangeManager(), session, nil);
     });
 
     return YES;
