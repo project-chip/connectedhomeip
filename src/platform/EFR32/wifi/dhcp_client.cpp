@@ -28,14 +28,14 @@
 #include "em_ldma.h"
 #include "em_usart.h"
 
-#include "wifi_config.h"
-#include "wfx_host_events.h"
 #include "dhcp_client.h"
 #include "lwip/dhcp.h"
+#include "wfx_host_events.h"
+#include "wifi_config.h"
 
+#include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "AppConfig.h"
 
 #define MAX_DHCP_TRIES 4
 #define NETIF_IPV4_ADDRESS(X, Y) (((X) >> (8 * Y)) & 0xFF)
@@ -66,13 +66,16 @@ static volatile uint8_t dhcp_state = DHCP_OFF;
  ******************************************************************************/
 void dhcpclient_set_link_state(int link_up)
 {
-  if (link_up) {
-    dhcp_state = DHCP_START;
-    EFR32_LOG("DHCP: Starting");
-  } else {
-    /* Update DHCP state machine */
-    dhcp_state = DHCP_LINK_DOWN;
-  }
+    if (link_up)
+    {
+        dhcp_state = DHCP_START;
+        EFR32_LOG("DHCP: Starting");
+    }
+    else
+    {
+        /* Update DHCP state machine */
+        dhcp_state = DHCP_LINK_DOWN;
+    }
 }
 
 /**********************************************************************************
@@ -81,63 +84,65 @@ void dhcpclient_set_link_state(int link_up)
  * Don't need a task here. We get polled every 250ms
  * @return  None
  ************************************************************************************/
-uint8_t dhcpclient_poll(void *arg)
+uint8_t dhcpclient_poll(void * arg)
 {
-  struct netif *netif = (struct netif *)arg;
-  ip_addr_t ipaddr;
-  ip_addr_t netmask;
-  ip_addr_t gw;
-  struct dhcp *dhcp;
+    struct netif * netif = (struct netif *) arg;
+    ip_addr_t ipaddr;
+    ip_addr_t netmask;
+    ip_addr_t gw;
+    struct dhcp * dhcp;
 
-  switch (dhcp_state) {
+    switch (dhcp_state)
+    {
     case DHCP_START:
-      EFR32_LOG("DHCP: Wait addr");
-      ip_addr_set_zero_ip4(&netif->ip_addr);
-      ip_addr_set_zero_ip4(&netif->netmask);
-      ip_addr_set_zero_ip4(&netif->gw);
-      dhcp_start(netif);
-      dhcp_state = DHCP_WAIT_ADDRESS;
-      break;
+        EFR32_LOG("DHCP: Wait addr");
+        ip_addr_set_zero_ip4(&netif->ip_addr);
+        ip_addr_set_zero_ip4(&netif->netmask);
+        ip_addr_set_zero_ip4(&netif->gw);
+        dhcp_start(netif);
+        dhcp_state = DHCP_WAIT_ADDRESS;
+        break;
 
     case DHCP_WAIT_ADDRESS:
-      if (dhcp_supplied_address(netif)) {
-        dhcp_state = DHCP_ADDRESS_ASSIGNED;
+        if (dhcp_supplied_address(netif))
+        {
+            dhcp_state = DHCP_ADDRESS_ASSIGNED;
 
-        uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
-        EFR32_LOG("DHCP IP: %d.%d.%d.%d",
-                  NETIF_IPV4_ADDRESS(addr, 0),
-                  NETIF_IPV4_ADDRESS(addr, 1),
-                  NETIF_IPV4_ADDRESS(addr, 2),
-                  NETIF_IPV4_ADDRESS(addr, 3));
-      } else {
-        dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
-
-        /* DHCP timeout */
-        if (dhcp->tries > MAX_DHCP_TRIES) {
-          dhcp_state = DHCP_TIMEOUT;
-
-          EFR32_LOG("*ERR*DHCP: Failed");
-          /* Stop DHCP */
-          dhcp_stop(netif);
-
-          /* TODO - I am not sure that this is best */
-          /* Static address used */
-          IP_ADDR4(&ipaddr, sta_ip_addr0, sta_ip_addr1, sta_ip_addr2, sta_ip_addr3);
-          IP_ADDR4(&netmask, sta_netmask_addr0, sta_netmask_addr1, sta_netmask_addr2, sta_netmask_addr3);
-          IP_ADDR4(&gw, sta_gw_addr0, sta_gw_addr1, sta_gw_addr2, sta_gw_addr3);
-          netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
+            uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
+            EFR32_LOG("DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1), NETIF_IPV4_ADDRESS(addr, 2),
+                      NETIF_IPV4_ADDRESS(addr, 3));
         }
-      }
-      break;
+        else
+        {
+            dhcp = (struct dhcp *) netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
+
+            /* DHCP timeout */
+            if (dhcp->tries > MAX_DHCP_TRIES)
+            {
+                dhcp_state = DHCP_TIMEOUT;
+
+                EFR32_LOG("*ERR*DHCP: Failed");
+                /* Stop DHCP */
+                dhcp_stop(netif);
+
+                /* TODO - I am not sure that this is best */
+                /* Static address used */
+                IP_ADDR4(&ipaddr, sta_ip_addr0, sta_ip_addr1, sta_ip_addr2, sta_ip_addr3);
+                IP_ADDR4(&netmask, sta_netmask_addr0, sta_netmask_addr1, sta_netmask_addr2, sta_netmask_addr3);
+                IP_ADDR4(&gw, sta_gw_addr0, sta_gw_addr1, sta_gw_addr2, sta_gw_addr3);
+                netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
+            }
+        }
+        break;
 
     case DHCP_LINK_DOWN:
-      /* Stop DHCP */
-      EFR32_LOG("*ERR*DHCP Link down");
-      dhcp_stop(netif);
-      dhcp_state = DHCP_OFF;
-      break;
+        /* Stop DHCP */
+        EFR32_LOG("*ERR*DHCP Link down");
+        dhcp_stop(netif);
+        dhcp_state = DHCP_OFF;
+        break;
     default:
-      break;
-  }
-  return dhcp_state;
+        break;
+    }
+    return dhcp_state;
 }

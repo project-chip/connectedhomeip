@@ -27,7 +27,7 @@
 #include <string.h>
 
 // Securelink Task Configurations
-#define WFX_SECURELINK_TASK_PRIO     1u
+#define WFX_SECURELINK_TASK_PRIO 1u
 #define WFX_SECURELINK_TASK_STK_SIZE 512u
 
 TaskHandle_t secureLinkTaskHandle;
@@ -44,44 +44,42 @@ StaticSemaphore_t xSlMutexBuffer;
  * @param[in] p_arg:
  * @return None
  *************************************************************************/
-static void prvSecureLinkTask(void *p_arg)
+static void prvSecureLinkTask(void * p_arg)
 {
-  sl_status_t result;
-  (void)p_arg;
+    sl_status_t result;
+    (void) p_arg;
 
-  /* Create a mutex used for making Secure Link renegotiations atomic */
-  s_xSLSemaphore = xSemaphoreCreateMutexStatic(&xSlMutexBuffer);
+    /* Create a mutex used for making Secure Link renegotiations atomic */
+    s_xSLSemaphore = xSemaphoreCreateMutexStatic(&xSlMutexBuffer);
 
-  for (;;) {
-    /* Wait for a key renegotiation request */
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    for (;;)
+    {
+        /* Wait for a key renegotiation request */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-    result = sl_wfx_secure_link_renegotiate_session_key();
-    if (result != SL_STATUS_OK) {
-      printf("session key negotiation error %lu\n", result);
+        result = sl_wfx_secure_link_renegotiate_session_key();
+        if (result != SL_STATUS_OK)
+        {
+            printf("session key negotiation error %lu\n", result);
+        }
     }
-  }
 }
 
 /****************************************************************************
  * @fn  void wfx_securelink_task_start(void)
- * @brief 
+ * @brief
  * Creates WFX securelink key renegotiation task.
  * @param[in] None
  * @return None
  ******************************************************************************/
 void wfx_securelink_task_start(void)
 {
-  secureLinkTaskHandle = xTaskCreateStatic(prvSecureLinkTask,
-                                           "secureLinkTask",
-                                           WFX_SECURELINK_TASK_STK_SIZE,
-                                           NULL,
-                                           WFX_SECURELINK_TASK_PRIO,
-                                           secureLinkStack,
-                                           &secureLinkTaskStruct);
-  if (secureLinkTaskHandle == NULL) {
-    printf("Failed to create WFX secureLinkTask");
-  }
+    secureLinkTaskHandle = xTaskCreateStatic(prvSecureLinkTask, "secureLinkTask", WFX_SECURELINK_TASK_STK_SIZE, NULL,
+                                             WFX_SECURELINK_TASK_PRIO, secureLinkStack, &secureLinkTaskStruct);
+    if (secureLinkTaskHandle == NULL)
+    {
+        printf("Failed to create WFX secureLinkTask");
+    }
 }
 
 #endif

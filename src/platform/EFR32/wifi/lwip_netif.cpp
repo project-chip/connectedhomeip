@@ -9,8 +9,8 @@
 #include "em_ldma.h"
 #include "em_usart.h"
 
-#include "wifi_config.h"
 #include "wfx_host_events.h"
+#include "wifi_config.h"
 
 #include "AppConfig.h"
 #include "dhcp_client.h"
@@ -37,31 +37,26 @@ static struct netif ap_netif;
  * @param[in]  ap_if:
  * @return None
  *****************************************************************************/
-static void netif_config(struct netif *sta_if, struct netif *ap_if)
+static void netif_config(struct netif * sta_if, struct netif * ap_if)
 {
-  if (sta_if != NULL) {
-    ip_addr_t sta_ipaddr;
-    ip_addr_t sta_netmask;
-    ip_addr_t sta_gw;
+    if (sta_if != NULL)
+    {
+        ip_addr_t sta_ipaddr;
+        ip_addr_t sta_netmask;
+        ip_addr_t sta_gw;
 
-    /* Initialize the Station information */
-    ip_addr_set_zero_ip4(&sta_ipaddr);
-    ip_addr_set_zero_ip4(&sta_netmask);
-    ip_addr_set_zero_ip4(&sta_gw);
+        /* Initialize the Station information */
+        ip_addr_set_zero_ip4(&sta_ipaddr);
+        ip_addr_set_zero_ip4(&sta_netmask);
+        ip_addr_set_zero_ip4(&sta_gw);
 
-    /* Add station interfaces */
-    netif_add(sta_if,
-              (const ip4_addr_t *)&sta_ipaddr,
-              (const ip4_addr_t *)&sta_netmask,
-              (const ip4_addr_t *)&sta_gw,
-              NULL,
-              &sta_ethernetif_init,
-              &tcpip_input);
+        /* Add station interfaces */
+        netif_add(sta_if, (const ip4_addr_t *) &sta_ipaddr, (const ip4_addr_t *) &sta_netmask, (const ip4_addr_t *) &sta_gw, NULL,
+                  &sta_ethernetif_init, &tcpip_input);
 
-    /* Registers the default network interface */
-    netif_set_default(sta_if);
-  }
-
+        /* Registers the default network interface */
+        netif_set_default(sta_if);
+    }
 }
 
 /****************************************************************************
@@ -73,13 +68,13 @@ static void netif_config(struct netif *sta_if, struct netif *ap_if)
  *****************************************************************************/
 void wfx_lwip_set_sta_link_up(void)
 {
-  netifapi_netif_set_up(&sta_netif);
-  netifapi_netif_set_link_up(&sta_netif);
-  dhcpclient_set_link_state(LINK_UP);
-  /*
+    netifapi_netif_set_up(&sta_netif);
+    netifapi_netif_set_link_up(&sta_netif);
+    dhcpclient_set_link_state(LINK_UP);
+    /*
      * Enable IPV6
      */
-  netif_create_ip6_linklocal_address(&sta_netif, MAC_48_BIT_SET);
+    netif_create_ip6_linklocal_address(&sta_netif, MAC_48_BIT_SET);
 }
 
 /***************************************************************************
@@ -91,9 +86,9 @@ void wfx_lwip_set_sta_link_up(void)
  *****************************************************************************/
 void wfx_lwip_set_sta_link_down(void)
 {
-  dhcpclient_set_link_state(LINK_DOWN);
-  netifapi_netif_set_link_down(&sta_netif);
-  netifapi_netif_set_down(&sta_netif);
+    dhcpclient_set_link_state(LINK_DOWN);
+    netifapi_netif_set_link_down(&sta_netif);
+    netifapi_netif_set_down(&sta_netif);
 }
 
 /***************************************************************************
@@ -105,8 +100,8 @@ void wfx_lwip_set_sta_link_down(void)
  *****************************************************************************/
 void wfx_lwip_start(void)
 {
-  /* Initialize the LwIP stack */
-  netif_config(&sta_netif, NULL);
+    /* Initialize the LwIP stack */
+    netif_config(&sta_netif, NULL);
 }
 
 /***************************************************************************
@@ -116,17 +111,19 @@ void wfx_lwip_start(void)
  * @param[in] interface:
  * @return None
  *****************************************************************************/
-struct netif *wfx_get_netif(sl_wfx_interface_t interface)
+struct netif * wfx_get_netif(sl_wfx_interface_t interface)
 {
-  if (interface == SL_WFX_STA_INTERFACE) {
-    return &sta_netif;
-  }
+    if (interface == SL_WFX_STA_INTERFACE)
+    {
+        return &sta_netif;
+    }
 #ifdef SL_WFX_CONFIG_SOFTAP
-  else if (interface == SL_WFX_SOFTAP_INTERFACE) {
-    return &ap_netif;
-  }
+    else if (interface == SL_WFX_SOFTAP_INTERFACE)
+    {
+        return &ap_netif;
+    }
 #endif
-  return (struct netif *)0;
+    return (struct netif *) 0;
 }
 
 #endif /* RS911X_SOCKETS */

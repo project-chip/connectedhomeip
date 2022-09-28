@@ -27,64 +27,66 @@ StaticTask_t wfxRsiTaskBuffer;
 
 /*********************************************************************
  * @fn  sl_status_t wfx_wifi_start(void)
- * @brief  
+ * @brief
  * Called from ConnectivityManagerImpl.cpp - to enable the device
  * Create the RSI task and let it deal with life.
  * @param[in]  None
  * @return  Returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise  
+ *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-  if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED) {
-    WFX_RSI_LOG("%s: already started.", __func__);
-    return SL_STATUS_OK;
-  }
-  wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
-  WFX_RSI_LOG("%s: starting..", __func__);
-  /*
-   * Create the Wifi driver task
-   */
-  wfx_rsi.wlan_task = xTaskCreateStatic(wfx_rsi_task, "wfx_rsi",
-  			WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY, wfxRsiTaskStack, &wfxRsiTaskBuffer);
+    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED)
+    {
+        WFX_RSI_LOG("%s: already started.", __func__);
+        return SL_STATUS_OK;
+    }
+    wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
+    WFX_RSI_LOG("%s: starting..", __func__);
+    /*
+     * Create the Wifi driver task
+     */
+    wfx_rsi.wlan_task = xTaskCreateStatic(wfx_rsi_task, "wfx_rsi", WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY,
+                                          wfxRsiTaskStack, &wfxRsiTaskBuffer);
 
-  if (NULL == wfx_rsi.wlan_task) {
-    WFX_RSI_LOG("%s: error: failed to create task.", __func__);
-    return SL_STATUS_FAIL;
-  }
-  return SL_STATUS_OK;
+    if (NULL == wfx_rsi.wlan_task)
+    {
+        WFX_RSI_LOG("%s: error: failed to create task.", __func__);
+        return SL_STATUS_FAIL;
+    }
+    return SL_STATUS_OK;
 }
 
 /*********************************************************************
  * @fn  void wfx_enable_sta_mode(void)
- * @brief  
+ * @brief
  *      driver enable the STA mode
  * @param[in]  None
- * @return   None 
+ * @return   None
  ***********************************************************************/
 void wfx_enable_sta_mode(void)
 {
-  wfx_rsi.dev_state |= WFX_RSI_ST_STA_MODE;
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_MODE;
 }
 
 /*********************************************************************
  * @fn  bool wfx_is_sta_mode_enabled(void)
- * @brief  
+ * @brief
  *      driver enabled the STA mode
  * @param[in]  None
  * @return   mode
  ***********************************************************************/
 bool wfx_is_sta_mode_enabled(void)
 {
-  bool mode;
-  mode = !!(wfx_rsi.dev_state & WFX_RSI_ST_STA_MODE);
-  // WFX_RSI_LOG("%s: %d", __func__, (mode ? "yes" : "no"));
-  return mode;
+    bool mode;
+    mode = !!(wfx_rsi.dev_state & WFX_RSI_ST_STA_MODE);
+    // WFX_RSI_LOG("%s: %d", __func__, (mode ? "yes" : "no"));
+    return mode;
 }
 
 /*********************************************************************
  * @fn  sl_wfx_state_t wfx_get_wifi_state(void)
- * @brief  
+ * @brief
  *      get the wifi state
  * @param[in]  None
  * @return   return SL_WFX_NOT_INIT if successful,
@@ -92,108 +94,103 @@ bool wfx_is_sta_mode_enabled(void)
  ***********************************************************************/
 sl_wfx_state_t wfx_get_wifi_state(void)
 {
-  if (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) {
-    return SL_WFX_STA_INTERFACE_CONNECTED;
-  }
-  if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY) {
-    return SL_WFX_STARTED;
-  }
-  return SL_WFX_NOT_INIT;
+    if (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE)
+    {
+        return SL_WFX_STA_INTERFACE_CONNECTED;
+    }
+    if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
+    {
+        return SL_WFX_STARTED;
+    }
+    return SL_WFX_NOT_INIT;
 }
 
 /*********************************************************************
  * @fn  sl_wfx_state_t wfx_get_wifi_state(void)
- * @brief  
+ * @brief
  *      get the wifi mac address
  * @param[in]  Interface:
  * @param[in]  addr : address
- * @return   
+ * @return
  *       None
  ***********************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
+void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
-  sl_wfx_mac_address_t *mac;
+    sl_wfx_mac_address_t * mac;
 
 #ifdef SL_WFX_CONFIG_SOFTAP
-  mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wfx_rsi.softap_mac : &wfx_rsi.sta_mac;
+    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wfx_rsi.softap_mac : &wfx_rsi.sta_mac;
 #else
-  mac = &wfx_rsi.sta_mac;
+    mac = &wfx_rsi.sta_mac;
 #endif
-  *addr = *mac;
-  WFX_RSI_LOG("%s: %02x:%02x:%02x:%02x:%02x:%02x",
-              __func__,
-              mac->octet[0],
-              mac->octet[1],
-              mac->octet[2],
-              mac->octet[3],
-              mac->octet[4],
-              mac->octet[5]);
+    *addr = *mac;
+    WFX_RSI_LOG("%s: %02x:%02x:%02x:%02x:%02x:%02x", __func__, mac->octet[0], mac->octet[1], mac->octet[2], mac->octet[3],
+                mac->octet[4], mac->octet[5]);
 }
 
 /*********************************************************************
  * @fn  void wfx_set_wifi_provision(wfx_wifi_provision_t *cfg)
- * @brief  
+ * @brief
  *      Driver set the wifi provision
- * @param[in]  cfg:  wifi configuration 
- * @return  
+ * @param[in]  cfg:  wifi configuration
+ * @return
  *       None
  ***********************************************************************/
-void wfx_set_wifi_provision(wfx_wifi_provision_t *cfg)
+void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
-  WFX_RSI_LOG("%s: SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
+    WFX_RSI_LOG("%s: SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
 
-  wfx_rsi.sec = *cfg;
-  wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    wfx_rsi.sec = *cfg;
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
 }
 
 /*********************************************************************
  * @fn  bool wfx_get_wifi_provision(wfx_wifi_provision_t *wifiConfig)
- * @brief  
+ * @brief
  *      Driver get the wifi provision
- * @param[in]  wifiConfig:  wifi configuration 
+ * @param[in]  wifiConfig:  wifi configuration
  * @return  return false if successful,
  *        true otherwise
  ***********************************************************************/
-bool wfx_get_wifi_provision(wfx_wifi_provision_t *wifiConfig)
+bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-  if (wifiConfig != NULL) {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED) {
-      *wifiConfig = wfx_rsi.sec;
-      return true;
+    if (wifiConfig != NULL)
+    {
+        if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
+        {
+            *wifiConfig = wfx_rsi.sec;
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 /*********************************************************************
  * @fn  bool wfx_is_sta_provisioned(void)
- * @brief  
+ * @brief
  *      Driver is STA provisioned
  * @param[in]  None
  * @return  None
  ***********************************************************************/
 bool wfx_is_sta_provisioned(void)
 {
-  bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED) ? true : false;
-  WFX_RSI_LOG("%s: status: SSID -> %s: %s",
-              __func__,
-              &wfx_rsi.sec.ssid[0],
-              (status ? "provisioned" : "not provisioned"));
-  return status;
+    bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED) ? true : false;
+    WFX_RSI_LOG("%s: status: SSID -> %s: %s", __func__, &wfx_rsi.sec.ssid[0], (status ? "provisioned" : "not provisioned"));
+    return status;
 }
 
 /*********************************************************************
  * @fn  void wfx_clear_wifi_provision(void)
- * @brief  
+ * @brief
  *      Driver is clear the wifi provision
  * @param[in]  None
  * @return  None
  ***********************************************************************/
 void wfx_clear_wifi_provision(void)
 {
-  memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
-  wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
-  WFX_RSI_LOG("%s: completed.", __func__);
+    memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
+    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
+    WFX_RSI_LOG("%s: completed.", __func__);
 }
 
 /*************************************************************************
@@ -206,38 +203,38 @@ void wfx_clear_wifi_provision(void)
  ****************************************************************************/
 sl_status_t wfx_connect_to_ap(void)
 {
-  if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED) {
-    WFX_RSI_LOG("%s: connecting to access point -> SSID: %s, PSK:%s",
-                __func__,
-                &wfx_rsi.sec.ssid[0],
-                &wfx_rsi.sec.passkey[0]);
-    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
-  } else {
-    WFX_RSI_LOG("%s: error: access point not provisioned", __func__);
-    return SL_STATUS_INVALID_CONFIGURATION;
-  }
-  return SL_STATUS_OK;
+    if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
+    {
+        WFX_RSI_LOG("%s: connecting to access point -> SSID: %s, PSK:%s", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0]);
+        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+    }
+    else
+    {
+        WFX_RSI_LOG("%s: error: access point not provisioned", __func__);
+        return SL_STATUS_INVALID_CONFIGURATION;
+    }
+    return SL_STATUS_OK;
 }
 
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
- * @brief  
+ * @brief
  *      Implement the ipv6 setup
  * @param[in]  whichif:
  * @return  None
  ***********************************************************************/
 void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 {
-  /*
-   * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
-   * This is hooked with MATTER code.
-   */
-  WFX_RSI_LOG("%s: warning: not implemented.", __func__);
+    /*
+     * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
+     * This is hooked with MATTER code.
+     */
+    WFX_RSI_LOG("%s: warning: not implemented.", __func__);
 }
 
 /*********************************************************************
  * @fn  bool wfx_is_sta_connected(void)
- * @brief  
+ * @brief
  *      called fuction when driver is connected to STA
  * @param[in]  None
  * @return  returns ture if successful,
@@ -245,15 +242,15 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
  ***********************************************************************/
 bool wfx_is_sta_connected(void)
 {
-  bool status;
-  status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
-  WFX_RSI_LOG("%s: status: %s", __func__, (status ? "connected" : "not connected"));
-  return status;
+    bool status;
+    status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
+    WFX_RSI_LOG("%s: status: %s", __func__, (status ? "connected" : "not connected"));
+    return status;
 }
 
 /*********************************************************************
  * @fn  wifi_mode_t wfx_get_wifi_mode()
- * @brief  
+ * @brief
  *      get the wifi mode
  * @param[in]  None
  * @return  return WIFI_MODE_NULL if successful,
@@ -261,14 +258,14 @@ bool wfx_is_sta_connected(void)
  ***********************************************************************/
 wifi_mode_t wfx_get_wifi_mode()
 {
-  if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
-    return WIFI_MODE_STA;
-  return WIFI_MODE_NULL;
+    if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
+        return WIFI_MODE_STA;
+    return WIFI_MODE_NULL;
 }
 
 /*********************************************************************
  * @fn  sl_status_t wfx_sta_discon(void)
- * @brief  
+ * @brief
  *      called fuction when STA disconnected
  * @param[in]  None
  * @return  return SL_STATUS_OK if successful,
@@ -276,17 +273,17 @@ wifi_mode_t wfx_get_wifi_mode()
  ***********************************************************************/
 sl_status_t wfx_sta_discon(void)
 {
-  WFX_RSI_LOG("%s: started.", __func__);
-  int32_t status;
-  status = wfx_rsi_disconnect();
-  wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
-  WFX_RSI_LOG("%s: completed.", __func__);
-  return status;
+    WFX_RSI_LOG("%s: started.", __func__);
+    int32_t status;
+    status = wfx_rsi_disconnect();
+    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
+    WFX_RSI_LOG("%s: completed.", __func__);
+    return status;
 }
 
 /*********************************************************************
  * @fn  bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
- * @brief  
+ * @brief
  *      called fuction when driver have ipv4 address
  * @param[in]  which_if:
  * @return  returns ture if successful,
@@ -294,19 +291,22 @@ sl_status_t wfx_sta_discon(void)
  ***********************************************************************/
 bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 {
-  bool status = false;
-  if (which_if == SL_WFX_STA_INTERFACE) {
-    status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) ? true : false;
-  } else {
-    status = false; /* TODO */
-  }
-  WFX_RSI_LOG("%s: status: %d", __func__, status);
-  return status;
+    bool status = false;
+    if (which_if == SL_WFX_STA_INTERFACE)
+    {
+        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) ? true : false;
+    }
+    else
+    {
+        status = false; /* TODO */
+    }
+    WFX_RSI_LOG("%s: status: %d", __func__, status);
+    return status;
 }
 
 /*********************************************************************
  * @fn  bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
- * @brief  
+ * @brief
  *      called fuction when driver have ipv6 address
  * @param[in]  which_if:
  * @return  returns ture if successful,
@@ -314,19 +314,22 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
  ***********************************************************************/
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
-  bool status = false;
-  if (which_if == SL_WFX_STA_INTERFACE) {
-    status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
-  } else {
-    status = false; /* TODO */
-  }
-  WFX_RSI_LOG("%s: status: %d", __func__, status);
-  return status;
+    bool status = false;
+    if (which_if == SL_WFX_STA_INTERFACE)
+    {
+        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
+    }
+    else
+    {
+        status = false; /* TODO */
+    }
+    WFX_RSI_LOG("%s: status: %d", __func__, status);
+    return status;
 }
 
 /*********************************************************************
  * @fn  bool wfx_hw_ready(void)
- * @brief  
+ * @brief
  *      called fuction when driver ready
  * @param[in]  None
  * @return  returns ture if successful,
@@ -334,86 +337,89 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
  ***********************************************************************/
 bool wfx_hw_ready(void)
 {
-  return (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY) ? true : false;
+    return (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY) ? true : false;
 }
 
 /*********************************************************************
  * @fn  int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap)
- * @brief  
+ * @brief
  *      get the access point information
  * @param[in]  ap: access point
- * @return 
+ * @return
  *      access point information
  ***********************************************************************/
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap)
+int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-  return wfx_rsi_get_ap_info(ap);
+    return wfx_rsi_get_ap_info(ap);
 }
 
 /*********************************************************************
  * @fn   int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
- * @brief  
+ * @brief
  *      get the access point extra information
  * @param[in]  extra_info:access point extra information
- * @return 
+ * @return
  *      access point extra information
  ***********************************************************************/
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
+int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-  return wfx_rsi_get_ap_ext(extra_info);
+    return wfx_rsi_get_ap_ext(extra_info);
 }
 
 /***************************************************************************
  * @fn   int32_t wfx_reset_counts(){
- * @brief  
+ * @brief
  *      get the driver reset count
  * @param[in]  None
- * @return 
+ * @return
  *      reset count
  *****************************************************************************/
-int32_t wfx_reset_counts(){
-  return wfx_rsi_reset_count();
+int32_t wfx_reset_counts()
+{
+    return wfx_rsi_reset_count();
 }
 
 #ifdef SL_WFX_CONFIG_SCAN
 /*******************************************************************************
  * @fn   bool wfx_start_scan(char *ssid, void (*callback)(wfx_wifi_scan_result_t *))
- * @brief  
+ * @brief
  *       called fuction when driver start scaning
  * @param[in]  ssid:
  * @return returns ture if successful,
- *          false otherwise 
+ *          false otherwise
  *******************************************************************************/
-bool wfx_start_scan(char *ssid, void (*callback)(wfx_wifi_scan_result_t *))
+bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
-  int sz;
+    int sz;
 
-  if (wfx_rsi.scan_cb)
-    return false; /* Already in progress */
-  if (ssid) {
-    sz = strlen(ssid);
-    if ((wfx_rsi.scan_ssid = (char *)pvPortMalloc(sz + 1)) == (char *)0) {
-      return false;
+    if (wfx_rsi.scan_cb)
+        return false; /* Already in progress */
+    if (ssid)
+    {
+        sz = strlen(ssid);
+        if ((wfx_rsi.scan_ssid = (char *) pvPortMalloc(sz + 1)) == (char *) 0)
+        {
+            return false;
+        }
+        strcpy(wfx_rsi.scan_ssid, ssid);
     }
-    strcpy(wfx_rsi.scan_ssid, ssid);
-  }
-  wfx_rsi.scan_cb = callback;
-  xEventGroupSetBits(wfx_rsi.events, WFX_EVT_SCAN);
+    wfx_rsi.scan_cb = callback;
+    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_SCAN);
 
-  return true;
+    return true;
 }
 
 /***************************************************************************
  * @fn   void wfx_cancel_scan(void)
- * @brief  
+ * @brief
  *      called function when driver cancel scaning
  * @param[in]  None
- * @return 
+ * @return
  *      None
  *****************************************************************************/
 void wfx_cancel_scan(void)
 {
-  /* Not possible */
-  WFX_RSI_LOG("%s: cannot cancel scan", __func__);
+    /* Not possible */
+    WFX_RSI_LOG("%s: cannot cancel scan", __func__);
 }
 #endif /* SL_WFX_CONFIG_SCAN */

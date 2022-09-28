@@ -5,11 +5,11 @@
 #define RSI_HAL_NO_COM_PORT /* This will be done by the project */
 
 /* Should be enums */
-#define RSI_HAL_RESET_PIN             0
-#define RSI_HAL_MODULE_INTERRUPT      1
-#define RSI_HAL_SLEEP_CONFIRM_PIN     2
+#define RSI_HAL_RESET_PIN 0
+#define RSI_HAL_MODULE_INTERRUPT 1
+#define RSI_HAL_SLEEP_CONFIRM_PIN 2
 #define RSI_HAL_WAKEUP_INDICATION_PIN 3
-#define RSI_HAL_MODULE_INTERRUPT_PIN  4
+#define RSI_HAL_MODULE_INTERRUPT_PIN 4
 
 //! Timer related macros
 //! Macro to configure timer type in single shot
@@ -52,17 +52,13 @@ void rsi_hal_config_gpio(uint8_t gpio_number, uint8_t mode, uint8_t value);
 void rsi_hal_set_gpio(uint8_t gpio_number);
 uint8_t rsi_hal_get_gpio(uint8_t gpio_number);
 void rsi_hal_clear_gpio(uint8_t gpio_number);
-int16_t rsi_spi_transfer(uint8_t *tx_buff, uint8_t *rx_buff, uint16_t transfer_length, uint8_t mode);
-int16_t rsi_uart_send(uint8_t *ptrBuf, uint16_t bufLen);
-int16_t rsi_uart_recv(uint8_t *ptrBuf, uint16_t bufLen);
-int16_t rsi_com_port_send(uint8_t *ptrBuf, uint16_t bufLen);
-int16_t rsi_com_port_receive(uint8_t *ptrBuf, uint16_t bufLen);
+int16_t rsi_spi_transfer(uint8_t * tx_buff, uint8_t * rx_buff, uint16_t transfer_length, uint8_t mode);
+int16_t rsi_uart_send(uint8_t * ptrBuf, uint16_t bufLen);
+int16_t rsi_uart_recv(uint8_t * ptrBuf, uint16_t bufLen);
+int16_t rsi_com_port_send(uint8_t * ptrBuf, uint16_t bufLen);
+int16_t rsi_com_port_receive(uint8_t * ptrBuf, uint16_t bufLen);
 uint32_t rsi_get_random_number(void);
-int32_t rsi_timer_start(uint8_t timer_node,
-                        uint8_t mode,
-                        uint8_t type,
-                        uint32_t duration,
-                        void (*rsi_timer_expiry_handler)(void));
+int32_t rsi_timer_start(uint8_t timer_node, uint8_t mode, uint8_t type, uint32_t duration, void (*rsi_timer_expiry_handler)(void));
 int32_t rsi_timer_stop(uint8_t timer_node);
 uint32_t rsi_timer_read(uint8_t timer_node);
 void rsi_delay_us(uint32_t delay_us);

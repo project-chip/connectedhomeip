@@ -1,19 +1,19 @@
 /*******************************************************************************
-* @file  rsi_hal_mcu_interrupt.c
-* @brief
-*******************************************************************************
-* # License
-* <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
-*******************************************************************************
-*
-* The licensor of this software is Silicon Laboratories Inc. Your use of this
-* software is governed by the terms of Silicon Labs Master Software License
-* Agreement (MSLA) available at
-* www.silabs.com/about-us/legal/master-software-license-agreement. This
-* software is distributed to you in Source Code format and is governed by the
-* sections of the MSLA applicable to Source Code.
-*
-******************************************************************************/
+ * @file  rsi_hal_mcu_interrupt.c
+ * @brief
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
 
 /**
  * Includes
@@ -23,18 +23,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_device.h"
+#include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_usart.h"
-#include "em_ldma.h"
-#include "dmadrv.h"
 #include "em_core.h"
-#include "sl_status.h"
-#include "sl_device_init_clocks.h"
+#include "em_device.h"
+#include "em_gpio.h"
+#include "em_ldma.h"
+#include "em_usart.h"
 #include "gpiointerrupt.h"
-#include "dmadrv.h"
+#include "sl_device_init_clocks.h"
+#include "sl_status.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -43,8 +42,8 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
-#include "rsi_driver.h"
 #include "rsi_board_configuration.h"
+#include "rsi_driver.h"
 
 typedef void (*UserIntCallBack_t)(void);
 UserIntCallBack_t call_back, gpio_callback;
@@ -56,14 +55,14 @@ uint8_t current_pin_set, prev_pin_set;
 void rsi_gpio_irq_cb(uint8_t irqnum)
 {
 
-  //WFX_RSI_LOG ("RSI: Got Int=%d", irqnum)
-  if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
-    return;
-  GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
+    // WFX_RSI_LOG ("RSI: Got Int=%d", irqnum)
+    if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
+        return;
+    GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
 
-  //WFX_RSI_LOG ("Got SPI intr, cb=%x", (uint32_t)call_back);
-  if (call_back != NULL)
-    (*call_back)();
+    // WFX_RSI_LOG ("Got SPI intr, cb=%x", (uint32_t)call_back);
+    if (call_back != NULL)
+        (*call_back)();
 }
 
 /*===================================================*/
@@ -78,8 +77,8 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
  */
 void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
 {
-  call_back = rsi_interrupt_handler;
-  WFX_RSI_LOG("RSI:Set SPI intr CB to=%x", (uint32_t)call_back);
+    call_back = rsi_interrupt_handler;
+    WFX_RSI_LOG("RSI:Set SPI intr CB to=%x", (uint32_t) call_back);
 }
 
 /*===================================================*/
@@ -95,7 +94,7 @@ void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
 #ifdef LOGGING_STATS
 void rsi_hal_log_stats_intr_config(void (*rsi_give_wakeup_indication)())
 {
-  gpio_callback = rsi_give_wakeup_indication;
+    gpio_callback = rsi_give_wakeup_indication;
 }
 #endif
 
@@ -110,9 +109,9 @@ void rsi_hal_log_stats_intr_config(void (*rsi_give_wakeup_indication)())
  */
 void rsi_hal_intr_mask(void)
 {
-  //WFX_RSI_LOG ("RSI:Disable IRQ");
-  //NVIC_DisableIRQ(GPIO_ODD_IRQn);
-  GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
+    // WFX_RSI_LOG ("RSI:Disable IRQ");
+    // NVIC_DisableIRQ(GPIO_ODD_IRQn);
+    GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
 }
 
 /*===================================================*/
@@ -126,11 +125,11 @@ void rsi_hal_intr_mask(void)
  */
 void rsi_hal_intr_unmask(void)
 {
-  // Unmask/Enable the interrupt
-  NVIC_EnableIRQ(GPIO_ODD_IRQn);
-  NVIC_EnableIRQ(GPIO_EVEN_IRQn);
-  GPIO_IntEnable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
-  //WFX_RSI_LOG ("RSI:Enable IRQ (mask=%x)", GPIO_IntGetEnabled ());
+    // Unmask/Enable the interrupt
+    NVIC_EnableIRQ(GPIO_ODD_IRQn);
+    NVIC_EnableIRQ(GPIO_EVEN_IRQn);
+    GPIO_IntEnable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
+    // WFX_RSI_LOG ("RSI:Enable IRQ (mask=%x)", GPIO_IntGetEnabled ());
 }
 
 /*===================================================*/
@@ -144,7 +143,7 @@ void rsi_hal_intr_unmask(void)
  */
 void rsi_hal_intr_clear(void)
 {
-  GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
+    GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
 }
 
 /*===================================================*/
@@ -158,9 +157,9 @@ void rsi_hal_intr_clear(void)
  */
 uint8_t rsi_hal_intr_pin_status(void)
 {
-  uint32_t mask;
-  // Return interrupt pin  status(high(1) /low (0))
-  mask = GPIO_PinInGet (WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin);
+    uint32_t mask;
+    // Return interrupt pin  status(high(1) /low (0))
+    mask = GPIO_PinInGet(WFX_INTERRUPT_PIN.port, WFX_INTERRUPT_PIN.pin);
 
-  return !!mask;
+    return !!mask;
 }
