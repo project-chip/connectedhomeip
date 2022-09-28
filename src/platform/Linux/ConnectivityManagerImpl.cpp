@@ -1140,6 +1140,8 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: save config");
+
     result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr,
                                                                        &MakeUniquePointerReceiver(err).Get());
 
