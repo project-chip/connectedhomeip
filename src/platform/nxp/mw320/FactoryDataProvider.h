@@ -31,17 +31,16 @@ namespace DeviceLayer {
  */
 
 class FactoryDataProvider : public CommissionableDataProvider,
-                                 public Credentials::DeviceAttestationCredentialsProvider
+                            public Credentials::DeviceAttestationCredentialsProvider
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     ,
-                                 public DeviceInstanceInfoProvider
+                            public DeviceInstanceInfoProvider
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 {
 public:
-	static FactoryDataProvider & GetDefaultInstance();
+    static FactoryDataProvider & GetDefaultInstance();
 
-	FactoryDataProvider()
-	{ }
+    FactoryDataProvider() {}
 
     CHIP_ERROR Init();
 

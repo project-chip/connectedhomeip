@@ -21,8 +21,8 @@
  *          statistics(extracted from /proc/net/wireless) on Linux platforms.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include "ConnectivityUtils.h"
+#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <netdb.h>
@@ -39,7 +39,6 @@ extern "C" {
 #include "wm_net.h"
 static struct wlan_network sta_network;
 }
-
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -256,8 +255,8 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
     VerifyOrReturnError(bufSize >= 6, CHIP_ERROR_BUFFER_TOO_SMALL);
     wifi_get_device_mac_addr(&mac_addr);
     memcpy(buf, mac_addr.mac, 6);
-    ChipLogProgress(DeviceLayer, "GetInterfaceHardwareAddrs: [%02x:%02x:%02x:%02x:%02x:%02x]", buf[0], buf[1], buf[2],
-                buf[3], buf[4], buf[5]);
+    ChipLogProgress(DeviceLayer, "GetInterfaceHardwareAddrs: [%02x:%02x:%02x:%02x:%02x:%02x]", buf[0], buf[1], buf[2], buf[3],
+                    buf[4], buf[5]);
     err = CHIP_NO_ERROR;
     return err;
 }
@@ -265,16 +264,16 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
 CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
     CHIP_ERROR err;
-    uint8_t index      = 0;
+    uint8_t index = 0;
     struct wlan_ip_config addr;
-    uint8_t *pipv4;
+    uint8_t * pipv4;
 
     wlan_get_address(&addr);
     memcpy(ifp->Ipv4AddressesBuffer[index], &addr.ipv4.address, kMaxIPv4AddrSize);
     ifp->Ipv4AddressSpans[index] = ByteSpan(ifp->Ipv4AddressesBuffer[index], kMaxIPv4AddrSize);
 
-    pipv4 = (uint8_t*)&addr.ipv4.address;
-    ChipLogProgress(DeviceLayer,"GetInterfaceIPv4Addrs: [%u.%u.%u.%u]", pipv4[0], pipv4[1], pipv4[2], pipv4[3]);
+    pipv4 = (uint8_t *) &addr.ipv4.address;
+    ChipLogProgress(DeviceLayer, "GetInterfaceIPv4Addrs: [%u.%u.%u.%u]", pipv4[0], pipv4[1], pipv4[2], pipv4[3]);
 
     index++;
     err  = CHIP_NO_ERROR;
@@ -287,7 +286,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
 {
     CHIP_ERROR err;
     uint8_t i;
-    uint8_t index       = 0;
+    uint8_t index = 0;
     int ret;
 
     ret = wlan_get_current_network(&sta_network);
@@ -302,9 +301,8 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
         {
             continue;
         }
-        ChipLogProgress(DeviceLayer,"\t%-13s:\t%s (%s)", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
-                                  inet6_ntoa(sta_network.ip.ipv6[i].address),
-                                  ipv6_addr_state_to_desc(sta_network.ip.ipv6[i].addr_state));
+        ChipLogProgress(DeviceLayer, "\t%-13s:\t%s (%s)", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
+                        inet6_ntoa(sta_network.ip.ipv6[i].address), ipv6_addr_state_to_desc(sta_network.ip.ipv6[i].addr_state));
         memcpy(ifp->Ipv6AddressesBuffer[index], &sta_network.ip.ipv6[index].address, kMaxIPv6AddrSize);
         ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
         index++;
@@ -325,8 +323,8 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
 CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    channelNumber = wlan_get_current_channel();
-    ChipLogProgress(DeviceLayer,"GetWiFiChannelNumber: [%u]", channelNumber);
+    channelNumber  = wlan_get_current_channel();
+    ChipLogProgress(DeviceLayer, "GetWiFiChannelNumber: [%u]", channelNumber);
     return err;
 }
 
@@ -339,42 +337,43 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
 
     VerifyOrReturnError(dblevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
     rssi = static_cast<int8_t>(dblevel);
-    ChipLogProgress(DeviceLayer,"GetWiFiRssi: [%d]", rssi);
-    err  = CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "GetWiFiRssi: [%d]", rssi);
+    err = CHIP_NO_ERROR;
     return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconRxCount(const char * ifname, uint32_t & beaconRxCount)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int ret;
     wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
 
     beaconRxCount = stats.bcn_rcv_cnt;
-    ChipLogProgress(DeviceLayer,"GetWiFiBeaconRxCount [%ld] -> working in sdk", beaconRxCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconRxCount [%ld] -> working in sdk", beaconRxCount);
 
     return err;
 }
 
-
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int ret;
     wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
 
     beaconLostCount = stats.bcn_miss_cnt;
-    ChipLogProgress(DeviceLayer,"GetWiFiBeaconLostCount [%ld] -> working in sdk", beaconLostCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconLostCount [%ld] -> working in sdk", beaconLostCount);
 
     return err;
 }
@@ -383,7 +382,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     currentMaxRate = 24000000;
-    ChipLogProgress(DeviceLayer,"GetWiFiCurrentMaxRate: %llu", currentMaxRate);
+    ChipLogProgress(DeviceLayer, "GetWiFiCurrentMaxRate: %llu", currentMaxRate);
 
     return err;
 }

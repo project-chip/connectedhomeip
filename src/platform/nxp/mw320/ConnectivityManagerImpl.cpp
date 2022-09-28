@@ -17,22 +17,22 @@
  *    limitations under the License.
  */
 /* this file behaves like a config.h, comes first */
-#include <sstream>
 #include <iomanip>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <sstream>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/nxp/mw320/ConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+#include <platform/nxp/mw320/ConnectivityManagerImpl.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
 #endif
 
-#include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -53,7 +53,6 @@ static struct wlan_network sta_network;
 #include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 // NetworkCommission--
 
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
@@ -64,7 +63,6 @@ using namespace ::chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace ::chip::app::Clusters::NetworkCommissioning;
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
-
 // NetworkCommission++
 namespace {
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
@@ -72,14 +70,14 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 #if (USE_ETHERNET_COMMISSION == 1)
 DeviceLayer::NetworkCommissioning::Mw320EthernetDriver sEthernetDriver;
-app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
+                                                                                &sEthernetDriver);
 #else
 Mw320WiFiDriver sWiFiDriver;
 Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sWiFiDriver);
-#endif //USE_ETHERNET_COMMISSION
+#endif // USE_ETHERNET_COMMISSION
 } // namespace
 // NetworkCommission--
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -94,7 +92,6 @@ uint8_t ConnectivityManagerImpl::sCfgSSIDLen;
 
 NetworkCommissioning::WiFiDriver::ScanCallback * ConnectivityManagerImpl::mpScanCallback;
 NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * ConnectivityManagerImpl::mpConnectCallback;
-
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
@@ -193,20 +190,21 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     return CHIP_NO_ERROR;
 }
 
-
-
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
     int ret = wlan_get_current_network(&sta_network);
     uint8_t macAddress[6];
 
-    if (ret == WM_SUCCESS) {
+    if (ret == WM_SUCCESS)
+    {
         memcpy(macAddress, sta_network.bssid, 6);
-    } else {
+    }
+    else
+    {
         memset(macAddress, 0, 6);
     }
     ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1], macAddress[2],
-           macAddress[3], macAddress[4], macAddress[5]);
+                    macAddress[3], macAddress[4], macAddress[5]);
     value = ByteSpan(macAddress, 6);
     return CHIP_NO_ERROR;
 }
@@ -214,29 +212,30 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 {
     int ret = wlan_get_current_network(&sta_network);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         // Set as no security by default
         securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
         return CHIP_NO_ERROR;
     }
-    switch (sta_network.security.type) {
-        case WLAN_SECURITY_WEP_OPEN:
-        case WLAN_SECURITY_WEP_SHARED:
-            securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
-            break;
-        case WLAN_SECURITY_WPA:
-            securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
-            break;
-        case WLAN_SECURITY_WPA2:
-            securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
-            break;
-        case WLAN_SECURITY_WPA3_SAE:
-            securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
-            break;
-        case WLAN_SECURITY_NONE:
-        default: // Default: No_security
-            securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
-
+    switch (sta_network.security.type)
+    {
+    case WLAN_SECURITY_WEP_OPEN:
+    case WLAN_SECURITY_WEP_SHARED:
+        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        break;
+    case WLAN_SECURITY_WPA:
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        break;
+    case WLAN_SECURITY_WPA2:
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        break;
+    case WLAN_SECURITY_WPA3_SAE:
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        break;
+    case WLAN_SECURITY_NONE:
+    default: // Default: No_security
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
     }
 
     ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", securityType);
@@ -267,7 +266,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, NetworkCommissi
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    CHIP_ERROR ret = CHIP_NO_ERROR;
     memset(sInterestedSSID, 0, sizeof(sInterestedSSID));
     memcpy(sInterestedSSID, ssid.data(), ssid.size());
     sInterestedSSIDLen = ssid.size();
@@ -279,7 +278,9 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, NetworkCommissi
     if (wlan_scan(_OnWpaInterfaceScanDone))
     {
         ChipLogProgress(DeviceLayer, "Error: scan request failed");
-    } else {
+    }
+    else
+    {
         ChipLogProgress(DeviceLayer, "Scan scheduled now...");
     }
 
@@ -309,12 +310,8 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
     }
 
     mpStatusChangeCallback->OnNetworkingStatusChange(
-        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
-        NullOptional);
+        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
 }
-
-
-
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -322,7 +319,7 @@ CHIP_ERROR
 ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                                  NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
-    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    CHIP_ERROR ret                        = CHIP_NO_ERROR;
     char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
     char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
 
@@ -339,7 +336,8 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     //
     mpConnectCallback = apCallback;
 #if (MW320_CONNECT_SCAN_SYNC == 1)
-    if (mpConnectCallback != nullptr) {
+    if (mpConnectCallback != nullptr)
+    {
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -402,21 +400,30 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
     // => bssid
     memcpy(result.bssid, res.bssid, kWiFiBSSIDLength);
     // => rssi
-    result.rssi = static_cast<int8_t>(0-res.rssi);
+    result.rssi = static_cast<int8_t>(0 - res.rssi);
     // => band, mw320 only works in 2.4G
     result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBand::k2g4;
     // => channel
     result.channel = res.channel;
     // => security
-    if (res.wep) {
+    if (res.wep)
+    {
         result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WEP);
-    } else if (res.wpa) {
+    }
+    else if (res.wpa)
+    {
         result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA);
-    } else if ((res.wpa2)||(res.wpa2_entp)) {
+    }
+    else if ((res.wpa2) || (res.wpa2_entp))
+    {
         result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA2);
-    } else if (res.wpa3_sae) {
+    }
+    else if (res.wpa3_sae)
+    {
         result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA3);
-    } else {
+    }
+    else
+    {
         result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_NONE);
     }
 
@@ -426,16 +433,15 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
 /*
     Convert the ascii string to hex string with upper case
 */
-std::string ConnectivityManagerImpl::to_hex_string(const std::string &input)
+std::string ConnectivityManagerImpl::to_hex_string(const std::string & input)
 {
     std::stringstream hex_stream;
     std::string hex_upstr;
     hex_stream << std::hex << std::internal << std::setfill('0');
-    for (auto &byte : input)
+    for (auto & byte : input)
         hex_stream << std::setw(2) << static_cast<int>(static_cast<unsigned char>(byte));
     hex_upstr = hex_stream.str();
-    transform(hex_upstr.begin(), hex_upstr.end(), hex_upstr.begin(),
-                   [](unsigned char c){ return toupper(c); });
+    transform(hex_upstr.begin(), hex_upstr.end(), hex_upstr.begin(), [](unsigned char c) { return toupper(c); });
     return hex_upstr;
 }
 
@@ -443,7 +449,8 @@ int ConnectivityManagerImpl::_OnWpaInterfaceScanDone(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "network scan done (%d)", count);
     // No ap reported
-    if (count == 0) {
+    if (count == 0)
+    {
         ChipLogProgress(DeviceLayer, "=> no network found");
         DeviceLayer::SystemLayer().ScheduleLambda([]() {
             if (mpScanCallback != nullptr)
@@ -457,19 +464,20 @@ int ConnectivityManagerImpl::_OnWpaInterfaceScanDone(unsigned int count)
 
     // Get the scan result from SDK and push to the list
     std::vector<WiFiScanResponse> * networkScanned = new std::vector<WiFiScanResponse>();
-    for (uint8_t id=0 ; id<count ; id++)
+    for (uint8_t id = 0; id < count; id++)
     {
         WiFiScanResponse network;
         if (_GetBssInfo(id, network))
         {
-            std::string ascii_ssid((char*)(network.ssid));
+            std::string ascii_ssid((char *) (network.ssid));
             std::string hex_ssid = to_hex_string(ascii_ssid);
             if (sInterestedSSIDLen == 0)
             {
                 networkScanned->push_back(network);
             }
             else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
-            //else if ((network.ssidLen<<1) == sInterestedSSIDLen && memcmp(hex_ssid.c_str(), sInterestedSSID, sInterestedSSIDLen) == 0)
+            // else if ((network.ssidLen<<1) == sInterestedSSIDLen && memcmp(hex_ssid.c_str(), sInterestedSSID, sInterestedSSIDLen)
+            // == 0)
             {
                 networkScanned->push_back(network);
             }
@@ -491,7 +499,6 @@ int ConnectivityManagerImpl::_OnWpaInterfaceScanDone(unsigned int count)
     });
     return 0;
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

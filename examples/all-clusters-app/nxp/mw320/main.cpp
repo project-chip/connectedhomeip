@@ -46,7 +46,7 @@
 #include <ChipShellCollection.h>
 
 // cr++
-#if (defined (CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
 #include "FactoryDataProvider.h"
 #else
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -100,7 +100,7 @@ extern "C" {
 #define SSID_FNAME "ssid_fname"
 #define PSK_FNAME "psk_fname"
 
-#define VERSION_STR	"mw320-2.9.10-005"
+#define VERSION_STR "mw320-2.9.10-005"
 enum
 {
     MCUXPRESSO_WIFI_CLI,
@@ -123,7 +123,7 @@ const int TASK_MAIN_STACK_SIZE   = 800;
 portSTACK_TYPE * task_main_stack = NULL;
 TaskHandle_t task_main_task_handler;
 
-uint8_t *__FACTORY_DATA_START;
+uint8_t * __FACTORY_DATA_START;
 uint32_t __FACTORY_DATA_SIZE;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -185,7 +185,7 @@ void InitOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 
-const char* mw320_get_verstr(void)
+const char * mw320_get_verstr(void)
 {
     return VERSION_STR;
 }
@@ -1041,11 +1041,11 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     // Init ZCL Data Model and CHIP App Server
     {
         // Initialize device attestation config
-#if (defined (CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
         FactoryDataProvider::GetDefaultInstance().Init();
-    #if (CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER == 1)
+#if (CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER == 1)
         SetDeviceInstanceInfoProvider(&FactoryDataProvider::GetDefaultInstance());
-    #endif // USE_LOCAL_DEVICEINSTANCEINFOPROVIDER
+#endif // USE_LOCAL_DEVICEINSTANCEINFOPROVIDER
         SetDeviceAttestationCredentialsProvider(&FactoryDataProvider::GetDefaultInstance());
         SetCommissionableDataProvider(&FactoryDataProvider::GetDefaultInstance());
 #else
@@ -1188,9 +1188,9 @@ void init_mw320_sdk()
     manu_dat = part_get_layout_by_id(FC_COMP_USER_APP, NULL);
     part_to_flash_desc(manu_dat, &fl);
     PRINTF("[Manufacture_Data]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
-    pmfdat = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
+    pmfdat               = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
     __FACTORY_DATA_START = pmfdat;
-    __FACTORY_DATA_SIZE = (uint32_t)fl.fl_size;
+    __FACTORY_DATA_SIZE  = (uint32_t) fl.fl_size;
 
     f1 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     f2 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
@@ -1545,7 +1545,7 @@ Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
 
 void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    Identify_Time_t *pidt = (Identify_Time_t *)appState;
+    Identify_Time_t * pidt = (Identify_Time_t *) appState;
     PRINTF(" -> %s(%u, %u) \r\n", __FUNCTION__, pidt->ep, pidt->identifyTimerCount);
     if (pidt->identifyTimerCount)
     {
@@ -1564,7 +1564,7 @@ static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, Attribu
                  ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));
     if (id_time[endpointId].identifyTimerCount != *value)
     {
-        id_time[endpointId].ep = endpointId;
+        id_time[endpointId].ep                 = endpointId;
         id_time[endpointId].identifyTimerCount = *value;
         PRINTF("-> Identify: %u \r\n", id_time[endpointId].identifyTimerCount);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, &id_time[endpointId]);

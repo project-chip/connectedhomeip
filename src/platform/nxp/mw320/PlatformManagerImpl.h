@@ -60,7 +60,6 @@ public:
     static int uECC_RNG_Function(uint8_t * dest, unsigned int size);
 #endif
 
-
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 

@@ -125,10 +125,10 @@ Status Mw320WiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     memcpy(mStagingNetwork.ssid, ssid.data(), ssid.size());
     mStagingNetwork.ssidLen = static_cast<decltype(mStagingNetwork.ssidLen)>(ssid.size());
 
-#if (MW320_CONNECT_SCAN_SYNC==1)
-    //ConnectNetwork(ssid, nullptr);
+#if (MW320_CONNECT_SCAN_SYNC == 1)
+    // ConnectNetwork(ssid, nullptr);
     ConnectivityMgrImpl().UpdateNetworkStatus();
-#endif //MW320_CONNECT_SCAN_SYNC
+#endif // MW320_CONNECT_SCAN_SYNC
 
     return Status::kSuccess;
 }

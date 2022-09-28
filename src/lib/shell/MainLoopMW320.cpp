@@ -16,9 +16,9 @@
  */
 
 #include "streamer.h"
+#include <app/server/Server.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/server/Server.h>
 #include <platform/CommissionableDataProvider.h>
 
 #include <ctype.h>
@@ -28,9 +28,7 @@
 
 extern "C" {
 #include "wlan.h"
-
 }
-
 
 using chip::FormatCHIPError;
 using chip::Shell::Engine;
@@ -152,7 +150,7 @@ exit:
 
 } // namespace
 
-extern const char* mw320_get_verstr(void);
+extern const char * mw320_get_verstr(void);
 extern void save_network(char * ssid, char * pwd);
 namespace chip {
 namespace Shell {
@@ -177,12 +175,12 @@ static void AtExitShell(void)
 
 static CHIP_ERROR VersionHandler(int argc, char ** argv)
 {
-    //streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
+    // streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
     streamer_printf(streamer_get(), "CHIP %s\r\n", mw320_get_verstr());
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR SetPinCodeHandler(int argc, char **argv)
+static CHIP_ERROR SetPinCodeHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
     uint32_t setupPinCode = strtoull(argv[0], nullptr, 10);
@@ -192,7 +190,7 @@ static CHIP_ERROR SetPinCodeHandler(int argc, char **argv)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR SetDefAPHandler(int argc, char **argv)
+static CHIP_ERROR SetDefAPHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
     PRINTF("[%s], [%s] \r\n", argv[0], argv[1]);
@@ -201,39 +199,41 @@ static CHIP_ERROR SetDefAPHandler(int argc, char **argv)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR wlan_state_handler (int argc, char **argv)
+static CHIP_ERROR wlan_state_handler(int argc, char ** argv)
 {
     enum wlan_connection_state state;
     int result;
     result = wlan_get_connection_state(&state);
-    if (result != WM_SUCCESS) {
+    if (result != WM_SUCCESS)
+    {
         streamer_printf(streamer_get(), "Unknown WiFi State\r\n");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    switch (state) {
-        case WLAN_DISCONNECTED:
-            streamer_printf(streamer_get(), "Wi-Fi: Disconnected\r\n");
-            break;
-        case WLAN_CONNECTING:
-            streamer_printf(streamer_get(), "Wi-Fi: connecting \r\n");
-            break;
-        case WLAN_ASSOCIATED:
-            streamer_printf(streamer_get(), "Wi-Fi: associated \r\n");
-            break;
-        case WLAN_CONNECTED:
-            streamer_printf(streamer_get(), "Wi-Fi: connected \r\n");
-            break;
-        case WLAN_SCANNING:
-            streamer_printf(streamer_get(), "Wi-Fi: scanning \r\n");
-            break;
-        default:
-            streamer_printf(streamer_get(), "Unknown WiFi State [%d] \r\n", (int) state);
+    switch (state)
+    {
+    case WLAN_DISCONNECTED:
+        streamer_printf(streamer_get(), "Wi-Fi: Disconnected\r\n");
+        break;
+    case WLAN_CONNECTING:
+        streamer_printf(streamer_get(), "Wi-Fi: connecting \r\n");
+        break;
+    case WLAN_ASSOCIATED:
+        streamer_printf(streamer_get(), "Wi-Fi: associated \r\n");
+        break;
+    case WLAN_CONNECTED:
+        streamer_printf(streamer_get(), "Wi-Fi: connected \r\n");
+        break;
+    case WLAN_SCANNING:
+        streamer_printf(streamer_get(), "Wi-Fi: scanning \r\n");
+        break;
+    default:
+        streamer_printf(streamer_get(), "Unknown WiFi State [%d] \r\n", (int) state);
     }
 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR wlan_abort_handler (int argc, char **argv)
+static CHIP_ERROR wlan_abort_handler(int argc, char ** argv)
 {
     wlan_abort_connect();
     return CHIP_NO_ERROR;
@@ -246,8 +246,8 @@ static void RegisterMetaCommands(void)
         { &VersionHandler, "version", "Output the software version" },
         { &SetPinCodeHandler, "pincode", "Set the pin code" },
         { &SetDefAPHandler, "set_defap", "Set default AP SSID/PWD" },
-        { &wlan_state_handler, "wlan-stat", "Check the wifi status"},
-        { &wlan_abort_handler, "wlan-abort", "Abort the scan/reconnect"},
+        { &wlan_state_handler, "wlan-stat", "Check the wifi status" },
+        { &wlan_abort_handler, "wlan-abort", "Abort the scan/reconnect" },
     };
 
     std::atexit(AtExitShell);

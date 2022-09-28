@@ -39,8 +39,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
-#include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -113,7 +113,7 @@ private:
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
 #endif
-    static std::string to_hex_string(const std::string &input);
+    static std::string to_hex_string(const std::string & input);
     static int _OnWpaInterfaceScanDone(unsigned int count);
     static bool _GetBssInfo(const uint8_t sid, NetworkCommissioning::WiFiScanResponse & result);
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;

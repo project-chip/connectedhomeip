@@ -36,7 +36,6 @@
 #include "ecc.h"
 #endif
 
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -44,7 +43,6 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 #if defined(MBEDTLS_USE_TINYCRYPT)
 sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
 #endif
-
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -93,12 +91,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 #if defined(MBEDTLS_USE_TINYCRYPT)
     /* Set RNG function for tinycrypt operations. */
-    err_t  ret;
-    ret  = sys_mutex_new(&rngMutexHandle);
-    VerifyOrExit((ERR_OK==ret), err = CHIP_ERROR_NO_MEMORY);
+    err_t ret;
+    ret = sys_mutex_new(&rngMutexHandle);
+    VerifyOrExit((ERR_OK == ret), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif
-
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -111,7 +108,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 exit:
     return err;
 }
-
 
 void PlatformManagerImpl::_Shutdown()
 {
@@ -137,7 +133,6 @@ void PlatformManagerImpl::_Shutdown()
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
-
 
 } // namespace DeviceLayer
 } // namespace chip

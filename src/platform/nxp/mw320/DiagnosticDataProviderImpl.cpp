@@ -31,19 +31,15 @@
 #include <platform/nxp/mw320/ConnectivityUtils.h>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 
-
 extern "C" {
 #include "wlan.h"
 }
-
-
 
 //#include <openthread/platform/entropy.h>
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -205,7 +201,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
     return ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconRxCount);
 }
 
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
     return ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconLostCount);
@@ -218,14 +213,15 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
     wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
     packetMulticastRxCount = stats.mcast_rx_frame;
 #else
     packetMulticastRxCount = 0;
 #endif // GET_FROM_SDK
-    ChipLogProgress(DeviceLayer,"GetWiFiPacketMulticastRxCount: %lu ", packetMulticastRxCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiPacketMulticastRxCount: %lu ", packetMulticastRxCount);
     return CHIP_NO_ERROR;
 }
 
@@ -236,7 +232,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
     wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
 
@@ -244,7 +241,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 #else
     packetMulticastTxCount = 0;
 #endif // GET_FROM_SDK
-    ChipLogProgress(DeviceLayer,"GetWiFiPacketMulticastTxCount: %lu ", packetMulticastTxCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiPacketMulticastTxCount: %lu ", packetMulticastTxCount);
     return CHIP_NO_ERROR;
 }
 
@@ -252,7 +249,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 {
     // => Not support in SDK yet
     packetUnicastRxCount = 0;
-    ChipLogProgress(DeviceLayer,"GetWiFiPacketUnicastRxCount: %lu (ToDo)", packetUnicastRxCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiPacketUnicastRxCount: %lu (ToDo)", packetUnicastRxCount);
     return CHIP_NO_ERROR;
 }
 
@@ -263,15 +260,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
     wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
-    if (ret != WM_SUCCESS) {
+    if (ret != WM_SUCCESS)
+    {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
 
     packetUnicastTxCount = stats.tx_frame;
 #else
-    packetUnicastTxCount = 0;
+    packetUnicastTxCount   = 0;
 #endif // #ifdef GET_FROM_SDK
-    ChipLogProgress(DeviceLayer,"GetWiFiPacketUnicastTxCount: %lu", packetUnicastTxCount);
+    ChipLogProgress(DeviceLayer, "GetWiFiPacketUnicastTxCount: %lu", packetUnicastTxCount);
     return CHIP_NO_ERROR;
 }
 
