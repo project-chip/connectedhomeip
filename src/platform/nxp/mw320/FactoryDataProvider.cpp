@@ -180,8 +180,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     dacCertSpan.reduce_size(certificateSize);
 
 #if (!defined (MBEDTLS_USE_TINYCRYPT))
-    /* Skip fetching public key if using tiny_crypt 
-        In mbedtls_pk_parse_subpubkey(), 
+    /* Skip fetching public key if using tiny_crypt
+        In mbedtls_pk_parse_subpubkey(),
         If using tiny_crypt => pk_get_ueccpubkey()
         If not using tiny_crypt => pk_get_ecpubkey() (needed)
     */
