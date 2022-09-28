@@ -507,14 +507,10 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    Inet::IPAddress addr;
     JniUtfString addrJniString(env, address);
-    VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
-                   ChipLogError(Controller, "Failed to parse IP address."),
-                   JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters rendezvousParams =
-        RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams = RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(
+        Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
