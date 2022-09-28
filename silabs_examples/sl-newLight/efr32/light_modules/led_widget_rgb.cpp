@@ -266,7 +266,7 @@ void LEDWidgetRGB::SetSaturation(uint8_t sat)
     OnOffServer::Instance().getOnOffValue(1, &currentValue);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     
-    this->current_saturation_ = static_cast<uint16_t>((sat * 360) / ATTRIBUTE_LEVEL_MAX);
+    this->current_saturation_ = static_cast<uint16_t>((sat * 100) / ATTRIBUTE_LEVEL_MAX);
     if(currentValue){
         
         this->SetColor(this->current_hue_, this->current_saturation_, this->current_level_);
