@@ -176,7 +176,8 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                 name=attrs['type']
             )
 
-            # TODO: handle isFabricSensitive
+            # TODO(#22938): IDL should keep track and use the
+            #               isFabricSensitive attribute here
 
             if 'fieldId' in attrs:
                 self._field_index = ParseInt(attrs['fieldId'])
@@ -362,7 +363,6 @@ class CommandHandler(BaseHandler):
             else:
                 response_name = 'DefaultResponse'
 
-            # TODO: what if no response? DefaultResponse?
             self._command = Command(
                 name=name,
                 code=ParseInt(attrs['code']),
@@ -419,7 +419,6 @@ class CommandHandler(BaseHandler):
         elif name.lower() == 'description':
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
-            # TODO: implement
             return BaseHandler(self.context)
 
     def EndProcessing(self):

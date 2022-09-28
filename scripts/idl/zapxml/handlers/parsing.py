@@ -84,13 +84,13 @@ def AttrsToAttribute(attrs) -> Attribute:
     if attrs.get('writable', "false").lower() == 'true':
         attribute.tags.add(AttributeTag.WRITABLE)
 
-    # TODO: XML does not seem to contain information about
-    #   - NOSUBSCRIBE
+    # TODO(#22937): NOSUBSCRIBE attribute tag is not available - could find no
+    #               clear source to get this info.
 
-    # TODO: do we care about default value at all? XML contains it, but IDL
-    #       only applies it on endpoint instantiation (which makes more sense
-    #       if default values on endpoints can be different)
-    #
-    #       Generally would expect .zap files to contain defaults, not XML.
+    # NOTE: default values are also present in this XML, however generally IDL
+    #       **DATA** definitions would not care about the defaults. The
+    #       defaults should be used to initializ storage for devices, hence
+    #       they are part of endpoint definition/composition. We are not doing
+    #       that here, so defaults are ignored.
 
     return attribute
