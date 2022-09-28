@@ -44,6 +44,9 @@ mw320_sdk("sdk") {
   } else {
     defines += [ "BUILD_RELEASE=1" ]
   }
+  if (wifi_conn_abort_support == true ) {
+    defines += [ "WIFI_CONN_ABORT_SUPPORT" ]
+  }
 }
 
 mw320_executable("shell_mw320") {

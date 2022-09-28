@@ -235,7 +235,9 @@ static CHIP_ERROR wlan_state_handler(int argc, char ** argv)
 
 static CHIP_ERROR wlan_abort_handler(int argc, char ** argv)
 {
+#ifdef WIFI_CONN_ABORT_SUPPORT
     wlan_abort_connect();
+#endif // WIFI_CONN_ABORT_SUPPORT
     return CHIP_NO_ERROR;
 }
 
