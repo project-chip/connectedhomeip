@@ -137,8 +137,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       byte[][] textEntriesDatas,
       String[] subTypes) {
     /**
-     * Note, MF's NSDService will be repeatedly registered until it exceeds the OS's maximum(http://androidxref.com/9.0.0_r3/xref/frameworks/base/services/core/java/com/android/server/NsdService.java#MAX_LIMIT) limit
-     * at which time the registration will fail.
+     * Note, MF's NSDService will be repeatedly registered until it exceeds the OS's
+     * maximum(http://androidxref.com/9.0.0_r3/xref/frameworks/base/services/core/java/com/android/server/NsdService.java#MAX_LIMIT)
+     * limit at which time the registration will fail.
      */
     if (serviceName.contains("-") && mMFServiceName.contains(serviceName)) {
       Log.w(TAG, "publish: duplicate MF nsdService");
