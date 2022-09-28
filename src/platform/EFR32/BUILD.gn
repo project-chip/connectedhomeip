@@ -57,8 +57,6 @@ static_library("EFR32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "gatt_db.c",
-    "gatt_db.h",
   ]
 
   if (chip_enable_ota_requestor) {
