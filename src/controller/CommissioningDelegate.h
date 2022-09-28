@@ -54,7 +54,7 @@ enum CommissioningStage : uint8_t
     kCleanup,                   ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
-    /// However, the circ tests fail if it is earlier in the list
+    /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
     kNeedsNetworkCreds,
 };
