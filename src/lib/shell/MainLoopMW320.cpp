@@ -26,6 +26,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern "C" {
+#include "wlan.h"
+
+}
+
+
 using chip::FormatCHIPError;
 using chip::Shell::Engine;
 using chip::Shell::streamer_get;
@@ -195,6 +201,44 @@ static CHIP_ERROR SetDefAPHandler(int argc, char **argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR wlan_state_handler (int argc, char **argv)
+{
+    enum wlan_connection_state state;
+    int result;
+    result = wlan_get_connection_state(&state);
+    if (result != WM_SUCCESS) {
+        streamer_printf(streamer_get(), "Unknown WiFi State\r\n");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    switch (state) {
+        case WLAN_DISCONNECTED:
+            streamer_printf(streamer_get(), "Wi-Fi: Disconnected\r\n");
+            break;
+        case WLAN_CONNECTING:
+            streamer_printf(streamer_get(), "Wi-Fi: connecting \r\n");
+            break;
+        case WLAN_ASSOCIATED:
+            streamer_printf(streamer_get(), "Wi-Fi: associated \r\n");
+            break;
+        case WLAN_CONNECTED:
+            streamer_printf(streamer_get(), "Wi-Fi: connected \r\n");
+            break;
+        case WLAN_SCANNING:
+            streamer_printf(streamer_get(), "Wi-Fi: scanning \r\n");
+            break;
+        default:
+            streamer_printf(streamer_get(), "Unknown WiFi State [%d] \r\n", (int) state);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR wlan_abort_handler (int argc, char **argv)
+{
+    wlan_abort_connect();
+    return CHIP_NO_ERROR;
+}
+
 static void RegisterMetaCommands(void)
 {
     static shell_command_t sCmds[] = {
@@ -202,6 +246,8 @@ static void RegisterMetaCommands(void)
         { &VersionHandler, "version", "Output the software version" },
         { &SetPinCodeHandler, "pincode", "Set the pin code" },
         { &SetDefAPHandler, "set_defap", "Set default AP SSID/PWD" },
+        { &wlan_state_handler, "wlan-stat", "Check the wifi status"},
+        { &wlan_abort_handler, "wlan-abort", "Abort the scan/reconnect"},
     };
 
     std::atexit(AtExitShell);
