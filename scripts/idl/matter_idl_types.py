@@ -36,6 +36,7 @@ class AttributeTag(enum.Enum):
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
     FABRIC_SCOPED = enum.auto()
+    FABRIC_SENSITIVE = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -48,6 +49,10 @@ class EventPriority(enum.Enum):
     DEBUG = enum.auto()
     INFO = enum.auto()
     CRITICAL = enum.auto()
+
+
+class EventTag(enum.Enum):
+    FABRIC_SENSITIVE = enum.auto()
 
 
 class ClusterSide(enum.Enum):
@@ -138,6 +143,12 @@ class Event:
     code: int
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
+    tags: Set[EventTag] = field(default_factory=set)
+
+    @property
+    def is_fabric_sensitive(self):
+        return EventTag.FABRIC_SENSITIVE in self.tags
+    
 
 
 @dataclass
