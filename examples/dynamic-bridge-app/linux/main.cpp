@@ -291,9 +291,11 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
     std::vector<CommonAttributeAccessInterface> clusterAccess;
+    clusterAccess.reserve(std::extent<decltype(clusters::kKnownClusters)>::value);
     for (auto & entry : clusters::kKnownClusters)
     {
         clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
+        registerAttributeAccessOverride(&clusterAccess.back());
     }
 
     ChipLinuxAppMainLoop();

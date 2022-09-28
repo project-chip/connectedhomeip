@@ -195,9 +195,12 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
     switch (aPath.mListOp)
     {
     case ConcreteDataAttributePath::ListOperation::DeleteItem:
-        if (aPath.mListIndex >= x.size()) {
+        if (aPath.mListIndex >= x.size())
+        {
             return CHIP_ERROR_INVALID_LIST_LENGTH;
-        } else {
+        }
+        else
+        {
             auto it = x.begin();
             std::advance(it, aPath.mListIndex);
             x.erase(it);
@@ -205,9 +208,12 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
         }
 
     case ConcreteDataAttributePath::ListOperation::ReplaceItem:
-        if (aPath.mListIndex >= x.size()) {
+        if (aPath.mListIndex >= x.size())
+        {
             return CHIP_ERROR_INVALID_LIST_LENGTH;
-        } else {
+        }
+        else
+        {
             auto it = x.begin();
             std::advance(it, aPath.mListIndex);
             return aDecoder.Decode(*it);

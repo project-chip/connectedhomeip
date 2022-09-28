@@ -29,8 +29,8 @@
 
 #include <functional>
 
-#include "data-model/Attribute.h"
 #include "GeneratedClusters.h"
+#include "data-model/Attribute.h"
 
 // This is the interface to cluster implementations, providing access to manipulate attributes.
 class ClusterInterface

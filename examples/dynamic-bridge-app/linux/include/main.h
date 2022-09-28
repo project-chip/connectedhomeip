@@ -20,7 +20,7 @@
 
 #include <lib/core/Optional.h>
 
-#include "ActionList.h"
+#include "ActionCluster.h"
 #include "Device.h"
 #include "GeneratedClusters.h"
 
