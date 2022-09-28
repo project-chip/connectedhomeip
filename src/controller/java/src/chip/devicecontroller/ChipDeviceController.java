@@ -50,6 +50,9 @@ public class ChipDeviceController {
    * ID
    */
   public ChipDeviceController(ControllerParams params) {
+    if (params == null) {
+      throw new NullPointerException("params cannot be null");
+    }
     deviceControllerPtr = newDeviceController(params);
   }
 
@@ -452,7 +455,7 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given attribute path. */
-  public void subscribeToPath(
+  public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
@@ -524,7 +527,7 @@ public class ChipDeviceController {
   }
 
   /** Read the given attribute path. */
-  public void readPath(
+  public void readAttributePath(
       ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(

@@ -19,6 +19,7 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - MCORE.SC.LWIP
 
 config:
     nodeId: 0x12344321
