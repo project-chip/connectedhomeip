@@ -1299,6 +1299,172 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    mbedtls_x509_crt mbed_cert;
+    unsigned char * p         = nullptr;
+    const unsigned char * end = nullptr;
+    size_t len                = 0;
+    bool extBasicPresent      = false;
+    bool extKeyUsagePresent   = false;
+
+    VerifyOrReturnError(!cert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(cert.data()), cert.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // "version" value is 1 higher than the actual encoded value.
+    VerifyOrExit(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(version) - 1 == 2, error = CHIP_ERROR_INTERNAL);
+
+    // Verify signature algorithms is ECDSA_WITH_SHA256.
+    p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(sig_oid).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(sig_oid).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    VerifyOrExit((strlen(MBEDTLS_OID_ECDSA_SHA256) == len) && (memcmp(MBEDTLS_OID_ECDSA_SHA256, p, len) == 0),
+                 error = CHIP_ERROR_INTERNAL);
+
+    // Verify public key presence and format.
+    {
+        Crypto::P256PublicKey pubkey;
+        SuccessOrExit(error = ExtractPubkeyFromX509Cert(cert, pubkey));
+    }
+
+    p      = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    end    = p + mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    while (p < end)
+    {
+        mbedtls_x509_buf extOID = { 0, 0, nullptr };
+        int extCritical         = 0;
+        int extType             = 0;
+
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+        /* Get extension ID */
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OID);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+        extOID.CHIP_CRYPTO_PAL_PRIVATE_X509(tag) = MBEDTLS_ASN1_OID;
+        extOID.CHIP_CRYPTO_PAL_PRIVATE_X509(len) = len;
+        extOID.CHIP_CRYPTO_PAL_PRIVATE_X509(p)   = p;
+        p += len;
+
+        /* Get optional critical */
+        result = mbedtls_asn1_get_bool(&p, end, &extCritical);
+        VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
+
+        /* Data should be octet string type */
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OCTET_STRING);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+        mbedtls_oid_get_x509_ext_type(&extOID, &extType);
+        if (extType == MBEDTLS_X509_EXT_BASIC_CONSTRAINTS)
+        {
+            int isCA                 = 0;
+            int pathLen              = -1;
+            unsigned char * seqStart = p;
+
+            VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
+            extBasicPresent = true;
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+            if (len > 0)
+            {
+                result = mbedtls_asn1_get_bool(&p, end, &isCA);
+                VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
+
+                if (p != seqStart + len)
+                {
+                    result = mbedtls_asn1_get_int(&p, end, &pathLen);
+                    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+                }
+            }
+
+            if (certType == AttestationCertType::kDAC)
+            {
+                VerifyOrExit(!isCA && pathLen == -1, error = CHIP_ERROR_INTERNAL);
+            }
+            else if (certType == AttestationCertType::kPAI)
+            {
+                VerifyOrExit(isCA && pathLen == 0, error = CHIP_ERROR_INTERNAL);
+            }
+            else
+            {
+                VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), error = CHIP_ERROR_INTERNAL);
+            }
+        }
+        else if (extType == MBEDTLS_X509_EXT_KEY_USAGE)
+        {
+            mbedtls_x509_bitstring bs = { 0, 0, nullptr };
+            unsigned int keyUsage     = 0;
+
+            VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
+            extKeyUsagePresent = true;
+
+            result = mbedtls_asn1_get_bitstring(&p, p + len, &bs);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+            for (size_t i = 0; i < bs.CHIP_CRYPTO_PAL_PRIVATE_X509(len) && i < sizeof(unsigned int); i++)
+            {
+                keyUsage |= static_cast<unsigned int>(bs.CHIP_CRYPTO_PAL_PRIVATE_X509(p)[i]) << (8 * i);
+            }
+
+            if (certType == AttestationCertType::kDAC)
+            {
+                // SHALL only have the digitalSignature bit set.
+                VerifyOrExit(keyUsage == MBEDTLS_X509_KU_DIGITAL_SIGNATURE, error = CHIP_ERROR_INTERNAL);
+            }
+            else
+            {
+                bool keyCertSignFlag = keyUsage & MBEDTLS_X509_KU_KEY_CERT_SIGN;
+                bool crlSignFlag     = keyUsage & MBEDTLS_X509_KU_CRL_SIGN;
+                bool otherFlags =
+                    keyUsage & ~(MBEDTLS_X509_KU_CRL_SIGN | MBEDTLS_X509_KU_KEY_CERT_SIGN | MBEDTLS_X509_KU_DIGITAL_SIGNATURE);
+                VerifyOrExit(keyCertSignFlag && crlSignFlag && !otherFlags, error = CHIP_ERROR_INTERNAL);
+            }
+        }
+        else
+        {
+            p += len;
+        }
+    }
+
+    // Verify basic and key usage extensions are present.
+    VerifyOrExit(extBasicPresent && extKeyUsagePresent, error = CHIP_ERROR_INTERNAL);
+
+    // Verify that SKID and AKID extensions are present.
+    {
+        uint8_t kidBuf[kSubjectKeyIdentifierLength];
+        MutableByteSpan kid(kidBuf);
+        SuccessOrExit(error = ExtractSKIDFromX509Cert(cert, kid));
+        if (certType == AttestationCertType::kDAC || certType == AttestationCertType::kPAI)
+        {
+            // Mandatory extension for DAC and PAI certs.
+            SuccessOrExit(error = ExtractAKIDFromX509Cert(cert, kid));
+        }
+    }
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) cert;
+    (void) certType;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result)
