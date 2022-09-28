@@ -61,8 +61,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -95,8 +94,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -224,8 +222,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -256,8 +253,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -287,8 +283,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -339,8 +334,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -378,8 +372,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -411,8 +404,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -511,8 +503,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -618,8 +609,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -650,8 +640,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -682,8 +671,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -713,8 +701,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -744,8 +731,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -789,8 +775,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -820,8 +805,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -927,8 +911,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -959,8 +942,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -1104,8 +1086,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1143,8 +1124,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1182,8 +1162,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1215,8 +1194,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1260,8 +1238,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1293,8 +1270,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1578,8 +1554,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1620,8 +1595,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1662,8 +1636,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1705,8 +1678,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1740,8 +1712,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1782,8 +1753,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1824,8 +1794,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1867,8 +1836,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -1902,8 +1870,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2791,8 +2758,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2829,8 +2795,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2868,8 +2833,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2906,8 +2870,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2945,8 +2908,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -2983,8 +2945,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3021,8 +2982,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3060,8 +3020,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3098,8 +3057,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3136,8 +3094,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3175,8 +3132,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3213,8 +3169,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3342,8 +3297,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3650,8 +3604,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -3722,8 +3675,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -3753,8 +3705,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -3847,8 +3798,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -4673,8 +4623,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -4705,8 +4654,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -4752,8 +4700,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -4901,8 +4848,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -4946,8 +4892,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -4982,8 +4927,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5017,8 +4961,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5052,8 +4995,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5087,8 +5029,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5263,8 +5204,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5353,8 +5293,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -5527,8 +5466,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -5659,8 +5597,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -6280,8 +6217,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -6488,8 +6424,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -6929,8 +6864,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -6970,8 +6904,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -7016,8 +6949,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -7137,8 +7069,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7168,8 +7099,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7199,8 +7129,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7234,8 +7163,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7273,8 +7201,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7308,8 +7235,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7339,8 +7265,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7369,8 +7294,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -7510,8 +7434,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -7584,8 +7507,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -7614,8 +7536,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -7649,8 +7570,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8022,8 +7942,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8199,8 +8118,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8241,8 +8159,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8283,8 +8200,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8324,8 +8240,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8365,8 +8280,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8396,8 +8310,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8431,8 +8344,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8469,8 +8381,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8500,8 +8411,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8535,8 +8445,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8574,8 +8483,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8604,8 +8512,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8638,8 +8545,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8709,8 +8615,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8739,8 +8644,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -8777,8 +8681,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8835,8 +8738,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -8867,8 +8769,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9621,8 +9522,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9663,8 +9563,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9705,8 +9604,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9738,8 +9636,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9772,8 +9669,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9806,8 +9702,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -9840,8 +9735,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -10132,8 +10026,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -10175,8 +10068,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -10794,8 +10686,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -10829,8 +10720,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -10902,8 +10792,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -10944,8 +10833,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12376,8 +12264,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12415,8 +12302,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12452,8 +12338,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12490,8 +12375,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12527,8 +12411,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12564,8 +12447,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12602,8 +12484,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12640,8 +12521,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12678,8 +12558,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12715,8 +12594,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12753,8 +12631,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12790,8 +12667,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12829,8 +12705,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12866,8 +12741,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12904,8 +12778,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12942,8 +12815,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -12984,8 +12856,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -13019,8 +12890,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -13058,8 +12928,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -15116,8 +14985,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15146,8 +15014,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -15181,8 +15048,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -15297,8 +15163,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15412,8 +15277,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15449,8 +15313,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15489,8 +15352,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15529,8 +15391,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15566,8 +15427,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15603,8 +15463,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15640,8 +15499,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15680,8 +15538,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15710,8 +15567,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15741,8 +15597,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15772,8 +15627,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -15915,8 +15769,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -15958,8 +15811,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16000,8 +15852,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16033,8 +15884,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16147,8 +15997,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16238,8 +16087,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -16326,8 +16174,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -16413,8 +16260,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -16636,8 +16482,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16670,8 +16515,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -16779,8 +16623,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -16815,8 +16658,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -16847,8 +16689,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -17092,8 +16933,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -17125,8 +16965,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -17169,8 +17008,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -17271,8 +17109,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -17304,8 +17141,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -18640,8 +18476,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -18682,8 +18517,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -18726,8 +18560,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -18764,8 +18597,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -18798,8 +18630,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -18830,8 +18661,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -18862,8 +18692,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19102,8 +18931,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19140,8 +18968,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19180,8 +19007,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19241,8 +19067,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19293,8 +19118,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19431,8 +19255,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19593,8 +19416,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19645,8 +19467,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19677,8 +19498,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19720,8 +19540,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19919,8 +19738,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -19965,8 +19783,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -20001,8 +19818,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRCommandSuccessCallbackBridge(
         self.callbackQueue, baseDevice,
         ^(id _Nullable value, NSError * _Nullable error) {
@@ -20041,8 +19857,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -20077,8 +19892,7 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:@(self.device.nodeID)
-                                                            controller:self.device.deviceController];
+    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
     new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;

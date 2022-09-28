@@ -10,7 +10,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-      timeout: 900s
+      timeout: 2700s
 
     - name: "connectedhomeip/chip-build-vscode:0.5.99"
       env:

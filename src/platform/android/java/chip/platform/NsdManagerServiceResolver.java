@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -35,6 +36,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
   private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
+  private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -134,6 +136,15 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       String[] textEntriesKeys,
       byte[][] textEntriesDatas,
       String[] subTypes) {
+    /**
+     * Note, MF's NSDService will be repeatedly registered until it exceeds the OS's
+     * maximum(http://androidxref.com/9.0.0_r3/xref/frameworks/base/services/core/java/com/android/server/NsdService.java#MAX_LIMIT)
+     * limit at which time the registration will fail.
+     */
+    if (serviceName.contains("-") && mMFServiceName.contains(serviceName)) {
+      Log.w(TAG, "publish: duplicate MF nsdService");
+      return;
+    }
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(serviceName);
 
@@ -193,6 +204,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       multicastLock.acquire();
     }
     registrationListeners.add(registrationListener);
+    mMFServiceName.add(serviceName);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
     Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
@@ -209,5 +221,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       nsdManager.unregisterService(l);
     }
     registrationListeners.clear();
+    mMFServiceName.clear();
   }
 }
