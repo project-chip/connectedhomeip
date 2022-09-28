@@ -50,6 +50,9 @@ public class ChipDeviceController {
    * ID
    */
   public ChipDeviceController(ControllerParams params) {
+    if (params == null) {
+      throw new NullPointerException("params cannot be null");
+    }
     deviceControllerPtr = newDeviceController(params);
   }
 
