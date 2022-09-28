@@ -46,6 +46,7 @@
 #include "TimersManager.h"
 #include "fsl_sha.h"
 #include "k32w0-chip-mbedtls-config.h"
+#include "SecLib.h"
 
 namespace chip {
 namespace DeviceLayer {
