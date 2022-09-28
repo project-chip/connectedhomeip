@@ -318,7 +318,7 @@ CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[
 
     tlv->SetValue(aExtendedPanId, sizeof(aExtendedPanId));
 
-    assert(mLength + tlv->GetSize() < sizeof(mData));
+    assert(mLength + tlv->GetSize() <= sizeof(mData));
 
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
 
@@ -349,7 +349,7 @@ CHIP_ERROR OperationalDataset::SetMasterKey(const uint8_t (&aMasterKey)[kSizeMas
 
     tlv->SetValue(aMasterKey, sizeof(aMasterKey));
 
-    assert(mLength + tlv->GetSize() < sizeof(mData));
+    assert(mLength + tlv->GetSize() <= sizeof(mData));
 
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
 
