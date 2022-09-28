@@ -556,7 +556,7 @@ def K32WTargets():
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
-                        low_power=True, release=True).GlobBlacklist("Only on demand build")
+                        low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
 
 
 def cc13x2x7_26x2x7Targets():

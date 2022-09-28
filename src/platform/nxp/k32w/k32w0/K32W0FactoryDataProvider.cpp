@@ -94,10 +94,10 @@ CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, u
     while (addr < (factoryDataStartAddress + (uint32_t) __FACTORY_DATA_SIZE))
     {
         if (gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash(sizeof(type), addr, (uint8_t *) &type, NULL, pFunctionEepromRead) ||
+                OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(type), addr, &type, NULL, pFunctionEepromRead) ||
             gOtaUtilsSuccess_c !=
-                OtaUtils_ReadFromInternalFlash(sizeof(length), addr + 1, (uint8_t *) &length, NULL, pFunctionEepromRead))
-            break;
+                OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(length), addr + 1, (uint8_t*)&length, NULL, pFunctionEepromRead))
+        	break;
 
         if ((type > kMaxId) || (length > maxLengths[type]))
         {

@@ -34,7 +34,7 @@
 #include "app_dual_mode_low_power.h"
 #include "app_dual_mode_switch.h"
 #include "k32w0-chip-mbedtls-config.h"
-#include <AppTask.h>
+#include <AppTask.h> // nogncheck
 
 #include "app_config.h"
 #include "fsl_gpio.h"

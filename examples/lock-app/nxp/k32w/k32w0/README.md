@@ -344,9 +344,10 @@ The example also offers the possibility to run in low power mode. This means
 that the board will go in a deep power down mode most of the time and the power
 consumption will be very low.
 
-In order build with low power support, the _chip_with_low_power=1_ must be
+In order to build with low power support, the _chip_with_low_power=1_ must be
 provided to the build system. In this case, please note that the GN build
-arguments chip*with_OM15082 and \_chip_with_ot_cli* must be set to 0.
+arguments _chip_with_OM15082_ and _chip_with_ot_cli_ must be set to 0 and
+_chip_logging_ must be set to false to disable logging.
 
 In order to maintain a low power consumption, the LEDs showing the state of the
 elock and the internal state are disabled. Console logs can be used instead.
