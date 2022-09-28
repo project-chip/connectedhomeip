@@ -18,6 +18,7 @@
 package chip.devicecontroller.model;
 
 import androidx.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,8 +76,10 @@ public final class NodeState {
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
-    // This will overwrite previous events.
-    clusterState.getEventStates().put(eventId, eventStateToAdd);
+    if (!clusterState.getEventStates().containsKey(eventId)) {
+      clusterState.getEventStates().put(eventId, new ArrayList<EventState>());
+    }
+    clusterState.getEventStates().get(eventId).add(eventStateToAdd);
   }
 
   @Override
