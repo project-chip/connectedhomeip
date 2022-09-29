@@ -373,7 +373,7 @@ class TestParser(unittest.TestCase):
                     ])])
         self.assertEqual(actual, expected)
 
-    def test_fabric_senstive_event(self):
+    def test_fabric_sensitive_event(self):
         actual = parseText("""
             client cluster EventTester = 0x123 {
                fabric_sensitive info event Hello = 1 {}
