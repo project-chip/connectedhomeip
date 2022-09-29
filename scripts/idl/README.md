@@ -48,7 +48,8 @@ server cluster AccessControl = 31 {
     kGroup = 3;
   }
 
-  struct AccessControlEntry {
+  // structures may be fabric scoped by tagging them as 'fabric-scoped'
+  fabric-scoped struct AccessControlEntry {
     fabric_idx fabricIndex = 0;
     Privilege privilege = 1;
     AuthMode authMode = 2;
@@ -93,10 +94,6 @@ server cluster AccessControl = 31 {
   //
   // These defaults can be modified to any of view/operate/manage/administer roles.
   attribute access(read: manage, write: administer) int32u customAcl = 3;
-
-  // Attributes may be fabric-scoped as well by tagging them as `fabric`.
-  fabric readonly attribute int16u myFabricAttr = 22;
-  fabric attribute(read: view, write: administer) int16u someFabricRWAttribute = 33;
 
   // attributes may be read-only as well
   readonly attribute int16u clusterRevision = 65533;
