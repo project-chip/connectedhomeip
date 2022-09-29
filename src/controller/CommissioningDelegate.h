@@ -32,28 +32,29 @@ class DeviceCommissioner;
 enum CommissioningStage : uint8_t
 {
     kError,
-    kSecurePairing,
-    kReadCommissioningInfo,
-    kArmFailsafe,
-    kConfigRegulatory,
-    kSendPAICertificateRequest,
-    kSendDACCertificateRequest,
-    kSendAttestationRequest,
-    kAttestationVerification,
-    kSendOpCertSigningRequest,
-    kValidateCSR,
-    kGenerateNOCChain,
-    kSendTrustedRootCert,
-    kSendNOC,
-    kWiFiNetworkSetup,
-    kThreadNetworkSetup,
-    kWiFiNetworkEnable,
-    kThreadNetworkEnable,
-    kFindOperational,
-    kSendComplete,
-    kCleanup,
-    // ScanNetworks can happen anytime after kArmFailsafe.
-    // However, the circ tests fail if it is earlier in the list
+    kSecurePairing,             ///< Establish a PASE session with the device
+    kReadCommissioningInfo,     ///< Query General Commissioning Attributes and Network Features
+    kArmFailsafe,               ///< Send ArmFailSafe (0x30:0) command to the device
+    kConfigRegulatory,          ///< Send SetRegulatoryConfig (0x30:2) command to the device
+    kSendPAICertificateRequest, ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
+    kSendDACCertificateRequest, ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
+    kSendAttestationRequest,    ///< Send AttestationRequest (0x3E:0) command to the device
+    kAttestationVerification,   ///< Verify AttestationResponse (0x3E:1) validity
+    kSendOpCertSigningRequest,  ///< Send CSRRequest (0x3E:4) command to the device
+    kValidateCSR,               ///< Verify CSRResponse (0x3E:5) validity
+    kGenerateNOCChain,          ///< TLV encode Node Operational Credentials (NOC) chain certs
+    kSendTrustedRootCert,       ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
+    kSendNOC,                   ///< Send AddNOC (0x3E:6) command to the device
+    kWiFiNetworkSetup,          ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,        ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kWiFiNetworkEnable,         ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,       ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kFindOperational,           ///< Perform operational discovery and establish a CASE session with the device
+    kSendComplete,              ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,                   ///< Call delegates with status, free memory, clear timers and state
+    /// Send ScanNetworks (0x31:0) command to the device.
+    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
     kNeedsNetworkCreds,
 };
