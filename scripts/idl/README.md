@@ -49,12 +49,13 @@ server cluster AccessControl = 31 {
   }
 
   // structures may be fabric scoped by tagging them as 'fabric-scoped'
+  // in a fabric scoped structure, fields may be 'fabric-sensitive'
   fabric-scoped struct AccessControlEntry {
     fabric_idx fabricIndex = 0;
-    Privilege privilege = 1;
-    AuthMode authMode = 2;
-    nullable INT64U subjects[] = 3;  // fields in structures may be lists and
-    nullable Target targets[] = 4;   // they may have attributes: nullable
+    fabric-sensitive Privilege privilege = 1;
+    fabric-sensitive AuthMode authMode = 2;
+    nullable fabric-sensitive INT64U subjects[] = 3;  // fields in structures may be lists and
+    nullable fabric-sensitive Target targets[] = 4;   // they may have attributes: nullable
   }
 
   // request structures are regular structures that are used
