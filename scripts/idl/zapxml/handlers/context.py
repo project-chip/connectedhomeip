@@ -30,6 +30,14 @@ class IdlPostProcessor:
 
 
 class ProcessingPath:
+    """Maintains the current path of tags within xml processing.
+
+    As processing descents into an xml like `<configurator><cluster>....`
+    paths will have contents like ['configurator', 'cluster', ...].
+
+    The main purpose for this is to log and keep track of what was visited
+    and in general to report things like 'this path found but was not handled'.
+    """
     def __init__(self, paths: List[str] = None):
         if paths is None:
             paths = []
@@ -49,6 +57,25 @@ class ProcessingPath:
 
 
 class Context:
+    """
+    Contains a processing state during XML reading. 
+
+    The purpose of this is to allow elements to interact with each other, share
+    data and defer processing.
+
+    Usage:
+      - globally shared data: 
+         > locator: parsing location, for error reporting
+         > path: current ProcessingPath for any logging of where we are located
+      - shared data:
+         > global attributes are parsed by one handler, but used by others
+      - post-processing support:
+         > can register AddIdlPostProcessor to perform some processing once
+           a full parsing pass has been done
+ 
+    More data may be added in time if it involves separate XML parse handlers
+    needing to interact with each other.
+    """
     def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
         self.path = ProcessingPath()
         self.locator = locator
