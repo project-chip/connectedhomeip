@@ -251,11 +251,11 @@ bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
     wifiErr = wifi_manager_ap_clone(clonedAp, ap);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: clone AP [%s]", get_error_message(wifiErr)));
 
+    memset(sInstance.mWiFiSSID, 0, sizeof(sInstance.mWiFiSSID));
+    memset(sInstance.mWiFiKey, 0, sizeof(sInstance.mWiFiKey));
     cbRet = false;
 
 exit:
-    memset(sInstance.mWiFiSSID, 0, sizeof(sInstance.mWiFiSSID));
-    memset(sInstance.mWiFiKey, 0, sizeof(sInstance.mWiFiKey));
     g_free(essid);
     return cbRet;
 }
