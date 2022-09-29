@@ -585,7 +585,7 @@ tests:
       verification: |
           DUT implementation required to verify read an attribute of data type Float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:

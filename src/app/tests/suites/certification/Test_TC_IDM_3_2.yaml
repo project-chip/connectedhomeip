@@ -219,7 +219,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -229,7 +229,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type float
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -239,7 +239,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -249,7 +249,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -259,7 +259,7 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute of  data type List
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -842,5 +842,5 @@ tests:
       verification: |
           DUT implementation required to verify write an attribute which need NEEDS_TIMED_INTERACTION.
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true

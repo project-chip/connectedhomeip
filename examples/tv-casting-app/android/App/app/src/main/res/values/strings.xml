@@ -8,4 +8,15 @@
     <string name="content_url_prompt_text">URL</string>
     <string name="content_display_string_prompt_text">Display string</string>
     <string name="discovery_message_text">Discovering commissioners on-network...</string>
+    <string name="select_cluster_text">Select a Cluster</string>
+    <string name="select_content_launcher_button_text">Content Launcher</string>
+    <string name="select_media_playback_button_text">Media Playback</string>
+    <string name="media_playback_fragment_title">Media Playback</string>
+    <string name="subscribe_to_current_state_command_title">Subscribe to Current State</string>
+    <string name="min_interval_text">Minimum interval (in ms)</string>
+    <string name="default_min_interval">0</string>
+    <string name="max_interval_text">Maximum interval (in ms)</string>
+    <string name="default_max_interval">4000</string>
+    <string name="subscribe_to_current_state_button_text">Subscribe</string>
+    <string name="current_state_text">Reported Current State</string>
 </resources>

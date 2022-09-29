@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SelectClusterFragment">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10sp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_cluster_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+        <Button
+            android:id="@+id/selectContentLauncherButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_content_launcher_button_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginRight="10sp" />
+
+        <Button
+            android:id="@+id/selectMediaPlaybackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_media_playback_button_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginRight="10sp" />
+    </LinearLayout>
+</FrameLayout>
