@@ -38,6 +38,7 @@ class ProcessingPath:
     The main purpose for this is to log and keep track of what was visited
     and in general to report things like 'this path found but was not handled'.
     """
+
     def __init__(self, paths: List[str] = None):
         if paths is None:
             paths = []
@@ -72,10 +73,11 @@ class Context:
       - post-processing support:
          > can register AddIdlPostProcessor to perform some processing once
            a full parsing pass has been done
- 
+
     More data may be added in time if it involves separate XML parse handlers
     needing to interact with each other.
     """
+
     def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
         self.path = ProcessingPath()
         self.locator = locator

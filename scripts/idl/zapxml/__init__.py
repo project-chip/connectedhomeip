@@ -34,6 +34,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
     Overall converts a python SAX handler into idl.zapxml.handlers
     """
+
     def __init__(self, include_meta_data=True):
         super().__init__()
         self._idl = Idl()
