@@ -38,7 +38,7 @@ _nvram_start = 0x480C0000;
 MEMORY
 {
   m_interrupts          (RX)  : ORIGIN = 0x1F000100, LENGTH = 0x00000180
-  m_text                (RX)  : ORIGIN = 0x1F000280, LENGTH = 0x000EFD80
+  m_text                (RX)  : ORIGIN = 0x1F000280, LENGTH = 0x000FFD80
   m_data0               (RW)  : ORIGIN = 0x00100000, LENGTH = 0x0005EFC0
   m_data1               (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00020000
   m_nvram               (RW)  : ORIGIN = 0x480C0044, LENGTH = 0x00000FBC
