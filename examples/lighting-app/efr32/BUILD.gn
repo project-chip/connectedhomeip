@@ -113,9 +113,9 @@ if (chip_enable_wifi) {
   if (use_rs911x) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+    import("${examples_plat_dir}/rs911x/rs911x.gni")
   } else {
-    import("${wifi_sdk_dir}/wf200/wf200.gni")
+    import("${examples_plat_dir}/wf200/wf200.gni")
   }
 }
 

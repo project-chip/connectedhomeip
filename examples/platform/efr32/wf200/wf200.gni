@@ -16,15 +16,15 @@ softap_defs = "SL_WFX_CONFIG_SOFTAP"
 wifi_scan_defs = "SL_WFX_CONFIG_SCAN"
 wf200_plat_incs = [
   "${wifi_sdk_dir}/",
-  "${wifi_sdk_dir}/wf200",
+  "${examples_plat_dir}/wf200",
 ]
 wf200_plat_src = [
   "${wifi_sdk_dir}/dhcp_client.cpp",
   "${wifi_sdk_dir}/ethernetif.cpp",
   "${wifi_sdk_dir}/lwip_netif.cpp",
   "${wifi_sdk_dir}/wfx_notify.cpp",
-  "${wifi_sdk_dir}/wf200/sl_wfx_task.c",
-  "${wifi_sdk_dir}/wf200/wf200_init.c",
-  "${wifi_sdk_dir}/wf200/efr_spi.c",
-  "${wifi_sdk_dir}/wf200/host_if.cpp",
+  "${examples_plat_dir}/wf200/sl_wfx_task.c",
+  "${examples_plat_dir}/wf200/wf200_init.c",
+  "${examples_plat_dir}/wf200/efr_spi.c",
+  "${examples_plat_dir}/wf200/host_if.cpp",
 ]

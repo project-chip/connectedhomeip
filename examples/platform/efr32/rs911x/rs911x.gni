@@ -8,13 +8,13 @@ wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
 rs911x_cflags = []
 
 rs911x_src_plat = [
-  "${wifi_sdk_dir}/rs911x/rsi_if.c",
-  "${wifi_sdk_dir}/rs911x/wfx_rsi_host.c",
+  "${examples_plat_dir}/rs911x/rsi_if.c",
+  "${examples_plat_dir}/rs911x/wfx_rsi_host.c",
   "${wifi_sdk_dir}/wfx_notify.cpp",
-  "${wifi_sdk_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
-  "${wifi_sdk_dir}/rs911x/hal/rsi_hal_mcu_ioports.c",
-  "${wifi_sdk_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
-  "${wifi_sdk_dir}/rs911x/hal/efx_spi.c",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_ioports.c",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
+  "${examples_plat_dir}/rs911x/hal/efx_spi.c",
 ]
 rs911x_plat_incs = [
   "${wifi_sdk_dir}",
@@ -65,8 +65,8 @@ foreach(src_file, rs911x_src_sapi) {
 
 rs911x_inc_plat = [
   "${wifi_sdk_dir}",
-  "${wifi_sdk_dir}/rs911x",
-  "${wifi_sdk_dir}/rs911x/hal",
+  "${examples_plat_dir}/rs911x",
+  "${examples_plat_dir}/rs911x/hal",
   "${wiseconnect_sdk_root}/sapi/include",
 ]
 
