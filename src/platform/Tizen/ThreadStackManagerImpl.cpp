@@ -294,6 +294,17 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: attach thread network"));
 
         threadErr = thread_start(mThreadInstance);
+        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+            if (this->mpConnectCallback != nullptr)
+            {
+                this->mpConnectCallback->OnResult(
+                    threadErr == THREAD_ERROR_NONE ?
+                        NetworkCommissioning::Status::kSuccess :
+                        NetworkCommissioning::Status::kUnknownError,
+                    CharSpan(), 0);
+                this->mpConnectCallback = nullptr;
+            }
+        });
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: start thread network"));
     }
     else if (!val && isEnabled)
