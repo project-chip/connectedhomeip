@@ -37,26 +37,15 @@ public:
         {{else}}
         AddArgument("{{asUpperCamelCase label}}",
             {{~#if_is_float_or_double_data_type type~}}
-                -std::numeric_limits<
-                {{~#unless (is_lowercase_equal type 'single')~}}
-                    {{~type~}}
-                {{~else~}}
-                    float
-                {{~/unless~}}>::infinity(), std::numeric_limits<
-                {{~#unless (is_lowercase_equal type 'single')~}}
-                    {{~type~}}
-                {{~else~}}
-                    float
-                {{~/unless~}}>::infinity()
+                {{~as_underlying_zcl_type_size type prefix="-std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}},
+                {{~as_underlying_zcl_type_size type prefix="std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}}
             {{~else~}}
                 {{~#if_is_underlying_zcl_type_signed type~}}
-                    INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MIN, INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
-                {{~else~}}0,
-                    {{~#unless (is_lowercase_equal type 'BOOLEAN')~}}
-                        UINT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
-                    {{~else~}}
-                        1
-                    {{~/unless~}}
+                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MIN" sizeIn="bits"}},
+                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MAX" sizeIn="bits"~}}
+                {{~else~}}
+                    0,
+                    {{~as_underlying_zcl_type_size type prefix="UINT" postfix="_MAX" sizeIn="bits" boolean="1" removePrePostFixForExceptions=1~}}
                 {{~/if_is_underlying_zcl_type_signed~}}
             {{~/if_is_float_or_double_data_type~}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
@@ -176,26 +165,15 @@ public:
         {{else}}
         AddArgument("attr-value",
             {{~#if_is_float_or_double_data_type type~}}
-                -std::numeric_limits<
-                {{~#unless (is_lowercase_equal type 'single')~}}
-                    {{~type~}}
-                {{~else~}}
-                    float
-                {{~/unless~}}>::infinity(), std::numeric_limits<
-                {{~#unless (is_lowercase_equal type 'single')~}}
-                    {{~type~}}
-                {{~else~}}
-                    float
-                {{~/unless~}}>::infinity()
+                {{~as_underlying_zcl_type_size type prefix="-std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}},
+                {{~as_underlying_zcl_type_size type prefix="std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}}
             {{~else~}}
                 {{~#if_is_underlying_zcl_type_signed type~}}
-                    INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MIN, INT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
-                {{~else~}}0,
-                    {{~#unless (is_lowercase_equal type 'BOOLEAN')~}}
-                        UINT{{as_underlying_zcl_type_size_bits type sizeIn="bits"}}_MAX
-                    {{~else~}}
-                        1
-                    {{~/unless~}}
+                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MIN" sizeIn="bits"}},
+                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MAX" sizeIn="bits"~}}
+                {{~else~}}
+                    0,
+                    {{~as_underlying_zcl_type_size type prefix="UINT" postfix="_MAX" sizeIn="bits" boolean="1" removePrePostFixForExceptions=1~}}
                 {{~/if_is_underlying_zcl_type_signed~}}
             {{~/if_is_float_or_double_data_type~}}, &mValue);
         {{/if_chip_complex}}
