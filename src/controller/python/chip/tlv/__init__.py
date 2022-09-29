@@ -681,7 +681,7 @@ class TLVReader(object):
                     out[decoding["profileTag"]] = decoding["value"]
                 elif "tag" in list(decoding.keys()):
                     if isinstance(out, Mapping):
-                        tag = decoding["tag"] or "Any"
+                        tag = decoding["tag"] if decoding["tag"] is not None else "Any"
                         out[tag] = decoding["value"]
                     else:
                         out.append(decoding["value"])
