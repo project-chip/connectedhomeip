@@ -20,6 +20,7 @@ class ParseMetaData:
             self.line = line
             self.column = column
 
+
 class StructAttribute(enum.Enum):
     FABRIC_SCOPED = enum.auto()
 
