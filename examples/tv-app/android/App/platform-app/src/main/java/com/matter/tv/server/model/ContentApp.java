@@ -9,6 +9,7 @@ import java.util.Set;
 public class ContentApp {
 
   public static final int INVALID_ENDPOINTID = -1;
+  private final String version;
   private String appName;
   private String vendorName;
   private int vendorId;
@@ -18,15 +19,30 @@ public class ContentApp {
   private int endpoint = INVALID_ENDPOINTID;
 
   public ContentApp(
+          String appName,
+          String vendorName,
+          int vendorId,
+          int productId,
+          String version) {
+    this.vendorName = vendorName;
+    this.appName = appName;
+    this.vendorId = vendorId;
+    this.productId = productId;
+    this.version = version;
+  }
+
+  public ContentApp(
       String appName,
       String vendorName,
       int vendorId,
       int productId,
+      String version,
       Set<SupportedCluster> supportedClusters) {
     this.vendorName = vendorName;
     this.appName = appName;
     this.vendorId = vendorId;
     this.productId = productId;
+    this.version = version;
     this.supportedClusters = supportedClusters;
   }
 
@@ -58,7 +74,12 @@ public class ContentApp {
     return Collections.unmodifiableSet(supportedClusters);
   }
 
+  public String getVersion() {
+    return version;
+  }
+
   public void setSupportedClusters(List<SupportedCluster> supportedClusters) {
     this.supportedClusters = new HashSet<>(supportedClusters);
   }
+
 }

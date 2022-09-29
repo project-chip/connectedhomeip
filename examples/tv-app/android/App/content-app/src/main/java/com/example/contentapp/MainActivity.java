@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                   .setAttributeValue(
                       Clusters.MediaPlayback.Id,
                       Clusters.MediaPlayback.Attributes.CurrentState,
-                      Clusters.MediaPlayback.PlaybackStateEnum.Playing);
+                      Clusters.MediaPlayback.Types.PlaybackStateEnum.Playing);
               reportAttributeChange(
                   Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState);
               break;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                   .setAttributeValue(
                       Clusters.MediaPlayback.Id,
                       Clusters.MediaPlayback.Attributes.CurrentState,
-                      Clusters.MediaPlayback.PlaybackStateEnum.Paused);
+                      Clusters.MediaPlayback.Types.PlaybackStateEnum.Paused);
               reportAttributeChange(
                   Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState);
               break;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                   .setAttributeValue(
                       Clusters.MediaPlayback.Id,
                       Clusters.MediaPlayback.Attributes.CurrentState,
-                      Clusters.MediaPlayback.PlaybackStateEnum.Buffering);
+                      Clusters.MediaPlayback.Types.PlaybackStateEnum.Buffering);
               reportAttributeChange(
                   Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState);
               break;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                   .setAttributeValue(
                       Clusters.MediaPlayback.Id,
                       Clusters.MediaPlayback.Attributes.CurrentState,
-                      Clusters.MediaPlayback.PlaybackStateEnum.NotPlaying);
+                      Clusters.MediaPlayback.Types.PlaybackStateEnum.NotPlaying);
               reportAttributeChange(
                   Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState);
               break;
@@ -91,21 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
     MatterAgentClient matterAgentClient = MatterAgentClient.getInstance();
     executorService.execute(matterAgentClient::reportClusters);
-
-    // Setting up attribute defaults
-    AttributeHolder.getInstance()
-        .setAttributeValue(
-            Clusters.ContentLauncher.Id,
-            Clusters.ContentLauncher.Attributes.AcceptHeader,
-            "[\"video/mp4\", \"application/x-mpegURL\", \"application/dash+xml\"]");
-    AttributeHolder.getInstance()
-        .setAttributeValue(
-            Clusters.ContentLauncher.Id,
-            Clusters.ContentLauncher.Attributes.SupportedStreamingProtocols,
-            3);
-    AttributeHolder.getInstance()
-        .setAttributeValue(
-            Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState, 2);
   }
 
   private void reportAttributeChange(final int clusterId, final int attributeId) {
