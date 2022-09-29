@@ -181,6 +181,12 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
+    def event_fabric_sensitive(self, _):
+        return EventAttribute.FABRIC_SENSITIVE
+
+    def event_tags(selt, tags):
+        return set(tags)
+
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
 
@@ -247,7 +253,7 @@ class MatterIdlTransformer(Transformer):
         return init_args
 
     def event(self, args):
-        return Event(priority=args[0], code=args[2], fields=args[3:], **args[1])
+        return Event(attributes=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW

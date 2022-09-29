@@ -17,7 +17,10 @@ event_access: "access" "(" ("read" ":" access_privilege)? ")"
 
 event_with_access: "event" event_access? id
 
-event: event_priority event_with_access "=" positive_integer "{" (struct_field ";")* "}"
+event: event_tags event_priority event_with_access "=" positive_integer "{" (struct_field ";")* "}"
+
+event_tags: event_tag*
+event_tag: "fabric_sensitive" -> event_fabric_sensitive
 
 ?event_priority: "critical"i -> critical_priority
                | "info"i     -> info_priority

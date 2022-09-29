@@ -373,6 +373,28 @@ class TestParser(unittest.TestCase):
                     ])])
         self.assertEqual(actual, expected)
 
+    def test_fabric_senstive_event(self):
+        actual = parseText("""
+            client cluster EventTester = 0x123 {
+               fabric_sensitive info event Hello = 1 {}
+               fabric_sensitive debug event access(read: manage) GoodBye = 2 {}
+               fabric_sensitive debug event access(read: administer) AdminEvent = 3 {}
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="EventTester",
+                    code=0x123,
+                    events=[
+                        Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
+                              name="Hello", code=1, fields=[], attributes={EventAttribute.FABRIC_SENSITIVE}),
+                        Event(priority=EventPriority.DEBUG, readacl=AccessPrivilege.MANAGE,
+                              name="GoodBye", code=2, fields=[], attributes={EventAttribute.FABRIC_SENSITIVE}),
+                        Event(priority=EventPriority.DEBUG, readacl=AccessPrivilege.ADMINISTER,
+                              name="AdminEvent", code=3, fields=[], attributes={EventAttribute.FABRIC_SENSITIVE}),
+                    ])])
+        self.assertEqual(actual, expected)
+
     def test_parsing_metadata_for_cluster(self):
         actual = CreateParser(skip_meta=False).parse("""
 server cluster A = 1 { /* Test comment */ }

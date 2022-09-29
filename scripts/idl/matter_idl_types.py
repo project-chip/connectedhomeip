@@ -53,7 +53,7 @@ class EventPriority(enum.Enum):
     CRITICAL = enum.auto()
 
 
-class EventTag(enum.Enum):
+class EventAttribute(enum.Enum):
     FABRIC_SENSITIVE = enum.auto()
 
 
@@ -146,11 +146,11 @@ class Event:
     code: int
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
-    tags: Set[EventTag] = field(default_factory=set)
+    attributes: Set[EventAttribute] = field(default_factory=set)
 
     @property
     def is_fabric_sensitive(self):
-        return EventTag.FABRIC_SENSITIVE in self.tags
+        return EventAttribute.FABRIC_SENSITIVE in self.attributes
 
 
 @dataclass
