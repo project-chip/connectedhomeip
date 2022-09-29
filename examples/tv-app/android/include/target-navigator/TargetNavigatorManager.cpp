@@ -74,7 +74,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                         return CHIP_NO_ERROR;
                     });
                 }
-                
+
             }
         }
 
@@ -119,7 +119,7 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
                 {
                     return static_cast<uint8_t>(value[attrId].asUInt());
                 }
-                
+
             }
         }
 

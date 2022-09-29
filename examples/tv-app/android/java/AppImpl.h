@@ -91,7 +91,7 @@ public:
         mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
-        mMediaPlaybackDelegate(attributeDelegate), 
+        mMediaPlaybackDelegate(attributeDelegate),
         mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
@@ -110,10 +110,10 @@ public:
         mMediaPlaybackDelegate.SetEndpointId(GetEndpointId());
         return &mMediaPlaybackDelegate;
     };
-    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override 
-    { 
+    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override
+    {
         mTargetNavigatorDelegate.SetEndpointId(GetEndpointId());
-        return &mTargetNavigatorDelegate; 
+        return &mTargetNavigatorDelegate;
     };
 
 protected:
