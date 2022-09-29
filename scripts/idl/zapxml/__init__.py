@@ -24,6 +24,16 @@ from idl.matter_idl_types import Idl
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
+    """A parser for ZAP-style XML data definitions.
+
+    Defers its processing to ZapXmlHandler and keeps track of:
+       - an internal context for all handlers
+       - the parsed Idl structure that is incrementally built
+       - sets up parsing location within the context
+       - keeps track of ParsePath
+
+    Overall converts a python SAX handler into idl.zapxml.handlers
+    """
     def __init__(self, include_meta_data=True):
         super().__init__()
         self._idl = Idl()
@@ -73,6 +83,10 @@ class ParseHandler(xml.sax.handler.ContentHandler):
 
 @dataclass
 class ParseSource:
+    """Represents an input sopurce for ParseXmls.
+
+    Allows for named data sources to be parsed.
+    """
     source: Union[str, typing.IO]  # filename or stream
     name: Optional[str] = None  # actual filename to use, None if the source is a filename already
 
@@ -84,6 +98,12 @@ class ParseSource:
 
 
 def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
+    """Parse one or more XML inputs and return the resulting Idl data.
+
+    Params:
+       sources - what to parse
+       include_meta_data - if parsing location data should be included in the Idl
+    """
     handler = ParseHandler(include_meta_data=include_meta_data)
 
     for source in sources:
