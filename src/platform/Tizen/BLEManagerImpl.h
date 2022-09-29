@@ -82,6 +82,7 @@ class BLEManagerImpl final : public BLEManager,
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
+    static const char * ConvertErrToStr(int error);
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -164,10 +165,10 @@ private:
     static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
     static void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                       bool responseNeeded, int offset, const char * value, int len, void * userData);
+    static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                                     int offset, void * userData);
     static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
                                          bool completed, void * userData);
-    static void IndicationConfirmationCb(bt_gatt_h characteristic, bt_gatt_server_notification_sent_cb callback,
-                                         const char * device_address, void * userData);
     static void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
@@ -204,8 +205,8 @@ private:
     void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
     int RegisterGATTServer();
-    int StartBLEAdvertising();
-    int StopBLEAdvertising();
+    int StartAdvertising();
+    int StopAdvertising();
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
