@@ -1,13 +1,12 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +15,7 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
+#pragma once
 
 #ifndef DEMO_CONFIG_H
 #define DEMO_CONFIG_H
@@ -48,19 +40,19 @@
 #define STA_GW_ADDR2_DEFAULT (uint8_t) 0 ///< Static IP: Gateway value 2
 #define STA_GW_ADDR3_DEFAULT (uint8_t) 0 ///< Static IP: Gateway value 3
 
-// /************************** Access Point Static Default ****************************/
+/************************** Access Point Static Default ****************************/
 // #define AP_IP_ADDR0_DEFAULT (uint8_t) 10 ///< Static IP: IP address value 0
 // #define AP_IP_ADDR1_DEFAULT (uint8_t) 10 ///< Static IP: IP address value 1
 // #define AP_IP_ADDR2_DEFAULT (uint8_t) 0  ///< Static IP: IP address value 2
 // #define AP_IP_ADDR3_DEFAULT (uint8_t) 1  ///< Static IP: IP address value 3
 
-// /*NETMASK*/
+/*NETMASK*/
 // #define AP_NETMASK_ADDR0_DEFAULT (uint8_t) 255 ///< Static IP: Netmask value 0
 // #define AP_NETMASK_ADDR1_DEFAULT (uint8_t) 255 ///< Static IP: Netmask value 1
 // #define AP_NETMASK_ADDR2_DEFAULT (uint8_t) 255 ///< Static IP: Netmask value 2
 // #define AP_NETMASK_ADDR3_DEFAULT (uint8_t) 0   ///< Static IP: Netmask value 3
 
-// /*Gateway Address*/
+/*Gateway Address*/
 // #define AP_GW_ADDR0_DEFAULT (uint8_t) 0 ///< Static IP: Gateway value 0
 // #define AP_GW_ADDR1_DEFAULT (uint8_t) 0 ///< Static IP: Gateway value 1
 // #define AP_GW_ADDR2_DEFAULT (uint8_t) 0 ///< Static IP: Gateway value 2
