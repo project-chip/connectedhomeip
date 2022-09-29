@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "ApplicationBasic.h"
 #include "ApplicationLauncher.h"
 #include "Channel.h"
 #include "ContentLauncher.h"
@@ -86,6 +87,22 @@ public:
     CHIP_ERROR ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
                                              bool autoPlay, chip::Optional<chip::CharSpan> data,
                                              std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR
+    ContentLauncher_SubscribeToAcceptHeader(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR
+    ContentLauncher_SubscribeToSupportedStreamingProtocols(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
 
     /**
      * @brief Level Control cluster
@@ -230,6 +247,67 @@ public:
                                    std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
+     * @brief Application Basic cluster
+     */
+    CHIP_ERROR ApplicationBasic_SubscribeToVendorName(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToVendorID(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToApplicationName(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToProductID(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToApplication(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR
+    ApplicationBasic_SubscribeToStatus(void * context,
+                                       chip::Controller::ReadResponseSuccessCallback<
+                                           chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
+                                           successFn,
+                                       chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval,
+                                       uint16_t maxInterval,
+                                       chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToApplicationVersion(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+    CHIP_ERROR ApplicationBasic_SubscribeToAllowedVendorList(
+        void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
+        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
+
+    /*
      * @brief Channel cluster
      */
     CHIP_ERROR Channel_ChangeChannelCommand(const chip::CharSpan & match, std::function<void(CHIP_ERROR)> responseCallback);
@@ -258,6 +336,9 @@ private:
      */
     LaunchURLCommand mLaunchURLCommand;
     LaunchContentCommand mLaunchContentCommand;
+
+    AcceptHeaderSubscriber mAcceptHeaderSubscriber;
+    SupportedStreamingProtocolsSubscriber mSupportedStreamingProtocolsSubscriber;
 
     /**
      * @brief Level Control cluster
@@ -311,6 +392,18 @@ private:
     SendKeyCommand mSendKeyCommand;
 
     /**
+     * @brief Application Basic cluster
+     */
+    VendorNameSubscriber mVendorNameSubscriber;
+    VendorIDSubscriber mVendorIDSubscriber;
+    ApplicationNameSubscriber mApplicationNameSubscriber;
+    ProductIDSubscriber mProductIDSubscriber;
+    ApplicationSubscriber mApplicationSubscriber;
+    StatusSubscriber mStatusSubscriber;
+    ApplicationVersionSubscriber mApplicationVersionSubscriber;
+    AllowedVendorListSubscriber mAllowedVendorListSubscriber;
+
+    /*
      * @brief Channel cluster
      */
     ChangeChannelCommand mChangeChannelCommand;

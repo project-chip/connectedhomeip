@@ -130,3 +130,56 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
 
     return rgb;
 }
+
+RgbColor_t CTToRgb(CtColor_t ct)
+{
+    RgbColor_t rgb;
+    float r, g, b;
+
+    // Algorithm credits to Tanner Helland: https://tannerhelland.com/2012/09/18/convert-temperature-rgb-algorithm-code.html
+
+    // Convert Mireds to centiKelvins. k = 1,000,000/mired
+    float ctCentiKelvin = 10000 / ct.ctMireds;
+
+    // Red
+    if (ctCentiKelvin <= 66)
+    {
+        r = 255;
+    }
+    else
+    {
+        r = 329.698727446f * pow(ctCentiKelvin - 60, -0.1332047592f);
+    }
+
+    // Green
+    if (ctCentiKelvin <= 66)
+    {
+        g = 99.4708025861f * log(ctCentiKelvin) - 161.1195681661f;
+    }
+    else
+    {
+        g = 288.1221695283f * pow(ctCentiKelvin - 60, -0.0755148492f);
+    }
+
+    // Blue
+    if (ctCentiKelvin >= 66)
+    {
+        b = 255;
+    }
+    else
+    {
+        if (ctCentiKelvin <= 19)
+        {
+            b = 0;
+        }
+        else
+        {
+            b = 138.5177312231 * log(ctCentiKelvin - 10) - 305.0447927307;
+        }
+    }
+    rgb.r = (uint8_t) clamp(r, 0, 255);
+    rgb.g = (uint8_t) clamp(g, 0, 255);
+    rgb.b = (uint8_t) clamp(b, 0, 255);
+
+    return rgb;
+}

@@ -461,7 +461,7 @@ tests:
           Subscribe to an attribute of type signed integer to the Harness
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -475,7 +475,7 @@ tests:
           Subscribe to an attribute of type floating point to the Harness
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
