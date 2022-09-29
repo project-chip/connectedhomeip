@@ -147,7 +147,7 @@ Router][ot_border_router_setup].
 
 The first step to bring the Matter device onto the network is to provision it.
 Our example accomplishes this with Bluetooth Low Energy (BLE) and the
-[CHIPTool](../../../src/android/CHIPTool/README.md) mobile app.
+[CHIPTool](../../../examples/android/CHIPTool/README.md) mobile app.
 
 #### Bluetooth LE Advertising
 
