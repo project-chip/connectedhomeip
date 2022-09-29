@@ -20,10 +20,14 @@ class ParseMetaData:
             self.line = line
             self.column = column
 
+class StructAttribute(enum.Enum):
+    FABRIC_SCOPED = enum.auto()
+
 
 class FieldAttribute(enum.Enum):
     OPTIONAL = enum.auto()
     NULLABLE = enum.auto()
+    FABRIC_SENSITIVE = enum.auto()
 
 
 class CommandAttribute(enum.Enum):
@@ -35,7 +39,6 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
-    FABRIC_SENSITIVE = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -62,7 +65,6 @@ class ClusterSide(enum.Enum):
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()
-    FABRIC_SCOPED = enum.enum()
 
 
 class EndpointContentType(enum.Enum):
@@ -134,6 +136,7 @@ class Struct:
     fields: List[Field]
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
+    attributes: Set[StructAttribute] = field(default_factory=set)
 
 
 @dataclass

@@ -89,6 +89,29 @@ class TestParser(unittest.TestCase):
         )
         self.assertEqual(actual, expected)
 
+    def test_fabric_scoped_struct(self):
+        actual = parseText("""
+            fabric_scoped struct FabricStruct {
+                CHAR_STRING astring = 1;
+                optional CLUSTER_ID idlist[] = 2;
+                nullable fabric_sensitive int nullablesensitive = 0x123;
+            }
+        """)
+
+        expected = Idl(structs=[
+            Struct(name='FabricStruct',
+                   attributes={StructAttribute.FABRIC_SCOPED},
+                   fields=[
+                        Field(
+                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
+                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist", is_list=True, attributes=set(
+                            [FieldAttribute.OPTIONAL])),
+                        Field(data_type=DataType(name="int"), code=0x123, name="nullablesensitive", attributes=set(
+                            [FieldAttribute.NULLABLE, FieldAttribute.FABRIC_SENSITIVE])),
+                   ])]
+        )
+        self.assertEqual(actual, expected)
+
     def test_cluster_attribute(self):
         actual = parseText("""
             server cluster MyCluster = 0x321 {
@@ -96,7 +119,6 @@ class TestParser(unittest.TestCase):
                 attribute int32u rwAttr[] = 123;
                 readonly nosubscribe attribute int8s nosub[] = 0xaa;
                 readonly attribute nullable int8s isNullable = 0xab;
-                fabric readonly attribute int8s fabric_attr = 0x1234;
             }
         """)
 
@@ -113,8 +135,6 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int8s"), code=0xAA, name="nosub", is_list=True)),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=0xAB, name="isNullable", attributes=set([FieldAttribute.NULLABLE]))),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.FABRIC_SCOPED]), definition=Field(
-                            data_type=DataType(name="int8s"), code=0x1234, name="fabric_attr"))
                     ]
                     )])
         self.assertEqual(actual, expected)
@@ -148,7 +168,6 @@ class TestParser(unittest.TestCase):
                 attribute access(read: manage)                 int8s attr3 = 3;
                 attribute access(write: administer)            int8s attr4 = 4;
                 attribute access(read: operate, write: manage) int8s attr5 = 5;
-                fabric attribute access(read: view, write: administer) int16u attr6 = 6;
             }
         """)
 
@@ -179,11 +198,6 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int8s"), code=5, name="attr5"),
                             readacl=AccessPrivilege.OPERATE,
                             writeacl=AccessPrivilege.MANAGE
-                        ),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.FABRIC_SCOPED]), definition=Field(
-                            data_type=DataType(name="int16u"), code=6, name="attr6"),
-                            readacl=AccessPrivilege.VIEW,
-                            writeacl=AccessPrivilege.ADMINISTER
                         ),
                     ]
                     )])

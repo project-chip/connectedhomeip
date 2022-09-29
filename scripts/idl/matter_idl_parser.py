@@ -16,10 +16,6 @@ except:
     from matter_idl_types import *
 
 
-class SharedTag(enum.Enum):
-    FABRIC_SCOPED = enum.auto()
-
-
 class AddServerClusterToEndpointTransform:
     """Provides an 'apply' method that can be run on endpoints
        to add a server cluster to the given endpoint.
@@ -133,12 +129,6 @@ class MatterIdlTransformer(Transformer):
         else:
             raise Error("Unexpected size for data type")
 
-    def shared_tag_fabric(self, _):
-        return SharedTag.FABRIC_SCOPED
-
-    def shared_tags(self, entries):
-        return entries
-
     @v_args(inline=True)
     def constant_entry(self, id, number):
         return ConstantEntry(name=id, code=number)
@@ -164,6 +154,9 @@ class MatterIdlTransformer(Transformer):
     def nullable(self, _):
         return FieldAttribute.NULLABLE
 
+    def fabric_sensitive(self, _):
+        return FieldAttribute.FABRIC_SENSITIVE
+
     def attr_readonly(self, _):
         return AttributeTag.READABLE
 
@@ -171,6 +164,12 @@ class MatterIdlTransformer(Transformer):
         return AttributeTag.NOSUBSCRIBE
 
     def attribute_tags(self, tags):
+        return tags
+
+    def struct_fabric_scoped(self, _):
+        return StructAttribute.FABRIC_SCOPED
+
+    def struct_tags(self, tags):
         return tags
 
     def critical_priority(self, _):
@@ -184,6 +183,9 @@ class MatterIdlTransformer(Transformer):
 
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
+
+    def fabric_command(self, _):
+        return CommandAttribute.FABRIC_SCOPED
 
     def command_attributes(self, attrs):
         # List because attrs is a tuple
@@ -218,22 +220,15 @@ class MatterIdlTransformer(Transformer):
         return init_args
 
     def command(self, args):
-        # The command takes 5 arguments if no input argument, 6 if input
+        # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
-        if len(args) != 6:
-            args.insert(3, None)
-
-        attr = args[1]  # direct command attributes
-        for shared_attr in args[0]:
-            if shared_attr == SharedTag.FABRIC_SCOPED:
-                attr.add(CommandAttribute.FABRIC_SCOPED)
-            else:
-                raise Exception("Unknown shared tag: %r" % shared_attr)
+        if len(args) != 5:
+            args.insert(2, None)
 
         return Command(
-            attributes=attr,
-            input_param=args[3], output_param=args[4], code=args[5],
-            **args[2]
+            attributes=args[0],
+            input_param=args[2], output_param=args[3], code=args[4],
+            **args[1]
         )
 
     def event_access(self, privilege):
@@ -315,16 +310,10 @@ class MatterIdlTransformer(Transformer):
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
     @v_args(inline=True)
-    def attribute(self, shared_tags, tags, definition_tuple):
+    def attribute(self, tags, definition_tuple):
 
         tags = set(tags)
         (definition, acl) = definition_tuple
-
-        for shared_attr in shared_tags:
-            if shared_attr == SharedTag.FABRIC_SCOPED:
-                tags.add(AttributeTag.FABRIC_SCOPED)
-            else:
-                raise Exception("Unknown shared tag: %r" % shared_attr)
 
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
@@ -336,8 +325,8 @@ class MatterIdlTransformer(Transformer):
         return Attribute(definition=definition, tags=tags, **acl)
 
     @v_args(inline=True)
-    def struct(self, id, *fields):
-        return Struct(name=id, fields=list(fields))
+    def struct(self, attrs, id, *fields):
+        return Struct(name=id, attributes=set(attrs), fields=list(fields))
 
     @v_args(inline=True)
     def request_struct(self, value):
