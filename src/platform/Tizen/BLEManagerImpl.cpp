@@ -50,6 +50,39 @@ struct BLEConnection
     bool isChipDevice;
 };
 
+struct ErrToStrTable
+{
+    int err;
+    const char * str;
+};
+
+static ErrToStrTable ErrToStr[] = { { BT_ERROR_CANCELLED, "Operation Cancelled" },
+                                    { BT_ERROR_INVALID_PARAMETER, "Invalid parameter" },
+                                    { BT_ERROR_OUT_OF_MEMORY, "Out of memory" },
+                                    { BT_ERROR_RESOURCE_BUSY, "Device or resource busy" },
+                                    { BT_ERROR_TIMED_OUT, "Timeout error" },
+                                    { BT_ERROR_NOW_IN_PROGRESS, "Operation now in progress" },
+                                    { BT_ERROR_NOT_SUPPORTED, "BT is not supported" },
+                                    { BT_ERROR_PERMISSION_DENIED, "Permission denied" },
+                                    { BT_ERROR_QUOTA_EXCEEDED, "Quota exceeded" },
+                                    { BT_ERROR_NO_DATA, "No data available" },
+                                    { BT_ERROR_DEVICE_POLICY_RESTRICTION, "Device policy restriction" },
+                                    { BT_ERROR_NOT_INITIALIZED, "Local adapter not initialized" },
+                                    { BT_ERROR_NOT_ENABLED, "Local adapter not enabled" },
+                                    { BT_ERROR_ALREADY_DONE, "Operation already done" },
+                                    { BT_ERROR_OPERATION_FAILED, "Operation failed" },
+                                    { BT_ERROR_NOT_IN_PROGRESS, "Operation not in progress" },
+                                    { BT_ERROR_REMOTE_DEVICE_NOT_BONDED, "Remote device not bonded" },
+                                    { BT_ERROR_AUTH_REJECTED, "Authentication rejected" },
+                                    { BT_ERROR_AUTH_FAILED, "Authentication failed" },
+                                    { BT_ERROR_REMOTE_DEVICE_NOT_FOUND, "Remote device not found" },
+                                    { BT_ERROR_SERVICE_SEARCH_FAILED, "Service search failed" },
+                                    { BT_ERROR_REMOTE_DEVICE_NOT_CONNECTED, "Remote device not connected" },
+                                    { BT_ERROR_AGAIN, "Resource temporarily unavailable" },
+                                    { BT_ERROR_SERVICE_NOT_FOUND, "Service not found" },
+                                    { BT_ERROR_AUTHORIZATION_REJECTED, "Authorization rejected" },
+                                    { 0, "Unknown" } };
+
 /* CHIPoBLE UUID strings */
 const char * chip_ble_service_uuid    = "0000FFF6-0000-1000-8000-00805F9B34FB";
 const char * chip_ble_char_c1_tx_uuid = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
@@ -65,6 +98,15 @@ static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
 /* Tizen Default Connect Timeout */
 constexpr System::Clock::Timeout kConnectTimeoutMs = System::Clock::Seconds16(10);
 
+const char * BLEManagerImpl::ConvertErrToStr(int error)
+{
+    for (auto iter : ErrToStr)
+        if (iter.err == error)
+            return iter.str;
+
+    return "Unknown";
+}
+
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
     ChipLogProgress(DeviceLayer, "Adapter State Changed: %s", adapterState == BT_ADAPTER_ENABLED ? "Enabled" : "Disabled");
@@ -72,16 +114,16 @@ static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState,
 
 void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData)
 {
-    ChipLogProgress(DeviceLayer, "Gatt Connection State Changed: %s result [%d]", connected ? "Connected" : "Disconnected", result);
-
     if (result != BT_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "%s", connected ? "Connection req failed" : "Disconnection req failed");
+        ChipLogError(DeviceLayer, "Gatt %s failed. err: 0x%x(%s)", connected ? "Connection" : "Disconnection", result,
+                     ConvertErrToStr(result));
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
     }
     else
     {
+        ChipLogProgress(DeviceLayer, "Gatt %s", connected ? "Connected" : "Disconnected");
         sInstance.HandleConnectionEvent(connected, remoteAddress);
     }
 }
@@ -97,16 +139,20 @@ gboolean BLEManagerImpl::_BleInitialize(void * userData)
     }
 
     ret = bt_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_initialize() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_initialize() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ret = bt_adapter_set_state_changed_cb(__AdapterStateChangedCb, nullptr);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ret = bt_gatt_server_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ret = bt_gatt_set_connection_state_changed_cb(GattConnectionStateChangedCb, nullptr);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     sInstance.InitConnectionData();
 
@@ -141,8 +187,8 @@ static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
     }
 }
 
-static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                   int offset, void * userData)
+void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                                          int offset, void * userData)
 {
     int ret, len = 0;
     bt_gatt_type_e type;
@@ -155,13 +201,14 @@ static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt
     g_free(uuid);
 
     ret = bt_gatt_get_value(gattHandle, &value, &len);
-    VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_get_value() failed. ret: %d", ret));
-
+    VerifyOrReturn(ret == BT_ERROR_NONE,
+                   ChipLogError(DeviceLayer, "bt_gatt_get_value() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     ChipLogProgress(DeviceLayer, "Read Value (len: %d): %.*s", len, len, value);
 
     ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_READ, offset, 0x00, value, len);
     g_free(value);
-    VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed. ret: %d", ret));
+    VerifyOrReturn(ret == BT_ERROR_NONE,
+                   ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 }
 
 void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
@@ -178,12 +225,13 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
 
-    ChipLogProgress(DeviceLayer, "Write Requested on %s: %s", __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Write Requested on %s(%s)", __ConvertAttTypeToStr(type), uuid);
     ChipLogProgress(DeviceLayer, "Write Value (len: %d): %.*s ", len, len, value);
     g_free(uuid);
 
     ret = bt_gatt_set_value(gattHandle, value, len);
-    VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. ret: %d", ret));
+    VerifyOrReturn(ret == BT_ERROR_NONE,
+                   ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_WRITE, offset, 0x00, nullptr, 0);
     VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed. ret: %d", ret));
@@ -421,10 +469,12 @@ gboolean BLEManagerImpl::ConnectChipThing(gpointer userData)
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", address);
 
     ret = bt_gatt_client_create(address, &sInstance.mGattClient);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "Failed to create GATT client. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ret = bt_gatt_connect(address, false);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to issue GATT connect request. ret [%d]", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "Failed to issue GATT connect request. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
 exit:
@@ -512,11 +562,13 @@ int BLEManagerImpl::RegisterGATTServer()
 
     // Create Server
     ret = bt_gatt_server_create(&server);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_create() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_server_create() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     // Create Service (BTP Service)
     ret = bt_gatt_service_create(chip_ble_service_uuid, BT_GATT_SERVICE_TYPE_PRIMARY, &service);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_service_create() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_service_create() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     // Create 1st Characteristic (Client TX Buffer)
     ret = bt_gatt_characteristic_create(
@@ -526,43 +578,56 @@ int BLEManagerImpl::RegisterGATTServer()
                                 // GATT Service
         "CHIPoBLE_C1", strlen("CHIPoBLE_C1"), &char1);
 
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     ret = bt_gatt_server_set_write_value_requested_cb(char1, WriteValueRequestedCb, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_server_set_write_value_requested_cb() failed. ret: %d", ret));
+                 ChipLogError(DeviceLayer, "bt_gatt_server_set_write_value_requested_cb() failed. err: 0x%x(%s)", ret,
+                              ConvertErrToStr(ret)));
     ret = bt_gatt_service_add_characteristic(service, char1);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed. ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     // Create 2nd Characteristic (Client RX Buffer)
     ret = bt_gatt_characteristic_create(chip_ble_char_c2_rx_uuid, BT_GATT_PERMISSION_READ,
                                         BT_GATT_PROPERTY_READ | BT_GATT_PROPERTY_INDICATE, "CHIPoBLE_C2", strlen("CHIPoBLE_C2"),
                                         &char2);
 
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed. ret: %d", ret));
-    ret = bt_gatt_server_set_read_value_requested_cb(char2, __ReadValueRequestedCb, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_server_set_read_value_requested_cb() failed. ret: %d", ret));
-    ret = bt_gatt_server_set_characteristic_notification_state_change_cb(char2, NotificationStateChangedCb, nullptr);
+                 ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
+    ret = bt_gatt_server_set_read_value_requested_cb(char2, ReadValueRequestedCb, nullptr);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
-        ChipLogError(DeviceLayer, "bt_gatt_server_set_characteristic_notification_state_change_cb() failed. ret: %d", ret));
+        ChipLogError(DeviceLayer, "bt_gatt_server_set_read_value_requested_cb() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
+    ret = bt_gatt_server_set_characteristic_notification_state_change_cb(char2, NotificationStateChangedCb, nullptr);
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_server_set_characteristic_notification_state_change_cb() failed. err: 0x%x(%s)",
+                              ret, ConvertErrToStr(ret)));
 
     // Create CCC Descriptor
     ret = bt_gatt_descriptor_create(desc_uuid_short, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE, desc_value,
                                     sizeof(desc_value), &desc);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_descriptor_create() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_descriptor_create() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     ret = bt_gatt_characteristic_add_descriptor(char2, desc);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_characteristic_add_descriptor() failed. ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_gatt_characteristic_add_descriptor() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     ret = bt_gatt_service_add_characteristic(service, char2);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed. ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     // Register Service to Server
     ret = bt_gatt_server_register_service(server, service);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_register_service() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_server_register_service() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     // Start Server
     ret = bt_gatt_server_start();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_start() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_server_start() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ChipLogDetail(DeviceLayer, "NotifyBLEPeripheralGATTServerRegisterComplete Success");
     BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(true, nullptr);
@@ -579,7 +644,7 @@ exit:
     return ret;
 }
 
-int BLEManagerImpl::StartBLEAdvertising()
+int BLEManagerImpl::StartAdvertising()
 {
     int ret                                                    = BT_ERROR_NONE;
     CHIP_ERROR err                                             = CHIP_NO_ERROR;
@@ -601,23 +666,29 @@ int BLEManagerImpl::StartBLEAdvertising()
     if (mAdvertiser == nullptr)
     {
         ret = bt_adapter_le_create_advertiser(&mAdvertiser);
-        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_create_advertiser() failed. ret: %d", ret));
+        VerifyOrExit(
+            ret == BT_ERROR_NONE,
+            ChipLogError(DeviceLayer, "bt_adapter_le_create_advertiser() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     }
     else
     {
         ret = bt_adapter_le_clear_advertising_data(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING);
-        VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_clear_advertising_data() failed. ret: %d", ret));
+        VerifyOrExit(
+            ret == BT_ERROR_NONE,
+            ChipLogError(DeviceLayer, "bt_adapter_le_clear_advertising_data() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
         ret = bt_adapter_le_clear_advertising_data(mAdvertiser, BT_ADAPTER_LE_PACKET_SCAN_RESPONSE);
-        VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_clear_advertising_data() failed. ret: %d", ret));
+        VerifyOrExit(
+            ret == BT_ERROR_NONE,
+            ChipLogError(DeviceLayer, "bt_adapter_le_clear_advertising_data() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     }
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ret = bt_adapter_le_set_advertising_mode(mAdvertiser, BT_ADAPTER_LE_ADVERTISING_MODE_LOW_LATENCY);
-        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_mode() failed. ret: %d", ret));
+        VerifyOrExit(
+            ret == BT_ERROR_NONE,
+            ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_mode() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
         // NOTE: Check specification for recommended Advertising Interval range for Fast Advertising
         // ret = bt_adapter_le_set_advertising_interval(mAdvertiser, BT_LE_ADV_INTERVAL_MIN, BT_LE_ADV_INTERVAL_MIN);
@@ -634,13 +705,16 @@ int BLEManagerImpl::StartBLEAdvertising()
     memcpy(service_data, &deviceIdInfo, sizeof(service_data));
     ret = bt_adapter_le_add_advertising_service_data(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING, chip_ble_service_uuid_short,
                                                      service_data, sizeof(service_data));
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed. ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
 
     ret = bt_adapter_le_start_advertising_new(mAdvertiser, AdvertisingStateChangedCb, nullptr);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_advertising_new() failed. ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_adapter_le_start_advertising_new() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     sInstance.mAdvReqInProgress = true;
     return ret;
 
@@ -649,13 +723,14 @@ exit:
     return ret;
 }
 
-int BLEManagerImpl::StopBLEAdvertising()
+int BLEManagerImpl::StopAdvertising()
 {
     int ret = BT_ERROR_NONE;
 
     ChipLogProgress(DeviceLayer, "Stop Advertising");
     ret = bt_adapter_le_stop_advertising(mAdvertiser);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_stop_advertising() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_le_stop_advertising() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     sInstance.mAdvReqInProgress = true;
     return ret;
 
@@ -861,7 +936,8 @@ void BLEManagerImpl::DriveBLEState()
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
         ret = RegisterGATTServer();
-        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Register GATT Server Failed. ret: %d", ret));
+        VerifyOrExit(ret == BT_ERROR_NONE,
+                     ChipLogError(DeviceLayer, "Register GATT Server Failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
         ChipLogProgress(DeviceLayer, "GATT Service Registered");
         mFlags.Set(Flags::kAppRegistered);
@@ -872,25 +948,30 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (!mFlags.Has(Flags::kAdvertising))
         {
-            ret = StartBLEAdvertising();
-            VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Start Advertising Failed. ret: %d", ret));
+            ret = StartAdvertising();
+            VerifyOrExit(ret == BT_ERROR_NONE,
+                         ChipLogError(DeviceLayer, "Start Advertising Failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
         }
         else if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
         {
             ChipLogProgress(DeviceLayer, "Advertising Refreshed Needed. Stop Advertising");
-            ret = StopBLEAdvertising();
-            VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Stop Advertising Failed. ret: %d", ret));
+            ret = StopAdvertising();
+            VerifyOrExit(ret == BT_ERROR_NONE,
+                         ChipLogError(DeviceLayer, "Stop Advertising Failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
         }
     }
     else if (mFlags.Has(Flags::kAdvertising))
     {
         ChipLogProgress(DeviceLayer, "Stop Advertising");
 
-        ret = StopBLEAdvertising();
-        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Stop Advertising Failed. ret: %d", ret));
+        ret = StopAdvertising();
+        VerifyOrExit(ret == BT_ERROR_NONE,
+                     ChipLogError(DeviceLayer, "Stop Advertising Failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
         ret = bt_adapter_le_destroy_advertiser(mAdvertiser);
-        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_destroy_advertiser() failed. ret: %d", ret));
+        VerifyOrExit(
+            ret == BT_ERROR_NONE,
+            ChipLogError(DeviceLayer, "bt_adapter_le_destroy_advertiser() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
         mAdvertiser = nullptr;
     }
 
@@ -926,10 +1007,36 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::_Shutdown()
+CHIP_ERROR BLEManagerImpl::_Shutdown(void)
 {
-    int ret = bt_deinitialize();
-    VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_deinitialize() failed. ret: %d", ret));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int ret = BT_ERROR_NONE;
+
+    ChipLogProgress(DeviceLayer, "BLE Shutdown");
+
+    if (sInstance.mGattClient) {
+    	ret = bt_gatt_client_destroy(sInstance.mGattClient);
+        if (ret != BT_ERROR_NONE)
+            ChipLogError(DeviceLayer, "bt_gatt_client_destroy() failed. ret: %d", ret);
+    }
+
+    ret = bt_gatt_unset_connection_state_changed_cb();
+    if (ret != BT_ERROR_NONE)
+        ChipLogError(DeviceLayer, "bt_gatt_unset_connection_state_changed_cb failed. ret: %d", ret);
+
+    ret = bt_gatt_server_deinitialize();
+    if (ret != BT_ERROR_NONE)
+        ChipLogError(DeviceLayer, "bt_gatt_server_deinitialize() failed. ret: %d", ret);
+
+    ret = bt_adapter_unset_state_changed_cb();
+    if (ret != BT_ERROR_NONE)
+        ChipLogError(DeviceLayer, "bt_adapter_unset_state_changed_cb() failed. ret: %d", ret);
+
+    ret = bt_deinitialize();
+    if (ret != BT_ERROR_NONE)
+        ChipLogError(DeviceLayer, "bt_deinitialize() failed. ret: %d", ret);
+
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -968,7 +1075,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
     ret = bt_adapter_get_name(&deviceName);
     if (ret != BT_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "bt_adapter_get_name() failed. ret: %d", ret);
+        ChipLogError(DeviceLayer, "bt_adapter_get_name() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret));
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -992,7 +1099,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     ret = bt_adapter_set_name(deviceName);
     if (ret != BT_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "bt_adapter_set_name() failed. ret: %d", ret);
+        ChipLogError(DeviceLayer, "bt_adapter_set_name() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret));
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1162,7 +1269,8 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     ret = bt_gatt_client_set_characteristic_value_changed_cb(conn->gattCharC2Handle, CharacteristicNotificationCb, conn);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed. ret: %d", ret));
+                 ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed. err: 0x%x(%s)", ret,
+                              ConvertErrToStr(ret)));
     sInstance.NotifySubscribeOpComplete(conn, true);
     return true;
 exit:
@@ -1192,7 +1300,8 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     ret = bt_gatt_client_unset_characteristic_value_changed_cb(conn->gattCharC2Handle);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_client_unset_characteristic_value_changed_cb() failed. ret: %d", ret));
+                 ChipLogError(DeviceLayer, "bt_gatt_client_unset_characteristic_value_changed_cb() failed. err: 0x%x(%s)", ret,
+                              ConvertErrToStr(ret)));
     sInstance.NotifySubscribeOpComplete(conn, false);
     return true;
 exit:
@@ -1211,7 +1320,8 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conn->peerAddr);
     ret = bt_gatt_disconnect(conn->peerAddr);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     RemoveConnectionData(conn->peerAddr);
     return true;
@@ -1232,14 +1342,16 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     ret = bt_gatt_set_value(mGattCharC2Handle, reinterpret_cast<const char *>(pBuf->Start()), pBuf->DataLength());
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conn->peerAddr,
                     pBuf->DataLength());
 
     ret = bt_gatt_server_notify_characteristic_changed_value(mGattCharC2Handle, IndicationConfirmationCb, conn->peerAddr, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed. ret: %d", ret));
+                 ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed. err: 0x%x(%s)", ret,
+                              ConvertErrToStr(ret)));
     return true;
 
 exit:
@@ -1267,13 +1379,15 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     VerifyOrExit(conn->gattCharC1Handle != nullptr, ChipLogError(DeviceLayer, "Char C1 is null"));
 
     ret = bt_gatt_set_value(conn->gattCharC1Handle, reinterpret_cast<const char *>(pBuf->Start()), pBuf->DataLength());
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_set_value() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conn->peerAddr,
                     pBuf->DataLength());
 
     ret = bt_gatt_client_write_value(conn->gattCharC1Handle, WriteCompletedCb, conn);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed. err: 0x%x(%s)", ret, ConvertErrToStr(ret)));
     return true;
 exit:
     return false;

@@ -152,7 +152,9 @@ gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
 
     // All set, trigger LE Scan
     ret = bt_adapter_le_start_scan(LeScanResultCb, userData);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() ret: %d", ret));
+    VerifyOrExit(
+        ret == BT_ERROR_NONE,
+        ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed. err: 0x%x(%s)", ret, BLEManagerImpl::ConvertErrToStr(ret)));
     ChipLogProgress(DeviceLayer, "Scan started");
 
     // Start Timer
@@ -183,11 +185,12 @@ void ChipDeviceScanner::CheckScanFilter(ScanFilterType filterType, ScanFilterDat
         return;
 
     ret = CreateLEScanFilter(filterType, filterData);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Scan Filter Creation Failed! ret: %d Do Normal Scan", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Scan Filter Creation Failed! Do Normal Scan"));
 
     ret = RegisterScanFilter(filterType, filterData);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Scan Filter Registration Failed! ret: %d Do Normal Scan", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Scan Filter Registration Failed! Do Normal Scan"));
     return;
+
 exit:
     UnRegisterScanFilter();
 }
@@ -264,14 +267,16 @@ int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, ScanFilterD
         ChipLogProgress(DeviceLayer, "Register Scan filter: Address");
         ret = bt_adapter_le_scan_filter_set_device_address(mScanFilter, filterData.address);
         VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_device_address() failed. ret: %d", ret));
+                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_device_address() failed. err: 0x%x(%s)", ret,
+                                  BLEManagerImpl::ConvertErrToStr(ret)));
         break;
     }
     case ScanFilterType::kServiceUUID: {
         ChipLogProgress(DeviceLayer, "Register Scan filter: Service UUID");
         ret = bt_adapter_le_scan_filter_set_service_uuid(mScanFilter, filterData.service_uuid);
         VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_uuid() failed. ret: %d", ret));
+                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_uuid() failed. err: 0x%x(%s)", ret,
+                                  BLEManagerImpl::ConvertErrToStr(ret)));
         break;
     }
     case ScanFilterType::kServiceData: {
@@ -279,7 +284,8 @@ int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, ScanFilterD
         ret = bt_adapter_le_scan_filter_set_service_data(mScanFilter, filterData.service_uuid, filterData.service_data,
                                                          filterData.service_data_len);
         VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_data() failed. ret: %d", ret));
+                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_data() failed. err: 0x%x(%s)", ret,
+                                  BLEManagerImpl::ConvertErrToStr(ret)));
         break;
     }
     case ScanFilterType::kNoFilter:
@@ -288,8 +294,10 @@ int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, ScanFilterD
     }
 
     ret = bt_adapter_le_scan_filter_register(mScanFilter);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_register failed(). ret: %d", ret));
-    return ret;
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_register failed(). err: 0x%x(%s)", ret,
+                              BLEManagerImpl::ConvertErrToStr(ret)));
+
 exit:
     return ret;
 }
@@ -299,8 +307,11 @@ int ChipDeviceScanner::CreateLEScanFilter(ScanFilterType filterType, ScanFilterD
     int ret = BT_ERROR_NONE;
 
     ret = bt_adapter_le_scan_filter_create(&mScanFilter);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_create() Failed. ret: %d", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_create() failed. err: 0x%x(%s)", ret,
+                              BLEManagerImpl::ConvertErrToStr(ret)));
     ChipLogError(DeviceLayer, "Scan Filter Created Successfully");
+
 exit:
     return ret;
 }
