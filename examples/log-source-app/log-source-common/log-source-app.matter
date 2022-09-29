@@ -22,11 +22,11 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  struct AccessControlEntry {
-    Privilege privilege = 1;
-    AuthMode authMode = 2;
-    nullable int64u subjects[] = 3;
-    nullable Target targets[] = 4;
+  fabric_scoped struct AccessControlEntry {
+    fabric_sensitive Privilege privilege = 1;
+    fabric_sensitive AuthMode authMode = 2;
+    nullable fabric_sensitive int64u subjects[] = 3;
+    nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -36,8 +36,8 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  struct ExtensionEntry {
-    octet_string<128> data = 1;
+  fabric_scoped struct ExtensionEntry {
+    fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
@@ -322,7 +322,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptor {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorId = 2;
     fabric_id fabricId = 3;
