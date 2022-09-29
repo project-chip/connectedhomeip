@@ -27,7 +27,6 @@ using SendKeyResponseType = chip::app::Clusters::KeypadInput::Commands::SendKeyR
 class AppKeypadInputManager : public KeypadInputDelegate
 {
 public:
-
     void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
                        const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 

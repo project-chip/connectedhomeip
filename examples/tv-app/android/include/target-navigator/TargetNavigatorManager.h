@@ -20,13 +20,13 @@
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
-using chip::app::AttributeValueEncoder;
-using chip::app::CommandResponseHelper;
 using chip::CharSpan;
 using chip::EndpointId;
-using TargetNavigatorDelegate    = chip::app::Clusters::TargetNavigator::Delegate;
-using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
-using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using TargetNavigatorDelegate     = chip::app::Clusters::TargetNavigator::Delegate;
+using TargetInfoType              = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type;
+using NavigateTargetResponseType  = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 class TargetNavigatorManager : public TargetNavigatorDelegate
@@ -51,5 +51,4 @@ protected:
     EndpointId mEndpointId;
 
     ContentAppAttributeDelegate * mAttributeDelegate;
-
 };

@@ -24,7 +24,6 @@
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
 
-
 void AppKeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCode & keyCode)
 {
     Commands::SendKeyResponse::Type response;
