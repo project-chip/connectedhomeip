@@ -118,7 +118,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
         supportedClusters = new HashSet<>();
       }
 
-      ContentApp app = new ContentApp(pkg, vendorName, vendorId, productId, version, supportedClusters);
+      ContentApp app =
+          new ContentApp(pkg, vendorName, vendorId, productId, version, supportedClusters);
       applications.put(pkg, app);
 
       Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_ADD);

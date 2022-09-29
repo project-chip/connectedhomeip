@@ -19,11 +19,7 @@ public class ContentApp {
   private int endpoint = INVALID_ENDPOINTID;
 
   public ContentApp(
-          String appName,
-          String vendorName,
-          int vendorId,
-          int productId,
-          String version) {
+      String appName, String vendorName, int vendorId, int productId, String version) {
     this.vendorName = vendorName;
     this.appName = appName;
     this.vendorId = vendorId;
@@ -81,5 +77,4 @@ public class ContentApp {
   public void setSupportedClusters(List<SupportedCluster> supportedClusters) {
     this.supportedClusters = new HashSet<>(supportedClusters);
   }
-
 }

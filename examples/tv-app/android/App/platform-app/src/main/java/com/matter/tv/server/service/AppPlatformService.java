@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
@@ -30,7 +29,6 @@ import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.tvapp.AppPlatform;
 import com.matter.tv.server.utils.EndpointsDataStore;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,17 +75,21 @@ public class AppPlatformService {
   private void initializeContentAppEndpoints() {
 
     // Read the metadada of previously discovered endpoints.
-    Map<String, ContentApp> previouslyPersistedEndpoints = new HashMap((Map<String, ContentApp>) endpointsDataStore.getAllPersistedContentApps());
+    Map<String, ContentApp> previouslyPersistedEndpoints =
+        new HashMap((Map<String, ContentApp>) endpointsDataStore.getAllPersistedContentApps());
 
     // Get the list of currently discovered content apps.
-    Map<String, ContentApp> discoveredContentApps = new HashMap<>(ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps());
+    Map<String, ContentApp> discoveredContentApps =
+        new HashMap<>(ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps());
 
     // Iterate through the previously discovered endpoints
     for (ContentApp persistedContentApp : previouslyPersistedEndpoints.values()) {
-      ContentApp discoveredContentApp = discoveredContentApps.remove(persistedContentApp.getAppName());
-      if (discoveredContentApp != null){
+      ContentApp discoveredContentApp =
+          discoveredContentApps.remove(persistedContentApp.getAppName());
+      if (discoveredContentApp != null) {
         // If the content app for the persisted endpoint is present in currently discovered list,
-        // register endpoint with updated metadata and update the metadata in the persisted endpoints.
+        // register endpoint with updated metadata and update the metadata in the persisted
+        // endpoints.
         discoveredContentApp.setEndpointId(persistedContentApp.getEndpointId());
         addContentApp(discoveredContentApp);
       } else {
@@ -120,19 +122,22 @@ public class AppPlatformService {
                       .get(packageName);
               // if this app was already added as endpoint remove and add so that the app metadata
               // stored by the content app platform is also updated
-              ContentApp persistedContentApp = endpointsDataStore.getAllPersistedContentApps().get(app.getAppName());
+              ContentApp persistedContentApp =
+                  endpointsDataStore.getAllPersistedContentApps().get(app.getAppName());
               if (persistedContentApp != null) {
                 mAppPlatform.removeContentApp(persistedContentApp.getEndpointId());
                 app.setEndpointId(persistedContentApp.getEndpointId());
               }
               addContentApp(app);
-//            } else if (action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE)) {
-//              int endpointId =
-//                  intent.getIntExtra(
-//                      ContentAppDiscoveryService.DISCOVERY_APPAGENT_EXTRA_ENDPOINTID, -1);
-//              if (endpointId != -1) {
-//                removeContentApp(endpointId, packageName);
-//              }
+              //            } else if
+              // (action.equals(ContentAppDiscoveryService.DISCOVERY_APPAGENT_ACTION_REMOVE)) {
+              //              int endpointId =
+              //                  intent.getIntExtra(
+              //
+              // ContentAppDiscoveryService.DISCOVERY_APPAGENT_EXTRA_ENDPOINTID, -1);
+              //              if (endpointId != -1) {
+              //                removeContentApp(endpointId, packageName);
+              //              }
             }
           }
         };
@@ -178,5 +183,4 @@ public class AppPlatformService {
       Log.e(TAG, "Could not add content app as endpoint. App Name " + app.getAppName());
     }
   }
-
 }

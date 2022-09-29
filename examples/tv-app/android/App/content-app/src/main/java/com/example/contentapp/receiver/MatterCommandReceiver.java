@@ -44,7 +44,7 @@ public class MatterCommandReceiver extends BroadcastReceiver {
           Intent in = new Intent(context, MainActivity.class);
           in.putExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, command);
           in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-          context.startActivity(in );
+          context.startActivity(in);
 
           Log.d(TAG, "Started activity. Now sending response");
 

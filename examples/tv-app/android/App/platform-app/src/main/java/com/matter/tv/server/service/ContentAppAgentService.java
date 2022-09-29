@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.matter.tv.app.api.IMatterAppAgent;
@@ -37,7 +36,6 @@ public class ContentAppAgentService extends Service {
 
   private static final int COMMAND_TIMEOUT = 8; // seconds
   private static final int ATTRIBUTE_TIMEOUT = 2; // seconds
-
 
   private static ResponseRegistry responseRegistry = new ResponseRegistry();
 
@@ -141,27 +139,56 @@ public class ContentAppAgentService extends Service {
 
   @NonNull
   private static String getResponse(int messageId, int timeout) {
-    ResponseRegistry.WaitState status = responseRegistry.waitForMessage(messageId, timeout, TimeUnit.SECONDS);
+    ResponseRegistry.WaitState status =
+        responseRegistry.waitForMessage(messageId, timeout, TimeUnit.SECONDS);
     String response = "";
     switch (status) {
       case SUCCESS:
       case INVALID_COUNTER:
         response = responseRegistry.readAndRemoveResponse(messageId);
         if (response == null) {
-          response = "{\"" + FAILURE_KEY + "\":{\"" + ContentAppAgentService.FAILURE_STATUS_KEY + "\":" + FAILED_UNKNOWN + "}}";
+          response =
+              "{\""
+                  + FAILURE_KEY
+                  + "\":{\""
+                  + ContentAppAgentService.FAILURE_STATUS_KEY
+                  + "\":"
+                  + FAILED_UNKNOWN
+                  + "}}";
         }
         break;
       case TIMED_OUT:
-        response = "{\"" + FAILURE_KEY + "\":{\"" + ContentAppAgentService.FAILURE_STATUS_KEY + "\":" + FAILED_TIMEOUT + "}}";
+        response =
+            "{\""
+                + FAILURE_KEY
+                + "\":{\""
+                + ContentAppAgentService.FAILURE_STATUS_KEY
+                + "\":"
+                + FAILED_TIMEOUT
+                + "}}";
         break;
       case INTERRUPTED:
         response = responseRegistry.readAndRemoveResponse(messageId);
         if (response == null) {
-          response = "{\"" + FAILURE_KEY + "\":{\"" + ContentAppAgentService.FAILURE_STATUS_KEY + "\":" + FAILED_TIMEOUT + "}}";
+          response =
+              "{\""
+                  + FAILURE_KEY
+                  + "\":{\""
+                  + ContentAppAgentService.FAILURE_STATUS_KEY
+                  + "\":"
+                  + FAILED_TIMEOUT
+                  + "}}";
         }
         break;
       default:
-        response = "{\"" + FAILURE_KEY + "\":{\"" + ContentAppAgentService.FAILURE_STATUS_KEY + "\":" + FAILED_UNKNOWN + "}}";
+        response =
+            "{\""
+                + FAILURE_KEY
+                + "\":{\""
+                + ContentAppAgentService.FAILURE_STATUS_KEY
+                + "\":"
+                + FAILED_UNKNOWN
+                + "}}";
     }
     Log.d(TAG, "Response " + response + " being returned for message " + messageId);
     return response;

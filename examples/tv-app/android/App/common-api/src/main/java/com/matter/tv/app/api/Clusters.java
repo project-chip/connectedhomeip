@@ -1,9 +1,8 @@
 package com.matter.tv.app.api;
 
 /**
- * Helper class to hold the IDs and corresponding constants for media related clusters.
- * TODO : Add the rest of the media clusters
- * TODO : Maybe generate using ZAP tool
+ * Helper class to hold the IDs and corresponding constants for media related clusters. TODO : Add
+ * the rest of the media clusters TODO : Maybe generate using ZAP tool
  */
 public class Clusters {
   // Clusters
@@ -14,48 +13,63 @@ public class Clusters {
       public static class Play {
         public static final int ID = 0x00;
       }
+
       public static class Pause {
         public static final int ID = 0x01;
       }
+
       public static class StopPlayback {
         public static final int ID = 0x02;
       }
+
       public static class StartOver {
         public static final int ID = 0x03;
       }
+
       public static class Previous {
         public static final int ID = 0x04;
       }
+
       public static class Next {
         public static final int ID = 0x05;
       }
+
       public static class Rewind {
         public static final int ID = 0x06;
       }
+
       public static class FastForward {
         public static final int ID = 0x07;
       }
+
       public static class SkipForward {
         public static final int ID = 0x08;
+
         public static class Fields {
           public static final int DeltaPositionMilliseconds = 0x00;
         }
       }
+
       public static class SkipBackward {
         public static final int ID = 0x09;
+
         public static class Fields {
           public static final int DeltaPositionMilliseconds = 0x00;
         }
       }
+
       public static class Seek {
         public static final int ID = 0x0B;
+
         public static class Fields {
           public static final int Position = 0x00;
         }
       }
+
       public static class PlaybackResponse {
         public static final int ID = 0x0A;
-        public static class Fields{
+
+        public static class Fields {
           public static final int Status = 0x00;
           public static final int Data = 0x01;
         }
@@ -94,7 +108,6 @@ public class Clusters {
         public static final int Position = 0x01;
       }
     }
-
   }
 
   public static class ContentLauncher {
@@ -103,32 +116,36 @@ public class Clusters {
     public static class Commands {
       public static class LaunchContent {
         public static final int ID = 0x00;
-        public static class Fields{
+
+        public static class Fields {
           public static final int Search = 0x00;
           public static final int AutoPlay = 0x01;
           public static final int Data = 0x02;
         }
       }
+
       public static class LaunchURL {
         public static final int ID = 0x01;
-        public static class Fields{
+
+        public static class Fields {
           public static final int ContentURL = 0x00;
           public static final int DisplayString = 0x01;
           public static final int BrandingInformation = 0x02;
         }
       }
-      public static class LaunchResponse{
+
+      public static class LaunchResponse {
         public static final int ID = 0x02;
-        public static class Fields{
+
+        public static class Fields {
           public static final int Status = 0x00;
           public static final int Data = 0x01;
         }
       }
-
     }
 
     public static class Attributes {
-      public static final int AcceptHeader                = 0x00;
+      public static final int AcceptHeader = 0x00;
       public static final int SupportedStreamingProtocols = 0x01;
     }
 
@@ -173,7 +190,7 @@ public class Clusters {
 
       public static class BrandingInformation {
         public static final int ProviderName = 0x00;
-        public static final int Background  = 0x01;
+        public static final int Background = 0x01;
         public static final int Logo = 0x02;
         public static final int ProgressBar = 0x03;
         public static final int Splash = 0x04;
@@ -182,40 +199,40 @@ public class Clusters {
 
       public static class StyleInformation {
         public static final int ProviderName = 0x00;
-        public static final int Background  = 0x01;
+        public static final int Background = 0x01;
         public static final int Logo = 0x02;
       }
 
       public static class Dimension {
         public static final int ImageUrl = 0x00;
-        public static final int Color  = 0x01;
+        public static final int Color = 0x01;
         public static final int Size = 0x02;
       }
 
       public static class MetricTypeEnum {
         public static final int Pixels = 0x00;
-        public static final int Percentage  = 0x01;
+        public static final int Percentage = 0x01;
       }
-
     }
-
   }
 
   public static class TargetNavigator {
     public static final int Id = 0x0505;
 
     public static class Commands {
-      public static class NavigateTarget{
+      public static class NavigateTarget {
         public static final int ID = 0x00;
-        public static class Fields{
+
+        public static class Fields {
           public static final int Target = 0x00;
           public static final int Data = 0x01;
         }
       }
 
-      public static class NavigateTargetResponse{
+      public static class NavigateTargetResponse {
         public static final int ID = 0x01;
-        public static class Fields{
+
+        public static class Fields {
           public static final int Status = 0x00;
           public static final int Data = 0x01;
         }
@@ -223,7 +240,7 @@ public class Clusters {
     }
 
     public static class Attributes {
-      public static final int TargetList    = 0x00;
+      public static final int TargetList = 0x00;
       public static final int CurrentTarget = 0x01;
     }
 

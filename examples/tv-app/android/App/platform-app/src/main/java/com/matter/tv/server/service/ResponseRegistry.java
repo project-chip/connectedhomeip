@@ -10,7 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ResponseRegistry {
 
   public enum WaitState {
-    TIMED_OUT, INTERRUPTED, SUCCESS, INVALID_COUNTER
+    TIMED_OUT,
+    INTERRUPTED,
+    SUCCESS,
+    INVALID_COUNTER
   }
 
   private static final String TAG = "ResponseRegistry";
