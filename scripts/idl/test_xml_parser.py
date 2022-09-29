@@ -193,5 +193,55 @@ class TestXmlParser(unittest.TestCase):
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 
 
+    def testSkipsNotProcessedFields(self):
+        # Zap has extra fields that are generally not processed
+        # This includes such fields and ansures we do not consider them
+        idl = XmlToIdl('''<?xml version="1.0"?>
+<!--
+Some copyright here... testing that we skip over comments
+-->
+<configurator>
+  <domain name="CHIP"/> 
+  <cluster>
+    <name>Window Covering</name>
+    <domain>Closures</domain>
+    <code>0x0102</code>
+    <define>WINDOW_COVERING_CLUSTER</define>
+    <description>Provides an interface for controlling and adjusting automatic window coverings. </description>
+
+    <!-- Abbreviations used in descriptions -->
+    <tag name="LF" description="Lift Control"/>
+    <tag name="TL" description="Tilt Control"/>
+    <tag name="PA_LF" description="Position Aware Lift"/>
+    <tag name="ABS" description="Absolute Positioning"/>
+    <tag name="PA_TL" description="Position Aware Tilt"/>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <!-- Window Covering Information Attribute Set -->
+    <!-- Conformance feature M -->
+    <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"
+               type="Type"     min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
+  </cluster>
+</configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(side=ClusterSide.CLIENT, name='WindowCovering', code=0x102,
+                                     structs=[],
+                                     attributes=[
+                                         Attribute(
+                                             definition=Field(
+                                                 data_type=DataType(name='Type'),
+                                                 code=0,
+                                                 name='Type',
+                                             ),
+                                             tags={AttributeTag.READABLE},
+                                             readacl=AccessPrivilege.VIEW,
+                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+
+
+
 if __name__ == '__main__':
     unittest.main()
