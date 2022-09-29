@@ -770,13 +770,27 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         {
             TLV::TLVType array, item;
             ReturnErrorOnFailure(writer.StartContainer(TagGroupCredentials(), TLV::kTLVType_Array, array));
+            uint8_t keyCount   = 0;
+            uint64_t startTime = 0;
+            uint16_t hash      = 0;
+            uint8_t encryptionKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
             for (auto & key : operational_keys)
             {
+                startTime = 0;
+                hash      = 0;
+                memset(encryptionKey, 0, sizeof(encryptionKey));
                 ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item));
-                ReturnErrorOnFailure(writer.Put(TagStartTime(), static_cast<uint64_t>(key.start_time)));
-                ReturnErrorOnFailure(writer.Put(TagKeyHash(), key.hash));
-                ReturnErrorOnFailure(
-                    writer.Put(TagKeyValue(), ByteSpan(key.encryption_key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES)));
+
+                if (keyCount++ < keys_count)
+                {
+                    startTime = key.start_time;
+                    hash      = key.hash;
+                    memcpy(encryptionKey, key.encryption_key, sizeof(encryptionKey));
+                }
+                ReturnErrorOnFailure(writer.Put(TagStartTime(), static_cast<uint64_t>(startTime)));
+                ReturnErrorOnFailure(writer.Put(TagKeyHash(), hash));
+                ReturnErrorOnFailure(writer.Put(TagKeyValue(), ByteSpan(encryptionKey)));
+
                 ReturnErrorOnFailure(writer.EndContainer(item));
             }
             ReturnErrorOnFailure(writer.EndContainer(array));
