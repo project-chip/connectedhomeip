@@ -39,6 +39,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
+#include <platform/NetworkCommissioning.h>
+#include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -72,10 +74,27 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
+    CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
+                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+    CHIP_ERROR CommitConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
 #endif
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
+    CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+    static const char * GetWiFiIfName() { return "mlan0"; }
+
+    void UpdateNetworkStatus();
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -94,6 +113,10 @@ private:
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
 #endif
+    static std::string to_hex_string(const std::string & input);
+    static int _OnWpaInterfaceScanDone(unsigned int count);
+    static bool _GetBssInfo(const uint8_t sid, NetworkCommissioning::WiFiScanResponse & result);
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     // ===== Members for internal use by the following friends.
 
@@ -106,6 +129,15 @@ private:
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
+
+    static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+    static uint8_t sInterestedSSIDLen;
+    // Configured SSID
+    static uint8_t sCfgSSID[Internal::kMaxWiFiSSIDLength];
+    static uint8_t sCfgSSIDLen;
+
+    static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
