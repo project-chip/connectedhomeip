@@ -923,7 +923,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::FixedLabel::Structs::LabelStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.value);

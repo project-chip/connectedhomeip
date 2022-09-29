@@ -38,7 +38,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::{{as_camel_cased clusterName false}}::Structs::{{name}}::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request)
 {
     {{#zcl_struct_items}}
     ComplexArgumentParser::Finalize(request.{{asLowerCamelCase label}});
