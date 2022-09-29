@@ -98,7 +98,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
+    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
@@ -192,9 +192,9 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="INT8U"  isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
-    <attribute side="server" code="0x0001" define="REMAINING_TIME"  type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
-    <attribute side="server" code="0x0002" define="MIN_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
-    <attribute side="server" code="0x0003" define="MAX_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
+    <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
+    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="INT8U"  min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
     <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">CurrentFrequency</attribute>
     <attribute side="server" code="0x0005" define="MIN_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MinFrequency</attribute>
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY"                 type="INT16U" min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MaxFrequency</attribute>
