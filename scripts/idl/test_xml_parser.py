@@ -192,7 +192,6 @@ class TestXmlParser(unittest.TestCase):
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 
-
     def testSkipsNotProcessedFields(self):
         # Zap has extra fields that are generally not processed
         # This includes such fields and ansures we do not consider them
@@ -240,7 +239,6 @@ Some copyright here... testing that we skip over comments
                                              tags={AttributeTag.READABLE},
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
-
 
 
 if __name__ == '__main__':
