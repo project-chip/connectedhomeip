@@ -35,7 +35,6 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
-    FABRIC_SCOPED = enum.auto()
     FABRIC_SENSITIVE = enum.auto()
 
 
@@ -63,6 +62,7 @@ class ClusterSide(enum.Enum):
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()
+    FABRIC_SCOPED = enum.enum()
 
 
 class EndpointContentType(enum.Enum):
@@ -148,7 +148,6 @@ class Event:
     @property
     def is_fabric_sensitive(self):
         return EventTag.FABRIC_SENSITIVE in self.tags
-    
 
 
 @dataclass
