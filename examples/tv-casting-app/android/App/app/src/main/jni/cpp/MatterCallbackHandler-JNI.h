@@ -18,18 +18,229 @@
 
 #pragma once
 
+#include <controller/CHIPCluster.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
-class MatterCallbackHandlerJNI
+class CallbackBaseJNI
 {
 public:
+    CallbackBaseJNI(const char * methodSignature) { mMethodSignature = methodSignature; }
     CHIP_ERROR SetUp(JNIEnv * env, jobject inHandler);
 
-    void Handle(CHIP_ERROR err);
+protected:
+    jobject mObject               = nullptr;
+    jclass mClazz                 = nullptr;
+    jmethodID mMethod             = nullptr;
+    const char * mMethodSignature = nullptr;
+};
 
-private:
-    jobject mObject   = nullptr;
-    jclass mClazz     = nullptr;
-    jmethodID mMethod = nullptr;
+class FailureHandlerJNI : public CallbackBaseJNI
+{
+public:
+    FailureHandlerJNI() : CallbackBaseJNI("(ILjava/lang/String;)V") {}
+    void Handle(CHIP_ERROR err);
+};
+
+class MatterCallbackHandlerJNI : public FailureHandlerJNI
+{
+};
+
+class SubscriptionEstablishedHandlerJNI : public CallbackBaseJNI
+{
+public:
+    SubscriptionEstablishedHandlerJNI() : CallbackBaseJNI("()V") {}
+    void Handle();
+};
+
+// helper functions for conversions
+jobject ConvertToLongJObject(uint64_t responseData);
+jobject ConvertToFloatJObject(float responseData);
+jobject ConvertToShortJObject(uint8_t responseData);
+jobject ConvertToByteJObject(uint8_t responseData);
+jobject ConvertToIntegerJObject(uint32_t responseData);
+jstring ConvertToJString(chip::CharSpan responseData);
+
+template <typename T>
+class SuccessHandlerJNI : public CallbackBaseJNI
+{
+public:
+    SuccessHandlerJNI(const char * methodSignature) : CallbackBaseJNI(methodSignature) {}
+
+    virtual ~SuccessHandlerJNI() = 0;
+
+    virtual jobject ConvertToJObject(T responseData) = 0;
+
+    void Handle(T responseData)
+    {
+        ChipLogProgress(AppServer, "SuccessHandlerJNI::Handle called");
+
+        JNIEnv * env          = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject jResponseData = ConvertToJObject(responseData);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        env->CallVoidMethod(mObject, mMethod, jResponseData);
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "SuccessHandlerJNI::Handle status error: %s", err.AsString());
+        }
+    }
+};
+
+template <typename T>
+SuccessHandlerJNI<T>::~SuccessHandlerJNI(){};
+
+// MEDIA PLAYBACK
+class CurrentStateSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType>
+{
+public:
+    CurrentStateSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData);
+};
+
+class DurationSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType>
+{
+public:
+    DurationSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType responseData);
+};
+
+class SampledPositionSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType>
+{
+public:
+    SampledPositionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType responseData);
+};
+
+class PlaybackSpeedSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType>
+{
+public:
+    PlaybackSpeedSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Float;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType responseData);
+};
+
+class SeekRangeEndSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType>
+{
+public:
+    SeekRangeEndSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType responseData);
+};
+
+class SeekRangeStartSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType>
+{
+public:
+    SeekRangeStartSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Long;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType responseData);
+};
+
+// TARGET NAVIGATOR
+class CurrentTargetSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType>
+{
+public:
+    CurrentTargetSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType responseData);
+};
+
+class TargetListSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType>
+{
+public:
+    TargetListSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/util/ArrayList;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType responseData);
+};
+
+// LEVEL CONTROL
+class CurrentLevelSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType>
+{
+public:
+    CurrentLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType responseData);
+};
+
+class MinLevelSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType>
+{
+public:
+    MinLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType responseData);
+};
+
+class MaxLevelSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType>
+{
+public:
+    MaxLevelSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Byte;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType responseData);
+};
+
+// CONTENT LAUNCHER
+class SupportedStreamingProtocolsSuccessHandlerJNI
+    : public SuccessHandlerJNI<
+          chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType>
+{
+public:
+    SupportedStreamingProtocolsSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
+    jobject ConvertToJObject(
+        chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData);
+};
+
+// APPLICATION BASIC
+class VendorNameSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+{
+public:
+    VendorNameSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType responseData);
+};
+
+class VendorIDSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+{
+public:
+    VendorIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Short;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData);
+};
+
+class ApplicationNameSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+{
+public:
+    ApplicationNameSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
+    jobject
+    ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType responseData);
+};
+
+class ProductIDSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+{
+public:
+    ProductIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Short;)V") {}
+    jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData);
+};
+
+class ApplicationVersionSuccessHandlerJNI
+    : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+{
+public:
+    ApplicationVersionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/String;)V") {}
+    jobject ConvertToJObject(
+        chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType responseData);
 };
