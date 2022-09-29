@@ -120,10 +120,10 @@ server cluster AccessControl = 31 {
   command access(invoke: administer) Off(): DefaultSuccess = 4;
 
   // command invocation can require timed invoke usage
-  timed command RequiresTimedInvok(): DefaultSuccess = 5;
+  timed command RequiresTimedInvoke(): DefaultSuccess = 5;
 
   // commands may be fabric scoped
-  fabric command RequiresTimedInvok(): DefaultSuccess = 6;
+  fabric command RequiresTimedInvoke(): DefaultSuccess = 6;
 
   // commands may have multiple attributes
   fabric timed command RequiresTimedInvok(): DefaultSuccess = 7;
