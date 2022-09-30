@@ -1177,8 +1177,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
 
-    ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable, device name %s)",
-                    (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
+    ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable)",
+                    (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-");
 
     {
         if (ble_gap_adv_active())
