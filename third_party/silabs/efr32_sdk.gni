@@ -80,6 +80,7 @@ template("efr32_sdk") {
     _include_dirs = [
       "${efr32_sdk_root}",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
+      "${efr32_sdk_root}/app/common/util/app_assert/",
       "${efr32_sdk_root}/hardware/board/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
@@ -134,6 +135,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
       "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
       "${efr32_sdk_root}/protocol/bluetooth/inc/",
+      "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
@@ -385,6 +387,7 @@ template("efr32_sdk") {
   source_set(sdk_target_name) {
     sources = [
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
+      "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_init.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
@@ -438,6 +441,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
+      "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
@@ -553,6 +557,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/gatt_db.c",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_bluetooth.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_board_default_init.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_device_init_clocks.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
@@ -639,6 +645,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s1.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
       ]
     } else if (silabs_family == "efr32mg21") {
@@ -686,11 +693,11 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s2.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_cipher.c",
@@ -730,6 +737,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_mgm24.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s2.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_cipher.c",
@@ -759,6 +767,11 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
+    }
+
+    if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
+        silabs_board == "BRD4187A" || silabs_board == "BRD4187C") {
+      sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
     }
 
     public_deps = [
