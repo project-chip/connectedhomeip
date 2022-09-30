@@ -162,7 +162,7 @@ CHIP_ERROR AppTask::Init()
 #endif
     UpdateDeviceState();
 
-    /* intialize the Keyboard and button press calback */
+    /* intialize the Keyboard and button press callback */
     KBD_Init(KBD_Callback);
 
     // Create FreeRTOS sw timer for Function Selection.
