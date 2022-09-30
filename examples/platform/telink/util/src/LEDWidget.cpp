@@ -18,7 +18,7 @@
 
 #include "LEDWidget.h"
 
-#include <zephyr.h>
+#include <zephyr/zephyr.h>
 
 const struct device * LEDWidget::mPort = NULL;
 

@@ -27,7 +27,7 @@
  * See documentation for your RTOS.
  ****************************************************************/
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 K_MUTEX_DEFINE(mbedtls_entropy_mutex);
 K_MUTEX_DEFINE(mbedtls_ecp_mutex);

@@ -35,7 +35,7 @@
 /*Includes for ieee802154 switchings */
 #define DT_DRV_COMPAT telink_b91_zb
 #include <drivers/ieee802154/b91.h>
-#include <net/ieee802154_radio.h>
+#include <zephyr/net/ieee802154_radio.h>
 
 /* Telink headers */
 #include "drivers.h"

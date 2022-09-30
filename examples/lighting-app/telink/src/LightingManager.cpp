@@ -22,9 +22,9 @@
 
 #include <lib/support/CodeUtils.h>
 
-#include <drivers/pwm.h>
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/drivers/pwm.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app);
 
