@@ -140,6 +140,21 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
+#if CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        ESP_LOGI(TAG, "Thread credentials already provisioned, not initializing BLE");
+        return CHIP_NO_ERROR;
+    }
+#else
+    if (ConnectivityMgr().IsWiFiStationProvisioned()) {
+        ESP_LOGI(TAG, "WiFi station already provisioned, not initializing BLE");
+        return CHIP_NO_ERROR;
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+
     CHIP_ERROR err;
 
     // Initialize the Chip BleLayer.
