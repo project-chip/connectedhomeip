@@ -17,12 +17,12 @@ The GitHub repository also includes tools for testing your Matter project.
 
 Silicon Laboratories now maintains a public matter GitHub repo with frequent
 releases thoroughly tested and validated. Developers looking to develop matter
-products with silabs hardware are encouraged to use our latest release,
-currently 0.3.0, with added tools and documentation.
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases/tag/v0.3.0)
+products with silabs hardware are encouraged to use our latest release with 
+added tools and documentation.
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
 The complete Silabs documentation can be found here
-[SMG Documentation](https://github.com/SiliconLabs/matter/tree/v0.3.0/docs/silabs)
+[SMG Documentation](https://github.com/SiliconLabs/matter#readme)
 
 ## Getting Started with Matter on EFR32
 
