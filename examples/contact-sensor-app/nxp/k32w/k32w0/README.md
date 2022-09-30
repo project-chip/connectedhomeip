@@ -1,8 +1,8 @@
 # CHIP K32W061 Contact Sensor Example Application
 
-The Project CHIP K32W061 Contact Sensor Example uses buttons to test changing the lock
-and device states and LEDs to show the state of these changes. You can use this
-example as a reference for creating your own application.
+The Project CHIP K32W061 Contact Sensor Example uses buttons to test changing
+the lock and device states and LEDs to show the state of these changes. You can
+use this example as a reference for creating your own application.
 
 The example is based on
 [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP K32W
@@ -36,6 +36,7 @@ network.
     -   [OTA Testing](#otatesting)
     -   [Known issues](#otaissues)
 -   [Low power](#low-power)
+
     -   [Known issues](#low-power-issues)
 
     </hr>
@@ -46,19 +47,19 @@ network.
 
 ![K32W061 DK6](../../../../platform/nxp/k32w/k32w0/doc/images/k32w-dk6.jpg)
 
-The K32W061 contact sensor example application provides a working demonstration of a
-connected contact sensor device, built using the Project CHIP codebase and the NXP
-K32W061 SDK. The example supports remote access (e.g.: using CHIP Tool from a
-mobile phone) and control of a simulated contact sensor over a low-power, 802.15.4
-Thread network. It is capable of being paired into an existing Project CHIP
-network along with other Project CHIP-enabled devices.
+The K32W061 contact sensor example application provides a working demonstration
+of a connected contact sensor device, built using the Project CHIP codebase and
+the NXP K32W061 SDK. The example supports remote access (e.g.: using CHIP Tool
+from a mobile phone) and control of a simulated contact sensor over a low-power,
+802.15.4 Thread network. It is capable of being paired into an existing Project
+CHIP network along with other Project CHIP-enabled devices.
 
 The example targets the
 [NXP K32W061 DK6](https://www.nxp.com/products/wireless/thread/k32w061-41-high-performance-secure-and-ultra-low-power-mcu-for-zigbeethread-and-bluetooth-le-5-0-with-built-in-nfc-option:K32W061_41)
 development kit, but is readily adaptable to other K32W-based hardware.
 
-The CHIP device that runs the contact sensor application is controlled by the CHIP
-controller device over the Thread protocol. By default, the CHIP device has
+The CHIP device that runs the contact sensor application is controlled by the
+CHIP controller device over the Thread protocol. By default, the CHIP device has
 Thread disabled, and it should be paired over Bluetooth LE with the CHIP
 controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
@@ -177,9 +178,11 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
+-   Download
+    [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
+
     -   without Secure Element
 
     ```
@@ -191,10 +194,10 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
     ```
-    
-    -   with Secure element
-        Exactly the same steps as above but set chip_with_se05x=1 in the gn command
-        and add argument chip_enable_ota_requestor=false
+
+    -   with Secure element Exactly the same steps as above but set
+        chip_with_se05x=1 in the gn command and add argument
+        chip_enable_ota_requestor=false
 
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
@@ -230,14 +233,15 @@ The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
 ## Known issues
 
--   When using Secure element and cross-compiling on Linux, log messages from the Plug&Trust middleware
-    stack may not echo to the console.
+-   When using Secure element and cross-compiling on Linux, log messages from
+    the Plug&Trust middleware stack may not echo to the console.
 
 <a name="manufacturing"></a>
 
 ## Manufacturing data
 
-See [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+See
+[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
 <a name="flashdebug"></a>
 
@@ -298,8 +302,9 @@ argument _chip_pw_tokenizer_logging=true_ was used.
 
 The detokenizer script must be run inside the example's folder after a
 successful run of the _scripts/activate.sh_ script. The pw_tokenizer module used
-by the script is loaded by the environment. An example of running the detokenizer
-script to see logs of a contact-sensor app:
+by the script is loaded by the environment. An example of running the
+detokenizer script to see logs of a contact-sensor app:
+
 ```
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-contact-example-database.bin -o device.txt
 ```
@@ -546,7 +551,7 @@ user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 
 -   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
     Otherwise, issues related to BLE-WiFi combo may appear.
-    
+
 <a name="low-power"></a>
 
 ## Low power
