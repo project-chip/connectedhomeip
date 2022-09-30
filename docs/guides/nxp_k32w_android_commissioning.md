@@ -1,7 +1,7 @@
 # Commissioning NXP K32W using Android CHIPTool
 
 This article describes how to use
-[CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
+[CHIPTool](../../examples/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
 [NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
 onto a CHIP-enabled Thread network.
@@ -372,7 +372,7 @@ to learn how to build and program the light example onto an K32W061 DK6.
 ## Building and installing Android CHIPTool
 
 To build the CHIPTool application for your smartphone, read
-[Android CHIPTool README](../../src/android/CHIPTool/README.md).
+[Android CHIPTool README](../../examples/android/CHIPTool/README.md).
 
 After building, install the application by completing the following steps:
 
@@ -393,7 +393,7 @@ After building, install the application by completing the following steps:
     replaced with the path to the CHIP source directory:
 
         ```
-        adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        adb install -r chip-dir/examples/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
         ```
 
 6.  Navigate to settings on your smartphone and grant _Camera_ and _Location_
