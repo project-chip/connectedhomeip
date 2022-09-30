@@ -148,7 +148,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
         return CHIP_NO_ERROR;
     }
 #else
-    if (ConnectivityMgr().IsWiFiStationProvisioned()) {
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+    {
         ESP_LOGI(TAG, "WiFi station already provisioned, not initializing BLE");
         return CHIP_NO_ERROR;
     }
