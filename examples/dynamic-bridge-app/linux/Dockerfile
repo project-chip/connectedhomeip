@@ -17,7 +17,7 @@
 
 FROM connectedhomeip/chip-cirque-device-base:latest
 
-COPY out/debug/chip-bridge-app /usr/bin/
+COPY out/debug/dynamic-chip-bridge-app /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "server"]
