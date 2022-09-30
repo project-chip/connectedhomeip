@@ -49,8 +49,8 @@
 #include "OTAUtil.h"
 #endif
 
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
 
 #include <algorithm>
 
