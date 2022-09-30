@@ -146,6 +146,60 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(side=ClusterSide.CLIENT, name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
 
+    def testFabricScopedAndSensitive(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                <name>Test Cluster</name>
+                <code>0x0001</code>
+
+                <event side="server" code="0x1234" name="FabricEvent" priority="info" isFabricSensitive="true" optional="false">
+                  <description>This is a test event</description>
+                  <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
+                  <access op="read" privilege="administer"/>
+                </event>
+
+              </cluster>
+
+              <struct name="FabricStruct" isFabricScoped="true">
+                <cluster code="1"/>
+                <item fieldId="1" name="Field1" type="int32u" isFabricSensitive="true"/>
+                <item fieldId="3" name="Field3" type="int32u" isFabricSensitive="true"/>
+                <item fieldId="10" name="Field10" type="int32u" />
+              </struct>
+
+
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[Cluster(side=ClusterSide.CLIENT,
+                                               name='TestCluster',
+                                               code=1,
+                                               events=[Event(priority=EventPriority.INFO,
+                                                             name='FabricEvent',
+                                                             code=0x1234,
+                                                             fields=[Field(data_type=DataType(name='node_id'),
+                                                                           code=1,
+                                                                           name='AdminNodeID',
+                                                                           attributes={FieldAttribute.NULLABLE})],
+                                                             readacl=AccessPrivilege.ADMINISTER,
+                                                             attributes={EventAttribute.FABRIC_SENSITIVE})],
+                             structs=[Struct(name='FabricStruct',
+                                      fields=[Field(data_type=DataType(name='int32u'),
+                                                    code=1,
+                                                    name='Field1',
+                                                    attributes={FieldAttribute.FABRIC_SENSITIVE}),
+                                              Field(data_type=DataType(name='int32u'),
+                                                    code=3,
+                                                    name='Field3',
+                                                    attributes={FieldAttribute.FABRIC_SENSITIVE}),
+                                              Field(data_type=DataType(name='int32u',
+                                                                       max_length=None),
+                                                    code=10,
+                                                    name='Field10')],
+                                      attributes={StructAttribute.FABRIC_SCOPED})],
+                         )]))
+
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>

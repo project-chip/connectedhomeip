@@ -79,7 +79,7 @@ class EventHandler(BaseHandler):
         )
 
         if attrs.get('isFabricSensitive', "false").lower() == 'true':
-           self._event.attributes.add(EventAttribute.FABRIC_SENSITIVE)
+            self._event.attributes.add(EventAttribute.FABRIC_SENSITIVE)
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
@@ -175,7 +175,6 @@ class StructHandler(BaseHandler, IdlPostProcessor):
 
         if attrs.get('isFabricScoped', "false").lower() == 'true':
             self._struct.attributes.add(StructAttribute.FABRIC_SCOPED)
-
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'item':
