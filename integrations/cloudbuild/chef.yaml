@@ -44,8 +44,10 @@ steps:
       args:
           - "-c"
           - COMMIT_SHA=$COMMIT_SHA SHORT_SHA=$SHORT_SHA REVISION_ID=$REVISION_ID
-            BUILD_ID=$BUILD_ID IMAGE_NAME=$_DOCKER_IMAGE_NAME DEVICE_NAME=$_DOCKER_DEVICE_NAME
-            WORKING_DIR=/workspace/examples/chef TAR_PATH=/workspace/artifacts/linux_x86-$_DOCKER_DEVICE_NAME.tar.gz
+            BUILD_ID=$BUILD_ID IMAGE_NAME=$_DOCKER_IMAGE_NAME
+            DEVICE_NAME=$_DOCKER_DEVICE_NAME
+            WORKING_DIR=/workspace/examples/chef
+            TAR_PATH=/workspace/artifacts/linux_x86-$_DOCKER_DEVICE_NAME.tar.gz
             ./examples/chef/create_docker.sh
       id: DockerAll
       entrypoint: /usr/bin/bash
