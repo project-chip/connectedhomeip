@@ -46,30 +46,11 @@ static_library("telink") {
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-
-    # B91 HW crypto unit
-    "crypto/internal/common.h",
-    "crypto/internal/compatibility/aes_alt.c",
-    "crypto/internal/compatibility/aesni.h",
-    "crypto/internal/compatibility/bn_mul.h",
-    "crypto/internal/compatibility/ecp_alt.c",
-    "crypto/internal/compatibility/ecp_curves_alt.c",
-    "crypto/internal/compatibility/ecp_internal_alt.h",
-    "crypto/internal/compatibility/ecp_invasive.h",
-    "crypto/internal/compatibility/padlock.h",
-    "crypto/internal/ecp_alt_b91_backend.c",
-    "crypto/internal/ecp_alt_b91_backend_test.c",
-    "crypto/internal/entropy_poll_alt.c",
-    "crypto/internal/multithread.c",
-    "crypto/internal/multithread.h",
-    "crypto/internal/test_utils.c",
-    "crypto/internal/test_utils.h",
   ]
 
   deps = []
 
   public_deps = [
-    "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
     "${telink_sdk_build_root}",
   ]
@@ -93,6 +74,4 @@ static_library("telink") {
       "OTAImageProcessorImpl.h",
     ]
   }
-
-  public_deps += [ "${chip_root}/src/crypto" ]
 }
