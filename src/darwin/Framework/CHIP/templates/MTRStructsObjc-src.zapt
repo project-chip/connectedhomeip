@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import "MTRStructsObjc.h"
 
@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_structs}}
-@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -17,9 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} alloc] init];
+  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}} alloc] init];
 
   {{#zcl_struct_items}}
   other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_structs}}
 
 {{#zcl_events}}
-@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -50,9 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event alloc] init];
+  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event alloc] init];
 
   {{#zcl_event_fields}}
   other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};

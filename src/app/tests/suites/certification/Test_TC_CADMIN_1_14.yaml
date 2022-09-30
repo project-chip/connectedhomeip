@@ -58,47 +58,19 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify success response On TH_CE(all-clusters-app) Log
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
 
 
 
-          On DUT_CR2, using chip tool connect to the accessory
+          On TH_CR3, using chip tool connect to the accessory
           ./chip-tool pairing onnetwork 1 20202021  --commissioner-name gamma
 
           Verify you got below message on TH_CE (all-clusters-app) log
-          Device commissioning completed with success
+          Commissioning completed successfully
       disabled: true
 
     - label:
@@ -114,52 +86,22 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify success response On TH_CE (all-clusters-app) Log
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
+
 
 
 
           On TH_CR2 , using chip tool connect to the accessory
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
-
-
           ./chip-tool pairing onnetwork 1 20202021  --commissioner-name beta
 
           Verify you got below message on TH_CE (all-clusters-app) log
 
-          Device commissioning completed with success
+          Commissioning completed successfully
       disabled: true
 
     - label:
@@ -174,39 +116,12 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify success response On TH_CE (all-clusters-app) Log
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -221,11 +136,31 @@ tests:
 
           ./chip-tool administratorcommissioning read window-status 1 0
 
-          Verify on TH_CE (all-clusters-app) log successfully reads the WindowStatus
+          Verify TH_CE successfully reads windowstatus
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
-          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
-          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i"
+          [1661483425.923623][6917:6917] CHIP:DMG: ReportDataMessage =
+          [1661483425.923649][6917:6917] CHIP:DMG: {
+          [1661483425.923667][6917:6917] CHIP:DMG:         AttributeReportIBs =
+          [1661483425.923698][6917:6917] CHIP:DMG:         [
+          [1661483425.923722][6917:6917] CHIP:DMG:                 AttributeReportIB =
+          [1661483425.923752][6917:6917] CHIP:DMG:                 {
+          [1661483425.923777][6917:6917] CHIP:DMG:                         AttributeDataIB =
+          [1661483425.923805][6917:6917] CHIP:DMG:                         {
+          [1661483425.923834][6917:6917] CHIP:DMG:                                 DataVersion = 0x2b727529,
+          [1661483425.923862][6917:6917] CHIP:DMG:                                 AttributePathIB =
+          [1661483425.923891][6917:6917] CHIP:DMG:                                 {
+          [1661483425.923921][6917:6917] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661483425.923951][6917:6917] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661483425.923981][6917:6917] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661483425.924009][6917:6917] CHIP:DMG:                                 }
+          [1661483425.924040][6917:6917] CHIP:DMG:
+          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2,
+          [1661483425.924097][6917:6917] CHIP:DMG:                         },
+          [1661483425.924126][6917:6917] CHIP:DMG:
+          [1661483425.924169][6917:6917] CHIP:DMG:                 },
+          [1661483425.924197][6917:6917] CHIP:DMG:
+          [1661483425.924218][6917:6917] CHIP:DMG:         ],
+          [1661483425.924244][6917:6917] CHIP:DMG:
       disabled: true
 
     - label:
@@ -298,19 +233,11 @@ tests:
 
           ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
-          Verify Manual pairing code on TH_CE (all-clusters-app) Log
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -324,12 +251,35 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool administratorcommissioning read window-status 1 0
+          Verify TH_CE successfully reads windowstatus
 
-          Verify on TH_CE (all-clusters-app) log successfully reads the WindowStatus
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
-          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
-          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i"
+          [1661482777.283822][6453:6453] CHIP:DMG: ReportDataMessage =
+          [1661482777.283855][6453:6453] CHIP:DMG: {
+          [1661482777.283882][6453:6453] CHIP:DMG:         AttributeReportIBs =
+          [1661482777.283921][6453:6453] CHIP:DMG:         [
+          [1661482777.283951][6453:6453] CHIP:DMG:                 AttributeReportIB =
+          [1661482777.283995][6453:6453] CHIP:DMG:                 {
+          [1661482777.284036][6453:6453] CHIP:DMG:                         AttributeDataIB =
+          [1661482777.284080][6453:6453] CHIP:DMG:                         {
+          [1661482777.284122][6453:6453] CHIP:DMG:                                 DataVersion = 0xd3f3fc78,
+          [1661482777.284289][6453:6453] CHIP:DMG:                                 AttributePathIB =
+          [1661482777.284337][6453:6453] CHIP:DMG:                                 {
+          [1661482777.284385][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661482777.284522][6453:6453] CHIP:DMG:                                 }
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1,
+          [1661482777.284655][6453:6453] CHIP:DMG:                         },
+          [1661482777.284699][6453:6453] CHIP:DMG:
+          [1661482777.284733][6453:6453] CHIP:DMG:                 },
+          [1661482777.284773][6453:6453] CHIP:DMG:
+          [1661482777.284803][6453:6453] CHIP:DMG:         ],
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
+          [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
+          [1661482777.284934][6453:6453] CHIP:DMG: }
+          [1661482777.284962][6453:6453] CHIP:DMG:
       disabled: true
 
     - label:
@@ -401,19 +351,11 @@ tests:
 
           ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
-          Verify Manual pairing code on TH_CE (all-clusters-app) Log
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -481,12 +423,35 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool administratorcommissioning read window-status 1 0
+          Verify TH_CE successfully reads windowstatus
 
-          Verify on TH_CE(all-clusters-app) log successfully reads the WindowStatus
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
-          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
-          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i"
+          [1661482777.283822][6453:6453] CHIP:DMG: ReportDataMessage =
+          [1661482777.283855][6453:6453] CHIP:DMG: {
+          [1661482777.283882][6453:6453] CHIP:DMG:         AttributeReportIBs =
+          [1661482777.283921][6453:6453] CHIP:DMG:         [
+          [1661482777.283951][6453:6453] CHIP:DMG:                 AttributeReportIB =
+          [1661482777.283995][6453:6453] CHIP:DMG:                 {
+          [1661482777.284036][6453:6453] CHIP:DMG:                         AttributeDataIB =
+          [1661482777.284080][6453:6453] CHIP:DMG:                         {
+          [1661482777.284122][6453:6453] CHIP:DMG:                                 DataVersion = 0xd3f3fc78,
+          [1661482777.284289][6453:6453] CHIP:DMG:                                 AttributePathIB =
+          [1661482777.284337][6453:6453] CHIP:DMG:                                 {
+          [1661482777.284385][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661482777.284522][6453:6453] CHIP:DMG:                                 }
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 0,
+          [1661482777.284655][6453:6453] CHIP:DMG:                         },
+          [1661482777.284699][6453:6453] CHIP:DMG:
+          [1661482777.284733][6453:6453] CHIP:DMG:                 },
+          [1661482777.284773][6453:6453] CHIP:DMG:
+          [1661482777.284803][6453:6453] CHIP:DMG:         ],
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
+          [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
+          [1661482777.284934][6453:6453] CHIP:DMG: }
+          [1661482777.284962][6453:6453] CHIP:DMG:
       disabled: true
 
     - label: "DUT_CR1 sends command to TH_CE to read AdminFabricIndex attribute"
@@ -498,12 +463,31 @@ tests:
 
           ./chip-tool administratorcommissioning read admin-fabric-index  1 0
 
-          Verify on TH_CE(all-clusters-app) log successfully reads the AdminFabricIndex
+          Verify on TH_CE(all-clusters-app) successfully reads the AdminFabricIndex
 
-          [1659097193.389295][11728:11733] CHIP:DMG: }
-          [1659097193.389588][11728:11733] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0001 DataVersion: 1299585105
-          [1659097193.389731][11728:11733] CHIP:TOO:   AdminFabricIndex: 0
-          [1659097193.389913][11728:11733] CHIP:EM: Sending Standalone Ack for MessageCounter:195671426 on exchange 34244i
+          [1661484456.069189][6930:6930] CHIP:DMG: ReportDataMessage =
+          [1661484456.069213][6930:6930] CHIP:DMG: {
+          [1661484456.069232][6930:6930] CHIP:DMG:         AttributeReportIBs =
+          [1661484456.069259][6930:6930] CHIP:DMG:         [
+          [1661484456.069280][6930:6930] CHIP:DMG:                 AttributeReportIB =
+          [1661484456.069314][6930:6930] CHIP:DMG:                 {
+          [1661484456.069339][6930:6930] CHIP:DMG:                         AttributeDataIB =
+          [1661484456.069366][6930:6930] CHIP:DMG:                         {
+          [1661484456.069395][6930:6930] CHIP:DMG:                                 DataVersion = 0x5698b43f,
+          [1661484456.069427][6930:6930] CHIP:DMG:                                 AttributePathIB =
+          [1661484456.069459][6930:6930] CHIP:DMG:                                 {
+          [1661484456.069492][6930:6930] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661484456.069524][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661484456.069629][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1661484456.069661][6930:6930] CHIP:DMG:                                 }
+          [1661484456.069695][6930:6930] CHIP:DMG:
+          [1661484456.069729][6930:6930] CHIP:DMG:                                 Data = NULL
+          [1661484456.069757][6930:6930] CHIP:DMG:                         },
+          [1661484456.069790][6930:6930] CHIP:DMG:
+          [1661484456.069815][6930:6930] CHIP:DMG:                 },
+          [1661484456.069844][6930:6930] CHIP:DMG:
+          [1661484456.069865][6930:6930] CHIP:DMG:         ],
+          [1661484456.069892][6930:6930] CHIP:DMG:
       disabled: true
 
     - label: "DUT_CR1 sends command to TH_CE to read AdminVendorId attribute"
@@ -513,11 +497,31 @@ tests:
 
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
+          Verify on TH_CE(all-clusters-app) successfully reads the AdminVendorId
+
           ./chip-tool administratorcommissioning read admin-vendor-id 1 0
 
-          Verify on TH_CE(all-clusters-app) log successfully reads the AdminVendorId
-
-          [1658838521.588942][9317:9322] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0002 DataVersion: 2423106591
-          [1658838521.589005][9317:9322] CHIP:TOO:   AdminVendorId: 0
-          [1658838521.589079][9317:9322] CHIP:EM: Sending Standalone Ack for MessageCounter:217165763 on exchange 55683i
+          [1661484515.721772][6930:6930] CHIP:DMG: ReportDataMessage =
+          [1661484515.721809][6930:6930] CHIP:DMG: {
+          [1661484515.721838][6930:6930] CHIP:DMG:         AttributeReportIBs =
+          [1661484515.721880][6930:6930] CHIP:DMG:         [
+          [1661484515.721913][6930:6930] CHIP:DMG:                 AttributeReportIB =
+          [1661484515.721965][6930:6930] CHIP:DMG:                 {
+          [1661484515.722006][6930:6930] CHIP:DMG:                         AttributeDataIB =
+          [1661484515.722051][6930:6930] CHIP:DMG:                         {
+          [1661484515.722100][6930:6930] CHIP:DMG:                                 DataVersion = 0x5698b43f,
+          [1661484515.722146][6930:6930] CHIP:DMG:                                 AttributePathIB =
+          [1661484515.722191][6930:6930] CHIP:DMG:                                 {
+          [1661484515.722242][6930:6930] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661484515.722292][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661484515.722344][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1661484515.722394][6930:6930] CHIP:DMG:                                 }
+          [1661484515.722443][6930:6930] CHIP:DMG:
+          [1661484515.722494][6930:6930] CHIP:DMG:                                 Data = NULL
+          [1661484515.722542][6930:6930] CHIP:DMG:                         },
+          [1661484515.722589][6930:6930] CHIP:DMG:
+          [1661484515.722626][6930:6930] CHIP:DMG:                 },
+          [1661484515.722673][6930:6930] CHIP:DMG:
+          [1661484515.722705][6930:6930] CHIP:DMG:         ],
+          [1661484515.722746][6930:6930] CHIP:DMG:
       disabled: true

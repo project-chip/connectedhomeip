@@ -72,7 +72,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app
+          sudo ./chip-all-clusters-app --wifi
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -584,7 +584,7 @@ tests:
     - label:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
-          1.struct Data field: D_BAD_NOnE"
+          1.struct Data field: D_BAD_NONE"
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":""}]' 1 0

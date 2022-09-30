@@ -507,14 +507,10 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    Inet::IPAddress addr;
     JniUtfString addrJniString(env, address);
-    VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
-                   ChipLogError(Controller, "Failed to parse IP address."),
-                   JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters rendezvousParams =
-        RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams = RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(
+        Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
@@ -1043,9 +1039,9 @@ exit:
     return nullptr;
 }
 
-JNI_METHOD(void, subscribeToPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jint minInterval,
- jint maxInterval)
+JNI_METHOD(void, subscribe)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1060,18 +1056,26 @@ JNI_METHOD(void, subscribeToPath)
     std::vector<app::AttributePathParams> attributePathParamsList;
     err = ParseAttributePathList(attributePathList, attributePathParamsList);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
+
+    std::vector<app::EventPathParams> eventPathParamsList;
+    err = ParseEventPathList(eventPathList, eventPathParamsList);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
 
     app::ReadPrepareParams params(device->GetSecureSession().Value());
     params.mMinIntervalFloorSeconds     = minInterval;
     params.mMaxIntervalCeilingSeconds   = maxInterval;
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
+    params.mpEventPathParamsList        = eventPathParamsList.data();
+    params.mEventPathParamsListSize     = eventPathParamsList.size();
+    params.mKeepSubscriptions           = (keepSubscriptions != JNI_FALSE);
+    params.mIsFabricFiltered            = (isFabricFiltered != JNI_FALSE);
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Subscribe);
+    app::ReadClient * readClient = Platform::New<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Subscribe);
 
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
@@ -1086,8 +1090,9 @@ JNI_METHOD(void, subscribeToPath)
     callback->mReadClient = readClient;
 }
 
-JNI_METHOD(void, readPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList)
+JNI_METHOD(void, read)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jboolean isFabricFiltered)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1103,101 +1108,23 @@ JNI_METHOD(void, readPath)
     err = ParseAttributePathList(attributePathList, attributePathParamsList);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
 
+    std::vector<app::EventPathParams> eventPathParamsList;
+    err = ParseEventPathList(eventPathList, eventPathParamsList);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
+
     app::ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
+    params.mpEventPathParamsList        = eventPathParamsList.data();
+    params.mEventPathParamsListSize     = eventPathParamsList.size();
+
+    params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Read);
-
-    err = readClient->SendRequest(params);
-    if (err != CHIP_NO_ERROR)
-    {
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
-                                                                                  err);
-        delete readClient;
-        delete callback;
-        return;
-    }
-
-    callback->mReadClient = readClient;
-}
-
-JNI_METHOD(void, subscribeToEventPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject eventPathList, jint minInterval,
- jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
-    if (device == nullptr)
-    {
-        ChipLogError(Controller, "No device found");
-        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
-    }
-
-    std::vector<app::EventPathParams> eventPathParamsList;
-    err = ParseEventPathList(eventPathList, eventPathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
-
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mMinIntervalFloorSeconds   = minInterval;
-    params.mMaxIntervalCeilingSeconds = maxInterval;
-    params.mpEventPathParamsList      = eventPathParamsList.data();
-    params.mEventPathParamsListSize   = eventPathParamsList.size();
-    params.mKeepSubscriptions         = (keepSubscriptions != JNI_FALSE);
-    params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
-
-    auto callback = reinterpret_cast<ReportEventCallback *>(callbackHandle);
-
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Subscribe);
-
-    err = readClient->SendAutoResubscribeRequest(std::move(params));
-    if (err != CHIP_NO_ERROR)
-    {
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
-                                                                                  err);
-        delete readClient;
-        delete callback;
-        return;
-    }
-
-    callback->mReadClient = readClient;
-}
-
-JNI_METHOD(void, readEventPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject eventPathList)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
-    if (device == nullptr)
-    {
-        ChipLogError(Controller, "No device found");
-        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
-    }
-
-    std::vector<app::EventPathParams> eventPathParamsList;
-
-    err = ParseEventPathList(eventPathList, eventPathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
-
-    app::ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mpEventPathParamsList    = eventPathParamsList.data();
-    params.mEventPathParamsListSize = eventPathParamsList.size();
-
-    auto callback = reinterpret_cast<ReportEventCallback *>(callbackHandle);
-
-    app::ReadClient * readClient =
-        Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                       callback->mBufferedReadAdapter, app::ReadClient::InteractionType::Read);
+    app::ReadClient * readClient = Platform::New<app::ReadClient>(
+        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)

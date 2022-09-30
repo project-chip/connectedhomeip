@@ -217,7 +217,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         {
             for (size_t i = 0; i < len; i++)
             {
-                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
+                PRETTY_PRINT_SAMELINE("0x%02x, ", value_b[i]);
             }
         }
 

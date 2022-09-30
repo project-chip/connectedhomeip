@@ -34,8 +34,10 @@
  */
 
 // TODO: ADD NS_ASSUME_NONNULL_BEGIN to this header.  When that happens, note
-// that in MTRActionBlock the two callback pointers are nonnull.
+// that in MTRActionBlock the two callback pointers are nonnull and the two
+// arguments of ResponseHandler are both nullable.
 
+typedef void (^ResponseHandler)(id value, NSError * error);
 typedef CHIP_ERROR (^MTRActionBlock)(chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
     chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
 typedef CHIP_ERROR (^MTRLocalActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
@@ -94,11 +96,10 @@ public:
     }
 
     /**
-     * Run the given MTRActionBlock on the Matter thread (possibly
-     * synchronously, if the MTRBaseDevice represents a PASE connection), after
-     * getting a secure session corresponding to the given MTRBaseDevice.  On
-     * success, convert the success value to whatever type it needs to be to
-     * call the callback type we're templated over.
+     * Run the given MTRActionBlock on the Matter thread after getting a secure
+     * session corresponding to the given MTRBaseDevice.  On success, convert
+     * the success value to whatever type it needs to be to call the callback
+     * type we're templated over.
      */
     MTRCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, T OnSuccessFn,
         bool keepAlive)
@@ -109,23 +110,27 @@ public:
         , mSuccess(OnSuccessFn, this)
         , mFailure(OnFailureFn, this)
     {
-        auto * paseDevice = [device paseDevice];
-        if (paseDevice != nullptr) {
-            ActionWithDevice(paseDevice);
+        if (device.isPASEDevice) {
+            ActionWithPASEDevice(device);
         } else {
             ActionWithNodeID(device.nodeID, device.deviceController);
         }
     };
 
-    void ActionWithDevice(chip::DeviceProxy * device)
+    void ActionWithPASEDevice(MTRBaseDevice * device)
     {
         LogRequestStart();
 
-        // Keep doing dispatch_sync here for now, because we don't want device
-        // to become stale.
-        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-            MaybeDoAction(device->GetExchangeManager(), device->GetSecureSession(), nil);
-        });
+        BOOL ok = [device.deviceController
+            getSessionForCommissioneeDevice:device.nodeID
+                                 completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                     const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                     MaybeDoAction(exchangeManager, session, error);
+                                 }];
+
+        if (ok == NO) {
+            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
+        }
     }
 
     void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
@@ -133,10 +138,10 @@ public:
         LogRequestStart();
 
         BOOL ok = [controller getSessionForNode:nodeID
-                              completionHandler:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                  const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                                  MaybeDoAction(exchangeManager, session, error);
-                              }];
+                                     completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                         const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                         MaybeDoAction(exchangeManager, session, error);
+                                     }];
 
         if (ok == NO) {
             OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);

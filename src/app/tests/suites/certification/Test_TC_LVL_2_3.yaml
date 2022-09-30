@@ -39,6 +39,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
+
           ./chip-tool levelcontrol read current-level 1 1
           Verify DUT receives  current-level attribute response on the TH(all-clusters-app) Log:
           [1657279115.433005][4417:4417] CHIP:IM: Received Read request
@@ -522,6 +523,8 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
+
+
           ./chip-tool levelcontrol read current-level 1 1
           Verify DUT receives  current-level attribute response on the TH(all-clusters-minimal-app) Log:
           [1657913862.815749][3126:3126] CHIP:IM: Received Read request
@@ -605,6 +608,28 @@ tests:
           [1657913906.649731][3126:3126] CHIP:DMG:        isFabricFiltered = true,
           [1657913906.649757][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
           [1657913906.649781][3126:3126] CHIP:DMG: },
+
+
+          ./chip-tool levelcontrol read feature-map 1 1
+          Verify DUT receives  feature-map attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663070713.467153][4422:4422] CHIP:IM: Received Read request
+          [1663070713.467242][4422:4422] CHIP:DMG: ReadRequestMessage =
+          [1663070713.467275][4422:4422] CHIP:DMG: {
+          [1663070713.467300][4422:4422] CHIP:DMG:         AttributePathIBs =
+          [1663070713.467329][4422:4422] CHIP:DMG:         [
+          [1663070713.467355][4422:4422] CHIP:DMG:                 AttributePathIB =
+          [1663070713.467390][4422:4422] CHIP:DMG:                 {
+          [1663070713.467422][4422:4422] CHIP:DMG:                         Endpoint = 0x1,
+          [1663070713.467455][4422:4422] CHIP:DMG:                         Cluster = 0x8,
+          [1663070713.467487][4422:4422] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1663070713.467517][4422:4422] CHIP:DMG:                 }
+          [1663070713.467548][4422:4422] CHIP:DMG:
+          [1663070713.467576][4422:4422] CHIP:DMG:         ],
+          [1663070713.467606][4422:4422] CHIP:DMG:
+          [1663070713.467635][4422:4422] CHIP:DMG:         isFabricFiltered = true,
+          [1663070713.467663][4422:4422] CHIP:DMG:         InteractionModelRevision = 1
+          [1663070713.467689][4422:4422] CHIP:DMG: },
+          [1663070713.467767][4422:4422] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
@@ -614,20 +639,158 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           TH all-clusters-minimal-app does not support optional attributes
-          To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
+
            ./chip-tool levelcontrol read remaining-time 1 1
+          Verify DUT(chip-tool) receives  remaining-time attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147148.155292][37702:37702] CHIP:IM: Received Read request
+          [1663147148.155312][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147148.155315][37702:37702] CHIP:DMG: {
+          [1663147148.155317][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147148.155320][37702:37702] CHIP:DMG:         [
+          [1663147148.155323][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147148.155326][37702:37702] CHIP:DMG:                 {
+          [1663147148.155328][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147148.155331][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147148.155334][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1663147148.155338][37702:37702] CHIP:DMG:                 }
+          [1663147148.155341][37702:37702] CHIP:DMG:
+          [1663147148.155343][37702:37702] CHIP:DMG:         ],
+          [1663147148.155346][37702:37702] CHIP:DMG:
+          [1663147148.155349][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147148.155351][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147148.155353][37702:37702] CHIP:DMG: },
+          [1663147148.155366][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663147148.155376][37702:37702] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
+
 
            ./chip-tool levelcontrol read min-level 1 1
+          Verify DUT(chip-tool) receives  min-level attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147176.255360][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147176.255364][37702:37702] CHIP:DMG: {
+          [1663147176.255368][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147176.255373][37702:37702] CHIP:DMG:         [
+          [1663147176.255376][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147176.255381][37702:37702] CHIP:DMG:                 {
+          [1663147176.255385][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147176.255389][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147176.255393][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1663147176.255396][37702:37702] CHIP:DMG:                 }
+          [1663147176.255401][37702:37702] CHIP:DMG:
+          [1663147176.255404][37702:37702] CHIP:DMG:         ],
+          [1663147176.255409][37702:37702] CHIP:DMG:
+          [1663147176.255413][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147176.255416][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147176.255419][37702:37702] CHIP:DMG: },
+          [1663147176.255436][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663147176.255451][37702:37702] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
 
            ./chip-tool levelcontrol read max-level 1 1
+          Verify DUT(chip-tool) receives  max-level attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147204.133512][37702:37702] CHIP:IM: Received Read request
+          [1663147204.133528][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147204.133531][37702:37702] CHIP:DMG: {
+          [1663147204.133533][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147204.133536][37702:37702] CHIP:DMG:         [
+          [1663147204.133538][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147204.133541][37702:37702] CHIP:DMG:                 {
+          [1663147204.133543][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147204.133546][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147204.133549][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0003,
+          [1663147204.133551][37702:37702] CHIP:DMG:                 }
+          [1663147204.133553][37702:37702] CHIP:DMG:
+          [1663147204.133555][37702:37702] CHIP:DMG:         ],
+          [1663147204.133558][37702:37702] CHIP:DMG:
+          [1663147204.133561][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147204.133563][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147204.133565][37702:37702] CHIP:DMG: },
+          [1663147204.133577][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663147204.133587][37702:37702] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
           ./chip-tool levelcontrol read current-frequency 1 1
+          Verify DUT(chip-tool) receives  current-frequency attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147223.228680][37702:37702] CHIP:IM: Received Read request
+          [1663147223.228702][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147223.228706][37702:37702] CHIP:DMG: {
+          [1663147223.228710][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147223.228714][37702:37702] CHIP:DMG:         [
+          [1663147223.228717][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147223.228722][37702:37702] CHIP:DMG:                 {
+          [1663147223.228726][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147223.228730][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147223.228734][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1663147223.228738][37702:37702] CHIP:DMG:                 }
+          [1663147223.228742][37702:37702] CHIP:DMG:
+          [1663147223.228746][37702:37702] CHIP:DMG:         ],
+          [1663147223.228751][37702:37702] CHIP:DMG:
+          [1663147223.228754][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147223.228758][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147223.228761][37702:37702] CHIP:DMG: },
+          [1663147223.228780][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool levelcontrol read min-frequency 1 1
+          Verify DUT(chip-tool) receives min-frequency attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147242.442251][37702:37702] CHIP:IM: Received Read request
+          [1663147242.442277][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147242.442282][37702:37702] CHIP:DMG: {
+          [1663147242.442287][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147242.442293][37702:37702] CHIP:DMG:         [
+          [1663147242.442298][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147242.442304][37702:37702] CHIP:DMG:                 {
+          [1663147242.442309][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147242.442315][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147242.442320][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1663147242.442324][37702:37702] CHIP:DMG:                 }
+          [1663147242.442331][37702:37702] CHIP:DMG:
+          [1663147242.442336][37702:37702] CHIP:DMG:         ],
+          [1663147242.442342][37702:37702] CHIP:DMG:
+          [1663147242.442347][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147242.442352][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147242.442355][37702:37702] CHIP:DMG: },
+          [1663147242.442378][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
 
            ./chip-tool levelcontrol read max-frequency 1 1
+          Verify DUT(chip-tool) receives  max-frequency attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147259.687422][37702:37702] CHIP:IM: Received Read request
+          [1663147259.687445][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147259.687450][37702:37702] CHIP:DMG: {
+          [1663147259.687454][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147259.687458][37702:37702] CHIP:DMG:         [
+          [1663147259.687463][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147259.687469][37702:37702] CHIP:DMG:                 {
+          [1663147259.687474][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147259.687478][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147259.687481][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0006,
+          [1663147259.687485][37702:37702] CHIP:DMG:                 }
+          [1663147259.687490][37702:37702] CHIP:DMG:
+          [1663147259.687494][37702:37702] CHIP:DMG:         ],
+          [1663147259.687500][37702:37702] CHIP:DMG:
+          [1663147259.687504][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147259.687509][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147259.687513][37702:37702] CHIP:DMG: },
+          [1663147259.687532][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool levelcontrol read on-off-transition-time 1 1
+          Verify DUT(chip-tool) receives  on-off-transition-time attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147276.525081][37702:37702] CHIP:IM: Received Read request
+          [1663147276.525105][37702:37702] CHIP:DMG: ReadRequestMessage =
+          [1663147276.525110][37702:37702] CHIP:DMG: {
+          [1663147276.525115][37702:37702] CHIP:DMG:         AttributePathIBs =
+          [1663147276.525120][37702:37702] CHIP:DMG:         [
+          [1663147276.525124][37702:37702] CHIP:DMG:                 AttributePathIB =
+          [1663147276.525129][37702:37702] CHIP:DMG:                 {
+          [1663147276.525133][37702:37702] CHIP:DMG:                         Endpoint = 0x1,
+          [1663147276.525138][37702:37702] CHIP:DMG:                         Cluster = 0x8,
+          [1663147276.525143][37702:37702] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1663147276.525148][37702:37702] CHIP:DMG:                 }
+          [1663147276.525155][37702:37702] CHIP:DMG:
+          [1663147276.525159][37702:37702] CHIP:DMG:         ],
+          [1663147276.525166][37702:37702] CHIP:DMG:
+          [1663147276.525171][37702:37702] CHIP:DMG:         isFabricFiltered = true,
+          [1663147276.525177][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147276.525181][37702:37702] CHIP:DMG: },
+          [1663147276.525202][37702:37702] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
@@ -637,10 +800,149 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           TH all-clusters-minimal-app does not support optional attributes
-          To verify this behaviour send the below mentioned commands and check the result as unsupported attribute
+
            ./chip-tool levelcontrol write on-off-transition-time 5 1 1
+          Verify DUT(chip-tool) receives  on-off-transition-time attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147558.231731][37702:37702] CHIP:IM: Received Write request
+          [1663147558.231735][37702:37702] CHIP:DMG: IM WH moving to [Initialized]
+          [1663147558.231746][37702:37702] CHIP:DMG: WriteRequestMessage =
+          [1663147558.231749][37702:37702] CHIP:DMG: {
+          [1663147558.231753][37702:37702] CHIP:DMG:         suppressResponse = false,
+          [1663147558.231757][37702:37702] CHIP:DMG:         timedRequest = false,
+          [1663147558.231760][37702:37702] CHIP:DMG:         AttributeDataIBs =
+          [1663147558.231765][37702:37702] CHIP:DMG:         [
+          [1663147558.231767][37702:37702] CHIP:DMG:                 AttributeDataIB =
+          [1663147558.231771][37702:37702] CHIP:DMG:                 {
+          [1663147558.231773][37702:37702] CHIP:DMG:                         AttributePathIB =
+          [1663147558.231777][37702:37702] CHIP:DMG:                         {
+          [1663147558.231781][37702:37702] CHIP:DMG:                                 Endpoint = 0x1,
+          [1663147558.231784][37702:37702] CHIP:DMG:                                 Cluster = 0x8,
+          [1663147558.231789][37702:37702] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1663147558.231792][37702:37702] CHIP:DMG:                         }
+          [1663147558.231795][37702:37702] CHIP:DMG:
+          [1663147558.231798][37702:37702] CHIP:DMG:                         Data = 5,
+          [1663147558.231801][37702:37702] CHIP:DMG:                 },
+          [1663147558.231805][37702:37702] CHIP:DMG:
+          [1663147558.231809][37702:37702] CHIP:DMG:         ],
+          [1663147558.231813][37702:37702] CHIP:DMG:
+          [1663147558.231816][37702:37702] CHIP:DMG:         moreChunkedMessages = false,
+          [1663147558.231820][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147558.231822][37702:37702] CHIP:DMG: },
+          [1663147558.231844][37702:37702] CHIP:DMG: IM WH moving to [AddStatus]
+
            ./chip-tool levelcontrol write on-transition-time 5 1 1
+          Verify DUT(chip-tool) receives  on-transition-time attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147582.702165][37702:37702] CHIP:IM: Received Write request
+          [1663147582.702168][37702:37702] CHIP:DMG: IM WH moving to [Initialized]
+          [1663147582.702179][37702:37702] CHIP:DMG: WriteRequestMessage =
+          [1663147582.702182][37702:37702] CHIP:DMG: {
+          [1663147582.702185][37702:37702] CHIP:DMG:         suppressResponse = false,
+          [1663147582.702188][37702:37702] CHIP:DMG:         timedRequest = false,
+          [1663147582.702191][37702:37702] CHIP:DMG:         AttributeDataIBs =
+          [1663147582.702196][37702:37702] CHIP:DMG:         [
+          [1663147582.702199][37702:37702] CHIP:DMG:                 AttributeDataIB =
+          [1663147582.702202][37702:37702] CHIP:DMG:                 {
+          [1663147582.702205][37702:37702] CHIP:DMG:                         AttributePathIB =
+          [1663147582.702209][37702:37702] CHIP:DMG:                         {
+          [1663147582.702212][37702:37702] CHIP:DMG:                                 Endpoint = 0x1,
+          [1663147582.702216][37702:37702] CHIP:DMG:                                 Cluster = 0x8,
+          [1663147582.702219][37702:37702] CHIP:DMG:                                 Attribute = 0x0000_0012,
+          [1663147582.702222][37702:37702] CHIP:DMG:                         }
+          [1663147582.702226][37702:37702] CHIP:DMG:
+          [1663147582.702230][37702:37702] CHIP:DMG:                         Data = 5,
+          [1663147582.702233][37702:37702] CHIP:DMG:                 },
+          [1663147582.702236][37702:37702] CHIP:DMG:
+          [1663147582.702239][37702:37702] CHIP:DMG:         ],
+          [1663147582.702243][37702:37702] CHIP:DMG:
+          [1663147582.702246][37702:37702] CHIP:DMG:         moreChunkedMessages = false,
+          [1663147582.702248][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147582.702252][37702:37702] CHIP:DMG: },
+          [1663147582.702271][37702:37702] CHIP:DMG: IM WH moving to [AddStatus]
+
            ./chip-tool levelcontrol write off-transition-time 5 1 1
+          Verify DUT(chip-tool) receives  off-transition-time attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147605.317885][37702:37702] CHIP:IM: Received Write request
+          [1663147605.317891][37702:37702] CHIP:DMG: IM WH moving to [Initialized]
+          [1663147605.317910][37702:37702] CHIP:DMG: WriteRequestMessage =
+          [1663147605.317915][37702:37702] CHIP:DMG: {
+          [1663147605.317920][37702:37702] CHIP:DMG:         suppressResponse = false,
+          [1663147605.317925][37702:37702] CHIP:DMG:         timedRequest = false,
+          [1663147605.317930][37702:37702] CHIP:DMG:         AttributeDataIBs =
+          [1663147605.317936][37702:37702] CHIP:DMG:         [
+          [1663147605.317941][37702:37702] CHIP:DMG:                 AttributeDataIB =
+          [1663147605.317945][37702:37702] CHIP:DMG:                 {
+          [1663147605.317950][37702:37702] CHIP:DMG:                         AttributePathIB =
+          [1663147605.317956][37702:37702] CHIP:DMG:                         {
+          [1663147605.317962][37702:37702] CHIP:DMG:                                 Endpoint = 0x1,
+          [1663147605.317968][37702:37702] CHIP:DMG:                                 Cluster = 0x8,
+          [1663147605.317973][37702:37702] CHIP:DMG:                                 Attribute = 0x0000_0013,
+          [1663147605.317978][37702:37702] CHIP:DMG:                         }
+          [1663147605.317985][37702:37702] CHIP:DMG:
+          [1663147605.317990][37702:37702] CHIP:DMG:                         Data = 5,
+          [1663147605.317996][37702:37702] CHIP:DMG:                 },
+          [1663147605.318002][37702:37702] CHIP:DMG:
+          [1663147605.318007][37702:37702] CHIP:DMG:         ],
+          [1663147605.318014][37702:37702] CHIP:DMG:
+          [1663147605.318018][37702:37702] CHIP:DMG:         moreChunkedMessages = false,
+          [1663147605.318024][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147605.318028][37702:37702] CHIP:DMG: },
+          [1663147605.318058][37702:37702] CHIP:DMG: IM WH moving to [AddStatus]
+
            ./chip-tool levelcontrol write default-move-rate 5 1 1
+          Verify DUT(chip-tool) receives  default-move-rate attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147644.857538][37702:37702] CHIP:IM: Received Write request
+          [1663147644.857541][37702:37702] CHIP:DMG: IM WH moving to [Initialized]
+          [1663147644.857552][37702:37702] CHIP:DMG: WriteRequestMessage =
+          [1663147644.857555][37702:37702] CHIP:DMG: {
+          [1663147644.857557][37702:37702] CHIP:DMG:         suppressResponse = false,
+          [1663147644.857560][37702:37702] CHIP:DMG:         timedRequest = false,
+          [1663147644.857562][37702:37702] CHIP:DMG:         AttributeDataIBs =
+          [1663147644.857566][37702:37702] CHIP:DMG:         [
+          [1663147644.857568][37702:37702] CHIP:DMG:                 AttributeDataIB =
+          [1663147644.857571][37702:37702] CHIP:DMG:                 {
+          [1663147644.857574][37702:37702] CHIP:DMG:                         AttributePathIB =
+          [1663147644.857577][37702:37702] CHIP:DMG:                         {
+          [1663147644.857580][37702:37702] CHIP:DMG:                                 Endpoint = 0x1,
+          [1663147644.857582][37702:37702] CHIP:DMG:                                 Cluster = 0x8,
+          [1663147644.857585][37702:37702] CHIP:DMG:                                 Attribute = 0x0000_0014,
+          [1663147644.857587][37702:37702] CHIP:DMG:                         }
+          [1663147644.857591][37702:37702] CHIP:DMG:
+          [1663147644.857594][37702:37702] CHIP:DMG:                         Data = 5,
+          [1663147644.857596][37702:37702] CHIP:DMG:                 },
+          [1663147644.857601][37702:37702] CHIP:DMG:
+          [1663147644.857603][37702:37702] CHIP:DMG:         ],
+          [1663147644.857606][37702:37702] CHIP:DMG:
+          [1663147644.857609][37702:37702] CHIP:DMG:         moreChunkedMessages = false,
+          [1663147644.857611][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147644.857613][37702:37702] CHIP:DMG: },
+          [1663147644.857629][37702:37702] CHIP:DMG: IM WH moving to [AddStatus]
+
            ./chip-tool levelcontrol write start-up-current-level 5 1 1
+          Verify DUT(chip-tool) receives  start-up-current-level attribute response on the TH(all-clusters-minimal-app) Log:
+          [1663147665.149448][37702:37702] CHIP:IM: Received Write request
+          [1663147665.149453][37702:37702] CHIP:DMG: IM WH moving to [Initialized]
+          [1663147665.149474][37702:37702] CHIP:DMG: WriteRequestMessage =
+          [1663147665.149480][37702:37702] CHIP:DMG: {
+          [1663147665.149486][37702:37702] CHIP:DMG:         suppressResponse = false,
+          [1663147665.149492][37702:37702] CHIP:DMG:         timedRequest = false,
+          [1663147665.149497][37702:37702] CHIP:DMG:         AttributeDataIBs =
+          [1663147665.149506][37702:37702] CHIP:DMG:         [
+          [1663147665.149511][37702:37702] CHIP:DMG:                 AttributeDataIB =
+          [1663147665.149520][37702:37702] CHIP:DMG:                 {
+          [1663147665.149525][37702:37702] CHIP:DMG:                         AttributePathIB =
+          [1663147665.149532][37702:37702] CHIP:DMG:                         {
+          [1663147665.149539][37702:37702] CHIP:DMG:                                 Endpoint = 0x1,
+          [1663147665.149545][37702:37702] CHIP:DMG:                                 Cluster = 0x8,
+          [1663147665.149552][37702:37702] CHIP:DMG:                                 Attribute = 0x0000_4000,
+          [1663147665.149558][37702:37702] CHIP:DMG:                         }
+          [1663147665.149565][37702:37702] CHIP:DMG:
+          [1663147665.149572][37702:37702] CHIP:DMG:                         Data = 5,
+          [1663147665.149578][37702:37702] CHIP:DMG:                 },
+          [1663147665.149586][37702:37702] CHIP:DMG:
+          [1663147665.149590][37702:37702] CHIP:DMG:         ],
+          [1663147665.149598][37702:37702] CHIP:DMG:
+          [1663147665.149604][37702:37702] CHIP:DMG:         moreChunkedMessages = false,
+          [1663147665.149609][37702:37702] CHIP:DMG:         InteractionModelRevision = 1
+          [1663147665.149614][37702:37702] CHIP:DMG: },
+          [1663147665.149652][37702:37702] CHIP:DMG: IM WH moving to [AddStatus]
       disabled: true

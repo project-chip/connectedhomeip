@@ -56,6 +56,60 @@ tests:
               type: list
               contains: [0, 1, 8, 65528, 65529, 65531, 65532, 65533]
 
+    - label: "Read optional attribute(UpTime) in AttributeList"
+      PICS: DGGEN.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Read optional attribute(TotalOperationalHours) in AttributeList"
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read optional attribute(BootReason) in AttributeList"
+      PICS: DGGEN.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Read optional attribute(ActiveHardwareFaults) in AttributeList"
+      PICS: DGGEN.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Read optional attribute(ActiveRadioFaults) in AttributeList"
+      PICS: DGGEN.S.A0006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "Read optional attribute(ActiveNetworkFaults) in AttributeList"
+      PICS: DGGEN.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"

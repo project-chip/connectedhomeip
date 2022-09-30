@@ -27,6 +27,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -44,6 +45,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -55,6 +58,7 @@ using namespace ::chip::DeviceLayer;
 #define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define QPG_LIGHT_ENDPOINT_ID (1)
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -250,8 +254,11 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
     // Setup light
     err = LightingMgr().Init();
@@ -587,23 +594,17 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
  */
 void AppTask::UpdateClusterState(void)
 {
-    uint8_t newValue;
-
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    // write the new on/off value
-    newValue = LightingMgr().IsTurnedOn();
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    // Write the new on/off value
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 
-    newValue = LightingMgr().GetLevel();
-    status   = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                   ZCL_INT8U_ATTRIBUTE_TYPE);
-
+    // Write new level value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating level %x", status);

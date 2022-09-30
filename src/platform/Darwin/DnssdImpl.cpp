@@ -96,6 +96,11 @@ std::string GetFullTypeWithSubTypes(const DnssdService * service)
     return GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
 }
 
+std::string GetHostNameWithDomain(const char * hostname)
+{
+    return std::string(hostname) + '.' + kLocalDot;
+}
+
 void LogOnFailure(const char * name, DNSServiceErrorType err)
 {
     if (kDNSServiceErr_NoError != err)
@@ -172,10 +177,10 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
-                    uint16_t port, ScopedTXTRecord & record)
+                    uint16_t port, ScopedTXTRecord & record, Inet::IPAddressType addressType, const char * hostname)
 {
-    ChipLogProgress(Discovery, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, name, port, type,
-                    interfaceId);
+    ChipLogDetail(Discovery, "Registering service %s on host %s with port %u and type: %s on interface id: %" PRIu32, name,
+                  hostname, port, type, interfaceId);
 
     RegisterContext * sdCtx = nullptr;
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfType(type, &sdCtx))
@@ -188,8 +193,10 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     sdCtx = chip::Platform::New<RegisterContext>(type, name, callback, context);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
+    sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
+
     DNSServiceRef sdRef;
-    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, nullptr, ntohs(port), record.size(),
+    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, ntohs(port), record.size(),
                                   record.data(), OnRegister, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
@@ -362,13 +369,17 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strcmp(service->mHostName, "") != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ScopedTXTRecord record;
     ReturnErrorOnFailure(record.Init(service->mTextEntries, service->mTextEntrySize));
 
     auto regtype     = GetFullTypeWithSubTypes(service);
     auto interfaceId = GetInterfaceId(service->mInterface);
-    return Register(context, callback, interfaceId, regtype.c_str(), service->mName, service->mPort, record);
+    auto hostname    = GetHostNameWithDomain(service->mHostName);
+
+    return Register(context, callback, interfaceId, regtype.c_str(), service->mName, service->mPort, record, service->mAddressType,
+                    hostname.c_str());
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()
@@ -376,9 +387,8 @@ CHIP_ERROR ChipDnssdRemoveServices()
     auto err = MdnsContexts::GetInstance().RemoveAllOfType(ContextType::Register);
     if (CHIP_ERROR_KEY_NOT_FOUND == err)
     {
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
-
     return err;
 }
 

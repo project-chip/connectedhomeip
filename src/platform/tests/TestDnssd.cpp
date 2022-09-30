@@ -82,6 +82,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
 
     service.mInterface = chip::Inet::InterfaceId::Null();
     service.mPort      = 80;
+    strcpy(service.mHostName, "MatterTest");
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
     service.mAddressType   = chip::Inet::IPAddressType::kAny;

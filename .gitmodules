@@ -51,8 +51,8 @@
 	branch  = master
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/qpg-connectedhomeip
-	branch  = master
+	url = https://github.com/Qorvo/QMatter
+	branch  = v0.9.0.0-libs
 	platforms = qpg
 [submodule "zap"]
 	path = third_party/zap/repo
@@ -272,4 +272,19 @@
 	path = third_party/bouffalolab/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk.git
 	branch = master
-	platforms = bl602
+	platforms = bouffalolab,bl602
+[submodule "third_party/mt793x_sdk/filogic"]
+	path = third_party/mt793x_sdk/filogic
+	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
+	branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/mDNSResponder"]
+	path = third_party/mt793x_sdk/mDNSResponder
+	url = https://github.com/matter-mtk/genio-matter-mdnsresponder.git
+	branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/lwip"]
+	path = third_party/mt793x_sdk/lwip
+	url = https://github.com/matter-mtk/genio-matter-lwip.git
+	branch = main
+	platforms = genio

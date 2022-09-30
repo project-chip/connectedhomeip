@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 /**
  * The current state of the device.
@@ -134,8 +134,28 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end
 

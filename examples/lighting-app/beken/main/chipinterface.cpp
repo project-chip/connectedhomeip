@@ -15,9 +15,11 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Server.h"
+
+#include <common/BekenAppServer.h>
+#include <common/CHIPDeviceManager.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -33,31 +35,14 @@
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
-//#if CONFIG_ENABLE_OTA_REQUESTOR
-#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
-#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTADownloader.h>
-#include <lib/core/OTAImageHeader.h>
-#include <platform/Beken/OTAImageProcessorImpl.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/OTAImageProcessor.h>
-//#endif
+#include <ota/OTAHelper.h>
 
-// using chip::OTAImageProcessorImpl;
-using chip::BDXDownloader;
 using chip::ByteSpan;
-using chip::DefaultOTARequestor;
 using chip::EndpointId;
 using chip::FabricIndex;
-using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
-using chip::OTADownloader;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
@@ -65,160 +50,13 @@ using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
 using namespace chip::Messaging;
-using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-namespace {
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
-                                      &(NetworkCommissioning::BekenWiFiDriver::GetInstance()));
-} // namespace
-
-static DeviceCallbacks EchoCallbacks;
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-ExtendedOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
-
-// need to check CONFIG_RENDEZVOUS_MODE
-bool isRendezvousBLE()
-{
-    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
-    return flags.Has(RendezvousInformationFlag::kBLE);
-}
-
-//#if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void QueryImageCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling QueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
-}
-
-extern "C" void ApplyUpdateCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling ApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
-}
-
-extern "C" void NotifyUpdateAppliedHandler(uint32_t version)
-{
-    ChipLogProgress(DeviceLayer, "NotifyUpdateApplied");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->NotifyUpdateApplied(); });
-}
-
-extern "C" void BkQueryImageCmdHandler(char * pcWriteBuffer, int xWriteBufferLen, int argc, char ** argv)
-{
-    uint32_t dwLoop   = 0;
-    uint32_t nodeId   = 0;
-    uint32_t fabricId = 0;
-
-    char cmd0 = 0;
-    char cmd1 = 0;
-
-    for (dwLoop = 0; dwLoop < argc; dwLoop++)
-    {
-        ChipLogProgress(DeviceLayer, "QueryImageArgument %d = %s\r\n", dwLoop + 1, argv[dwLoop]);
-    }
-
-    if (argc == 3)
-    {
-        cmd0   = argv[1][0] - 0x30;
-        cmd1   = argv[1][1] - 0x30;
-        nodeId = (uint32_t)(cmd0 * 10 + cmd1);
-
-        cmd0     = argv[2][0] - 0x30;
-        cmd1     = argv[2][1] - 0x30;
-        fabricId = (uint32_t)(cmd0 * 10 + cmd1);
-        ChipLogProgress(DeviceLayer, "nodeId %lu,fabricId %lu\r\n", nodeId, fabricId);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "cmd param error ");
-        return;
-    }
-
-    QueryImageCmdHandler();
-    ChipLogProgress(DeviceLayer, "QueryImageCmdHandler begin");
-
-    return;
-}
-
-extern "C" void BkApplyUpdateCmdHandler(char * pcWriteBuffer, int xWriteBufferLen, int argc, char ** argv)
-{
-    // ApplyUpdateCmdHandler();
-    ChipLogProgress(DeviceLayer, "ApplyUpdateCmdHandler send request");
-
-    return;
-}
-
-extern "C" void BkNotifyUpdateApplied(char * pcWriteBuffer, int xWriteBufferLen, int argc, char ** argv)
-{
-    uint32_t dwLoop  = 0;
-    uint32_t version = 0;
-
-    char cmd0 = 0;
-    char cmd1 = 0;
-
-    for (dwLoop = 0; dwLoop < argc; dwLoop++)
-    {
-        ChipLogProgress(DeviceLayer, "NotifyUpdateApplied %d = %s\r\n", dwLoop + 1, argv[dwLoop]);
-    }
-
-    if (argc == 2)
-    {
-        cmd0    = argv[1][0] - 0x30;
-        cmd1    = argv[1][1] - 0x30;
-        version = (uint32_t)(cmd0 * 10 + cmd1);
-
-        ChipLogProgress(DeviceLayer, "version %lu \r\n", version);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "cmd param error ");
-        return;
-    }
-
-    NotifyUpdateAppliedHandler(version);
-    ChipLogProgress(DeviceLayer, "NotifyUpdateApplied send request");
-
-    return;
-}
-
-static void InitOTARequestor(void)
-{
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-
-    // Set server instance used for session establishment
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
-}
-//#endif // CONFIG_ENABLE_OTA_REQUESTOR
+static AppDeviceCallbacks EchoCallbacks;
 
 void OnIdentifyStart(Identify *)
 {
@@ -347,15 +185,9 @@ extern "C" void _init(void)
 
 static void InitServer(intptr_t context)
 {
-    // Init ZCL Data Model and CHIP App Server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
+    BekenAppServer::Init();
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    sWiFiNetworkCommissioningInstance.Init();
-    InitOTARequestor();
+    OTAHelpers::Instance().InitOTARequestor();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 }
 

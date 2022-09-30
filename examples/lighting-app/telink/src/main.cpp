@@ -21,7 +21,7 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 LOG_MODULE_REGISTER(app);
 

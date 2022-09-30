@@ -112,7 +112,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
-        Descriptor::Structs::DeviceType::Type deviceStruct;
+        Descriptor::Structs::DeviceTypeStruct::Type deviceStruct;
         CHIP_ERROR err2;
 
         auto deviceTypeList = emberAfDeviceTypeListFromEndpoint(endpoint, err2);
@@ -161,7 +161,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
     switch (aPath.mAttributeId)
     {
-    case DeviceList::Id: {
+    case DeviceTypeList::Id: {
         return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
     }
     case ServerList::Id: {

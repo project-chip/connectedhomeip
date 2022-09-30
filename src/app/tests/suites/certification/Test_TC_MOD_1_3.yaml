@@ -241,7 +241,33 @@ tests:
           [1659589890.492658][3088:3088] CHIP:DMG:         InteractionModelRevision = 1
           [1659589890.492679][3088:3088] CHIP:DMG: },
 
+          ./chip-tool modeselect read feature-map  1 1
 
+          verify the " feature-map " on the TH (all-cluster-minimal-app) log:
+
+          [1663142252.747239][5476:5476] CHIP:IM: Received Read request
+          [1663142252.747411][5476:5476] CHIP:DMG: ReadRequestMessage =
+          [1663142252.747649][5476:5476] CHIP:DMG: {
+          [1663142252.747731][5476:5476] CHIP:DMG:         AttributePathIBs =
+          [1663142252.747799][5476:5476] CHIP:DMG:         [
+          [1663142252.747861][5476:5476] CHIP:DMG:                 AttributePathIB =
+          [1663142252.747966][5476:5476] CHIP:DMG:                 {
+          [1663142252.748039][5476:5476] CHIP:DMG:                         Endpoint = 0x1,
+          [1663142252.748137][5476:5476] CHIP:DMG:                         Cluster = 0x50,
+          [1663142252.748226][5476:5476] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1663142252.748321][5476:5476] CHIP:DMG:                 }
+          [1663142252.748398][5476:5476] CHIP:DMG:
+          [1663142252.748488][5476:5476] CHIP:DMG:         ],
+          [1663142252.748561][5476:5476] CHIP:DMG:
+          [1663142252.748627][5476:5476] CHIP:DMG:         isFabricFiltered = true,
+          [1663142252.748716][5476:5476] CHIP:DMG:         InteractionModelRevision = 1
+          [1663142252.748775][5476:5476] CHIP:DMG: },
+          [1663142252.748965][5476:5476] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663142252.749188][5476:5476] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663142252.749311][5476:5476] CHIP:DMG: <RE:Run> Cluster 50, Attribute fffc is dirty
+          [1663142252.749358][5476:5476] CHIP:DMG: Reading attribute: Cluster=0x0000_0050 Endpoint=1 AttributeId=0x0000_FFFC (expanded=0)
+          [1663142252.749531][5476:5476] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0050 e=1 p=v
+          [1663142252.749617][5476:5476] CHIP:DMG: AccessControl: allowed
 
           ./chip-tool modeselect read supported-modes 1 1
 

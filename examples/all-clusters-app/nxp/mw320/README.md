@@ -33,6 +33,7 @@ Building the example application is quite straightforward. It can be done via
 following commands:
 
 ```
+$ cd examples/all-clusters-app/nxp/mw320/
 $ git submodule update --init
 $ source third_party/connectedhomeip/scripts/activate.sh
 $ gn gen out/debug
@@ -56,7 +57,7 @@ Note: This solution is temporary.
 In order to use the tinycrypt ecc operations, use the following build arguments:
 
 ```
-$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" mbedtls_use_tinycrypt=true'
+$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" chip_crypto="tinycrypt"'
 ```
 
 <a name="flashdebug"></a>

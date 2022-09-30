@@ -24,6 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
 
 #include <lwip_netconf.h>
@@ -87,8 +88,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = taskStatusArray[x].xTaskNumber;
 
@@ -196,8 +196,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             NetworkInterface * ifp = new NetworkInterface();
 
-            strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
-            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+            Platform::CopyString(ifp->Name, ifa->name);
 
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;

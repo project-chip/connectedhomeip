@@ -59,6 +59,7 @@ struct ChipDevicePlatformEvent final
             int32_t Id;
             union
             {
+                ip_event_t EthGotIp;
                 ip_event_got_ip_t IpGotIp;
                 ip_event_got_ip6_t IpGotIp6;
                 ip_event_ap_staipassigned_t IpApStaIpAssigned;

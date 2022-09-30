@@ -94,6 +94,10 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
         make_unique<ReadAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if}}
+        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22507 }}
+        {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}
+        make_unique<ReadAttribute>(Id, "device-list", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{/if}}
         {{/zcl_attributes_server}}
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
@@ -114,6 +118,10 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22341 }}
         {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
         make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        {{/if}}
+        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22507 }}
+        {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}
+        make_unique<SubscribeAttribute>(Id, "device-list", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if}}
         {{/if}}
         {{/zcl_attributes_server}}

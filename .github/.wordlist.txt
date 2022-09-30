@@ -19,6 +19,7 @@ AccessControlEntry
 accessor
 AccountLogin
 acdbc
+ack
 ACKed
 ACL
 ACLs
@@ -253,6 +254,7 @@ ClusterTestGeneration
 cmake
 CMakeLists
 CMD
+CMS
 CMSIS
 CMVH
 cn
@@ -328,6 +330,7 @@ cxx
 CY
 CYW
 DAC
+DACs
 dadbdcdddedf
 DAP
 DAPLINK
@@ -445,6 +448,7 @@ dryrun
 DS
 duplicative
 DUT
+DUTS
 DV
 DVK
 dynload
@@ -592,6 +596,7 @@ GPL
 GPLv
 Gradle
 gradlew
+Groupcast
 GroupId
 GroupKeyManagement
 groupKeySecurityPolicy
@@ -826,6 +831,7 @@ mdash
 MDNS
 MediaInput
 MediaPlayback
+MediaTek
 mem
 memdf
 MemMonitoring
@@ -983,6 +989,7 @@ PAAs
 PacketBuffer
 PAI
 PairDevice
+PAIs
 PAKE
 palletsprojects
 pankore
@@ -1369,12 +1376,14 @@ uint
 ULA
 UNBLUR
 uncommissioned
+Unencrypted
 unfocus
 Unicast
 UniFlash
 UnitLocalization
 unpair
 unprovisioned
+Unsecure
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1410,6 +1419,7 @@ ver
 Verifier
 Verifiers
 VID
+vids
 virtualenv
 visualstudio
 vlatest

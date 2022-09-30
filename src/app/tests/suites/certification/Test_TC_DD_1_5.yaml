@@ -142,8 +142,3 @@ tests:
 
           Note: chip-tool does not support physically scanning an NFC tag
       disabled: true
-
-    - label: ""
-      verification: |
-          verification step to be updated.
-      disabled: true

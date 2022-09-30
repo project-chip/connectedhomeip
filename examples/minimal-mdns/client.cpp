@@ -22,8 +22,8 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
@@ -315,7 +315,10 @@ int main(int argc, char ** args)
     ReportDelegate reporter;
     CHIP_ERROR err;
 
-    mdns::Minimal::SetDefaultAddressPolicy();
+    // This forces the global MDNS instance to be loaded in, effectively setting
+    // built in policies for addresses.
+    (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
+
     gMdnsServer.SetDelegate(&reporter);
 
     {

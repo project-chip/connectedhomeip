@@ -184,8 +184,8 @@ typedef void (*CHIPBinaryInputBasicClusterFeatureMapAttributeCallbackType)(
 typedef void (*CHIPBinaryInputBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPDescriptorClusterDeviceListAttributeCallbackType)(
-    void *, const chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo::DecodableType &);
+typedef void (*CHIPDescriptorClusterDeviceTypeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::TypeInfo::DecodableType &);
 typedef void (*CHIPDescriptorClusterServerListAttributeCallbackType)(
     void *, const chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo::DecodableType &);
 typedef void (*CHIPDescriptorClusterClientListAttributeCallbackType)(

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 declare_args() {
@@ -33,8 +34,13 @@ declare_args() {
   # time.
   chip_minmdns_high_verbosity = false
 
-  # Compile in the default minmdns policy for endpoint and ip address fetching
-  chip_minmdns_default_policy = true
+  # MinMdns address policy to be compiled in.
+  # Supported values:
+  #   - "default" will compile in AddressPolicy_DefaultImpl.h/cpp
+  #   - "libnl" will compile in AddressPolicy_LibNlImpl.h/cpp (linux only)
+  #   - "none" will NOT compile any default policy, app is expected to call
+  #     SetAddressPolicy apropriately
+  chip_minmdns_default_policy = "default"
 }
 
 config("config") {
@@ -52,8 +58,14 @@ config("config") {
     defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=0" ]
   }
 
-  if (chip_minmdns_default_policy) {
+  if (chip_minmdns_default_policy == "default") {
     defines += [ "CHIP_MINMDNS_DEFAULT_POLICY=1" ]
+  } else if (chip_minmdns_default_policy == "libnl") {
+    assert(current_os == "linux", "LibNL only supported on linux")
+    defines += [ "CHIP_MINMDNS_LIBNL_POLICY=1" ]
+  } else {
+    assert(chip_minmdns_default_policy == "none",
+           "minmdns default policy should be a supported value")
   }
 }
 
@@ -80,6 +92,31 @@ static_library("default_policy") {
     ":address_policy",
     "${chip_root}/src/inet",
   ]
+}
+
+if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
+  import("${build_root}/config/linux/pkg_config.gni")
+
+  pkg_config("libnl_config") {
+    packages = [
+      "libnl-3.0",
+      "libnl-route-3.0",
+    ]
+  }
+
+  static_library("libnl_policy") {
+    sources = [
+      "AddressPolicy_LibNlImpl.cpp",
+      "AddressPolicy_LibNlImpl.h",
+    ]
+
+    public_deps = [
+      ":address_policy",
+      "${chip_root}/src/inet",
+    ]
+
+    public_configs = [ ":libnl_config" ]
+  }
 }
 
 static_library("minimal_mdns") {
@@ -112,8 +149,10 @@ static_library("minimal_mdns") {
     "${chip_root}/src/platform",
   ]
 
-  if (chip_minmdns_default_policy) {
+  if (chip_minmdns_default_policy == "default") {
     public_deps += [ ":default_policy" ]
+  } else if (chip_minmdns_default_policy == "libnl") {
+    public_deps += [ ":libnl_policy" ]
   }
 
   public_configs = [ ":config" ]

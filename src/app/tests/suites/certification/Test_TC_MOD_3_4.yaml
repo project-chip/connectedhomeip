@@ -31,6 +31,11 @@ tests:
           To execute this test case set onmode to any integer value because as default it value has null.
       disabled: true
 
+    - label: "Preconditions"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
     - label: "TH reads the StartUpMode attribute from the DUT"
       PICS: MOD.S.A0004
       verification: |

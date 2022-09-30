@@ -26,6 +26,7 @@ using namespace chip::Dnssd;
 // TODO: Accept these values over CLI
 const char * kContentUrl        = "https://www.test.com/videoid";
 const char * kContentDisplayStr = "Test video";
+int gInitialContextVal          = 121212;
 
 CHIP_ERROR DiscoverCommissioners()
 {
@@ -114,14 +115,69 @@ void LaunchURLResponseCallback(CHIP_ERROR err)
     ChipLogProgress(AppServer, "LaunchURLResponseCallback called with %" CHIP_ERROR_FORMAT, err.Format());
 }
 
+void OnCurrentStateReadResponseSuccess(
+    void * context, chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData)
+{
+    ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess called with responseData: %d", static_cast<int>(responseData));
+    switch (responseData)
+    {
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying:
+        ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess CurrentState: Playing");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPaused:
+        ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess CurrentState: Paused");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kNotPlaying:
+        ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess CurrentState: Not Playing");
+        break;
+    case chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kBuffering:
+        ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess CurrentState: Buffering");
+        break;
+    default:
+        ChipLogError(AppServer, "OnCurrentStateReadResponseSuccess Invalid CurrentState!");
+        break;
+    }
+
+    if (context != nullptr)
+    {
+        ChipLogProgress(AppServer, "OnCurrentStateReadResponseSuccess context value: %d", *(static_cast<int *>(context)));
+    }
+}
+
+void OnCurrentStateReadResponseFailure(void * context, CHIP_ERROR err)
+{
+    ChipLogProgress(AppServer, "OnCurrentStateReadResponseFailure called with %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+void OnCurrentStateSubscriptionEstablished(void * context)
+{
+    ChipLogProgress(AppServer, "OnCurrentStateSubscriptionEstablished called");
+    if (context != nullptr)
+    {
+        ChipLogProgress(AppServer, "OnCurrentStateSubscriptionEstablished context value: %d", *(static_cast<int *>(context)));
+    }
+}
+
 void HandleCommissioningCompleteCallback(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback called with %" CHIP_ERROR_FORMAT, err.Format());
     if (err == CHIP_NO_ERROR)
     {
-        ReturnOnFailure(
-            CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr, LaunchURLResponseCallback));
-        ChipLogProgress(AppServer, "ContentLauncherLaunchURL called successfully");
+        // Subscribe to a media attribute
+        err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
+            static_cast<void *>(&gInitialContextVal), OnCurrentStateReadResponseSuccess, OnCurrentStateReadResponseFailure, 0, 4000,
+            OnCurrentStateSubscriptionEstablished);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "MediaPlayback_SubscribeToCurrentState call failed!");
+        }
+
+        // Send a media command
+        err = CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr, LaunchURLResponseCallback);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ContentLauncherLaunchURL call failed!");
+        }
     }
 }
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/bl602_sdk.gni")
+import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 
@@ -60,6 +60,8 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/lwip/src/include/lwip/apps",
       "${bl602_sdk_root}/components/network/lwip/lwip-port",
       "${bl602_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+      "${bl602_sdk_root}/components/network/lwip/lwip-port/hook",
+      "${bl602_sdk_root}/components/network/lwip_mdns",
 
       #"${bl602_sdk_root}/components/network/lwip_mdns",
 
@@ -189,7 +191,7 @@ template("bl602_sdk") {
       "SYS_AOS_LOOP_ENABLE=1",
       "BL602_USE_HAL_DRIVER=1",
       "BL602=BL602",
-      "SYS_LOOPRT_ENABLE=1",
+
       "CFG_TXDESC=2",
       "CFG_STA_MAX=1",
       "CFG_CHIP_BL602",
@@ -250,6 +252,9 @@ template("bl602_sdk") {
       "OS_USING_FREERTOS",
       "BL602_MATTER_SUPPORT",
       "TD_DIAGNOSIS_STA",
+      "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
+      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
+      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
     ]
 
     if (bl602_board == "BL-HWC-G1") {
@@ -294,11 +299,6 @@ template("bl602_sdk") {
     cflags_cc = [ "-fpermissive" ]
     cflags_cc += [ "-std=c++17" ]
     cflags_cc += [ "-D _GNU_SOURCE" ]
-
-    #cflags_cc += [ "-fcommon" ]
-    #cflags_cc += [ "-fno-rtti" ]
-    #cflags_cc += [ "-Wnon-virtual-dtor" ]
-    #cflags_cc += [ "-frtti" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]

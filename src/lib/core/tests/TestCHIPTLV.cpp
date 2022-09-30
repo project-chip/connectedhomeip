@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
@@ -1674,6 +1675,56 @@ void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
     reader.Init(buf, encodedLen);
     reader.ImplicitProfileId = TestProfile_2;
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+}
+
+static char gStringDumpWriterBuf[128]        = { 0 };
+static size_t gStringDumpWriterLengthWritten = 0;
+
+/**
+ *  Log the specified message in the form of @a aFormat.
+ *
+ *  @param[in]     aFormat   A pointer to a NULL-terminated C string with
+ *                           C Standard Library-style format specifiers
+ *                           containing the log message to be formatted and
+ *                           logged.
+ *  @param[in]     ...       An argument list whose elements should correspond
+ *                           to the format specifiers in @a aFormat.
+ *
+ */
+void ENFORCE_FORMAT(1, 2) StringDumpWriter(const char * aFormat, ...)
+{
+    va_list args;
+
+    va_start(args, aFormat);
+
+    gStringDumpWriterLengthWritten +=
+        static_cast<size_t>(vsprintf(&gStringDumpWriterBuf[gStringDumpWriterLengthWritten], aFormat, args));
+
+    va_end(args);
+}
+
+/**
+ *  Test Octet String Pretty Printer
+ */
+void CheckOctetStringPrettyPrinter(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t testOctetString[] = { 0x62, 0xFA, 0x82, 0x33, 0x59, 0xAC, 0xFA, 0xA9 };
+    const char expectedPrint[] =
+        "0x04, tag[Common Profile (2 Bytes)]: 0x0::0x0::0x0, type: Octet String (0x10), length: 8, value: hex:62FA823359ACFAA9\n";
+    uint8_t encodedBuf[128] = { 0 };
+
+    TLVWriter writer;
+    writer.Init(encodedBuf);
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.PutBytes(CommonTag(0), testOctetString, sizeof(testOctetString)));
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.Finalize());
+
+    TLVReader reader;
+    reader.Init(encodedBuf, writer.GetLengthWritten());
+
+    chip::TLV::Debug::Dump(reader, StringDumpWriter);
+
+    NL_TEST_ASSERT(inSuite, strlen(expectedPrint) == strlen(gStringDumpWriterBuf));
+    NL_TEST_ASSERT(inSuite, strcmp(expectedPrint, gStringDumpWriterBuf) == 0);
 }
 
 /**
@@ -4397,6 +4448,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Inet Buffer Test",                    CheckPacketBuffer),
     NL_TEST_DEF("Buffer Overflow Test",                CheckBufferOverflow),
     NL_TEST_DEF("Pretty Print Test",                   CheckPrettyPrinter),
+    NL_TEST_DEF("Pretty Octet String Print Test",      CheckOctetStringPrettyPrinter),
     NL_TEST_DEF("Data Macro Test",                     CheckDataMacro),
     NL_TEST_DEF("Strict Aliasing Test",                CheckStrictAliasing),
     NL_TEST_DEF("CHIP TLV Basics",                     CheckCHIPTLVBasics),

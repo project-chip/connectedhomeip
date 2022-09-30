@@ -26,13 +26,13 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Bring the DUT into a state without any wired faults."
       PICS: PS.S.A000a
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
@@ -102,7 +102,7 @@ tests:
     - label: "Bring the DUT into a state without any battery faults."
       PICS: PS.S.A0012
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
@@ -171,7 +171,7 @@ tests:
     - label: "Bring the DUT into a state without any charge faults."
       PICS: PS.S.A001e
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"

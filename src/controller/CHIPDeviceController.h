@@ -403,9 +403,11 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] setUpCode             The setup code for connecting to the device
+     * @param[in] discoveryType         The network discovery type, defaults to DiscoveryType::kAll.
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType = DiscoveryType::kAll);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters,
+                          DiscoveryType discoveryType = DiscoveryType::kAll);
 
     /**
      * @brief
@@ -466,8 +468,10 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] setUpCode             The setup code for connecting to the device
+     * @param[in] discoveryType         The network discovery type, defaults to DiscoveryType::kAll.
      */
-    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode);
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode,
+                                       DiscoveryType discoveryType = DiscoveryType::kAll);
 
     /**
      * @brief

@@ -44,7 +44,7 @@ tests:
       attribute: "FeatureMap"
       PICS: " !OO.S.F00 "
       response:
-          value: 1
+          value: 0
           constraints:
               type: bitmap32
 

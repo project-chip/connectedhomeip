@@ -48,7 +48,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap(G.S.F00) from DUT"
+    - label: "Given G.S.F00 ensure featuremap has the correct bit set"
       PICS: G.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"

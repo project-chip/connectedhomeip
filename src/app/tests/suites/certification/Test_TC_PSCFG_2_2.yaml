@@ -31,7 +31,7 @@ tests:
 
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads the Sources attribute from the DUT"

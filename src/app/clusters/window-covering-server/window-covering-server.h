@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "window-covering-delegate.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
@@ -37,9 +38,9 @@ namespace WindowCovering {
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
 typedef DataModel::Nullable<uint16_t> NAbsolute;
-
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
+
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
 {
@@ -128,6 +129,8 @@ EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
  * @param[in] attributeId
  */
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 } // namespace WindowCovering
 } // namespace Clusters
