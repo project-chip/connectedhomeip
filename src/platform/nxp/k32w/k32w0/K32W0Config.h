@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Utilities for accessing persisted device configuration on
- *          platforms based on the NXP K32W SDK.
- */
-
 #pragma once
 
 #include <functional>
@@ -32,10 +26,14 @@
 #include "fsl_os_abstraction.h"
 #include "pdm_ram_storage_glue.h"
 #include "ram_storage.h"
+#include <platform/nxp/k32w/common/RamStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+constexpr uint16_t kNvmIdChipConfigData  = 0x5000;
+constexpr uint16_t kRamBufferInitialSize = 3072;
 
 constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t pdmId)
 {
@@ -117,16 +115,16 @@ public:
     static CHIP_ERROR Init(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
-    static CHIP_ERROR ReadConfigValue(Key key, bool & val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
+    template <typename TValue>
+    static CHIP_ERROR ReadConfigValue(Key key, TValue & val);
+    template <typename TValue>
+    static CHIP_ERROR WriteConfigValue(Key key, TValue val);
+    template <typename TValue>
+    static CHIP_ERROR WriteConfigValueSync(Key key, TValue val);
+
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
-    static CHIP_ERROR WriteConfigValue(Key key, bool val);
-    static CHIP_ERROR WriteConfigValueSync(Key key, bool val);
-    static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
-    static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
@@ -149,9 +147,8 @@ protected:
     static constexpr uint8_t GetRecordKey(uint32_t key);
 
 private:
-    static CHIP_ERROR MapPdmStatus(PDM_teStatus pdmStatus);
-    static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
-    static CHIP_ERROR MapPdmInitStatus(int pdmStatus);
+    static CHIP_ERROR MapPdmStatusToChipError(PDM_teStatus status);
+    static CHIP_ERROR MapPdmInitStatusToChipError(int status);
     static void FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
 
@@ -169,6 +166,65 @@ inline constexpr uint8_t K32WConfig::GetPDMId(Key key)
 inline constexpr uint8_t K32WConfig::GetRecordKey(Key key)
 {
     return static_cast<uint8_t>(key);
+}
+
+template <typename TValue>
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, TValue & val)
+{
+    CHIP_ERROR err;
+    uint16_t valLen = sizeof(val);
+
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    err = RamStorage::Read(key, 0, (uint8_t *) &val, &valLen);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <typename TValue>
+CHIP_ERROR K32WConfig::WriteConfigValue(Key key, TValue val)
+{
+    CHIP_ERROR err;
+    PDM_teStatus status;
+    RamStorage::Buffer buffer;
+
+    MutexLock(pdmMutexHandle, osaWaitForever_c);
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    err = RamStorage::Write(key, (uint8_t *) &val, sizeof(TValue));
+    SuccessOrExit(err);
+
+    buffer = RamStorage::GetBuffer();
+    status = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
+    SuccessOrExit(err = MapPdmStatusToChipError(status));
+
+exit:
+    MutexUnlock(pdmMutexHandle);
+    return err;
+}
+
+template <typename TValue>
+CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, TValue val)
+{
+    CHIP_ERROR err;
+    PDM_teStatus status;
+    RamStorage::Buffer buffer;
+
+    MutexLock(pdmMutexHandle, osaWaitForever_c);
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    err = RamStorage::Write(key, (uint8_t *) &val, sizeof(TValue));
+    SuccessOrExit(err);
+    // Interrupts are disabled to ensure there is no context switch during the actual
+    // writing, thus avoiding race conditions.
+    OSA_InterruptDisable();
+    buffer = RamStorage::GetBuffer();
+    status = PDM_eSaveRecordData(kNvmIdChipConfigData, buffer, buffer->ramBufferLen + kRamDescHeaderSize);
+    OSA_InterruptEnable();
+    SuccessOrExit(err = MapPdmStatusToChipError(status));
+
+exit:
+    MutexUnlock(pdmMutexHandle);
+    return err;
 }
 
 } // namespace Internal

@@ -48,12 +48,23 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    /* none so far */
+#if defined(MBEDTLS_USE_TINYCRYPT)
+    // Since the RNG callback will be called from multiple threads,
+    // use this mutex to lock/unlock the call to Matter RNG API, which
+    // uses some global variables.
+    static sys_mutex_t rngMutexHandle;
+
+    // Callback used by tinycrypt to generate random numbers.
+    // It must be set before calling any sign operations,
+    // which are used in both Matter and OT threads.
+    static int uECC_RNG_Function(uint8_t * dest, unsigned int size);
+#endif
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
+    void _Shutdown(void);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const { return true; };

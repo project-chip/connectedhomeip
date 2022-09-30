@@ -299,11 +299,13 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     char * ipv4           = nullptr;
     char * ipv6           = nullptr;
     int port              = 0;
+    char * interface      = nullptr;
     unsigned short txtLen = 0;
     uint8_t * txtRecord   = nullptr;
     std::vector<TextEntry> textEntries;
     DnssdService dnssdService = {};
     chip::Inet::IPAddress ipAddr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // In fact, if cancel resolve fails, we can not do anything about it
     int ret = dnssd_cancel_resolve_service(service);
@@ -352,6 +354,14 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 
     dnssdService.mPort = static_cast<uint16_t>(port);
 
+    ret = dnssd_service_get_interface(service, &interface);
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
+
+    err = chip::Inet::InterfaceId::InterfaceNameToId(interface, dnssdService.mInterface);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed. ret: %" CHIP_ERROR_FORMAT, err.Format()));
+
     ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
 
@@ -371,7 +381,14 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     return;
 
 exit:
-    rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    if (err == CHIP_NO_ERROR)
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    }
+    else
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
+    }
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
