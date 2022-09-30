@@ -17,7 +17,7 @@ The GitHub repository also includes tools for testing your Matter project.
 
 Silicon Laboratories now maintains a public matter GitHub repo with frequent
 releases thoroughly tested and validated. Developers looking to develop matter
-products with silabs hardware are encouraged to use our latest release with 
+products with silabs hardware are encouraged to use our latest release with
 added tools and documentation.
 [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
