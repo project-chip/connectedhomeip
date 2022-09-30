@@ -170,6 +170,7 @@ class TestXmlParser(unittest.TestCase):
         ''')
         struct = Struct(
             name='SomeStruct',
+            attributes={StructAttribute.FABRIC_SCOPED},
             fields=[
                 Field(data_type=DataType(name='int16u'), code=1, name='FirstMember'),
                 Field(data_type=DataType(name='int32u'), code=2, name='SecondMember')
@@ -188,7 +189,7 @@ class TestXmlParser(unittest.TestCase):
                                                  name='FabricAttribute',
                                                  attributes={FieldAttribute.NULLABLE}
                                              ),
-                                             tags={AttributeTag.READABLE, AttributeTag.FABRIC_SCOPED},
+                                             tags={AttributeTag.READABLE},
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 

@@ -78,6 +78,9 @@ class EventHandler(BaseHandler):
             fields=[],
         )
 
+        if attrs.get('isFabricSensitive', "false").lower() == 'true':
+           self._event.attributes.add(EventAttribute.FABRIC_SENSITIVE)
+
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
             data_type = DataType(name=attrs['type'])
@@ -121,11 +124,12 @@ class AttributeHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
+            # Modifier not currently used: fabric scoped exists on the structure itself.
             if 'modifier' in attrs:
                 if attrs['modifier'] != 'fabric-scoped':
                     raise Exception("UNKNOWN MODIFIER: %s" % attrs['modifier'])
-                self._attribute.tags.add(AttributeTag.FABRIC_SCOPED)
-            else:
+
+            if ('role' in attrs) or ('privilege' in attrs):
                 role = AttrsToAccessPrivilege(attrs)
 
                 if attrs['op'] == 'read':
@@ -134,6 +138,7 @@ class AttributeHandler(BaseHandler):
                     self._attribute.writeacl = role
                 else:
                     logging.error("Unknown access: %r" % attrs['op'])
+
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
@@ -168,16 +173,15 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #    - tag not set because not a request/response
         #    - code not set because not a response
 
-        self._is_fabric_scoped = (attrs.get('isFabricScoped', "false").lower() == 'true')
+        if attrs.get('isFabricScoped', "false").lower() == 'true':
+            self._struct.attributes.add(StructAttribute.FABRIC_SCOPED)
+
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'item':
             data_type = DataType(
                 name=attrs['type']
             )
-
-            # TODO(#22938): IDL should keep track and use the
-            #               isFabricSensitive attribute here
 
             if 'fieldId' in attrs:
                 self._field_index = ParseInt(attrs['fieldId'])
@@ -201,6 +205,9 @@ class StructHandler(BaseHandler, IdlPostProcessor):
 
             if attrs.get('isNullable', "false").lower() == 'true':
                 field.attributes.add(FieldAttribute.NULLABLE)
+
+            if attrs.get('isFabricSensitive', "false").lower() == 'true':
+                field.attributes.add(FieldAttribute.FABRIC_SENSITIVE)
 
             self._struct.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -227,14 +234,6 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                                   (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
-
-        # Secondary processing, for fabric scoped:
-        #      while ZAP XML maintains these at a struct level. Update attributes
-        if self._is_fabric_scoped:
-            for cluster in idl.clusters:
-                for attribute in cluster.attributes:
-                    if self._struct.name == attribute.definition.data_type.name:
-                        attribute.tags.add(AttributeTag.FABRIC_SCOPED)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
