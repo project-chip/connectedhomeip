@@ -21,7 +21,7 @@ Unless specified, numerical values are represented in decimal notation.
 
 | Field                | Description                                                                                                                            |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| exchange_id          | Exchange ID + IsInitiator flag from message header ('i' if initiator, 'r' if responder')                                               |
+| exchange_id          | Exchange ID + `IsInitiator` flag from message header ('i' if initiator, 'r' if responder')                                             |
 | msg_id               | Message counter                                                                                                                        |
 | ack_msg_id           | If present, the ACK message counter. Otherwise, this entire field is omitted from display                                              |
 | msg_category         | U: Un-secure Unicast, S: Secure Unicast, G: Secure Groupcast                                                                           |

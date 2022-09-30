@@ -60,6 +60,7 @@ class K32WBuilder(GnBuilder):
                  tokenizer: bool = False,
                  disable_ble: bool = False,
                  disable_ota: bool = False,
+                 disable_logs: bool = False,
                  se05x: bool = False,
                  tinycrypt: bool = False):
         super(K32WBuilder, self).__init__(
@@ -72,6 +73,7 @@ class K32WBuilder(GnBuilder):
         self.release = release
         self.disable_ble = disable_ble
         self.disable_ota = disable_ota
+        self.disable_logs = disable_logs
         self.se05x = se05x
         self.tinycrypt = tinycrypt
 
@@ -96,6 +98,9 @@ class K32WBuilder(GnBuilder):
 
         if self.disable_ota:
             args.append('chip_enable_ota_requestor=false')
+
+        if self.disable_logs:
+            args.append('chip_logging=false')
 
         if self.se05x:
             args.append('chip_with_se05x=true')
