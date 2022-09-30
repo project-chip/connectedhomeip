@@ -50,6 +50,7 @@ jobs:
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
+              if: ${{ !env.ACT }}
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -57,6 +58,15 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
+            # To use act like:
+            #   act -j test_suites_linux
+            #
+            # Note you likely still need to have non submodules setup for the
+            # local machine, like:
+            #   git submodule deinit --all
+            - uses: actions/checkout@v3
+              if: ${{ env.ACT }}
+              name: Checkout (ACT for local build)
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -76,6 +86,98 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+            - name: Validate that xml are parseable
+              timeout-minutes: 10
+              # The sub-items being run here are the same as the input XMLs listed
+              # at src/app/zap-templates/zcl/zcl.json
+              #
+              # This ensures that the syntax of the XML can always be parsed/validated, however it
+              # does not enforce that the content is understood (that part is covered by parser
+              # unit tests)
+              #
+              # Also note ordering: global attributes are parsed first because other XML files may
+              # reference these. 
+              #
+              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of 
+              #       things.
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/idl/xml_parser.py \
+                      --no-print \
+                      --log-level info \
+                      src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
+                      src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic.xml \
+                      src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
+                      src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
+                      src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
+                      src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/fault-injection-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/fixed-label-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/proxy-configuration-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/proxy-discovery-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/scene.xml \
+                      src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
+                      src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/general.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/ha.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/types.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
+                      src/app/zap-templates/zcl/data-model/silabs/zll.xml \
+                    "
             - name: Build Apps
               timeout-minutes: 45
               run: |

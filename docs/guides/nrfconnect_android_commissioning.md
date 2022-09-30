@@ -125,7 +125,7 @@ After building, install the application by completing the following steps:
     replaced with the path to the Matter source directory:
 
         ```
-        adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+        adb install -r chip-dir/examples/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
         ```
 
 6.  Navigate to settings on your smartphone and grant **Camera** and

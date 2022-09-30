@@ -1292,37 +1292,37 @@ ninja -C {out}/ameba-amebad-light
 ninja -C {out}/ameba-amebad-pigweed
 
 # Building APP android-androidstudio-arm-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=armeabi-v7a assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=armeabi-v7a assembleDebug
 
 # Building APP android-androidstudio-arm64-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm64-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=arm64-v8a assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm64-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=arm64-v8a assembleDebug
 
 # Building APP android-androidstudio-x64-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-x64-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=x86_64 assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-x64-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=x86_64 assembleDebug
 
 # Building APP android-androidstudio-x86-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-x86-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=x86 assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-x86-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=x86 assembleDebug
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
 
 # Prepare Native libs android-arm-chip-tool
-mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a
+mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/examples/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
 
-cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
 
-cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
-cp {out}/android-arm-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+cp {out}/android-arm-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
-cp {out}/android-arm-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 
 # Building APP android-arm-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
 
 # Building JNI android-arm-tv-casting-app
 ninja -C {out}/android-arm-tv-casting-app
@@ -1373,43 +1373,43 @@ cp {out}/android-arm-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 ninja -C {out}/android-arm64-chip-test
 
 # Prepare Native libs android-arm64-chip-test
-mkdir -p {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a
+mkdir -p {root}/examples/android/CHIPTest/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
 
-cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libCHIPController.so
 
-cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
-cp {out}/android-arm64-chip-test/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTest/app/libs/CHIPController.jar
+cp {out}/android-arm64-chip-test/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTest/app/libs/CHIPController.jar
 
-cp {out}/android-arm64-chip-test/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTest/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm64-chip-test/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTest/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-arm64-chip-test/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTest/app/libs/AndroidPlatform.jar
+cp {out}/android-arm64-chip-test/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTest/app/libs/AndroidPlatform.jar
 
 # Building APP android-arm64-chip-test
-{root}/src/android/CHIPTest/gradlew -p {root}/src/android/CHIPTest -PmatterBuildSrcDir={out}/android-arm64-chip-test -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-test assembleDebug
+{root}/examples/android/CHIPTest/gradlew -p {root}/examples/android/CHIPTest -PmatterBuildSrcDir={out}/android-arm64-chip-test -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-test assembleDebug
 
 # Building JNI android-arm64-chip-tool
 ninja -C {out}/android-arm64-chip-tool
 
 # Prepare Native libs android-arm64-chip-tool
-mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a
+mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
 
-cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
 
-cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
-cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
-cp {out}/android-arm64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+cp {out}/android-arm64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 
 # Building APP android-arm64-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
 
 # Building JNI android-arm64-tv-casting-app
 ninja -C {out}/android-arm64-tv-casting-app
@@ -1460,22 +1460,22 @@ cp {out}/android-arm64-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/Ap
 ninja -C {out}/android-x64-chip-tool
 
 # Prepare Native libs android-x64-chip-tool
-mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64
+mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/x86_64
 
-cp {out}/android-x64-chip-tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
 
-cp {out}/android-x64-chip-tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPController.so
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPController.so
 
-cp {out}/android-x64-chip-tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
 
-cp {out}/android-x64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+cp {out}/android-x64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
-cp {out}/android-x64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+cp {out}/android-x64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 
 # Building APP android-x64-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
 
 # Building JNI android-x64-tv-server
 ninja -C {out}/android-x64-tv-server
@@ -1507,22 +1507,22 @@ cp {out}/android-x64-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 ninja -C {out}/android-x86-chip-tool
 
 # Prepare Native libs android-x86-chip-tool
-mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86
+mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/x86
 
-cp {out}/android-x86-chip-tool/lib/jni/x86/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libSetupPayloadParser.so
+cp {out}/android-x86-chip-tool/lib/jni/x86/libSetupPayloadParser.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86/libSetupPayloadParser.so
 
-cp {out}/android-x86-chip-tool/lib/jni/x86/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libCHIPController.so
+cp {out}/android-x86-chip-tool/lib/jni/x86/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86/libCHIPController.so
 
-cp {out}/android-x86-chip-tool/lib/jni/x86/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
+cp {out}/android-x86-chip-tool/lib/jni/x86/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
 
-cp {out}/android-x86-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+cp {out}/android-x86-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
-cp {out}/android-x86-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+cp {out}/android-x86-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
-cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
 
 # Building APP android-x86-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
 
 # Building JNI android-x86-tv-server
 ninja -C {out}/android-x86-tv-server

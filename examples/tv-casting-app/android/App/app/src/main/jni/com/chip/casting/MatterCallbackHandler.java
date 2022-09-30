@@ -17,58 +17,10 @@
  */
 package com.chip.casting;
 
-import java.util.Objects;
-
 public abstract class MatterCallbackHandler {
-  public abstract void handle(Status status);
+  public abstract void handle(MatterError err);
 
   public final void handle(int errorCode, String errorMessage) {
-    handle(new Status(errorCode, errorMessage));
-  }
-
-  public static class Status {
-    private int errorCode;
-    private String errorMessage;
-
-    public static final Status SUCCESS = new Status(0, null);
-
-    public Status(int errorCode, String errorMessage) {
-      this.errorCode = errorCode;
-      this.errorMessage = errorMessage;
-    }
-
-    public boolean isSuccess() {
-      return this.equals(SUCCESS);
-    }
-
-    public int getErrorCode() {
-      return errorCode;
-    }
-
-    public String getErrorMessage() {
-      return errorMessage;
-    }
-
-    @Override
-    public String toString() {
-      return "Status{"
-          + (isSuccess()
-              ? "Success"
-              : "errorCode=" + errorCode + ", errorMessage='" + errorMessage + '\'')
-          + '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      Status status = (Status) o;
-      return errorCode == status.errorCode;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(errorCode);
-    }
+    handle(new MatterError(errorCode, errorMessage));
   }
 }

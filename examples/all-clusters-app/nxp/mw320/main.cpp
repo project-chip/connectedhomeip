@@ -46,8 +46,12 @@
 #include <ChipShellCollection.h>
 
 // cr++
+#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+#include "FactoryDataProvider.h"
+#else
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif // if CONFIG_CHIP_MW320_REAL_FACTORY_DATA
 // cr--
 // ota++
 #include "app/clusters/ota-requestor/BDXDownloader.h"
@@ -93,6 +97,10 @@ extern "C" {
  ******************************************************************************/
 #define APP_AES AES
 #define CONNECTION_INFO_FILENAME "connection_info.dat"
+#define SSID_FNAME "ssid_fname"
+#define PSK_FNAME "psk_fname"
+
+#define VERSION_STR "mw320-2.9.10-005"
 enum
 {
     MCUXPRESSO_WIFI_CLI,
@@ -101,6 +109,8 @@ enum
 };
 static int Matter_Selection = MAX_SELECTION;
 #define RUN_RST_LT_DELAY 10
+static const char * TAG = "mw320";
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -112,6 +122,9 @@ const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
 portSTACK_TYPE * task_main_stack = NULL;
 TaskHandle_t task_main_task_handler;
+
+uint8_t * __FACTORY_DATA_START;
+uint32_t __FACTORY_DATA_SIZE;
 
 #if CHIP_ENABLE_OPENTHREAD
 extern "C" {
@@ -170,6 +183,31 @@ void InitOTARequestor(void)
         }
     */
     // Initialize and interconnect the Requestor and Image Processor objects -- END
+}
+
+const char * mw320_get_verstr(void)
+{
+    return VERSION_STR;
+}
+
+void save_network(char * ssid, char * pwd);
+void save_network(char * ssid, char * pwd)
+{
+    int ret;
+
+    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write ssid to flash failed\r\n");
+    }
+
+    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write psk to flash failed\r\n");
+    }
+
+    return;
 }
 
 // ota --
@@ -280,6 +318,8 @@ bool is_connected = false;
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
+static void load_network(char * ssid, char * pwd);
+
 /*
 static void saveProfile(int argc, char **argv);
 static void loadProfile(int argc, char **argv);
@@ -326,6 +366,40 @@ static status_t APP_AES_Lock(void)
 static void APP_AES_Unlock(void)
 {
     xSemaphoreGiveRecursive(aesLock);
+}
+
+static void load_network(char * ssid, char * pwd)
+{
+    int ret;
+    unsigned char ssid_buf[IEEEtypes_SSID_SIZE + 1];
+    unsigned char psk_buf[WLAN_PSK_MAX_LENGTH];
+    uint32_t len;
+
+    len = IEEEtypes_SSID_SIZE + 1;
+    ret = get_saved_wifi_network((char *) SSID_FNAME, ssid_buf, &len);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: Read saved SSID\r\n");
+        strcpy(ssid, "");
+    }
+    else
+    {
+        PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
+        strcpy(ssid, (const char *) ssid_buf);
+    }
+
+    len = WLAN_PSK_MAX_LENGTH;
+    ret = get_saved_wifi_network((char *) PSK_FNAME, psk_buf, &len);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: Read saved PSK\r\n");
+        strcpy(pwd, "");
+    }
+    else
+    {
+        PRINTF("saved_psk: [%s]\r\n", psk_buf);
+        strcpy(pwd, (const char *) psk_buf);
+    }
 }
 
 /*
@@ -527,7 +601,7 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
     switch (reason)
     {
     case WLAN_REASON_INITIALIZED:
-//            PRINTF("app_cb: WLAN initialized\r\n");
+        // PRINTF("app_cb: WLAN initialized\r\n");
 #ifdef MCUXPRESSO_WIFI_CLI
         ret = wlan_basic_cli_init();
         if (ret != WM_SUCCESS)
@@ -586,14 +660,14 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
 #endif
         break;
     case WLAN_REASON_INITIALIZATION_FAILED:
-        //            PRINTF("app_cb: WLAN: initialization failed\r\n");
+        // PRINTF("app_cb: WLAN: initialization failed\r\n");
         break;
     case WLAN_REASON_SUCCESS:
-        //            PRINTF("app_cb: WLAN: connected to network\r\n");
+        // PRINTF("app_cb: WLAN: connected to network\r\n");
         ret = wlan_get_address(&addr);
         if (ret != WM_SUCCESS)
         {
-            //                PRINTF("failed to get IP address\r\n");
+            // PRINTF("failed to get IP address\r\n");
             return 0;
         }
 
@@ -602,12 +676,13 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
         ret = wlan_get_current_network(&sta_network);
         if (ret != WM_SUCCESS)
         {
-            //                PRINTF("Failed to get External AP network\r\n");
+            // PRINTF("Failed to get External AP network\r\n");
             return 0;
         }
 
         PRINTF("Connected to following BSS:\r\n");
         PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
+        save_network(sta_network.ssid, sta_network.security.psk);
 
 #ifdef CONFIG_IPV6
         {
@@ -966,7 +1041,16 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     // Init ZCL Data Model and CHIP App Server
     {
         // Initialize device attestation config
+#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+        FactoryDataProvider::GetDefaultInstance().Init();
+#if (CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER == 1)
+        SetDeviceInstanceInfoProvider(&FactoryDataProvider::GetDefaultInstance());
+#endif // USE_LOCAL_DEVICEINSTANCEINFOPROVIDER
+        SetDeviceAttestationCredentialsProvider(&FactoryDataProvider::GetDefaultInstance());
+        SetCommissionableDataProvider(&FactoryDataProvider::GetDefaultInstance());
+#else
         SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_CHIP_MW320_REAL_FACTORY_DATA
     }
     {
         //    chip::Server::GetInstance().Init();
@@ -1062,6 +1146,12 @@ void task_test_main(void * param)
             PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
             emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
                                false);
+#ifdef SUPPORT_MANUAL_CTRL
+            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
+            PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
+            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
+#endif // SUPPORT_MANUAL_CTRL
+
             need2sync_sw_attr = false;
         }
         // =============================
@@ -1072,45 +1162,36 @@ void task_test_main(void * param)
     return;
 }
 
-void ShellCLIMain(void * pvParameter)
+void init_mw320_sdk()
 {
     flash_desc_t fl;
     struct partition_entry *p, *f1, *f2;
     short history = 0;
     uint32_t * wififw;
     struct partition_entry * psm;
+    struct partition_entry * manu_dat;
+    uint8_t * pmfdat;
 
-    const int rc = streamer_init(streamer_get());
-    if (rc != 0)
-    {
-        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
-        return;
-    }
-
-    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
-
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
-#endif
-
-    cmd_misc_init();
-    // cmd_otcli_init();
-
-    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
+    PRINTF("=> init mw320 sdk \r\n");
     PRINTF("call mcuInitPower() \r\n");
     mcuInitPower();
     boot_init();
     mflash_drv_init();
     cli_init();
     part_init();
+
     psm = part_get_layout_by_id(FC_COMP_PSM, NULL);
     part_to_flash_desc(psm, &fl);
     init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
+    PRINTF("[PSM]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+
+    manu_dat = part_get_layout_by_id(FC_COMP_USER_APP, NULL);
+    part_to_flash_desc(manu_dat, &fl);
+    PRINTF("[Manufacture_Data]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+    pmfdat               = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
+    __FACTORY_DATA_START = pmfdat;
+    __FACTORY_DATA_SIZE  = (uint32_t) fl.fl_size;
+
     f1 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     f2 = part_get_layout_by_id(FC_COMP_WLAN_FW, &history);
     if (f1 && f2)
@@ -1127,27 +1208,72 @@ void ShellCLIMain(void * pvParameter)
     }
     else
     {
-        //        PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
+        // PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
         p = NULL;
     }
     if (p != NULL)
     {
         part_to_flash_desc(p, &fl);
         wififw = (uint32_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
-        //        assert(wififw != NULL);
+        // assert(wififw != NULL);
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
         wlan_init((const uint8_t *) (wififw + 2U), *(wififw + 1U));
-        //        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
+        // PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
-        //		demo_init();
+        // demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
     }
+    PRINTF(" mw320 init complete! \r\n");
+
+    return;
+}
+
+void ShellCLIMain(void * pvParameter)
+{
+    const int rc = streamer_init(streamer_get());
+    if (rc != 0)
+    {
+        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
+        return;
+    }
+
+    PRINTF("version: [%s] \r\n", VERSION_STR);
+
+    // Initialize the SDK components
+    init_mw320_sdk();
+
+    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
+
+    chip::Platform::MemoryInit();
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    ConfigurationMgr().LogDeviceConfig();
+    PrintOnboardingCodes(chip::RendezvousInformationFlag::kOnNetwork);
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+#endif
+
+    cmd_misc_init();
+    // cmd_otcli_init();
+    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
 
     //    std::string qrCodeText = createSetupPayload();
     //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
+    {
+        char def_ssid[IEEEtypes_SSID_SIZE + 1];
+        char def_psk[WLAN_PSK_MAX_LENGTH];
+        load_network(def_ssid, def_psk);
 
-    ConnectivityMgrImpl().ProvisionWiFiNetwork("nxp_matter", "nxp12345");
+        if ((strlen(def_ssid) <= 0) || (strlen(def_psk) <= 0))
+        {
+            // No saved connected_ap_info => Using the default ssid/password
+            strcpy(def_ssid, "nxp_matter");
+            strcpy(def_psk, "nxp12345");
+        }
+        PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
+        ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
+    }
 
     // Run CHIP servers
     run_update_chipsrv(chip_srv_all);
@@ -1408,6 +1534,46 @@ exit:
     return;
 }
 
+uint32_t identifyTimerCount;
+constexpr uint32_t kIdentifyTimerDelayMS = 250;
+typedef struct _Identify_Timer
+{
+    EndpointId ep;
+    uint32_t identifyTimerCount;
+} Identify_Time_t;
+Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
+
+void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    Identify_Time_t * pidt = (Identify_Time_t *) appState;
+    PRINTF(" -> %s(%u, %u) \r\n", __FUNCTION__, pidt->ep, pidt->identifyTimerCount);
+    if (pidt->identifyTimerCount)
+    {
+        pidt->identifyTimerCount--;
+        emAfWriteAttribute(pidt->ep, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
+                           sizeof(identifyTimerCount), true, false);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
+    }
+}
+
+static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+                 ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
+    VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
+                 ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));
+    if (id_time[endpointId].identifyTimerCount != *value)
+    {
+        id_time[endpointId].ep                 = endpointId;
+        id_time[endpointId].identifyTimerCount = *value;
+        PRINTF("-> Identify: %u \r\n", id_time[endpointId].identifyTimerCount);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, &id_time[endpointId]);
+    }
+
+exit:
+    return;
+}
+
 /*
         Callback to receive the cluster modification event
 */
@@ -1425,6 +1591,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices
         chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+        break;
+    case ZCL_IDENTIFY_CLUSTER_ID:
+        OnIdentifyPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
     default:
         break;

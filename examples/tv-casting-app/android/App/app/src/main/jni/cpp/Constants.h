@@ -38,3 +38,29 @@ enum MediaCommandName
 
     MEDIA_COMMAND_COUNT
 };
+
+enum MediaAttributeName
+{
+    ContentLauncher_SupportedStreamingProtocols,
+    ContentLauncher_AcceptHeader,
+    LevelControl_CurrentLevel,
+    LevelControl_MinLevel,
+    LevelControl_MaxLevel,
+    MediaPlayback_CurrentState,
+    MediaPlayback_StartTime,
+    MediaPlayback_Duration,
+    MediaPlayback_SampledPosition,
+    MediaPlayback_PlaybackSpeed,
+    MediaPlayback_SeekRangeEnd,
+    MediaPlayback_SeekRangeStart,
+    ApplicationLauncher_CurrentApp,
+    TargetNavigator_TargetList,
+    TargetNavigator_CurrentTarget,
+    ApplicationBasic_VendorName,
+    ApplicationBasic_VendorID,
+    ApplicationBasic_ApplicationName,
+    ApplicationBasic_ProductID,
+    ApplicationBasic_ApplicationVersion,
+
+    MEDIA_ATTRIBUTE_COUNT
+};

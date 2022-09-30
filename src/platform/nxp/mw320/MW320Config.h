@@ -61,6 +61,8 @@ public:
                                                                        * runtime. Retained during factory reset. */
     static constexpr uint8_t kFileId_KVS = CATEGORY_BASE + 3;         /**< Category containing KVS set at runtime.
                                                                        *   Cleared during factory reset. */
+    static constexpr uint8_t kPDMId_ChipCounter = CATEGORY_BASE + 4;  /**< Category containing KVS set at runtime.
+                                                                       *   Cleared during factory reset. */
 
     using Key = uint32_t;
 
@@ -95,6 +97,12 @@ public:
     static constexpr Key kConfigKey_CountryCode                 = ConfigKey(kFileId_ChipConfig, 0x0C);
     // static constexpr Key kConfigKey_Breadcrumb           = ConfigKey(kFileId_ChipConfig, 0x0D);
     static constexpr Key kConfigKey_UniqueId = ConfigKey(kFileId_ChipConfig, 0x0D);
+
+    // CHIP Counter Keys
+    static constexpr Key kCounterKey_RebootCount           = ConfigKey(kPDMId_ChipCounter, 0x00);
+    static constexpr Key kCounterKey_UpTime                = ConfigKey(kPDMId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_TotalOperationalHours = ConfigKey(kPDMId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_BootReason            = ConfigKey(kPDMId_ChipCounter, 0x03);
 
     static constexpr Key kConfigKey_GroupKey   = ConfigKey(kFileId_ChipConfig, 0x0E);
     static constexpr Key kConfigKey_GroupKey0  = ConfigKey(kFileId_ChipConfig, 0x0F);
