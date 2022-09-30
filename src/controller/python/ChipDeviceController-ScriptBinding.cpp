@@ -139,6 +139,10 @@ ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::De
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * peerAddrStr, uint32_t setupPINCode,
                                                                       chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       uint32_t setupPINCode, uint16_t discriminator,
+                                                                       chip::NodeId nodeid);
+
 ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 ChipError::StorageType
@@ -481,6 +485,18 @@ ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Cont
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
 }
+
+ChipError::StorageType pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       uint32_t setupPINCode, uint16_t discriminator,
+                                                                       chip::NodeId nodeid)
+{
+    chip::Transport::PeerAddress addr;
+    RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+    addr.SetTransportType(chip::Transport::Type::kBle);
+    params.SetPeerAddress(addr).SetDiscriminator(discriminator);
+    return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     CommissioningParameters params;
@@ -665,6 +681,11 @@ ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::Devic
 ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId)
 {
     VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+
+    //
+    // Stop any active pairing sessions to this node.
+    //
+    devCtrl->StopPairing(nodeId);
 
     //
     // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session

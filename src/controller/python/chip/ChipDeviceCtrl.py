@@ -432,6 +432,15 @@ class ChipDeviceController():
                 self.devCtrl, nodeid)
         )
 
+    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int):
+        self.CheckIsActive()
+
+        self.state = DCState.RENDEZVOUS_ONGOING
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
+                self.devCtrl, setupPinCode, discriminator, nodeid)
+        )
+
     def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
         self.CheckIsActive()
 
@@ -1353,6 +1362,10 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
+                c_void_p, c_uint32, c_uint16, c_uint64]
+            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
