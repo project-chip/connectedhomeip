@@ -31,6 +31,8 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
+#include "mdns.h"
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -110,6 +112,15 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
 void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
+
+    if (event->Type == DeviceEventType::kInternetConnectivityChange)
+    {
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
+            event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            mdns_update_interface();
+        }
+    }
 
     if (event->Type != DeviceEventType::kMtkWiFiEvent)
         return;

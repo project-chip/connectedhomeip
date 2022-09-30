@@ -22,8 +22,11 @@
  *          platforms based on the MediaTek SDK.
  */
 /* this file behaves like a config.h, comes first */
+#include <functional>
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/PlatformManager.h>
 #include <platform/mt793x/MT793XConfig.h>
 
 #include <lib/core/CHIPEncoding.h>
@@ -147,9 +150,24 @@ CHIP_ERROR MT793XConfig::ReadConfigValue(Key key, uint32_t & val)
         err = CHIP_ERROR_TIMEOUT;
         SuccessOrExit(err);
     }
-    // Get NVDM item
-    err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) &val, &len));
-    SuccessOrExit(err);
+
+    if (key.Namespace == MT793XConfig::kConfigKey_SetupDiscriminator.Namespace &&
+        key.Name == MT793XConfig::kConfigKey_SetupDiscriminator.Name)
+    {
+        uint8_t mac_addr[WIFI_MAC_ADDRESS_LENGTH] = { 0 };
+        auto mFilogicCtx                          = PlatformMgrImpl().mFilogicCtx;
+
+        filogic_wifi_mac_addr_get_sync(mFilogicCtx, FILOGIC_WIFI_OPMODE_STA, mac_addr);
+
+        val = (*(reinterpret_cast<uint32_t *>(mac_addr))) & 0xFFF;
+        err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        // Get NVDM item
+        err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) &val, &len));
+        SuccessOrExit(err);
+    }
 exit:
     OnExit();
     return err;

@@ -57,10 +57,6 @@ static_library("EFR32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "freertos_bluetooth.c",
-    "freertos_bluetooth.h",
-    "gatt_db.c",
-    "gatt_db.h",
   ]
 
   if (chip_enable_ota_requestor) {
