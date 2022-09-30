@@ -36,6 +36,10 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+extern "C" bool isThreadInitialized();
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -60,6 +64,18 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 
 exit:
     return err;
+}
+
+void ThreadStackManagerImpl::ProcessThreadActivity()
+{
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    if (isThreadInitialized())
+#endif
+    {
+        otTaskletsProcess(OTInstance());
+        otSysProcessDrivers(OTInstance());
+    }
 }
 
 bool ThreadStackManagerImpl::IsInitialized()

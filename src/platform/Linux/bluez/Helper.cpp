@@ -401,7 +401,17 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
     isSuccess = true;
 
 exit:
-    return isSuccess ? TRUE : FALSE;
+    if (!isSuccess && (conn != nullptr))
+    {
+        // Returning G_SOURCE_REMOVE from the source callback removes the source object
+        // from the context. Unset self source ID tag, so we will not call g_source_remove()
+        // in BluezOTConnectionDestroy() on already removed source.
+        //
+        // TODO: Investigate whether there is a batter way to handle this.
+        conn->mC1Channel.mWatch = 0;
+    }
+
+    return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
 }
 
 static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMethodInvocation * invocation, int fd, guint16 mtu)
@@ -417,6 +427,13 @@ static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMetho
 
 static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apClosure)
 {
+    BluezConnection * conn = static_cast<BluezConnection *>(apClosure);
+    // Returning G_SOURCE_REMOVE from the source callback removes the source object
+    // from the context. Unset self source ID tag, so we will not call g_source_remove()
+    // in BluezOTConnectionDestroy() on already removed source.
+    //
+    // TODO: Investigate whether there is a batter way to handle this.
+    conn->mC2Channel.mWatch = 0;
     return G_SOURCE_REMOVE;
 }
 

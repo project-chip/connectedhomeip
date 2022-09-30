@@ -25,7 +25,8 @@ struct AppEvent
 {
     enum AppEventTypes
     {
-        kEventType_Button = 0,
+        kEventType_None = 0,
+        kEventType_Button,
         kEventType_Timer,
         kEventType_TurnOn,
         kEventType_Install,

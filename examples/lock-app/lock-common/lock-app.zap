@@ -1,5 +1,5 @@
 {
-  "featureLevel": 80,
+  "featureLevel": 81,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -5482,7 +5482,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -7758,5 +7758,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ]
+  ],
+  "log": []
 }

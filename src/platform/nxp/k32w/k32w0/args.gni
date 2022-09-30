@@ -28,9 +28,15 @@ chip_build_tests = false
 
 chip_mdns = "platform"
 
-# Trying to fit into the available flash by disabling optional logging for now
-chip_detail_logging = false
-chip_progress_logging = true
+# Logs are enabled by default, but can be disabled by setting
+# chip_logging=false in the build command.
+# Alternatively, a user can overwrite the value for different logging levels
+# by uncommenting the lines below and setting the corresponding value.
+# A user can disable some logging levels to decrease flash usage.
+#chip_detail_logging = true
+#chip_progress_logging = true
+#chip_automation_logging = true
+#chip_error_logging = true
 
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false

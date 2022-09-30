@@ -25,8 +25,8 @@
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
-#include <net/openthread.h>
-#include <zephyr.h>
+#include <zephyr/net/openthread.h>
+#include <zephyr/zephyr.h>
 
 #include <openthread/thread.h>
 #if !CONFIG_SOC_SERIES_RISCV_TELINK_B91
