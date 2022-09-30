@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef _WFX_RSI_H_
 #define _WFX_RSI_H_
 /*

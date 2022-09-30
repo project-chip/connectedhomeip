@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef _RSI_BOARD_CONFIGURATION_H_
 #define _RSI_BOARD_CONFIGURATION_H_
 

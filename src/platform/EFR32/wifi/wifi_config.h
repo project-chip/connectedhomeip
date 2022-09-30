@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef DEMO_CONFIG_H
 #define DEMO_CONFIG_H
 

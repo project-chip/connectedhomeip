@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef _HAL_RSI_HAL_H_
 #define _HAL_RSI_HAL_H_
 #include "rsi_board_configuration.h"

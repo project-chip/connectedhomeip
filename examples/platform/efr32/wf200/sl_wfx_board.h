@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef _SL_WFX_BOARD_H_
 #define _SL_WFX_BOARD_H_
 /*

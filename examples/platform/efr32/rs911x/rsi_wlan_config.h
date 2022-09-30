@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #ifndef RSI_CONFIG_H
 #define RSI_CONFIG_H
 
