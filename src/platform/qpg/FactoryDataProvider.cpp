@@ -111,7 +111,7 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE, outBuffer.data(), 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE, outBuffer.data(),
                                         outBuffer.size(), &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -139,7 +139,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     MutableByteSpan qorvoDacPublicKey(qorvoDacPubKeyBuffer, DEVICE_ATTESTATION_PUBLIC_KEY_LEN);
     qvStatus_t status;
     uint32_t dataLength;
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, qorvoDacPrivateKey.data(), 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, qorvoDacPrivateKey.data(),
                                         qorvoDacPrivateKey.size(), &dataLength);;
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -148,7 +148,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     }
     ReturnErrorOnFailure(MapQorvoError(status));
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, qorvoDacPublicKey.data(), 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, qorvoDacPublicKey.data(),
                                         qorvoDacPublicKey.size(), &dataLength);;
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -171,7 +171,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscrimina
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t *)&setupDiscriminator, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t *)&setupDiscriminator,
                                         SETUP_DISCRIMINATOR_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -193,7 +193,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *)&iterationCount, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *)&iterationCount,
                                         SPAKE2_ITERATION_COUNT_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -240,7 +240,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_SETUP_PASSCODE, (uint8_t *)&setupPasscode, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_SETUP_PASSCODE, (uint8_t *)&setupPasscode,
                                         SETUP_PASSCODE_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -268,7 +268,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_VENDOR_ID, (uint8_t *)&vendorId, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_VENDOR_ID, (uint8_t *)&vendorId,
                                         VENDOR_ID_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -290,7 +290,7 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ID, (uint8_t *)&productId, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ID, (uint8_t *)&productId,
                                         PRODUCT_ID_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
@@ -334,7 +334,7 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
     qvStatus_t status;
     uint32_t dataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION, (uint8_t *)&hardwareVersion, 
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION, (uint8_t *)&hardwareVersion,
                                         HARDWARE_VERSION_LEN, &dataLength);
     if (status == QV_STATUS_NO_ERROR)
     {
