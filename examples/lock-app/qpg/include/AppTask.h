@@ -31,6 +31,8 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <platform/qpg/FactoryDataProvider.h>
+
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x01)
 
@@ -81,6 +83,8 @@ private:
     Function_t mFunction;
     bool mFunctionTimerActive;
     bool mSyncClusterToButtonAction;
+
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
     static AppTask sAppTask;
 };
