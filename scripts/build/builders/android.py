@@ -165,13 +165,13 @@ class AndroidBuilder(Builder):
         # when using dry run.
         jnilibs_dir = os.path.join(
             self.root,
-            "src/android/",
+            "examples/android/",
             self.app.AppName(),
             "app/libs/jniLibs",
             self.board.AbiName(),
         )
         libs_dir = os.path.join(
-            self.root, "src/android/", self.app.AppName(), "app/libs"
+            self.root, "examples/android/", self.app.AppName(), "app/libs"
         )
         self._Execute(
             ["mkdir", "-p", jnilibs_dir], title="Prepare Native libs " + self.identifier
@@ -272,9 +272,9 @@ class AndroidBuilder(Builder):
         # App compilation
         self._Execute(
             [
-                "%s/src/android/%s/gradlew" % (self.root, self.app.AppName()),
+                "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
                 "-p",
-                "%s/src/android/%s" % (self.root, self.app.AppName()),
+                "%s/examples/android/%s" % (self.root, self.app.AppName()),
                 "-PmatterBuildSrcDir=%s" % self.output_dir,
                 "-PmatterSdkSourceBuild=false",
                 "-PbuildDir=%s" % self.output_dir,
@@ -393,9 +393,9 @@ class AndroidBuilder(Builder):
             # TODO: Android Gradle with module and -PbuildDir= will caused issue, remove -PbuildDir=
             self._Execute(
                 [
-                    "%s/src/android/%s/gradlew" % (self.root, self.app.AppName()),
+                    "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
                     "-p",
-                    "%s/src/android/%s" % (self.root, self.app.AppName()),
+                    "%s/examples/android/%s" % (self.root, self.app.AppName()),
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=true",
                     "-PmatterSourceBuildAbiFilters=%s" % self.board.AbiName(),
@@ -423,7 +423,7 @@ class AndroidBuilder(Builder):
                 self.app.AppName()
                 + "-debug.apk": os.path.join(
                     self.root,
-                    "src/android",
+                    "examples/android",
                     self.app.AppName(),
                     "app/build/outputs/apk/debug/app-debug.apk",
                 )

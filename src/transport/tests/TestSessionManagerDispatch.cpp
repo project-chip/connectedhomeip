@@ -140,6 +140,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .sessionId  = 0x0bb8, // 3000
         .peerNodeId = 0x0000000000000000ULL,
     },
+#if !CHIP_CONFIG_SECURITY_TEST_MODE
     {
         .name     = "secure group message (no privacy)",
         .peerAddr = "::1",
@@ -169,6 +170,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .groupId      = 2,
         .sourceNodeId = 0x0000000000000002ULL,
     },
+#endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 };
 
 const uint16_t theMessageTestVectorLength = sizeof(theMessageTestVector) / sizeof(theMessageTestVector[0]);
