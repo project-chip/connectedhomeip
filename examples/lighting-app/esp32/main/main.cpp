@@ -22,7 +22,11 @@
 #include <common/Esp32AppServer.h>
 
 #include "esp_log.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "spi_flash_mmap.h"
+#else
 #include "esp_spi_flash.h"
+#endif
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
