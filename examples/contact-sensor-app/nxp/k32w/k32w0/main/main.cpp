@@ -114,7 +114,7 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    
+
 #ifdef K32WMCM_APP_BUILD
     APP_SetHighTxPowerMode();
 #endif
