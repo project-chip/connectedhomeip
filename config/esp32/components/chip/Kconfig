@@ -497,11 +497,14 @@ menu "CHIP Device Layer"
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
-        config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-	    bool "Disable and DeInit BLE on commissioning complete"
+        config USE_BLE_ONLY_FOR_COMMISSIONING
+	    bool "Use BLE only for commissioning"
 	    default y
 	    help 
-                Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
+            Disable this flag if BLE is used for any other purpose than commissioning.
+            When enabled, it deinitialized the BLE on successful commissioning, and on
+            bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
+
     endmenu
 
     menu "CHIP Thread Options"

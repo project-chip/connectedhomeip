@@ -16,4 +16,5 @@ declare_args() {
   # Root directory for MW320 SDK.
   mw320_sdk_build_root =
       "//third_party/connectedhomeip/third_party/nxp/mw320_sdk"
+  wifi_conn_abort_support = true
 }

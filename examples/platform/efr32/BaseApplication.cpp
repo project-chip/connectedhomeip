@@ -46,7 +46,6 @@
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/freertos_bluetooth.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -414,7 +413,8 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        // If the button was released before factory reset got initiated, open the commissioning window and start BLE advertissement
+        // in fast mode
         if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
         {
             CancelFunctionTimer();
@@ -431,9 +431,14 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             if (!ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
             {
-                // Enable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+                // Open Basic CommissioningWindow. Will start BLE advertisements
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                CHIP_ERROR err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+                if (err != CHIP_NO_ERROR)
+                {
+                    EFR32_LOG("Failed to open the Basic Commissioning Window");
+                }
             }
             else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
