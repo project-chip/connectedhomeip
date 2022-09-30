@@ -19,7 +19,7 @@ when running an example build script, the arguments and their order is
 important.
 
 ```PowerShell
-./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]
+./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]
 ```
 
 for example:

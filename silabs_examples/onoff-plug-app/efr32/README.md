@@ -105,7 +105,7 @@ Silicon Labs platform.
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true matter_openthread_ftd=false'
+          $ gn gen out/debug '--args=silabs_board="BRD4161A" enable_sleepy_device=true matter_openthread_ftd=false'
 
 For more build options, help is provided when running the build script without
 arguments
