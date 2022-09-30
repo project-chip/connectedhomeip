@@ -406,6 +406,8 @@ exit:
         // Returning G_SOURCE_REMOVE from the source callback removes the source object
         // from the context. Unset self source ID tag, so we will not call g_source_remove()
         // in BluezOTConnectionDestroy() on already removed source.
+        //
+        // TODO: Investigate whether there is a batter way to handle this.
         conn->mC1Channel.mWatch = 0;
     }
 
@@ -429,6 +431,8 @@ static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition
     // Returning G_SOURCE_REMOVE from the source callback removes the source object
     // from the context. Unset self source ID tag, so we will not call g_source_remove()
     // in BluezOTConnectionDestroy() on already removed source.
+    //
+    // TODO: Investigate whether there is a batter way to handle this.
     conn->mC2Channel.mWatch = 0;
     return G_SOURCE_REMOVE;
 }
