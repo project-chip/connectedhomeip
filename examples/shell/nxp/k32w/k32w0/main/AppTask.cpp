@@ -419,8 +419,8 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
             K32W_LOG("Started NFC Tag Emulation!");
         }
     }
-}
 #endif
+}
 
 void AppTask::CancelTimer()
 {

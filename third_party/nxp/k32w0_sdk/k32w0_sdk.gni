@@ -83,7 +83,7 @@ template("k32w0_sdk") {
            "Please build for only one platform")
     device = "K32W061"
     board = "k32w061dk6"
-    chip_with_ntag = 1
+    chip_with_ntag = 0
     chip_with_high_power = 0
   }
   if (build_for_k32w041am == 1) {
