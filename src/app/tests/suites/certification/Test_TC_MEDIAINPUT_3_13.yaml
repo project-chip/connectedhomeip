@@ -36,10 +36,7 @@ tests:
     #This step implicitly validating the attribute(InputList)constraints, as long as the payload is being parsed successfully
     - label:
           "TH reads the InputList attribute from the DUT to show list of Inputs
-          available and Verify list of available inputs supported by the device
-          is provided, where each entry in the list contains an index(type:uint
-          8), InputType (InputType Enums), Name (type: Strings), and
-          Description(Type:String)"
+          available"
       PICS: MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "InputList"

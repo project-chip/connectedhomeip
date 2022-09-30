@@ -35,7 +35,7 @@ using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelega
 class AppContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    AppContentLauncherManager(ContentAppAttributeDelegate attributeDelegate, std::list<std::string> acceptHeaderList,
+    AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> acceptHeaderList,
                               uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
@@ -60,5 +60,5 @@ private:
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
 
-    ContentAppAttributeDelegate mAttributeDelegate;
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

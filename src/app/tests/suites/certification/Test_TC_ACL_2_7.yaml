@@ -67,6 +67,7 @@ tests:
           Open a commissioning window On TH1(Chiptool)using below command
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
+
           [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
           [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
           [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
@@ -75,7 +76,7 @@ tests:
 
           Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
 
-          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
           [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step "Cleanup"
           [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -84,7 +85,7 @@ tests:
           "TH2 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       verification: |
-          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
           On TH2(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
           [1657186956.724761][3910:3915] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3161849734
@@ -97,7 +98,7 @@ tests:
           1.struct .Data field: D_OK_EMPTY 1718"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension "[{"data":"1718"}]" 1 0
+          ./chip-tool accesscontrol write extension '[{"data":"1718"}]' 1 0
 
           On TH1(Chiptool),Verify  Successfully to extension attribute list containg one element .
 
@@ -146,7 +147,7 @@ tests:
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-name beta
+          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
           On TH2(Chiptool),Verify Successfully to extension attribute list containg one element .
           1657894672.479983][2433:2438] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -212,7 +213,7 @@ tests:
           "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta
+          ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
           On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327214.683199][2749:2754] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 2953114587
@@ -252,20 +253,18 @@ tests:
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol read-event access-control-extension-changed  2 0 --commissioner-name beta
+          ./chip-tool accesscontrol read-event access-control-extension-changed  2 0 --commissioner-name beta  --commissioner-nodeid 223344
           On TH2(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F1
-          [1658327551.622018][4295:4300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
-          [1658327551.622043][4295:4300] CHIP:TOO:          Event number: 6
-          [1658327551.622065][4295:4300] CHIP:TOO:          Priority: Info
-          [1658327551.622130][4295:4300] CHIP:TOO:          Timestamp: 4633724
-          [1658327551.622239][4295:4300] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1658327551.622287][4295:4300] CHIP:TOO:     AdminNodeID: 112233
-          [1658327551.622313][4295:4300] CHIP:TOO:     AdminPasscodeID: null
-          [1658327551.622337][4295:4300] CHIP:TOO:     ChangeType: 1
-          [1658327551.622361][4295:4300] CHIP:TOO:     LatestValue: {
-          [1658327551.622389][4295:4300] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
-          [1658327551.622414][4295:4300] CHIP:TOO:       FabricIndex: 2
-          [1658327551.622436][4295:4300] CHIP:TOO:      }
-          [1658327551.622459][4295:4300] CHIP:TOO:     AdminFabricIndex: 2
-          [1658327551.622480][4295:4300] CHIP:TOO:    }
+          [1663242753.957097][4264:4270] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
+          [1663242753.957400][4264:4270] CHIP:TOO:   Event number: 8
+          [1663242753.957459][4264:4270] CHIP:TOO:   Priority: Info
+          [1663242753.957507][4264:4270] CHIP:TOO:   Timestamp: 20785045
+          [1663242753.957708][4264:4270] CHIP:TOO:   AccessControlExtensionChanged: {
+          [1663242753.957801][4264:4270] CHIP:TOO:     AdminNodeID: 223344
+          [1663242753.957867][4264:4270] CHIP:TOO:     AdminPasscodeID: null
+          [1663242753.957931][4264:4270] CHIP:TOO:     ChangeType: 1
+          [1663242753.957991][4264:4270] CHIP:TOO:     LatestValue: {
+          [1663242753.958055][4264:4270] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
+          [1663242753.958118][4264:4270] CHIP:TOO:       FabricIndex: 2
+          [1663242753.958183][4264:4270] CHIP:TOO:      }
       disabled: true

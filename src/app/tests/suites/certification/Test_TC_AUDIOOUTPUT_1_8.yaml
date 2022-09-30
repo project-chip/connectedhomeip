@@ -67,16 +67,6 @@ tests:
               contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: AUDIOOUTPUT.S.NU
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: [1]
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: " !AUDIOOUTPUT.S.NU "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

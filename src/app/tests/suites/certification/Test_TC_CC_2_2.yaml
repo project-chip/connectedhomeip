@@ -275,7 +275,7 @@ tests:
           "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute"
       PICS: CC.C.A0007
       verification: |
-          ./chip-tool colorcontrol read color-temperature 1 1
+          ./chip-tool colorcontrol read color-temperature-mireds 1 1
 
           Verify response contains an uint16 in  TH(all-clusters-app)  Logs:
 

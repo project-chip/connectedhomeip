@@ -648,25 +648,13 @@ tests:
       response:
           value: UniqueIDValue
 
+    #This step implicitly validating the attribute(CapabilityMinima)constraints, as long as the payload is being parsed successfully
     - label: "TH reads CapabilityMinima attribute from the DUT."
       PICS: BINFO.S.A0013
       command: "readAttribute"
       attribute: "CapabilityMinima"
       response:
           saveAs: CapabilityMinimaValue
-
-    - label:
-          "Step 56 is implicitly validating the attribute(CapabilityMinima)
-          constraints, as long as the payload is being parsed successfully"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && BINFO.S.A0013
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "TH writes CapabilityMinima from the DUT."
       PICS: BINFO.S.A0013

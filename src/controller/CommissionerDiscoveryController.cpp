@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -51,7 +51,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         return;
     }
     mReady = false;
-    strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
+    Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingDeviceIdHexBuffer,

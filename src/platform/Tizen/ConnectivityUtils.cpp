@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <lib/support/CHIPMemString.h>
+
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
@@ -53,7 +55,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 
     // Test wireless extensions for CONNECTION_WIFI
     struct iwreq pwrq = {};
-    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(pwrq.ifr_name, ifname);
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
@@ -65,7 +67,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
         ecmd.cmd                = ETHTOOL_GSET;
         struct ifreq ifr        = {};
         ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
             ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;

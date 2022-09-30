@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@
 #include <unistd.h>
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -255,7 +256,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 
     // Test wireless extensions for CONNECTION_WIFI
     struct iwreq pwrq = {};
-    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(pwrq.ifr_name, ifname);
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
@@ -267,7 +268,7 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
         ecmd.cmd                = ETHTOOL_GSET;
         struct ifreq ifr        = {};
         ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
             ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
@@ -329,9 +330,8 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
         {
             if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                strncpy(ifname, ifa->ifa_name, bufSize);
-                ifname[bufSize - 1] = '\0';
-                err                 = CHIP_NO_ERROR;
+                Platform::CopyString(ifname, bufSize, ifa->ifa_name);
+                err = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -348,7 +348,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to
                                                struct iwreq * pwrq) /* Fixed part of the request */
 {
     /* Set device name */
-    strncpy(pwrq->ifr_name, ifname, IFNAMSIZ);
+    Platform::CopyString(pwrq->ifr_name, ifname);
 
     /* Do the request */
     if (ioctl(skfd, request, pwrq) < 0)
@@ -366,7 +366,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct
     wrq.u.data.pointer = (caddr_t) stats;
     wrq.u.data.length  = sizeof(struct iw_statistics);
     wrq.u.data.flags   = 1; /*Clear updated flag */
-    strncpy(wrq.ifr_name, ifname, IFNAMSIZ);
+    Platform::CopyString(wrq.ifr_name, ifname);
 
     return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
 }
@@ -524,9 +524,8 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
         {
             if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
-                strncpy(ifname, ifa->ifa_name, bufSize);
-                ifname[bufSize - 1] = '\0';
-                err                 = CHIP_NO_ERROR;
+                Platform::CopyString(ifname, bufSize, ifa->ifa_name);
+                err = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -548,7 +547,7 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, app::Clusters::
     struct ifreq ifr        = {};
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(ifr.ifr_name, ifname);
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -617,7 +616,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
     struct ifreq ifr        = {};
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(ifr.ifr_name, ifname);
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {

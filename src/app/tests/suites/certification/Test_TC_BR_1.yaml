@@ -24,6 +24,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT (bridge) has been commissioned to TH
+
+          2. Two or more bridged devices of a supported type connected via non-Matter network/protocol to DUT (bridge).
+          If the bridge supports both actuator and sensor/switch devices, use at least one of each type
+      disabled: true
+
     - label:
           "Read attribute DeviceTypeList of the Descriptor cluster on endpoint 0"
       PICS: MCORE.BRIDGE
@@ -257,6 +265,16 @@ tests:
       disabled: true
 
     - label:
+          "IF 0 endpoints found in step 1c, FAIL the test (no Aggregator device
+          type found) ELSE Execute test steps 2a..7d for each of the endpoints
+          found in step 1c (i.e. for each of the Aggregator device types)"
+      verification: |
+          From Step1c,  list all the endpoints having the aggregator i.e., 0x000e=14
+
+          Then in this case Endpoint is 1
+      disabled: true
+
+    - label:
           "Read attribute PartsList of the Descriptor cluster on endpoint found
           in step 1c"
       PICS: MCORE.BRIDGE
@@ -480,7 +498,7 @@ tests:
 
           ./chip-tool bridgeddevicebasic read node-label 1 4
 
-          Verify Verify Node-label is read sucessfully in TH(chip-tool) Log
+          Verify Node-label is read sucessfully in TH(chip-tool) Log
 
           [1657003598.573764][4552:4557] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3722118563
           [1657003598.573811][4552:4557] CHIP:TOO:   NodeLabel: Switch 1
@@ -646,7 +664,7 @@ tests:
           which is an actuator (e.g. light, window covering)"
       PICS: MCORE.BRIDGE
       verification: |
-          From Step 5 output , choose one of the device type and identfy the device from the device librray.
+          From Step 5 output , choose one of the device type and identify the device from the device library.
           For Ex: on-off cluster has been taken as example to run tfurther steps
       disabled: true
 
@@ -716,10 +734,10 @@ tests:
     - label:
           "From the list acquired in step 5, choose one of the bridged devices
           which is a sensor (e.g. occupancy sensor, contact sensor, temperature
-          sensor)"
+          sensor)or switch"
       PICS: MCORE.BRIDGE
       verification: |
-          From Step 5 output , choose one of the sensor device type and identfy the device from the device librray.
+          From Step 5 output , choose one of the sensor device type and identify the device from the device library
           For Ex:  temperature sensor, being added to bridge-app as example to run further steps
       disabled: true
 

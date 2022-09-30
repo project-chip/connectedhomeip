@@ -1376,6 +1376,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster Switch = 59 {
+  bitmap SwitchFeature : BITMAP32 {
+    kLatchingSwitch = 0x1;
+    kMomentarySwitch = 0x2;
+    kMomentarySwitchRelease = 0x4;
+    kMomentarySwitchLongPress = 0x8;
+    kMomentarySwitchMultiPress = 0x10;
+  }
+
   info event SwitchLatched = 0 {
     INT8U newPosition = 0;
   }
@@ -1739,6 +1747,11 @@ client cluster MediaPlayback = 1286 {
     kPaused = 1;
     kNotPlaying = 2;
     kBuffering = 3;
+  }
+
+  bitmap MediaPlaybackFeature : BITMAP32 {
+    kAdvancedSeek = 0x1;
+    kVariableSpeed = 0x2;
   }
 
   readonly attribute int16u clusterRevision = 65533;

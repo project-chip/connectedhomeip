@@ -138,7 +138,404 @@ tests:
               type: list
               contains: [6]
 
-    - label: "Read the optional attribute(ActiveTimestamp) in AttributeList"
+    - label: "TH reads optional attribute (DetachedRoleCount) in AttributeList"
+      PICS: DGTHREAD.S.A000e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [14]
+
+    - label: "TH reads optional attribute (ChildRoleCount) AttributeList"
+      PICS: DGTHREAD.S.A001f
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [15]
+
+    - label: "TH reads optional attribute (RouterRoleCount) in AttributeList"
+      PICS: DGTHREAD.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label: "TH reads optional attribute (LeaderRoleCount) in AttributeList"
+      PICS: DGTHREAD.S.A0011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
+
+    - label: "TH reads optional attribute (AttachAttemptCount) in AttributeList"
+      PICS: DGTHREAD.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label:
+          "TH reads optional attribute (PartitionIdChangeCount) in AttributeList"
+      PICS: DGTHREAD.S.A0013
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
+
+    - label:
+          "TH reads optional attribute (BetterPartitionAttachAttemptCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label: "TH reads optional attribute (ParentChangeCount) in AttributeList"
+      PICS: DGTHREAD.S.A0015
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [21]
+
+    - label: "TH reads optional attribute (TxTotalCount) in AttributeList"
+      PICS: DGTHREAD.S.A0016
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [22]
+
+    - label: "TH reads optional attribute (TxUnicastCount) in AttributeList"
+      PICS: DGTHREAD.S.A0017
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [23]
+
+    - label: "TH reads optional attribute (TxBroadcastCount) in AttributeList"
+      PICS: DGTHREAD.S.A0018
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [24]
+
+    - label:
+          "TH reads optional attribute (TxAckRequestedCount) in AttributeList"
+      PICS: DGTHREAD.S.A0019
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [25]
+
+    - label: "TH reads optional attribute (TxAckedCount) in AttributeList"
+      PICS: DGTHREAD.S.A001a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [26]
+
+    - label:
+          "TH reads optional attribute (TxNoAckRequestedCount) in AttributeList"
+      PICS: DGTHREAD.S.A001b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [27]
+
+    - label: "TH reads optional attributes (TxDataCount) in AttributeList"
+      PICS: DGTHREAD.S.A001c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [28]
+
+    - label: "TH reads optional attribute (TxDataPollCount) in AttributeList"
+      PICS: DGTHREAD.S.A001d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [29]
+
+    - label: "TH reads optional attribute (TxBeaconCount) in AttributeList"
+      PICS: DGTHREAD.S.A001e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [30]
+
+    - label:
+          "TH reads optional attribute (TxBeaconRequestCount) in AttributeList"
+      PICS: DGTHREAD.S.A001f
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [31]
+
+    - label: "TH reads optional attribute (TxOtherCount) in AttributeList"
+      PICS: DGTHREAD.S.A0020
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [32]
+
+    - label: "TH reads optional attribute (TxRetryCount) in AttributeList"
+      PICS: DGTHREAD.S.A0021
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [33]
+
+    - label:
+          "TH reads optional attribute (TxDirectMaxRetryExpiryCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0022
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [34]
+
+    - label:
+          "TH reads optional attribute (TxIndirectMaxRetryExpiryCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0023
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [35]
+
+    - label: "TH reads optional attribute (TxErrCcaCount) in AttributeList"
+      PICS: DGTHREAD.S.A0024
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [36]
+
+    - label: "TH reads optional attribute (TxErrAbortCount) in AttributeList"
+      PICS: DGTHREAD.S.A0025
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [37]
+
+    - label:
+          "TH reads optional attribute (TxErrBusyChannelCount) in AttributeList"
+      PICS: DGTHREAD.S.A0026
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [38]
+
+    - label: "TH reads optional attribute (RxTotalCount) in AttributeList"
+      PICS: DGTHREAD.S.A0027
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [39]
+
+    - label: "TH reads optional attribute (RxUnicastCount) in AttributeList"
+      PICS: DGTHREAD.S.A0028
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [40]
+
+    - label: "TH reads optional attribute (RxBroadcastCount) in AttributeList"
+      PICS: DGTHREAD.S.A0029
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [41]
+
+    - label: "TH reads optional attribute (RxDataCount) in AttributeList"
+      PICS: DGTHREAD.S.A002a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [42]
+
+    - label: "TH reads optional attribute (RxDataPollCount) in AttributeList"
+      PICS: DGTHREAD.S.A002b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [43]
+
+    - label: "TH reads optional attribute (RxBeaconCount) in AttributeList"
+      PICS: DGTHREAD.S.A002c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [44]
+
+    - label:
+          "TH reads optional attribute (RxBeaconRequestCount) in AttributeList"
+      PICS: DGTHREAD.S.A002d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [45]
+
+    - label: "TH reads optional attribute (RxOtherCount) in AttributeList"
+      PICS: DGTHREAD.S.A002e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [46]
+
+    - label:
+          "TH reads optional attribute (RxAddressFilteredCount) in AttributeList"
+      PICS: DGTHREAD.S.A002f
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [47]
+
+    - label:
+          "TH reads optional attribute (RxDestAddrFilteredCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0030
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [48]
+
+    - label: "TH reads optional attribute (RxDuplicatedCount) in AttributeList"
+      PICS: DGTHREAD.S.A0031
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
+
+    - label: "TH reads optional attribute (RxErrNoFrameCount) in AttributeList"
+      PICS: DGTHREAD.S.A0032
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [50]
+
+    - label:
+          "TH reads optional attribute (RxErrUnknownNeighborCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0033
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [51]
+
+    - label:
+          "TH reads optional attribute (RxErrInvalidScrAddrCount) in
+          AttributeList"
+      PICS: DGTHREAD.S.A0034
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [52]
+
+    - label: "TH reads optional attribute (RxErrSecCount) in AttributeList"
+      PICS: DGTHREAD.S.A0035
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [53]
+
+    - label: "TH reads optional attribute (RxErrFcsCount) in AttributeList"
+      PICS: DGTHREAD.S.A0036
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [54]
+
+    - label: "TH reads optional attribute (RxErrOtherCount) in AttributeList"
+      PICS: DGTHREAD.S.A0037
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [55]
+
+    - label: "Read the optional attribute (ActiveTimestamp) in AttributeList"
       PICS: DGTHREAD.S.A0039
       command: "readAttribute"
       attribute: "AttributeList"
@@ -147,7 +544,7 @@ tests:
               type: list
               contains: [56]
 
-    - label: "Read the optional attribute(PendingTimestamp) in AttributeList"
+    - label: "Read the optional attribute (PendingTimestamp) in AttributeList"
       PICS: DGTHREAD.S.A003A
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,7 +553,7 @@ tests:
               type: list
               contains: [57]
 
-    - label: "Read the optional attribute(Delay) in AttributeList"
+    - label: "Read the optional attribute (Delay) in AttributeList"
       PICS: DGTHREAD.S.A003B
       command: "readAttribute"
       attribute: "AttributeList"

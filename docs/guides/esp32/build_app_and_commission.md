@@ -154,7 +154,7 @@ Below apps can be used for commissioning the application running on ESP32:
 -   [Python Based Device Controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
 -   [Standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 -   [iOS chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
--   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
+-   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/examples/android/CHIPTool)
 
 ### Building Standalone chip-tool
 
