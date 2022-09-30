@@ -25,8 +25,8 @@
 #include "ContactSensorManager.h"
 #include "K32W0FactoryDataProvider.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -54,8 +54,8 @@ public:
     bool IsSyncClusterToButtonAction();
     void SetSyncClusterToButtonAction(bool value);
     // Identify cluster callbacks.
-    static void OnIdentifyStart(Identify* identify);
-    static void OnIdentifyStop(Identify* identify);
+    static void OnIdentifyStart(Identify * identify);
+    static void OnIdentifyStop(Identify * identify);
 
 private:
     friend AppTask & GetAppTask(void);

@@ -50,7 +50,7 @@ public:
     typedef void (*CallbackStateChanged)(State aState);
     void SetCallback(CallbackStateChanged aCallbackStateChanged);
 
-    static void HandleAction(void* aGenericEvent);
+    static void HandleAction(void * aGenericEvent);
 
 private:
     friend ContactSensorManager & ContactSensorMgr(void);

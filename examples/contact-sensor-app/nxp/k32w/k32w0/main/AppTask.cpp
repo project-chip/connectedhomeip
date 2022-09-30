@@ -21,14 +21,14 @@
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <DeviceInfoProviderImpl.h>
-#include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -45,10 +45,10 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #endif
 
-#include "PWR_Interface.h"
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
+#include "PWR_Interface.h"
 #include "app_config.h"
 
 #if CHIP_CRYPTO_HSM
@@ -70,8 +70,8 @@ static LEDWidget sStatusLED;
 static LEDWidget sContactSensorLED;
 #endif
 
-static bool sIsThreadProvisioned = false;
-static bool sHaveBLEConnections  = false;
+static bool sIsThreadProvisioned        = false;
+static bool sHaveBLEConnections         = false;
 static bool sIsDnssdPlatformInitialized = false;
 
 static uint32_t eventMask = 0;
@@ -86,12 +86,8 @@ using namespace chip;
 
 AppTask AppTask::sAppTask;
 
-static Identify gIdentify = {
-    chip::EndpointId{1},
-    AppTask::OnIdentifyStart,
-    AppTask::OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED
-};
+static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
+                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -137,12 +133,12 @@ CHIP_ERROR AppTask::Init()
 // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
-	ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
+    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-	SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
 #endif
-	SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-	SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -230,7 +226,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
@@ -297,7 +293,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
             K32WUartProcess();
 #endif
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -315,8 +311,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
 
 #if !cPWR_UsePowerDownMode
-        if (sAppTask.mFunction != Function::kFactoryReset &&
-            sAppTask.mFunction != Function::kIdentify)
+        if (sAppTask.mFunction != Function::kFactoryReset && sAppTask.mFunction != Function::kIdentify)
         {
             if (sIsThreadProvisioned)
             {
@@ -509,10 +504,10 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
 
 void AppTask::ContactActionEventHandler(void * aGenericEvent)
 {
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+    AppEvent * aEvent                   = (AppEvent *) aGenericEvent;
     ContactSensorManager::Action action = ContactSensorManager::Action::kInvalid;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool state_changed = false;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    bool state_changed                  = false;
 
     if (sAppTask.mFunction != Function::kNoneSelected)
     {
@@ -589,10 +584,7 @@ void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appSta
     else
     {
         CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY),
-            AppTask::OnScheduleInitOTA,
-            nullptr
-        );
+            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY), AppTask::OnScheduleInitOTA, nullptr);
 
         if (error != CHIP_NO_ERROR)
         {
@@ -622,9 +614,9 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-    #if !cPWR_UsePowerDownMode
+#if !cPWR_UsePowerDownMode
         sStatusLED.Set(false);
-    #endif
+#endif
         K32W_LOG("Stopped BLE Advertising!");
     }
     else
@@ -633,9 +625,9 @@ void AppTask::BleStartAdvertising(intptr_t arg)
 
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
-        #if !cPWR_UsePowerDownMode
+#if !cPWR_UsePowerDownMode
             sStatusLED.Set(true);
-        #endif
+#endif
             K32W_LOG("Started BLE Advertising!");
         }
         else
@@ -758,7 +750,7 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     sAppTask.mFunction = Function::kNoneSelected;
 }
 
-void AppTask::OnIdentifyStart(Identify* identify)
+void AppTask::OnIdentifyStart(Identify * identify)
 {
     if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
     {
@@ -776,7 +768,7 @@ void AppTask::OnIdentifyStart(Identify* identify)
     }
 }
 
-void AppTask::OnIdentifyStop(Identify* identify)
+void AppTask::OnIdentifyStop(Identify * identify)
 {
     if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
     {
@@ -842,7 +834,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
 #endif
 
-    if (aEvent->Handler)
+        if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
@@ -881,15 +873,14 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool stateValueAttrValue = 0;
 
     /* get onoff attribute value */
-    (void)emberAfReadAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID,
-            (uint8_t *) &stateValueAttrValue, 1);
+    (void) emberAfReadAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue, 1);
 #if !cPWR_UsePowerDownMode
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);
 #endif
 }
 
-extern "C" void OTAIdleActivities( void )
+extern "C" void OTAIdleActivities(void)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();

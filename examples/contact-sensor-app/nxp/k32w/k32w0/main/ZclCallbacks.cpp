@@ -23,8 +23,8 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/EventLogging.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
@@ -35,7 +35,7 @@ using namespace ::chip::app::Clusters::BooleanState;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl,"MatterPostAttributeChangeCallback, value:%d\n", *value);
+    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback, value:%d\n", *value);
     if (path.mClusterId != BooleanState::Id)
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mClusterId));
@@ -48,7 +48,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         return;
     }
 
-    AppTask& task = GetAppTask();
+    AppTask & task = GetAppTask();
     // If the callback is called after the cluster attribute was changed due to pressing a button,
     // set the sync value to false. Both LED and attribute were updated at this point.
     // On the other hand, if the cluster attribute was changed due to a cluster command,
@@ -59,7 +59,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else
     {
-        task.PostContactActionRequest(*value ? ContactSensorManager::Action::kSignalDetected : ContactSensorManager::Action::kSignalLost);
+        task.PostContactActionRequest(*value ? ContactSensorManager::Action::kSignalDetected
+                                             : ContactSensorManager::Action::kSignalLost);
     }
 }
 
