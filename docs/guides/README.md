@@ -18,8 +18,9 @@
 -   [nRF Connect - Software Update](./nrfconnect_examples_software_update.md)
 -   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
 -   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)
+-   [Silicon Labs - SMG Documentation](https://github.com/SiliconLabs/matter/tree/v0.3.0/docs/silabs))
 -   [Silicon Labs - Building](./silabs_efr32_building.md)
--   [Silicon Labs - Building](./silabs_efr32_software_update.md)
+-   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
 -   [TI - Platform Overview](./ti_platform_overview.md)
 
 ## Development Guides

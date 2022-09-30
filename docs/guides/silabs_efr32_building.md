@@ -13,8 +13,18 @@ The full list of examples can be found
 [here](https://github.com/project-chip/connectedhomeip/tree/master/examples).
 The GitHub repository also includes tools for testing your Matter project.
 
+## Silicon Labs Matter Github (SMG)
+
+Silicon Laboratories now maintains a public matter GitHub repo with frequent
+releases thoroughly tested and validated. Developers looking to develop matter
+products with silabs hardware are encouraged to use our latest release,
+currently 0.3.0, with added tools and documentation.
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases/tag/v0.3.0)
+
+The complete Silabs documentation can be found here
+[SMG Documentation](https://github.com/SiliconLabs/matter/tree/v0.3.0/docs/silabs)
+
 ## Getting Started with Matter on EFR32
 
 Developers can find more resources on
-[Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US)
-.
+[Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US).
