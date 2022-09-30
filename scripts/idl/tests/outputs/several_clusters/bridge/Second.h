@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BridgeGlobalStructs.h"
+#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
 
 namespace clusters {
 struct SecondCluster : public GeneratedCluster
@@ -11,7 +12,8 @@ struct SecondCluster : public GeneratedCluster
   {
   }
 
-  chip::ClusterId GetClusterId() override { return 2; }
+  static constexpr uint32_t kClusterId =2;
+  chip::ClusterId GetClusterId() override { return kClusterId; }
 
   std::vector<AttributeInterface*> GetAttributes() override
   {
