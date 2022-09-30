@@ -79,10 +79,13 @@ k32w0_executable("light_app") {
     "main/main.cpp",
   ]
 
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h" ]
+
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common/",
+    "${chip_root}/examples/lighting-app/nxp/zap/",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
@@ -113,16 +116,7 @@ k32w0_executable("light_app") {
       "-Wl,--defsym",
       "-Wl,__app_load_address__=0x4000",
       "-Wl,--defsym",
-      "-Wl,__app_stated_size__=0x99A00",
-    ]
-  }
-
-  if (chip_enable_ota_requestor) {
-    ldflags += [
-      "-Wl,--defsym",
-      "-Wl,__app_load_address__=0x4000",
-      "-Wl,--defsym",
-      "-Wl,__app_stated_size__=0x99A00",
+      "-Wl,__app_stated_size__=0x99200",
     ]
   }
 
