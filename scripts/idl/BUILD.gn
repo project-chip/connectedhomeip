@@ -59,10 +59,18 @@ pw_python_package("idl") {
     "generators/types.py",
     "matter_idl_parser.py",
     "matter_idl_types.py",
+    "xml_parser.py",
+    "zapxml/__init__.py",
+    "zapxml/handlers/__init__.py",
+    "zapxml/handlers/base.py",
+    "zapxml/handlers/context.py",
+    "zapxml/handlers/handlers.py",
+    "zapxml/handlers/parsing.py",
   ]
 
   tests = [
     "test_matter_idl_parser.py",
     "test_generators.py",
+    "test_xml_parser.py",
   ]
 }
