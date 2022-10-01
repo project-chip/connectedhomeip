@@ -112,10 +112,7 @@ bool ReadValue(Json::Value jsonValue)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 // TODO: This should be moved to a method of P256Keypair

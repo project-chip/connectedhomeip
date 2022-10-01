@@ -157,11 +157,6 @@ static void TestCommissionerDUTVectors(nlTestSuite * inSuite, void * inContext)
             isSuccessCase = true;
         }
 
-        if (!isSuccessCase && (attestationResult == AttestationVerificationResult::kSuccess))
-        {
-            fprintf(stderr, "DEBUG PRINT 02: %s\n", jsonFilePath.c_str());
-        }
-
         if (isSuccessCase)
         {
             NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
