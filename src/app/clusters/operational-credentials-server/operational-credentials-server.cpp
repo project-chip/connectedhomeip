@@ -968,7 +968,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         Crypto::P256ECDSASignature signature;
         MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-        // Getnerate attestation signature
+        // Generate attestation signature
         err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
         ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
         VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
@@ -1101,7 +1101,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             Crypto::P256ECDSASignature signature;
             MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-            // Getnerate attestation signature
+            // Generate attestation signature
             err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
             ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
             VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
