@@ -46,6 +46,7 @@ CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 skip_gn=false
+run_yaml=false
 
 help() {
 
@@ -53,6 +54,7 @@ help() {
 
     echo "General Options:
   -h, --help                Display this information.
+  -f, --full                Run both yaml and unit tests for unified coverage.
 Input Options:
   -o, --output_root         Set the build output directory.  When set manually, performs only lcov stage
                             on provided build output.  Assumes output_root has been built with 'use_coverage=true'
@@ -67,6 +69,9 @@ while (($#)); do
         --help | -h)
             help
             exit 1
+            ;;
+        --full | -f)
+            run_yaml=true
             ;;
         --output_root | -o)
             OUTPUT_ROOT=$2
@@ -88,12 +93,32 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
 if [ "$skip_gn" == false ]; then
-    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true'
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_build_all_clusters_app=true'
+    ninja -C "$OUTPUT_ROOT"
+fi
+
+# Run unit tests
+if [ "$skip_gn" == false ]; then
     ninja -C "$OUTPUT_ROOT" check
 fi
 
+# Run yaml tests
+if [ "$run_yaml" == true ]; then
+    scripts/run_in_build_env.sh \
+        "./scripts/tests/run_test_suite.py \
+         --chip-tool ""$OUTPUT_ROOT/chip-tool \
+         run \
+         --iterations 1 \
+         --test-timeout-seconds 120 \
+         --all-clusters-app ""$OUTPUT_ROOT/chip-all-clusters-app
+      "
+fi
+
+# Remove unit test itself from coverage statistics
+find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
+
 mkdir -p "$COVERAGE_ROOT"
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
-lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
+lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"

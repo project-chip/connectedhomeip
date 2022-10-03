@@ -152,7 +152,9 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 12000
+          constraints:
+              minValue: 10200
+              maxValue: 13800
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=6000,
@@ -262,7 +264,9 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 54000
+          constraints:
+              minValue: 50700
+              maxValue: 62100
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=6000,
@@ -372,7 +376,9 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 12000
+          constraints:
+              minValue: 10200
+              maxValue: 13800
 
     - label:
           "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=12000,
@@ -482,7 +488,9 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 6000
+          constraints:
+              minValue: 5100
+              maxValue: 6900
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F01 && CC.S.A0008

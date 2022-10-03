@@ -33,8 +33,8 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
-@property (nonatomic, readonly, strong, nonnull) MTRDeviceController * deviceController;
-@property (nonatomic, readonly) uint64_t nodeID;
+@property (nonatomic, readonly) MTRDeviceController * deviceController;
+@property (nonatomic, readonly, copy) NSNumber * nodeID;
 
 @end
 

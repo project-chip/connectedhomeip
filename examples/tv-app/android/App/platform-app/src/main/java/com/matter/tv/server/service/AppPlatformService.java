@@ -49,6 +49,10 @@ public class AppPlatformService {
 
   private AppPlatformService() {}
 
+  public void reportAttributeChange(int endpointId, int clusterId, int attributeId) {
+    mAppPlatform.reportAttributeChange(endpointId, clusterId, attributeId);
+  }
+
   private static class SingletonHolder {
     static AppPlatformService instance = new AppPlatformService();
   }

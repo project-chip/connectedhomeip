@@ -5,25 +5,31 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
+import com.matter.tv.server.service.MatterServant;
 import com.matter.tv.server.tvapp.UserPrompter;
 import com.matter.tv.server.tvapp.UserPrompterResolver;
 
 public class MatterCommissioningPrompter extends UserPrompterResolver implements UserPrompter {
 
-  private Activity activity;
+  private final Context context;
   private NotificationManager notificationManager;
   private final String CHANNEL_ID = "MatterCommissioningPrompter.CHANNEL";
   private final int SUCCESS_ID = 0;
   private final int FAIL_ID = 1;
 
-  public MatterCommissioningPrompter(Activity activity) {
-    this.activity = activity;
+  public MatterCommissioningPrompter(Context context) {
+    this.context = context;
     this.createNotificationChannel();
+  }
+
+  private Activity getActivity() {
+    return MatterServant.get().getActivity();
   }
 
   public void promptForCommissionOkPermission(
@@ -37,7 +43,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + productId
             + ". Commissionee: "
             + commissioneeName);
-    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
     builder
         .setMessage(commissioneeName + " is requesting permission to cast to this device, approve?")
@@ -67,8 +73,8 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + productId
             + ". Commissionee: "
             + commissioneeName);
-    EditText editText = new EditText(activity);
-    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    EditText editText = new EditText(getActivity());
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
     builder
         .setMessage("Please enter PIN displayed in casting app.")
@@ -99,7 +105,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
     NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(activity, CHANNEL_ID)
+        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
             .setContentTitle("Connection Complete")
             .setContentText(
@@ -114,7 +120,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   public void promptCommissioningFailed(String commissioneeName, String error) {
     Log.d(TAG, "Received prompt for failure Commissionee: " + commissioneeName);
     NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(activity, CHANNEL_ID)
+        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)
             .setContentTitle("Connection Failed")
             .setContentText("Failed. " + commissioneeName + " experienced error: " + error + ".")
@@ -134,7 +140,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
       channel.setDescription(description);
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
-      this.notificationManager = getSystemService(activity, NotificationManager.class);
+      this.notificationManager = getSystemService(context, NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
     }
   }

@@ -61,6 +61,7 @@ qpg_executable("lock_app") {
   ]
 
   deps = [
+    ":factorydata_lib",
     ":sdk",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/providers:device_info_provider",
@@ -150,4 +151,16 @@ group("qpg") {
 
 group("default") {
   deps = [ ":qpg" ]
+}
+
+static_library("factorydata_lib") {
+  libs = [ "${qpg_sdk_root}/Binaries/FactoryData/FactoryData_example/FactoryData_example.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
+config("qpg_retain_factorydata") {
+  ldflags = [
+    "-Wl,-u_binary_factory_data_bin_start",
+    "-Wl,-u_binary_factory_data_start",
+  ]
 }

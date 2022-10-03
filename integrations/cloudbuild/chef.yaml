@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -10,9 +10,9 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-      timeout: 900s
+      timeout: 2700s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -26,7 +26,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:

@@ -489,18 +489,19 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 {
     VerifyOrReturnValue([self checkIsRunning:error], nil);
 
-    __block chip::CommissioneeDeviceProxy * deviceProxy;
-
+    __block MTRBaseDevice * device;
     __block BOOL success = NO;
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning:error]);
 
+        chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([nodeID unsignedLongLongValue], &deviceProxy);
         success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     });
     VerifyOrReturnValue(success, nil);
 
-    return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
+    return device;
 }
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
@@ -524,18 +525,22 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 - (void)removeDevice:(MTRDevice *)device
 {
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[@(device.nodeID)];
+    MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[device.nodeID];
     if (deviceToRemove == device) {
-        self.nodeIDToDeviceMap[@(device.nodeID)] = nil;
+        self.nodeIDToDeviceMap[device.nodeID] = nil;
     } else {
-        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID);
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, [device.nodeID unsignedLongLongValue]);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 }
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
+    VerifyOrReturn([self checkIsRunning]);
+
     dispatch_async(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
         self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
     });
 }
@@ -699,6 +704,38 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         // MTRDeviceConnectionBridge always delivers errors async via
         // completion.
         connectionBridge->connect(self->_cppCommissioner, nodeID);
+    });
+
+    return YES;
+}
+
+- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    if (![self checkIsRunning]) {
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            completion(nullptr, chip::NullOptional, error);
+            return;
+        }
+
+        chip::CommissioneeDeviceProxy * deviceProxy;
+        CHIP_ERROR err = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
+        if (err != CHIP_NO_ERROR) {
+            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+            return;
+        }
+
+        chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
+        if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
+            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+            return;
+        }
+
+        completion(deviceProxy->GetExchangeManager(), session, nil);
     });
 
     return YES;

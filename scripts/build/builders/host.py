@@ -57,6 +57,7 @@ class HostApp(Enum):
     NL_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    DYNAMIC_BRIDGE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -95,6 +96,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            return 'dynamic-bridge-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -226,9 +229,6 @@ class HostBuilder(GnBuilder):
         self.extra_gn_options = []
         self.build_env = {}
 
-        if board == HostBoard.ARM64:
-            self.build_env['PKG_CONFIG_PATH'] = os.path.join(self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
-
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
 
@@ -300,6 +300,9 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.NL_TEST_RUNNER:
             self.build_command = 'runner'
+            # board will NOT be used, but is required to be able to properly
+            # include things added by the test_runner efr32 build
+            self.extra_gn_options.append('silabs_board="BRD4161A"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -348,6 +351,9 @@ class HostBuilder(GnBuilder):
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
+        if self.board == HostBoard.ARM64:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
         return self.build_env
 
     def SysRootPath(self, name):
@@ -365,19 +371,27 @@ class HostBuilder(GnBuilder):
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
+            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
+                           '-name', 'tests', '-exec', 'rm -rf {} \\;'], title="Cleanup unit tests")
+            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
+            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
-                          os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+                           os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
     def build_outputs(self):
         outputs = {}

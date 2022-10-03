@@ -27,7 +27,7 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
-AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate attributeDelegate,
+AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
                                                      list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) :
     mAttributeDelegate(attributeDelegate)
 {
@@ -85,7 +85,7 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
-    const char * resStr = mAttributeDelegate.Read(aPath);
+    const char * resStr = mAttributeDelegate->Read(aPath);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
 
     if (resStr != nullptr && *resStr != 0)
@@ -124,7 +124,7 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
-    const char * resStr = mAttributeDelegate.Read(aPath);
+    const char * resStr = mAttributeDelegate->Read(aPath);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
 
     if (resStr == nullptr || *resStr == 0)

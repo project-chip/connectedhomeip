@@ -509,7 +509,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read channel-page0mask 54 0
 
-          Verify "ChannelMask response" on the TH(All-cluster-app) Log:
+          Verify ""channel-page0mask"" on the TH(All-cluster-app) Log:
 
           I: 2464057 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53367840 to 0x0000000000000000c
           I: 2464071 [EM]Received message of type 0x2 with protocolId (0, 1) and MessageCounter:147354356 on exchar

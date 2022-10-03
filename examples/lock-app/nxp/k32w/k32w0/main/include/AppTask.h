@@ -23,6 +23,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include "K32W0FactoryDataProvider.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -57,6 +58,7 @@ private:
     static void HandleKeyboard(void);
     static void JoinHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void LockActionEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);
@@ -64,7 +66,7 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateClusterStateInternal(intptr_t arg);
     static void ThreadStart();
     static void InitServer(intptr_t arg);

@@ -112,7 +112,7 @@ tests:
       verification: |
           On DUT_CR1  using chip tool, read fabrics list
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+            Below are the example command for using single RPI as multiplecontrollers. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           Verify TH_CE receives and processes the command successfully on TH_CE (all-clusters-app) log
 
@@ -219,15 +219,16 @@ tests:
 
           ./chip-tool operationalcredentials remove-fabric 2 1 0  --commissioner-name beta
 
-          Verify TH_CE responses with NOCResponse with a StatusCode OK on TH_CE (all-clusters-app) log
+          Verify TH_CE responses with "RemoveFabric successful" and "Expiring all sessions for fabric 0x2" on TH_CE (all-clusters-app) log
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          CHIP:TOO:   NOCResponse: {
-          CHIP:TOO:     statusCode: 0
-          CHIP:TOO:     fabricIndex: 2
-          CHIP:TOO:    }
-          CHIP:DMG: ICR moving to [AwaitingDe]
+
+          [1663307444.729967][1746:1746] CHIP:DIS: mDNS service published: _matter._tcp
+          [1663307444.730031][1746:1746] CHIP:ZCL: OpCreds: RemoveFabric successful
+          [1663307444.730110][1746:1746] CHIP:DMG: Command handler moving to [ Preparing]
+          [1663307444.730183][1746:1746] CHIP:DMG: Command handler moving to [AddingComm]
+          [1663307444.730277][1746:1746] CHIP:DMG: Command handler moving to [AddedComma]
+          [1663307444.730346][1746:1746] CHIP:IN: Expiring all sessions for fabric 0x2!!
+          [1663307444.730426][1746:1746] CHIP:IN: SecureSession[0xaaaae0b82e10]: MarkForEviction Type:2 LSID:23764
       disabled: true
 
     - label:

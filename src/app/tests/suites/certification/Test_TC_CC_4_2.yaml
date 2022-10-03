@@ -114,7 +114,7 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 212
+              minValue: 216
               maxValue: 254
 
     - label: "Wait 5s"
@@ -130,7 +130,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 254
+          constraints:
+              minValue: 216
+              maxValue: 254
 
     - label:
           "TH sends MoveToSaturation command to DUT with Saturation=120 and
@@ -203,8 +205,8 @@ tests:
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 5
-              maxValue: 35
+              minValue: 17
+              maxValue: 23
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -301,7 +303,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          saveAs: CurrentSaturationValueStep4e
           constraints:
               minValue: 170
               maxValue: 230
@@ -319,7 +320,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: CurrentSaturationValueStep4e
+          constraints:
+              minValue: 170
+              maxValue: 230
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

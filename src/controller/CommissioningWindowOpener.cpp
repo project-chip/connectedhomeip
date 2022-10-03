@@ -204,9 +204,6 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
     self->mNextStep = Step::kAcceptCommissioningStart;
     if (self->mCommissioningWindowCallback != nullptr)
     {
-        self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
-                                                  self->mSetupPayload);
-
         char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 
         MutableCharSpan manualCode(payloadBuffer);
@@ -230,11 +227,18 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
         {
             ChipLogError(Controller, "Unable to generate QR code for setup payload: %" CHIP_ERROR_FORMAT, err.Format());
         }
+
+        self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
+                                                  self->mSetupPayload);
+        // Don't touch `self` anymore; it might have been destroyed by the
+        // callee.
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
         self->mBasicCommissioningWindowCallback->mCall(self->mBasicCommissioningWindowCallback->mContext, self->mNodeId,
                                                        CHIP_NO_ERROR);
+        // Don't touch `self` anymore; it might have been destroyed by the
+        // callee.
     }
 }
 
