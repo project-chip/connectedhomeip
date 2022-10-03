@@ -35,19 +35,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}",
-            {{~#if_is_float_or_double_data_type type~}}
-                {{~as_underlying_zcl_type_size type prefix="-std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}},
-                {{~as_underlying_zcl_type_size type prefix="std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}}
-            {{~else~}}
-                {{~#if_is_underlying_zcl_type_signed type~}}
-                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MIN" sizeIn="bits"}},
-                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MAX" sizeIn="bits"~}}
-                {{~else~}}
-                    0,
-                    {{~as_underlying_zcl_type_size type prefix="UINT" postfix="_MAX" sizeIn="bits" boolean="1" removePrePostFixForExceptions=1~}}
-                {{~/if_is_underlying_zcl_type_signed~}}
-            {{~/if_is_float_or_double_data_type~}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -163,19 +151,7 @@ public:
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
-        AddArgument("attr-value",
-            {{~#if_is_float_or_double_data_type type~}}
-                {{~as_underlying_zcl_type_size type prefix="-std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}},
-                {{~as_underlying_zcl_type_size type prefix="std::numeric_limits<" postfix=">::infinity()" single="float" double="double"~}}
-            {{~else~}}
-                {{~#if_is_underlying_zcl_type_signed type~}}
-                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MIN" sizeIn="bits"}},
-                    {{~as_underlying_zcl_type_size type prefix="INT" postfix="_MAX" sizeIn="bits"~}}
-                {{~else~}}
-                    0,
-                    {{~as_underlying_zcl_type_size type prefix="UINT" postfix="_MAX" sizeIn="bits" boolean="1" removePrePostFixForExceptions=1~}}
-                {{~/if_is_underlying_zcl_type_signed~}}
-            {{~/if_is_float_or_double_data_type~}}, &mValue);
+        AddArgument("attr-value", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mValue);
         {{/if_chip_complex}}
         WriteAttribute::AddArguments();
     }
