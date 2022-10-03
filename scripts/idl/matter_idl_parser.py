@@ -149,28 +149,28 @@ class MatterIdlTransformer(Transformer):
         return Field(data_type=data_type, name=name, code=code, is_list=is_list)
 
     def optional(self, _):
-        return FieldAttribute.OPTIONAL
+        return FieldQuality.OPTIONAL
 
     def nullable(self, _):
-        return FieldAttribute.NULLABLE
+        return FieldQuality.NULLABLE
 
     def fabric_sensitive(self, _):
-        return FieldAttribute.FABRIC_SENSITIVE
+        return FieldQuality.FABRIC_SENSITIVE
 
     def attr_readonly(self, _):
-        return AttributeTag.READABLE
+        return AttributeQuality.READABLE
 
     def attr_nosubscribe(self, _):
-        return AttributeTag.NOSUBSCRIBE
+        return AttributeQuality.NOSUBSCRIBE
 
-    def attribute_tags(self, tags):
-        return tags
+    def attribute_qualities(self, qualities):
+        return qualities
 
     def struct_fabric_scoped(self, _):
-        return StructAttribute.FABRIC_SCOPED
+        return StructQuality.FABRIC_SCOPED
 
-    def struct_tags(self, tags):
-        return tags
+    def struct_qualities(self, qualities):
+        return qualities
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -182,26 +182,26 @@ class MatterIdlTransformer(Transformer):
         return EventPriority.DEBUG
 
     def event_fabric_sensitive(self, _):
-        return EventAttribute.FABRIC_SENSITIVE
+        return EventQuality.FABRIC_SENSITIVE
 
-    def event_tags(selt, tags):
-        return set(tags)
+    def event_qualities(selt, qualities):
+        return set(qualities)
 
     def timed_command(self, _):
-        return CommandAttribute.TIMED_INVOKE
+        return CommandQuality.TIMED_INVOKE
 
     def fabric_command(self, _):
-        return CommandAttribute.FABRIC_SCOPED
+        return CommandQuality.FABRIC_SCOPED
 
-    def command_attributes(self, attrs):
+    def command_qualities(self, attrs):
         # List because attrs is a tuple
         return set(list(attrs))
 
     def struct_field(self, args):
         # Last argument is the named_member, the rest
-        # are attributes
+        # are qualities
         field = args[-1]
-        field.attributes = set(args[:-1])
+        field.qualities = set(args[:-1])
         return field
 
     def server_cluster(self, _):
@@ -232,7 +232,7 @@ class MatterIdlTransformer(Transformer):
             args.insert(2, None)
 
         return Command(
-            attributes=args[0],
+            qualities=args[0],
             input_param=args[2], output_param=args[3], code=args[4],
             **args[1]
         )
@@ -253,7 +253,7 @@ class MatterIdlTransformer(Transformer):
         return init_args
 
     def event(self, args):
-        return Event(attributes=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
+        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
@@ -316,23 +316,23 @@ class MatterIdlTransformer(Transformer):
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
     @v_args(inline=True)
-    def attribute(self, tags, definition_tuple):
+    def attribute(self, qualities, definition_tuple):
 
-        tags = set(tags)
+        qualities = set(qualities)
         (definition, acl) = definition_tuple
 
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
         # read/write
-        if AttributeTag.READABLE not in tags:
-            tags.add(AttributeTag.READABLE)
-            tags.add(AttributeTag.WRITABLE)
+        if AttributeQuality.READABLE not in qualities:
+            qualities.add(AttributeQuality.READABLE)
+            qualities.add(AttributeQuality.WRITABLE)
 
-        return Attribute(definition=definition, tags=tags, **acl)
+        return Attribute(definition=definition, qualities=qualities, **acl)
 
     @v_args(inline=True)
-    def struct(self, attrs, id, *fields):
-        return Struct(name=id, attributes=set(attrs), fields=list(fields))
+    def struct(self, qualities, id, *fields):
+        return Struct(name=id, qualities=set(qualities), fields=list(fields))
 
     @v_args(inline=True)
     def request_struct(self, value):
