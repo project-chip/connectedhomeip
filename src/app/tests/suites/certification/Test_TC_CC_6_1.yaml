@@ -181,7 +181,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          value: 250
+          constraints:
+              minValue: 212
+              maxValue: 288
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A0008

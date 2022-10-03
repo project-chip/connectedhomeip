@@ -122,7 +122,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxBeaconRequestCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002f
+      PICS: DGTHREAD.S.A001f
       command: "readAttribute"
       attribute: "TxBeaconRequestCount"
       response:

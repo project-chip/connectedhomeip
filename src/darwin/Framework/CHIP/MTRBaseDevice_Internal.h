@@ -30,12 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller;
 
 /**
- * Only returns non-nil if the device is using a PASE session.  Otherwise, the
- * deviceController + nodeId should be used to get a CASE session.
- */
-- (chip::DeviceProxy * _Nullable)paseDevice;
-
-/**
  * Invalidate the CASE session, so an attempt to getConnectedDevice for this
  * device id will have to create a new CASE session.  Ideally this API will go
  * away.
@@ -43,13 +37,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)invalidateCASESession;
 
 /**
+ * Whether this device represents a PASE session or not.
+ */
+@property (nonatomic, assign, readonly) BOOL isPASEDevice;
+
+/**
  * Controller that that this MTRDevice was gotten from.
  */
 @property (nonatomic, strong, readonly) MTRDeviceController * deviceController;
 
 /**
- * Node id for this MTRDevice.  Only set to a usable value if this device
- * represents a CASE session.
+ * Node id for this MTRDevice.  If this device represents a CASE session, this
+ * is set to the node ID of the target node.  If this device represents a PASE
+ * session, this is set to the device id of the PASE device.
  */
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
@@ -60,10 +60,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Initialize the device object with the given node id and controller.  This
- * will always succeed, even if there is no such node id on the controller's
- * fabric, but attempts to actually use the MTRBaseDevice will fail
- * (asynchronously) in that case.
+ * Initialize the device object as a CASE device with the given node id and
+ * controller.  This will always succeed, even if there is no such node id on
+ * the controller's fabric, but attempts to actually use the MTRBaseDevice will
+ * fail (asynchronously) in that case.
  */
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 

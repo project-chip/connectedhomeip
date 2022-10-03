@@ -182,6 +182,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {
@@ -277,6 +278,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {

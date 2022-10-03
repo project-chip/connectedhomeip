@@ -29,7 +29,7 @@ public class MatterAgentClient {
   // TODO : Introduce dependency injection
   private MatterAgentClient() {};
 
-  public static synchronized MatterAgentClient getInstance(Context context) {
+  public static synchronized void initialize(Context context) {
     if (instance == null || (instance.service == null && !instance.bound)) {
       instance = new MatterAgentClient();
       if (!instance.bindService(context)) {
@@ -39,6 +39,9 @@ public class MatterAgentClient {
         Log.d(TAG, "Matter agent binding request successful.");
       }
     }
+  }
+
+  public static MatterAgentClient getInstance() {
     return instance;
   }
 
@@ -59,6 +62,19 @@ public class MatterAgentClient {
       Log.d(TAG, "Setting supported clusters returned " + (success ? "True" : "False"));
     } catch (RemoteException e) {
       e.printStackTrace();
+    }
+  }
+
+  public void reportAttributeChange(int clusterId, int attributeId) {
+    IMatterAppAgent matterAgent = instance.getMatterAgent();
+    if (matterAgent == null) {
+      Log.e(TAG, "Matter agent not retrieved.");
+      return;
+    }
+    try {
+      matterAgent.reportAttributeChange(clusterId, attributeId);
+    } catch (RemoteException e) {
+      Log.e(TAG, "Error invoking remote method to report attribute change to Matter agent");
     }
   }
 

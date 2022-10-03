@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMemString.h>
 
 namespace chip {
 namespace Credentials {
@@ -56,9 +57,7 @@ public:
             }
             else
             {
-                size_t size = strnlen(groupName, kGroupNameMax);
-                strncpy(name, groupName, size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
         void SetName(const CharSpan & groupName)
@@ -69,9 +68,7 @@ public:
             }
             else
             {
-                size_t size = std::min(groupName.size(), kGroupNameMax);
-                strncpy(name, groupName.data(), size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
         bool operator==(const GroupInfo & other)

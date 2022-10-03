@@ -15,7 +15,8 @@ from enum import Enum
 VID_NOT_PRESENT = 0xFFFF
 PID_NOT_PRESENT = 0x0000
 
-VALID_IN_PAST = "2021-06-28 14:23:43"
+VALID_IN_PAST = "2020-06-28 14:23:43"
+VALID_NOW = "2022-09-28 14:23:43"
 VALID_IN_FUTURE = "2031-06-28 14:23:43"
 
 
@@ -164,19 +165,19 @@ CERT_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong (not present for DAC and present for PAI",
+        "description": "Certificate Key Usage extension diginalSignature field is wrong (not present for DAC and present for PAI, which is OK as optional)",
         "test_folder": 'ext_key_usage_dig_sig_wrong',
         "error_flag": 'ext-key-usage-dig-sig',
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension keyCertSign field is wrong (present for DAC and not present for PAI",
+        "description": "Certificate Key Usage extension keyCertSign field is wrong (present for DAC and not present for PAI)",
         "test_folder": 'ext_key_usage_key_cert_sign_wrong',
         "error_flag": 'ext-key-usage-key-cert-sign',
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension cRLSign field is wrong (present for DAC and not present for PAI",
+        "description": "Certificate Key Usage extension cRLSign field is wrong (present for DAC and not present for PAI)",
         "test_folder": 'ext_key_usage_crl_sign_wrong',
         "error_flag": 'ext-key-usage-crl-sign',
         "is_success_case": 'false',
@@ -261,13 +262,13 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1',
         "test_folder": 'vidpid_fallback_encoding_08',
-        "is_success_case": 'true',
+        "is_success_case": 'false',
     },
     {
         "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1',
         "test_folder": 'vidpid_fallback_encoding_09',
-        "is_success_case": 'true',
+        "is_success_case": 'false',
     },
     # More valid/invalid fallback encoding examples:
     {
@@ -463,7 +464,7 @@ CD_STRUCT_TEST_CASES = [
         "description": 'The version_number field is missing.',
         "test_folder": 'version_number_missing',
         "error_flag": 'version-number-missing',
-        "is_success_case": 'true',
+        "is_success_case": 'false',
     },
     {
         "description": 'The version_number field matches the VID and PID used in a DeviceSoftwareVersionModel entry in the DCL matching the certification record associated with the product presenting this CD.',
@@ -496,13 +497,13 @@ CD_STRUCT_TEST_CASES = [
         "is_success_case": 'true',
     },
     {
-        "description": 'The dac_origin_vendor_id fild is present and dac_origin_product_id fields is not present.',
+        "description": 'The dac_origin_vendor_id field is present and dac_origin_product_id fields is not present.',
         "test_folder": 'dac_origin_vid_present_pid_missing',
         "error_flag": 'dac-origin-vid-present',
         "is_success_case": 'false',
     },
     {
-        "description": 'The dac_origin_vendor_id fild is not present and dac_origin_product_id is present.',
+        "description": 'The dac_origin_vendor_id field is not present and dac_origin_product_id is present.',
         "test_folder": 'dac_origin_vid_missing_pid_present',
         "error_flag": 'dac-origin-pid-present',
         "is_success_case": 'false',
@@ -694,9 +695,9 @@ class DevCertBuilder:
         vid_flag = ' -V 0x{:X}'.format(self.vid)
         pid_flag = ' -P 0x{:X}'.format(self.pid)
         if (len(self.valid_from) == 0):
-            valid_from_flag = ''
+            validity_flags = ' -l 4294967295 '
         else:
-            valid_from_flag = ' -f "' + self.valid_from + '"'
+            validity_flags = ' -f "' + self.valid_from + '" -l 730 '
 
         if self.cert_type == CertType.PAI:
             if (len(subject_name) == 0):
@@ -710,7 +711,7 @@ class DevCertBuilder:
             return
 
         cmd = self.chipcert + ' gen-att-cert ' + type_flag + error_type_flag + ' -c "' + subject_name + '" -C ' + self.signer.cert_pem + ' -K ' + \
-            self.signer.key_pem + vid_flag + pid_flag + valid_from_flag + ' -l 4294967295 -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
+            self.signer.key_pem + vid_flag + pid_flag + validity_flags + ' -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
         subprocess.run(cmd, shell=True)
         cmd = 'openssl x509 -inform pem -in ' + self.own.cert_pem + \
             ' -out ' + self.own.cert_der + ' -outform DER'
@@ -760,7 +761,11 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
     if "description" in test_case:
         json_dict["description"] = test_cert.upper() + " Test Vector: " + test_case["description"]
     if "is_success_case" in test_case:
-        json_dict["is_success_case"] = test_case["is_success_case"]
+        # These test cases are expected to fail when error injected in DAC but expected to pass when error injected in PAI
+        if (test_cert == 'pai') and (test_case["test_folder"] in ['ext_basic_pathlen0', 'vidpid_fallback_encoding_08', 'vidpid_fallback_encoding_09', 'ext_key_usage_dig_sig_wrong']):
+            json_dict["is_success_case"] = "true"
+        else:
+            json_dict["is_success_case"] = test_case["is_success_case"]
 
     # Out of all files we could add, find the ones that were present in test case, and embed them in hex
     files_available = {os.path.basename(path) for path in files_in_path}
@@ -809,25 +814,32 @@ def main():
             test_case_out_dir = args.outdir + '/struct_' + test_cert + '_' + test_case["test_folder"]
 
             if test_case["test_folder"] == 'valid_in_past':
-                valid_from = VALID_IN_PAST
+                if test_cert == 'dac':
+                    dac_valid_from = VALID_IN_PAST
+                    pai_valid_from = VALID_NOW
+                else:
+                    dac_valid_from = VALID_NOW
+                    pai_valid_from = VALID_IN_PAST
             elif test_case["test_folder"] == 'valid_in_future':
-                valid_from = VALID_IN_FUTURE
+                if test_cert == 'dac':
+                    dac_valid_from = VALID_IN_FUTURE
+                    pai_valid_from = VALID_NOW
+                else:
+                    dac_valid_from = VALID_NOW
+                    pai_valid_from = VALID_IN_FUTURE
             else:
-                valid_from = ''
+                dac_valid_from = ''
+                pai_valid_from = ''
 
             if test_cert == 'dac':
                 error_type_dac = test_case["error_flag"]
                 error_type_pai = 'no-error'
-                dac_valid_from = valid_from
-                pai_valid_from = ''
             else:
                 if test_case["error_flag"] == 'ext-skid-missing':
                     error_type_dac = 'ext-akid-missing'
                 else:
                     error_type_dac = 'no-error'
                 error_type_pai = test_case["error_flag"]
-                dac_valid_from = ''
-                pai_valid_from = valid_from
 
             vid = 0xFFF1
             pid = 0x8000
@@ -945,7 +957,13 @@ def main():
         generate_test_case_vector_json(test_case_out_dir, 'cd', test_case)
 
     # Test case: Generate {DAC, PAI, PAA} chain with random (invalid) PAA
-    test_case_out_dir = args.outdir + '/invalid_paa'
+    test_case = {
+        "description": 'Use Invalid PAA (Not Registered in the DCL).',
+        "test_folder": 'invalid_paa',
+        "error_flag": 'no-error',
+        "is_success_case": 'false',
+    }
+    test_case_out_dir = args.outdir + '/' + test_case["test_folder"]
     paapath = test_case_out_dir + '/paa-'
 
     if not os.path.exists(test_case_out_dir):
@@ -960,12 +978,12 @@ def main():
     pid = 0x8000
 
     # Generate PAI Cert/Key
-    builder = DevCertBuilder(CertType.PAI, 'no-error', paapath, test_case_out_dir,
+    builder = DevCertBuilder(CertType.PAI, test_case["error_flag"], paapath, test_case_out_dir,
                              chipcert, vid, PID_NOT_PRESENT, '', VALID_IN_PAST)
     builder.make_certs_and_keys()
 
     # Generate DAC Cert/Key
-    builder = DevCertBuilder(CertType.DAC, 'no-error', paapath, test_case_out_dir,
+    builder = DevCertBuilder(CertType.DAC, test_case["error_flag"], paapath, test_case_out_dir,
                              chipcert, vid, pid, '', VALID_IN_PAST)
     builder.make_certs_and_keys()
 
@@ -977,7 +995,7 @@ def main():
     subprocess.run(cmd, shell=True)
 
     # Generate Test Case Data Container in JSON Format
-    generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+    generate_test_case_vector_json(test_case_out_dir, 'paa', test_case)
 
 
 if __name__ == '__main__':

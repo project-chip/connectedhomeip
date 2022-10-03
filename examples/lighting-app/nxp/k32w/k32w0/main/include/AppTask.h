@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "K32W0FactoryDataProvider.h"
 #include "LightingManager.h"
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -73,6 +74,7 @@ private:
     static void HandleKeyboard(void);
     static void OTAHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void LightActionEventHandler(AppEvent * aEvent);
     static void OTAResumeEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
@@ -81,7 +83,7 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void StartTimer(uint32_t aTimeoutInMs);
 
     static void RestoreLightingState(void);
@@ -90,6 +92,7 @@ private:
     static void InitOTA(intptr_t arg);
     static void StartOTAQuery(intptr_t arg);
     static void PostOTAResume();
+    static void OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);

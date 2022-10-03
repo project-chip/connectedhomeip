@@ -45,55 +45,126 @@ _normpath() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+SUPPORTED_CODE=(core clusters all)
+SUPPORTED_TESTS=(unit yaml all)
+CODE="core"
+TESTS="unit"
 skip_gn=false
 
 help() {
 
-    echo "Usage: $file_name [ options ... ]"
-
-    echo "General Options:
-  -h, --help                Display this information.
-Input Options:
+    echo "Usage: $file_name [--output_root=<output_root>] [--code=<core|clusters|all>] [--tests=<unit|yaml|all>]"
+    echo
+    echo "Misc:
+  -h, --help                Print this help, then exit."
+    echo
+    echo "Options:
   -o, --output_root         Set the build output directory.  When set manually, performs only lcov stage
                             on provided build output.  Assumes output_root has been built with 'use_coverage=true'
                             and that 'ninja check' was run.
+  -c, --code                Specify which scope to collect coverage data.
+                            'core': collect coverage data from core stack in Matter SDK. --default
+                            'clusters': collect coverage data from clusters implementation in Matter SDK.
+                            'all': collect coverage data from Matter SDK.
+  -t, --tests               Specify which tools to run the coverage check.
+                            'unit': Run unit test to drive the coverage check. --default
+                            'yaml': Run yaml test to drive the coverage check.
+                            'all': Run unit & yaml test to drive the coverage check.
   "
 }
 
 file_name=${0##*/}
 
-while (($#)); do
-    case $1 in
-        --help | -h)
+for i in "$@"; do
+    case $i in
+        -h | --help)
             help
             exit 1
             ;;
-        --output_root | -o)
-            OUTPUT_ROOT=$2
+        -c=* | --code=*)
+            CODE="${i#*=}"
+            shift
+            ;;
+        -t=* | --tests=*)
+            TESTS="${i#*=}"
+            shift
+            ;;
+        -o=* | --output_root=*)
+            OUTPUT_ROOT="${i#*=}"
             COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
             skip_gn=true
             shift
             ;;
-        -*)
-            help
+        *)
             echo "Unknown Option \"$1\""
+            echo
+            help
             exit 1
             ;;
     esac
-    shift
 done
 
-# Ensure we have a compilation environment
-source "$CHIP_ROOT/scripts/activate.sh"
+if [[ ! " ${SUPPORTED_CODE[@]} " =~ " ${CODE} " ]]; then
+    echo "ERROR: Code $CODE not supported"
+    exit 1
+fi
 
-# Generates ninja files
+if [[ ! " ${SUPPORTED_TESTS[@]} " =~ " ${TESTS} " ]]; then
+    echo "ERROR: Tests $TESTS not supported"
+    exit 1
+fi
+
 if [ "$skip_gn" == false ]; then
-    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true'
-    ninja -C "$OUTPUT_ROOT" check
+    # Ensure we have a compilation environment
+    source "$CHIP_ROOT/scripts/activate.sh"
+
+    # Generates ninja files
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_build_all_clusters_app=true'
+    ninja -C "$OUTPUT_ROOT"
+
+    # Run unit tests
+    if [[ "$TESTS" == "unit" || "$TESTS" == "all" ]]; then
+        ninja -C "$OUTPUT_ROOT" check
+    fi
+
+    # Run yaml tests
+    if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
+        scripts/run_in_build_env.sh \
+            "./scripts/tests/run_test_suite.py \
+             --chip-tool ""$OUTPUT_ROOT/chip-tool \
+             run \
+             --iterations 1 \
+             --test-timeout-seconds 120 \
+             --all-clusters-app ""$OUTPUT_ROOT/chip-all-clusters-app
+          "
+    fi
+
+    # Remove misc support components from coverage statistics
+    rm -rf "$OUTPUT_ROOT/obj/src/app/app-platform"
+    rm -rf "$OUTPUT_ROOT/obj/src/app/common"
+    rm -rf "$OUTPUT_ROOT/obj/src/app/util/mock"
+    rm -rf "$OUTPUT_ROOT/obj/src/controller/python"
+    rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/platform"
+    rm -rf "$OUTPUT_ROOT/obj/src/lib/shell"
+    rm -rf "$OUTPUT_ROOT/obj/src/lwip"
+    rm -rf "$OUTPUT_ROOT/obj/src/platform"
+    rm -rf "$OUTPUT_ROOT/obj/src/tools"
+
+    # Remove unit test itself from coverage statistics
+    find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
+
+    if [ "$CODE" == "core" ]; then
+        rm -rf "$OUTPUT_ROOT/obj/src/app/clusters"
+    elif [ "$CODE" == "clusters" ]; then
+        mv "$OUTPUT_ROOT/obj/src/app/clusters" "$OUTPUT_ROOT/obj/clusters"
+        rm -rf "$OUTPUT_ROOT/obj/src"
+        mkdir "$OUTPUT_ROOT/obj/src"
+        mv "$OUTPUT_ROOT/obj/clusters" "$OUTPUT_ROOT/obj/src/clusters"
+    fi
 fi
 
 mkdir -p "$COVERAGE_ROOT"
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
-lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$CHIP_ROOT/third_party/*" --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
+lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_base.info"
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated/* --exclude="$PWD"/third_party/* --exclude=/usr/include/* --output-file "$COVERAGE_ROOT/lcov_test.info"
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 
@@ -60,6 +61,13 @@ config("mbedtls_k32w0_config") {
     ]
   }
 
+  if (chip_with_factory_data == 1) {
+    defines += [
+      "MBEDTLS_X509_CRT_PARSE_C",
+      "MBEDTLS_X509_USE_C",
+    ]
+  }
+
   if (chip_crypto == "tinycrypt") {
     defines += [
       "MBEDTLS_USE_TINYCRYPT",
@@ -76,8 +84,8 @@ config("mbedtls_k32w0_config") {
 
 mbedtls_target("mbedtls") {
   sources = [
+    "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/ksdk_mbedtls.c",
     "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
-    "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/ksdk_mbedtls.c",
   ]
 
   if (chip_crypto == "tinycrypt") {

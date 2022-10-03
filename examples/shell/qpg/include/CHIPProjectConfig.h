@@ -51,14 +51,18 @@
  *
  * 0xFFF1: Test vendor.
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#endif // CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * 0x8009: example shell
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8012
+#endif // CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -125,7 +129,8 @@
  *    provision the device with its unique operational credentials and manage
  *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
+// !Note - 3 is not spec compliant, only to accomodate shell test app RAM use
+#define CHIP_CONFIG_MAX_FABRICS 3
 
 /**
  *  @name Interaction Model object pool configuration.

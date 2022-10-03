@@ -206,7 +206,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     AttestationCertVidPid paaVidPid;
 
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
-                     !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
+                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() &&
                      !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
@@ -215,6 +215,14 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
     // Ensure PAI is present
     VerifyOrExit(!info.paiDerBuffer.empty(), attestationError = AttestationVerificationResult::kPaiMissing);
+
+    // Validate Proper Certificate Format
+    {
+        VerifyOrExit(VerifyAttestationCertificateFormat(info.paiDerBuffer, AttestationCertType::kPAI) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+        VerifyOrExit(VerifyAttestationCertificateFormat(info.dacDerBuffer, AttestationCertType::kDAC) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kDacFormatInvalid);
+    }
 
     // match DAC and PAI VIDs
     {

@@ -47,3 +47,134 @@ freertos_target("freertos") {
 
   public_configs = [ ":qpg_freertos_config" ]
 }
+
+template("qpg_make_build") {
+  forward_variables_from(invoker,
+                         [
+                           "make_sources",
+                           "make_args",
+                           "make_output",
+                         ])
+  action(target_name) {
+    script = "make.py"
+    sources = make_sources
+    outputs = make_output
+    args = [
+      "-s",
+
+      #use PATH variable lookup for compiler
+      "TOOLCHAIN=",
+    ]
+    args += make_args
+  }
+}
+
+qpg_make_build("qpg_mbedtls_alt") {
+  make_sources = [ "${qpg_sdk_root}/Components/ThirdParty/Silex" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_${qpg_target_ic}",
+    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/mbedtls/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}",
+  ]
+}
+
+static_library("qpg_mbedtls_alt_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+}
+
+qpg_make_build("qpg_stack") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/QorvoStack",
+  ]
+}
+
+static_library("qpg_stack_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_stack" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
+}
+
+qpg_make_build("qpg_glue") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}_libbuild",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/mbedtls/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/MatterQorvoGlue",
+  ]
+}
+static_library("qpg_glue_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_glue" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
+}
+
+# openthread toevoegen
+# bootloader build
+#
+qpg_make_build("qpg_bootloader") {
+  make_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/Bootloader" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure/libBootloader_${qpg_target_ic}_compr_secure.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.Bootloader_${qpg_target_ic}_compr_secure",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/mbedtls/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure",
+    "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/UMB_QPG6105DK_B01_nrt_flash_compr_secure",
+  ]
+}
+config("qpg_retain_bootloader") {
+  ldflags = [
+    "-Wl,-u_binary_bl_userlicense_bin_start",
+    "-Wl,-u_binary_bootloader_bin_start",
+  ]
+}
+
+static_library("qpg_bootloader_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure/libBootloader_${qpg_target_ic}_compr_secure.a" ]
+  public_configs = [ ":qpg_retain_bootloader" ]
+}
+
+qpg_make_build("qpg_openthread_glue") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_${qpg_target_ic}_mtd.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_${qpg_target_ic}_mtd",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/mbedtls/repo",
+    "OPENTHREAD_REPO_DIR =" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/openthread/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_mtd",
+  ]
+}
+static_library("qpg_openthread_glue_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_${qpg_target_ic}_mtd.a" ]
+}

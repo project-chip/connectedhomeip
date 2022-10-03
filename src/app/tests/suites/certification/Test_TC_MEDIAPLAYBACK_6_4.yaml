@@ -63,6 +63,17 @@ tests:
               - name: "status"
                 value: 0
 
+    - label: "verify that the media state is playing"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media state is playing"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
@@ -85,6 +96,17 @@ tests:
               - name: "status"
                 value: 0
 
+    - label: "verify that the media play speed has increased."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media play speed has increased."
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
@@ -99,6 +121,17 @@ tests:
           values:
               - name: "status"
                 value: 0
+
+    - label: "verify that the media play has reversed direction."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C06.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media play has reversed direction"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C06.Rsp
@@ -132,6 +165,21 @@ tests:
               - name: "status"
                 value: 0
 
+    - label:
+          "verify that the media play speed has increased in the reverse
+          direction."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C06.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if media play speed has increased in the
+                    reverse direction"
+              - name: "expectedValue"
+                value: "y"
+
     #Issue 19800
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       verification: |
@@ -156,6 +204,21 @@ tests:
           values:
               - name: "status"
                 value: 0
+
+    - label:
+          "verify that the media is has resumed playing forward at the default
+          speed."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if media is has resumed playing forward at
+                    the default speed"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"

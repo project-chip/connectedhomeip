@@ -1,0 +1,42 @@
+#pragma once
+
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app/data-model/Nullable.h>
+
+#include <string>
+#include <vector>
+
+namespace clusters {
+
+{% for struct in structs %}
+struct {{struct.name}}
+{
+  CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+  {
+    chip::app::Clusters::detail::Structs::{{struct.name}}::DecodableType t;
+    CHIP_ERROR err = t.Decode(reader);
+    if(err == CHIP_NO_ERROR) {
+      {%-      for field in struct.fields %}
+      {{field.name}} = t.{{field.name}};
+      {%-      endfor  %}
+    }
+    return err;
+  }
+
+  CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+  {
+    chip::app::Clusters::detail::Structs::{{struct.name}}::Type t;
+    {%-      for field in struct.fields %}
+    t.{{field.name}} = {{field.name}};
+    {%-      endfor  %}
+    return t.Encode(writer, tag);
+  }
+
+  {%-   for field in struct.fields %}
+  {{field | getField(None, idl)}} {{field.name}};
+  {%-  endfor  %}
+};
+{%- endfor %}
+
+}

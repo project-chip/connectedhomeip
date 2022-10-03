@@ -19,9 +19,9 @@ class GenioApp(Enum):
 
     def AppNamePrefix(self):
         if self == GenioApp.LIGHT:
-            return 'chip-genio-lighting-app-example'
+            return 'chip-mt793x-lighting-app-example'
         elif self == GenioApp.SHELL:
-            return 'chip-genio-shell-example'
+            return 'chip-mt793x-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

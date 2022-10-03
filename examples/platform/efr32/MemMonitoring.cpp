@@ -21,7 +21,6 @@
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/freertos_bluetooth.h>
 
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
 static StaticTask_t monitoringTaskStruct;

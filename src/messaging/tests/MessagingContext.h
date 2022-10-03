@@ -85,6 +85,12 @@ public:
                          //      i.e IDLE = 10ms, ACTIVE = 10ms
     };
 
+    //
+    // See above for a description of the values used.
+    //
+    static constexpr System::Clock::Timeout kResponsiveIdleRetransTimeout   = System::Clock::Milliseconds32(10);
+    static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
+
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
         mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
