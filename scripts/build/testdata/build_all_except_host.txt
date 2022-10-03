@@ -487,6 +487,48 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4187a-window-covering-with-ota-requestor
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187A" chip_enable_ota_requestor=true' {out}/efr32-brd4187a-window-covering-with-ota-requestor
 
+# Generating efr32-brd4187c-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187C"' {out}/efr32-brd4187c-light
+
+# Generating efr32-brd4187c-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187C" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187c-light-rpc
+
+# Generating efr32-brd4187c-light-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187C" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187c-light-rpc-with-ota-requestor
+
+# Generating efr32-brd4187c-light-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4187C" chip_enable_ota_requestor=true' {out}/efr32-brd4187c-light-with-ota-requestor
+
+# Generating efr32-brd4187c-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187C"' {out}/efr32-brd4187c-lock
+
+# Generating efr32-brd4187c-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187C" is_debug=false import("//with_pw_rpc.gni")' {out}/efr32-brd4187c-lock-rpc
+
+# Generating efr32-brd4187c-lock-rpc-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187C" is_debug=false import("//with_pw_rpc.gni") chip_enable_ota_requestor=true' {out}/efr32-brd4187c-lock-rpc-with-ota-requestor
+
+# Generating efr32-brd4187c-lock-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=silabs_board="BRD4187C" chip_enable_ota_requestor=true' {out}/efr32-brd4187c-lock-with-ota-requestor
+
+# Generating efr32-brd4187c-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187C"' {out}/efr32-brd4187c-switch
+
+# Generating efr32-brd4187c-switch-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=silabs_board="BRD4187C" chip_enable_ota_requestor=true' {out}/efr32-brd4187c-switch-with-ota-requestor
+
+# Generating efr32-brd4187c-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187C"' {out}/efr32-brd4187c-unit-test
+
+# Generating efr32-brd4187c-unit-test-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=silabs_board="BRD4187C" chip_enable_ota_requestor=true' {out}/efr32-brd4187c-unit-test-with-ota-requestor
+
+# Generating efr32-brd4187c-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187C"' {out}/efr32-brd4187c-window-covering
+
+# Generating efr32-brd4187c-window-covering-with-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=silabs_board="BRD4187C" chip_enable_ota_requestor=true' {out}/efr32-brd4187c-window-covering-with-ota-requestor
+
 # Generating efr32-brd4304a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=silabs_board="BRD4304A"' {out}/efr32-brd4304a-light
 
@@ -1888,6 +1930,48 @@ ninja -C {out}/efr32-brd4187a-window-covering
 
 # Building efr32-brd4187a-window-covering-with-ota-requestor
 ninja -C {out}/efr32-brd4187a-window-covering-with-ota-requestor
+
+# Building efr32-brd4187c-light
+ninja -C {out}/efr32-brd4187c-light
+
+# Building efr32-brd4187c-light-rpc
+ninja -C {out}/efr32-brd4187c-light-rpc
+
+# Building efr32-brd4187c-light-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-light-rpc-with-ota-requestor
+
+# Building efr32-brd4187c-light-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-light-with-ota-requestor
+
+# Building efr32-brd4187c-lock
+ninja -C {out}/efr32-brd4187c-lock
+
+# Building efr32-brd4187c-lock-rpc
+ninja -C {out}/efr32-brd4187c-lock-rpc
+
+# Building efr32-brd4187c-lock-rpc-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-lock-rpc-with-ota-requestor
+
+# Building efr32-brd4187c-lock-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-lock-with-ota-requestor
+
+# Building efr32-brd4187c-switch
+ninja -C {out}/efr32-brd4187c-switch
+
+# Building efr32-brd4187c-switch-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-switch-with-ota-requestor
+
+# Building efr32-brd4187c-unit-test
+ninja -C {out}/efr32-brd4187c-unit-test
+
+# Building efr32-brd4187c-unit-test-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-unit-test-with-ota-requestor
+
+# Building efr32-brd4187c-window-covering
+ninja -C {out}/efr32-brd4187c-window-covering
+
+# Building efr32-brd4187c-window-covering-with-ota-requestor
+ninja -C {out}/efr32-brd4187c-window-covering-with-ota-requestor
 
 # Building efr32-brd4304a-light
 ninja -C {out}/efr32-brd4304a-light
