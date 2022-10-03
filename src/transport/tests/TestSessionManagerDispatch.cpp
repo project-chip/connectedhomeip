@@ -140,6 +140,7 @@ struct MessageTestEntry theMessageTestVector[] = {
         .sessionId  = 0x0bb8, // 3000
         .peerNodeId = 0x0000000000000000ULL,
     },
+#if !CHIP_CONFIG_SECURITY_TEST_MODE
     {
         .name     = "secure group message (no privacy)",
         .peerAddr = "::1",
@@ -193,8 +194,6 @@ struct MessageTestEntry theMessageTestVector[] = {
         .nonce        = "\x01\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
         .privacyNonce = "\xdb\x7d\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
-        // Extra field for deriving the privacy key
-        .compressedFabricId = "\x29\x06\xC9\x08\xD1\x15\xD3\x62",
         .sessionId    = 0xdb7d, // 56189
         .peerNodeId   = 0x0000000000000000ULL,
         .groupId      = 2,
