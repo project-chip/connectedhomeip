@@ -8,7 +8,5 @@ PostAttributeChangeCallback = CFUNCTYPE(
     c_uint16,
     c_uint8,
     c_uint16,
-    c_uint8,
-    c_uint16,
     c_char_p,
 )

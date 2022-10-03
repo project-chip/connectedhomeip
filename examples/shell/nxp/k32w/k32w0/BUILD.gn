@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 import("${k32w0_sdk_build_root}/k32w0_executable.gni")
@@ -39,16 +40,11 @@ k32w0_sdk("sdk") {
     "main/include",
     "main",
     "include",
-    "${k32w0_platform_dir}/app/project_include",
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
   ]
 
-  defines = [
-    # shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_NETWORK_COMMISSIONING_DRIVER_",
-  ]
-
+  defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
@@ -68,6 +64,7 @@ k32w0_executable("shell_app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/third_party/mbedtls:mbedtls",

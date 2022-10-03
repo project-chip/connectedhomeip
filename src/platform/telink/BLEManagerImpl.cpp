@@ -35,7 +35,7 @@
 /*Includes for ieee802154 switchings */
 #define DT_DRV_COMPAT telink_b91_zb
 #include <drivers/ieee802154/b91.h>
-#include <net/ieee802154_radio.h>
+#include <zephyr/net/ieee802154_radio.h>
 
 /* Telink headers */
 #include "drivers.h"
@@ -319,11 +319,11 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     SuccessOrExit(err);
 
     /* Resetup stimer interrupt to handle BLE stack */
-    ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
+    ret = irq_connect_dynamic(STIMER_IRQ_NUM + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, NULL, 0);
     ChipLogDetail(DeviceLayer, "Stimer IRQ assigned vector %d", ret);
 
     /* Resetup rf interrupt to handle BLE stack */
-    ret = irq_connect_dynamic(RF_IRQ_NUM, 2, rf_irq_handler, NULL, 0);
+    ret = irq_connect_dynamic(RF_IRQ_NUM + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, NULL, 0);
     ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
 exit:
@@ -577,7 +577,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     /* @todo: move to RadioSwitch module*/
     const struct device * radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
-    b91_ieee802154_deinit(radio_dev);
+    b91_deinit(radio_dev);
 
     /* It is time to init BLE stack */
     err = _InitStack();
@@ -837,7 +837,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
 
     /* Init IEEE802154 */
-    result = b91_ieee802154_init(radio_dev);
+    result = b91_init(radio_dev);
     __ASSERT(result == 0, "Fail to init IEEE802154 radio. Error: %d", result);
 }
 

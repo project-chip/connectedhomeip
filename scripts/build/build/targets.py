@@ -273,6 +273,7 @@ def HostTargets():
         app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
+        app_targets.append(target.Extend('dynamic-bridge', app=HostApp.DYNAMIC_BRIDGE))
 
         nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False,
                            crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True)
@@ -553,10 +554,10 @@ def K32WTargets():
 
     yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
     yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True, tinycrypt=True)
-    yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
+    yield target.Extend('shell-release', app=K32WApp.SHELL, disable_logs=True, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
-                        low_power=True, release=True).GlobBlacklist("Only on demand build")
+                        low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
 
 
 def cc13x2x7_26x2x7Targets():

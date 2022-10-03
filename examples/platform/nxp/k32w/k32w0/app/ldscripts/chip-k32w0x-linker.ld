@@ -54,11 +54,22 @@ m_int_sector_size      = 512;
 /* first 8K: SSBL, next 8K: SSBL update region */
 m_app_start            = DEFINED(__app_load_address__) ? __app_load_address__ : 0x0;
 
+/* PSECT: 8.5K */
+m_psect_size           = 0x2200;
+
 /* sizeof(BOOT_BLOCK_T) + sizeof(IMAGE_CERT_T) + SIGNATURE_LEN + alignment = 1024 bytes */
 m_app_meta_data        = 0x400;
 
-/* 640K (Total Flash size) - 16K (SSBL + SSBL update region) - 8.5K (PSECT) - m_app_meta_data */
-m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : 0x9DE00;
+/* manufacturing data: 2K */
+m_factory_data_size    = 0x800;
+
+/* 16K: SSBL + SSBL update region */
+m_ssbl_size            = 0x4000;
+
+/* default app size, without OTA */
+m_app_default_size     = m_int_flash_size - m_psect_size - m_app_meta_data - m_factory_data_size;
+
+m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : m_app_default_size;
 
 MEMORY
 {
@@ -88,9 +99,8 @@ NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
 NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
-INT_STORAGE_START         = m_int_flash_size - 17 * m_int_sector_size - 1;
-INT_STORAGE_END           = INT_STORAGE_START;
-INT_STORAGE_SIZE          = INT_STORAGE_START - INT_STORAGE_END;
+FACTORY_DATA_START_ADDRESS = m_int_flash_size - m_psect_size - m_app_meta_data - m_factory_data_size;
+FACTORY_DATA_END_ADDRESS   = FACTORY_DATA_START_ADDRESS + m_factory_data_size - 1;
 
 __ram_vector_table__      = 1;
 vector_table_size         = 0x120;
@@ -213,9 +223,8 @@ SECTIONS
 
     _etext = .;
 
-    .heap_packet_buffer (COPY):
+    .heap (COPY):
     {
-        *(.bss._ZN4chip6System12PacketBuffer11sBufferPoolE)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))
@@ -353,4 +362,7 @@ SECTIONS
     PROVIDE(_scratch_buf_end = __scratch_area_top__);
 
     __StackLimit = _vStackTop - STACK_SIZE;
+
+     __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+     __FACTORY_DATA_SIZE = m_factory_data_size;
 }
