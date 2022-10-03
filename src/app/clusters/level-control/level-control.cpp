@@ -312,7 +312,7 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
     {
         emberAfLevelControlClusterPrintln("Setting on/off to %p due to level change", onOff ? "ON" : "OFF");
         OnOffServer::Instance().setOnOffValue(
-            endpoint, static_cast<uint8_t>(onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
+            endpoint, (onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
     }
 #endif // EMBER_AF_PLUGIN_ON_OFF
 }
