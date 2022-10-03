@@ -652,7 +652,8 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
-        else if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+
+        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -702,7 +703,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
-        else if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+
+        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
