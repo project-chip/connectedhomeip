@@ -19,7 +19,7 @@ import re
 
 from idl.generators import CodeGenerator, GeneratorStorage
 from idl.matter_idl_types import (Idl, ClusterSide, Field, Attribute, Cluster,
-                                  FieldAttribute, Command, DataType, Struct)
+                                  Command, DataType, Struct)
 from idl import matter_idl_types
 from idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
                                   IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext)
