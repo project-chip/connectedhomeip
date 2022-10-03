@@ -1904,6 +1904,40 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+
+    struct ValidationTestCase
+    {
+        ByteSpan cert;
+        AttestationCertType type;
+        CHIP_ERROR expectedError;
+    };
+
+    // clang-format off
+    static ValidationTestCase sValidationTestCases[] = {
+        // cert                                           type                               Expected Error
+        // ===============================================================================================================
+        {  sTestCert_PAA_FFF1_Cert,                       Crypto::AttestationCertType::kPAA, CHIP_NO_ERROR               },
+        {  sTestCert_PAI_FFF1_8000_Cert,                  Crypto::AttestationCertType::kPAI, CHIP_NO_ERROR               },
+        {  sTestCert_DAC_FFF2_8002_0017_Cert,             Crypto::AttestationCertType::kDAC, CHIP_NO_ERROR               },
+        {  ByteSpan(),                                    Crypto::AttestationCertType::kDAC, CHIP_ERROR_INVALID_ARGUMENT },
+        {  sTestCert_PAI_FFF2_NoPID_FB_Cert,              Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+    };
+    // clang-format on
+
+    for (auto & testCase : sValidationTestCases)
+    {
+        ByteSpan cert  = testCase.cert;
+        CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
+        NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+    }
+}
+
 static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
@@ -2416,6 +2450,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2+ object reuse", TestSPAKE2P_Reuse),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
+    NL_TEST_DEF("Test x509 Attestation Certificate Format Validation", TestX509_VerifyAttestationCertificateFormat),
     NL_TEST_DEF("Test x509 Certificate Chain Validation", TestX509_CertChainValidation),
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),

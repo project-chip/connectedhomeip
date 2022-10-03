@@ -24,6 +24,7 @@
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/Span.h>
 
 #include <fstream>
@@ -92,6 +93,28 @@ ByteSpan ReadValue(Json::Value jsonValue, uint8_t * buffer, size_t bufferLen)
     return ByteSpan(buffer, bytesLen);
 }
 
+CharSpan ReadValue(Json::Value jsonValue, char * buffer, size_t bufferLen)
+{
+    const std::string value = jsonValue.asString();
+    if (value.size() == 0)
+    {
+        return CharSpan();
+    }
+
+    Platform::CopyString(buffer, bufferLen, value.c_str());
+    return CharSpan(buffer, strlen(buffer));
+}
+
+bool ReadValue(Json::Value jsonValue)
+{
+    const std::string value = jsonValue.asString();
+    if (strcmp(value.c_str(), "true") == 0)
+    {
+        return true;
+    }
+    return false;
+}
+
 // TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
@@ -118,6 +141,8 @@ void TestHarnessDACProvider::Init(const char * filepath)
     constexpr const char kPaiCertKey[]      = "pai_cert";
     constexpr const char kCertDecKey[]      = "certification_declaration";
     constexpr const char kFirmwareInfoKey[] = "firmware_information";
+    constexpr const char kIsSuccessKey[]    = "is_success_case";
+    constexpr const char kDescription[]     = "description";
 
     std::ifstream json(filepath, std::ifstream::binary);
     if (!json)
@@ -173,6 +198,18 @@ void TestHarnessDACProvider::Init(const char * filepath)
         data.firmwareInformation.SetValue(ReadValue(root[kFirmwareInfoKey], buf, sizeof(buf)));
     }
 
+    if (root.isMember(kIsSuccessKey))
+    {
+        data.isSuccessCase.SetValue(ReadValue(root[kIsSuccessKey]));
+    }
+
+    if (root.isMember(kDescription))
+    {
+        constexpr size_t kMaxTestCaseDescriptionLen = 256;
+        static char buf[kMaxTestCaseDescriptionLen];
+        data.description.SetValue(ReadValue(root[kDescription], buf, sizeof(buf)));
+    }
+
     Init(data);
 }
 
@@ -184,6 +221,8 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
     mPaiCert       = data.paiCert.HasValue() ? data.paiCert.Value() : DevelopmentCerts::kPaiCert;
     mCertificationDeclaration =
         data.certificationDeclaration.HasValue() ? data.certificationDeclaration.Value() : ByteSpan{ kCdForAllExamples };
+    mIsSuccessCase = data.isSuccessCase.HasValue() ? data.isSuccessCase.Value() : true;
+    mDescription   = data.description.HasValue() ? data.description.Value() : CharSpan();
 
     // TODO: We need a real example FirmwareInformation to be populated.
     mFirmwareInformation = data.firmwareInformation.HasValue() ? data.firmwareInformation.Value() : ByteSpan();
