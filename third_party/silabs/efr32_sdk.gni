@@ -578,7 +578,7 @@ template("efr32_sdk") {
     }
 
     # SPI is only used for Wifi
-    if ((invoker.use_rs911x == true ) || (invoker.use_wf200 == true)) {
+    if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       sources += [
         "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_spidrv_init.c",
         "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
