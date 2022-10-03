@@ -88,6 +88,7 @@ infineon-psoc6-all-clusters
 infineon-psoc6-all-clusters-minimal
 infineon-psoc6-light
 infineon-psoc6-lock
+k32w-contact-release
 k32w-light-release-no-ota
 k32w-lock-release
 k32w-shell-release
