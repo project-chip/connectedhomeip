@@ -190,7 +190,7 @@ class MatterIdlTransformer(Transformer):
     def timed_command(self, _):
         return CommandQuality.TIMED_INVOKE
 
-    def fabric_command(self, _):
+    def fabric_scoped_command(self, _):
         return CommandQuality.FABRIC_SCOPED
 
     def command_qualities(self, attrs):
