@@ -21,14 +21,14 @@
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-
-#include <inet/EndPointStateOpenThread.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -38,6 +38,7 @@
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
+#include "PWR_Interface.h"
 #include "app_config.h"
 
 #if CHIP_CRYPTO_HSM
@@ -52,7 +53,6 @@ constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static SemaphoreHandle_t sCHIPEventLock;
 static QueueHandle_t sAppEventQueue;
 
 #if !cPWR_UsePowerDownMode
@@ -95,7 +95,16 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
+// Initialize device attestation config
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+    // Initialize factory data provider
+    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+#endif
+    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+#else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
@@ -104,6 +113,7 @@ CHIP_ERROR AppTask::Init()
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+#endif
 
     /* HW init leds */
 #if !cPWR_UsePowerDownMode
@@ -142,13 +152,6 @@ CHIP_ERROR AppTask::Init()
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    sCHIPEventLock = xSemaphoreCreateMutex();
-    if (sCHIPEventLock == NULL)
-    {
-        K32W_LOG("xSemaphoreCreateMutex() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
-
     // Print the current software version
     char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
     err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
@@ -158,7 +161,7 @@ CHIP_ERROR AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     K32W_LOG("Current Software Version: %s", currentSoftwareVer);
     return err;
@@ -180,6 +183,10 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
@@ -542,7 +549,11 @@ void AppTask::BleHandler(void * aGenericEvent)
         K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
         return;
     }
+    PlatformMgr().ScheduleWork(AppTask::BleStartAdvertising, 0);
+}
 
+void AppTask::BleStartAdvertising(intptr_t arg)
+{
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
@@ -563,7 +574,7 @@ void AppTask::BleHandler(void * aGenericEvent)
     }
 }
 
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
     {
