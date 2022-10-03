@@ -24,6 +24,10 @@ if (config_use_interactive_mode) {
 
 assert(chip_build_tools)
 
+declare_args() {
+  chip_codesign = current_os == "ios"
+}
+
 if (current_os == "ios") {
   output_sdk_type = "Debug-iphoneos"
 } else {
@@ -157,4 +161,21 @@ executable("darwin-framework-tool") {
   public_configs = [ ":config" ]
 
   output_dir = root_out_dir
+}
+
+if (chip_codesign) {
+  action("codesign") {
+    script = "entitlements/codesign.py"
+    public_deps = [ ":darwin-framework-tool" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/darwin-framework-tool", root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
 }
