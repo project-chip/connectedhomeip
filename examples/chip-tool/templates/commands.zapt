@@ -107,7 +107,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{else if (isString type)}}
         make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{else}}
-        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name language='c++'}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if_chip_complex}}
         {{/if}}
         {{/zcl_attributes_server}}
