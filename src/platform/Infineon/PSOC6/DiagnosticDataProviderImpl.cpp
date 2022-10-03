@@ -250,7 +250,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     whd_security_t security;
     cy_rslt_t result = CY_RSLT_SUCCESS;
 
-    if (whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security) != CY_RSLT_SUCCESS)
+    result = whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security);
+    if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "whd_wifi_get_ap_info failed: %d", (int) result);
         SuccessOrExit(CHIP_ERROR_INTERNAL);
