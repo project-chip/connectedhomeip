@@ -42,8 +42,6 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <platform/EFR32/freertos_bluetooth.h>
-
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
