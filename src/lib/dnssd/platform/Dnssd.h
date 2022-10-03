@@ -219,7 +219,10 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            intptr_t * browseIdentifier);
 
 /**
- * Stop an ongoing browse, if supported by this backend.
+ * Stop an ongoing browse, if supported by this backend.  If successful, this
+ * will trigger a final callback, with either an error status or finalBrowse set
+ * to true, to the DnssdBrowseCallback that was passed to the ChipDnssdBrowse
+ * call that handed back this browseIdentifier.
  *
  * @param browseIdentifier an identifier for a browse operation that came from
  *                         ChipDnssdBrowse.

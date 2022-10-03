@@ -156,7 +156,9 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         // We don't have access to the ResolverProxy here to clear out its
         // mDiscoveryContext.  The underlying implementation of
         // ChipDnssdStopBrowse needs to handle a possibly-stale reference
-        // anyway, though, so it's OK.
+        // safely, so this won't lead to crashes, but it can lead to
+        // mis-behavior if a stale mDiscoveryContext happens to match a newer
+        // browse operation.
         //
         // TODO: Have a way to clear that state here.
         proxy->Release();
@@ -183,7 +185,9 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         // We don't have access to the ResolverProxy here to clear out its
         // mDiscoveryContext.  The underlying implementation of
         // ChipDnssdStopBrowse needs to handle a possibly-stale reference
-        // anyway, though, so it's OK.
+        // safely, so this won't lead to crashes, but it can lead to
+        // mis-behavior if a stale mDiscoveryContext happens to match a newer
+        // browse operation.
         //
         // TODO: Have a way to clear that state here.
         proxy->Release();
