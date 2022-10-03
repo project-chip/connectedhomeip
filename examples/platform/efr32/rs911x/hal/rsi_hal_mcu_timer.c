@@ -23,9 +23,9 @@
 #ifdef RSI_WITH_OS
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
+#include "event_groups.h"
 #include "task.h"
 #include "timers.h"
-#include "event_groups.h"
 #if defined(SysTick)
 #undef SysTick_Handler
 /* FreeRTOS SysTick interrupt handler prototype */
@@ -35,17 +35,20 @@ extern void xPortSysTickHandler(void);
 #endif /* SysTick */
 #endif /* RSI_WITH_OS */
 #include "wfx_host_events.h"
+
+/* RSI Driver include file */
 #include "rsi_driver.h"
-#include "rsi_wlan_config.h"
-#include "rsi_data_types.h"
-#include "rsi_common_apis.h"
-#include "rsi_wlan_apis.h"
-#include "rsi_wlan.h"
-#include "rsi_utils.h"
-#include "rsi_socket.h"
-#include "rsi_nwk.h"
+/* RSI WLAN Config include file */
 #include "rsi_bootup_config.h"
+#include "rsi_common_apis.h"
+#include "rsi_data_types.h"
 #include "rsi_error.h"
+#include "rsi_nwk.h"
+#include "rsi_socket.h"
+#include "rsi_utils.h"
+#include "rsi_wlan.h"
+#include "rsi_wlan_apis.h"
+#include "rsi_wlan_config.h"
 #include "wfx_rsi.h"
 
 #ifndef _use_the_rsi_defined_functions
