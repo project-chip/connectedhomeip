@@ -306,6 +306,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
     }
 }
 
+#if CONFIG_ENABLE_CHIP_SHELL
 /********************************************************
  * LevelControl switch shell functions
  *********************************************************/
@@ -838,4 +839,4 @@ CHIP_ERROR GroupsStopWithOnOffSwitchCommandHandler(int argc, char ** argv)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
-
+#endif //CONFIG_ENABLE_CHIP_SHELL

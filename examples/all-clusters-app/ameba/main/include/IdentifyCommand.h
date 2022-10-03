@@ -126,6 +126,7 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBi
     }
 }
 
+#if CONFIG_ENABLE_CHIP_SHELL
 /********************************************************
  * Identify switch shell functions
  *********************************************************/
@@ -266,4 +267,4 @@ CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
-
+#endif //CONFIG_ENABLE_CHIP_SHELL

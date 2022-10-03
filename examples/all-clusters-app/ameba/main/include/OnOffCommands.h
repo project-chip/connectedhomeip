@@ -189,6 +189,7 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindi
     }
 }
 
+#if CONFIG_ENABLE_CHIP_SHELL
 /********************************************************
  * OnOff switch shell functions
  *********************************************************/
@@ -470,4 +471,4 @@ CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
-
+#endif //CONFIG_ENABLE_CHIP_SHELL
