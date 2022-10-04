@@ -30,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
@@ -173,7 +174,7 @@ CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
 }
 
 CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
-                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search)
+                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search, ListFreer & listFreer)
 {
     jclass jContentSearchClass;
     ReturnErrorOnFailure(
@@ -192,18 +193,21 @@ CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
     jmethodID jNextMid    = env->GetMethodID(env->GetObjectClass(jIterator), "next", "()Ljava/lang/Object;");
     jmethodID jHasNextMid = env->GetMethodID(env->GetObjectClass(jIterator), "hasNext", "()Z");
 
-    chip::app::Clusters::ContentLauncher::Structs::Parameter::Type * parameterList =
-        new chip::app::Clusters::ContentLauncher::Structs::Parameter::Type[parameterListSize];
+    auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(parameterListSize);
+    listFreer.add(parameterListHolder);
     int parameterIndex = 0;
     while (env->CallBooleanMethod(jIterator, jHasNextMid))
     {
         jobject jParameter = env->CallObjectMethod(jIterator, jNextMid);
         chip::app::Clusters::ContentLauncher::Structs::Parameter::Type parameter;
         ReturnErrorOnFailure(CreateParameter(env, jParameter, parameter));
-        parameterList[parameterIndex++] = parameter;
+        parameterListHolder->mList[parameterIndex].type           = parameter.type;
+        parameterListHolder->mList[parameterIndex].value          = parameter.value;
+        parameterListHolder->mList[parameterIndex].externalIDList = parameter.externalIDList;
+        parameterIndex++;
     }
     search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(
-        parameterList, parameterListSize);
+        parameterListHolder->mList, parameterListSize);
 
     return CHIP_NO_ERROR;
 }
@@ -221,8 +225,9 @@ JNI_METHOD(jboolean, contentLauncher_1launchContent)
     const char * nativeData             = env->GetStringUTFChars(jData, 0);
     chip::Optional<chip::CharSpan> data = MakeOptional(CharSpan::fromCharString(nativeData));
 
+    ListFreer listFreer;
     chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search;
-    CHIP_ERROR err = CreateContentSearch(env, jSearch, search);
+    CHIP_ERROR err = CreateContentSearch(env, jSearch, search, listFreer);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer,
                               "contentLauncher_1launchContent::Could not create ContentSearch object %" CHIP_ERROR_FORMAT,
