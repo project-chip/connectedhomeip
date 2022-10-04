@@ -340,13 +340,6 @@ public:
         {
             length += sizeof(GroupId);
         }
-        /*
-        if (mSecFlags.Has(Header::SecFlagValues::kMsgExtensionFlag))
-        {
-            // Add message extension length from length field
-            // offset += sizeof(uint16_t);
-        }
-        */
         return length;
     }
 

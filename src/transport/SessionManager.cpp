@@ -783,12 +783,12 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
     uint8_t * data     = msg->Start();
     uint16_t len       = msg->DataLength();
     uint16_t footerLen = packetHeader.MICTagLength();
-    VerifyOrReturn(footerLen <= len); // err = CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    VerifyOrReturn(footerLen <= len);
 
     uint16_t taglen = 0;
     MessageAuthenticationCode mac;
     ReturnOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
-    VerifyOrReturn(taglen == footerLen); // err = CHIP_ERROR_INTERNAL;
+    VerifyOrReturn(taglen == footerLen);
 
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
@@ -798,7 +798,6 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
 
         if (packetHeader.HasPrivacyFlag())
         {
-
             // Perform privacy deobfuscation, if applicable.
             uint8_t * privacyHeader = msgCopy->Start() + Header::kPrivacyHeaderOffset;
             size_t privacyLength    = packetHeader.PrivacyHeaderLength();
