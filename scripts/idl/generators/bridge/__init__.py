@@ -18,11 +18,10 @@ import logging
 import re
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import (Idl, ClusterSide, Field, Attribute, Cluster,
-                                  FieldAttribute, Command, DataType, Struct)
+from idl.matter_idl_types import (Idl, Field, Attribute, Cluster)
 from idl import matter_idl_types
 from idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
-                                  IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext)
+                                  IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext)
 from typing import Union, List, Set
 
 
