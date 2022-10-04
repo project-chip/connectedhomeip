@@ -24,10 +24,12 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemLayer.h>
 
 #include <net/net_if.h>
+#include <net/wifi_mgmt.h>
 
 extern "C" {
 #include <src/utils/common.h>
@@ -85,9 +87,16 @@ private:
 
 class WiFiManager
 {
-    using ConnectionCallback = void (*)();
-
 public:
+    enum WiFiRequestStatus : int
+    {
+        FAIL    = -1,
+        SUCCESS = 0
+    };
+
+    using ScanResultCallback = void (*)(NetworkCommissioning::WiFiScanResponse *);
+    using ScanDoneCallback   = void (*)(WiFiRequestStatus);
+
     enum class StationStatus : uint8_t
     {
         NONE,
@@ -97,7 +106,8 @@ public:
         CONNECTING,
         CONNECTED,
         PROVISIONING,
-        FULLY_PROVISIONED
+        FULLY_PROVISIONED,
+        UNKNOWN
     };
 
     static WiFiManager & Instance()
@@ -106,7 +116,7 @@ public:
         return sInstance;
     }
 
-    using ScanCallback = void (*)(int /* status */, NetworkCommissioning::WiFiScanResponse *);
+    using ConnectionCallback = void (*)();
 
     struct ConnectionHandling
     {
@@ -136,35 +146,50 @@ public:
     };
 
     CHIP_ERROR Init();
-    CHIP_ERROR Scan(const ByteSpan & ssid, ScanCallback callback);
+    CHIP_ERROR Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback);
     CHIP_ERROR Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling);
     StationStatus GetStationStatus() const;
     CHIP_ERROR ClearStationProvisioningData();
-    CHIP_ERROR DisconnectStation();
+    CHIP_ERROR Disconnect();
     CHIP_ERROR GetWiFiInfo(WiFiInfo & info) const;
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
 
 private:
-    CHIP_ERROR AddPsk(const ByteSpan & credentials);
+    using ConnectionParams = wifi_connect_req_params;
+    using NetEventCallback = net_mgmt_event_callback;
+    using WiFiStatus       = wifi_status;
+    using NetEventHandler  = void (*)(NetEventCallback *);
+
+    struct NetworkEventData
+    {
+        NetEventCallback * mCallback;
+        uint32_t mEvent;
+    };
+
+    constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
+        NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
+
+    CHIP_ERROR AddPsk(wifi_connect_req_params * params, const ByteSpan & credentials);
     CHIP_ERROR EnableStation(bool enable);
     CHIP_ERROR AddNetwork(const ByteSpan & ssid, const ByteSpan & credentials);
-    void PollTimerCallback();
-    void WaitForConnectionAsync();
-    void OnConnectionSuccess();
-    void OnConnectionFailed();
     uint8_t GetSecurityType() const;
 
-    WpaNetwork * mpWpaNetwork{ nullptr };
-    ConnectionCallback mConnectionSuccessClbk;
-    ConnectionCallback mConnectionFailedClbk;
-    System::Clock::Timeout mConnectionTimeoutMs;
-    ScanCallback mScanCallback{ nullptr };
+    // Event handling
+    static void WifiMgmtEventHandler(NetEventCallback * cb, uint32_t mgmtEvent, struct net_if * iface);
+    static void ScanResultClbk(NetEventCallback * cb);
+    static void ScanDoneClbk(NetEventCallback * cb);
+    static void ConnectClbk(NetEventCallback * cb);
+    static void DisconnectClbk(NetEventCallback * cb);
+    static void PostConnectivityStatusChange(ConnectivityChange changeType);
 
-    static uint8_t FrequencyToChannel(uint16_t freq);
-    static StationStatus StatusFromWpaStatus(const wpa_states & status);
-
-    static const Map<wpa_states, StationStatus, 10> sStatusMap;
-    static const Map<uint16_t, uint8_t, 42> sFreqChannelMap;
+    ConnectionParams mWiFiParams{};
+    ConnectionHandling mHandling;
+    wifi_iface_state mWiFiState;
+    NetEventCallback mWiFiMgmtClbk{};
+    ScanResultCallback mScanResultCallback{ nullptr };
+    ScanDoneCallback mScanDoneCallback{ nullptr };
+    static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
+    static const Map<uint32_t, NetEventHandler, 4> sEventHandlerMap;
 };
 
 } // namespace DeviceLayer

@@ -16,6 +16,9 @@
  */
 
 #pragma once
+
+#include "WiFiManager.h"
+
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -103,10 +106,9 @@ public:
         return sInstance;
     }
 
-    void OnConnectWiFiNetwork();
-    void OnConnectWiFiNetworkFailed();
     void OnNetworkStatusChanged(Status status);
-    void OnScanWiFiNetworkDone(int status, WiFiScanResponse * result);
+    void OnScanWiFiNetworkResult(WiFiScanResponse * result);
+    void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
 
 private:
     void LoadFromStorage();
