@@ -23,7 +23,7 @@
 #include "efr32_creds.h"
 #include "psa/crypto.h"
 
-extern uint32_t __attestation_credentials_base;
+extern uint8_t * __attestation_credentials_base;
 
 namespace chip {
 namespace Credentials {
