@@ -57,6 +57,7 @@ class HostApp(Enum):
     NL_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    DYNAMIC_BRIDGE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -95,6 +96,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            return 'dynamic-bridge-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -162,6 +165,9 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            yield 'dynamic-chip-bridge-app'
+            yield 'dynamic-chip-bridge-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

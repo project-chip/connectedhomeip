@@ -193,7 +193,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 {
-    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
 
     if (platformManagerDelegate != nullptr)
     {
@@ -233,9 +233,9 @@ void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFun
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
-#if CHIP_PROGRESS_LOGGING
+#if (CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0)
     System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0
 
     switch (event->Type)
     {
@@ -266,14 +266,13 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
     }
 
-    // TODO: make this configurable
-#if CHIP_PROGRESS_LOGGING
+#if (CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0)
     uint32_t deltaMs = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - start).count();
-    if (deltaMs > 100)
+    if (deltaMs > CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS)
     {
         ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0
 }
 
 template <class ImplClass>

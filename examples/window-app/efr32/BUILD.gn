@@ -95,7 +95,7 @@ if (chip_enable_wifi) {
     show_qr_code = false
     disable_lcd = true
   }
-  wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
     "LWIP_IPV4=1",
@@ -109,9 +109,9 @@ if (chip_enable_wifi) {
   if (use_rs911x) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+    import("${examples_plat_dir}/rs911x/rs911x.gni")
   } else {
-    import("${wifi_sdk_dir}/wf200/wf200.gni")
+    import("${examples_plat_dir}/wf200/wf200.gni")
   }
 }
 
