@@ -53,7 +53,7 @@ struct IsOptionalOrNullable<Nullable<X>>
     static constexpr bool value = true;
 };
 
-static_assert(IsList<std::vector<unsigned char>>::value);
+static_assert(IsList<std::vector<unsigned char>>::value, "Vector of chars must be a list");
 
 template <typename X,
           std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
