@@ -120,6 +120,10 @@ struct PayloadContents
     uint16_t vendorID                   = 0;
     uint16_t productID                  = 0;
     CommissioningFlow commissioningFlow = CommissioningFlow::kStandard;
+    // rendezvousInformation is Optional, because a payload parsed from a manual
+    // numeric code would not have any rendezvousInformation available.  A
+    // payload parsed from a QR code would always have a value for
+    // rendezvousInformation.
     Optional<RendezvousInformationFlags> rendezvousInformation;
     SetupDiscriminator discriminator;
     uint32_t setUpPINCode = 0;

@@ -224,35 +224,42 @@ public:
     bool IsExtensionBasicCritical() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCriticalWrong)); }
     bool IsExtensionBasicCAPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCAMissing)); }
     bool IsExtensionBasicCACorrect() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCAWrong)); }
-    bool IsExtensionBasicPathLenPresent(AttCertType & attCertType)
-    {
-        bool normallyPresent = (attCertType != kAttCertType_DAC);
-        bool testCaseWrong   = (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong));
-        return (normallyPresent ^ testCaseWrong);
-    }
     int GetExtensionBasicPathLenValue(AttCertType & attCertType)
     {
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
         {
             return 0;
         }
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen1))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen1))
         {
             return 1;
         }
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen2))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen2))
         {
             return 2;
         }
-        if (attCertType == kAttCertType_PAA)
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong))
         {
-            return 1;
+            if (attCertType == kAttCertType_DAC)
+            {
+                return 0;
+            }
+            else
+            {
+                return IsExtensionBasicCAPresent() ? static_cast<int>(kPathLength_NotSpecified) : 2;
+            }
+        }
+
+        // Correct Values:
+        if (attCertType == kAttCertType_DAC)
+        {
+            return IsExtensionBasicCAPresent() ? static_cast<int>(kPathLength_NotSpecified) : 0;
         }
         if (attCertType == kAttCertType_PAI)
         {
             return 0;
         }
-        return 0;
+        return 1;
     }
     bool IsExtensionBasicPathLenPresent()
     {

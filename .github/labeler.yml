@@ -140,10 +140,6 @@ ble:
     - src/ble/*
     - src/ble/**/*
 
-android:
-    - src/android/*
-    - src/android/**/*
-
 app:
     - src/app/*
     - src/app/**/*

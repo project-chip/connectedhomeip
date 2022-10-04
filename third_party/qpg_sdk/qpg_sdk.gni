@@ -23,9 +23,7 @@ declare_args() {
   qpg_sdk_root = "${chip_root}/third_party/qpg_sdk/repo"
 
   # subdirectory in qpg_sdk_root where the binary library builds (.a) are to be found
-  # for connectedhomeip-qpg: Binaries (default)
-  # for matter endnodes sdk: Work
-  qpg_sdk_lib_dir = "Binaries"
+  qpg_sdk_lib_dir = "Work"
 
   # Target IC for QPG SDK
   qpg_target_ic = "qpg6105"
@@ -69,27 +67,11 @@ template("qpg_sdk") {
       "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc",
       "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
       "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt",
-      "${qpg_sdk_root}/Components/ThirdParty/Lwip",
-      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch",
       "${mbedtls_root}/repo/include",
       "${openthread_root}/include",
     ]
 
     lib_dirs = []
-
-    if (qpg_sdk_include_platform_libs) {
-      libs += [
-        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/MatterQorvoGlue_${qpg_target_ic}_libbuild/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a",
-        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/QorvoStack_${qpg_target_ic}/libQorvoStack_${qpg_target_ic}.a",
-        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a",
-        "${qpg_sdk_root}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure/libBootloader_${qpg_target_ic}_compr_secure.a",
-      ]
-    }
-
-    ldflags = [
-      "-Wl,-u_binary_bl_userlicense_bin_start",
-      "-Wl,-u_binary_bootloader_bin_start",
-    ]
 
     #MBed TLS built from third_party/mbedtls tree - OT config not used
     defines = [
@@ -111,96 +93,19 @@ template("qpg_sdk") {
 
   source_set(sdk_target_name) {
     sources = [
-      "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
-      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
-      "${chip_root}/third_party/mbedtls/repo/library/aesni.c",
-      "${chip_root}/third_party/mbedtls/repo/library/arc4.c",
-      "${chip_root}/third_party/mbedtls/repo/library/aria.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
-      "${chip_root}/third_party/mbedtls/repo/library/base64.c",
-      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
-      "${chip_root}/third_party/mbedtls/repo/library/blowfish.c",
-      "${chip_root}/third_party/mbedtls/repo/library/camellia.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
-      "${chip_root}/third_party/mbedtls/repo/library/certs.c",
-      "${chip_root}/third_party/mbedtls/repo/library/chacha20.c",
-      "${chip_root}/third_party/mbedtls/repo/library/chachapoly.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cmac.c",
-      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/debug.c",
-      "${chip_root}/third_party/mbedtls/repo/library/des.c",
-      "${chip_root}/third_party/mbedtls/repo/library/dhm.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
-      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
-      "${chip_root}/third_party/mbedtls/repo/library/entropy_poll.c",
-      "${chip_root}/third_party/mbedtls/repo/library/error.c",
-      "${chip_root}/third_party/mbedtls/repo/library/gcm.c",
-      "${chip_root}/third_party/mbedtls/repo/library/havege.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md2.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md4.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md5.c",
-      "${chip_root}/third_party/mbedtls/repo/library/memory_buffer_alloc.c",
-      "${chip_root}/third_party/mbedtls/repo/library/net_sockets.c",
-      "${chip_root}/third_party/mbedtls/repo/library/nist_kw.c",
-      "${chip_root}/third_party/mbedtls/repo/library/oid.c",
-      "${chip_root}/third_party/mbedtls/repo/library/padlock.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pem.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pk.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pk_wrap.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkcs11.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkcs12.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkparse.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkwrite.c",
-      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
-      "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
-      "${chip_root}/third_party/mbedtls/repo/library/poly1305.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_crypto.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_crypto_driver_wrappers.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_crypto_se.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_crypto_slot_management.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_crypto_storage.c",
-      "${chip_root}/third_party/mbedtls/repo/library/psa_its_file.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ripemd160.c",
-      "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
-      "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_cache.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_ciphersuites.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_cli.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_cookie.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_msg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_ticket.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ssl_tls13_keys.c",
-      "${chip_root}/third_party/mbedtls/repo/library/threading.c",
-      "${chip_root}/third_party/mbedtls/repo/library/timing.c",
-      "${chip_root}/third_party/mbedtls/repo/library/version.c",
-      "${chip_root}/third_party/mbedtls/repo/library/version_features.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_crl.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_crt.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_csr.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509write_crt.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
-      "${chip_root}/third_party/mbedtls/repo/library/xtea.c",
       "${qpg_sdk_root}/Applications/Matter/shared/config/inc/FreeRTOSConfig.h",
       "${qpg_sdk_root}/Applications/Matter/shared/config/src/hooks.c",
+    ]
+
+    chip_glue_sources = [
+      #
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc/qvIO.h",
+      "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc/qvCHIP.h",
+    ]
+    sources += chip_glue_sources
+
+    mbedtls_alt_sources = [
+      # Add alt src
       "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/aes_alt.h",
       "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ccm_alt.h",
       "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecjpake_alt.h",
@@ -208,11 +113,34 @@ template("qpg_sdk") {
       "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha256_alt.h",
       "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h",
       "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c",
-
-      # mbedtls_hardware_poll
-      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc/qvIO.h",
-      "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc/qvCHIP.h",
     ]
+    mbedtls_sources = [
+      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
+      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
+      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md.c",
+      "${chip_root}/third_party/mbedtls/repo/library/oid.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkparse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkwrite.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
+    ]
+    sources += mbedtls_sources + mbedtls_alt_sources
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
@@ -220,5 +148,14 @@ template("qpg_sdk") {
 
     public_configs = [ ":${sdk_target_name}_config" ]
     public_deps = [ "${chip_root}/third_party/qpg_sdk:freertos" ]
+    if (qpg_sdk_include_platform_libs) {
+      public_deps += [
+        "${chip_root}/third_party/qpg_sdk:qpg_bootloader_lib",
+        "${chip_root}/third_party/qpg_sdk:qpg_glue_lib",
+        "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt_lib",
+        "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue_lib",
+        "${chip_root}/third_party/qpg_sdk:qpg_stack_lib",
+      ]
+    }
   }
 }

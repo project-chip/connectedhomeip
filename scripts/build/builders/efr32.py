@@ -81,6 +81,7 @@ class Efr32Board(Enum):
     BRD4186A = 6
     BRD4187A = 7
     BRD4304A = 8
+    BRD4187C = 9
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -99,6 +100,8 @@ class Efr32Board(Enum):
             return 'BRD4187A'
         elif self == Efr32Board.BRD4304A:
             return 'BRD4304A'
+        elif self == Efr32Board.BRD4187C:
+            return 'BRD4187C'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -117,7 +120,7 @@ class Efr32Builder(GnBuilder):
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
-        self.extra_gn_options = ['efr32_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
 
         if enable_rpcs:
             self.extra_gn_options.append('is_debug=false import("//with_pw_rpc.gni")')

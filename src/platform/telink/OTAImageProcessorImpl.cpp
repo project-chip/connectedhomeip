@@ -21,10 +21,10 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <dfu/mcuboot.h>
-#include <sys/reboot.h>
+#include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/storage/stream_flash.h>
+#include <zephyr/sys/reboot.h>
 
 static struct stream_flash_ctx stream;
 

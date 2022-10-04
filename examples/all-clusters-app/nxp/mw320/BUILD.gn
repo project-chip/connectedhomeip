@@ -37,12 +37,15 @@ mw320_sdk("sdk") {
     "include/FreeRTOSConfig.h",
   ]
 
-  defines = []
+  defines = [ "CHIP_CONFIG_MAX_FABRICS=5" ]
 
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
     defines += [ "BUILD_RELEASE=1" ]
+  }
+  if (wifi_conn_abort_support == true) {
+    defines += [ "WIFI_CONN_ABORT_SUPPORT" ]
   }
 }
 

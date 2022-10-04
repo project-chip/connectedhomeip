@@ -138,12 +138,21 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
     mOnDoneHandler = nil;
     dispatch_async(mQueue, ^{
         callback(err);
-        if (onDoneHandler) {
-            onDoneHandler();
-        }
     });
 
-    if (aCancelSubscription) {
+    if (onDoneHandler) {
+        // To guarantee the async onDoneHandler call is made before
+        // deletion, so that clean up can happen while the callback
+        // object is still alive (and therefore cluster cache), queue
+        // deletion after calling the onDoneHandler
+        mHaveQueuedDeletion = true;
+        dispatch_async(mQueue, ^{
+            onDoneHandler();
+            dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                delete myself;
+            });
+        });
+    } else if (aCancelSubscription) {
         // We can't synchronously delete ourselves, because we're inside one of
         // the ReadClient callbacks and we need to outlive the callback's
         // execution.  Queue an async deletion on the Matter queue (where we are

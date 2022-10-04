@@ -60,9 +60,16 @@ android_library("java") {
   ]
 
   sources = [
+    "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
     "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
+    "App/app/src/main/jni/com/chip/casting/FailureCallback.java",
     "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
+    "App/app/src/main/jni/com/chip/casting/MatterError.java",
+    "App/app/src/main/jni/com/chip/casting/MediaPlaybackTypes.java",
+    "App/app/src/main/jni/com/chip/casting/SubscriptionEstablishedCallback.java",
+    "App/app/src/main/jni/com/chip/casting/SuccessCallback.java",
+    "App/app/src/main/jni/com/chip/casting/TargetNavigatorTypes.java",
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
   ]
 

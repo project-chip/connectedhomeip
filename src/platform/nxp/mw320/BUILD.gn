@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
+import("//build_overrides/mw320_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
 
 assert(chip_device_platform == "mw320")
 
@@ -34,6 +35,10 @@ static_library("mw320") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
@@ -43,6 +48,9 @@ static_library("mw320") {
     "Logging.cpp",
     "MW320Config.cpp",
     "MW320Config.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "NetworkProvisioningServerImpl.h",
     "OTAImageProcessorImpl.cpp",
     "OTAImageProcessorImpl.h",
@@ -53,7 +61,20 @@ static_library("mw320") {
     "mw320_ota.h",
   ]
 
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
+
   defines = [ "MW320_LOG_ENABLED=1" ]
+
+  # Do Sync-connect/scan
+  defines += [ "MW320_CONNECT_SCAN_SYNC=1" ]
+
+  # Use ethernet/wifi interface for network commissioning. Default: WiFi
+  defines += [ "USE_ETHERNET_COMMISSION=0" ]
 
   deps = []
 

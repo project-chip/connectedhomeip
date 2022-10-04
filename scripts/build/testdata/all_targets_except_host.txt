@@ -18,10 +18,8 @@ android-x64-tv-server
 android-x86-chip-tool
 android-x86-tv-server
 bl602-light
-bouffalolab-BL702-IoT-DVK-light
-bouffalolab-BL702-IoT-DVK-light-rpc
-bouffalolab-BL706-IoT-DVK-BL706C-22-light
-bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc
+bouffalolab-BL706-IoT-DVK-light
+bouffalolab-BL706-IoT-DVK-light-rpc
 bouffalolab-BL706-NIGHT-LIGHT-light
 cc13x2x7_26x2x7-all-clusters
 cc13x2x7_26x2x7-all-clusters-minimal
@@ -132,6 +130,20 @@ efr32-brd4187a-unit-test (NOGLOB: only user requested)
 efr32-brd4187a-unit-test-with-ota-requestor (NOGLOB: only user requested)
 efr32-brd4187a-window-covering (NOGLOB: only user requested)
 efr32-brd4187a-window-covering-with-ota-requestor (NOGLOB: only user requested)
+efr32-brd4187c-light
+efr32-brd4187c-light-rpc
+efr32-brd4187c-light-rpc-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-light-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-lock
+efr32-brd4187c-lock-rpc
+efr32-brd4187c-lock-rpc-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-lock-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-switch
+efr32-brd4187c-switch-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-unit-test
+efr32-brd4187c-unit-test-with-ota-requestor (NOGLOB: Reduce default build variants)
+efr32-brd4187c-window-covering
+efr32-brd4187c-window-covering-with-ota-requestor (NOGLOB: Reduce default build variants)
 efr32-brd4304a-light (NOGLOB: only user requested)
 efr32-brd4304a-light-rpc (NOGLOB: only user requested)
 efr32-brd4304a-light-rpc-with-ota-requestor (NOGLOB: only user requested)

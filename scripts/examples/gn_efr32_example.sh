@@ -35,7 +35,7 @@ env
 USE_WIFI=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
-USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]"
+USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
@@ -48,7 +48,7 @@ if [ "$#" == "0" ]; then
     <outputFolder>
         Desired location for the output files
 
-    <efr32_board_name>
+    <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
             BRD4161A
@@ -115,7 +115,7 @@ else
     OUTDIR=$2
 
     if [ "$#" -gt "2" ]; then
-        EFR32_BOARD=$3
+        SILABS_BOARD=$3
         shift
     fi
 
@@ -171,22 +171,22 @@ else
         esac
     done
 
-    if [ -z "$EFR32_BOARD" ]; then
-        echo "EFR32_BOARD not defined"
+    if [ -z "$SILABS_BOARD" ]; then
+        echo "SILABS_BOARD not defined"
         exit 1
     fi
 
-    BUILD_DIR=$OUTDIR/$EFR32_BOARD
+    BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\"" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/
