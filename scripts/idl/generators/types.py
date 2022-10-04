@@ -195,7 +195,7 @@ __CHIP_SIZED_TYPES__ = {
     "command_id": BasicInteger(idl_name="command_id", byte_count=4, is_signed=True),
     "data_ver": BasicInteger(idl_name="data_ver", byte_count=4, is_signed=True),
     "date": BasicInteger(idl_name="date", byte_count=4, is_signed=True),
-    "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=True),
+    "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=False),
     "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=True),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
