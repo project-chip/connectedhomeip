@@ -165,6 +165,9 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            return 'dynamic-chip-bridge-app'
+            return 'dynamic-chip-bridge-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
