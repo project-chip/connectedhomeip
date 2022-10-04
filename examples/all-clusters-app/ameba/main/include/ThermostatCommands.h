@@ -40,7 +40,7 @@ Engine sShellSwitchGroupsThermostatSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
-                                       OperationalDeviceProxy * peer_device)
+                                         OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "Read Thermostat attribute succeeds");
@@ -55,89 +55,89 @@ void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const EmberB
     switch (data->attributeId)
     {
     case Clusters::Thermostat::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::LocalTemperature::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::PICoolingDemand::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::PICoolingDemand::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::PICoolingDemand::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::PIHeatingDemand::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::PIHeatingDemand::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::PIHeatingDemand::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::MinHeatSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::MinCoolSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::ControlSequenceOfOperation::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Thermostat::Attributes::SystemMode::Id:
-        Controller::ReadAttribute<Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
     }
 }
 
 void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
-                                       OperationalDeviceProxy * peer_device)
+                                            OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "Thermostat command succeeds");
@@ -154,7 +154,7 @@ void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Emb
     switch (data->commandId)
     {
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
-        setpointRaiseLowerCommand.mode = static_cast<EmberAfSetpointAdjustMode>(data->args[0]);
+        setpointRaiseLowerCommand.mode   = static_cast<EmberAfSetpointAdjustMode>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          setpointRaiseLowerCommand, onSuccess, onFailure);
@@ -171,7 +171,7 @@ void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Ember
     switch (data->commandId)
     {
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
-        setpointRaiseLowerCommand.mode = static_cast<EmberAfSetpointAdjustMode>(data->args[0]);
+        setpointRaiseLowerCommand.mode   = static_cast<EmberAfSetpointAdjustMode>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand);
         break;
@@ -442,4 +442,4 @@ CHIP_ERROR GroupsSetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
-#endif //CONFIG_ENABLE_CHIP_SHELL
+#endif // CONFIG_ENABLE_CHIP_SHELL

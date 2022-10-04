@@ -17,10 +17,10 @@
  */
 
 #include "BindingHandler.h"
-#include "IdentifyCommand.h"
-#include "OnOffCommands.h"
-#include "LevelControlCommands.h"
 #include "ColorControlCommands.h"
+#include "IdentifyCommand.h"
+#include "LevelControlCommands.h"
+#include "OnOffCommands.h"
 #include "ThermostatCommands.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
@@ -275,7 +275,8 @@ static void RegisterSwitchCommands()
         { &ToggleSwitchCommandHandler, "toggle", "toggle Usage: switch onoff toggle" },
         { &OffWithEffectSwitchCommandHandler, "offWE", "off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>" },
         { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "on-with-recall-global-scene Usage: switch onoff onWRGS" },
-        { &OnWithTimedOffSwitchCommandHandler, "onWTO", "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" },
+        { &OnWithTimedOffSwitchCommandHandler, "onWTO",
+          "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" },
         { &OnOffRead, "read", "Usage : switch onoff read <attribute>" }
     };
 
@@ -291,14 +292,22 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchLevelControlSubCommands[] = {
         { &LevelControlHelpHandler, "help", "Usage: switch levelcontrol <subcommand>" },
-        { &MoveToLevelSwitchCommandHandler, "movetolevel", "movetolevel Usage: switch levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveSwitchCommandHandler, "move", "move Usage: switch levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &StepSwitchCommandHandler, "step", "step Usage: switch levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToLevelSwitchCommandHandler, "movetolevel",
+          "movetolevel Usage: switch levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSwitchCommandHandler, "move",
+          "move Usage: switch levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSwitchCommandHandler, "step",
+          "step Usage: switch levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
         { &StopSwitchCommandHandler, "stop", "step Usage: switch levelcontrol stop <optionsmask> <optionsoverride>" },
-        { &MoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO", "movetolevelwithonoff Usage: switch levelcontrol MTLWOO <level> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveWithOnOffSwitchCommandHandler, "MWOO", "movewithonoff Usage: switch levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &StepWithOnOffSwitchCommandHandler, "stepWOO", "stepwithonoff Usage: switch levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &StopWithOnOffSwitchCommandHandler, "stopWOO", "stopwithonoff Usage: switch levelcontrol stopWOO <optionsmask> <optionsoverride>" },
+        { &MoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO",
+          "movetolevelwithonoff Usage: switch levelcontrol MTLWOO <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveWithOnOffSwitchCommandHandler, "MWOO",
+          "movewithonoff Usage: switch levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepWithOnOffSwitchCommandHandler, "stepWOO",
+          "stepwithonoff Usage: switch levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &StopWithOnOffSwitchCommandHandler, "stopWOO",
+          "stopwithonoff Usage: switch levelcontrol stopWOO <optionsmask> <optionsoverride>" },
         { &LevelControlRead, "read", "Usage : switch levelcontrol read <attribute>" }
     };
 
@@ -323,25 +332,53 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchColorControlSubCommands[] = {
         { &ColorControlHelpHandler, "help", "Usage: switch colorcontrol <subcommand>" },
-        { &MoveToHueCommandHandler, "movetohue", "movetohue Usage: switch colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveHueCommandHandler, "movehue", "movehue Usage: switch colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &StepHueCommandHandler, "stephue", "stephue Usage: switch colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveToSaturationCommandHandler, "movetosat", "movetosaturation Usage: switch colorcontrol movetosat <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveSaturationCommandHandler, "movesat", "movesaturation Usage: switch colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &StepSaturationCommandHandler, "stepsat", "stepsaturation Usage: switch colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveToHueAndSaturationCommandHandler, "movetoHS", "movetohueandsaturation Usage: switch colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveToColorCommandHandler, "movetocolor", "movetocolor Usage: switch colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveColorCommandHandler, "movecolor", "movecolor Usage: switch colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
-        { &StepColorCommandHandler, "stepcolor", "stepcolor Usage: switch colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &MoveToColorTemperatureCommandHandler, "movetoCT", "movetocolortemperature Usage: switch colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &EnhancedMoveToHueCommandHandler, "Emovetohue", "enhancedmovetohue Usage: switch colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &EnhancedMoveHueCommandHandler, "Emovehue", "enhancedmovehue Usage: switch colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &EnhancedStepHueCommandHandler, "Estephue", "enhancedstephue Usage: switch colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &EnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS", "enhancedmovetohueandsaturation Usage: switch colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &ColorLoopSetCommandHandler, "colorloopset", "colorloopset Usage: switch colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> <optionsmask> <optionsoverride>" },
-        { &StopMoveStepCommandHandler, "stopmovestep", "stopmovestep Usage: switch colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
-        { &MoveColorTemperatureCommandHandler, "moveCT", "movecolortemperature Usage: switch colorcontrol moveCT <movemode> <rate> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
-        { &StepColorTemperatureCommandHandler, "stepCT", "stepcolortemperature Usage: switch colorcontrol stepCT <stepmode> <stepsize> <transitiontime> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &MoveToHueCommandHandler, "movetohue",
+          "movetohue Usage: switch colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveHueCommandHandler, "movehue",
+          "movehue Usage: switch colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepHueCommandHandler, "stephue",
+          "stephue Usage: switch colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToSaturationCommandHandler, "movetosat",
+          "movetosaturation Usage: switch colorcontrol movetosat <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSaturationCommandHandler, "movesat",
+          "movesaturation Usage: switch colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSaturationCommandHandler, "stepsat",
+          "stepsaturation Usage: switch colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &MoveToHueAndSaturationCommandHandler, "movetoHS",
+          "movetohueandsaturation Usage: switch colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &MoveToColorCommandHandler, "movetocolor",
+          "movetocolor Usage: switch colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveColorCommandHandler, "movecolor",
+          "movecolor Usage: switch colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
+        { &StepColorCommandHandler, "stepcolor",
+          "stepcolor Usage: switch colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToColorTemperatureCommandHandler, "movetoCT",
+          "movetocolortemperature Usage: switch colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveToHueCommandHandler, "Emovetohue",
+          "enhancedmovetohue Usage: switch colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveHueCommandHandler, "Emovehue",
+          "enhancedmovehue Usage: switch colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &EnhancedStepHueCommandHandler, "Estephue",
+          "enhancedstephue Usage: switch colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS",
+          "enhancedmovetohueandsaturation Usage: switch colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> "
+          "<optionsmask> <optionsoverride>" },
+        { &ColorLoopSetCommandHandler, "colorloopset",
+          "colorloopset Usage: switch colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> <optionsmask> "
+          "<optionsoverride>" },
+        { &StopMoveStepCommandHandler, "stopmovestep",
+          "stopmovestep Usage: switch colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
+        { &MoveColorTemperatureCommandHandler, "moveCT",
+          "movecolortemperature Usage: switch colorcontrol moveCT <movemode> <rate> <colortempminmireds> <colortempmaxmireds> "
+          "<optionsmask> <optionsoverride>" },
+        { &StepColorTemperatureCommandHandler, "stepCT",
+          "stepcolortemperature Usage: switch colorcontrol stepCT <stepmode> <stepsize> <transitiontime> <colortempminmireds> "
+          "<colortempmaxmireds> <optionsmask> <optionsoverride>" },
         { &ColorControlRead, "read", "Usage : switch colorcontrol read <attribute>" }
     };
 
@@ -429,12 +466,12 @@ static void RegisterSwitchCommands()
         { &ThermostatReadSystemMode, "systemmode", "Read systemmode attribute" },
     };
 
-    static const shell_command_t sSwitchGroupsSubCommands[] = { 
+    static const shell_command_t sSwitchGroupsSubCommands[] = {
         { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
         { &GroupsOnOffSwitchCommandHandler, "onoff", "Usage: switch groups onoff <subcommand>" },
         { &GroupsLevelControlSwitchCommandHandler, "levelcontrol", "Usage: switch groups levelcontrol <subcommand>" },
-        { &GroupsColorControlSwitchCommandHandler, "colorcontrol", "Usage: switch groups colorcontrol <subcommand>" }, 
-        { &GroupsThermostatSwitchCommandHandler, "thermostat", "Usage: switch groups thermostat <subcommand>" } ,
+        { &GroupsColorControlSwitchCommandHandler, "colorcontrol", "Usage: switch groups colorcontrol <subcommand>" },
+        { &GroupsThermostatSwitchCommandHandler, "thermostat", "Usage: switch groups thermostat <subcommand>" },
     };
 
     static const shell_command_t sSwitchGroupsIdentifySubCommands[] = {
@@ -455,42 +492,85 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchGroupsLevelControlSubCommands[] = {
         { &GroupsLevelControlHelpHandler, "help", "Usage: switch groupos levelcontrol <subcommand>" },
-        { &GroupsMoveToLevelSwitchCommandHandler, "movetolevel", "movetolevel Usage: switch groups levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveSwitchCommandHandler, "move", "move Usage: switch groups levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &GroupsStepSwitchCommandHandler, "step", "step Usage: switch groups levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveToLevelSwitchCommandHandler, "movetolevel",
+          "movetolevel Usage: switch groups levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveSwitchCommandHandler, "move",
+          "move Usage: switch groups levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepSwitchCommandHandler, "step",
+          "step Usage: switch groups levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
         { &GroupsStopSwitchCommandHandler, "stop", "step Usage: switch groups levelcontrol stop <optionsmask> <optionsoverride>" },
-        { &GroupsMoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO", "movetolevelwithonoff Usage: switch groups levelcontrol MTLWOO <level> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveWithOnOffSwitchCommandHandler, "MWOO", "movewithonoff Usage: switch groups levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &GroupsStepWithOnOffSwitchCommandHandler, "stepWOO", "stepwithonoff Usage: switch groups levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsStopWithOnOffSwitchCommandHandler, "stopWOO", "stopwithonoff Usage: switch groups levelcontrol stopWOO <optionsmask> <optionsoverride>" },
+        { &GroupsMoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO",
+          "movetolevelwithonoff Usage: switch groups levelcontrol MTLWOO <level> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveWithOnOffSwitchCommandHandler, "MWOO",
+          "movewithonoff Usage: switch groups levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepWithOnOffSwitchCommandHandler, "stepWOO",
+          "stepwithonoff Usage: switch groups levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsStopWithOnOffSwitchCommandHandler, "stopWOO",
+          "stopwithonoff Usage: switch groups levelcontrol stopWOO <optionsmask> <optionsoverride>" },
     };
 
     static const shell_command_t sSwitchGroupsColorControlSubCommands[] = {
         { &GroupsColorControlHelpHandler, "help", "Usage: switch groups colorcontrol <subcommand>" },
-        { &GroupsMoveToHueCommandHandler, "movetohue", "movetohue Usage: switch groups colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveHueCommandHandler, "movehue", "movehue Usage: switch groups colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &GroupsStepHueCommandHandler, "stephue", "stephue Usage: switch groups colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveToSaturationCommandHandler, "movetosat", "movetosaturation Usage: switch groups colorcontrol movetosat <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveSaturationCommandHandler, "movesat", "movesaturation Usage: switch groups colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &GroupsStepSaturationCommandHandler, "stepsat", "stepsaturation Usage: switch groups colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveToHueAndSaturationCommandHandler, "movetoHS", "movetohueandsaturation Usage: switch groups colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveToColorCommandHandler, "movetocolor", "movetocolor Usage: switch groups colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveColorCommandHandler, "movecolor", "movecolor Usage: switch groups colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
-        { &GroupsStepColorCommandHandler, "stepcolor", "stepcolor Usage: switch groups colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsMoveToColorTemperatureCommandHandler, "movetoCT", "movetocolortemperature Usage: switch groups colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsEnhancedMoveToHueCommandHandler, "Emovetohue", "enhancedmovetohue Usage: switch groups colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsEnhancedMoveHueCommandHandler, "Emovehue", "enhancedmovehue Usage: switch groups colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
-        { &GroupsEnhancedStepHueCommandHandler, "Estephue", "enhancedstephue Usage: switch gropus colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsEnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS", "enhancedmovetohueandsaturation Usage: switch groups colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
-        { &GroupsColorLoopSetCommandHandler, "colorloopset", "colorloopset Usage: switch groups colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> <optionsmask> <optionsoverride>" },
-        { &GroupsStopMoveStepCommandHandler, "stopmovestep", "stopmovestep Usage: switch groups colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
-        { &GroupsMoveColorTemperatureCommandHandler, "moveCT", "movecolortemperature Usage: switch groups colorcontrol moveCT <movemode> <rate> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
-        { &GroupsStepColorTemperatureCommandHandler, "stepCT", "stepcolortemperature Usage: switch groups colorcontrol stepCT <stepmode> <stepsize> <transitiontime> <colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveToHueCommandHandler, "movetohue",
+          "movetohue Usage: switch groups colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveHueCommandHandler, "movehue",
+          "movehue Usage: switch groups colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepHueCommandHandler, "stephue",
+          "stephue Usage: switch groups colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToSaturationCommandHandler, "movetosat",
+          "movetosaturation Usage: switch groups colorcontrol movetosat <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveSaturationCommandHandler, "movesat",
+          "movesaturation Usage: switch groups colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepSaturationCommandHandler, "stepsat",
+          "stepsaturation Usage: switch groups colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToHueAndSaturationCommandHandler, "movetoHS",
+          "movetohueandsaturation Usage: switch groups colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToColorCommandHandler, "movetocolor",
+          "movetocolor Usage: switch groups colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveColorCommandHandler, "movecolor",
+          "movecolor Usage: switch groups colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
+        { &GroupsStepColorCommandHandler, "stepcolor",
+          "stepcolor Usage: switch groups colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToColorTemperatureCommandHandler, "movetoCT",
+          "movetocolortemperature Usage: switch groups colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveToHueCommandHandler, "Emovetohue",
+          "enhancedmovetohue Usage: switch groups colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveHueCommandHandler, "Emovehue",
+          "enhancedmovehue Usage: switch groups colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsEnhancedStepHueCommandHandler, "Estephue",
+          "enhancedstephue Usage: switch gropus colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS",
+          "enhancedmovetohueandsaturation Usage: switch groups colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> "
+          "<optionsmask> <optionsoverride>" },
+        { &GroupsColorLoopSetCommandHandler, "colorloopset",
+          "colorloopset Usage: switch groups colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> "
+          "<optionsmask> <optionsoverride>" },
+        { &GroupsStopMoveStepCommandHandler, "stopmovestep",
+          "stopmovestep Usage: switch groups colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
+        { &GroupsMoveColorTemperatureCommandHandler, "moveCT",
+          "movecolortemperature Usage: switch groups colorcontrol moveCT <movemode> <rate> <colortempminmireds> "
+          "<colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &GroupsStepColorTemperatureCommandHandler, "stepCT",
+          "stepcolortemperature Usage: switch groups colorcontrol stepCT <stepmode> <stepsize> <transitiontime> "
+          "<colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
     };
 
     static const shell_command_t sSwitchGroupsThermostatSubCommands[] = {
         { &GroupsThermostatHelpHandler, "help", "Usage: switch groups thermostat <subcommand>" },
-        { &GroupsSetpointRaiseLowerSwitchCommandHandler, "SPRL", "setpointraiselower Usage: switch groups thermostat SPRL <mode> <amount>" },
+        { &GroupsSetpointRaiseLowerSwitchCommandHandler, "SPRL",
+          "setpointraiselower Usage: switch groups thermostat SPRL <mode> <amount>" },
     };
 
     static const shell_command_t sSwitchBindingSubCommands[] = {
@@ -503,11 +583,15 @@ static void RegisterSwitchCommands()
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
     // Register groups command
-    sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands, ArraySize(sSwitchGroupsIdentifySubCommands));
+    sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands,
+                                                           ArraySize(sSwitchGroupsIdentifySubCommands));
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
-    sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands, ArraySize(sSwitchGroupsLevelControlSubCommands));
-    sShellSwitchGroupsColorControlSubCommands.RegisterCommands(sSwitchGroupsColorControlSubCommands, ArraySize(sSwitchGroupsColorControlSubCommands));
-    sShellSwitchGroupsThermostatSubCommands.RegisterCommands(sSwitchGroupsThermostatSubCommands, ArraySize(sSwitchGroupsThermostatSubCommands));
+    sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands,
+                                                               ArraySize(sSwitchGroupsLevelControlSubCommands));
+    sShellSwitchGroupsColorControlSubCommands.RegisterCommands(sSwitchGroupsColorControlSubCommands,
+                                                               ArraySize(sSwitchGroupsColorControlSubCommands));
+    sShellSwitchGroupsThermostatSubCommands.RegisterCommands(sSwitchGroupsThermostatSubCommands,
+                                                             ArraySize(sSwitchGroupsThermostatSubCommands));
 
     // Register commands
     sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, ArraySize(sSwitchIdentifySubCommands));
@@ -515,11 +599,14 @@ static void RegisterSwitchCommands()
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
     sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
     sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
-    sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands, ArraySize(sSwitchLevelControlReadSubCommands));
+    sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands,
+                                                             ArraySize(sSwitchLevelControlReadSubCommands));
     sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands, ArraySize(sSwitchColorControlSubCommands));
-    sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands, ArraySize(sSwitchColorControlReadSubCommands));
+    sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands,
+                                                             ArraySize(sSwitchColorControlReadSubCommands));
     sShellSwitchThermostatSubCommands.RegisterCommands(sSwitchThermostatSubCommands, ArraySize(sSwitchThermostatSubCommands));
-    sShellSwitchThermostatReadSubCommands.RegisterCommands(sSwitchThermostatReadSubCommands, ArraySize(sSwitchThermostatReadSubCommands));
+    sShellSwitchThermostatReadSubCommands.RegisterCommands(sSwitchThermostatReadSubCommands,
+                                                           ArraySize(sSwitchThermostatReadSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));

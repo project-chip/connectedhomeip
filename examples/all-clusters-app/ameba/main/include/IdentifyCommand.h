@@ -55,24 +55,24 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBin
     switch (data->attributeId)
     {
     case Clusters::Identify::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Identify::Attributes::IdentifyTime::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Identify::Attributes::IdentifyType::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onSuccess, onFailure);
+        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
     }
 }
 
 void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
-                                       OperationalDeviceProxy * peer_device)
+                                          OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "Identify command succeeds");
@@ -97,7 +97,7 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Ember
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<EmberAfIdentifyEffectIdentifier>(data->args[0]);
-        triggerEffectCommand.effectVariant = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
+        triggerEffectCommand.effectVariant    = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          triggerEffectCommand, onSuccess, onFailure);
         break;
@@ -120,7 +120,7 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBi
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<EmberAfIdentifyEffectIdentifier>(data->args[0]);
-        triggerEffectCommand.effectVariant = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
+        triggerEffectCommand.effectVariant    = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand);
         break;
     }
@@ -267,4 +267,4 @@ CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
-#endif //CONFIG_ENABLE_CHIP_SHELL
+#endif // CONFIG_ENABLE_CHIP_SHELL
