@@ -152,11 +152,16 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR StopDiscovery() override;
 
 private:
     ResolverDelegateProxy * mDelegate                            = nullptr;
     OperationalResolveDelegate * mPreInitOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
+
+    // While discovery (commissionable or commissioner) is ongoing,
+    // mDiscoveryContext may have a value to allow StopDiscovery to work.
+    Optional<intptr_t> mDiscoveryContext;
 };
 
 } // namespace Dnssd

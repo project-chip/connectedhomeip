@@ -203,6 +203,11 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate();
  * @param[in] interface   The interface to send queries.
  * @param[in] callback    The callback for found services.
  * @param[in] context     The user context.
+ * @param[out] browseIdentifier an identifier for this browse operation. This
+ *                              can be used to call ChipDnssdStopBrowse.  Only
+ *                              set on success.  This value remains valid until
+ *                              the browse callback is called with an error or
+ *                              is called with finalBrowse set to true.
  *
  * @retval CHIP_NO_ERROR                The browse succeeds.
  * @retval CHIP_ERROR_INVALID_ARGUMENT  The type or callback is nullptr.
@@ -210,7 +215,19 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate();
  *
  */
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier);
+
+/**
+ * Stop an ongoing browse, if supported by this backend.  If successful, this
+ * will trigger a final callback, with either an error status or finalBrowse set
+ * to true, to the DnssdBrowseCallback that was passed to the ChipDnssdBrowse
+ * call that handed back this browseIdentifier.
+ *
+ * @param browseIdentifier an identifier for a browse operation that came from
+ *                         ChipDnssdBrowse.
+ */
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier);
 
 /**
  * This function resolves the services published by mDNS

@@ -187,6 +187,8 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 
     mWaitingForDiscovery[kIPTransport] = false;
     currentFilter.type                 = Dnssd::DiscoveryFilterType::kNone;
+
+    mCommissioner->StopCommissionableDiscovery();
     return CHIP_NO_ERROR;
 }
 

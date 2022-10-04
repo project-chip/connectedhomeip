@@ -237,7 +237,8 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     nodeData.resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
-    // Stop Mdns discovery. Is it the right method ?
+    // Stop Mdns discovery.
+    CurrentCommissioner().StopCommissionableDiscovery();
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
 
     Inet::InterfaceId interfaceId =
