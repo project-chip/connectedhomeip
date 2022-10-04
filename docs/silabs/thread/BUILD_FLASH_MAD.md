@@ -2,7 +2,7 @@
 
 The Matter Accessory Device, such as the lighting-app, is the actual Matter
 device that you will commission onto the Matter network and control using the
-chiptool.
+chip-tool.
 
 ## Step 1: Get the Image File to Flash the MAD
 
@@ -45,7 +45,7 @@ use one of the following options:
 
     The build process puts all image files in the following location:
 
-    > \<git location>/matter/out/\<app name>/\<board name>
+    `<git location>/matter/out/<app name>/<board name>`
 
 <br>
 

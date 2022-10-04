@@ -15,7 +15,7 @@ in this release of the Silicon Labs Matter Out of Box Experience
 | --------------------------------------- | ------ | ---------------------------------------- |
 | https://github.com/SiliconLabs/ot-efr32 | main   | 7a567da02a078546eb34136c1c44170c8832dd55 |
 
-## Matter ChipTool
+## Matter chip-tool
 
 | Repo                                            | Branch | Commit Hash                              |
 | ----------------------------------------------- | ------ | ---------------------------------------- |

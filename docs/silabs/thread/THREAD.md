@@ -8,7 +8,7 @@ image.
 
 The setup consists of the following four elements:
 
-1.  A **Controller** such as an app running on a phone or the chiptool running
+1.  A **Controller** such as an app running on a phone or the chip-tool running
     on a Linux box or Raspberry Pi.
 2.  An Open Thread Border Router (**OTBR**) running on a Linux box or Raspberry
     Pi.

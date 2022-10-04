@@ -1,23 +1,29 @@
-# Using the Chiptool
+# Using the Mattertool (chip-tool)
 
 The following commands show how to start a new Thread network from the local
 OTBR, commission an EFR32 Matter End Device (Matter Accessory Device), and then
-send the on/off commands with the `mattertool` automated script.
+send the on/off commands with the `mattertool` automated script. The `mattertool` 
+script provides an interface into various chip-tool and otbr commands used to create 
+and interact with a Matter network
+
+## Basic Mattertool Commands
 
 | **Command**              | **Usage**                                                                 |
 | ------------------------ | ------------------------------------------------------------------------- |
 | `mattertool startThread` | Starts the thread network on the OTBR                                     |
-| `mattertool bleThread`   | Starts commissioning of a Matter Accessory Device using the chiptool      |
-| `mattertool on`          | Sends the _on_ command to the Matter Accessory Device using the chiptool  |
-| `mattertool off`         | Sends the _off_ command to the Matter Accessory Device using the chiptool |
+| `mattertool bleThread`   | Starts commissioning of a Matter Accessory Device using the chip-tool      |
+| `mattertool on`          | Sends the _on_ command to the Matter Accessory Device using the chip-tool  |
+| `mattertool off`         | Sends the _off_ command to the Matter Accessory Device using the chip-tool |
 
-You can also use the full chiptool command set (still using mattertool)
+You can also use the full chip-tool command set (still using mattertool)
 
-> `$ mattertool levelcontrol read current-level 106 1`
+```shell
+$ mattertool levelcontrol read current-level 106 1
+```
 
 <br><br>
 
-## Advanced information on the Matter Hub
+## Advanced Information on the Matter Hub
 
 ### Image tree
 
@@ -45,7 +51,9 @@ The pre-installed OTBR is configured for the infrastructure interface eth0.
 
 Bash script to modify, reinstall or update the OTBR:
 
-> `$ otbrsetup`
+```shell
+$ otbrsetup
+```
 
 This bash script centralizes and simplifies the local OTBR installation.
 
@@ -72,33 +80,47 @@ install for eth0 interface: `$ otbrsetup -i`
 
 Change OTBR commit reference/version
 
-> `$ cd /home/ubuntu/ot-br-posix` <br>
+```shell
+$ cd /home/ubuntu/ot-br-posix
+```
 
-> `$ git fetch` <br>
+```shell
+$ git fetch
+```
 
-> `$ git checkout <SHA>` <br>
+```shell
+$ git checkout <SHA>
+```
 
-> `$ otbrsetup -u`
+```shell
+$ otbrsetup -u
+```
 
-<br>
-
-## Upgrading the Matter - Chiptool
+## Upgrading the Matter - Chip-tool
 
 For more information on the commit hashes used for this demo please consult the
 following page:
 [Matter Repositories and Commit Hashes](../general/COMMIT_HASHES.md)
 
-To change the ChipTool commit reference/version, follow these steps:
+To change the chip-tool commit reference/version, follow these steps:
 
-> `$ cd /home/ubuntu/connectedhomeip` <br>
+```shell
+$ cd /home/ubuntu/connectedhomeip
+```
 
-> `$ git fetch` <br>
+```shell
+$ git fetch
+```
 
-> `$ git checkout <SHA>` <br>
+```shell
+$ git checkout <SHA>
+```
 
-> `$ mattertool buildCT`
+```shell
+$ mattertool buildCT
+```
 
-The mattertool script centralizes and simplifies the use of chiptool and
+The mattertool script centralizes and simplifies the use of chip-tool and
 starting a clean thread network.
 
 <br>
@@ -111,13 +133,13 @@ Available commands:
 | startThread  | Start a new thread network and store the operational thread dataset for the commissioning purpose (bleThread) |
 | bleThread    | For Matter Bluetooth LE thread commissioning with an EFR32 device                                             |
 | bleWifi      | For Matter Bluetooth LE Wi-FI commissioning with an EFR32 device                                              |
-| buildCT      | Clean build of the chiptool                                                                                   |
+| buildCT      | Clean build of the chip-tool                                                                                   |
 | cleanVars    | Erase every Set variable used in the script. They will be set back to default or randomized value             |
 | off          | Turn off the Light on the already-commissioned EFR32 device                                                   |
 | on           | Turn on the Light on the already-commissioned EFR32 device                                                    |
 | toggle       | Toggle the Light on the already-commissioned EFR32 device                                                     |
 | parsePayload | Parse the given Payload (QrCode string)                                                                       |
-| rebuildCT    | Rebuild the chiptool                                                                                          |
+| rebuildCT    | Rebuild the chip-tool                                                                                          |
 | vars         | Print the Variables in use by the script                                                                      |
 
 <br>
@@ -159,14 +181,14 @@ Active variables used by mattertool:
 You can preset them with export X=Y before running the script or use some
 available options to change some of them.
 
-> In most cases, MATTER_ROOT, CHIPTOOL_PATH, PINCODE, and DISCRIMINATOR should
-> remain at the default set value.
+In most cases, MATTER_ROOT, CHIPTOOL_PATH, PINCODE, and DISCRIMINATOR should
+remain at the default set value.
 
-> For commissioning commands (bleThread, bleWifi) NODE_ID will be randomized if
-> it is the same as the last pairing
+For commissioning commands (bleThread, bleWifi) NODE_ID will be randomized if
+it is the same as the last pairing
 
-> When the startThread command is used, THREAD_DATA_SET will be assigned with
-> the right operation dataset for the created Thread Network.
+When the startThread command is used, THREAD_DATA_SET will be assigned with
+the right operation dataset for the created Thread Network.
 
 <br>
 
@@ -175,9 +197,13 @@ available options to change some of them.
 The commands presented above are linked to scripts. You can edit **_.bashrc_**
 and rename the following alias to your liking.
 
-> `$ alias mattertool=‘source $HOME/scripts/matterTool.sh’` <br>
+```shell
+$ alias mattertool=‘source $HOME/scripts/matterTool.sh’
+```
 
-> `$ alias otbrsetup=‘source $HOME/scripts/setupOTBR.sh’`
+```shell
+$ alias otbrsetup=‘source $HOME/scripts/setupOTBR.sh'
+```
 
 ---
 

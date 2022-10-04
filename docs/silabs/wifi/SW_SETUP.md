@@ -39,18 +39,20 @@ application images.
     ```
 <br>
 
-## Compiling the ChipTool
+## Compiling the chip-tool
 
 In order to control the Wi-Fi Matter Accessory Device you will have to compile
-and run the ChipTool on either a Linux, Mac or Raspberry Pi. The ChipTool builds
+and run the chip-tool on either a Linux, Mac or Raspberry Pi. The chip-tool builds
 faster on the Mac and Linux machines so that is recommended, but if you have
 access to a Raspberry Pi that will work as well.
 
-1. Build the Chip-Tool
+1. Build the chip-tool
 
-    `$ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone`
+    ```shell
+    $ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone
+    ```
 
-    This will build chiptool in `out/standalone`.
+    This will build chip-tool in `out/standalone`.
 <br>
 
 
@@ -68,27 +70,34 @@ $ <run_appropriate_build_command_from_below>
 
 Build command for EFR32MG12 + RS911x:
 
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx --wifi rs911x |& tee out/rs911x_lighting.log`
+```shell
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx --wifi rs911x |& tee out/rs911x_lighting.log
+```
 
 Build command for EFR32MG12 + WF200:
 
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32 out/wf200_lighting_app BRD41xxx is_debug=false --wifi wf200 |& tee out/wf200_lighting.log`
+```shell
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32 out/wf200_lighting_app BRD41xxx is_debug=false --wifi wf200 |& tee out/wf200_lighting.log
+```
 
-In above command BRD41xxx represent the EFR32MG12 boards
-
-`BRD4161A, BRD4163A, BRD4164A`
 
 Build command for EFR32MG24 + RS911x:
 
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi rs911x`
+```shell
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi rs911x
+```
+
+Build command for EFR32MG24 + SiWx917:
+
+`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi siwx917`
 
 Build command for EFR32MG24 + WF200:
 
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=false --wifi wf200`
+```shell
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=false --wifi wf200
+```
 
-In above command BRD41xxx represent the EFR32MG24 boards
-
-`BRD4186C, BRD4187C`
+A complete list of hardware supported is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
 
 By using the following flags we can enable or disable the features of lighting application.
 
@@ -97,20 +106,28 @@ By using the following flags we can enable or disable the features of lighting a
     ```shell
     $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx rs91x_wpa3_only=true --wifi rs911x |& tee out/rs911x_lighting.log
     ```
-    Note: 
-    1. WPA/WPA2 is enabled by default for the rs911x
-    2. Enabling WPA3 will disable WPA and WPA2 support
+> **Note:** 
+> 1. WPA/WPA2 is enabled by default for the rs911x
+> 2. Enabling WPA3 will disable WPA and WPA2 support
 
 2.  `segger_rtt_buffer_size_up` : Flag to get the complete logs without truncation.
 
     ```shell
     $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs911x |& tee out/rs911x_lighting.log
     ```
+3.  `show_qr_code=false` : Use this flag while building to disable QR code.
+
+    ```shell
+    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs911x |& tee out/rs911x_lighting.log
+    ```
+    Note:
+    1. QR code is enabled by default for all except MG24
+    2. QR code is disable for MG24 because of lcd disable, can't able to enable it by using flag
 
 
-
-The generated software can be found in `out/rs911x_xxx/BRD4161A/*.out` for the
-RS9116 and in `out/wf200_xxx/BRD4161A/*.out` for the WF200.
+The generated software can be found in
+`out/rs911x_xxx/BRD41xxx/*.out` for the RS9116, in `out/siwx917_xxx/BRD41xxx/*.out`  for the
+SiWx917 and in `out/wf200_xxx/BRD41xxx/*.out` for the WF200.
 
 This is what you will flash onto the EFR32. For more information on how to flash
 the EFR32 please check out the page on

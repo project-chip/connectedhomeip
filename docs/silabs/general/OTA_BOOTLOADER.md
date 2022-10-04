@@ -72,7 +72,9 @@ Higher_) before clicking the build icon: Right-click the project name in the
 Project Explorer view and select Properties. In the C/C++ Build group, click
 Settings. On the Build Steps tab, in the Post Build Steps Command field enter
 
-> `$ ../postbuild.sh "${ProjDirPath}" "${StudioSdkPath}" "${CommanderAdapterPackPath}"`
+```shell
+$ ../postbuild.sh "${ProjDirPath}" "${StudioSdkPath}" "${CommanderAdapterPackPath}"
+```
 
 Click Apply and Close. Three bootloader images will be generated into the build
 directory: a main bootloader, a main bootloader with CRC32 checksum, and a
@@ -143,13 +145,19 @@ on BRD4186C.
 
 -   Build the application disabling all optional features
 
-    > `$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out lighting-app BRD4186A chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true`
+    ```shell
+    $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out lighting-app BRD4186A chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
+    ```
 
 -   Build the GBL file for the update image and note its size
 
-    > `$ commander gbl create --compress lzma ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl --app ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.s37`
+    ```shell
+    $ commander gbl create --compress lzma ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl --app ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.s37
+    ```
 
-    > `$ ls -la out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl 451176 Jul 19 16:39 out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl`
+    ```shell
+    $ ls -la out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl 451176 Jul 19 16:39 out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl
+    ```
 
 -   Flash the application image, bootloader (pre-built BRD4186C bootloader
     binary from the [Matter Artifacts page](./ARTIFACTS.md). Erase the flash.

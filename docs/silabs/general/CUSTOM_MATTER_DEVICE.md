@@ -22,13 +22,15 @@ command or it can be set to "0" by sending an "Off" command.
 The C++ implementation of these clusters is located in the clusters directory.
 Note that you can also create your own custom cluster.
 
-## ZAP configuration
+## ZAP Configuration
 
 From the matter repository, run the following command in a terminal to launch
 the ZAP user interface (UI). This will open up the ZAP configuration for the EFR32 lighting
 application example.
 
-> `$ ./scripts/tools/zap/run_zaptool.sh examples/lighting-app/lighting-common/lighting-app.zap`
+```shell
+$ ./scripts/tools/zap/run_zaptool.sh examples/lighting-app/lighting-common/lighting-app.zap
+```
 
 On the left side of the application, there is a tab for Endpoint 0 and
 Endpoint 1. Endpoint 0 is known as the root node. This endpoint is akin to a
@@ -59,9 +61,11 @@ Each time a modification is made to the ZAP UI, save (Electron→Save on
 a Mac toolbar) the current ZAP configuration and run the following command to
 generate ZAP code.
 
-> `$ ./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap -o zzz_generated/lighting-app/zap-generated/`
+```shell
+$ ./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap -o zzz_generated/lighting-app/zap-generated/
+```
 
-## Receiving Matter commands
+## Receiving Matter Commands
 
 All Matter commands reach the application through the intermediate function
 MatterPostAttributeChangeCallback(). When a request is made by a Matter client,
@@ -70,7 +74,7 @@ through this function. The command can then be dissected using conditional logic
 to call the proper application functions based on the most recent command
 received.
 
-## Adding a cluster to a ZAP configuration
+## Adding a Cluster to a ZAP Configuration
 
 In the ZAP UI, navigate to the Level Control cluster. Make sure this cluster is
 enabled as a server in the drop-down menu in the "Enable" column. Then click on
@@ -78,23 +82,24 @@ the blue settings wheel in the "Configure" column. This cluster can be used to
 gather power source configuration settings from a Matter device. It contains a
 few required attributes, and a number of optional attributes.
 
-## Adding a new attribute
+## Adding a New Attribute
 
 In the Level Control cluster configurations, ensure the CurrentLevel attribute
 is set to enabled. Set the default value of this attribute as 1.
 
-## Adding a new command
+## Adding a New Command
 
 Navigate to the commands tab in zap and enable the MoveToLevel command. Now save
 the current zap configuration, and run the generate.py script above.
 
-## React to Level Control cluster commands in ZclCallbacks
+## React to Level Control Cluster Commands in ZclCallbacks
 
 In the MatterPostAttributeCallback function in ZclCallbacks, add the following
 line of code or a similar line. This will give the application the ability to react to
 MoveToLevel commands. You can define platform-specific behavior for a
 MoveToLevel action.
 
+   ```cpp
     else if (clusterId == LevelControl::Id)
     {
        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
@@ -107,19 +112,25 @@ MoveToLevel action.
 
        LightMgr().InitiateActionLight(AppEvent::kEventType_Light, action_type, endpoint, *value);
     }
-
-## Send a MoveToLevel command and read the CurrentLevel attribute
+   ```
+## Send a MoveToLevel Command and Read the CurrentLevel Attribute
 
 Rebuild the application and load the new executable on your EFR32 device. Send
 the following mattertool commands and verify that the current-level default
 attribute was updated as was configured. Replace {desired_level} with 10, and
 node_ID with the node ID assigned to the device upon commissioning.
 
-> `$ mattertool levelcontrol read current-level 1 1 // Returns 1`
+```shell
+$ mattertool levelcontrol read current-level 1 1 // Returns 1
+```
 
-> `$ mattertool levelcontrol move-to-level {desired_level} 0 1 1 {node_ID} 1`
+```shell
+$ mattertool levelcontrol move-to-level {desired_level} 0 1 1 {node_ID} 1
+```
 
-> `$ mattertool levelcontrol read current-level 1 1 // Returns 10`
+```shell
+$ mattertool levelcontrol read current-level 1 1 // Returns 10
+```
 
 For more information on running a Silicon Labs lighting example on a Thunderboard Sense 2 see 
 [sl-newlight/efr32](../../../silabs_examples/sl-newLight/efr32/README.md).

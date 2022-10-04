@@ -29,24 +29,30 @@
 On macOS, you must install Xcode from the Mac App Store. The remaining
 dependencies can be installed and satisfied using [Brew](https://brew.sh/):
 
-> `$ brew install openssl pkg-config`
+```shell
+$ brew install openssl pkg-config
+```
 
 However, that does not expose the package to `pkg-config`. To fix that, run
 something like the following:
 
 Intel:
 
-> `$ cd /usr/local/lib/pkgconfig ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .`
+```shell
+$ cd /usr/local/lib/pkgconfig ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
+```
 
 where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
 OpenSSL installed by Brew.
 
 Apple Silicon:
 
-> `$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"`
+```shell
+$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
+```
 
-Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
-dependency.
+
+> **Note:** If using MacPorts, `port install openssl` is sufficient to satisfy this dependency.
 
 ### Mac OS (Apple Silicon) Users
 
@@ -56,21 +62,29 @@ those mentioned above. <br>
 1. Add ARM GCC toolchain to the search path within `bootstrap.sh` by adding this
    line of code:
 
-    > `$ export PATH="/Applications/ARM/bin:$PATH"`
+   ```shell
+   $ export PATH="/Applications/ARM/bin:$PATH"
+   ```
 
 2. Users may also have to specify which `pkg-config`/`openssl` to use by adding
    these lines of code as well:
 
-    > `$ export PATH="/opt/homebrew/opt/openssl@3/bin:$PATH"`
+    ```shell
+    $ export PATH="/opt/homebrew/opt/openssl@3/bin:$PATH"
+    ```
 
-    > `$ export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"`
+    ```shell
+    $ export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"
+    ```
 
 ### Installing prerequisites on Linux
 
 On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
-> ` $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev`
+```shell
+$ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+```
 
 ## Bootstrapping your source tree (one time)
 

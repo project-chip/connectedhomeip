@@ -35,7 +35,9 @@ You integrate the Silabs-PTI.jar utility into Wirehshark by adding a small
 script into Wireshark's `excap` directory. Make sure that you make the script
 executable using something like
 
-> `$ chmod 777 <myexcapscript>`
+```shell
+$ chmod 777 <myexcapscript>
+```
 
 This will make it so that Wireshark can execute the script and integrate the
 WSTK interfaces into its capture functionality.
@@ -52,4 +54,6 @@ Once your adapter is connected, you can test out the visibility of your WSTK on
 the network by running Silabs-PTI.jar from the command line using the following
 command:
 
-> `$ java -jar silabs-pti-<VERSION>.jar -discover`
+```shell
+$ java -jar silabs-pti-<VERSION>.jar -discover
+```

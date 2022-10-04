@@ -20,8 +20,8 @@ of the [Matter Hardware](../general/HARDWARE_REQUIREMENTS.md) and
 
 ## Step 1: Setting up the Matter Hub (Raspberry Pi)
 
-The Matter Hub consists of the Open Thread Border Router (OTBR) and the chiptool running on a Raspberry Pi.
-Silicon Labs has developed a Raspberry Pi image combining the OTBR and chiptool that can be downloaded and
+The Matter Hub consists of the Open Thread Border Router (OTBR) and the chip-tool running on a Raspberry Pi.
+Silicon Labs has developed a Raspberry Pi image combining the OTBR and chip-tool that can be downloaded and
 flashed onto an SD Card, which is then inserted into the Raspberry Pi.
 
 The Matter Controller sends IPv6 packets to the OTBR, which converts the IPv6
@@ -48,7 +48,7 @@ Information on flashing and optionally building the RCP is located here:
 ## Step 3: Build and Flash the MAD
 
 The Matter Accessory Device (MAD) is the actual Matter device that will be
-commissioned onto the Matter network and controlled using the ChipTool. Prebuilt
+commissioned onto the Matter network and controlled using the chip-tool. Prebuilt
 MAD images are available for the demo.
 
 Information on flashing and optionally building the Matter Accessory device is
@@ -66,9 +66,9 @@ Pi image:
 | Command                | Usage                                              |
 | ---------------------- | -------------------------------------------------- |
 | mattertool startThread | Starts the thread network on the OTBR              |
-| mattertool bleThread   | Starts commissioning of a MAD using ChipTool       |
-| mattertool on          | Sends an **on** command to the MAD using ChipTool  |
-| mattertool off         | Sends an **off** command to the MAD using ChipTool |
+| mattertool bleThread   | Starts commissioning of a MAD using chip-tool       |
+| mattertool on          | Sends an **on** command to the MAD using chip-tool  |
+| mattertool off         | Sends an **off** command to the MAD using chip-tool |
 
 <br>
 

@@ -5,10 +5,12 @@ order to run demos and do development. Following are the hardware requirements
 for both Thread and Wi-Fi use cases broken down by platform and transport
 protocol.
 
+The following sections describe the hardware that may be used for Matter+OpenThread (Matter Hub and Accessory Device) and for Matter+Wi-Fi (Accessory Device). The EFRMG24 is the preferred starting point for Matter MCUs (including the Matter Hub RCP and both Accessory Devices). It provides Secure Vault and can use the internal flash of the device to store an upgrade image.
+
 ## Matter Over Thread "Matter Hub" Requirements
 
 If you are running Matter over Thread and do not have a platform on which to run
-the Open Thread Border Router and chiptool, Silicon Labs recommends that you run
+the Open Thread Border Router and chip-tool, Silicon Labs recommends that you run
 them on a Raspberry Pi. To do so you will need:
 
 -   **Raspberry Pi**
@@ -16,7 +18,7 @@ them on a Raspberry Pi. To do so you will need:
     -   Raspberry Pi 4 with an SD card with storage >= 64 GB
 
         > The Raspberry Pi 4 is used to run the Open Thread Border Router and
-        > the chiptool. In this documentation the combination of this software
+        > the chip-tool. In this documentation the combination of this software
         > on the Raspberry Pi is also called the 'Matter Hub' A software image
         > for the Raspberry Pi is provided on the
         > [Matter Artifacts page](./ARTIFACTS.md).
@@ -33,6 +35,14 @@ them on a Raspberry Pi. To do so you will need:
     Simplicity Studio. Pre-built OpenThread RCP firmware images are provided for
     the following boards on the [Matter Artifacts page](./ARTIFACTS.md):
 
+    > **Note:** The EFR32MG24 is the preferred starting point for Matter MCUs.  It provides Secure Vault and can use the internal flash of the device to store an upgrade image. 
+
+    -   **MG24 boards:**
+        -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+            -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
+        -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+            -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
+<br><br>
     -   **MG12 boards:**
 
         -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
@@ -45,12 +55,6 @@ them on a Raspberry Pi. To do so you will need:
             -   [SLWRB4164A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4164a-efr32mg12-radio-board)
                 <br><br>
 
-    -   **MG24 boards:**
-        -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-            -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
-        -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-            -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
-
 ## Matter Over Thread Accessory Device Requirements
 
 The Matter Accessory Device (MAD) is the actual device that the Matter
@@ -59,6 +63,21 @@ Several different platforms for the Matter Accessory Device are supported.
 Pre-built binary images for the Matter accessory devices are provided on the
 [Matter Artifacts page](./ARTIFACTS.md). Silicon Labs supports development of
 Matter Accessory Devices for Matter over Thread on the following platforms:
+
+> **Note:** The EFR32MG24 is the preferred starting point for Matter MCUs.  It provides Secure Vault and can use the internal flash of the device to store an upgrade image. 
+
+
+-   **MG24 boards:**
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+        -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+        -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
+    -   BRD2703A / MG24 Explorer Kit
+        > Note: This board has yet to be released to the public, but it is
+        > supported in the Silicon Labs build flow.
+    -   BRD2601B / MG24 Explorer Kit
+        -   [XG24-DK2601B](https://www.silabs.com/development-tools/wireless/efr32xg24-dev-kit?tab=overview)
+<br><br>
 
 -   **MG12 boards:**
 
@@ -78,24 +97,27 @@ Matter Accessory Devices for Matter over Thread on the following platforms:
         -   [SLWRB4170A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4170a-efr32mg12-radio-board)
             <br><br>
 
--   **MG24 boards:**
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-        -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-        -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
-    -   BRD2703A / MG24 Explorer Kit
-        > Note: This board has yet to be released to the public, but it is
-        > supported in the Silicon Labs build flow.
-    -   BRD2601B / MG24 Explorer Kit
-        -   [XG24-DK2601B](https://www.silabs.com/development-tools/wireless/efr32xg24-dev-kit?tab=overview)
 
 ## Matter over Wi-Fi Accessory Device Requirements
 
 The Silicon Labs Matter over Wi-Fi demo and development requires two boards: the
-Silicon Labs EFR32 Radio board to run the Matter code and either the RS9116 or
+Silicon Labs EFR32 Radio board to run the Matter code and the RS9116
+or the SiWx917 or
 the WF200 to run the Wi-Fi protocol stack. Pre-built images for both the EFR32
 and the RS9116 are provided on the [Matter Artifacts page](./ARTIFACTS.md). The
 following boards are supported for the Matter over Wi-Fi demos and development:
+
+> **Note:** The EFR32MG24 is the preferred starting point for Matter MCUs.  It provides Secure Vault and can use the internal flash of the device to store an upgrade image. 
+
+
+-   **MG24 boards:**
+
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+        -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm -
+        [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
+        <br><br>
+
 
 -   **MG12 boards:**
 
@@ -110,18 +132,13 @@ following boards are supported for the Matter over Wi-Fi demos and development:
         -   [SLWRB4164A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4164a-efr32mg12-radio-board)
             <br><br>
 
--   **MG24 boards:**
-
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-        -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm -
-        [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
-        <br><br>
 
 -   **Wi-Fi Dev Kit**
 
     -   RS9116
         -   [RS9116X-SB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk-development-kit)
+    -   SiWx917
+        -   [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
     -   WF200
         -   [WF200](https://www.silabs.com/wireless/wi-fi/wf200-series-2-transceiver-ics)
     -   Interconnect board (included in the Wi-Fi kits)
@@ -134,5 +151,5 @@ In addition to your Matter over Wi-Fi Accessory Device you will need the
 following for both running the demo and for development:
 
 -   Access point with Internet access
--   microSD card (32GB) (if using Raspberry Pi)
--   **[Optional]** Android Mobile phone (If using the chiptool on Android)
+-   microSD card (>=32GB) (if using Raspberry Pi)
+-   **[Optional]** Android Mobile phone (If using the chip-tool on Android)

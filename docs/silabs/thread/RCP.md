@@ -41,20 +41,28 @@ https://github.com/SiliconLabs/ot-efr32.
 You must have Git installed on your local machine. To clone the repo use the
 following command:
 
-> `$ git clone https://github.com/SiliconLabs/ot-efr32.git`
+```shell
+$ git clone https://github.com/SiliconLabs/ot-efr32.git
+```
 
 Once you have cloned the repo, enter the repo and sync all the submodules with
 the following command:
 
-> `$ cd ot-efr32`
+```shell
+$ cd ot-efr32
+```
 
-> `$ git submodule update --init`
+```shell
+$ git submodule update --init
+```
 
 After updating the submodules you can check out the correct branch or commit
 hash for the system. Check the current branch and commit hash used here:
 [Matter Branches and Commit Hashes](../general/COMMIT_HASHES.md)
 
-> `$ git checkout <commit hash>`
+```shell
+$ git checkout <commit hash>
+```
 
 <br>
 

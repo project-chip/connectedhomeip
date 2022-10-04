@@ -1,4 +1,4 @@
-# Building Your Wi-Fi Matter End Device and the Chip-Tool
+# Building Your Wi-Fi Matter End Device and the chip-tool
 
 # Build Environment for Linux
 
@@ -27,9 +27,8 @@ $ sudo apt install
 -   Install required packages on Ubuntu Laptop/PC using the following commands:
 
     ```shell
-    $ sudo apt install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
-    libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-    python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+    $ sudo apt install git gcc g++ pkg-config libssl-dev libdbus-1-dev
+    libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
     ```
     <br>
 ### 2. Building Enviorment

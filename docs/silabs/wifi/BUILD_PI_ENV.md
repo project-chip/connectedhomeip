@@ -51,9 +51,7 @@ On powering up the board, the red and green lights should start blinking.
    ```
 5. Install required packages using the following commands:
     ```shell
-   $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
-      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+   $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
    ```
 
    > If you see any popups between installs, you can select 'Ok' or 'Continue'
@@ -73,28 +71,42 @@ Make sure Bluetooth LE (BLE) is up and running on Raspberry Pi. Raspberry Pi int
 some issues with BLE that may cause it to crash. Because BLE is used for
 commissioning on Matter, make sure BLE is running.
 
-`$ sudo systemctl status bluetooth.service`
+```shell
+$ sudo systemctl status bluetooth.service
+```
 
 To stop BLE if it is already running:
 
-`$ sudo systemctl stop bluetooth.service`
+```shell
+$ sudo systemctl stop bluetooth.service
+```
 
 To restart the Bluetooth service, first enable it:
 
-`$ sudo systemctl enable bluetooth.service`
+```shell
+$ sudo systemctl enable bluetooth.service
+```
 
 When you check the status of the Bluetooth service, it will be inactive because
 it has been enabled but not restarted:
 
-`$ sudo systemctl status bluetooth.service`
+```shell
+$ sudo systemctl status bluetooth.service
+```
 
 Restart the service:
 
-`$ sudo systemctl restart bluetooth.service`
+```shell
+$ sudo systemctl restart bluetooth.service
+```
 
 Now the status of the service should be active and running:
 
-`$ sudo systemctl status bluetooth.service`
+```shell
+$ sudo systemctl status bluetooth.service
+```
+
+
 
 ---
 

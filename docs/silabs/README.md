@@ -13,7 +13,7 @@
     2. [Loading the Raspberry Pi image onto the Matter Hub](thread/RASPI_IMG.md)
     3. [Setting up the RCP](thread/RCP.md)
     4. [Creating a Thread Matter End Device](thread/BUILD_FLASH_MAD.md)
-    5. [Using the Chip-Tool](thread/CHIP_TOOL.md)<BR> <BR>
+    5. [Using the chip-tool](thread/CHIP_TOOL.md)<BR> <BR>
 
 4. Matter over Wi-Fi
 

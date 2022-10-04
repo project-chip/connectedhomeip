@@ -13,9 +13,13 @@ controlled by the `chip_enable_ota_requestor` compile flag.
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
     as follows:
 
-    > `$ scripts/examples/gn_build_example.sh examples/chip-tool out/`
+    ```shell
+    $ scripts/examples/gn_build_example.sh examples/chip-tool out/
+    ```
 
-    > `$ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false`
+    ```shell
+    $ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+    ```
 
 -   Build or download the Gecko Bootloader binary. Follow the instructions in
     [Creating the Bootloader for Use in Matter OTA](OTA_BOOTLOADER.md). For the
@@ -31,34 +35,48 @@ controlled by the `chip_enable_ota_requestor` compile flag.
 -   Create a bootable image file (using the Lighting application image as an
     example):
 
-    > `$ commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37`
+    ```shell
+    $ commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37
+    ```
 
 -   Create the Matter OTA file from the bootable image file:
 
-    > `$ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota`
+    ```shell
+    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
+    ```
 
 -   In a terminal start the Provider app and pass to it the path to the Matter
     OTA file created in the previous step:
 
-    > `$ rm -r /tmp/chip_* ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota`
+    ```shell
+    $ rm -r /tmp/chip_* ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota
+    ```
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
 
-    > `$ ./out/chip-tool pairing onnetwork 1 20202021`
+    ```shell
+    $ ./out/chip-tool pairing onnetwork 1 20202021
+    ```
 
-    > `$ ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0`
+    ```shell
+    $ ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+    ```
 
 -   If the application device had been previously commissioned, hold Button 0
     for six seconds to factory-reset the device.
 
 -   In the chip-tool terminal enter:
-    > `$ ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840`
+    ```shell
+    $ ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
+    ```
 
 where operationalDataset is obtained from the OpenThread Border Router.
 
 -   Once the commissioning process completes enter:
 
-    > ` $ ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0`
+    ```shell
+    $ ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+    ```
 
 -   The application device will connect to the Provider and start the image
     download. Once the image is downloaded the device will reboot into the
@@ -126,12 +144,16 @@ Product ID that identify the image served by the Provider, see
 
 Example provider configuration file:
 
+```cpp
         { "foo": 1, // ignored by parser
           "deviceSoftwareVersionModel":
           [
-           { "vendorId": 65521, "productId": 32773, "softwareVersion": 1, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "chip-efr32-lighting-example.ota" }
+           { 
+            "vendorId": 65521, "productId": 32773, "softwareVersion": 1, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "chip-efr32-lighting-example.ota" 
+            }
           ]
         }
+```
 
 ## Additional Info
 

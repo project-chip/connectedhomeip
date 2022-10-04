@@ -1,6 +1,6 @@
 # Setting up the Matter Hub (Raspberry Pi)
 
-The Matter Hub consists of the Open Thread Border Router (OTBR) and the chiptool
+The Matter Hub consists of the Open Thread Border Router (OTBR) and the chip-tool
 running on a Raspberry Pi. Silicon Labs has developed a Raspberry Pi image that
 can be downloaded and flashed onto an SD Card for the Raspberry Pi.
 
@@ -29,7 +29,7 @@ The image can be downloaded from the
 
 > Please note that this image, even when zipped up, is quite large ~5GB so this
 > download will take a while if you are on a slow connection. This image
-> includes both the Ubuntu operating system as well as the OTBR and Chip-Tool,
+> includes both the Ubuntu operating system as well as the OTBR and chip-tool,
 > hence the size.
 
 <br>
@@ -54,7 +54,7 @@ used to flash the image to a micro SD card.
 The Raspberry Pi should be connected to a network - this could be Ethernet or a
 Wi-Fi network.
 
-> NOTE: If you cannot connect your Rasberry Pi to a network over Wi-Fi or
+> NOTE: If you cannot connect your Raspberry Pi to a network over Wi-Fi or
 > Ethernet you do have the option to connect a monitor and keyboard the the
 > Raspberry Pi and interact with it that way. In this case you do not need to
 > connect your Raspberry Pi to a network as you can interface with it directly
@@ -87,10 +87,10 @@ on finding the IP address and connecting to the Raspberry Pi by SSH. .
 
 ### Step 4: Using the Matter Hub
 
-The chiptool, also referred to as the `mattertool`, is provided as a pre-built
+The chip-tool, also referred to as the `mattertool`, is provided as a pre-built
 application inside the Raspberry Pi image.
 
-Refer to the [ChipTool page](./CHIP_TOOL.md) for information on using the Matter
+Refer to the [chip-tool page](./CHIP_TOOL.md) for information on using the Matter
 Hub with `mattertool` commands.
 
 ---

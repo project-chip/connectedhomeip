@@ -4,7 +4,7 @@
 
 <br>
 
-### 1. Bluetooth connection fails when trying to commission the system through the ChipTool:
+### 1. Bluetooth connection fails when trying to commission the system through the chip-tool:
 
 **Command leading to error:**
 
@@ -17,13 +17,13 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 **Error example:**
 
 ```log
-    [1659464425.856025][34818:34823] CHIP:DL: HandlePlatformSpecificBLEEvent 16386
-    [1659464425.856035][34818:34823] CHIP:IN: Clearing BLE pending packets.
-    [1659464425.856055][34818:34823] CHIP:IN: BleConnection Error: ../../examples/chip-tool/third_party/connectedhomeip/src/platform/Linux/bluez/Helper.cpp:1775: CHIP Error 0x000000AC: Internal error
+[1659464425.856025][34818:34823] CHIP:DL: HandlePlatformSpecificBLEEvent 16386
+[1659464425.856035][34818:34823] CHIP:IN: Clearing BLE pending packets.
+[1659464425.856055][34818:34823] CHIP:IN: BleConnection Error: ../../examples/chip-tool/third_party/connectedhomeip/src/platform/Linux/bluez/Helper.cpp:1775: CHIP Error 0x000000AC: Internal error
 ```
 
 > This error indicates that the Bluetooth connection between your system and
-> laptop is failing. Follow the given procedure and then retry the ChipTool
+> laptop is failing. Follow the given procedure and then retry the chip-tool
 > commissioning command.
 
 <br>
@@ -32,24 +32,34 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 
 1. Stop Bluetooth service:
 
-    `$ systemctl stop bluetooth.service`
+    ```shell
+    $ systemctl stop bluetooth.service
+    ```
 
 2. Wait 20 seconds
 3. Restart Bluetooth service:
 
-    `$ sudo service bluetooth restart`
+    ```shell
+    $ sudo service bluetooth restart
+    ```
 
 4. Unblock Bluetooth service:
 
-    `$ rfkill unblock all`
+    ```shell
+    $ rfkill unblock all
+    ```
 
 5. Enable Bluetooth service:
 
-    `$ sudo systemctl enable bluetooth`
+    ```shell
+    $ sudo systemctl enable bluetooth
+    ```
 
 6. Issue the pairing command:
 
-    `$ out/standalone/chip-tool pairing ble-wifi 1122 mySSID mypassword 20202021 3840`
+    ```shell
+    $ out/standalone/chip-tool pairing ble-wifi 1122 mySSID mypassword 20202021 3840
+    ```
 
     > Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's
     > password**.
@@ -78,7 +88,9 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 -   Delete the existing certificates on your laptop with the following command
     run from the `/connectedhomeip` directory:
 
-    `$ /bin/rm /tmp/chip_*`
+    ```shell
+    $ /bin/rm /tmp/chip_*
+    ```
 
 -   Issue the commissioning command
 
