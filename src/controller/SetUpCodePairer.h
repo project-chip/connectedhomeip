@@ -151,7 +151,12 @@ private:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
-    Dnssd::DiscoveryFilter currentFilter;
+    Dnssd::DiscoveryFilter mCurrentFilter;
+    // The vendor id and product id from the SetupPayload.  They may be 0, which
+    // indicates "not available" (e.g. because the SetupPayload came from a
+    // short manual code).  In that case we should not filter on those values.
+    uint16_t mPayloadVendorID  = 0;
+    uint16_t mPayloadProductID = 0;
 
     DeviceCommissioner * mCommissioner = nullptr;
     System::Layer * mSystemLayer       = nullptr;
