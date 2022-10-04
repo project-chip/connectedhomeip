@@ -87,11 +87,11 @@ class TestXmlParser(unittest.TestCase):
                                  code=0x1234,
                                  attributes=[
                                      Attribute(definition=Field(data_type=DataType(name='INT32U'), code=11, name='SomeIntAttribute',
-                                                                qualities={FieldQuality.NULLABLE}), qualities={AttributeQuality.READABLE},
+                                                                qualities=FieldQuality.NULLABLE), qualities=AttributeQuality.READABLE,
                                                readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
                                      Attribute(definition=Field(data_type=DataType(name='INT8U'), code=22, name='AttributeWithAccess',
-                                                                qualities={FieldQuality.OPTIONAL}),
-                                               qualities={AttributeQuality.READABLE, AttributeQuality.WRITABLE}, readacl=AccessPrivilege.OPERATE,
+                                                                qualities=FieldQuality.OPTIONAL),
+                                               qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, readacl=AccessPrivilege.OPERATE,
                                                writeacl=AccessPrivilege.MANAGE)
                                  ],
                                  structs=[
@@ -106,7 +106,7 @@ class TestXmlParser(unittest.TestCase):
                                                 Field(data_type=DataType(name='INT8U'), code=1,
                                                       name='dataPoint1'),
                                                 Field(data_type=DataType(name='INT8U'), code=2, name='dataPoint2',
-                                                      qualities={FieldQuality.OPTIONAL})
+                                                      qualities=FieldQuality.OPTIONAL)
                                             ],
                                             tag=StructTag.RESPONSE, code=0x44)
                                  ],
@@ -181,23 +181,23 @@ class TestXmlParser(unittest.TestCase):
                                                              fields=[Field(data_type=DataType(name='node_id'),
                                                                            code=1,
                                                                            name='AdminNodeID',
-                                                                           qualities={FieldQuality.NULLABLE})],
+                                                                           qualities=FieldQuality.NULLABLE)],
                                                              readacl=AccessPrivilege.ADMINISTER,
-                                                             qualities={EventQuality.FABRIC_SENSITIVE})],
+                                                             qualities=EventQuality.FABRIC_SENSITIVE)],
                              structs=[Struct(name='FabricStruct',
                                       fields=[Field(data_type=DataType(name='int32u'),
                                                     code=1,
                                                     name='Field1',
-                                                    qualities={FieldQuality.FABRIC_SENSITIVE}),
+                                                    qualities=FieldQuality.FABRIC_SENSITIVE),
                                               Field(data_type=DataType(name='int32u'),
                                                     code=3,
                                                     name='Field3',
-                                                    qualities={FieldQuality.FABRIC_SENSITIVE}),
+                                                    qualities=FieldQuality.FABRIC_SENSITIVE),
                                               Field(data_type=DataType(name='int32u',
                                                                        max_length=None),
                                                     code=10,
                                                     name='Field10')],
-                                      qualities={StructQuality.FABRIC_SCOPED})],
+                                      qualities=StructQuality.FABRIC_SCOPED)],
                          )]))
 
     def testStruct(self):
@@ -224,7 +224,7 @@ class TestXmlParser(unittest.TestCase):
         ''')
         struct = Struct(
             name='SomeStruct',
-            qualities={StructQuality.FABRIC_SCOPED},
+            qualities=StructQuality.FABRIC_SCOPED,
             fields=[
                 Field(data_type=DataType(name='int16u'), code=1, name='FirstMember'),
                 Field(data_type=DataType(name='int32u'), code=2, name='SecondMember')
@@ -241,9 +241,9 @@ class TestXmlParser(unittest.TestCase):
                                                  data_type=DataType(name='SomeStruct'),
                                                  code=123,
                                                  name='FabricAttribute',
-                                                 qualities={FieldQuality.NULLABLE}
+                                                 qualities=FieldQuality.NULLABLE
                                              ),
-                                             qualities={AttributeQuality.READABLE},
+                                             qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 
@@ -291,7 +291,7 @@ Some copyright here... testing that we skip over comments
                                                  code=0,
                                                  name='Type',
                                              ),
-                                             qualities={AttributeQuality.READABLE},
+                                             qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 

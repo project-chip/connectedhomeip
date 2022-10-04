@@ -79,7 +79,7 @@ class EventHandler(BaseHandler):
         )
 
         if attrs.get('isFabricSensitive', "false").lower() == 'true':
-            self._event.qualities.add(EventQuality.FABRIC_SENSITIVE)
+            self._event.qualities |= EventQuality.FABRIC_SENSITIVE
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
@@ -95,10 +95,10 @@ class EventHandler(BaseHandler):
             )
 
             if attrs.get('optional', "false").lower() == 'true':
-                field.qualities.add(FieldQuality.OPTIONAL)
+                field.qualities |= FieldQuality.OPTIONAL
 
             if attrs.get('isNullable', "false").lower() == 'true':
-                field.qualities.add(FieldQuality.NULLABLE)
+                field.qualities |= FieldQuality.NULLABLE
 
             self._event.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -174,7 +174,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #    - code not set because not a response
 
         if attrs.get('isFabricScoped', "false").lower() == 'true':
-            self._struct.qualities.add(StructQuality.FABRIC_SCOPED)
+            self._struct.qualities |= StructQuality.FABRIC_SCOPED
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'item':
@@ -200,13 +200,13 @@ class StructHandler(BaseHandler, IdlPostProcessor):
             )
 
             if attrs.get('optional', "false").lower() == 'true':
-                field.qualities.add(FieldQuality.OPTIONAL)
+                field.qualities |= FieldQuality.OPTIONAL
 
             if attrs.get('isNullable', "false").lower() == 'true':
-                field.qualities.add(FieldQuality.NULLABLE)
+                field.qualities |= FieldQuality.NULLABLE
 
             if attrs.get('isFabricSensitive', "false").lower() == 'true':
-                field.qualities.add(FieldQuality.FABRIC_SENSITIVE)
+                field.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             self._struct.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -369,10 +369,10 @@ class CommandHandler(BaseHandler):
             )
 
             if attrs.get('isFabricScoped', 'false') == 'true':
-                self._command.qualities.add(CommandQuality.FABRIC_SCOPED)
+                self._command.qualities |= CommandQuality.FABRIC_SCOPED
 
             if attrs.get('mustUseTimedInvoke', 'false') == 'true':
-                self._command.qualities.add(CommandQuality.TIMED_INVOKE)
+                self._command.qualities |= CommandQuality.TIMED_INVOKE
 
         else:
             self._struct.tag = StructTag.RESPONSE
@@ -394,10 +394,10 @@ class CommandHandler(BaseHandler):
         )
 
         if attrs.get('optional', "false").lower() == 'true':
-            field.qualities.add(FieldQuality.OPTIONAL)
+            field.qualities |= FieldQuality.OPTIONAL
 
         if attrs.get('isNullable', "false").lower() == 'true':
-            field.qualities.add(FieldQuality.NULLABLE)
+            field.qualities |= FieldQuality.NULLABLE
 
         return field
 
