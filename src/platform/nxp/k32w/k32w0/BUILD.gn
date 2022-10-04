@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/k32w0_sdk.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 assert(chip_device_platform == "k32w0")
 
@@ -24,8 +26,9 @@ if (chip_enable_openthread) {
 
 static_library("k32w0") {
   sources = [
-    "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
+    "../common/RamStorage.cpp",
+    "../common/RamStorage.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -34,12 +37,16 @@ static_library("k32w0") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DefaultTestEventTriggerDelegate.cpp",
+    "DefaultTestEventTriggerDelegate.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "K32W0Config.cpp",
     "K32W0Config.h",
+    "K32W0FactoryDataProvider.cpp",
+    "K32W0FactoryDataProvider.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -47,8 +54,20 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "SystemTimeSupport.cpp",
     "ble_function_mux.c",
   ]
+
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+  ]
+
+  if (chip_with_low_power != 0) {
+    sources += [ "LowPowerHooks.cpp" ]
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [

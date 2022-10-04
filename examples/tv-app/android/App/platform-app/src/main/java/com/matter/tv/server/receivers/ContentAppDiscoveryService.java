@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import com.matter.tv.app.api.MatterIntentConstants;
@@ -90,11 +92,18 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
       if (appInfo.metaData == null) {
         return;
       }
+      PackageInfo packageInfo = pm.getPackageInfo(pkg, PackageManager.GET_META_DATA);
 
       int resId = appInfo.metaData.getInt(CLUSTERS_RESOURCE_METADATA_KEY, 0);
       int vendorId = appInfo.metaData.getInt(MATTER_VENDOR_ID_METADATA_KEY, -1);
       int productId = appInfo.metaData.getInt(MATTER_PRODUCT_ID_METADATA_KEY, -1);
       String vendorName = appInfo.metaData.getString(MATTER_VENDOR_NAME_METADATA_KEY, "");
+      String version;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        version = String.valueOf(packageInfo.getLongVersionCode());
+      } else {
+        version = String.valueOf(packageInfo.versionName);
+      }
 
       if (vendorId == -1 || productId == -1) {
         return;
@@ -109,7 +118,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
         supportedClusters = new HashSet<>();
       }
 
-      ContentApp app = new ContentApp(pkg, vendorName, vendorId, productId, supportedClusters);
+      ContentApp app =
+          new ContentApp(pkg, vendorName, vendorId, productId, version, supportedClusters);
       applications.put(pkg, app);
 
       Intent in = new Intent(DISCOVERY_APPAGENT_ACTION_ADD);

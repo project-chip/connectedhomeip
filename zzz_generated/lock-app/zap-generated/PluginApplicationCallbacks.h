@@ -23,7 +23,6 @@
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
-    MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterAccessControlPluginServerInitCallback();                                                                                 \

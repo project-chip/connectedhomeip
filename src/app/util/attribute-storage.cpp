@@ -129,7 +129,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 // Initial configuration
 void emberAfEndpointConfigure(void)
 {
-    uint8_t ep;
+    uint16_t ep;
 
 #if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;

@@ -90,6 +90,8 @@ class PersistentStorage:
 
         This interfaces with a C++ adapter that implements the PersistentStorageDelegate interface
         and can be passed into C++ logic that needs an instance of that interface.
+
+        Object must be resident before the Matter stack starts up and last past its shutdown.
     '''
     @classmethod
     def logger(cls):
@@ -241,15 +243,21 @@ class PersistentStorage:
 
     def Shutdown(self):
         ''' Shuts down the object by free'ing up the associated adapter instance.
-
             You cannot interact with this object there-after.
-        '''
-        self._handle.pychip_Storage_ShutdownAdapter.argtypes = [c_void_p]
-        builtins.chipStack.Call(
-            lambda: self._handle.pychip_Storage_ShutdownAdapter(self._closure)
-        )
 
-        self._isActive = False
+            This should only be called after the CHIP stack has shutdown (i.e
+            after calling pychip_DeviceController_StackShutdown()).
+        '''
+        if (self._isActive):
+            self._handle.pychip_Storage_ShutdownAdapter.argtypes = [c_void_p]
+
+            #
+            # Since the stack is not running at this point, we can safely call
+            # C++ method directly on the current execution context without worrying
+            # about race conditions.
+            #
+            self._handle.pychip_Storage_ShutdownAdapter(self._closure)
+            self._isActive = False
 
     @property
     def jsonData(self) -> Dict:
@@ -258,7 +266,4 @@ class PersistentStorage:
         return copy.deepcopy(self._jsonData)
 
     def __del__(self):
-        if (self._isActive):
-            builtins.chipStack.Call(
-                lambda: self._handle.pychip_Storage_ShutdownAdapter()
-            )
+        self.Shutdown()
