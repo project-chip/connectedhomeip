@@ -186,13 +186,11 @@ to be On or Off.
               > switch onoff on
               > switch onoff off
 
-
--   You may also bind more than one cluster to the switch device. Below command
+*   You may also bind more than one cluster to the switch device. Below command
     binds the Identify, OnOff, LevelControl, ColorControl and Thermostat
     clusters to the switch device.
 
               $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":3}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":8}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":768}, {"fabricIndex": 1, "node":2, "endpoint":1, "cluster":513}]' 1 1
-
 
 -   After binding the clusters, you may send these cluster commands to the
     controllee device through the switch device's Matter Shell. Follow the
@@ -203,7 +201,6 @@ to be On or Off.
               > switch colorcontrol movetohue 100 0 0 0 0
               > switch thermostat SPRL 0 0
 
-
--   You may also request to read cluster attributes from Matter Shell
+*   You may also request to read cluster attributes from Matter Shell
 
               > switch <cluster> read <attribute>
