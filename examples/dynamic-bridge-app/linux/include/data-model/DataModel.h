@@ -180,7 +180,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
 {
     Span<std::decay_t<typename X::pointer>> span;
     CHIP_ERROR err = aDecoder.Decode(span);
-    if (err = CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         x = X(span.data(), span.size());
     }
