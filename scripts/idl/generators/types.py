@@ -213,7 +213,7 @@ __CHIP_SIZED_TYPES__ = {
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=True),
     "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=True),
     "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=True),
-    "utc": BasicInteger(idl_name="utc", byte_count=4, is_signed=True),
+    "utc": BasicInteger(idl_name="utc", byte_count=4, is_signed=False),
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
 }
 
