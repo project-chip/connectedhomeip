@@ -17,10 +17,10 @@ except:
     from matter_idl_types import *
 
 
-def UnionOfAllFlags(flags_list, default):
+def UnionOfAllFlags(flags_list):
     if not flags_list:
-        return default
-    return functools.reduce(lambda a,b: a|b, flags_list)
+        return None
+    return functools.reduce(lambda a, b: a | b, flags_list)
 
 
 class AddServerClusterToEndpointTransform:
@@ -171,13 +171,13 @@ class MatterIdlTransformer(Transformer):
         return AttributeQuality.NOSUBSCRIBE
 
     def attribute_qualities(self, qualities):
-        return UnionOfAllFlags(qualities, AttributeQuality.NONE)
+        return UnionOfAllFlags(qualities) or AttributeQuality.NONE
 
     def struct_fabric_scoped(self, _):
         return StructQuality.FABRIC_SCOPED
 
     def struct_qualities(self, qualities):
-        return UnionOfAllFlags(qualities, StructQuality.NONE)
+        return UnionOfAllFlags(qualities) or StructQuality.NONE
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -192,7 +192,7 @@ class MatterIdlTransformer(Transformer):
         return EventQuality.FABRIC_SENSITIVE
 
     def event_qualities(selt, qualities):
-        return UnionOfAllFlags(qualities, EventQuality.NONE)
+        return UnionOfAllFlags(qualities) or EventQuality.NONE
 
     def timed_command(self, _):
         return CommandQuality.TIMED_INVOKE
@@ -201,13 +201,13 @@ class MatterIdlTransformer(Transformer):
         return CommandQuality.FABRIC_SCOPED
 
     def command_qualities(self, attrs):
-        return UnionOfAllFlags(attrs, CommandQuality.NONE)
+        return UnionOfAllFlags(attrs) or CommandQuality.NONE
 
     def struct_field(self, args):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
-        field.qualities = UnionOfAllFlags(args[:-1], FieldQuality.NONE)
+        field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
         return field
 
     def server_cluster(self, _):
