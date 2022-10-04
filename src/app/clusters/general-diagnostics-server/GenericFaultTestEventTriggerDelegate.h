@@ -25,6 +25,9 @@ namespace chip {
 class GenericFaultTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
+    static constexpr uint64_t kGenericFaultQueryTrigger         = 0xFFFF'FFFF'10D0'0001;
+    static constexpr uint64_t kGenericFaultQueryFabricIndexMask = 0xff;
+
     explicit GenericFaultTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
 
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;

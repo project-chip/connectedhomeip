@@ -32,45 +32,49 @@ bool GenericFaultTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & e
 
 CHIP_ERROR GenericFaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
-    // Fault injection
-    GeneralFaults<kMaxHardwareFaults> hwFaultsPrevious;
-    GeneralFaults<kMaxHardwareFaults> hwFaultsCurrent;
-    ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-    ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
 
-    ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-    ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-    ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-    ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+    if ((eventTrigger & ~kGenericFaultQueryFabricIndexMask) == kGenericFaultQueryTrigger)
+    {
+        // Fault injection
+        GeneralFaults<kMaxHardwareFaults> hwFaultsPrevious;
+        GeneralFaults<kMaxHardwareFaults> hwFaultsCurrent;
+        ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
 
-    app::Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hwFaultsPrevious, hwFaultsCurrent);
+        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
 
-    // Radio faults injection
-    GeneralFaults<kMaxRadioFaults> radioFaultsPrevious;
-    GeneralFaults<kMaxRadioFaults> radioFaultsCurrent;
+        app::Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hwFaultsPrevious, hwFaultsCurrent);
 
-    ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-    ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        // Radio faults injection
+        GeneralFaults<kMaxRadioFaults> radioFaultsPrevious;
+        GeneralFaults<kMaxRadioFaults> radioFaultsCurrent;
 
-    ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-    ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-    ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+        ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
 
-    app::Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(radioFaultsPrevious, radioFaultsCurrent);
+        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
 
-    GeneralFaults<kMaxNetworkFaults> networkFaultsPrevious;
-    GeneralFaults<kMaxNetworkFaults> networkFaultsCurrent;
+        app::Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(radioFaultsPrevious, radioFaultsCurrent);
 
-    // Network faults injections
-    ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-    ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        GeneralFaults<kMaxNetworkFaults> networkFaultsPrevious;
+        GeneralFaults<kMaxNetworkFaults> networkFaultsCurrent;
 
-    ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-    ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-    ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+        // Network faults injections
+        ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
 
-    app::Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
+        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+
+        app::Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
+    }
 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
