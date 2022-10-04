@@ -190,11 +190,10 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 
     mWaitingForDiscovery[kIPTransport] = false;
     mCurrentFilter.type                = Dnssd::DiscoveryFilterType::kNone;
-    mPayloadVendorID                   = 0;
-    mPayloadProductID                  = 0;
+    mPayloadVendorID                   = kNotAvailable;
+    mPayloadProductID                  = kNotAvailable;
 
     mCommissioner->StopCommissionableDiscovery();
-
     return CHIP_NO_ERROR;
 }
 
@@ -292,12 +291,10 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-namespace {
-bool IsPresent(uint16_t vendorOrProductID)
+bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 {
-    return vendorOrProductID != 0;
+    return vendorOrProductID != kNotAvailable;
 }
-} // anonymous namespace
 
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
@@ -307,14 +304,14 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     }
 
     // The advertisement may not include a vendor id.
-    if (IsPresent(mPayloadVendorID) && IsPresent(nodeData.commissionData.vendorId) &&
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.commissionData.vendorId) &&
         mPayloadVendorID != nodeData.commissionData.vendorId)
     {
         return false;
     }
 
     // The advertisement may not include a product id.
-    if (IsPresent(mPayloadProductID) && IsPresent(nodeData.commissionData.productId) &&
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.commissionData.productId) &&
         mPayloadProductID != nodeData.commissionData.productId)
     {
         return false;
