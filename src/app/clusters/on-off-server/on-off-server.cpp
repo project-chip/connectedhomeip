@@ -109,12 +109,12 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
  */
-EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange)
+EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange)
 {
     EmberAfStatus status;
     bool currentValue, newValue;
 
-    emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, command);
+    emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, static_cast<uint8_t>(command));
 
     // read current on/off value
     status = Attributes::OnOff::Get(endpoint, &currentValue);

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */; };
+		3CA1CA7C28E282150023ED44 /* MediaPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7B28E282150023ED44 /* MediaPlayerView.swift */; };
+		3CA1CA7E28E284950023ED44 /* MediaPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7D28E284950023ED44 /* MediaPlayerViewModel.swift */; };
 		3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */; };
 		3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */; };
 		3CC0E8FE2841DD3500EC6A18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */; };
@@ -43,6 +46,9 @@
 		3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissioningViewModel.swift; sourceTree = "<group>"; };
 		3CA19434285BA780004768D5 /* ContentLauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherView.swift; sourceTree = "<group>"; };
 		3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherViewModel.swift; sourceTree = "<group>"; };
+		3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterSelectorView.swift; sourceTree = "<group>"; };
+		3CA1CA7B28E282150023ED44 /* MediaPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerView.swift; sourceTree = "<group>"; };
+		3CA1CA7D28E284950023ED44 /* MediaPlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewModel.swift; sourceTree = "<group>"; };
 		3CC0E8F62841DD3400EC6A18 /* TvCasting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TvCasting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvCastingApp.swift; sourceTree = "<group>"; };
 		3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -101,8 +107,11 @@
 				3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */,
 				3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */,
 				3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */,
+				3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */,
 				3CA19434285BA780004768D5 /* ContentLauncherView.swift */,
 				3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */,
+				3CA1CA7B28E282150023ED44 /* MediaPlayerView.swift */,
+				3CA1CA7D28E284950023ED44 /* MediaPlayerViewModel.swift */,
 				3CC0E8FF2841DD3500EC6A18 /* Preview Content */,
 			);
 			path = TvCasting;
@@ -201,11 +210,14 @@
 			files = (
 				3CCB8745286A5D0F00771BAD /* CommissionerDiscoveryView.swift in Sources */,
 				3CCB8746286A5D0F00771BAD /* CommissionerDiscoveryViewModel.swift in Sources */,
+				3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */,
 				3CCB8747286A5D0F00771BAD /* CommissioningView.swift in Sources */,
 				3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */,
+				3CA1CA7E28E284950023ED44 /* MediaPlayerViewModel.swift in Sources */,
 				3CCB8749286A5D0F00771BAD /* ContentLauncherView.swift in Sources */,
 				3CCB874A286A5D0F00771BAD /* ContentLauncherViewModel.swift in Sources */,
 				3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */,
+				3CA1CA7C28E282150023ED44 /* MediaPlayerView.swift in Sources */,
 				3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

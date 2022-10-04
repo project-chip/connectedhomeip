@@ -1,5 +1,6 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2020-2021 Project CHIP Authors
+#   All rights reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,12 +15,9 @@
 #   limitations under the License.
 #
 
-# Copy the merged.hex file if it exists, otherwise copy zephyr.hex
+FROM connectedhomeip/chip-cirque-device-base:latest
 
-set(HEX_NAME merged.hex)
+COPY out/debug/dynamic-chip-bridge-app /usr/bin/
+COPY entrypoint.sh /
 
-if(EXISTS "zephyr/${HEX_NAME}")
-  configure_file("zephyr/${HEX_NAME}" "${FLASHBUNDLE_FIRMWARE}" COPYONLY)
-else()
-  configure_file("zephyr/${KERNEL_HEX_NAME}" "${FLASHBUNDLE_FIRMWARE}" COPYONLY)
-endif()
+ENTRYPOINT ["/entrypoint.sh", "server"]

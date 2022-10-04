@@ -273,6 +273,7 @@ def HostTargets():
         app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
+        app_targets.append(target.Extend('dynamic-bridge', app=HostApp.DYNAMIC_BRIDGE))
 
         nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False,
                            crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True)
@@ -399,6 +400,7 @@ def Efr32Targets():
 
     board_targets = [
         efr_target.Extend('brd4161a', board=Efr32Board.BRD4161A),
+        efr_target.Extend('brd4187c', board=Efr32Board.BRD4187C),
         efr_target.Extend('brd4163a', board=Efr32Board.BRD4163A).GlobBlacklist(
             'only user requested'),
         efr_target.Extend('brd4164a', board=Efr32Board.BRD4164A).GlobBlacklist(

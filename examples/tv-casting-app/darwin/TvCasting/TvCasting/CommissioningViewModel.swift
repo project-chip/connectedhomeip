@@ -45,9 +45,7 @@ class CommissioningViewModel: ObservableObject {
                     self.commisisoningWindowOpened = result
                 })
         }
-        
-        // TBD: Get Onboarding payload
-        
+                
         // Send User directed commissioning request if a commissioner with a known IP addr was selected
         if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
         {

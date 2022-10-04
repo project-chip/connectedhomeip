@@ -1436,6 +1436,15 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result);
 
+enum class AttestationCertType
+{
+    kPAA = 0,
+    kPAI = 1,
+    kDAC = 2,
+};
+
+CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType);
+
 /**
  * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the
  *        issuer certificate (issuerCertificate).
