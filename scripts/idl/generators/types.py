@@ -189,7 +189,7 @@ __CHIP_SIZED_TYPES__ = {
     "int8s": BasicInteger(idl_name="int8s", byte_count=1, is_signed=True),
     "int8u": BasicInteger(idl_name="int8u", byte_count=1, is_signed=False),
     # Derived types
-    # Size and signdness should generally follow DataModelTypes.h
+    # Size and signdness should generally follow DataModelTypes.h or basic-types.h
     "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
     "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
     "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=False),
@@ -207,9 +207,9 @@ __CHIP_SIZED_TYPES__ = {
     "field_id": BasicInteger(idl_name="field_id", byte_count=4, is_signed=False),
     "group_id": BasicInteger(idl_name="group_id", byte_count=2, is_signed=False),
     "node_id": BasicInteger(idl_name="node_id", byte_count=8, is_signed=False),
-    "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=True),
-    "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=True),
-    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=True),
+    "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
+    "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
+    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=True),
     "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=True),
     "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=True),
