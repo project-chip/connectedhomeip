@@ -3,7 +3,7 @@
 ## Qorvo SDK
 
 More detailed information on the Qorvo SDK can be found in the
-[Qorvo Matter Documentation repository](https://github.com/Qorvo/qpg-connectedhomeip/blob/master/qpg6105/doc/README.md).
+[Qorvo Matter SDK](https://github.com/Qorvo/QMatter).
 
 ## More information
 
