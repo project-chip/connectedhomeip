@@ -151,7 +151,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     header.ClearDestinationNodeId();
     header.SetSessionType(Header::SessionType::kGroupSession);
-    // TODO(privacy): header.SetFlags(Header::SecFlagValues::kPrivacyFlag);
+    header.SetFlags(Header::SecFlagValues::kPrivacyFlag);
     header.SetSecureSessionControlMsg(false);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
@@ -174,7 +174,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(42ull));
     NL_TEST_ASSERT(inSuite, !header.HasDestinationGroupId());
-    // TODO(privacy): NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
+    NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
     NL_TEST_ASSERT(inSuite, header.IsValidMCSPMsg());
 }
 
