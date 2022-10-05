@@ -33,7 +33,6 @@ class FakeBuilder:
 class TestGlobMatcher(unittest.TestCase):
 
     def test_one_fixed_target(self):
-
         t = BuildTarget('fake', FakeBuilder)
         t.AppendFixedTargets([
             TargetPart('foo', foo=1),
@@ -44,8 +43,8 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNotNone(t.StringIntoTargetParts('bar'))
         self.assertIsNone(t.StringIntoTargetParts('baz'))
 
-    def test_fixed_targets(self):
 
+    def test_fixed_targets(self):
         t = BuildTarget('fake', FakeBuilder)
         t.AppendFixedTargets([
             TargetPart('foo', foo=1),
@@ -72,7 +71,35 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNone(t.StringIntoTargetParts('foo'))
         self.assertIsNone(t.StringIntoTargetParts('1-2-3'))
 
-        pass
+    def test_modifiers(self):
+        t = BuildTarget('fake', FakeBuilder)
+        t.AppendFixedTargets([
+            TargetPart('foo', foo=1),
+            TargetPart('bar', bar=2),
+        ])
+
+        t.AppendFixedTargets([
+            TargetPart('one', value=1),
+            TargetPart('two', value=2),
+        ])
+
+        t.AppendModifier(TargetPart('m1', m=1).ExceptIfRe('-m2'));
+        t.AppendModifier(TargetPart('m2', m=2).ExceptIfRe('-m1'));
+        t.AppendModifier(TargetPart('x1', x=1))
+        t.AppendModifier(TargetPart('y1', x=1).OnlyIfRe('foo-'))
+
+        self.assertIsNotNone(t.StringIntoTargetParts('foo-one'))
+        self.assertIsNotNone(t.StringIntoTargetParts('bar-one-m1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-m2'))
+        self.assertIsNotNone(t.StringIntoTargetParts('bar-one-x1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-y1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-m1-y1'))
+
+        self.assertIsNone(t.StringIntoTargetParts('bar-one-m1-y1'))
+        self.assertIsNone(t.StringIntoTargetParts('foo-one-m1-m2'))
+        self.assertIsNone(t.StringIntoTargetParts('bar-m1'))
+        self.assertIsNone(t.StringIntoTargetParts('foo-x1-y1'))
+
 
 
 if __name__ == '__main__':

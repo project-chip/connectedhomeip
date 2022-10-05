@@ -76,12 +76,12 @@ class TargetPart:
     def Accept(self, full_input: str):
         if self.except_if_re:
             if self.except_if_re.search(full_input):
-                logging.warn(f"{self.name} does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
+                logging.warning(f"{self.name} does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
                 return False
 
         if self.only_if_re:
             if not self.only_if_re.search(full_input):
-                logging.warn(f"{self.name} does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
+                logging.warning(f"{self.name} does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
                 return False
 
         return True
@@ -152,13 +152,13 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[
     # Only modifiers left to process
     # Process the modifiers one by one
     for modifier in modifiers:
-        suffix = _HasVariantPrefix(remaining_input, target.name)
+        suffix = _HasVariantPrefix(remaining_input, modifier.name)
         if suffix is None:
             continue
 
         # see if match should be rejected. Done AFTER variant prefix detection so we
         # can log if there are issues
-        if not target.Accept(full_input):
+        if not modifier.Accept(full_input):
             continue
 
         result = _StringIntoParts(full_input, suffix, fixed_targets[1:], filter(lambda x: x != modifier, modifiers))
