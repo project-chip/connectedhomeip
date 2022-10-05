@@ -1,10 +1,11 @@
 steps:
-    - name: gcr.io/cloud-builders/git
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+      entrypoint: 'bash'
       args:
-          - submodule
-          - update
-          - "--init"
-          - "--recursive"
+          - '-c'
+          - |
+            git config --global --add safe.directory `pwd`
+            git submodule update --init --recursive
       id: Submodules
     - name: "connectedhomeip/chip-build-vscode:0.6.02"
       env:
