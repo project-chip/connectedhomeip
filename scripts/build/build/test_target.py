@@ -43,7 +43,6 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNotNone(t.StringIntoTargetParts('bar'))
         self.assertIsNone(t.StringIntoTargetParts('baz'))
 
-
     def test_fixed_targets(self):
         t = BuildTarget('fake', FakeBuilder)
         t.AppendFixedTargets([
@@ -83,8 +82,8 @@ class TestGlobMatcher(unittest.TestCase):
             TargetPart('two', value=2),
         ])
 
-        t.AppendModifier(TargetPart('m1', m=1).ExceptIfRe('-m2'));
-        t.AppendModifier(TargetPart('m2', m=2).ExceptIfRe('-m1'));
+        t.AppendModifier(TargetPart('m1', m=1).ExceptIfRe('-m2'))
+        t.AppendModifier(TargetPart('m2', m=2).ExceptIfRe('-m1'))
         t.AppendModifier(TargetPart('x1', x=1))
         t.AppendModifier(TargetPart('y1', x=1).OnlyIfRe('foo-'))
 
@@ -99,7 +98,6 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNone(t.StringIntoTargetParts('foo-one-m1-m2'))
         self.assertIsNone(t.StringIntoTargetParts('bar-m1'))
         self.assertIsNone(t.StringIntoTargetParts('foo-x1-y1'))
-
 
 
 if __name__ == '__main__':
