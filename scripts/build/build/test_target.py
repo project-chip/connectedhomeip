@@ -39,9 +39,11 @@ class TestGlobMatcher(unittest.TestCase):
             TargetPart('bar', bar=2),
         ])
 
-        self.assertIsNotNone(t.StringIntoTargetParts('foo'))
-        self.assertIsNotNone(t.StringIntoTargetParts('bar'))
-        self.assertIsNone(t.StringIntoTargetParts('baz'))
+        self.assertEqual(t.HumanString(), "fake-{foo,bar}")
+
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-bar'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-baz'))
 
     def test_fixed_targets(self):
         t = BuildTarget('fake', FakeBuilder)
@@ -60,15 +62,20 @@ class TestGlobMatcher(unittest.TestCase):
             TargetPart('3', b=3),
         ])
 
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-1-2'))
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-2-3'))
-        self.assertIsNotNone(t.StringIntoTargetParts('bar-3-1'))
-        self.assertIsNone(t.StringIntoTargetParts('bar-1'))
-        self.assertIsNone(t.StringIntoTargetParts('baz-1-2'))
-        self.assertIsNone(t.StringIntoTargetParts('foo-bar'))
-        self.assertIsNone(t.StringIntoTargetParts('1-2'))
-        self.assertIsNone(t.StringIntoTargetParts('foo'))
-        self.assertIsNone(t.StringIntoTargetParts('1-2-3'))
+        self.assertEqual(
+            t.HumanString(),
+            "fake-{foo,bar}-{1,2,3}-{1,2,3}"
+        )
+
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-1-2'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-2-3'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-bar-3-1'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-bar-1'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-baz-1-2'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-foo-bar'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-1-2'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-foo'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-1-2-3'))
 
     def test_modifiers(self):
         t = BuildTarget('fake', FakeBuilder)
@@ -85,19 +92,24 @@ class TestGlobMatcher(unittest.TestCase):
         t.AppendModifier(TargetPart('m1', m=1).ExceptIfRe('-m2'))
         t.AppendModifier(TargetPart('m2', m=2).ExceptIfRe('-m1'))
         t.AppendModifier(TargetPart('x1', x=1))
-        t.AppendModifier(TargetPart('y1', x=1).OnlyIfRe('foo-'))
+        t.AppendModifier(TargetPart('y1', x=1).OnlyIfRe('-foo-'))
 
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-one'))
-        self.assertIsNotNone(t.StringIntoTargetParts('bar-one-m1'))
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-m2'))
-        self.assertIsNotNone(t.StringIntoTargetParts('bar-one-x1'))
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-y1'))
-        self.assertIsNotNone(t.StringIntoTargetParts('foo-one-m1-y1'))
+        self.assertEqual(
+            t.HumanString(),
+            "fake-{foo,bar}-{one,two}[-m1][-m2][-x1][-y1]"
+        )
 
-        self.assertIsNone(t.StringIntoTargetParts('bar-one-m1-y1'))
-        self.assertIsNone(t.StringIntoTargetParts('foo-one-m1-m2'))
-        self.assertIsNone(t.StringIntoTargetParts('bar-m1'))
-        self.assertIsNone(t.StringIntoTargetParts('foo-x1-y1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-bar-one-m1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one-m2'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-bar-one-x1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one-y1'))
+        self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one-m1-y1'))
+
+        self.assertIsNone(t.StringIntoTargetParts('fake-bar-one-m1-y1'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-foo-one-m1-m2'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-bar-m1'))
+        self.assertIsNone(t.StringIntoTargetParts('fake-foo-x1-y1'))
 
 
 if __name__ == '__main__':

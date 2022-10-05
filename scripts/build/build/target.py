@@ -231,11 +231,31 @@ class BuildTarget:
         """
         self.modifiers.append(part)
 
+    def HumanString(self):
+        """Prints out the human-readable string of the available variants and modifiers:
+
+           like:
+
+           foo-{bar,baz}[-modifier1][modifier2][modifier3]
+        """
+        result = self.name
+        for fixed in self.fixed_targets:
+            result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
+
+        for modifier in self.modifiers:
+            result += f"[-{modifier.name}]"
+
+        return result
+
     def StringIntoTargetParts(self, value: str):
         """Given an input string, process through all the input rules and return
            the underlying list of target parts for the input.
         """
-        return _StringIntoParts(value, value, self.fixed_targets, self.modifiers)
+        suffix = _HasVariantPrefix(value, self.name)
+        if not suffix:
+            return None
+
+        return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
                enable_flashbundle: bool):
