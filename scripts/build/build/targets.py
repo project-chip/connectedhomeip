@@ -304,50 +304,37 @@ def BuildHostTarget():
     return target
 
 
-def Esp32Targets():
-    esp32_target = Target('esp32', Esp32Builder)
+def BuildEsp32Target():
+    target = BuildTarget('esp32', Esp32Builder)
 
-    yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
-                              enable_ipv4=False)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
-                              enable_rpcs=True)
-    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
-                              enable_rpcs=True, enable_ipv4=False)
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('m5stack', board=Esp32Board.M5Stack).OnlyIfRe('-(all-clusters|ota-requestor)'),
+        TargetPart('c3devkit', board=Esp32Board.C3DevKit),
+        TargetPart('devkitc', board=Esp32Board.DevKitC),
+    ])
 
-    yield esp32_target.Extend('m5stack-ota-requestor', board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR)
-    yield esp32_target.Extend('m5stack-ota-requestor-rpc', board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR,
-                              enable_rpcs=True)
+    # applications
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', board=Esp32App.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', board=Esp32App.ALL_CLUSTERS_MINIMAL),
+        TargetPart('ota-requestor', board=Esp32App.OTA_REQUESTOR),
+        TargetPart('ota-requestor', board=Esp32App.OTA_REQUESTOR),
+        TargetPart('shell', app=Esp32App.SHELL),
+        TargetPart('light', app=Esp32App.LIGHT),
+        TargetPart('lock', app=Esp32App.LOCK),
+        TargetPart('bridge', app=Esp32App.BRIDGE),
+        TargetPart('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT),
+        TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
+    ])
 
-    yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
+    target.AppendModifier(TargetPart('rpc', enable_rpcs=True))
+    target.AppendModifier(TargetPart('ipv6only', enable_ipv4=False))
 
-    yield esp32_target.Extend('m5stack-all-clusters-minimal', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL)
-    yield esp32_target.Extend('m5stack-all-clusters-minimal-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
-                              enable_ipv4=False)
-    yield esp32_target.Extend('m5stack-all-clusters-minimal-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
-                              enable_rpcs=True)
-    yield esp32_target.Extend('m5stack-all-clusters-minimal-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS_MINIMAL,
-                              enable_rpcs=True, enable_ipv4=False)
-
-    yield esp32_target.Extend('c3devkit-all-clusters-minimal', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS_MINIMAL)
-
-    devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
-
-    yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
-    yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
-    yield devkitc.Extend('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL)
-    yield devkitc.Extend('all-clusters-minimal-ipv6only', app=Esp32App.ALL_CLUSTERS_MINIMAL, enable_ipv4=False)
-    yield devkitc.Extend('shell', app=Esp32App.SHELL)
-    yield devkitc.Extend('light', app=Esp32App.LIGHT)
-    yield devkitc.Extend('light-rpc', app=Esp32App.LIGHT, enable_rpcs=True)
-    yield devkitc.Extend('lock', app=Esp32App.LOCK)
-    yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
-    yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
-    yield devkitc.Extend('temperature-measurement-rpc', app=Esp32App.TEMPERATURE_MEASUREMENT, enable_rpcs=True)
-    yield devkitc.Extend('ota-requestor', app=Esp32App.OTA_REQUESTOR)
-    yield devkitc.Extend('ota-requestor-rpc', app=Esp32App.OTA_REQUESTOR, enable_rpcs=True)
-
-    yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
+    # TODO:
+    # yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
+    # yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
+    return target
 
 
 def Efr32Targets():
@@ -572,57 +559,77 @@ def TizenTargets():
         yield target
 
 
-def Bl602Targets():
-    target = Target('bl602', Bl602Builder)
+def BuildBl602Target():
+    target = BuildTarget('bl602', Bl602Builder)
 
-    yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
-
-
-def BouffalolabTargets():
-    target = Target('bouffalolab', BouffalolabBuilder)
-
-    yield target.Extend('BL706-IoT-DVK-light', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
-    yield target.Extend('BL706-IoT-DVK-light-rpc', board=BouffalolabBoard.BL706_IoT_DVK, app=BouffalolabApp.LIGHT, enable_rpcs=True, module_type="BL706C-22")
-    yield target.Extend('BL706-NIGHT-LIGHT-light', board=BouffalolabBoard.BL706_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL702")
+    target.AppendFixedTargets([
+       TargetPart('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT),
+    ])
+    
+    return target
 
 
-def IMXTargets():
-    target = Target('imx', IMXBuilder)
-
-    yield target.Extend('chip-tool', app=IMXApp.CHIP_TOOL)
-    yield target.Extend('lighting-app', app=IMXApp.LIGHT)
-    yield target.Extend('thermostat', app=IMXApp.THERMOSTAT)
-    yield target.Extend('all-clusters-app', app=IMXApp.ALL_CLUSTERS)
-    yield target.Extend('all-clusters-minimal-app', app=IMXApp.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('ota-provider-app', app=IMXApp.OTA_PROVIDER)
-    yield target.Extend('chip-tool-release', app=IMXApp.CHIP_TOOL, release=True)
-    yield target.Extend('lighting-app-release', app=IMXApp.LIGHT, release=True)
-    yield target.Extend('thermostat-release', app=IMXApp.THERMOSTAT, release=True)
-    yield target.Extend('all-clusters-app-release', app=IMXApp.ALL_CLUSTERS, release=True)
-    yield target.Extend('all-clusters-minimal-app-release', app=IMXApp.ALL_CLUSTERS_MINIMAL, release=True)
-    yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
+def BuildBouffalolabTarget():
+    target = BuildTarget('bouffalolab', BouffalolabBuilder)
 
 
-def MW320Targets():
-    target = Target('mw320', MW320Builder)
+    # Boards
+    target.AppendFixedTargets([
+       TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
+       TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
+    ])
 
-    yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
+    # Apps
+    target.AppendFixedTargets([
+       TargetPart('light', board=BouffalolabApp.LIGHT),
+    ])
+
+    return target
 
 
-def GenioTargets():
-    target = Target('genio', GenioBuilder)
+def BuildIMXTarget():
+    target = BuildTarget('imx', IMXBuilder)
 
-    yield target.Extend('lighting-app', app=GenioApp.LIGHT)
+    target.AppendFixedTargets([
+       TargetPart('chip-tool', app=IMXApp.CHIP_TOOL),
+       TargetPart('lighting-app', app=IMXApp.LIGHT),
+       TargetPart('thermostat', app=IMXApp.THERMOSTAT),
+       TargetPart('all-clusters-app', app=IMXApp.ALL_CLUSTERS),
+       TargetPart('all-clusters-minimal-app', app=IMXApp.ALL_CLUSTERS_MINIMAL),
+       TargetPart('ota-provider-app', app=IMXApp.OTA_PROVIDER),
+    ])
+
+    target.AppendModifier(TargetPart('release', release=True))
+
+    return target
+
+
+def BuildMW320Target():
+    target = BuildTarget('mw320', MW320Builder)
+    target.AppendFixedTargets([TargetPart('all-clusters-app', board=MW320App.ALL_CLUSTERS)])
+    return target
+
+
+def BuildGenioTarget():
+    target = BuildTarget('genio', GenioBuilder)
+    target.AppendFixedTargets([TargetPart('lighting-app', board=GenioApp.LIGHT)])
+    return target
+
 
 BUILD_TARGETS = [
     BuildHostTarget(),
+    BuildEsp32Target(),
+    BuildGenioTarget(),
+    BuildIMXTarget(),
+    BuildBl602Target(),
+    BuildBouffalolabTarget(),
 ]
 
 ALL = []
 
 target_generators = [
     #HostTargets(),
-    Esp32Targets(),
+    #Esp32Targets(),
     Efr32Targets(),
     NrfTargets(),
     AndroidTargets(),
@@ -634,11 +641,11 @@ target_generators = [
     Cyw30739Targets(),
     QorvoTargets(),
     TizenTargets(),
-    Bl602Targets(),
-    BouffalolabTargets(),
-    IMXTargets(),
-    MW320Targets(),
-    GenioTargets(),
+    #Bl602Targets(),
+    #BouffalolabTargets(),
+    #IMXTargets(),
+    #MW320Targets(),
+    #GenioTargets(),
 ]
 
 for generator in target_generators:
