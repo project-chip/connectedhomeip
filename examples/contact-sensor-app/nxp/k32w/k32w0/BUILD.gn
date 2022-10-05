@@ -1,0 +1,143 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${k32w0_sdk_build_root}/k32w0_executable.gni")
+import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
+
+if (chip_pw_tokenizer_logging) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_tokenizer/database.gni")
+}
+
+assert(current_os == "freertos")
+
+k32w0_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w0"
+
+k32w0_sdk("sdk") {
+  sources = [
+    "${k32w0_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
+  include_dirs = [
+    "main/include",
+    "main",
+    "include",
+    "${k32w0_platform_dir}/app/project_include",
+    "${k32w0_platform_dir}/app/support",
+    "${k32w0_platform_dir}/util/include",
+  ]
+
+  if (chip_with_se05x == 1) {
+    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
+  }
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+k32w0_executable("contact_sensor_app") {
+  output_name = "chip-k32w0x-contact-example"
+
+  sources = [
+    "${k32w0_platform_dir}/util/LEDWidget.cpp",
+    "${k32w0_platform_dir}/util/include/LEDWidget.h",
+    "main/AppTask.cpp",
+    "main/ContactSensorManager.cpp",
+    "main/ZclCallbacks.cpp",
+    "main/include/AppEvent.h",
+    "main/include/AppTask.h",
+    "main/include/ContactSensorManager.h",
+    "main/main.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/mbedtls:mbedtls",
+    "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
+  ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_enable_ota_requestor) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,__app_load_address__=0x4000",
+      "-Wl,--defsym",
+      "-Wl,__app_stated_size__=0x99200",
+      "-Wl,-print-memory-usage",
+    ]
+  }
+}
+
+if (chip_pw_tokenizer_logging) {
+  pw_tokenizer_database("contact_sensor_app.database") {
+    database = "$root_build_dir/chip-k32w0x-contact-example-database.bin"
+    create = "binary"
+    deps = [ ":contact_sensor_app" ]
+    optional_paths = [ "$root_build_dir/chip-k32w0x-contact-example" ]
+  }
+}
+
+group("k32w0") {
+  deps = [ ":contact_sensor_app" ]
+  if (chip_pw_tokenizer_logging) {
+    deps += [ ":contact_sensor_app.database" ]
+  }
+}
+
+group("default") {
+  deps = [ ":k32w0" ]
+}
