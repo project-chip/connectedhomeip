@@ -337,51 +337,35 @@ def BuildEsp32Target():
     return target
 
 
-def Efr32Targets():
-    efr_target = Target('efr32', Efr32Builder)
+def BuildEfr32Target():
+    target = BuildTarget('efr32', Efr32Builder)
 
-    board_targets = [
-        efr_target.Extend('brd4161a', board=Efr32Board.BRD4161A),
-        efr_target.Extend('brd4187c', board=Efr32Board.BRD4187C),
-        efr_target.Extend('brd4163a', board=Efr32Board.BRD4163A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4164a', board=Efr32Board.BRD4164A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4166a', board=Efr32Board.BRD4166A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4170a', board=Efr32Board.BRD4170A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4186a', board=Efr32Board.BRD4186A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4187a', board=Efr32Board.BRD4187A).GlobBlacklist(
-            'only user requested'),
-        efr_target.Extend('brd4304a', board=Efr32Board.BRD4304A).GlobBlacklist(
-            'only user requested')
-    ]
+    # board
+    target.AppendFixedTargets([
+        TargetPart('brd4161a', board=Efr32Board.BRD4161A),
+        TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4163a', board=Efr32Board.BRD4163A),
+        TargetPart('brd4164a', board=Efr32Board.BRD4164A),
+        TargetPart('brd4166a', board=Efr32Board.BRD4166A),
+        TargetPart('brd4170a', board=Efr32Board.BRD4170A),
+        TargetPart('brd4186a', board=Efr32Board.BRD4186A),
+        TargetPart('brd4187a', board=Efr32Board.BRD4187A),
+        TargetPart('brd4304a', board=Efr32Board.BRD4304A),
+    ])
 
-    builder = VariantBuilder()
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
+        TargetPart('switch', app=Efr32App.SWITCH),
+        TargetPart('unit-test', app=Efr32App.UNIT_TEST),
+        TargetPart('light', app=Efr32App.LIGHT),
+        TargetPart('lock', app=Efr32App.LOCK),
+    ])
 
-    for board_target in board_targets:
-        builder.targets.append(board_target.Extend(
-            'window-covering', app=Efr32App.WINDOW_COVERING))
-        builder.targets.append(board_target.Extend(
-            'switch', app=Efr32App.SWITCH))
-        builder.targets.append(board_target.Extend(
-            'unit-test', app=Efr32App.UNIT_TEST))
-        builder.targets.append(
-            board_target.Extend('light', app=Efr32App.LIGHT))
-        builder.targets.append(board_target.Extend('lock', app=Efr32App.LOCK))
+    target.AppendModifier(TargetPart('rpc', enable_rpcs=True))
+    target.AppendModifier(TargetPart('with-ota-requestor', enable_ota_requestor=True))
 
-    # Possible build variants. Note that number of potential
-    # builds is exponential here
-    builder.AppendVariant(name="rpc", validator=AcceptNameWithSubstrings(
-        ['-light', '-lock']), enable_rpcs=True)
-    builder.AppendVariant(name="with-ota-requestor", enable_ota_requestor=True)
-
-    builder.WhitelistVariantNameForGlob('rpc')
-
-    for target in builder.AllVariants():
-        yield target
+    return target
 
 
 def NrfTargets():
@@ -418,24 +402,30 @@ def NrfTargets():
         yield rpc
 
 
-def AndroidTargets():
-    target = Target('android', AndroidBuilder)
+def BuildAndroidTarget():
+    target = BuildTarget('android', AndroidBuilder)
 
-    yield target.Extend('arm-chip-tool', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('arm64-chip-tool', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
-    yield target.Extend('androidstudio-arm-chip-tool', board=AndroidBoard.AndroidStudio_ARM, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('arm64-tv-server', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER)
-    yield target.Extend('arm-tv-server', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
-    yield target.Extend('x86-tv-server', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER)
-    yield target.Extend('x64-tv-server', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER)
-    yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_CASTING_APP)
-    yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('arm', board=AndroidBoard.ARM),
+        TargetPart('arm64', board=AndroidBoard.ARM64),
+        TargetPart('x86', board=AndroidBoard.X86),
+        TargetPart('x64', board=AndroidBoard.X64),
+        TargetPart('androidstudio-arm', board=AndroidBoard.AndroidStudio_ARM).OnlyIfRe('chip-tool'),
+        TargetPart('androidstudio-arm64', board=AndroidBoard.AndroidStudio_ARM64).OnlyIfRe('chip-tool'),
+        TargetPart('androidstudio-x86', board=AndroidBoard.AndroidStudio_X86).OnlyIfRe('chip-tool'),
+        TargetPart('androidstudio-x64', board=AndroidBoard.AndroidStudio_X64).OnlyIfRe('chip-tool'),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('chip-tool', app=AndroidApp.CHIP_TOOL),
+        TargetPart('chip-test', app=AndroidApp.CHIP_TEST),
+        TargetPart('tv-server', app=AndroidApp.TV_SERVER),
+        TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
+    ])
+
+    return target
 
 
 def BuildMbedTarget():
@@ -679,6 +669,8 @@ BUILD_TARGETS = [
     BuildMW320Target(),
     BuildQorvoTarget(),
     BuildTizenTarget(),
+    BuildAndroidTarget(),
+    BuildEfr32Target(),
 ]
 
 ALL = []
@@ -699,8 +691,8 @@ target_generators = [
     #MW320Targets(),
     #QorvoTargets(),
     #TizenTargets(),
-    AndroidTargets(),
-    Efr32Targets(),
+    #AndroidTargets(),
+    #Efr32Targets(),
     NrfTargets(),
 ]
 
