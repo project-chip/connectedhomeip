@@ -33,7 +33,7 @@ steps:
                  --target esp32-m5stack-all-clusters-minimal-rpc-ipv6only
                  --target esp32-m5stack-all-clusters-rpc
                  --target esp32-m5stack-ota-requestor
-                 build 
+                 build
                  --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
@@ -82,7 +82,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py 
+              ./scripts/build/build_examples.py
                   --enable-flashbundle
                   --target linux-arm64-clang-all-clusters
                   --target linux-arm64-clang-all-clusters-app-nodeps-ipv6only
