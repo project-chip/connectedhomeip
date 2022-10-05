@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import os
+import re
 from itertools import combinations
-from typing import List
+from typing import List, Any, Optional
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
@@ -35,6 +36,7 @@ from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
+
 
 
 class Target:
