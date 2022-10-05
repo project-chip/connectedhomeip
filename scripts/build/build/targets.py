@@ -483,51 +483,81 @@ def InfineonTargets():
         yield target
 
 
-def AmebaTargets():
-    ameba_target = Target('ameba', AmebaBuilder)
+def BuildAmebaTarget():
+    target = BuildTarget('ameba', AmebaBuilder)
 
-    yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
-    yield ameba_target.Extend('amebad-all-clusters-minimal', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS_MINIMAL)
-    yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
-    yield ameba_target.Extend('amebad-pigweed', board=AmebaBoard.AMEBAD, app=AmebaApp.PIGWEED)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('amebad', board=AmebaBoard.AMEBAD),
+    ])
 
+    # apps
+    target.AppendFixedTargets([
+       TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
+       TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
+       TargetPart('light', app=AmebaApp.LIGHT),
+       TargetPart('pigweed', app=AmebaApp.PIGWEED),
+    ])
 
-def K32WTargets():
-    target = Target('k32w', K32WBuilder)
-
-    yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
-    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True, tinycrypt=True)
-    yield target.Extend('shell-release', app=K32WApp.SHELL, disable_logs=True, release=True)
-    yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
-    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
-                        low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
-    yield target.Extend('contact-release', app=K32WApp.CONTACT, tokenizer=True, release=True, tinycrypt=True)
-    yield target.Extend('contact-low-power-release', app=K32WApp.CONTACT, tokenizer=True, tinycrypt=True,
-                        low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
+    return target
 
 
-def cc13x2x7_26x2x7Targets():
-    target = Target('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+def BuildK32WTarget():
+    target = BuildTarget('k32w', K32WBuilder)
 
-    yield target.Extend('lock-ftd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=True)
-    yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
-    yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
-    yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
-    yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
-    yield target.Extend('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=K32WApp.LIGHT, release=True),
+        TargetPart('shell', app=K32WApp.SHELL, release=True),
+        TargetPart('lock', app=K32WApp.LOCK, release=True),
+        TargetPart('contact', app=K32WApp.CONTACT, release=True),
+    ])
+
+    target.AppendModifier(TargetPart(name="no-ota", disable_ota=True))
+    target.AppendModifier(TargetPart(name="low-power", low_power=True))
+    target.AppendModifier(TargetPart(name="nologs", disable_logs=True))
+
+    return target
 
 
-def Cyw30739Targets():
-    yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder,
-                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
-    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder,
-                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
-    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder,
-                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist(
-                     "Running out of XIP flash space")
-    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder,
-                 board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
+def Buildcc13x2x7_26x2x7Target():
+    target = BuildTarget('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL),
+        TargetPart('lock', app=cc13x2x7_26x2x7App.LOCK),
+        TargetPart('pump', app=cc13x2x7_26x2x7App.PUMP),
+        TargetPart('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER),
+        TargetPart('shell', app=cc13x2x7_26x2x7App.SHELL),
+    ])
+
+    target.AppendModifier(TargetPart(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd"))
+    target.AppendModifier(TargetPart(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd"))
+
+    return target
+
+
+def BuildCyw30739Target():
+    target = BuildTarget('cyw30739', Cyw30739Builder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=Cyw30739App.LIGHT),
+        TargetPart('lock',  app=Cyw30739App.LOCK),
+        TargetPart('ota-requestor',  app=Cyw30739App.OTA_REQUESTOR),
+    ])
+
+    target.AppendModifier(TargetPart(name="no-progress-logging", progress_logging=False))
+
+    return target
+
 
 
 def BuildQorvoTarget():
@@ -632,35 +662,41 @@ def BuildGenioTarget():
 BUILD_TARGETS = [
     BuildBl602Target(),
     BuildBouffalolabTarget(),
+    BuildCyw30739Target(),
     BuildEsp32Target(),
     BuildGenioTarget(),
     BuildHostTarget(),
     BuildIMXTarget(),
-    BuildTizenTarget(),
+    BuildMW320Target(),
     BuildQorvoTarget(),
+    BuildTizenTarget(),
+
+    Buildcc13x2x7_26x2x7Target(),
+    BuildK32WTarget(),
+    BuildAmebaTarget(),
 ]
 
 ALL = []
 
 target_generators = [
-    #HostTargets(),
-    #Esp32Targets(),
-    Efr32Targets(),
-    NrfTargets(),
-    AndroidTargets(),
-    MbedTargets(),
-    InfineonTargets(),
-    AmebaTargets(),
-    K32WTargets(),
-    cc13x2x7_26x2x7Targets(),
-    Cyw30739Targets(),
-    #QorvoTargets(),
-    #TizenTargets(),
     #Bl602Targets(),
     #BouffalolabTargets(),
+    #Cyw30739Targets(),
+    #Esp32Targets(),
+    #GenioTargets(),
+    #HostTargets(),
     #IMXTargets(),
     #MW320Targets(),
-    #GenioTargets(),
+    #QorvoTargets(),
+    #TizenTargets(),
+    #AmebaTargets(),
+    AndroidTargets(),
+    #cc13x2x7_26x2x7Targets(),
+    Efr32Targets(),
+    InfineonTargets(),
+    #K32WTargets(),
+    MbedTargets(),
+    NrfTargets(),
 ]
 
 for generator in target_generators:
