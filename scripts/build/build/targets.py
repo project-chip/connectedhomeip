@@ -450,14 +450,15 @@ def BuildGenioTarget():
     target.AppendFixedTargets([TargetPart('lighting-app', board=GenioApp.LIGHT)])
     return target
 
+
 def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
     target.AppendFixedTargets([TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
 
     target.AppendFixedTargets([
-       TargetPart('light', app=TelinkApp.LIGHT),
-       TargetPart('light-switch', app=TelinkApp.SWITCH),
-       TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
+        TargetPart('light', app=TelinkApp.LIGHT),
+        TargetPart('light-switch', app=TelinkApp.SWITCH),
+        TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
     ])
 
     return target
