@@ -162,7 +162,7 @@ class IdlType:
         return self.item_type == IdlItemType.STRUCT
 
 
-# Data types, held by ZAP in chip-types.xml
+# Data types, held by ZAP in chip-types.xml and generally by the spec.
 __CHIP_SIZED_TYPES__ = {
     "bitmap16": BasicInteger(idl_name="bitmap16", byte_count=2, is_signed=False),
     "bitmap24": BasicInteger(idl_name="bitmap24", byte_count=3, is_signed=False),
@@ -189,7 +189,7 @@ __CHIP_SIZED_TYPES__ = {
     "int8s": BasicInteger(idl_name="int8s", byte_count=1, is_signed=True),
     "int8u": BasicInteger(idl_name="int8u", byte_count=1, is_signed=False),
     # Derived types
-    # Size and signdness should generally follow DataModelTypes.h or basic-types.h
+    # Specification describes them in section '7.18.2. Derived Data Types'
     "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
     "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
     "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=False),
@@ -210,10 +210,9 @@ __CHIP_SIZED_TYPES__ = {
     "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
     "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
-    "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=True),
-    "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=True),
-    "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=True),
-    "utc": BasicInteger(idl_name="utc", byte_count=4, is_signed=False),
+    "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
+    "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=False),
+    "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=False),
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
 }
 
