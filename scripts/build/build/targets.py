@@ -367,38 +367,33 @@ def BuildEfr32Target():
     return target
 
 
-def NrfTargets():
-    target = Target('nrf', NrfConnectBuilder)
+def BuildNrfTarget():
+    target = BuildTarget('nrf', NrfConnectBuilder)
 
-    yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
+    # FIXME: what now? native would be nice
+    # yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
 
-    targets = [
-        target.Extend('nrf5340dk', board=NrfBoard.NRF5340DK),
-        target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
-    ]
+    # board
+    target.AppendFixedTargets([
+        TargetPart('nrf5340dk', board=NrfBoard.NRF5340DK),
+        TargetPart('nrf52840dk', board=NrfBoard.NRF52840DK),
+        TargetPart('nrf52840dongle').OnlyIfRe('-(all-clusters|light)'),
+    ])
 
-    # Enable nrf52840dongle for all-clusters and lighting app only
-    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS).GlobBlacklist('Out of flash when linking')
-    yield target.Extend('nrf52840dongle-all-clusters-minimal', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS_MINIMAL)
-    yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', app=NrfApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=NrfApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('lock', app=NrfApp.LOCK),
+        TargetPart('light', app=NrfApp.LIGHT),
+        TargetPart('shell', app=NrfApp.SHELL),
+        TargetPart('pump', app=NrfApp.PUMP),
+        TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
+    ])
 
-    for target in targets:
-        yield target.Extend('all-clusters', app=NrfApp.ALL_CLUSTERS)
-        yield target.Extend('all-clusters-minimal', app=NrfApp.ALL_CLUSTERS_MINIMAL)
-        yield target.Extend('lock', app=NrfApp.LOCK)
-        yield target.Extend('light', app=NrfApp.LIGHT)
-        yield target.Extend('shell', app=NrfApp.SHELL)
-        yield target.Extend('pump', app=NrfApp.PUMP)
-        yield target.Extend('pump-controller', app=NrfApp.PUMP_CONTROLLER)
+    target.AppendModifier('rpc', enable_rpcs=True)
 
-        rpc = target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
-
-        if '-nrf5340dk-' in rpc.name:
-            rpc = rpc.GlobBlacklist(
-                'Compile failure due to pw_build args not forwarded to proto compiler. '
-                'https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
-
-        yield rpc
+    return target
 
 
 def BuildAndroidTarget():
@@ -649,13 +644,27 @@ def BuildGenioTarget():
     target.AppendFixedTargets([TargetPart('lighting-app', board=GenioApp.LIGHT)])
     return target
 
+def BuildTelinkTarget():
+    target = BuildTarget('telink', TelinkBuilder)
+    target.AppendFixedTargets([TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
+
+    target.AppendFixedTargets([
+       TargetPart('light', app=TelinkApp.LIGHT),
+       TargetPart('light-switch', app=TelinkApp.SWITCH),
+       TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
+    ])
+
+    return target
+
 
 BUILD_TARGETS = [
     BuildAmebaTarget(),
+    BuildAndroidTarget(),
     BuildBl602Target(),
     BuildBouffalolabTarget(),
     Buildcc13x2x7_26x2x7Target(),
     BuildCyw30739Target(),
+    BuildEfr32Target(),
     BuildEsp32Target(),
     BuildGenioTarget(),
     BuildHostTarget(),
@@ -664,46 +673,10 @@ BUILD_TARGETS = [
     BuildK32WTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),
+    BuildNrfTarget(),
     BuildQorvoTarget(),
     BuildTizenTarget(),
-    BuildAndroidTarget(),
-    BuildEfr32Target(),
+    BuildTelinkTarget(),
 ]
 
 ALL = []
-
-target_generators = [
-    # AmebaTargets(),
-    # Bl602Targets(),
-    # BouffalolabTargets(),
-    # cc13x2x7_26x2x7Targets(),
-    # Cyw30739Targets(),
-    # Esp32Targets(),
-    # GenioTargets(),
-    # HostTargets(),
-    # IMXTargets(),
-    # InfineonTargets(),
-    # K32WTargets(),
-    # MbedTargets(),
-    # MW320Targets(),
-    # QorvoTargets(),
-    # TizenTargets(),
-    # AndroidTargets(),
-    # Efr32Targets(),
-    NrfTargets(),
-]
-
-for generator in target_generators:
-    for target in generator:
-        ALL.append(target)
-
-# Simple targets added one by one
-ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
-                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
-ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
-                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.SWITCH))
-ALL.append(Target('telink-tlsr9518adk80d-ota-requestor', TelinkBuilder,
-                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.OTA_REQUESTOR))
-
-# have a consistent order overall
-ALL.sort(key=lambda t: t.name)
