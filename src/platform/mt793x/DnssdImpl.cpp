@@ -212,7 +212,8 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
@@ -229,7 +230,16 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     {
         error = CHIP_ERROR_INTERNAL;
     }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
     return error;
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 static DNSServiceRef ResolveClient = NULL;

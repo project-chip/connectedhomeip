@@ -1,4 +1,4 @@
-# CHIP ESP32 Lock Example
+# Matter ESP32 Lock Example
 
 This example demonstrates the mapping of OnOff cluster to lock/unlock logic.
 

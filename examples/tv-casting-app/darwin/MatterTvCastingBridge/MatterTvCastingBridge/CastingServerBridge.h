@@ -15,34 +15,18 @@
  *    limitations under the License.
  */
 
+#import "ContentLauncherTypes.h"
 #import "DiscoveredNodeData.h"
+#import "MatterError.h"
+#import "MediaPlaybackTypes.h"
 #import "OnboardingPayload.h"
+#import "TargetNavigatorTypes.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CastingServerBridge_h
 #define CastingServerBridge_h
 
 @interface CastingServerBridge : NSObject
-
-@property void (^_Nonnull commissioningCompleteCallback)(bool);
-
-@property void (^_Nonnull contentLauncher_launchUrlResponseCallback)(bool);
-@property void (^_Nonnull levelControl_stepResponseCallback)(bool);
-@property void (^_Nonnull levelControl_moveToLevelResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_playResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_pauseResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_stopPlaybackResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_nextResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_seekResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_skipForwardResponseCallback)(bool);
-@property void (^_Nonnull mediaPlayback_skipBackwardResponseCallback)(bool);
-@property void (^_Nonnull applicationLauncher_launchAppResponseCallback)(bool);
-@property void (^_Nonnull applicationLauncher_stopAppResponseCallback)(bool);
-@property void (^_Nonnull applicationLauncher_hideAppResponseCallback)(bool);
-@property void (^_Nonnull targetNavigator_navigateTargetResponseCallback)(bool);
-@property void (^_Nonnull keypadInput_sendKeyResponseCallback)(bool);
-
-@property OnboardingPayload * _Nonnull onboardingPayload;
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
 
@@ -110,7 +94,7 @@
     commissioningWindowRequestedHandler:(void (^_Nonnull)(bool))commissioningWindowRequestedHandler;
 
 /*!
- @brief Send a Content Launcher:LaunchURL request to a TV
+ @brief Send a ContentLauncher:LaunchURL request to a TV
 
  @param contentUrl URL of the content to launch on the TV
 
@@ -127,6 +111,53 @@
                  responseCallback:(void (^_Nonnull)(bool))responseCallback
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a ContentLauncher:LaunchContent request to a TV
+
+ @param contentSearch Indicates the content to launch
+
+ @param autoPlay Play Best match automatically if true, otherwise display matches
+
+ @param data App specific data to be passed to the TV
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)contentLauncher_launchContent:(ContentLauncher_ContentSearch * _Nonnull)contentSearch
+                             autoPlay:(bool)autoPlay
+                                 data:(NSString * _Nullable)data
+                     responseCallback:(void (^_Nonnull)(bool))responseCallback
+                          clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Subscribe to ContentLauncher:SupportedStreamingProtocols
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)contentLauncher_subscribeSupportedStreamingProtocols:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                                          requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                                             successCallback:(void (^_Nonnull)(uint32_t))successCallback
+                                             failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+                             subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
 
 /*!
  @brief Send a LevelControl:Step request to a TV
@@ -180,6 +211,81 @@
                 responseCallback:(void (^_Nonnull)(bool))responseCallback
                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Subscribe to LevelControl:CurrentLevel
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)levelControl_subscribeCurrentLevel:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                        requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                           successCallback:(void (^_Nonnull)(NSNumber * _Nullable))successCallback
+                           failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+           subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to LevelControl:MinLevel
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)levelControl_subscribeMinLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                       successCallback:(void (^_Nonnull)(uint8_t))successCallback
+                       failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+       subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to LevelControl:MaxLevel
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)levelControl_subscribeMaxLevel:(uint16_t)minInterval
+                           maxInterval:(uint16_t)maxInterval
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                       successCallback:(void (^_Nonnull)(uint8_t))successCallback
+                       failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+       subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
 
 /*!
  @brief Send a MediaPlayback:Play request to a TV
@@ -282,6 +388,180 @@
                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
+ @brief Subscribe to MediaPlayback:CurrentState
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeCurrentState:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                         requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                            successCallback:(void (^_Nonnull)(MediaPlayback_PlaybackState))successCallback
+                            failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+            subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:StartTime
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeStartTime:(uint16_t)minInterval
+                             maxInterval:(uint16_t)maxInterval
+                             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                      requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                         successCallback:(void (^_Nonnull)(NSNumber * _Nullable))successCallback
+                         failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+         subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:Duration
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeDuration:(uint16_t)minInterval
+                            maxInterval:(uint16_t)maxInterval
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                     requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                        successCallback:(void (^_Nonnull)(NSNumber * _Nullable))successCallback
+                        failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+        subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:SampledPosition
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeSampledPosition:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                            requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                               successCallback:(void (^_Nonnull)(MediaPlayback_PlaybackPosition * _Nullable))successCallback
+                               failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+               subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:PlaybackSpeed
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribePlaybackSpeed:(uint16_t)minInterval
+                                 maxInterval:(uint16_t)maxInterval
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                          requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                             successCallback:(void (^_Nonnull)(float))successCallback
+                             failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+             subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:SeekRangeEnd
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeSeekRangeEnd:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                         requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                            successCallback:(void (^_Nonnull)(NSNumber * _Nullable))successCallback
+                            failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+            subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to MediaPlayback:SeekRangeStart
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)mediaPlayback_subscribeSeekRangeStart:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                           requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                              successCallback:(void (^_Nonnull)(NSNumber * _Nullable))successCallback
+                              failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+              subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+/*!
  @brief Send a ApplicationLauncher:LaunchApp request to a TV
 
  @param catalogVendorId CSA-issued vendor ID for the catalog
@@ -362,6 +642,56 @@
                     requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
+ @brief Subscribe to TargetNavigator:TargetList
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)targetNavigator_subscribeTargetList:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                         requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                            successCallback:(void (^_Nonnull)(NSMutableArray * _Nullable))successCallback
+                            failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+            subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to TargetNavigator:CurrentTarget
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)targetNavigator_subscribeCurrentTarget:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                            requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                               successCallback:(void (^_Nonnull)(uint8_t))successCallback
+                               failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+               subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
  @brief Send a KeypadInput:SendKey request to a TV
 
  @param keyCode Key Code to process. If a second SendKey request with the same KeyCode value is received within 200ms, then the
@@ -379,6 +709,130 @@
                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
+/*!
+ @brief Subscribe to ApplicationBasic:VendorName
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)applicationBasic_subscribeVendorName:(uint16_t)minInterval
+                                 maxInterval:(uint16_t)maxInterval
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                          requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                             successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                             failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+             subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to ApplicationBasic:VendorID
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)applicationBasic_subscribeVendorID:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                        requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                           successCallback:(void (^_Nonnull)(NSNumber * _Nonnull))successCallback
+                           failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+           subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to ApplicationBasic:ApplicationName
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)applicationBasic_subscribeApplicationName:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                               requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                                  successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                                  failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+                  subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to ApplicationBasic:ProductID
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)applicationBasic_subscribeProductID:(uint16_t)minInterval
+                                maxInterval:(uint16_t)maxInterval
+                                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                         requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                            successCallback:(void (^_Nonnull)(uint16_t))successCallback
+                            failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+            subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
+
+/*!
+ @brief Subscribe to ApplicationBasic:ApplicationVersion
+
+ @param minInterval Minimum interval between attribute read reports
+
+ @param maxInterval Maximum interval between attribute read reports
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+
+ @param subscriptionEstablishedCallback Callback for when the requested subscription has been established successfully
+ */
+- (void)applicationBasic_subscribeApplicationVersion:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                         clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                                  requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                                     successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                                     failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+                     subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
 @end
 
 #endif /* CastingServerBridge_h */
