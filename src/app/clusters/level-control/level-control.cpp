@@ -73,10 +73,10 @@ static constexpr size_t kLevelControlStateTableSize =
 
 struct CallbackScheduleState
 {
-    System::Clock::Timestamp idealTimestamp;    // The ideal time-stamp for the next callback to be scheduled.
-    System::Clock::Milliseconds32 runTime;      // The duration of the previous scheduled callback function.
-                                                // e.g. running time of emberAfLevelControlClusterServerTickCallback
-                                                // when called consecutively
+    System::Clock::Timestamp idealTimestamp; // The ideal time-stamp for the next callback to be scheduled.
+    System::Clock::Milliseconds32 runTime;   // The duration of the previous scheduled callback function.
+                                             // e.g. running time of emberAfLevelControlClusterServerTickCallback
+                                             // when called consecutively
 };
 
 typedef struct
@@ -132,7 +132,7 @@ static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedu
     const auto currentTime = System::SystemClock().GetMonotonicTimestamp();
 
     // Subsequent call
-    if(callbackSchedule.runTime)
+    if (callbackSchedule.runTime)
     {
         // Check whether the previous scheduled callback was late and whether its running time
         // is smaller than the desired delay
@@ -731,7 +731,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
     state->storedLevel = storedLevel;
 
-    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
@@ -859,7 +859,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     // storedLevel is not used for Move commands.
     state->storedLevel = INVALID_STORED_LEVEL;
 
-    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
@@ -987,7 +987,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     // storedLevel is not used for Step commands
     state->storedLevel = INVALID_STORED_LEVEL;
 
-    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
