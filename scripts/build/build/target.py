@@ -27,7 +27,7 @@
 #  - imx-thermostat-release: a 'thermostat` build for imx, with a `release` modifier applied
 #
 # Interpretation of a specific string of `a-b-c-d`  is left up to the Builder/platform
-# as there is no direct convention at this time that an application/variant may not contain 
+# as there is no direct convention at this time that an application/variant may not contain
 # a `-`. So `a-b-c-d` may for example mean any of:
 #   - platform 'a', application 'b', modifiers 'c' and 'd'
 #   - platform 'a', board 'b', application 'c-d'
@@ -64,7 +64,6 @@ class TargetPart:
     def __init__(self, name, **kargs):
         self.name = name
         self.build_arguments = kargs
-
 
     def OnlyIfRe(self, expr: str):
         self.only_if_re = re.compile(expr)
@@ -107,6 +106,7 @@ def _HasVariantPrefix(value: str, prefix: str):
         _HasVariantPrefix('foo-bar-baz', 'bar') # -> None
     """
 
+
 def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[list[TargetPart]], modifiers: list[TargetPart]):
     """Given an input string, process through all the input rules and return
        the underlying list of target parts for the input.
@@ -132,7 +132,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[
             if suffix is None:
                 continue
 
-            # see if match should be rejected. Done AFTER variant prefix detection so we 
+            # see if match should be rejected. Done AFTER variant prefix detection so we
             # can log if there are issues
             if not target.Accept(full_input):
                 continue
@@ -151,10 +151,10 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[
         if suffix is None:
             continue
 
-        # see if match should be rejected. Done AFTER variant prefix detection so we 
+        # see if match should be rejected. Done AFTER variant prefix detection so we
         # can log if there are issues
         if not target.Accept(full_input):
-           continue
+            continue
 
         result = _StringIntoParts(full_input, suffix, fixed_targets[1:], filter(lambda x: x != modifier, modifiers))
         if result:
@@ -216,7 +216,6 @@ class BuildTarget:
         """
         self.fixed_targets.append(parts)
 
-
     def AppendModifier(self, part: TargetPart):
         """Appends a specific modifier to a build target. For example:
 
@@ -227,15 +226,13 @@ class BuildTarget:
         """
         self.modifiers.append(part)
 
-
     def StringIntoTargetParts(self, value: str):
         """Given an input string, process through all the input rules and return
            the underlying list of target parts for the input.
         """
         return _StringIntoParts(value, value, self.fixed_targets, self.modifiers)
 
-
-    def Create(self, name:str, runner, repository_path: str, output_prefix: str,
+    def Create(self, name: str, runner, repository_path: str, output_prefix: str,
                enable_flashbundle: bool):
 
         parts = self.StringIntoTargetParts(name)
@@ -255,7 +252,3 @@ class BuildTarget:
         builder.enable_flashbundle(enable_flashbundle)
 
         return builder
-
-
-
-

@@ -38,7 +38,6 @@ from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
 
 
-
 class Target:
     """Represents a build target:
         Has a name identifier plus parameters on how to build it (what

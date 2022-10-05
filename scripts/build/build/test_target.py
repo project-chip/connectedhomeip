@@ -44,7 +44,6 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNotNone(t.StringIntoTargetParts('bar'))
         self.assertIsNone(t.StringIntoTargetParts('baz'))
 
-
     def test_fixed_targets(self):
 
         t = BuildTarget('fake', FakeBuilder)
@@ -73,9 +72,8 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNone(t.StringIntoTargetParts('foo'))
         self.assertIsNone(t.StringIntoTargetParts('1-2-3'))
 
-
-
         pass
+
 
 if __name__ == '__main__':
     unittest.main()
