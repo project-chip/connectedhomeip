@@ -530,33 +530,46 @@ def Cyw30739Targets():
                  board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
 
 
-def QorvoTargets():
-    target = Target('qpg', QpgBuilder)
+def BuildQorvoTarget():
+    target = BuildTarget('qpg', QpgBuilder)
 
-    yield target.Extend('lock', board=QpgBoard.QPG6105, app=QpgApp.LOCK)
-    yield target.Extend('light', board=QpgBoard.QPG6105, app=QpgApp.LIGHT)
-    yield target.Extend('shell', board=QpgBoard.QPG6105, app=QpgApp.SHELL)
-    yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('qpg6105', board=QpgBoard.QPG6105),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=QpgApp.LOCK),
+        TargetPart('light', app=QpgApp.LIGHT),
+        TargetPart('shell', app=QpgApp.SHELL),
+        TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
+    ])
+
+    return target
 
 
-def TizenTargets():
+def BuildTizenTarget():
+    target = BuildTarget('tizen', TizenBuilder)
 
-    # Possible build variants.
-    # NOTE: The number of potential builds is exponential here.
-    builder = VariantBuilder()
-    builder.AppendVariant(name="no-ble", enable_ble=False)
-    builder.AppendVariant(name="no-wifi", enable_wifi=False)
-    builder.AppendVariant(name="asan", use_asan=True)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('arm', board=TizenBoard.ARM),
+    ])
 
-    target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
+        TargetPart('light', app=TizenApp.LIGHT),
+    ])
 
-    builder.targets.append(target.Extend('all-clusters', app=TizenApp.ALL_CLUSTERS))
-    builder.targets.append(target.Extend('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL))
-    builder.targets.append(target.Extend('chip-tool', app=TizenApp.CHIP_TOOL))
-    builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
+    target.AppendModifier(TargetPart(name="no-ble", enable_ble=False))
+    target.AppendModifier(TargetPart(name="no-wifi", enable_wifi=False))
+    target.AppendModifier(TargetPart(name="asan", use_asan=True))
 
-    for target in builder.AllVariants():
-        yield target
+    return target
 
 
 def BuildBl602Target():
@@ -565,7 +578,7 @@ def BuildBl602Target():
     target.AppendFixedTargets([
        TargetPart('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT),
     ])
-    
+
     return target
 
 
@@ -617,12 +630,14 @@ def BuildGenioTarget():
 
 
 BUILD_TARGETS = [
-    BuildHostTarget(),
-    BuildEsp32Target(),
-    BuildGenioTarget(),
-    BuildIMXTarget(),
     BuildBl602Target(),
     BuildBouffalolabTarget(),
+    BuildEsp32Target(),
+    BuildGenioTarget(),
+    BuildHostTarget(),
+    BuildIMXTarget(),
+    BuildTizenTarget(),
+    BuildQorvoTarget(),
 ]
 
 ALL = []
@@ -639,8 +654,8 @@ target_generators = [
     K32WTargets(),
     cc13x2x7_26x2x7Targets(),
     Cyw30739Targets(),
-    QorvoTargets(),
-    TizenTargets(),
+    #QorvoTargets(),
+    #TizenTargets(),
     #Bl602Targets(),
     #BouffalolabTargets(),
     #IMXTargets(),
