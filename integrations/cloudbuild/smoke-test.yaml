@@ -119,6 +119,7 @@ steps:
                   --target linux-x64-thermostat-ipv6only
                   --target linux-x64-tv-app-ipv6only
                   --target linux-x64-tv-casting-app-ipv6only
+                  build
                   --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
