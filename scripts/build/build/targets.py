@@ -277,11 +277,12 @@ def BuildHostTarget():
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
-        app_parts.append(TargetPart('darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN) )
+        app_parts.append(TargetPart('darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN))
 
     target.AppendFixedTargets(app_parts)
 
-    target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False, crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
+    target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
+                          crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
     target.AppendModifier('libnl', minmdns_address_policy="libnl").OnlyIfRe('-minmdns')
     target.AppendModifier('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)')
@@ -485,10 +486,10 @@ def BuildAmebaTarget():
 
     # apps
     target.AppendFixedTargets([
-       TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
-       TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
-       TargetPart('light', app=AmebaApp.LIGHT),
-       TargetPart('pigweed', app=AmebaApp.PIGWEED),
+        TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('light', app=AmebaApp.LIGHT),
+        TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
     return target
@@ -551,7 +552,6 @@ def BuildCyw30739Target():
     return target
 
 
-
 def BuildQorvoTarget():
     target = BuildTarget('qpg', QpgBuilder)
 
@@ -598,7 +598,7 @@ def BuildBl602Target():
     target = BuildTarget('bl602', Bl602Builder)
 
     target.AppendFixedTargets([
-       TargetPart('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT),
+        TargetPart('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT),
     ])
 
     return target
@@ -607,16 +607,15 @@ def BuildBl602Target():
 def BuildBouffalolabTarget():
     target = BuildTarget('bouffalolab', BouffalolabBuilder)
 
-
     # Boards
     target.AppendFixedTargets([
-       TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-       TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
+        TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
+        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
     ])
 
     # Apps
     target.AppendFixedTargets([
-       TargetPart('light', board=BouffalolabApp.LIGHT),
+        TargetPart('light', board=BouffalolabApp.LIGHT),
     ])
 
     return target
@@ -626,12 +625,12 @@ def BuildIMXTarget():
     target = BuildTarget('imx', IMXBuilder)
 
     target.AppendFixedTargets([
-       TargetPart('chip-tool', app=IMXApp.CHIP_TOOL),
-       TargetPart('lighting-app', app=IMXApp.LIGHT),
-       TargetPart('thermostat', app=IMXApp.THERMOSTAT),
-       TargetPart('all-clusters-app', app=IMXApp.ALL_CLUSTERS),
-       TargetPart('all-clusters-minimal-app', app=IMXApp.ALL_CLUSTERS_MINIMAL),
-       TargetPart('ota-provider-app', app=IMXApp.OTA_PROVIDER),
+        TargetPart('chip-tool', app=IMXApp.CHIP_TOOL),
+        TargetPart('lighting-app', app=IMXApp.LIGHT),
+        TargetPart('thermostat', app=IMXApp.THERMOSTAT),
+        TargetPart('all-clusters-app', app=IMXApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal-app', app=IMXApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('ota-provider-app', app=IMXApp.OTA_PROVIDER),
     ])
 
     target.AppendModifier('release', release=True)
@@ -674,23 +673,23 @@ BUILD_TARGETS = [
 ALL = []
 
 target_generators = [
-    #AmebaTargets(),
-    #Bl602Targets(),
-    #BouffalolabTargets(),
-    #cc13x2x7_26x2x7Targets(),
-    #Cyw30739Targets(),
-    #Esp32Targets(),
-    #GenioTargets(),
-    #HostTargets(),
-    #IMXTargets(),
-    #InfineonTargets(),
-    #K32WTargets(),
-    #MbedTargets(),
-    #MW320Targets(),
-    #QorvoTargets(),
-    #TizenTargets(),
-    #AndroidTargets(),
-    #Efr32Targets(),
+    # AmebaTargets(),
+    # Bl602Targets(),
+    # BouffalolabTargets(),
+    # cc13x2x7_26x2x7Targets(),
+    # Cyw30739Targets(),
+    # Esp32Targets(),
+    # GenioTargets(),
+    # HostTargets(),
+    # IMXTargets(),
+    # InfineonTargets(),
+    # K32WTargets(),
+    # MbedTargets(),
+    # MW320Targets(),
+    # QorvoTargets(),
+    # TizenTargets(),
+    # AndroidTargets(),
+    # Efr32Targets(),
     NrfTargets(),
 ]
 

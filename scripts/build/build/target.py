@@ -221,7 +221,7 @@ class BuildTarget:
         """
         self.fixed_targets.append(parts)
 
-    def AppendModifier(self, name:str, **kargs):
+    def AppendModifier(self, name: str, **kargs):
         """Appends a specific modifier to a build target. For example:
 
         target.AppendModifier(name='release', release=True)
@@ -229,7 +229,7 @@ class BuildTarget:
         target.AppendModifier(name='coverage', coverage=True).OnlyIfRe('-clang')
 
         """
-        part=TargetPart(name, **kargs)
+        part = TargetPart(name, **kargs)
 
         self.modifiers.append(part)
 
