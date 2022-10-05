@@ -94,8 +94,8 @@ void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const Embe
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
-    case Clusters::ColorControl::Attributes::ColorTemperature::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
+    case Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id:
+        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTemperatureMireds::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
@@ -1250,7 +1250,7 @@ CHIP_ERROR ColorControlReadCompensationText(int argc, char ** argv)
 CHIP_ERROR ColorControlReadColorTemperature(int argc, char ** argv)
 {
     BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->attributeId         = Clusters::ColorControl::Attributes::ColorTemperature::Id;
+    data->attributeId         = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id;
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
