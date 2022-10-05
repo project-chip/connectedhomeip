@@ -44,7 +44,7 @@ def BuildHostTarget():
     native_board_name = HostBoard.NATIVE.BoardName()
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (native_board_name != HostBoard.ARM64.BoardName())
 
-    target = BuildTarget(native_board_name, HostBuilder)
+    target = BuildTarget('linux', HostBuilder)
 
     board_parts = [
         TargetPart(native_board_name, board=HostBoard.NATIVE),
@@ -485,5 +485,3 @@ BUILD_TARGETS = [
     BuildTizenTarget(),
     BuildTelinkTarget(),
 ]
-
-ALL = []

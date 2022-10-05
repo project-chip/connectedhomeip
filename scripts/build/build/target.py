@@ -39,6 +39,7 @@
 # but easy enough to follow when defining names for things: just don't reuse names between '-'
 
 import logging
+import os
 import re
 
 from typing import Any, Optional
@@ -267,7 +268,7 @@ class BuildTarget:
         parts = self.StringIntoTargetParts(name)
 
         if not parts:
-            raise Exception(f"Failed to build variant '{name}'")
+            return None
 
         kargs = {}
         for part in parts:
