@@ -1,0 +1,81 @@
+/*******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+
+
+// Default translation
+template <typename T>
+std::optional<T> from_json(const nlohmann::json & value)
+{
+    return std::nullopt;
+}
+
+/***************************** Simple types Convertes **************/
+
+template<> inline
+std::optional<bool> from_json(const nlohmann::json  & value)
+{
+    return value;
+}
+
+template<> inline
+std::optional<int> from_json(const nlohmann::json  & value)
+{
+    return value;
+}
+
+template<> inline
+std::optional<std::string> from_json(const nlohmann::json & value)
+{
+    return value;
+}
+
+
+/***************************** Bitmap Convertes **************/
+//{{#zcl_clusters}}
+//{{#zcl_bitmaps}}
+//template<> inline nlohmann::json to_json(const chip::BitFlags<{{asUpperCamelCase parent.label}}::{{label}}, uint8_t>& value) {
+//    return "{\"no bitmap support\"}";
+//}
+
+{{/zcl_bitmaps}}
+
+/***************************** Struct Convertes **************/
+//{{#zcl_structs}}
+//template<> inline nlohmann::json to_json(const {{asUpperCamelCase parent.label}}::Structs::{{name}}::Type& value) {
+//    return "no struct support";
+//}
+//
+//{{/zcl_structs}}
+
+{{#zcl_enums}}
+
+template<> inline std::optional<{{asUpperCamelCase parent.label}}::{{label}}> from_json(const nlohmann::json& value) {
+    const std::map< std::string, {{asUpperCamelCase parent.label}}::{{label}}> 
+        table = {
+            {{#zcl_enum_items}}
+            { "{{asUpperCamelCase label}}" , {{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}} },
+            {{/zcl_enum_items}}
+        };
+
+    auto i  = table.find( value );
+    if( i != table.end() ) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+
+{{/zcl_enums}}
+
+{{/zcl_clusters}}

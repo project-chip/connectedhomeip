@@ -1,0 +1,99 @@
+/*******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+
+
+// Default translation
+#include <app-common/zap-generated/cluster-objects.h>
+
+template <typename T>
+nlohmann::json inline to_json(const T & value)
+{
+    return __FUNCTION__;
+}
+
+/***************************** Simple types Convertes **************/
+
+template<>
+nlohmann::json inline to_json(const bool & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const int & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const int16_t & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const std::string & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const uint8_t & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const uint16_t & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const uint32_t & value)
+{
+    return value;
+}
+template<>
+nlohmann::json inline to_json(const uint64_t & value)
+{
+    return value;
+}
+
+/***************************** Bitmap Convertes **************/
+{{#zcl_clusters}}
+{{#if (supportedCluster label)}}
+
+/***************************** Bitmap Converter FIXME**************/
+//{{#zcl_bitmaps}}
+//template<> nlohmann::json to_json(const chip::BitFlags<{{asUpperCamelCase parent.label}}::{{label}}, uint8_t>& value) {
+//    return "{\"no bitmap support\"}";
+//}
+//{{/zcl_bitmaps}}
+
+/***************************** Struct Converted FIXME**************/
+//{{#zcl_structs}}
+//template<> nlohmann::json inline to_json(const {{asUpperCamelCase parent.label}}::Structs::{{name}}::Type& value) {
+//    return "no struct support";
+//}
+//{{/zcl_structs}}
+
+{{#zcl_enums}}
+template<> nlohmann::json inline to_json(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}& value) {
+    switch( value ) {
+        {{#zcl_enum_items}}
+        case chip::app::Clusters::{{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}: return "{{asUpperCamelCase label}}";
+        {{/zcl_enum_items}}
+        default: return "{}";
+    }
+}
+
+{{/zcl_enums}}
+
+{{/if}}
+{{/zcl_clusters}}

@@ -20,19 +20,18 @@
  * @{
  */
 #pragma once
-#include "matter.h"
 #include "command_translator_interface.hpp"
+#include "matter.h"
 
-namespace unify::matter_bridge
-{
+namespace unify::matter_bridge {
 class GroupClusterCommandHandler : public command_translator_interface
 {
-  public:
-  GroupClusterCommandHandler(const matter_node_state_monitor& node_state_monitor) : command_translator_interface(node_state_monitor,chip::app::Clusters::Groups::Id,"Groups" ) {}
-  // CommandHandlerInterface
-  void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext
-                       &handlerContext) override;
-
+public:
+    GroupClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
+        command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", uic_mqtt)
+    {}
+    // CommandHandlerInterface
+    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) override;
 };
 
-}  // namespace unify::matter_bridge
+} // namespace unify::matter_bridge

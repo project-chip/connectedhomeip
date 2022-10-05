@@ -55,7 +55,8 @@ function chipSupportedCluster(clusterName) {
    "FlowMeasurement":{}, 
    "OccupancySensing":{}, 
    "IasZone":{}, 
-   "IaswD":{}, 
+   "IaswD":{},
+   "Basic": {}, 
     };
    return clusterName in clusters
 }
@@ -67,6 +68,19 @@ function chipSupportedAttribute(cluster, attribute) {
   switch (cluster + "_" + attribute) {
     case "DoorLock_SecurityLevel": return false
     case "ColorControl_Options": return false
+    case "Basic_ZCLVersion": return false
+    case "Basic_StackVersion": return false
+    case "Basic_GenericDevice-Class": return false
+    case "Basic_GenericDevice-Type": return false
+    case "Basic_ProductCode": return false
+    case "Basic_ManufacturerVersionDetails": return false
+    case "Basic_LocationDescription": return false
+    case "Basic_Basic_PhysicalEnvironment": return false
+    case "Basic_AlarmMask": return false
+    case "Basic_DisableLocalConfig": return false
+    case "Basic_ResetToFactoryDefaults": return false
+    case "Basic_PhysicalEnvironment": return false
+    case "Basic_DeviceEnabled": return false
     default: return true
   }
 }
@@ -82,6 +96,7 @@ function chipSupportedCommands(cluster, command) {
     case "Level_MoveToClosestFrequency": return false
     case "DoorLock_Toggle": return false
     case "Identify_IdentifyQuery": return false
+    case "Basic_ResetToFactoryDefaults": return false
     default: return true
   }
 }
@@ -113,6 +128,17 @@ function chipAttributeConversion(attributeName) {
     case "ZoneID": return "ZoneId"
     case "ColorTemperatureMireds": return "ColorTemperature"
     case "IASCIEAddress": return "IasCieAddress"
+    case "ManufacturerName": return "VendorName"
+    case "ModelIdentifier": return "ProductName"
+    case "HWVersion": return "HardwareVersion"
+    case "ModelIdentifier": return "HardwareVersionString"
+    case "ApplicationVersion": return "SoftwareVersion"
+    case "SWBuildID": return "SoftwareVersionString"
+    case "DateCode": return "ManufacturingDate"
+    case "ProductURL": return "ProductURL"
+    case "ProductLabel": return "ProductLabel"
+    case "SerialNumber": return "SerialNumber"
+    case "ApplicationVersion": return "UniqueID"
     default: return asUpperCamelCase(attributeName)
   }
 }
@@ -151,7 +177,7 @@ function chipClusterConversion(clusterName) {
     case "RelativityHumidity": return "RelativityHumidityMeasurement"
     case "IASWD": return "IasWd"
     case "IASZone": return "IasZone"
-    case "Basic": return "ApplicationBasic"
+    case "Basic": return "BridgedDeviceBasic"
     //case "PowerConfiguration": return "PowerSourceConfiguration"
     default: return asUpperCamelCase(clusterName)
   }

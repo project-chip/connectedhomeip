@@ -33,6 +33,7 @@ namespace app {
 namespace Clusters {
 
 static const std::unordered_map<std::string, chip::ClusterId> unify_cluster_id_map {
+    { "Basic", BridgedDeviceBasic::Id},
     { "Identify", Identify::Id},
     { "Groups", Groups::Id},
     { "Scenes", Scenes::Id},
@@ -46,6 +47,25 @@ static const std::unordered_map<std::string, chip::ClusterId> unify_cluster_id_m
     { "FlowMeasurement", FlowMeasurement::Id},
     { "OccupancySensing", OccupancySensing::Id},
 };
+
+// Attribute mapping Unify->Matter conversion
+// Attribute structure for each cluster
+namespace BridgedDeviceBasic {
+namespace Attributes {
+static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
+    { "ApplicationVersion", SoftwareVersion::Id },
+    { "HwVersion", HardwareVersion::Id },
+    { "ManufacturerName", VendorName::Id },
+    { "ModelIdentifier", ProductName::Id },
+    { "DateCode", ManufacturingDate::Id },
+    { "PowerSource", PowerSource::Id },
+    { "ProductUrL", ProductURL::Id },
+    { "SerialNumber", SerialNumber::Id },
+    { "ProductLabel", ProductLabel::Id },
+    { "SwBuildID", SoftwareVersionString::Id }
+};
+} // namespace Attributes
+} // namespace Basic
 
 // Attribute mapping Unify->Matter conversion
 // Attribute structure for each cluster
@@ -124,7 +144,7 @@ static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_
     { "CurrentY", CurrentY::Id },
     { "DriftCompensation", DriftCompensation::Id },
     { "CompensationText", CompensationText::Id },
-    { "ColorTemperatureMireds", ColorTemperature::Id },
+    { "ColorTemperatureMireds", ColorTemperatureMireds::Id },
     { "ColorMode", ColorMode::Id },
     { "NumberOfPrimaries", NumberOfPrimaries::Id },
     { "Primary1X", Primary1X::Id },
@@ -238,6 +258,7 @@ static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_
 
 // Global map of each clusters attributes
 static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> unify_to_matter_attribute_id_map {
+    { "Basic",  BridgedDeviceBasic::Attributes::unify_to_matter_attribute_id_cluster_map },
     { "Identify",  Identify::Attributes::unify_to_matter_attribute_id_cluster_map },
     { "Groups",  Groups::Attributes::unify_to_matter_attribute_id_cluster_map },
     { "Scenes",  Scenes::Attributes::unify_to_matter_attribute_id_cluster_map },
@@ -255,6 +276,12 @@ static const std::unordered_map<std::string, std::unordered_map<std::string, chi
 
 // Command mapping Unify->Matter conversion
 // Command structure for each cluster
+namespace BridgedDeviceBasic {
+namespace Commands {
+static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
+};
+} // namespace Commands
+} // namespace Basic
 namespace Identify {
 namespace Commands {
 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
@@ -345,6 +372,7 @@ static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_co
 
 // Global map of each clusters commands
 static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> unify_to_matter_command_id_map {
+    { "Basic",  BridgedDeviceBasic::Commands::unify_to_matter_command_id_cluster_map },
     { "Identify",  Identify::Commands::unify_to_matter_command_id_cluster_map },
     { "Groups",  Groups::Commands::unify_to_matter_command_id_cluster_map },
     { "Scenes",  Scenes::Commands::unify_to_matter_command_id_cluster_map },

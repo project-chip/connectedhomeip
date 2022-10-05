@@ -1,6 +1,21 @@
+# ******************************************************************************
+# * # License
+# * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
+# ******************************************************************************
+# * The licensor of this software is Silicon Laboratories Inc. Your use of this
+# * software is governed by the terms of Silicon Labs Master Software License
+# * Agreement (MSLA) available at
+# * www.silabs.com/about-us/legal/master-software-license-agreement. This
+# * software is distributed to you in Source Code format and is governed by the
+# * sections of the MSLA applicable to Source Code.
+# *
+# ******************************************************************************
+
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/config/linux/pkg_config.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
 
 assert(chip_build_tools)
 
@@ -8,14 +23,22 @@ pkg_config("unify") {
   packages = [ "libunify" ]
 }
 
-executable("unify-matter-bridge") {
+config("unify-config") {
   include_dirs = [
     "src",
     "src/cluster_translator",
     "src/device_type_mapper",
     "src/matter_node_state_monitor",
+    "src/matter_wrappers",
     "include",
+    "zap-handlers/gen"
   ]
+
+  ldflags = [ "-lboost_system" ]
+  
+}
+
+static_library("unify-matter-bridge-lib") {
 
   sources = [
     "src/matter_data_storage.cpp",
@@ -23,31 +46,51 @@ executable("unify-matter-bridge") {
     "src/cluster_translator/bridged_device_basic_info_attribute_translator.cpp",
     "src/cluster_translator/group_command_translator.cpp",
     "src/cluster_translator/group_translator.cpp",
-    "src/cluster_translator/identify_attribute_translator.cpp",
-    "src/cluster_translator/identify_command_translator.cpp",
-
-    #"src/cluster_translator/level_attribute_translator.cpp",
-    #"src/cluster_translator/level_command_translator.cpp",
-    "src/cluster_translator/on_off_attribute_translator.cpp",
-    "src/cluster_translator/on_off_command_translator.cpp",
     "src/demo_uic_cli.cpp",
     "src/device_type_mapper/matter_device_translator.cpp",
     "src/device_type_mapper/matter_device_types_clusters_list_updated.inc",
     "src/dummy.cpp",
     "src/matter_bridge_config.c",
-    "src/matter_bridge_main.cpp",
+    "src/matter_bridge_cli.cpp",
     "src/matter_node_state_monitor/matter_cluster_interactor.cpp",
     "src/matter_node_state_monitor/matter_endpoint_builder.cpp",
     "src/matter_node_state_monitor/matter_node_state_monitor.cpp",
+    "zap-handlers/gen/command_translator.cpp",
+    "zap-handlers/gen/attribute_translator.cpp",
+    "zap-handlers/gen/unify_accessors.cpp",
+    "src/uic_mqtt_wrapper.cpp"
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "//../unify-matter-bridge-common",
   ]
-  configs += [ ":unify" ]
+   
+  output_dir = root_out_dir
+
+  public_configs = [ ":unify-config" , ":unify" ]
+
+}
+
+executable("unify-matter-bridge") {
+  sources = [
+    "src/matter_bridge_main.cpp",
+  ]
+
+  deps = [
+    ":unify-matter-bridge-lib"
+  ]
 }
 
 group("linux") {
   deps = [ ":unify-matter-bridge" ]
+}
+
+
+if (chip_build_tests) {
+  group("check") {
+    deps = [
+      "//src/tests",
+    ]
+  }
 }

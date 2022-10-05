@@ -13,76 +13,34 @@
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+
+// Matter includes
 #include "matter.h"
+// Unify bridge components
 #include "matter_node_state_monitor.hpp"
 #include "matter_cluster_interactor.hpp"
 #include "matter_device_translator.hpp"
 #include "matter_endpoint_builder.hpp"
 #include "matter_data_storage.hpp"
+// Unify lib components 
 #include "sl_log.h"
-static constexpr uint8_t ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL = 0;
+namespace unify::zap_types {
+  #include "zap-types.h"
+}
+
 constexpr const char *LOG_TAG = "matter_node_state_monitor";
-namespace
-{
-using namespace unify::matter_bridge;
-
-/**
- * @brief the first endpoint ids inside matter are reserved for fixed endpoints.
- * This function is able to return the next available endpoint which can be used
- * to declare a dynamic endpoint with.
- *
- * @return the next available EndpointId which can be used for 
- */
-static chip::EndpointId get_next_ember_endpoint_id()
-{
-  static chip::EndpointId current_id = FIXED_ENDPOINT_COUNT;
-
-  if (current_id >= MAX_ENDPOINT_COUNT) {
-    return 0xffff;
-  } else {
-    return current_id++;
-  }
-}
-
-/**
- * @brief registers a bridged_endpoint to matter.
- */
-static void register_dynamic_endpoint(const bridged_endpoint &bridge)
-{
-  EmberAfStatus status = emberAfSetDynamicEndpoint(
-    bridge.index,
-    bridge.matter_endpoint,
-    const_cast<EmberAfEndpointType *>(*bridge.ember_endpoint),
-    bridge.ember_endpoint.data_version_span(),
-    bridge.ember_endpoint.device_type_span(bridge.matter_type),
-    0);
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    sl_log_error(
-      LOG_TAG,
-      "The unify node [%s] is not added on matter bridge as a dynamic endpoint",
-      bridge.unify_unid.c_str());
-  }
-  if (status == EMBER_ZCL_STATUS_INSUFFICIENT_SPACE) {
-    sl_log_error(LOG_TAG,
-                 "There are not sufficient space to add the unify node [%s] on "
-                 "matter fabric domain",
-                 bridge.unify_unid.c_str());
-  }
-}
-}  // namespace
-
 namespace unify::matter_bridge
 {
 matter_node_state_monitor::matter_node_state_monitor(
-  const class device_translator &translator) :
-  matter_device_translator(translator)
+  const class device_translator &translator, UnifyEmberInterface &ember_interface) :
+  matter_device_translator(translator), unify_ember_interface(ember_interface)
 {
   // Disable last fixed endpoint, which is used as a placeholder for all of the
   // supported clusters so that ZAP will generated the requisite code.
-  emberAfEndpointEnableDisable(
-    emberAfEndpointFromIndex(emberAfFixedEndpointCount() - 1),
+  auto endpoints_count = unify_ember_interface.emberAfFixedEndpointCountUnify();
+  unify_ember_interface.emberAfEndpointEnableDisableUnify(
+    unify_ember_interface.emberAfEndpointFromIndexUnify(endpoints_count - 1),
     false);
-
   unify::node_state_monitor::node_state_monitor::get_instance().set_interface(
     this);
 }
@@ -122,30 +80,38 @@ void matter_node_state_monitor::on_unify_node_added(
     if (status_persisted_endpoint_map) {
       bridge.matter_endpoint = unify_node.matter_endpoint.value();
     } else {
-      bridge.matter_endpoint = get_next_ember_endpoint_id();
+      bridge.matter_endpoint = unify_ember_interface.getNextDynamicAvailableEndpointIndex();
       matter_data_storage::endpoint_mapping endpoint_map_info
         = {bridge.unify_unid.c_str(),
            bridge.unify_endpoint,
            bridge.matter_endpoint};
       matter_data_storage::instance().persist_data(endpoint_map_info);
     }
-    bridge.index = bridge.matter_endpoint - emberAfFixedEndpointCount();
+    
+    // The bridge.matter_endpoint is then next available endpoint. The index
+    // when registered will be added by FIXED_ENDPOINT_COUNT. Which is why we
+    // substract it first.
+    bridge.index = bridge.matter_endpoint - unify_ember_interface.emberAfFixedEndpointCountUnify();
+    
+    // Update or add the bridged endpoint
+    erase_mapper_endpoint(node.unid, bridge.matter_endpoint);
     auto new_ep
       = bridged_endpoints.insert(make_pair(node.unid, std::move(bridge)));
+    
     register_dynamic_endpoint(new_ep->second);
     invoke_listeners(new_ep->second, NODE_ADDED);
     //When the node is online we also invoke that the node state is reachable
     new_ep->second.reachable
-      = (node.state == ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL);
+      = (node.state == unify::zap_types::ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL);
     invoke_listeners(new_ep->second, update_t::NODE_STATE_CHANGED);
   }
-}  // namespace unify::matter_bridge
+} 
 
 void matter_node_state_monitor::on_unify_node_removed(const std::string &unid)
 {
   const auto &[start, end] = bridged_endpoints.equal_range(unid);
   for (auto ep = start; ep != end; ep++) {
-    emberAfClearDynamicEndpoint(ep->second.index);
+    unify_ember_interface.emberAfClearDynamicEndpointUnify(ep->second.index);
     // delete the persisted endpoint map entry
     matter_data_storage::endpoint_mapping unify_node
       = {ep->second.unify_unid.c_str(), ep->second.unify_endpoint};
@@ -161,7 +127,7 @@ void matter_node_state_monitor::on_unify_node_state_changed(
   const auto &[start, end] = bridged_endpoints.equal_range(node.unid);
   for (auto ep = start; ep != end; ep++) {
     ep->second.reachable
-      = (node.state == ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL);
+      = (node.state == unify::zap_types::ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL);
     invoke_listeners(ep->second, update_t::NODE_STATE_CHANGED);
   }
 }
@@ -202,6 +168,49 @@ void matter_node_state_monitor::register_event_listener(
   const event_listener_t &event_listener)
 {
   event_listeners.push_back(event_listener);
+}
+
+void matter_node_state_monitor::erase_mapper_endpoint(const std::string unid, chip::EndpointId endpoint) 
+{
+  const auto &[start, end] = bridged_endpoints.equal_range(unid);
+  for (auto ep = start; ep != end; ep++) {
+    if (ep->second.matter_endpoint == endpoint) {
+      bridged_endpoints.erase(ep);
+      return;
+    }
+  }
+}
+
+void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_endpoint &bridge)
+{
+  uint16_t index = unify_ember_interface.emberAfGetDynamicIndexFromEndpointUnify(bridge.matter_endpoint);
+  if (index != kEmberInvalidEndpointIndex) {
+    chip::EndpointId ep = unify_ember_interface.emberAfClearDynamicEndpointUnify(index);
+    if (ep != bridge.matter_endpoint) {
+      sl_log_error(LOG_TAG, "The endpoint %d is not cleared from the dynamic endpoint index %d", bridge.matter_endpoint, index);
+    }
+    sl_log_debug(LOG_TAG, "Dynamic endpoint already exists for bridge endpoint %d. Cleared out the endpoint to replace it.", bridge.matter_endpoint);
+  }
+  
+  EmberAfStatus status = unify_ember_interface.emberAfSetDynamicEndpointUnify(
+    bridge.index,
+    bridge.matter_endpoint,
+    const_cast<EmberAfEndpointType *>(*bridge.ember_endpoint),
+    bridge.ember_endpoint.data_version_span(),
+    bridge.ember_endpoint.device_type_span(bridge.matter_type),
+    1);
+  if (status != EMBER_ZCL_STATUS_SUCCESS) {
+        sl_log_error(
+      LOG_TAG,
+        "The unify node [%s] is not added on matter bridge as a dynamic endpoint",
+      bridge.unify_unid.c_str());
+  }
+  if (status == EMBER_ZCL_STATUS_INSUFFICIENT_SPACE) {
+    sl_log_error(LOG_TAG,
+                "There are not sufficient space to add the unify node [%s] on "
+                "matter fabric domain",
+                bridge.unify_unid.c_str());
+  }
 }
 
 }  // namespace unify::matter_bridge

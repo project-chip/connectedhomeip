@@ -28,8 +28,8 @@ namespace unify::matter_bridge
 class cluster_interactor
 {
   public:
-  cluster_interactor(const device_translator &translator,
-                     matter_endpoint_builder &endpoint_builder);
+  cluster_interactor(const device_translator &_translator,
+                     matter_endpoint_builder &_endpoint_builder);
   std::optional<uint16_t> get_matter_type() const;
 
   void build_matter_cluster(

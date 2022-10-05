@@ -19,54 +19,54 @@
  *
  * @{
  */
- 
+
 #ifndef MATTER_CLUSTER_TRANSLATOR_HPP
 #define MATTER_CLUSTER_TRANSLATOR_HPP
 
-#include <app/CommandHandlerInterface.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
 
-
-namespace unify::matter_bridge
+namespace unify::matter_bridge {
+/**
+ * The purpose of the cluster translator is to handle read/write attribute
+ * calls as well as matter commands. Since the matter data model and the UIC
+ * data model are very similar we will generally be able to do a 1-1
+ * translation.
+ *
+ * The translator has a ZAP generated handler, which implements a generic
+ * handler for all clusters which is able to send translate Matter commands
+ * into mqtt messages. The translator uses
+ * `InteractionModelEngine::RegisterCommandHandler` to register itself with
+ * the matter application framework. As the default behavior the translator
+ * will directly translate the matter command into a unify mqtt command.
+ *
+ * The translator will also handle attribute read and attribute writes. For
+ * attributes the translator uses the system
+ * `registerAttributeAccessOverride, when an attribute read is requested the
+ * Unify Reported value should be reported when an attribute write is
+ * requested the corresponding /WriteAttribute command is published on the
+ * mqtt side.
+ *
+ * The Unify Cluster translator is not required to check the capabilities of
+ * a node before sending WriteAttributes or other commands.
+ *
+ */
+class matter_cluster_translator
 {
-  /**
-    * The purpose of the cluster translator is to handle read/write attribute
-    * calls as well as matter commands. Since the matter data model and the UIC
-    * data model are very similar we will generally be able to do a 1-1
-    * translation.
-    *
-    * The translator has a ZAP generated handler, which implements a generic
-    * handler for all clusters which is able to send translate Matter commands
-    * into mqtt messages. The translator uses
-    * `InteractionModelEngine::RegisterCommandHandler` to register itself with
-    * the matter application framework. As the default behavior the translator
-    * will directly translate the matter command into a unify mqtt command.
-    *
-    * The translator will also handle attribute read and attribute writes. For
-    * attributes the translator uses the system
-    * `registerAttributeAccessOverride, when an attribute read is requested the
-    * Unify Reported value should be reported when an attribute write is
-    * requested the corresponding /WriteAttribute command is published on the
-    * mqtt side.
-    *
-    * The Unify Cluster translator is not required to check the capabilities of
-    * a node before sending WriteAttributes or other commands.
-    *
-   */
-  class matter_cluster_translator {
 
     /**
      * @brief Register access an interface to a cluster
-     * 
+     *
      * Register a cluster translator.
-     * 
-     * @param command_handler 
-     * @param attribute_access 
+     *
+     * @param command_handler
+     * @param attribute_access
      * @return true on success
      */
-    bool register_cluster(chip::ClusterId, const CommandHandlerInterface& command_handler, const AttributeAccessInterface& attribute_access);
-  }
-
+    bool register_cluster(chip::ClusterId, const CommandHandlerInterface & command_handler,
+                          const AttributeAccessInterface & attribute_access);
 }
-#endif  //MATTER_CLUSTER_TRANSLATOR_HPP
+
+} // namespace unify::matter_bridge
+#endif // MATTER_CLUSTER_TRANSLATOR_HPP
 /** @} end matter_cluster_translator */

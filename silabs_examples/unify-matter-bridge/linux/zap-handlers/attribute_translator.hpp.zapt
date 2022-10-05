@@ -24,12 +24,14 @@
 
 namespace unify::matter_bridge
 {
-class OnOffAttributeAccess : public attribute_translator_interface
+{{#zcl_clusters}}
+
+class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_interface
 {
   public:
-  OnOffAttributeAccess(matter_node_state_monitor &node_state_monitor) :
+  {{asUpperCamelCase label}}AttributeAccess(matter_node_state_monitor &node_state_monitor) :
     attribute_translator_interface(node_state_monitor,
-                                   chip::app::Clusters::OnOff::Id)
+                                   chip::app::Clusters::{{asUpperCamelCase label}}::Id)
   {}
 
   CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath &aPath,
@@ -38,16 +40,13 @@ class OnOffAttributeAccess : public attribute_translator_interface
                    chip::app::AttributeValueDecoder &aDecoder) override;
 
   private:
-  CHIP_ERROR
-  ReadAttributeState(const chip::app::ConcreteReadAttributePath &aPath,
-                     chip::app::AttributeValueEncoder &aEncoder);
-
   void reported_updated(const bridged_endpoint *ep,
                         const std::string& cluster,
                         const std::string& attribute,
                         const nlohmann::json &unify_value) override;
 
-   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "OnOff" });}
+   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{asUpperCamelCase label}}" });}
 };
 
+{{/zcl_clusters}}
 }  // namespace unify::matter_bridge

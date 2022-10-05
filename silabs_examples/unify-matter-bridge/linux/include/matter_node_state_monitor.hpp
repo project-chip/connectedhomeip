@@ -14,14 +14,14 @@
 #ifndef MATTER_NODE_STATE_MONITOR_HPP
 #define MATTER_NODE_STATE_MONITOR_HPP
 
-#include <string>
-#include "unify_node_state_monitor.hpp"
 #include "matter_context.hpp"
-#include <optional>
+#include "unify_ember_interface.hpp"
+#include "unify_node_state_monitor.hpp"
 #include <map>
+#include <optional>
+#include <string>
 
-namespace unify::matter_bridge
-{
+namespace unify::matter_bridge {
 class device_translator;
 
 /**
@@ -31,102 +31,98 @@ class device_translator;
  * matter endpoints to a unify endpoint
  *
  */
-struct bridged_endpoint {
-  /// the unid of the bridged endpoint
-  ///
-  std::string unify_unid;
+struct bridged_endpoint
+{
+    /// the unid of the bridged endpoint
+    ///
+    std::string unify_unid;
 
-  /// the unify endpoint number
-  ///
-  uint8_t unify_endpoint;
+    /// the unify endpoint number
+    ///
+    uint8_t unify_endpoint;
 
-  /// the endpoint id assigned on the matter bridge
-  ///
-  chip::EndpointId matter_endpoint;
+    /// the endpoint id assigned on the matter bridge
+    ///
+    chip::EndpointId matter_endpoint;
 
-  /// the index that holds the matter endpoint in
-  /// memory
-  uint16_t index;
+    /// the index that holds the matter endpoint in
+    /// memory
+    uint16_t index;
 
-  /// Matter Device type of the endpoint
-  ///
-  uint16_t matter_type;
+    /// Matter Device type of the endpoint
+    ///
+    uint16_t matter_type;
 
-  /// the ember endpoint structure, this will contain
-  /// the complete cluster list
-  matter_endpoint_context ember_endpoint;
+    /// the ember endpoint structure, this will contain
+    /// the complete cluster list
+    matter_endpoint_context ember_endpoint;
 
-  /// Tells if the node is reachable, ie it is possible to communicate with the
-  /// device it may be that the node is a non-listening device, so it could be
-  /// that the communication latency is very high
-  bool reachable;
+    /// Tells if the node is reachable, ie it is possible to communicate with the
+    /// device it may be that the node is a non-listening device, so it could be
+    /// that the communication latency is very high
+    bool reachable;
 
-  bridged_endpoint(matter_endpoint_context &&context) :
-    ember_endpoint(std::move(context))
-  {}
+    bridged_endpoint(matter_endpoint_context && context) : ember_endpoint(std::move(context)) {}
 };
 
 /**
-   * @brief Matter node state monitor
-   * 
-   * The matter nodestate monitor is responsible for using a unify_node_state_monitor
-   * to check when new unify nodes has been added to-  or removed from- the network and
-   * then crating a set of bridged endpoints. 
-   *
-   * As this components is the first point of contact between the Matter world
-   * and the unify world, the node state monitor also provides a translation between
-   * matter endpoints ids and the unify (unid,epid) tuple.
-   * 
-   */
-class matter_node_state_monitor :
-  private unify::node_state_monitor::node_state_monitor_interface
+ * @brief Matter node state monitor
+ *
+ * The matter nodestate monitor is responsible for using a unify_node_state_monitor
+ * to check when new unify nodes has been added to-  or removed from- the network and
+ * then crating a set of bridged endpoints.
+ *
+ * As this components is the first point of contact between the Matter world
+ * and the unify world, the node state monitor also provides a translation between
+ * matter endpoints ids and the unify (unid,epid) tuple.
+ *
+ */
+class matter_node_state_monitor : private unify::node_state_monitor::node_state_monitor_interface
 {
-  public:
-  matter_node_state_monitor(const device_translator &matter_device_translator);
+public:
+    matter_node_state_monitor(const device_translator & matter_device_translator, UnifyEmberInterface & ember_interface);
 
-  /**
+    /**
      * @brief Get the bridged endpoint by object from unify addresses
-     * 
-     * @param unid 
-     * @param epid 
-     * @return const bridged_endpoint& 
+     *
+     * @param unid
+     * @param epid
+     * @return const bridged_endpoint&
      */
-  const struct bridged_endpoint *bridged_endpoint(const std::string &unid,
-                                                  int epid) const;
-  /**
+    const struct bridged_endpoint * bridged_endpoint(const std::string & unid, int epid) const;
+    /**
      * @brief Get the unify endpoint address from a matter endpoint id
-     * 
-     * @return std::pair<std::string unid, int epid> 
+     *
+     * @return std::pair<std::string unid, int epid>
      */
-  const struct bridged_endpoint *
-    bridged_endpoint(chip::EndpointId endpoint) const;
+    virtual const struct bridged_endpoint * bridged_endpoint(chip::EndpointId endpoint) const;
 
-  enum update_t {
-    NODE_ADDED,         //<<< A node has been added (or just found)
-    NODE_DELETED,       ///<<< A node has been deleted
-    NODE_STATE_CHANGED  /// A node has changed its reachable state
-  };
+    enum update_t
+    {
+        NODE_ADDED,        //<<< A node has been added (or just found)
+        NODE_DELETED,      ///<<< A node has been deleted
+        NODE_STATE_CHANGED /// A node has changed its reachable state
+    };
 
-  /**
-   * @brief Callback function for event notifications
-   * 
-   */
-  using event_listener_t
-    = std::function<void(const struct bridged_endpoint &, update_t)>;
+    /**
+     * @brief Callback function for event notifications
+     *
+     */
+    using event_listener_t = std::function<void(const struct bridged_endpoint &, update_t)>;
 
-  /**
-   * @brief Register an event listener with the node state monitor
-   * 
-   * An event listener may be registered with the node state monitor allowing a user 
-   * to get notified when certain events occur.
-   * 
-   * @param event_listener Callback function to be called
-   */
-  void register_event_listener(const event_listener_t &event_listener);
+    /**
+     * @brief Register an event listener with the node state monitor
+     *
+     * An event listener may be registered with the node state monitor allowing a user
+     * to get notified when certain events occur.
+     *
+     * @param event_listener Callback function to be called
+     */
+    void register_event_listener(const event_listener_t & event_listener);
 
-  private:
-  /**
-     * @brief called when a unify device is added 
+protected:
+    /**
+     * @brief called when a unify device is added
      *
      * When a device is added a number of matter endpoints are created. All
      * newly added endpints will get a matter endpoint id assigned.
@@ -136,41 +132,40 @@ class matter_node_state_monitor :
      *
      * @param node
      */
-  void on_unify_node_added(const unify::node_state_monitor::node &node);
+    void on_unify_node_added(const unify::node_state_monitor::node & node);
 
-  /**
+    /**
      * @brief Called when a Unify node is deleted.
      *
      * This will remove all endpoints belonging to a unid from mapped endpoint
      * list. The removal of the endpoint is announced on the matter fabric
      * Using emberAfClearDynamicEndpoint
      *
-     * @param unid 
+     * @param unid
      */
-  void on_unify_node_removed(const std::string &unid);
+    void on_unify_node_removed(const std::string & unid);
 
-  /**
+    /**
      * @brief Called when a unify node changes state.
-     * 
+     *
      * When this function is called all endpoints belonging to a Unify node
      * changes its state The updated state must be published on the matter
-     * fabric 
+     * fabric
      *
-     * @param unid 
-     * @param state 
+     * @param unid
+     * @param state
      */
-  void on_unify_node_state_changed(const node_state_monitor::node &node);
+    void on_unify_node_state_changed(const node_state_monitor::node & node);
 
-  /**
-   * @brief Invoke all listeners
-   * 
-   * Invokes all listeners for all endpoints of the node
-   * 
-   * @param node 
-   */
-  void invoke_listeners(const struct bridged_endpoint &ep,
-                        update_t update) const;
-  /**
+    /**
+     * @brief Invoke all listeners
+     *
+     * Invokes all listeners for all endpoints of the node
+     *
+     * @param node
+     */
+    void invoke_listeners(const struct bridged_endpoint & ep, update_t update) const;
+    /**
      * @brief construct a new bridged endpoint.
      *
      * this function used by the matter bridge to construct an instance of a
@@ -184,22 +179,40 @@ class matter_node_state_monitor :
      * @param node
      * @return std::vector<bridged_endpoint>
      */
-  std::vector<struct bridged_endpoint>
-    new_bridged_endpoints(const unify::node_state_monitor::node &node);
-  const device_translator &matter_device_translator;
+    std::vector<struct bridged_endpoint> new_bridged_endpoints(const unify::node_state_monitor::node & node);
+    const device_translator & matter_device_translator;
 
-  /** @brief map containing all bridged endpoints which are currently registered
-  the node state monitor. If an entry is dropped from this list any associated
-  resources which might be in use by matter will released as well 
-  */
-  std::multimap<std::string, struct bridged_endpoint> bridged_endpoints;
+    /**
+     * @brief Unify ember interface
+     *
+     * A class which wraps the ember interface for the node state monitor.
+     * Initialize and set in the constructor stage
+     */
+    UnifyEmberInterface & unify_ember_interface;
 
-  /**
-   * @brief Event listeners
-   * 
-   */
-  std::vector<event_listener_t> event_listeners;
+    /** @brief map containing all bridged endpoints which are currently registered
+    the node state monitor. If an entry is dropped from this list any associated
+    resources which might be in use by matter will released as well
+    */
+    std::multimap<std::string, struct bridged_endpoint> bridged_endpoints;
+
+    /**
+     * @brief Event listeners
+     *
+     */
+    std::vector<event_listener_t> event_listeners;
+
+    /**
+     * @brief Erase matter endpoint in bridged endpoints if it exsits
+     *
+     */
+    void erase_mapper_endpoint(const std::string unid, chip::EndpointId endpoint);
+
+    /**
+     * @brief registers a bridged_endpoint to matter.
+     */
+    void register_dynamic_endpoint(const struct bridged_endpoint & bridge);
 };
-}  // namespace unify::matter_bridge
+} // namespace unify::matter_bridge
 
-#endif  //MATTER_NODE_STATE_MONITOR_HPP
+#endif // MATTER_NODE_STATE_MONITOR_HPP

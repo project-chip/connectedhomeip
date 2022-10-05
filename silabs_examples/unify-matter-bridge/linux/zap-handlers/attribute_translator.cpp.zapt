@@ -1,0 +1,184 @@
+/******************************************************************************
+ * # License
+ * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
+ ******************************************************************************
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ *****************************************************************************/
+
+#define CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <regex>
+#include <type_traits>
+#include "matter.h"
+
+#include <attribute_state_cache.hpp>
+#include "attribute_translator.hpp"
+#include "matter_device_translator.hpp"
+#include "uic_mqtt.h"
+#include "sl_log.h"
+#include "app-common/zap-generated/attributes/Accessors.h"
+#define LOG_TAG "attribute_translator"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace unify::matter_bridge;
+
+#include "chip_types_to_json.hpp"
+#include "chip_types_from_json.hpp"
+#include "unify_accessors.hpp"
+
+{{#zcl_clusters}}
+CHIP_ERROR
+{{asUpperCamelCase label}}AttributeAccess::Read(const ConcreteReadAttributePath &aPath,
+                           AttributeValueEncoder &aEncoder)
+{
+  namespace MN = chip::app::Clusters::{{asUpperCamelCase label}}::Attributes;
+  namespace UN = unify::matter_bridge::{{asUpperCamelCase label}}::Attributes;
+  if (aPath.mClusterId != Clusters::{{asUpperCamelCase label}}::Id) {
+    return CHIP_ERROR_INVALID_ARGUMENT;
+  }
+
+  ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId,
+                                                        aPath.mClusterId,
+                                                        aPath.mAttributeId);
+                                                        
+  try {
+    switch (aPath.mAttributeId) {
+    {{#zcl_attributes_server}}
+
+    {{#if_is_struct type}}
+    {{else if (canHaveSimpleAccessors this)}}
+    case MN::{{asUpperCamelCase label}}::Id: {     // type is {{type}}
+      MN::{{asUpperCamelCase label}}::TypeInfo::Type value;
+      UN::{{asUpperCamelCase label}}::Get(atrpath, value ); 
+      return aEncoder.Encode(value);
+    }
+    {{/if_is_struct}}
+    {{/zcl_attributes_server}}
+    }
+  } catch (const std::out_of_range &e) {
+    sl_log_info(
+      LOG_TAG,
+      "The request attribute Path is not found in the attribute state "
+      "contanier, %s\n",
+      e.what());
+      return CHIP_ERROR_NO_MESSAGE_HANDLER;
+  }
+  return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAttributePath &aPath,
+                                       AttributeValueDecoder &aDecoder)
+{
+  using namespace chip::app::Clusters::{{asUpperCamelCase label}};
+
+  if (aPath.mClusterId != Clusters::{{asUpperCamelCase label}}::Id) {
+    return CHIP_ERROR_INVALID_ARGUMENT;
+  }
+  auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
+
+  if (!unify_node) {
+    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+  }
+
+  std::string attribute_name;
+  nlohmann::json jsn;
+
+  switch (aPath.mAttributeId) {
+  {{#zcl_attributes_server}}
+  {{#if writable}}
+  
+  case Attributes::{{asUpperCamelCase label}}::Id: {
+
+      Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
+      aDecoder.Decode(value);
+      jsn["value"]   = to_json(value);
+      attribute_name = std::string("{{asUpperCamelCase label}}");
+      break;
+  }
+  {{/if}}
+  {{/zcl_attributes_server}}
+  }
+
+
+  if (!attribute_name.empty()) {
+    std::string payload_str;
+    std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep"
+                  + std::to_string(unify_node->unify_endpoint)
+                  + "/{{asUpperCamelCase label}}/Attributes/" + attribute_name + "/Desired";
+    payload_str = jsn.dump();
+    uic_mqtt_publish(topic.c_str(),
+                     payload_str.c_str(),
+                     payload_str.length(),
+                     true);
+    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+  }
+
+  return CHIP_NO_ERROR;
+}
+
+
+
+void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_endpoint *ep,
+                                            const std::string &cluster,
+                                            const std::string &attribute,
+                                            const nlohmann::json &unify_value)
+{
+  namespace MN = chip::app::Clusters::{{asUpperCamelCase label}}::Attributes;
+  namespace UN = unify::matter_bridge::{{asUpperCamelCase label}}::Attributes;
+
+  auto cluster_id = device_translator::instance().get_cluster_id(cluster);
+
+  if (!cluster_id.has_value() || (cluster_id.value() != Clusters::{{asUpperCamelCase label}}::Id)) {
+    return;
+  }
+
+  // get attribute id
+  auto attribute_id
+    = device_translator::instance().get_attribute_id(cluster, attribute);
+
+  if (!attribute_id.has_value()) {
+    return;
+  }
+
+  chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+  ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint,
+                                                         Clusters::{{asUpperCamelCase label}}::Id,
+                                                         attribute_id.value());
+
+  switch (attribute_id.value()) {
+    {{#zcl_attributes_server}}
+    {{#if_is_struct type}}
+    {{else if (canHaveSimpleAccessors this)}}
+    // type is {{type}}
+    case MN::{{asUpperCamelCase label}}::Id: {
+      using T = MN::{{asUpperCamelCase label}}::TypeInfo::Type;
+      std::optional<T> value = from_json<T>(unify_value);
+
+      if( value.has_value()) {
+        sl_log_debug(LOG_TAG,"{{asUpperCamelCase label}} attribute value is %s",unify_value.dump().c_str() );
+        UN::{{asUpperCamelCase label}}::Set( attrpath, value.value() );
+        MatterReportingAttributeChangeCallback(
+          node_matter_endpoint,
+          Clusters::{{asUpperCamelCase parent.label}}::Id,
+          MN::{{asUpperCamelCase label}}::Id,        
+          ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE,
+          reinterpret_cast<uint8_t *>(&value.value()));
+      }
+      break;
+    }
+    {{/if_is_struct}}
+    {{/zcl_attributes_server}}
+  }
+}
+
+{{/zcl_clusters}}

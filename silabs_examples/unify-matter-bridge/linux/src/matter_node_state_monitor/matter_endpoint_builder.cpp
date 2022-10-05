@@ -29,15 +29,14 @@ std::shared_ptr<const std::vector<T>> make_shared(const std::vector<T> &data)
 namespace unify::matter_bridge
 {
 matter_cluster_builder::matter_cluster_builder(
-  const std::function<void(const matter_cluster_builder &)> &on_done) :
-  on_done(on_done)
+  const std::function<void(const matter_cluster_builder &)> &_on_done) :
+  on_done(_on_done)
 {}
 
 matter_cluster_builder::~matter_cluster_builder()
 {
   on_done(*this);
 }
-
 
 matter_cluster_builder
   matter_endpoint_builder::register_cluster(const chip::ClusterId &cluster_id)

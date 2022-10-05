@@ -1,0 +1,41 @@
+
+/**
+ *  @file
+ *    This file contains declarations for accessors around clusters attributes.
+ */
+
+#pragma once
+
+#include <app/data-model/Nullable.h>
+#include <app/util/af-types.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/Span.h>
+
+namespace unify {
+namespace matter_bridge {
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+
+{{/first}}
+{{#if_is_struct type}}
+{{else if (canHaveSimpleAccessors this)}}
+namespace {{asUpperCamelCase label}} {
+EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}& value);
+EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}& value);
+} // namespace {{asUpperCamelCase label}}
+
+{{/if_is_struct}}
+{{#last}}
+} // namespace Attributes
+} // {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // matter_bridge
+} // unify

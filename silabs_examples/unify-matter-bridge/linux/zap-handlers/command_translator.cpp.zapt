@@ -1,0 +1,89 @@
+/*******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+ #define CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+
+#include "command_translator.hpp"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include "sl_log.h"
+#include "chip_types_to_json.hpp"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace unify::matter_bridge;
+
+#define LOG_TAG "matter_cluster_command_server"
+
+{{#zcl_clusters}}
+{{#if (supportedCluster label)}}
+
+void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
+  CommandHandlerInterface::HandlerContext &ctxt)
+{
+  using namespace chip::app::Clusters::{{asUpperCamelCase label}};
+  
+  auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
+  if (!unify_node) {
+    sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
+    return;
+  }
+
+  std::string cmd;
+  nlohmann::json payload     = {};
+
+  switch (ctxt.mRequestPath.mCommandId) {
+    {{#zcl_commands_source_client}}
+    case Commands::{{asUpperCamelCase label}}::Id:
+    {
+    cmd = "{{asUpperCamelCase label}}";
+    {{#zcl_command_arguments}}
+    {
+      Commands::{{asUpperCamelCase parent.label}}::DecodableType data;
+      if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+        {{#isOptional}}
+        if( data.{{asLowerCamelCase label}}.HasValue() ) {
+          try {
+          payload["{{asUpperCamelCase label}}"] = to_json(data.{{asLowerCamelCase label}}.Value());
+          } catch (std::exception &ex) {
+          sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+          }
+        }
+        {{else}}
+          try {
+          payload["{{asUpperCamelCase label}}"] = to_json(data.{{asLowerCamelCase label}});
+          } catch (std::exception &ex) {
+          sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+          }
+        {{/isOptional}}
+      }
+    }
+    {{/zcl_command_arguments}}
+    }
+    break;
+    {{/zcl_commands_source_client}}
+  }
+
+  if(!cmd.empty()) {
+    ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
+    send_unify_mqtt_cmd(ctxt, cmd, payload );
+    sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
+  } else {
+    ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+  }
+  ctxt.SetCommandHandled();
+}
+{{/if}}
+{{/zcl_clusters}}

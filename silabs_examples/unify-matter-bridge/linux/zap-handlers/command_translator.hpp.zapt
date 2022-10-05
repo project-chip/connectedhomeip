@@ -12,35 +12,41 @@
  *****************************************************************************/
 
 /**
- * @defgroup identify_command_translator
- * @brief Identify cluster command translator for matter interface
+ * @defgroup command_translator
+ * @brief cluster command translator for matter interface
  *
- * Translate Identify cluster commands from the matter protocol to unify
+ * Translate cluster commands from the matter protocol to unify
  * dotdot data model.
  *
  * @{
  */
 
-#ifndef IDENTIFY_COMMAND_TRANSLATOR_HPP
-#define IDENTIFY_COMMAND_TRANSLATOR_HPP
+#ifndef COMMAND_TRANSLATOR_HPP
+#define COMMAND_TRANSLATOR_HPP
 
 #pragma once
 #include "command_translator_interface.hpp"
 
 namespace unify::matter_bridge
 {
-class IdentifyClusterCommandHandler : public command_translator_interface
+
+{{#zcl_clusters}}
+{{#if (supportedCluster label)}}
+class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translator_interface
 {
   public:
-  IdentifyClusterCommandHandler(
-    const matter_node_state_monitor &node_state_monitor) :
+  {{asUpperCamelCase label}}ClusterCommandHandler(
+    const matter_node_state_monitor &node_state_monitor, UicMqtt &uic_mqtt) :
     command_translator_interface(node_state_monitor,
-                                 chip::app::Clusters::Identify::Id,"Identify")
+                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{asUpperCamelCase label}}", uic_mqtt)
   {}
   void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext
-                       &HandlerContext) override;
+                    &HandlerContext) override;
 };
+{{/if}}
+{{/zcl_clusters}}
+
 }  // namespace unify::matter_bridge
 
-#endif  //IDENTIFY_COMMAND_TRANSLATOR_HPP
-/** @} end identify_command_translator */
+#endif  //COMMAND_TRANSLATOR_HPP
+/** @} end command_translator */

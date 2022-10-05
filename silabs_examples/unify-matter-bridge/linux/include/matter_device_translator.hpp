@@ -28,79 +28,73 @@
 #ifndef MATTER_DEVICE_TRANSLATOR_HPP
 #define MATTER_DEVICE_TRANSLATOR_HPP
 
-#include <string>
-#include <optional>
-#include <vector>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <optional>
+#include <string>
+#include <vector>
 
-namespace unify::matter_bridge
-{
+namespace unify::matter_bridge {
 /**
  * @brief Device translator class.
  */
 class device_translator
 {
-  public:
-  /**
-   * @brief Given list of clustername find possible matching device types.
-   * 
-   * @param clusters Vector of clusters to find device type for.
-   * @return vector of possible device types sorted by most likely, or an empty
-   * vector if none is found.
-   */
-  virtual std::vector<chip::DeviceTypeId>
-    get_device_types(const std::vector<const char *> &clusters) const;
+public:
+    /**
+     * @brief Given list of clustername find possible matching device types.
+     *
+     * @param clusters Vector of clusters to find device type for.
+     * @return vector of possible device types sorted by most likely, or an empty
+     * vector if none is found.
+     */
+    virtual std::vector<chip::DeviceTypeId> get_device_types(const std::vector<const char *> & clusters) const;
 
-  /**
-   * @brief It provides the matter device name from device id.
-   *
-   * @param device_id the device id.
-   * @return std::optional containing the device name or std::nullopt_t.
-   */
-  virtual std::optional<const char *>
-    get_device_name(chip::DeviceTypeId device_id) const;
+    /**
+     * @brief It provides the matter device name from device id.
+     *
+     * @param device_id the device id.
+     * @return std::optional containing the device name or std::nullopt_t.
+     */
+    virtual std::optional<const char *> get_device_name(chip::DeviceTypeId device_id) const;
 
-  /**
-   * @brief Get the cluster id given a unify cluster name.
-   *
-   * @param cluster_name
-   * @return std::optional containing the cluster id or std::nullopt_t.
-   */
-  virtual std::optional<chip::ClusterId>
-    get_cluster_id(const std::string &cluster_name) const;
+    /**
+     * @brief Get the cluster id given a unify cluster name.
+     *
+     * @param cluster_name
+     * @return std::optional containing the cluster id or std::nullopt_t.
+     */
+    virtual std::optional<chip::ClusterId> get_cluster_id(const std::string & cluster_name) const;
 
-  /**
-   * @brief Get the attribute id given a unify cluster name and attribute name.
-   *
-   * @param cluster_name
-   * @param attribute_name
-   * @return std::optional containg the attribute id or std::nullopt_t.
-   */
+    /**
+     * @brief Get the attribute id given a unify cluster name and attribute name.
+     *
+     * @param cluster_name
+     * @param attribute_name
+     * @return std::optional containg the attribute id or std::nullopt_t.
+     */
 
-  virtual std::optional<chip::AttributeId>
-    get_attribute_id(const std::string &cluster_name,
-                     const std::string &attribute_name) const;
+    virtual std::optional<chip::AttributeId> get_attribute_id(const std::string & cluster_name,
+                                                              const std::string & attribute_name) const;
 
-  /**
-   * @brief Get the command id given a unify cluster name and command name.
-   *
-   * @param cluster_name
-   * @param attribute_name
-   * @return std::optional containing the command id or std::nullopt_t.
-   */
+    /**
+     * @brief Get the command id given a unify cluster name and command name.
+     *
+     * @param cluster_name
+     * @param attribute_name
+     * @return std::optional containing the command id or std::nullopt_t.
+     */
 
-  virtual std::optional<chip::CommandId>
-    get_command_id(const std::string &cluster_name,
-                   const std::string &command_name) const;
+    virtual std::optional<chip::CommandId> get_command_id(const std::string & cluster_name, const std::string & command_name) const;
 
-  virtual ~device_translator() = default;
+    virtual ~device_translator() = default;
 
-  static const device_translator& instance() {
-    static device_translator me;
-    return me;
-  }
+    static const device_translator & instance()
+    {
+        static device_translator me;
+        return me;
+    }
 };
-}  // namespace unify::matter_bridge
+} // namespace unify::matter_bridge
 
-#endif  //MATTER_DEVICE_TRANSLATOR_HPP
+#endif // MATTER_DEVICE_TRANSLATOR_HPP
 /** @} end matter_device_mapper */

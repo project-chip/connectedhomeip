@@ -1,0 +1,57 @@
+{
+    "name": "CHIP Application templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "unify-helper.js"
+    ],
+    "override": "../../../../src/app/zap-templates/common/override.js",
+    "templates": [
+        {
+            "path": "command_translator.cpp.zapt",
+            "name": "Command Handler Implementation",
+            "output": "command_translator.cpp"
+        },
+        {
+            "path": "command_translator.hpp.zapt",
+            "name": "Command Handler Header",
+            "output": "command_translator.hpp"
+        },
+        {
+            "path": "chip_types_to_json.hpp.zapt",
+            "name": "Type converters",
+            "output": "chip_types_to_json.hpp"
+        },
+        {
+            "path": "chip_types_from_json.hpp.zapt",
+            "name": "Type converters",
+            "output": "chip_types_from_json.hpp"
+        },
+        {
+            "path": "attribute_translator.cpp.zapt",
+            "name": "Attribute Translator Implementation",
+            "output": "attribute_translator.cpp"
+        },
+        {
+            "path": "attribute_translator.hpp.zapt",
+            "name": "Attribute Translator Header",
+            "output": "attribute_translator.hpp"
+        },
+        {
+            "path": "unify_accessors.hpp.zapt",
+            "name": "Attribute Accessor Header",
+            "output": "unify_accessors.hpp"
+        },
+        {
+            "path": "unify_accessors.cpp.zapt",
+            "name": "Attribute Accessor Source",
+            "output": "unify_accessors.cpp"
+        }
+    ]
+}
