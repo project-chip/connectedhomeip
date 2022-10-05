@@ -281,25 +281,23 @@ def BuildHostTarget():
 
     target.AppendFixedTargets(app_parts)
 
-    target.AppendModifier(
-        TargetPart('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False, crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
-    )
+    target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False, crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
-    target.AppendModifier(TargetPart('libnl', minmdns_address_policy="libnl").OnlyIfRe('-minmdns'))
-    target.AppendModifier(TargetPart('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)'))
-    target.AppendModifier(TargetPart('no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool'))
-    target.AppendModifier(TargetPart("ipv6only", enable_ipv4=False))
-    target.AppendModifier(TargetPart("no-ble", enable_ble=False))
-    target.AppendModifier(TargetPart("no-wifi", enable_wifi=False))
-    target.AppendModifier(TargetPart("no-thread", enable_thread=False))
-    target.AppendModifier(TargetPart("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls'))
-    target.AppendModifier(TargetPart("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl'))
-    target.AppendModifier(TargetPart("asan", use_asan=True).ExceptIfRe("-tsan"))
-    target.AppendModifier(TargetPart("tsan", use_tsan=True).ExceptIfRe("-asan"))
-    target.AppendModifier(TargetPart("libfuzzer", use_tsan=True).OnlyIfRe("-clang"))
-    target.AppendModifier(TargetPart('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)'))
-    target.AppendModifier(TargetPart('dmalloc', use_dmalloc=True))
-    target.AppendModifier(TargetPart('clang', use_clang=True))
+    target.AppendModifier('libnl', minmdns_address_policy="libnl").OnlyIfRe('-minmdns')
+    target.AppendModifier('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)')
+    target.AppendModifier('no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
+    target.AppendModifier("ipv6only", enable_ipv4=False)
+    target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-wifi", enable_wifi=False)
+    target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
+    target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
+    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
+    target.AppendModifier('dmalloc', use_dmalloc=True)
+    target.AppendModifier('clang', use_clang=True)
 
     return target
 
@@ -328,8 +326,8 @@ def BuildEsp32Target():
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
     ])
 
-    target.AppendModifier(TargetPart('rpc', enable_rpcs=True))
-    target.AppendModifier(TargetPart('ipv6only', enable_ipv4=False))
+    target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('ipv6only', enable_ipv4=False)
 
     # TODO:
     # yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
@@ -362,8 +360,8 @@ def BuildEfr32Target():
         TargetPart('lock', app=Efr32App.LOCK),
     ])
 
-    target.AppendModifier(TargetPart('rpc', enable_rpcs=True))
-    target.AppendModifier(TargetPart('with-ota-requestor', enable_ota_requestor=True))
+    target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
 
     return target
 
@@ -447,9 +445,9 @@ def BuildMbedTarget():
     ])
 
     # Modifiers
-    target.AppendModifier(TargetPart('release', profile=MbedProfile.RELEASE).ExceptIfRe('-(develop|debug)'))
-    target.AppendModifier(TargetPart('develop', profile=MbedProfile.DEVELOP).ExceptIfRe('-(release|debug)'))
-    target.AppendModifier(TargetPart('debug', profile=MbedProfile.DEBUG).ExceptIfRe('-(release|develop)'))
+    target.AppendModifier('release', profile=MbedProfile.RELEASE).ExceptIfRe('-(develop|debug)')
+    target.AppendModifier('develop', profile=MbedProfile.DEVELOP).ExceptIfRe('-(release|debug)')
+    target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe('-(release|develop)')
 
     return target
 
@@ -471,8 +469,8 @@ def BuildInfineonTarget():
     ])
 
     # modifiers
-    target.AppendModifier(TargetPart('ota', enable_ota_requestor=True))
-    target.AppendModifier(TargetPart('updateimage', update_image=True))
+    target.AppendModifier('ota', enable_ota_requestor=True)
+    target.AppendModifier('updateimage', update_image=True)
 
     return target
 
@@ -507,9 +505,9 @@ def BuildK32WTarget():
         TargetPart('contact', app=K32WApp.CONTACT, release=True),
     ])
 
-    target.AppendModifier(TargetPart(name="no-ota", disable_ota=True))
-    target.AppendModifier(TargetPart(name="low-power", low_power=True))
-    target.AppendModifier(TargetPart(name="nologs", disable_logs=True))
+    target.AppendModifier(name="no-ota", disable_ota=True)
+    target.AppendModifier(name="low-power", low_power=True)
+    target.AppendModifier(name="nologs", disable_logs=True)
 
     return target
 
@@ -527,8 +525,8 @@ def Buildcc13x2x7_26x2x7Target():
         TargetPart('shell', app=cc13x2x7_26x2x7App.SHELL),
     ])
 
-    target.AppendModifier(TargetPart(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd"))
-    target.AppendModifier(TargetPart(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd"))
+    target.AppendModifier(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd")
+    target.AppendModifier(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd")
 
     return target
 
@@ -548,7 +546,7 @@ def BuildCyw30739Target():
         TargetPart('ota-requestor',  app=Cyw30739App.OTA_REQUESTOR),
     ])
 
-    target.AppendModifier(TargetPart(name="no-progress-logging", progress_logging=False))
+    target.AppendModifier(name="no-progress-logging", progress_logging=False)
 
     return target
 
@@ -589,9 +587,9 @@ def BuildTizenTarget():
         TargetPart('light', app=TizenApp.LIGHT),
     ])
 
-    target.AppendModifier(TargetPart(name="no-ble", enable_ble=False))
-    target.AppendModifier(TargetPart(name="no-wifi", enable_wifi=False))
-    target.AppendModifier(TargetPart(name="asan", use_asan=True))
+    target.AppendModifier(name="no-ble", enable_ble=False)
+    target.AppendModifier(name="no-wifi", enable_wifi=False)
+    target.AppendModifier(name="asan", use_asan=True)
 
     return target
 
@@ -636,7 +634,7 @@ def BuildIMXTarget():
        TargetPart('ota-provider-app', app=IMXApp.OTA_PROVIDER),
     ])
 
-    target.AppendModifier(TargetPart('release', release=True))
+    target.AppendModifier('release', release=True)
 
     return target
 

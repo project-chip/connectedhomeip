@@ -221,15 +221,19 @@ class BuildTarget:
         """
         self.fixed_targets.append(parts)
 
-    def AppendModifier(self, part: TargetPart):
+    def AppendModifier(self, name:str, **kargs):
         """Appends a specific modifier to a build target. For example:
 
-        target.AppendModifier(TargetParet(name='release', release=True))
-        target.AppendModifier(TargetParet(name='clang', use_clang=True))
-        target.AppendModifier(TargetParet(name='coverage', coverage=True).OnlyIfRe('-clang'))
+        target.AppendModifier(name='release', release=True)
+        target.AppendModifier(name='clang', use_clang=True)
+        target.AppendModifier(name='coverage', coverage=True).OnlyIfRe('-clang')
 
         """
+        part=TargetPart(name, **kargs)
+
         self.modifiers.append(part)
+
+        return part
 
     def HumanString(self):
         """Prints out the human-readable string of the available variants and modifiers:

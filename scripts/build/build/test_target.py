@@ -89,10 +89,10 @@ class TestGlobMatcher(unittest.TestCase):
             TargetPart('two', value=2),
         ])
 
-        t.AppendModifier(TargetPart('m1', m=1).ExceptIfRe('-m2'))
-        t.AppendModifier(TargetPart('m2', m=2).ExceptIfRe('-m1'))
-        t.AppendModifier(TargetPart('x1', x=1))
-        t.AppendModifier(TargetPart('y1', x=1).OnlyIfRe('-foo-'))
+        t.AppendModifier('m1', m=1).ExceptIfRe('-m2')
+        t.AppendModifier('m2', m=2).ExceptIfRe('-m1')
+        t.AppendModifier('x1', x=1)
+        t.AppendModifier('y1', x=1).OnlyIfRe('-foo-')
 
         self.assertEqual(
             t.HumanString(),
