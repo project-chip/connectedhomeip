@@ -17,6 +17,8 @@ import re
 from itertools import combinations
 from typing import List, Any, Optional
 
+from .target import BuildTarget, TargetPart
+
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
@@ -232,122 +234,74 @@ class VariantBuilder:
                     yield variant_target
 
 
-def HostTargets():
-    target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    target_native = target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
+def BuildHostTarget():
+    native_board_name = HostBoard.NATIVE.BoardName()
+    cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (native_board_name != HostBoard.ARM64.BoardName())
 
-    targets = [target_native]
+    target = BuildTarget(native_board_name, HostBuilder)
 
-    # x64 linux  supports cross compile
-    cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
+    board_parts = [
+        TargetPart(native_board_name, board=HostBoard.NATIVE),
+        TargetPart('fake', board=HostBoard.FAKE),
+    ]
+
     if cross_compile:
-        targets.append(target.Extend('arm64-clang', board=HostBoard.ARM64, use_clang=True))
+        board_parts.append(TargetPart('arm64', board=HostBoard.ARM64).OnlyIfRe('-clang'))
 
-    app_targets = []
+    target.AppendFixedTargets(board_parts)
 
-    # Don't cross  compile some builds
-    app_targets.append(
-        target_native.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
-    app_targets.append(
-        target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
+    # Add all the applications
+    app_parts = [
+        TargetPart('rpc-console', app=HostApp.RPC_CONSOLE).OnlyIfRe(f'{native_board_name}-'),
+        TargetPart('nl-test-runner', app=HostApp.NL_TEST_RUNNER).OnlyIfRe(f'{native_board_name}-'),
+        TargetPart('all-clusters', app=HostApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS),
+        TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
+        TargetPart('thermostat', app=HostApp.THERMOSTAT),
+        TargetPart('minmdns', app=HostApp.MIN_MDNS),
+        TargetPart('light', app=HostApp.LIGHT),
+        TargetPart('light-rpc', app=HostApp.LIGHT, enable_rpcs=True),
+        TargetPart('lock', app=HostApp.LOCK),
+        TargetPart('shell', app=HostApp.SHELL),
+        TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
+        TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False),
+        TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
+        TargetPart('tv-app', app=HostApp.TV_APP),
+        TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
+        TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('dynamic-bridge', app=HostApp.DYNAMIC_BRIDGE),
+        TargetPart('tests', app=HostApp.TESTS),
+        TargetPart('chip-cert', app=HostApp.CERT_TOOL),
+        TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
+        TargetPart('tests', app=HostApp.TESTS, extra_tests=True),
+    ]
 
-    for target in targets:
-        app_targets.append(target.Extend(
-            'all-clusters', app=HostApp.ALL_CLUSTERS))
-        app_targets.append(target.Extend(
-            'all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL))
-        if (HostBoard.NATIVE.PlatformName() == 'darwin'):
-            app_targets.append(target.Extend(
-                'darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN))
-        app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
-        app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
-        app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
-        app_targets.append(target.Extend('light', app=HostApp.LIGHT))
-        app_targets.append(target.Extend('light-rpc', app=HostApp.LIGHT, enable_rpcs=True))
-        app_targets.append(target.Extend('lock', app=HostApp.LOCK))
-        app_targets.append(target.Extend('shell', app=HostApp.SHELL))
-        app_targets.append(target.Extend(
-            'ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False))
-        app_targets.append(target.Extend(
-            'ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False))
-        app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
-        app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
-        app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
-        app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
-        app_targets.append(target.Extend('dynamic-bridge', app=HostApp.DYNAMIC_BRIDGE))
+    if (HostBoard.NATIVE.PlatformName() == 'darwin'):
+        app_parts.append(TargetPart('darwin-framework-tool', app=HostApp.CHIP_TOOL_DARWIN) )
 
-        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False,
-                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True)
-        app_targets.append(target.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args))
-        app_targets.append(target.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args))
-        app_targets.append(target.Extend('ota-provider-nodeps', app=HostApp.OTA_PROVIDER, **nodeps_args))
-        app_targets.append(target.Extend('ota-requestor-nodeps', app=HostApp.OTA_REQUESTOR, **nodeps_args))
+    target.AppendFixedTargets(app_parts)
 
-    builder = VariantBuilder()
+    target.AppendModifier(
+        TargetPart('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False, crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
+    )
 
-    # Possible build variants. Note that number of potential
-    # builds is exponential here
-    builder.AppendVariant(name="libnl", validator=AcceptNameWithSubstrings(
-        ['-minmdns']), minmdns_address_policy="libnl"),
-    builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
-        ['-chip-tool', '-darwin-framework-tool']), separate_event_loop=False),
-    builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
-        ['-chip-tool']), interactive_mode=False),
-    builder.AppendVariant(name="ipv6only", enable_ipv4=False),
-    builder.AppendVariant(name="no-ble", enable_ble=False),
-    builder.AppendVariant(name="no-wifi", enable_wifi=False),
-    builder.AppendVariant(name="no-thread", enable_thread=False),
-    builder.AppendVariant(name="mbedtls", conflicts=['boringssl'], crypto_library=HostCryptoLibrary.MBEDTLS),
-    builder.AppendVariant(name="boringssl", conflicts=['mbedtls'], crypto_library=HostCryptoLibrary.BORINGSSL),
-    builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
-    builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
-    builder.AppendVariant(name="libfuzzer", requires=[
-                          "clang"], use_libfuzzer=True),
-    if cross_compile:
-        builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
-            ['arm64']
-        )),
-    else:
-        builder.AppendVariant(name="clang", use_clang=True)
+    target.AppendModifier(TargetPart('libnl', minmdns_address_policy="libnl").OnlyIfRe('-minmdns'))
+    target.AppendModifier(TargetPart('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)'))
+    target.AppendModifier(TargetPart('no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool'))
+    target.AppendModifier(TargetPart("ipv6only", enable_ipv4=False))
+    target.AppendModifier(TargetPart("no-ble", enable_ble=False))
+    target.AppendModifier(TargetPart("no-wifi", enable_wifi=False))
+    target.AppendModifier(TargetPart("no-thread", enable_thread=False))
+    target.AppendModifier(TargetPart("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls'))
+    target.AppendModifier(TargetPart("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl'))
+    target.AppendModifier(TargetPart("asan", use_asan=True).ExceptIfRe("-tsan"))
+    target.AppendModifier(TargetPart("tsan", use_tsan=True).ExceptIfRe("-asan"))
+    target.AppendModifier(TargetPart("libfuzzer", use_tsan=True).OnlyIfRe("-clang"))
+    target.AppendModifier(TargetPart('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)'))
+    target.AppendModifier(TargetPart('dmalloc', use_dmalloc=True))
+    target.AppendModifier(TargetPart('clang', use_clang=True))
 
-    builder.AppendVariant(name="test", extra_tests=True),
-
-    builder.WhitelistVariantNameForGlob('ipv6only')
-
-    for target in app_targets:
-        if ('-rpc-console' in target.name) or ('-python-bindings' in target.name) or ('nl-test-runner' in target.name):
-            # Single-variant builds
-            yield target
-        else:
-            builder.targets.append(target)
-
-    for target in builder.AllVariants():
-        yield target
-
-    # limited subset for coverage
-    yield target_native.Extend('all-clusters-coverage', app=HostApp.ALL_CLUSTERS, use_coverage=True)
-    yield target_native.Extend('chip-tool-coverage', app=HostApp.CHIP_TOOL, use_coverage=True)
-
-    # Without extra build variants
-    yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
-    yield target_native.Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
-    yield target_native.Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE,
-                               use_clang=True).GlobBlacklist("Reduce default build variants")
-    yield target_native.Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE,
-                               use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
-    yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
-                               use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
-
-    yield target_native.Extend('tests', app=HostApp.TESTS)
-    yield target_native.Extend('tests-mbedtls', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.MBEDTLS).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-boringssl', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.BORINGSSL).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-clang-asan', app=HostApp.TESTS, use_clang=True, use_asan=True).GlobBlacklist("Non-default test")
-    yield target_native.Extend('tests-dmalloc', app=HostApp.TESTS, use_dmalloc=True).GlobBlacklist("Non-default test")
-
-    test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
+    return target
 
 
 def Esp32Targets():
@@ -660,11 +614,14 @@ def GenioTargets():
 
     yield target.Extend('lighting-app', app=GenioApp.LIGHT)
 
+BUILD_TARGETS = [
+    BuildHostTarget(),
+]
 
 ALL = []
 
 target_generators = [
-    HostTargets(),
+    #HostTargets(),
     Esp32Targets(),
     Efr32Targets(),
     NrfTargets(),
