@@ -45,6 +45,13 @@ using namespace chip::Credentials;
 namespace chip {
 namespace Controller {
 
+DeviceControllerFactory & DeviceControllerFactory::GetInstance()
+{
+    static DeviceControllerFactory* instance = new DeviceControllerFactory{};
+    return *instance;
+}
+
+
 CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 {
 

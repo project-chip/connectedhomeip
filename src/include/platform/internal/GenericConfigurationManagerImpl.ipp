@@ -54,7 +54,11 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static Optional<System::Clock::Seconds32> sFirmwareBuildChipEpochTime;
+static Optional<System::Clock::Seconds32> & sGetFirmwareBuildChipEpochTime()
+{
+    static auto *epochTime = new Optional<System::Clock::Seconds32>{};
+    return *epochTime;
+}
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
@@ -277,9 +281,9 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
-    if (sFirmwareBuildChipEpochTime.HasValue())
+    if (sGetFirmwareBuildChipEpochTime().HasValue())
     {
-        chipEpochTime = sFirmwareBuildChipEpochTime.Value();
+        chipEpochTime = sGetFirmwareBuildChipEpochTime().Value();
         return CHIP_NO_ERROR;
     }
     // Else, attempt to read the hard-coded values.
@@ -306,7 +310,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpo
     //
     // Implementations that can't use the hard-coded time for whatever reason
     // should set this at each init.
-    sFirmwareBuildChipEpochTime.SetValue(chipEpochTime);
+    sGetFirmwareBuildChipEpochTime().SetValue(chipEpochTime);
     return CHIP_NO_ERROR;
 }
 

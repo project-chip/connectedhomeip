@@ -26,6 +26,13 @@
 namespace chip {
 namespace Messaging {
 
+ExchangeMessageDispatch & ApplicationExchangeDispatch::Instance()
+{
+    static ApplicationExchangeDispatch *instance = new ApplicationExchangeDispatch{};
+    return *instance;
+}
+
+
 bool ApplicationExchangeDispatch::MessagePermitted(Protocols::Id protocol, uint8_t type)
 {
     // TODO: Change this check to only include the protocol and message types that are allowed

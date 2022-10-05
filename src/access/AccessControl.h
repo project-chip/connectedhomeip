@@ -112,7 +112,7 @@ public:
 
         Entry() = default;
 
-        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &mDefaultDelegate; }
+        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = Entry::_GetDefaultDelegate(); }
 
         Entry & operator=(Entry && other)
         {
@@ -120,7 +120,7 @@ public:
             {
                 mDelegate->Release();
                 mDelegate       = other.mDelegate;
-                other.mDelegate = &mDefaultDelegate;
+                other.mDelegate = Entry::_GetDefaultDelegate();
             }
             return *this;
         }
@@ -216,7 +216,7 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
-        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate; }
+        bool HasDefaultDelegate() const { return mDelegate == Entry::_GetDefaultDelegate(); }
 
         const Delegate & GetDelegate() const { return *mDelegate; }
 
@@ -231,12 +231,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &mDefaultDelegate;
+            mDelegate = Entry::_GetDefaultDelegate();
         }
 
     private:
-        static Delegate mDefaultDelegate;
-        Delegate * mDelegate = &mDefaultDelegate;
+        static Delegate * _GetDefaultDelegate(void);
+        Delegate * mDelegate = Entry::_GetDefaultDelegate();
     };
 
     /**
@@ -284,12 +284,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &mDefaultDelegate;
+            mDelegate = EntryIterator::_GetDefaultDelegate();
         }
 
     private:
-        static Delegate mDefaultDelegate;
-        Delegate * mDelegate = &mDefaultDelegate;
+        static Delegate * _GetDefaultDelegate(void);
+        Delegate * mDelegate = EntryIterator::_GetDefaultDelegate();
     };
 
     /**

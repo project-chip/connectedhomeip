@@ -35,18 +35,26 @@
 
 extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
+namespace {
+
+chip::app::InteractionModelEngine * sGetInteractionModelEngine()
+{
+    static auto * modelEngine = new chip::app::InteractionModelEngine{};
+    return modelEngine;
+}
+
+} // namespace
+
 namespace chip {
 namespace app {
 
 using Protocols::InteractionModel::Status;
 
-InteractionModelEngine sInteractionModelEngine;
-
 InteractionModelEngine::InteractionModelEngine() {}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
-    return &sInteractionModelEngine;
+    return sGetInteractionModelEngine();
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,

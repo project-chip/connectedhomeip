@@ -128,11 +128,7 @@ struct FactoryInitParams
 class DeviceControllerFactory
 {
 public:
-    static DeviceControllerFactory & GetInstance()
-    {
-        static DeviceControllerFactory instance;
-        return instance;
-    }
+    static DeviceControllerFactory & GetInstance();
 
     CHIP_ERROR Init(FactoryInitParams params);
 

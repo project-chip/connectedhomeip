@@ -33,8 +33,17 @@ using namespace chip::Access;
 
 namespace {
 
-AccessControl defaultAccessControl;
-AccessControl * globalAccessControl = &defaultAccessControl;
+AccessControl * sGetDefaultAccessControl()
+{
+    static auto* defaultAccessControl = new AccessControl{};
+    return defaultAccessControl;
+}
+
+AccessControl ** sGetGlobalAccessControlPtr()
+{
+    static auto* accessControl = sGetDefaultAccessControl();
+    return &accessControl;
+}
 
 static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
                   ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
@@ -174,8 +183,17 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 
 } // namespace
 
-AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
-AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
+AccessControl::Entry::Delegate * AccessControl::Entry::_GetDefaultDelegate(void)
+{
+    static auto *defaultDelegate = new AccessControl::Entry::Delegate{};
+    return defaultDelegate;
+}
+
+AccessControl::EntryIterator::Delegate * AccessControl::EntryIterator::_GetDefaultDelegate(void)
+{
+    static auto *defaultDelegate = new AccessControl::EntryIterator::Delegate{};
+    return defaultDelegate;
+}
 
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
@@ -623,13 +641,13 @@ void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescript
 
 AccessControl & GetAccessControl()
 {
-    return *globalAccessControl;
+    return **sGetGlobalAccessControlPtr();
 }
 
 void SetAccessControl(AccessControl & accessControl)
 {
     ChipLogProgress(DataManagement, "AccessControl: setting");
-    globalAccessControl = &accessControl;
+    *sGetGlobalAccessControlPtr() = &accessControl;
 }
 
 } // namespace Access

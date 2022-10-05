@@ -40,7 +40,12 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-BLEManagerImpl BLEManagerImpl::sInstance;
+BLEManagerImpl & BLEManagerImpl::_GetInstance(void)
+{
+    static auto *instance = new BLEManagerImpl{};
+    return *instance;
+}
+
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {

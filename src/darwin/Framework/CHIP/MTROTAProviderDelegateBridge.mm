@@ -326,7 +326,15 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 };
 
-BdxOTASender gOtaSender;
+namespace {
+
+BdxOTASender& sGetOtaSender() {
+    static BdxOTASender* otaSender = new BdxOTASender{};
+    return *otaSender;
+}
+
+} // namespace
+
 
 static NSInteger const kOtaProviderEndpoint = 0;
 
@@ -334,22 +342,22 @@ MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(id<MTROTAProviderDele
     : mDelegate(delegate)
     , mWorkQueue(DeviceLayer::PlatformMgrImpl().GetWorkQueue())
 {
-    gOtaSender.SetDelegate(delegate);
+    sGetOtaSender().SetDelegate(delegate);
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
 }
 
 MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
 {
-    gOtaSender.SetDelegate(nil);
+    sGetOtaSender().SetDelegate(nil);
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
 }
 
 CHIP_ERROR MTROTAProviderDelegateBridge::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
 {
-    return gOtaSender.Init(systemLayer, exchangeManager);
+    return sGetOtaSender().Init(systemLayer, exchangeManager);
 }
 
-void MTROTAProviderDelegateBridge::Shutdown() { gOtaSender.Shutdown(); }
+void MTROTAProviderDelegateBridge::Shutdown() { sGetOtaSender().Shutdown(); }
 
 namespace {
 // Return false if we could not get peer node info (a running controller for
@@ -473,7 +481,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
             if (hasUpdate && isBDXProtocolSupported) {
                 auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
                 auto nodeId = handler->GetSubjectDescriptor().subject;
-                CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
+                CHIP_ERROR err = sGetOtaSender().PrepareForTransfer(fabricIndex, nodeId);
                 if (CHIP_NO_ERROR != err) {
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);

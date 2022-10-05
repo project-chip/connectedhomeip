@@ -81,7 +81,7 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
 
-    static PlatformManagerImpl sInstance;
+    static PlatformManagerImpl& _GetInstance();
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
@@ -106,7 +106,7 @@ private:
  */
 inline PlatformManager & PlatformMgr(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::_GetInstance();
 }
 
 /**
@@ -117,7 +117,7 @@ inline PlatformManager & PlatformMgr(void)
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::_GetInstance();
 }
 
 } // namespace DeviceLayer

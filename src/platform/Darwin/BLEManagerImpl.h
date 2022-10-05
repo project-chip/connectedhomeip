@@ -63,7 +63,7 @@ private:
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
 
-    static BLEManagerImpl sInstance;
+    static BLEManagerImpl & _GetInstance(void);
 
     BleConnectionDelegate * mConnectionDelegate   = nullptr;
     BlePlatformDelegate * mPlatformDelegate       = nullptr;
@@ -78,7 +78,7 @@ private:
  */
 inline BLEManager & BLEMgr(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::_GetInstance();
 }
 
 /**
@@ -89,7 +89,7 @@ inline BLEManager & BLEMgr(void)
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::_GetInstance();
 }
 
 } // namespace Internal

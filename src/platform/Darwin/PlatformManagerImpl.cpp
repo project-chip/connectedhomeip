@@ -40,7 +40,11 @@
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManagerImpl& PlatformManagerImpl::_GetInstance()
+{
+    static auto* instance = new PlatformManagerImpl{};
+    return *instance;
+}
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {

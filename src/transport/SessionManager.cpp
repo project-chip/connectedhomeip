@@ -45,8 +45,15 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
-// Global object
-chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
+namespace {
+
+chip::Transport::GroupPeerTable & sGetGroupPeerMsgCounter()
+{
+    static auto* table = new chip::Transport::GroupPeerTable{};
+    return *table;
+}
+
+} // namespace
 
 namespace chip {
 
@@ -135,7 +142,7 @@ void SessionManager::Shutdown()
  */
 void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 {
-    mGroupPeerMsgCounter.FabricRemoved(fabricIndex);
+    sGetGroupPeerMsgCounter().FabricRemoved(fabricIndex);
 }
 
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
@@ -823,7 +830,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     Transport::PeerMessageCounter * counter = nullptr;
 
     if (CHIP_NO_ERROR ==
-        mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),
+        sGetGroupPeerMsgCounter().FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),
                                            packetHeader.IsSecureSessionControlMsg(), counter))
     {
 

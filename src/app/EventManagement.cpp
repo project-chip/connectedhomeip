@@ -31,9 +31,17 @@
 
 using namespace chip::TLV;
 
+namespace {
+
+chip::app::EventManagement & sGetInstance() {
+    static auto *instance = new chip::app::EventManagement{};
+    return *instance;
+}
+
+} // namespace
+
 namespace chip {
 namespace app {
-static EventManagement sInstance;
 
 /**
  * @brief
@@ -60,7 +68,7 @@ public:
 
 EventManagement & EventManagement::GetInstance(void)
 {
-    return sInstance;
+    return sGetInstance();
 }
 
 struct ReclaimEventCtx
@@ -330,7 +338,7 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
                                             MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
 {
 
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter);
+    sGetInstance().Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter);
 }
 
 /**
@@ -338,9 +346,10 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-    sInstance.mState        = EventManagementStates::Shutdown;
-    sInstance.mpEventBuffer = nullptr;
-    sInstance.mpExchangeMgr = nullptr;
+    auto & instance = sGetInstance();
+    instance.mState        = EventManagementStates::Shutdown;
+    instance.mpEventBuffer = nullptr;
+    instance.mpExchangeMgr = nullptr;
 }
 
 CircularEventBuffer * EventManagement::GetPriorityBuffer(PriorityLevel aPriority) const

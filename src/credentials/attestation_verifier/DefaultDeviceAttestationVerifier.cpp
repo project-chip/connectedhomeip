@@ -46,10 +46,15 @@ namespace {
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxResponseLength = 900;
 
-static const ByteSpan kTestPaaRoots[] = {
-    TestCerts::sTestCert_PAA_FFF1_Cert,
-    TestCerts::sTestCert_PAA_NoVID_Cert,
-};
+
+std::array<ByteSpan, 2> const& sGetTestPaaRoots()
+{
+    static auto const* paaRoots = new std::array<ByteSpan, 2>{
+        TestCerts::sTestCert_PAA_FFF1_Cert,
+        TestCerts::sTestCert_PAA_NoVID_Cert,
+    };
+    return *paaRoots;
+}
 
 // Test CD Signing Key from `credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem`
 // used to verify any in-SDK development CDs. The associated keypair to do actual signing is in
@@ -390,7 +395,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
         if (err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            VerifyOrExit(kTestAttestationTrustStore.GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+            VerifyOrExit(sGetTestAttestationTrustStore().GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
                          attestationError = AttestationVerificationResult::kPaaNotFound);
         }
 
@@ -671,14 +676,14 @@ CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto:
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
 {
-    return &kTestAttestationTrustStore;
+    return &sGetTestAttestationTrustStore();
 }
 
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)
 {
-    static DefaultDACVerifier defaultDACVerifier{ paaRootStore };
+    static auto *defaultDACVerifier = new DefaultDACVerifier{ paaRootStore };
 
-    return &defaultDACVerifier;
+    return defaultDACVerifier;
 }
 
 } // namespace Credentials

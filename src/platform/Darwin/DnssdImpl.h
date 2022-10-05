@@ -57,7 +57,7 @@ public:
     MdnsContexts(const MdnsContexts &) = delete;
     MdnsContexts & operator=(const MdnsContexts &) = delete;
     ~MdnsContexts();
-    static MdnsContexts & GetInstance() { return sInstance; }
+    static MdnsContexts & GetInstance() { return MdnsContexts::_GetInstance(); }
 
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
@@ -85,7 +85,7 @@ public:
 
 private:
     MdnsContexts(){};
-    static MdnsContexts sInstance;
+    static MdnsContexts & _GetInstance(void);
 
     std::vector<GenericContext *> mContexts;
 };

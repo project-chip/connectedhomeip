@@ -93,7 +93,7 @@ private:
 
     ResolverProxy mResolverProxy;
 
-    static DiscoveryImplPlatform sManager;
+    static DiscoveryImplPlatform & _GetManager();
 };
 
 } // namespace Dnssd

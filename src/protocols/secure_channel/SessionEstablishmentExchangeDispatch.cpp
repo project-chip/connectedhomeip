@@ -28,6 +28,14 @@ namespace chip {
 
 using namespace Messaging;
 
+ExchangeMessageDispatch & SessionEstablishmentExchangeDispatch::Instance()
+{
+    static SessionEstablishmentExchangeDispatch* instance = new SessionEstablishmentExchangeDispatch{};
+    return *instance;
+}
+
+
+
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(Protocols::Id protocol, uint8_t type)
 {
     if (protocol == Protocols::SecureChannel::Id)

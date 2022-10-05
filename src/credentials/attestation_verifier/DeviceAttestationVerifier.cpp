@@ -73,9 +73,18 @@ public:
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before
 // they provide their own.
-UnimplementedDACVerifier gDefaultDACVerifier;
+UnimplementedDACVerifier * sGetDefaultDACVerifier()
+{
+    static auto* verifier = new UnimplementedDACVerifier{};
+    return verifier;
+}
 
-DeviceAttestationVerifier * gDacVerifier = &gDefaultDACVerifier;
+
+DeviceAttestationVerifier ** sGetDeviceAttestationVerifierPtr()
+{
+    static DeviceAttestationVerifier *verifier = sGetDefaultDACVerifier();
+    return &verifier;
+}
 
 } // namespace
 
@@ -100,7 +109,7 @@ CHIP_ERROR DeviceAttestationVerifier::ValidateAttestationSignature(const P256Pub
 
 DeviceAttestationVerifier * GetDeviceAttestationVerifier()
 {
-    return gDacVerifier;
+    return *sGetDeviceAttestationVerifierPtr();;
 }
 
 void SetDeviceAttestationVerifier(DeviceAttestationVerifier * verifier)
@@ -110,7 +119,8 @@ void SetDeviceAttestationVerifier(DeviceAttestationVerifier * verifier)
         return;
     }
 
-    gDacVerifier = verifier;
+    auto **ptr = sGetDeviceAttestationVerifierPtr();
+    *ptr = verifier;
 }
 
 static inline Platform::ScopedMemoryBufferWithSize<uint8_t> CopyByteSpanHelper(const ByteSpan & span_to_copy)

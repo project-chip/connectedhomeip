@@ -39,7 +39,7 @@ public:
     {
         return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
-} gDeviceTypeResolver;
+};
 
 // TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate {
@@ -68,7 +68,16 @@ class AccessControlDelegate : public Access::AccessControl::Delegate {
     }
 };
 
-AccessControlDelegate gDelegate;
+DeviceTypeResolver& sGetDeviceTypeResolver() {
+    static DeviceTypeResolver* resolver = new DeviceTypeResolver{};
+    return *resolver;
+}
+
+AccessControlDelegate& sGetDelegate() {
+    static AccessControlDelegate* delegate = new AccessControlDelegate{};
+    return *delegate;
+}
+
 } // anonymous namespace
 
 @implementation MTRControllerAccessControl
@@ -77,7 +86,7 @@ AccessControlDelegate gDelegate;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        GetAccessControl().Init(&gDelegate, gDeviceTypeResolver);
+        GetAccessControl().Init(&sGetDelegate(), sGetDeviceTypeResolver());
     });
 }
 

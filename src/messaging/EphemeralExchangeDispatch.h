@@ -27,8 +27,8 @@ class EphemeralExchangeDispatch : public ExchangeMessageDispatch
 public:
     static ExchangeMessageDispatch & Instance()
     {
-        static EphemeralExchangeDispatch instance;
-        return instance;
+        static EphemeralExchangeDispatch* instance = new EphemeralExchangeDispatch{};
+        return *instance;
     }
 
     EphemeralExchangeDispatch() {}

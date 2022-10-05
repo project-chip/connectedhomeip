@@ -349,7 +349,11 @@ CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCo
 
 } // namespace
 
-DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+DiscoveryImplPlatform & DiscoveryImplPlatform::_GetManager()
+{
+    static auto * manager = new DiscoveryImplPlatform{};
+    return *manager;
+}
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -640,7 +644,7 @@ CHIP_ERROR DiscoveryImplPlatform::StopDiscovery()
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    return sManager;
+    return DiscoveryImplPlatform::_GetManager();
 }
 
 ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()

@@ -163,7 +163,11 @@ private:
 namespace chip {
 namespace Dnssd {
 
-MdnsContexts MdnsContexts::sInstance;
+MdnsContexts & MdnsContexts::_GetInstance(void)
+{
+    static auto * instance = new MdnsContexts{};
+    return *instance;
+}
 
 namespace {
 
