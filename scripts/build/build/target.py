@@ -77,7 +77,7 @@ class TargetPart:
     def Accept(self, full_input: str):
         if self.except_if_re:
             if self.except_if_re.search(full_input):
-                logging.warning(f"{self.name} does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
+                logging.warning(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
                 return False
 
         if self.only_if_re:
