@@ -105,6 +105,11 @@ def _HasVariantPrefix(value: str, prefix: str):
         _HasVariantPrefix('foo-bar-baz', 'foo') # -> 'bar-baz'
         _HasVariantPrefix('foo-bar-baz', 'bar') # -> None
     """
+    if value == prefix:
+        return ''
+
+    if value.startswith(prefix + '-'):
+        return value[len(prefix)+1:]
 
 
 def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[list[TargetPart]], modifiers: list[TargetPart]):
@@ -138,7 +143,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[
                 continue
 
             result = _StringIntoParts(full_input, suffix, fixed_targets[1:], modifiers)
-            if result:
+            if result is not None:
                 return [target] + result
 
         # None of the variants matched
@@ -157,7 +162,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[
             continue
 
         result = _StringIntoParts(full_input, suffix, fixed_targets[1:], filter(lambda x: x != modifier, modifiers))
-        if result:
+        if result is not None:
             return [modifier] + result
 
     # Remaining input is not empty and we failed to match it
