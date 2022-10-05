@@ -4,7 +4,7 @@ steps:
       args:
           - '-c'
           - |
-            git config --global --add safe.directory `pwd`
+            git config --global --add safe.directory "*"
             git submodule update --init --recursive
       id: Submodules
     - name: "connectedhomeip/chip-build-vscode:0.6.02"
