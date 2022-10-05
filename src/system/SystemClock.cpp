@@ -52,12 +52,20 @@ namespace Clock {
 namespace Internal {
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-extern ClockImpl gClockImpl;
+extern ClockImpl & GetClockImpl();
 #else  // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-ClockImpl gClockImpl;
+ClockImpl & GetClockImpl()
+{
+    static auto * clockImpl = new ClockImpl{};
+    return *clockImpl;
+}
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-ClockBase * gClockBase = &gClockImpl;
+ClockBase ** GetClockBasePtr(void)
+{
+    static ClockBase * clockBase = &GetClockImpl();
+    return &clockBase;
+}
 
 } // namespace Internal
 

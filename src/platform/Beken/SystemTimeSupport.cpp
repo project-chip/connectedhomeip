@@ -31,7 +31,14 @@ namespace System {
 namespace Clock {
 
 namespace Internal {
-ClockImpl gClockImpl;
+
+static ClockImpl gClockImpl;
+
+ClockImpl & GetClockImpl()
+{
+    return gClockImpl;
+}
+
 } // namespace Internal
 
 Clock::Milliseconds64 baseTime;

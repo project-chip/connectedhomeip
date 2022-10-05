@@ -296,11 +296,12 @@ public:
 namespace Internal {
 
 // This should only be used via SystemClock() below.
-extern ClockBase * gClockBase;
+ClockBase ** GetClockBasePtr(void);
 
 inline void SetSystemClockForTesting(Clock::ClockBase * clock)
 {
-    Clock::Internal::gClockBase = clock;
+    auto ** clockBasePtr = GetClockBasePtr();
+    *clockBasePtr = clock;
 }
 
 // Provide a mock implementation for use by unit tests.
@@ -344,7 +345,7 @@ void ToTimeval(Microseconds64 in, timeval & out);
 
 inline Clock::ClockBase & SystemClock()
 {
-    return *Clock::Internal::gClockBase;
+    return **Clock::Internal::GetClockBasePtr();
 }
 
 } // namespace System

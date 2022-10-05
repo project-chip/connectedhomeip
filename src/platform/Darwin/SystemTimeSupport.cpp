@@ -38,7 +38,13 @@ namespace System {
 namespace Clock {
 
 namespace Internal {
-ClockImpl gClockImpl;
+
+ClockImpl & GetClockImpl()
+{
+    static auto * clockImpl = new ClockImpl{};
+    return *clockImpl;
+}
+
 } // namespace Internal
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
