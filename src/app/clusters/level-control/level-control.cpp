@@ -73,8 +73,10 @@ static constexpr size_t kLevelControlStateTableSize =
 
 struct CallbackScheduleState
 {
-    System::Clock::Milliseconds32 prevDuration;  // The duration of the previous scheduled callback.
-    System::Clock::Timestamp nextIdealTimestamp; // The ideal time stamp for the next callback to be scheduled.
+    System::Clock::Timestamp idealTimestamp;    // The ideal time-stamp for the next callback to be scheduled.
+    System::Clock::Milliseconds32 runTime;      // The duration of the previous scheduled callback function.
+                                                // e.g. running time of emberAfLevelControlClusterServerTickCallback
+                                                // when called consecutively
 };
 
 typedef struct
@@ -129,24 +131,36 @@ static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedu
     auto waitTime          = delay;
     const auto currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    // Compute the wait time until the next callback based on the previous schedule latency
-    // and on the previous callback duration.
-    if ((currentTime > callbackSchedule.nextIdealTimestamp) && (callbackSchedule.prevDuration < delay))
+    // Subsequent call
+    if(callbackSchedule.runTime)
     {
-        System::Clock::Timestamp latency = currentTime - callbackSchedule.nextIdealTimestamp;
+        // Check whether the previous scheduled callback was late and whether its running time
+        // is smaller than the desired delay
+        // If the running time of the scheduled callback is greater than the desired delay
+        // then do nothing; do not flood the event loop if the device is not fast enough
+        if ((currentTime > callbackSchedule.idealTimestamp) && (callbackSchedule.runTime < delay))
+        {
+            System::Clock::Timestamp latency = currentTime - callbackSchedule.idealTimestamp;
 
-        if (latency >= delay)
-        {
-            waitTime = System::Clock::Milliseconds32(0);
-        }
-        else
-        {
-            waitTime -= latency;
+            if (latency >= delay)
+            {
+                waitTime = System::Clock::Milliseconds32(0);
+            }
+            else
+            {
+                waitTime -= latency;
+            }
         }
     }
+    // First-time call
+    else
+    {
+        // initialize idealTimestamp
+        callbackSchedule.idealTimestamp = currentTime;
+    }
 
-    callbackSchedule.nextIdealTimestamp += System::Clock::Milliseconds32(delayMs);
-    callbackSchedule.prevDuration = System::Clock::Milliseconds32(0);
+    callbackSchedule.idealTimestamp += System::Clock::Milliseconds32(delayMs);
+    callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     return waitTime.count();
 }
@@ -209,7 +223,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-        state->callbackSchedule.prevDuration = System::Clock::Milliseconds32(0);
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
     }
@@ -242,7 +256,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
-        state->callbackSchedule.prevDuration = System::Clock::Milliseconds32(0);
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
     }
@@ -280,12 +294,12 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
             }
         }
 
-        state->callbackSchedule.prevDuration = System::Clock::Milliseconds32(0);
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
     }
     else
     {
-        state->callbackSchedule.prevDuration = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
+        state->callbackSchedule.runTime = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
         schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     }
@@ -717,10 +731,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
     state->storedLevel = storedLevel;
 
-    // Initialize CallbackScheduleState structure;
-    // factor in the first callback in which case the computed latency should be zero.
-    state->callbackSchedule.prevDuration       = System::Clock::Milliseconds32(0);
-    state->callbackSchedule.nextIdealTimestamp = System::SystemClock().GetMonotonicTimestamp();
+    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
@@ -848,10 +859,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     // storedLevel is not used for Move commands.
     state->storedLevel = INVALID_STORED_LEVEL;
 
-    // Initialize CallbackScheduleState structure;
-    // factor in the first callback in which case the computed latency should be zero.
-    state->callbackSchedule.prevDuration       = System::Clock::Milliseconds32(0);
-    state->callbackSchedule.nextIdealTimestamp = System::SystemClock().GetMonotonicTimestamp();
+    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
@@ -979,10 +987,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     // storedLevel is not used for Step commands
     state->storedLevel = INVALID_STORED_LEVEL;
 
-    // Initialize CallbackScheduleState structure;
-    // factor in the first callback in which case the computed latency should be zero.
-    state->callbackSchedule.prevDuration       = System::Clock::Milliseconds32(0);
-    state->callbackSchedule.nextIdealTimestamp = System::SystemClock().GetMonotonicTimestamp();
+    state->callbackSchedule.runTime       = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
