@@ -438,49 +438,53 @@ def AndroidTargets():
     yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP)
 
 
-def MbedTargets():
-    target = Target('mbed', MbedBuilder)
+def BuildMbedTarget():
+    target = BuildTarget('mbed', MbedBuilder)
 
-    targets = [
-        target.Extend('CY8CPROTO_062_4343W',
-                      board=MbedBoard.CY8CPROTO_062_4343W),
-    ]
+    # board
+    target.AppendFixedTargets([
+        TargetPart('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
+    ])
 
-    app_targets = []
-    for target in targets:
-        app_targets.append(target.Extend('lock', app=MbedApp.LOCK))
-        app_targets.append(target.Extend('light', app=MbedApp.LIGHT))
-        app_targets.append(target.Extend(
-            'all-clusters', app=MbedApp.ALL_CLUSTERS))
-        app_targets.append(target.Extend(
-            'all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL))
-        app_targets.append(target.Extend('pigweed', app=MbedApp.PIGWEED))
-        app_targets.append(target.Extend('shell', app=MbedApp.SHELL))
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=MbedApp.LOCK),
+        TargetPart('light', app=MbedApp.LIGHT),
+        TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('pigweed', app=MbedApp.PIGWEED),
+        TargetPart('shell', app=MbedApp.SHELL),
+    ])
 
-    for target in app_targets:
-        yield target.Extend('release', profile=MbedProfile.RELEASE)
-        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist(
-            'Compile only for debugging purpose - '
-            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
-        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist(
-            'Compile only for debugging purpose - '
-            'https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+    # Modifiers
+    target.AppendModifier(TargetPart('release', profile=MbedProfile.RELEASE).ExceptIfRe('-(develop|debug)'))
+    target.AppendModifier(TargetPart('develop', profile=MbedProfile.DEVELOP).ExceptIfRe('-(release|debug)'))
+    target.AppendModifier(TargetPart('debug', profile=MbedProfile.DEBUG).ExceptIfRe('-(release|develop)'))
+
+    return target
 
 
-def InfineonTargets():
-    builder = VariantBuilder()
-    builder.AppendVariant(name="ota", enable_ota_requestor=True)
-    builder.AppendVariant(name="updateimage", update_image=True)
+def BuildInfineonTarget():
+    target = BuildTarget('infineon', InfineonBuilder)
 
-    target = Target('infineon-psoc6', InfineonBuilder, board=InfineonBoard.PSOC6BOARD)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('psoc6', board=InfineonBoard.PSOC6BOARD)
+    ])
 
-    builder.targets.append(target.Extend('lock', app=InfineonApp.LOCK))
-    builder.targets.append(target.Extend('light', app=InfineonApp.LIGHT))
-    builder.targets.append(target.Extend('all-clusters', app=InfineonApp.ALL_CLUSTERS))
-    builder.targets.append(target.Extend('all-clusters-minimal', app=InfineonApp.ALL_CLUSTERS_MINIMAL))
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=InfineonApp.LOCK),
+        TargetPart('light', app=InfineonApp.LIGHT),
+        TargetPart('all-clusters', app=InfineonApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=InfineonApp.ALL_CLUSTERS_MINIMAL),
+    ])
 
-    for target in builder.AllVariants():
-        yield target
+    # modifiers
+    target.AppendModifier(TargetPart('ota', enable_ota_requestor=True))
+    target.AppendModifier(TargetPart('updateimage', update_image=True))
+
+    return target
 
 
 def BuildAmebaTarget():
@@ -660,42 +664,43 @@ def BuildGenioTarget():
 
 
 BUILD_TARGETS = [
+    BuildAmebaTarget(),
     BuildBl602Target(),
     BuildBouffalolabTarget(),
+    Buildcc13x2x7_26x2x7Target(),
     BuildCyw30739Target(),
     BuildEsp32Target(),
     BuildGenioTarget(),
     BuildHostTarget(),
     BuildIMXTarget(),
+    BuildInfineonTarget(),
+    BuildK32WTarget(),
+    BuildMbedTarget(),
     BuildMW320Target(),
     BuildQorvoTarget(),
     BuildTizenTarget(),
-
-    Buildcc13x2x7_26x2x7Target(),
-    BuildK32WTarget(),
-    BuildAmebaTarget(),
 ]
 
 ALL = []
 
 target_generators = [
+    #AmebaTargets(),
     #Bl602Targets(),
     #BouffalolabTargets(),
+    #cc13x2x7_26x2x7Targets(),
     #Cyw30739Targets(),
     #Esp32Targets(),
     #GenioTargets(),
     #HostTargets(),
     #IMXTargets(),
+    #InfineonTargets(),
+    #K32WTargets(),
+    #MbedTargets(),
     #MW320Targets(),
     #QorvoTargets(),
     #TizenTargets(),
-    #AmebaTargets(),
     AndroidTargets(),
-    #cc13x2x7_26x2x7Targets(),
     Efr32Targets(),
-    InfineonTargets(),
-    #K32WTargets(),
-    MbedTargets(),
     NrfTargets(),
 ]
 
