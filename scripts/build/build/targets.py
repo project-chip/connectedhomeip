@@ -422,7 +422,7 @@ def BuildBouffalolabTarget():
 
     # Apps
     target.AppendFixedTargets([
-        TargetPart('light', board=BouffalolabApp.LIGHT),
+        TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
     return target
