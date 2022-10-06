@@ -99,6 +99,34 @@ class TestBuilder(unittest.TestCase):
             'targets'.split(' ')
         )
 
+    def test_general_dry_runs(self):
+        # A sampling of targets and variants to validate that
+        # build options do not change too much
+        TARGETS = [
+            'esp32-devkitc-light-rpc',
+            'esp32-m5stack-all-clusters-minimal-rpc-ipv6only',
+            'android-arm64-chip-tool',
+            'nrf-nrf52840dk-pump',
+            'efr32-brd4161a-light-rpc'
+        ]
+
+        for target in TARGETS:
+            expected = os.path.join('testdata', f'dry_run_{target}.txt')
+            self.assertCommandOutput(expected, f'--target {target} --dry-run build'.split(' '))
+
+    @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
+    @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64 and crosscompile, requires linux x64')
+    def test_linux_dry_runs(self):
+        TARGETS = [
+            'linux-arm64-chip-tool-ipv6only-clang',
+            'linux-arm64-ota-requestor-nodeps-ipv6only',
+            'linux-x64-all-clusters-coverage',
+        ]
+
+        for target in TARGETS:
+            expected = os.path.join('testdata', f'dry_run_{target}.txt')
+            self.assertCommandOutput(expected, f'--target {target} --dry-run build'.split(' '))
+
 
 if __name__ == '__main__':
     unittest.main()
