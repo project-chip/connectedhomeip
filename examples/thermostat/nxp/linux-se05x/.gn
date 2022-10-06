@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 
-import("${chip_root}/config/standalone/args.gni")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-chip_crypto = "boringssl"
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  import("//args.gni")
+}

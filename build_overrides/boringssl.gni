@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 declare_args() {
   # Root directory for BoringSSL
-  boringssl_root = "//third_party/boringssl/repo"
+  boringssl_root = "${chip_root}/third_party/boringssl/repo"
 }

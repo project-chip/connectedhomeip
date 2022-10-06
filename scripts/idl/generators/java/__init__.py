@@ -31,10 +31,10 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     if field.is_list:
         return None  # lists are always specific per cluster
 
-    if FieldQuality.NULLABLE in field.qualities:
+    if FieldQuality.NULLABLE & field.qualities:
         return None
 
-    if FieldQuality.OPTIONAL in field.qualities:
+    if FieldQuality.OPTIONAL & field.qualities:
         return None
 
     actual = ParseDataType(field.data_type, context)

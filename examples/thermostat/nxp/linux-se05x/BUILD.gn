@@ -12,8 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/config/standalone/args.gni")
+executable("thermostat-se05x-app") {
+  sources = [ "${chip_root}/examples/thermostat/linux/main.cpp" ]
 
-chip_crypto = "boringssl"
+  include_dirs = [ "${chip_root}/examples/platform/linux" ]
+
+  deps = [
+    "${chip_root}/examples/platform/nxp/se05x/linux:app-main",
+    "${chip_root}/examples/thermostat/thermostat-common",
+    "${chip_root}/src/lib",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}

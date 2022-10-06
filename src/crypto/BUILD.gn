@@ -58,10 +58,6 @@ buildconfig_header("crypto_buildconfig") {
     defines += [ "CHIP_CRYPTO_HSM=0" ]
     defines += [ "CHIP_CRYPTO_HSM_NXP=0" ]
   }
-
-  if (chip_with_se05x_da == 1) {
-    defines += [ "ENABLE_HSM_DEVICE_ATTESTATION=1" ]
-  }
 }
 
 source_set("public_headers") {
@@ -92,7 +88,7 @@ if (chip_crypto == "openssl") {
     public_deps = [ ":public_headers" ]
   }
 } else if (chip_crypto == "boringssl") {
-  import("//build_overrides/boringssl.gni")
+  import("${chip_root}/build_overrides/boringssl.gni")
 
   source_set("cryptopal_boringssl") {
     # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences

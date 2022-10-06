@@ -21,22 +21,26 @@ class ParseMetaData:
             self.column = column
 
 
-class StructQuality(enum.Enum):
+class StructQuality(enum.Flag):
+    NONE = 0
     FABRIC_SCOPED = enum.auto()
 
 
-class FieldQuality(enum.Enum):
+class FieldQuality(enum.Flag):
+    NONE = 0
     OPTIONAL = enum.auto()
     NULLABLE = enum.auto()
     FABRIC_SENSITIVE = enum.auto()
 
 
-class CommandQuality(enum.Enum):
+class CommandQuality(enum.Flag):
+    NONE = 0
     TIMED_INVOKE = enum.auto()
     FABRIC_SCOPED = enum.auto()
 
 
-class AttributeQuality(enum.Enum):
+class AttributeQuality(enum.Flag):
+    NONE = 0
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
@@ -54,7 +58,8 @@ class EventPriority(enum.Enum):
     CRITICAL = enum.auto()
 
 
-class EventQuality(enum.Enum):
+class EventQuality(enum.Flag):
+    NONE = 0
     FABRIC_SENSITIVE = enum.auto()
 
 
@@ -99,36 +104,36 @@ class Field:
     code: int
     name: str
     is_list: bool = False
-    qualities: Set[FieldQuality] = field(default_factory=set)
+    qualities: FieldQuality = FieldQuality.NONE
 
     @property
     def is_optional(self):
-        return FieldQuality.OPTIONAL in self.qualities
+        return FieldQuality.OPTIONAL & self.qualities
 
     @property
     def is_nullable(self):
-        return FieldQuality.NULLABLE in self.qualities
+        return FieldQuality.NULLABLE & self.qualities
 
 
 @dataclass
 class Attribute:
     definition: Field
-    qualities: Set[AttributeQuality] = field(default_factory=set)
+    qualities: AttributeQuality = AttributeQuality.NONE
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
     default: Optional[Union[str, int]] = None
 
     @property
     def is_readable(self):
-        return AttributeQuality.READABLE in self.qualities
+        return AttributeQuality.READABLE & self.qualities
 
     @property
     def is_writable(self):
-        return AttributeQuality.WRITABLE in self.qualities
+        return AttributeQuality.WRITABLE & self.qualities
 
     @property
     def is_subscribable(self):
-        return AttributeQuality.NOSUBSCRIBE not in self.qualities
+        return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
 
 
 @dataclass
@@ -137,7 +142,7 @@ class Struct:
     fields: List[Field]
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
-    qualities: Set[StructQuality] = field(default_factory=set)
+    qualities: StructQuality = StructQuality.NONE
 
 
 @dataclass
@@ -147,11 +152,11 @@ class Event:
     code: int
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
-    qualities: Set[EventQuality] = field(default_factory=set)
+    qualities: EventQuality = EventQuality.NONE
 
     @property
     def is_fabric_sensitive(self):
-        return EventQuality.FABRIC_SENSITIVE in self.qualities
+        return EventQuality.FABRIC_SENSITIVE & self.qualities
 
 
 @dataclass
@@ -180,12 +185,12 @@ class Command:
     code: int
     input_param: Optional[str]
     output_param: str
-    qualities: Set[CommandQuality] = field(default_factory=set)
+    qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_timed_invoke(self):
-        return CommandQuality.TIMED_INVOKE in self.qualities
+        return CommandQuality.TIMED_INVOKE & self.qualities
 
 
 @dataclass
