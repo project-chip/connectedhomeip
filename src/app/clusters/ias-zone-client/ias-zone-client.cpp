@@ -15,69 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/****************************************************************************
- * @file
- * @brief  *
- * Client Operation:
- *   1. Look for ZDO device announce notification.
- *   2. Perform ZDO match descriptor on device.
- *   3. If supports IAS Zone Server, Add that server
- *to our known list. Write CIE Address.
- *   4. Read CIE address, verify it is ours.  This is
- *done mostly because the test case requires it.
- *   5. Read the IAS Zone Server attributes.
- *     Record in table.
- *   6. When we get an enroll request, give them our
- *(only) zone ID.
- *   7. When we get a notification, read their
- *attributes.
- *
- * Improvements that could be made:
- *   Add support for multiple endpoints on server.
- *Most often this is a legacy security system
- *retrofitted with a single ZigBee radio.  Therefore
- *   each sensor is on a different endpoint.  Right
- *now our client only handles a single endpoint per
- *node.
- *
- *   Integration with Poll Control.  When the device
- *boots we should configure its polling to make it
- *possible to read/write its attributes.
- *
- *   Update the emberAfIasZoneClientKnownServers list
- *when we know a server un-enrolls. Right now, we
- *don't have any way to tell when we don't need to
- *keep track of a server anymore, i.e., when it
- *un-enrolls. Therefore, we could potentially keep
- *adding servers to our known list, and run out of
- *room to add more. Fortunately, we have two things
- *working for us:
- *     1. Servers will most likely stay around in a
- *network. It is unlikely that an IAS Zone Client in
- *production will have to handle 254 different
- *servers.
- *     2. If a server un-enrolls and then enrolls
- *again, it will get the same Zone ID and have a spot
- *in the list, since we store servers by long address.
- *******************************************************************************
- ******************************************************************************/
-
 #include "ias-zone-client.h"
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
