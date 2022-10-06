@@ -67,7 +67,7 @@ def ValidateRepoPath(context, parameter, value):
     help='Determines the verbosity of script output.')
 @click.option(
     '--target',
-    default=['all'],
+    default=[],
     multiple=True,
     help='Build target(s)'
 )
