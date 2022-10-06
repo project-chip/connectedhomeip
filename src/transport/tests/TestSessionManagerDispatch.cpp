@@ -89,9 +89,14 @@ struct MessageTestEntry
     NodeId peerNodeId;
     GroupId groupId;
     NodeId sourceNodeId;
+
+    uint8_t expectedMessageCount;
 };
 
 struct MessageTestEntry theMessageTestVector[] = {
+    // =======================================
+    // PASE positive test cases
+    // =======================================
     {
         .name     = "secure pase message (no payload)",
         .peerAddr = "::1",
@@ -100,8 +105,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
                      "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
-        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                   "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 14,
@@ -115,6 +120,8 @@ struct MessageTestEntry theMessageTestVector[] = {
 
         .sessionId  = 0x0bb8, // 3000
         .peerNodeId = 0x0000000000000000ULL,
+
+        .expectedMessageCount = 1,
     },
     {
         .name     = "secure pase message (short payload)",
@@ -124,8 +131,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
                      "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
-        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                   "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
 
         .payloadLength   = 5,
         .plainLength     = 19,
@@ -139,6 +146,63 @@ struct MessageTestEntry theMessageTestVector[] = {
 
         .sessionId  = 0x0bb8, // 3000
         .peerNodeId = 0x0000000000000000ULL,
+
+        .expectedMessageCount = 1,
+    },
+    // =======================================
+    // PASE negative test cases
+    // =======================================
+    {
+        .name     = "secure pase message (no payload / wrong MIC)",
+        .peerAddr = "::1",
+
+        .payload   = "",
+        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
+        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
+
+        .payloadLength   = 0,
+        .plainLength     = 14,
+        .encryptedLength = 30,
+        .privacyLength   = 30,
+
+        // TODO(#22830): unicast message tests must use test key currently
+        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+
+        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+
+        .sessionId  = 0x0bb8, // 3000
+        .peerNodeId = 0x0000000000000000ULL,
+
+        .expectedMessageCount = 0,
+    },
+    {
+        .name     = "secure pase message (short payload / wrong MIC)",
+        .peerAddr = "::1",
+
+        .payload   = "\x11\x22\x33\x44\x55",
+        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
+        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
+        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
+
+        .payloadLength   = 5,
+        .plainLength     = 19,
+        .encryptedLength = 35,
+        .privacyLength   = 35,
+
+        // TODO(#22830): unicast message tests must use test key currently
+        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+
+        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+
+        .sessionId  = 0x0bb8, // 3000
+        .peerNodeId = 0x0000000000000000ULL,
+
+        .expectedMessageCount = 0,
     },
 #if !CHIP_CONFIG_SECURITY_TEST_MODE
     {
@@ -150,8 +214,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
                      "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
-        .privacy = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                   "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -169,6 +233,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .peerNodeId   = 0x0000000000000000ULL,
         .groupId      = 2,
         .sourceNodeId = 0x0000000000000002ULL,
+
+        .expectedMessageCount = 1,
     },
     {
         .name     = "private group message",
@@ -179,8 +245,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
                      "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
-        .privacy = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
-                   "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+        .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
+                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -198,6 +264,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .peerNodeId   = 0x0000000000000000ULL,
         .groupId      = 2,
         .sourceNodeId = 0x0000000000000002ULL,
+
+        .expectedMessageCount = 1,
     },
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 };
@@ -389,7 +457,12 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
         sessionManager.OnMessageReceived(peerAddress, std::move(msg));
-        NL_TEST_ASSERT(inSuite, callback.NumMessagesReceived() > 0);
+        NL_TEST_ASSERT(inSuite, callback.NumMessagesReceived() == testEntry.expectedMessageCount);
+
+        if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))
+        {
+            ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS (negative test case)", i);
+        }
     }
 
     sessionManager.Shutdown();

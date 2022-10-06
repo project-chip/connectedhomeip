@@ -668,6 +668,13 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
         return;
     }
 
+    // Drop secure unicast messages with privacy enabled.
+    if (packetHeader.HasPrivacyFlag())
+    {
+        ChipLogError(Inet, "Dropping secure unicast message with privacy flag set");
+        return;
+    }
+
     if (!session.HasValue())
     {
         ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
