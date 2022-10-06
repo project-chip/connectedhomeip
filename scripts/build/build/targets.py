@@ -426,6 +426,8 @@ def BuildBouffalolabTarget():
         TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
+    target.AppendModifier('rpc', enable_rpcs=True)
+
     return target
 
 
