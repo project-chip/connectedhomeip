@@ -52,6 +52,35 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
 
+    for (size_t i = 0; i < index.mSize; ++i)
+    {
+        if (index.mNodes[i] == node)
+        {
+            // Node already exists in the index.  Save in place.
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            ResumptionIdStorage oldResumptionId;
+            Crypto::P256ECDHDerivedSecret oldSharedSecret;
+            CATValues oldPeerCATs;
+            err = LoadState(node, oldResumptionId, oldSharedSecret, oldPeerCATs);
+            // This follows the approach in Delete.  Removal of the old link is
+            // best effort.  Leaks will occur if an entry in the link table does
+            // not have a corresponding entry in the state table.
+            if (err == CHIP_NO_ERROR)
+            {
+                err = DeleteLink(oldResumptionId);
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(SecureChannel,
+                             "Unable to delete session resumption link for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(node.GetNodeId()), err.Format());
+            }
+            ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
+            ReturnErrorOnFailure(SaveLink(resumptionId, node));
+            return CHIP_NO_ERROR;
+        }
+    }
+
     if (index.mSize == CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE)
     {
         // TODO: implement LRU for resumption
