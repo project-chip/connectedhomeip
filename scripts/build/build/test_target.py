@@ -25,7 +25,6 @@ except:
     from target import *
 
 
-
 class FakeBuilder:
     def __init__(self, **kargs):
         self.kargs = kargs
