@@ -551,6 +551,12 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
         return;
     }
 
+    if (packetHeader.HasPrivacyFlag())
+    {
+        ChipLogError(Inet, "Received unsupported message with privacy flag set");
+        return;
+    }
+
     if (packetHeader.IsEncrypted())
     {
         if (packetHeader.IsGroupSession())
