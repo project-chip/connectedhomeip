@@ -107,8 +107,10 @@ class FactoryDataWriter:
         offset = self.WriteBits(fillBits, offset, 0, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits)
         offset = self.WriteBits(fillBits, offset, self._args.vendor_id, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
         offset = self.WriteBits(fillBits, offset, self._args.product_id, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, 0, kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, 2, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.commissioning_flow,
+                                kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.rendezvous_flag,
+                                kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits)
         offset = self.WriteBits(fillBits, offset, self._args.discriminator,
                                 kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits)
         offset = self.WriteBits(fillBits, offset, self._args.passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits)
@@ -153,6 +155,10 @@ class FactoryDataWriter:
                 datetime.datetime.strptime(self._args.manufacturing_date, '%Y-%m-%d')
             except ValueError:
                 raise ValueError("Incorrect manufacturing data format, should be YYYY-MM-DD")
+        if self._args.commissioning_flow:
+            assert(self._args.commissioning_flow <= 3), "Invalid commissioning flow value"
+        if self._args.rendezvous_flag:
+            assert(self._args.rendezvous_flag <= 7), "Invalid rendez-vous flag value"
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
 
@@ -301,15 +307,20 @@ def main():
     parser.add_argument("--vendor_name", type=str,
                         help="[string] Provide the vendor name [optional]")
     parser.add_argument("--hw_version", type=all_int_format,
-                        help="[int | hex int] Provide the harware version value[optional]")
+                        help="[int | hex int] Provide the hardware version value[optional]")
     parser.add_argument("--hw_version_str", type=str,
-                        help="[string] Provide the harware version string[optional]")
+                        help="[string] Provide the hardware version string[optional]")
     parser.add_argument("--rotating_id", type=str,
                         help="[hex_string] A 128 bits hex string unique id (without 0x) [optional]")
     parser.add_argument("--serial_number", type=str,
                         help="[string] Provide serial number of the device")
     parser.add_argument("--manufacturing_date", type=str,
                         help="[string] Provide Manufacturing date in YYYY-MM-DD format [optional]")
+    parser.add_argument("--commissioning_flow", type=all_int_format, default=0,
+                        help="[int| hex] Provide Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)")
+    parser.add_argument("--rendezvous_flag", type=all_int_format, default=2,
+                        help="[int| hex] Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)")
+
     args = parser.parse_args()
     writer = FactoryDataWriter(args)
     writer.create_nvm3injected_image()
