@@ -117,6 +117,7 @@ def BuildEsp32Target():
         TargetPart('m5stack', board=Esp32Board.M5Stack).OnlyIfRe('-(all-clusters|ota-requestor)'),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
+        TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
     ])
 
     # applications
@@ -131,14 +132,12 @@ def BuildEsp32Target():
         TargetPart('bridge', app=Esp32App.BRIDGE),
         TargetPart('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
+        TargetPart('tests', app=Esp32App.TESTS).OnlyIfRe('-qemu-'),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
 
-    # TODO:
-    # yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
-    # yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
     return target
 
 
