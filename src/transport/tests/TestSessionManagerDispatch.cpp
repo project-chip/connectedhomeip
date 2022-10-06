@@ -204,6 +204,33 @@ struct MessageTestEntry theMessageTestVector[] = {
 
         .expectedMessageCount = 0,
     },
+    {
+        .name     = "secure pase message (short payload / drop when privacy enabled)",
+        .peerAddr = "::1",
+
+        .payload   = "\x11\x22\x33\x44\x55",
+        .plain     = "\x00\xb8\x0b\x80\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
+        .encrypted = "\x00\xb8\x0b\x80\x39\x30\x00\x00\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
+                     "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+        .privacy   = "\x00\xb8\x0b\x80\x87\xbe\xef\x06\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
+                     "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+
+        .payloadLength   = 5,
+        .plainLength     = 19,
+        .encryptedLength = 35,
+        .privacyLength   = 35,
+
+        // TODO(#22830): unicast message tests must use test key currently
+        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+
+        .nonce        = "\x00\x39\x30\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        .privacyNonce = "\x0b\xb8\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f",
+
+        .sessionId  = 0x0bb8, // 3000
+        .peerNodeId = 0x0000000000000000ULL,
+
+        .expectedMessageCount = 0,
+    },
 #if !CHIP_CONFIG_SECURITY_TEST_MODE
     {
         .name     = "secure group message (no privacy)",
