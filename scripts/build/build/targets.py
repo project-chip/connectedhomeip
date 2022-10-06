@@ -52,7 +52,7 @@ def BuildHostTarget():
     ]
 
     if cross_compile:
-        board_parts.append(TargetPart('arm64', board=HostBoard.ARM64).OnlyIfRe('-clang'))
+        board_parts.append(TargetPart('arm64', board=HostBoard.ARM64).OnlyIfRe('-(clang|nodeps)'))
 
     target.AppendFixedTargets(board_parts)
 
@@ -447,13 +447,13 @@ def BuildIMXTarget():
 
 def BuildMW320Target():
     target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets([TargetPart('all-clusters-app', board=MW320App.ALL_CLUSTERS)])
+    target.AppendFixedTargets([TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
     return target
 
 
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
-    target.AppendFixedTargets([TargetPart('lighting-app', board=GenioApp.LIGHT)])
+    target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
     return target
 
 

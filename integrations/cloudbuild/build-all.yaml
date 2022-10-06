@@ -69,35 +69,35 @@ steps:
               --target infineon-psoc6-all-clusters-minimal
               --target infineon-psoc6-light
               --target infineon-psoc6-lock
-              --target k32w-contact-release
-              --target k32w-light-release-no-ota
-              --target k32w-lock-release
-              --target k32w-shell-release
-              --target linux-arm64-clang-all-clusters
-              --target linux-arm64-clang-all-clusters-app-nodeps
-              --target linux-arm64-clang-all-clusters-app-nodeps-ipv6only
-              --target linux-arm64-clang-all-clusters-ipv6only
-              --target linux-arm64-clang-all-clusters-minimal
-              --target linux-arm64-clang-all-clusters-minimal-ipv6only
-              --target linux-arm64-clang-bridge-ipv6only
-              --target linux-arm64-clang-chip-tool
-              --target linux-arm64-clang-chip-tool-ipv6only
-              --target linux-arm64-clang-chip-tool-nodeps
-              --target linux-arm64-clang-chip-tool-nodeps-ipv6only
-              --target linux-arm64-clang-dynamic-bridge-ipv6only
-              --target linux-arm64-clang-light
-              --target linux-arm64-clang-light-ipv6only
-              --target linux-arm64-clang-light-rpc
-              --target linux-arm64-clang-light-rpc-ipv6only
-              --target linux-arm64-clang-lock
-              --target linux-arm64-clang-lock-ipv6only
-              --target linux-arm64-clang-minmdns
-              --target linux-arm64-clang-ota-provider-nodeps-ipv6only
-              --target linux-arm64-clang-ota-requestor-nodeps-ipv6only
-              --target linux-arm64-clang-shell-ipv6only
-              --target linux-arm64-clang-thermostat-ipv6only
-              --target linux-arm64-clang-tv-app-ipv6only
-              --target linux-arm64-clang-tv-casting-app-ipv6only
+              --target k32w-contact
+              --target k32w-light-no-ota
+              --target k32w-lock
+              --target k32w-shell
+              --target linux-arm64-all-clusters-clang
+              --target linux-arm64-all-clusters-app-nodeps
+              --target linux-arm64-all-clusters-app-nodeps-ipv6only
+              --target linux-arm64-all-clusters-ipv6only-clang
+              --target linux-arm64-all-clusters-minimal-clang
+              --target linux-arm64-all-clusters-minimal-ipv6only-clang
+              --target linux-arm64-bridge-ipv6only-clang
+              --target linux-arm64-chip-tool-clang
+              --target linux-arm64-chip-tool-ipv6only-clang
+              --target linux-arm64-chip-tool-nodeps
+              --target linux-arm64-chip-tool-nodeps-ipv6only
+              --target linux-arm64-dynamic-bridge-ipv6only-clang
+              --target linux-arm64-light-clang
+              --target linux-arm64-light-ipv6only-clang
+              --target linux-arm64-light-rpc-clang
+              --target linux-arm64-light-rpc-ipv6only-clang
+              --target linux-arm64-lock-clang
+              --target linux-arm64-lock-ipv6only-clang
+              --target linux-arm64-minmdns-clang
+              --target linux-arm64-ota-provider-nodeps-ipv6only
+              --target linux-arm64-ota-requestor-nodeps-ipv6only
+              --target linux-arm64-shell-ipv6only-clang
+              --target linux-arm64-thermostat-ipv6only-clang
+              --target linux-arm64-tv-app-ipv6only-clang
+              --target linux-arm64-tv-casting-app-ipv6only-clang
               --target linux-x64-address-resolve-tool
               --target linux-x64-all-clusters
               --target linux-x64-all-clusters-nodeps
@@ -139,8 +139,8 @@ steps:
               --target nrf-nrf5340dk-all-clusters
               --target nrf-nrf5340dk-all-clusters-minimal
               --target nrf-nrf5340dk-shell
-              --target qpg-light
-              --target qpg-shell
+              --target qpg-qpg6105-light
+              --target qpg-qpg6105-shell
               --target telink-tlsr9518adk80d-light
               --target tizen-arm-light
               build

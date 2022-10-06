@@ -65,7 +65,7 @@ class TargetPart:
     except_if_re: Optional[re.Pattern] = None
 
     def __init__(self, name, **kargs):
-        self.name = name
+        self.name = name.lower()
         self.build_arguments = kargs
 
     def OnlyIfRe(self, expr: str):
@@ -180,7 +180,7 @@ class BuildTarget:
         """ Sets up a new build tareget starting with the given builder class
             and initial arguments
         """
-        self.name = name
+        self.name = name.lower()
         self.builder_class = builder_class
         self.create_kw_args = kwargs
 
@@ -336,6 +336,8 @@ class BuildTarget:
         kargs = {}
         for part in parts:
             kargs.update(part.build_arguments)
+
+        logging.info("Preparing builder '%s'" % (name,))
 
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self
