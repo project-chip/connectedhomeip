@@ -42,18 +42,28 @@ def build_darwin_framework(args):
     if not os.path.exists(abs_path):
         os.mkdir(abs_path)
 
+    sdk = 'macosx' if os.environ.get('SDKROOT') == None else os.environ.get('SDKROOT')
+    arch = platform.machine() if sdk.startswith('macosx') else 'arm64'
+
     command = [
         'xcodebuild',
         '-scheme',
         args.target,
         '-sdk',
-        'macosx',
+        sdk,
         '-project',
         args.project_path,
         '-derivedDataPath',
         abs_path,
-        "PLATFORM_PREFERRED_ARCH={}".format(platform.machine())
+        "PLATFORM_PREFERRED_ARCH={}".format(arch),
     ]
+
+    if sdk != "macosx":
+        command += [
+            # Build Matter.framework as a static library
+            "SUPPORTS_TEXT_BASED_API=NO",
+            "MACH_O_TYPE=staticlib",
+        ]
     command_result = run_command(command)
 
     print("Build Framework Result: {}".format(command_result))

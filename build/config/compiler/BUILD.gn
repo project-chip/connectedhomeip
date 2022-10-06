@@ -19,7 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
-if (current_os == "mac") {
+if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
@@ -49,13 +49,11 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_os == "mac") {
+  if (current_os == "mac" || current_os == "ios") {
     cflags += [
       "-target",
       mac_target_triple,
     ]
-  } else if (current_os == "ios") {
-    # iOS ABI currently set by chip_xcode_build_connector.sh
   }
 
   if (current_os != "mac" && current_os != "ios") {
