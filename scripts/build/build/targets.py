@@ -314,7 +314,7 @@ def BuildK32WTarget():
     ])
 
     target.AppendModifier(name="no-ota", disable_ota=True)
-    target.AppendModifier(name="low-power", low_power=True)
+    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
     target.AppendModifier(name="nologs", disable_logs=True)
 
     return target
