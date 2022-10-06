@@ -570,6 +570,7 @@ void BLEManagerImpl::DriveBLEState()
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
         err = BluezGattsAppRegister(mpEndpoint);
+        SuccessOrExit(err);
         mFlags.Set(Flags::kControlOpInProgress);
         ExitNow();
     }
