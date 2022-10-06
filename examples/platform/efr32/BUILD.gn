@@ -93,3 +93,18 @@ source_set("efr32-attestation-credentials") {
 
   public_configs = [ ":attestation-credentials-config" ]
 }
+
+source_set("efr32-factory-data-provider") {
+  sources = [
+    "EFR32DeviceDataProvider.cpp",
+    "EFR32DeviceDataProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  #public_configs = [ "" ]
+}

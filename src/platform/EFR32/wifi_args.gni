@@ -30,6 +30,10 @@ if (chip_crypto == "") {
   chip_crypto = "platform"
 }
 
+# Transitional CommissionableDataProvider not used anymore
+# examples/platform/efr32/EFR32DeviceDataProvider is now used.
+chip_use_transitional_commissionable_data_provider = false
+
 #lwip_platform = "external"
 lwip_platform = "efr32"
 lwip_ipv6 = true

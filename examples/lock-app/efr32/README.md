@@ -105,7 +105,7 @@ Silicon Labs platform.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${EFR32_BOARD}\""
           $ ninja -C out/debug
           ```
 
@@ -125,7 +125,7 @@ Silicon Labs platform.
     or use gn as previously mentioned but adding the following arguments:
 
           ```
-          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=silabs_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
           ```
 
 *   Build the example with pigweed RCP
