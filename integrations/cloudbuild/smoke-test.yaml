@@ -89,8 +89,8 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py 
-              --enable-flashbundle 
+              ./scripts/build/build_examples.py
+              --enable-flashbundle
               --target linux-arm64-all-clusters-clang
               --target linux-arm64-all-clusters-app-nodeps-ipv6only-clang
               --target linux-arm64-all-clusters-minimal-ipv6only-clang
@@ -112,7 +112,7 @@ steps:
               --target linux-x64-all-clusters-app-nodeps-ipv6only
               --target linux-x64-all-clusters-coverage
               --target linux-x64-bridge-ipv6only
-              --target linux-x64-chip-cert 
+              --target linux-x64-chip-cert
               --target linux-x64-chip-tool-ipv6only
               --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-light-rpc-ipv6only
@@ -125,8 +125,8 @@ steps:
               --target linux-x64-shell-ipv6only
               --target linux-x64-thermostat-ipv6only
               --target linux-x64-tv-app-ipv6only
-              --target linux-x64-tv-casting-app-ipv6only 
-              build 
+              --target linux-x64-tv-casting-app-ipv6only
+              build
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
