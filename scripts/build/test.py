@@ -91,31 +91,12 @@ class TestBuilder(unittest.TestCase):
                                             '{root}').replace(OUT, '{out}').strip())
             self.fail(msg)
 
-    def test_output(self):
-        self.assertCommandOutput(
-            os.path.join('testdata', 'build_all_except_host.txt'),
-            '--skip-target-glob {linux,darwin}-* build'.split(' ')
-        )
-
-    def test_targets(self):
-        self.assertCommandOutput(
-            os.path.join('testdata', 'all_targets_except_host.txt'),
-            '--skip-target-glob {linux,darwin}-* targets'.split(' ')
-        )
-
-    def test_glob_targets(self):
-        self.assertCommandOutput(
-            os.path.join('testdata', 'glob_star_targets_except_host.txt'),
-            '--target-glob * --skip-target-glob {linux,darwin}-* targets'.split(
-                ' ')
-        )
-
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
     @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64 and crosscompile, requires linux x64')
-    def test_linux_build(self):
+    def test_linux64_targets(self):
         self.assertCommandOutput(
-            os.path.join('testdata', 'build_linux_on_x64.txt'),
-            '--target-glob {linux}-* build'.split(' ')
+            os.path.join('testdata', 'all_targets_linux_x64.txt'),
+            'targets'.split(' ')
         )
 
 

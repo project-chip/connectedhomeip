@@ -22,13 +22,12 @@ pw_python_package("build_examples") {
   setup = [ "setup.py" ]
   inputs = [
     # Dependency for the unit test
-    "testdata/all_targets_except_host.txt",
-    "testdata/build_all_except_host.txt",
-    "testdata/build_linux_on_x64.txt",
+    "testdata/all_targets_linux_x64.txt",
   ]
 
   sources = [
     "build/__init__.py",
+    "build/target.py",
     "build/targets.py",
     "build_examples.py",
     "builders/__init__.py",
