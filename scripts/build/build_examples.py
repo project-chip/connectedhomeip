@@ -153,15 +153,19 @@ def cmd_generate(context):
     'targets',
     help=('List the targets that would be generated/built given '
           'the input arguments'))
+@click.option(
+    '--expand',
+    default=False,
+    is_flag=True,
+    help='Expand all possible targets rather than the shorthand string')
 @click.pass_context
-def cmd_targets(context):
-    # FIXME: implement
-    for builder in context.obj.builders:
-        if builder.target.IsGlobBlacklisted:
-            print("%s (NOGLOB: %s)" %
-                  (builder.target.name, builder.target.GlobBlacklistReason))
+def cmd_targets(context, expand):
+    for target in build.targets.BUILD_TARGETS:
+        if expand:
+            for s in target.AllVariants():
+                print(s)
         else:
-            print(builder.target.name)
+            print(target.HumanString()
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')

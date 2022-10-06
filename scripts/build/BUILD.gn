@@ -59,5 +59,6 @@ pw_python_package("build_examples") {
   tests = [
     "test.py",
     "test_glob_matcher.py",
+    "build/test_target.py",
   ]
 }
