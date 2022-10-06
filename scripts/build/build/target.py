@@ -38,12 +38,14 @@
 # combination of platform/board/app/modifier(s). This requirement is unenfornced in code
 # but easy enough to follow when defining names for things: just don't reuse names between '-'
 
+import itertools
 import logging
 import os
 import re
 
-from typing import Any, Optional
+from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Any, Optional
 
 
 @dataclass(init=False)
@@ -253,6 +255,62 @@ class BuildTarget:
             result += f"[-{modifier.name}]"
 
         return result
+
+    def AllVariants(self) -> Iterable[str]:
+        """Returns all possible accepted variants by this target.
+
+           For example name-{a,b}-{c,d}[-1][-2]  could return (there may be Only/ExceptIfRe rules):
+
+              name-a-c
+              name-a-c-1
+              name-a-c-2
+              name-a-c-1-2
+              name-a-d
+              name-a-d-1
+              ...
+              name-b-d-2
+              name-b-d-1-2
+
+           Notice that this DOES increase exponentially and is potentially a very long list
+        """
+
+        # Output is made out of 2 separate parts:
+        #   - a valid combination of "fixed parts"
+        #   - a combination of modifiers
+
+        fixed_indices = [0]*len(self.fixed_targets)
+
+        while True:
+
+            prefix = "-".join(map(
+                lambda p: self.fixed_targets[p[0]][p[1]].name, enumerate(fixed_indices)
+            ))
+
+            for n in range(len(self.modifiers) + 1):
+                for c in itertools.combinations(self.modifiers, n):
+                    suffix = ""
+                    for m in c:
+                        suffix += "-" + m.name
+                    option = f"{self.name}-{prefix}{suffix}"
+                    
+                    if self.StringIntoTargetParts(option) is not None:
+                        yield option
+
+            # Move to the next index in fixed_indices or exit loop if we cannot move
+            move_idx = len(fixed_indices) - 1
+            while move_idx >= 0:
+                if fixed_indices[move_idx] + 1 < len(self.fixed_targets[move_idx]):
+                    fixed_indices[move_idx] += 1
+                    break
+
+                # need to move the previous value
+                fixed_indices[move_idx] = 0
+                move_idx -= 1
+
+            if move_idx < 0:
+                # done iterating through all
+                return
+
 
     def StringIntoTargetParts(self, value: str):
         """Given an input string, process through all the input rules and return

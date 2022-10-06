@@ -99,6 +99,48 @@ class TestGlobMatcher(unittest.TestCase):
             "fake-{foo,bar}-{one,two}[-m1][-m2][-x1][-y1]"
         )
 
+        self.assertEqual(
+            set(t.AllVariants()),
+            {
+                'fake-foo-one',
+                'fake-foo-one-m1',
+                'fake-foo-one-m1-x1',
+                'fake-foo-one-m1-x1-y1',
+                'fake-foo-one-m1-y1',
+                'fake-foo-one-m2',
+                'fake-foo-one-m2-x1',
+                'fake-foo-one-m2-x1-y1',
+                'fake-foo-one-m2-y1',
+                'fake-foo-one-x1',
+                'fake-foo-one-x1-y1',
+                'fake-foo-one-y1',
+                'fake-foo-two',
+                'fake-foo-two-m1',
+                'fake-foo-two-m1-x1',
+                'fake-foo-two-m1-x1-y1',
+                'fake-foo-two-m1-y1',
+                'fake-foo-two-m2',
+                'fake-foo-two-m2-x1',
+                'fake-foo-two-m2-x1-y1',
+                'fake-foo-two-m2-y1',
+                'fake-foo-two-x1',
+                'fake-foo-two-x1-y1',
+                'fake-foo-two-y1',
+                'fake-bar-one',
+                'fake-bar-one-m1',
+                'fake-bar-one-m1-x1',
+                'fake-bar-one-m2',
+                'fake-bar-one-m2-x1',
+                'fake-bar-one-x1',
+                'fake-bar-two',
+                'fake-bar-two-m1',
+                'fake-bar-two-m1-x1',
+                'fake-bar-two-m2',
+                'fake-bar-two-m2-x1',
+                'fake-bar-two-x1',
+            }
+        )
+
         self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one'))
         self.assertIsNotNone(t.StringIntoTargetParts('fake-bar-one-m1'))
         self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-one-m2'))
