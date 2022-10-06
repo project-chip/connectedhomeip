@@ -71,11 +71,11 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light-ota-se \
-                      --target k32w-light-release-no-ota \
-                      --target k32w-lock-low-power-release \
-                      --target k32w-contact-low-power-release \
-                      --target k32w-shell-release \
+                      --target k32w-light \
+                      --target k32w-light-no-ota \
+                      --target k32w-lock-low-power \
+                      --target k32w-contact-low-power \
+                      --target k32w-shell \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
