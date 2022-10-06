@@ -130,7 +130,7 @@ jobs:
                       --target cyw30739-cyw930739m2evb_01-lock \
                       --target cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging \
                       build \
-                      -copy-artifacts-to out/artifacts \
+                      --copy-artifacts-to out/artifacts \
                     "
             - name: Get light size stats
               timeout-minutes: 5
