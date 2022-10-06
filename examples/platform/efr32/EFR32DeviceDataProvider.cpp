@@ -84,10 +84,11 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 
     ReturnErrorOnFailure(err);
 
-    size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+    uint8_t saltByteArray[kSpake2pSalt_MaxBase64Len] = { 0 };
+    size_t saltLen                                   = chip::Base64Decode32(saltB64, saltB64Len, saltByteArray);
     ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(saltBuf.data(), saltB64, saltLen);
+    memcpy(saltBuf.data(), saltByteArray, saltLen);
     saltBuf.reduce_size(saltLen);
 
     return CHIP_NO_ERROR;

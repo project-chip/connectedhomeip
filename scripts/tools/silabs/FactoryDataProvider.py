@@ -213,11 +213,10 @@ class FactoryDataWriter:
                     return
 
         # Convert interger to little endian hex format and strings to hex byte array format for nvm3 storage
-        Passcode = self._args.passcode.to_bytes(4, "little").hex()
-        Spake2pIterationCount = self._args.spake2_iteration.to_bytes(4, 'little').hex()
-        Discriminator = self._args.discriminator.to_bytes(2, 'little').hex()
-        SaltByteArray = bytes(self._args.spake2_salt, 'utf-8').hex()
-        VerifierByteArray = bytes(self._args.spake2_verifier, 'utf-8').hex()
+        spake2pIterationCount = self._args.spake2_iteration.to_bytes(4, 'little').hex()
+        discriminator = self._args.discriminator.to_bytes(2, 'little').hex()
+        saltByteArray = bytes(self._args.spake2_salt, 'utf-8').hex()
+        verifierByteArray = bytes(self._args.spake2_verifier, 'utf-8').hex()
 
         productId = self._args.product_id.to_bytes(2, "little").hex()
         vendorId = self._args.vendor_id.to_bytes(2, "little").hex()
@@ -225,37 +224,37 @@ class FactoryDataWriter:
         # create the binary containing the new nvm3 data
         cmd = [
             "commander", "nvm3", "set", inputImage,
-            "--object", self.DISCRIMINATOR_NVM3_KEY + str(Discriminator),
+            "--object", self.DISCRIMINATOR_NVM3_KEY + str(discriminator),
             "--object", self.SETUP_PAYLOAD_NVM3_KEY + self.generateQrCodeBitSet(),
-            "--object", self.ITERATIONCOUNT_NVM3_KEY + str(Spake2pIterationCount),
-            "--object", self.SALT_NVM3_KEY + str(SaltByteArray),
-            "--object", self.VERIFIER_NVM3_KEY + str(VerifierByteArray),
+            "--object", self.ITERATIONCOUNT_NVM3_KEY + str(spake2pIterationCount),
+            "--object", self.SALT_NVM3_KEY + str(saltByteArray),
+            "--object", self.VERIFIER_NVM3_KEY + str(verifierByteArray),
             "--object", self.PRODUCT_ID_NVM3_KEY + str(productId),
             "--object", self.VENDOR_ID_NVM3_KEY + str(vendorId),
         ]
 
         if self._args.product_name:
-            ProductNameByteArray = bytes(self._args.product_name, 'utf-8').hex()
-            cmd.extend(["--object", self.PRODUCT_NAME_NVM3_KEY + str(ProductNameByteArray)])
+            productNameByteArray = bytes(self._args.product_name, 'utf-8').hex()
+            cmd.extend(["--object", self.PRODUCT_NAME_NVM3_KEY + str(productNameByteArray)])
 
         if self._args.vendor_name:
-            VendorNameByteArray = bytes(self._args.vendor_name, 'utf-8').hex()
-            cmd.extend(["--object", self.VENDOR_NAME_NVM3_KEY + str(VendorNameByteArray)])
+            vendorNameByteArray = bytes(self._args.vendor_name, 'utf-8').hex()
+            cmd.extend(["--object", self.VENDOR_NAME_NVM3_KEY + str(vendorNameByteArray)])
 
         if self._args.hw_version:
-            HwVersionByteArray = self._args.hw_version.to_bytes(2, "little").hex()
-            cmd.extend(["--object", self.HW_VER_NVM3_KEY + str(HwVersionByteArray)])
+            hwVersionByteArray = self._args.hw_version.to_bytes(2, "little").hex()
+            cmd.extend(["--object", self.HW_VER_NVM3_KEY + str(hwVersionByteArray)])
 
         if self._args.hw_version_str:
-            HwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
-            cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(HwVersionByteArray)])
+            hwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
+            cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(hwVersionByteArray)])
 
         if self._args.rotating_id:
             cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.rotating_id])
 
         if self._args.manufacturing_date:
-            DateByteArray = bytes(self._args.manufacturing_date, 'utf-8').hex()
-            cmd.extend(["--object", self.MANUFACTURING_DATE_NVM3_KEY + str(DateByteArray)])
+            dateByteArray = bytes(self._args.manufacturing_date, 'utf-8').hex()
+            cmd.extend(["--object", self.MANUFACTURING_DATE_NVM3_KEY + str(dateByteArray)])
 
         if self._args.serial_number:
             serialNumberByteArray = bytes(self._args.serial_number, 'utf-8').hex()

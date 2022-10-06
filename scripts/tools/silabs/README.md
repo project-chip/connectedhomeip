@@ -46,31 +46,34 @@ number to ensure you are writing to the right device.
 
 | Arguments            | Conformance          | Type               | Description                                                                             |
 | -------------------- | -------------------- | ------------------ | --------------------------------------------------------------------------------------- |
-| --discriminator      | Required             | dec/hex            | Provide BLE pairing discriminator.                                                      |
+| --discriminator      | Required             | dec/hex            | Provide BLE pairing discriminator. e.g: 3840 or 0xF00.                                  |
 | --passcode           | Required             | dec/hex            | Provide the default PASE session passcode used to generate the spake2p verifier.        |
-| --spake2_iteration   | Required             | dec/hex            | Provide Spake2+ iteration count used to generate the spake2p verifier                   |
+| --spake2_iteration   | Required             | dec/hex            | Provide Spake2+ iteration count used to generate the spake2p verifier.                  |
 | --spake2_salt        | Required             | string<sup>1</sup> | Provide Spake2+ salt used to generate the spake2p verifier.                             |
-| --spake2_verifier    | optional<sup>2</sup> | string<sup>1</sup> | Provide The pre-generated Spake2+ verifier                                              |
+| --spake2_verifier    | optional<sup>2</sup> | string<sup>1</sup> | Provide The pre-generated Spake2+ verifier.                                             |
 | --gen_spake2p_path   | optional<sup>2</sup> | string             | Provide the absolute path to spake2p generator.                                         |
 | --mcu_family         | optional             | string             | MCU Family target. Only needed if your board isn't plugged in (EFR32MG12 or EFR32MG24). |
-| --jtag_serial        | optional             | string             | Provide the serial number of the jtag if you have more than one board connected"        |
-| --product_id         | optional             | dec/hex            | Provide the product ID (Max 2 bytes)                                                    |
-| --vendor_id          | optional             | dec/hex            | Provide the vendor ID (Max 2 bytes)                                                     |
-| --product_name       | optional             | string             | Provide the product name (Max 32 char)                                                  |
-| --vendor_name        | optional             | string             | Provide the vendor name (Max 32 char)                                                   |
-| --hw_version         | optional             | dec/hex            | Provide the hardware version value (Max 2 bytes)                                        |
-| --hw_version_str     | optional             | string             | Provide the hardware version string (Max 64 char)                                       |
-| --rotating_id        | optional             | Hex string         | A 128 bits hex string unique id (without 0x)                                            |
-| --serial_number      | optional             | string             | Provide serial number of the device (Max 32 char)                                       |
-| --commissioning_flow | optional             | dec/hex            | Provide Commissioning Flow 0=Standard, 1=User Action, 2=Custom                          |
-| --rendezvous_flag    | optional             | dec/hex            | Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Can be combined)                 |
+| --jtag_serial        | optional             | string             | Provide the serial number of the jtag if you have more than one board connected.        |
+| --product_id         | optional             | dec/hex            | Provide the product ID. e.g: 32773 or 0x8005 (Max 2 bytes).                             |
+| --vendor_id          | optional             | dec/hex            | Provide the vendor ID. e.g: 65521 or 0xFFF1 (Max 2 bytes).                              |
+| --product_name       | optional             | string             | Provide the product name (Max 32 char).                                                 |
+| --vendor_name        | optional             | string             | Provide the vendor name (Max 32 char).                                                  |
+| --hw_version         | optional             | dec/hex            | Provide the hardware version value (Max 2 bytes).                                       |
+| --hw_version_str     | optional             | string             | Provide the hardware version string (Max 64 char).                                      |
+| --rotating_id        | optional             | Hex string         | A 128 bits hex string unique id (without 0x).                                           |
+| --serial_number      | optional             | string             | Provide serial number of the device (Max 32 char).                                      |
+| --commissioning_flow | optional             | dec/hex            | Provide Commissioning Flow 0=Standard, 1=User Action, 2=Custom.                         |
+| --rendezvous_flag    | optional             | dec/hex            | Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Can be combined).                |
 
 <sup>1</sup> Salt and verifier must be provided as base64 string
 
 <sup>2</sup> You need to provide either a pre-generated spake2_verifier or path
 to the spake2p generator to generate the verifier
 
-e.g"
+For the hex type, provide the value with the `0x` prefix. For hex string type,
+do not add the `0x` prefix.
+
+e.g:
 
 ```
  # With spake2_verifier
