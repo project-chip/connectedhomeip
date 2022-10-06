@@ -15,9 +15,12 @@
  *    limitations under the License.
  */
 
-#include "EFR32CommissionableDataProvider.h"
+#include "EFR32DeviceDataProvider.h"
+#include "EFR32Config.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <setup_payload/Base38Encode.h>
+#include <setup_payload/SetupPayload.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -123,21 +126,46 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifie
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EFR32DeviceDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
+CHIP_ERROR EFR32DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf)
 {
-    CHIP_ERROR err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_SetupPinCode, setupPasscode);
+    CHIP_ERROR err                                      = CHIP_NO_ERROR;
+    uint8_t payloadBitSet[kTotalPayloadDataSizeInBytes] = { 0 };
+    size_t bitSetLen                                    = 0;
+
+    err = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
+                                          bitSetLen);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        setupPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
-        err           = CHIP_NO_ERROR;
+        static constexpr uint8_t kTestSetupPayloadBitset[] = { 0x88, 0xFF, 0x2F, 0x00, 0x44, 0x00, 0xE0, 0x4B, 0x84, 0x68, 0x02 };
+        bitSetLen                                          = sizeof(kTestSetupPayloadBitset);
+        ReturnErrorCodeIf(bitSetLen > kTotalPayloadDataSizeInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(payloadBitSet, kTestSetupPayloadBitset, bitSetLen);
+        err = CHIP_NO_ERROR;
     }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+
+    ReturnErrorOnFailure(err);
+
+    size_t prefixLen = strlen(kQRCodePrefix);
+
+    if (payloadBuf.size() < prefixLen + 1)
+    {
+        err = CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
+    {
+        MutableCharSpan subSpan = payloadBuf.SubSpan(prefixLen, payloadBuf.size() - prefixLen);
+        memcpy(payloadBuf.data(), kQRCodePrefix, prefixLen);
+        err = base38Encode(MutableByteSpan(payloadBitSet), subSpan);
+        // Reduce output span size to be the size of written data
+        payloadBuf.reduce_size(subSpan.size() + prefixLen);
+    }
+
     return err;
 }
 
-#if ENABLE_DEVICE_DATA_PROVIDER
 CHIP_ERROR EFR32DeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     size_t vendorNameLen = 0; // without counting null-terminator
@@ -146,12 +174,21 @@ CHIP_ERROR EFR32DeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 
 CHIP_ERROR EFR32DeviceDataProvider::GetVendorId(uint16_t & vendorId)
 {
-    ChipError err   = CHIP_NO_ERROR;
-    uint32_t valInt = 0;
+    ChipError err       = CHIP_NO_ERROR;
+    uint32_t vendorId32 = 0;
 
-    err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_VendorId, valInt);
+    err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_VendorId, vendorId32);
+
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        vendorId32 = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+        err        = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+
     ReturnErrorOnFailure(err);
-    vendorId = static_cast<uint16_t>(valInt);
+    vendorId = static_cast<uint16_t>(vendorId32);
     return err;
 }
 
@@ -163,41 +200,131 @@ CHIP_ERROR EFR32DeviceDataProvider::GetProductName(char * buf, size_t bufSize)
 
 CHIP_ERROR EFR32DeviceDataProvider::GetProductId(uint16_t & productId)
 {
-    ChipError err   = CHIP_NO_ERROR;
-    uint32_t valInt = 0;
+    ChipError err        = CHIP_NO_ERROR;
+    uint32_t productId32 = 0;
 
-    err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_ProductId, valInt);
+    err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_ProductId, productId32);
+
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        productId32 = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+        err         = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
     ReturnErrorOnFailure(err);
-    productId = static_cast<uint16_t>(valInt);
+
+    productId = static_cast<uint16_t>(productId32);
     return err;
 }
 
 CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
-    return EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
+    CHIP_ERROR err =
+        EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING) && CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, sizeof(bufSize));
+        err = CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+    return err;
+}
+
+CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    CHIP_ERROR err;
+    uint32_t hardwareVersion32;
+
+    err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_HardwareVersion, hardwareVersion32);
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION) && CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        hardwareVersion32 = CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION;
+        err               = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION) && CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
+
+    hardwareVersion = static_cast<uint16_t>(hardwareVersion32);
+    return err;
 }
 
 CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
 
     size_t uniqueIdLen = 0;
     err = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+#if CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdLen = sizeof(uniqueId);
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+
     ReturnErrorOnFailure(err);
     uniqueIdSpan.reduce_size(uniqueIdLen);
-#endif
+
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
     return err;
 }
-#endif // ENABLE_DEVICE_DATA_PROVIDER
 
-CommissionableDataProvider * GetEFR32DeviceDataProvider()
+CHIP_ERROR EFR32DeviceDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+{
+    size_t serialNumberLen = 0; // without counting null-terminator
+    return EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_SerialNum, buf, bufSize, serialNumberLen);
+}
+
+CHIP_ERROR EFR32DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+{
+    CHIP_ERROR err;
+    constexpr uint8_t kDateStringLength = 10; // YYYY-MM-DD
+    char dateStr[kDateStringLength + 1];
+    size_t dateLen;
+    char * parseEnd;
+
+    err = mGenericConfigManager.ReadConfigValueStr(EFR32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    SuccessOrExit(err);
+
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul(dateStr, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul(dateStr + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    day = static_cast<uint8_t>(strtoul(dateStr + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+    }
+    return err;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+EFR32DeviceDataProvider & EFR32DeviceDataProvider::GetDeviceDataProvider()
 {
     static EFR32DeviceDataProvider sDataProvider;
-    return &sDataProvider;
+    return sDataProvider;
 }
 
 } // namespace EFR32

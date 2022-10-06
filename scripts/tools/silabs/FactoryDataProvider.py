@@ -18,18 +18,33 @@ import subprocess
 import sys
 import argparse
 import struct
+import base64
+import datetime
+import os
 
 
 class FactoryDataWriter:
+    script_dir = os.path.dirname(__file__)
     # CONSTANTS
-    TEMP_FILE = 'tmp_nvm3.s37'
-    OUT_FILE = 'matter_factorydata.s37'  # Final output file containing the nvm3 data to flash to the device
+    TEMP_FILE = script_dir + "/tmp_nvm3.s37"
+    OUT_FILE = script_dir + "/matter_factorydata.s37"  # Final output file containing the nvm3 data to flash to the device
+    BASE_MG12_FILE = script_dir + "/base_matter_mg12_nvm3.s37"
+    BASE_MG24_FILE = script_dir + "/base_matter_mg24_nvm3.s37"
     # nvm3 keys to set
-    PASSCODE_NVM3_KEY = "0x87205:"
+    SERIAL_NUMBER_NVM3_KEY = "0x87200:"
+    MANUFACTURING_DATE_NVM3_KEY = "0x87204:"
+    SETUP_PAYLOAD_NVM3_KEY = "0x87205:"
     DISCRIMINATOR_NVM3_KEY = "0x87207:"
     ITERATIONCOUNT_NVM3_KEY = "0x87208:"
     SALT_NVM3_KEY = "0x87209:"
     VERIFIER_NVM3_KEY = "0x8720A:"
+    PRODUCT_ID_NVM3_KEY = "0x8720B:"
+    VENDOR_ID_NVM3_KEY = "0x8720C:"
+    PRODUCT_NAME_NVM3_KEY = "0x8720D:"
+    VENDOR_NAME_NVM3_KEY = "0x8720E:"
+    HW_VER_STR_NVM3_KEY = "0x8720F:"
+    UNIQUE_ID_NVM3_KEY = "0x8721F:"
+    HW_VER_NVM3_KEY = "0x87308:"
 
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
@@ -56,6 +71,51 @@ class FactoryDataWriter:
         generation_results = dict(zip(output[0].split(','), output[1].split(',')))
         return generation_results["Verifier"]
 
+    # Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
+    def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
+        if ((offset + numberOfBits) > totalPayloadSizeInBits):
+            print("THIS IS NOT VALID")
+            return
+        # input < 1u << numberOfBits);
+
+        index = offset
+        offset += numberOfBits
+        while (input != 0):
+            if (input & 1):
+                bits[int(index / 8)] |= (1 << (index % 8))
+            index += 1
+            input >>= 1
+
+        return offset
+
+    def generateQrCodeBitSet(self):
+        kVersionFieldLengthInBits = 3
+        kVendorIDFieldLengthInBits = 16
+        kProductIDFieldLengthInBits = 16
+        kCommissioningFlowFieldLengthInBits = 2
+        kRendezvousInfoFieldLengthInBits = 8
+        kPayloadDiscriminatorFieldLengthInBits = 12
+        kSetupPINCodeFieldLengthInBits = 27
+        kPaddingFieldLengthInBits = 4
+
+        kTotalPayloadDataSizeInBits = (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
+                                       kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
+                                       kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits)
+
+        offset = 0
+        fillBits = [0] * int(kTotalPayloadDataSizeInBits / 8)
+        offset = self.WriteBits(fillBits, offset, 0, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.vendor_id, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.product_id, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, 0, kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, 2, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.discriminator,
+                                kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, self._args.passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits)
+        offset = self.WriteBits(fillBits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits)
+
+        return str(bytes(fillBits).hex())
+
     def __init__(self, arguments) -> None:
         """ Do some checks on the received arguments.
             Generate the Spake2+ verifier if needed and assign the values
@@ -64,6 +124,11 @@ class FactoryDataWriter:
         Args:
             The whole set of args passed to the script.
         """
+        kMaxVendorNameLength = 32
+        kMaxProductNameLength = 32
+        kMaxHardwareVersionStringLength = 64
+        kMaxSerialNumberLength = 32
+        kUniqueIDLength = 16
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
                              55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
@@ -73,6 +138,21 @@ class FactoryDataWriter:
 
         self._args = arguments
 
+        if self._args.rotating_id:
+            assert(len(bytearray.fromhex(self._args.rotating_id)) == kUniqueIDLength), "Provide a 16 bytes rotating id"
+        if self._args.product_name:
+            assert(len(self._args.product_name) <= kMaxProductNameLength), "Product name exceeds the size limit"
+        if self._args.vendor_name:
+            assert(len(self._args.vendor_name) <= kMaxVendorNameLength), "Vendor name exceeds the size limit"
+        if self._args.hw_version_str:
+            assert(len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
+        if self._args.serial_number:
+            assert(len(self._args.serial_number) <= kMaxSerialNumberLength), "Serial number exceeds the size limit"
+        if self._args.manufacturing_date:
+            try:
+                datetime.datetime.strptime(self._args.manufacturing_date, '%Y-%m-%d')
+            except ValueError:
+                raise ValueError("Incorrect manufacturing data format, should be YYYY-MM-DD")
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
 
@@ -90,11 +170,6 @@ class FactoryDataWriter:
             containing the factory commissioning data in NVM3 section
         """
         isDeviceConnected = True
-        print("passcode :", self._args.passcode)
-        print("discriminator :", self._args.discriminator)
-        print("spake2_iteration :", self._args.spake2_iteration)
-        print("spake2_salt :",  self._args.spake2_salt)
-        print("spake2_verifier :",  self._args.spake2_verifier)
 
         # Retrieve the device current nvm3 data in a binary file
         # It will be used as base to add the new credentials
@@ -113,9 +188,9 @@ class FactoryDataWriter:
                 deviceInfo = dict(map(str.strip, lines.split(':')) for lines in output[0:len(output)-1])
                 # Only MG12 and MG24 are supported in matter currently
                 if "EFR32MG12" in deviceInfo["Part Number"]:
-                    inputImage = "base_matter_mg12_nvm3.s37"
+                    inputImage = self.BASE_MG12_FILE
                 elif "EFR32MG24" in deviceInfo["Part Number"]:
-                    inputImage = "base_matter_mg24_nvm3.s37"
+                    inputImage = self.BASE_MG24_FILE
                 else:
                     raise Exception('Invalid MCU')
             except:
@@ -123,10 +198,10 @@ class FactoryDataWriter:
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created
                 if self._args.mcu_family:
-                    if "EFR32MG12" in deviceInfo["Part Number"]:
-                        inputImage = "matter_mg12_nvm3.s37"
-                    elif "EFR32MG24" in deviceInfo["Part Number"]:
-                        inputImage = "matter_mg24_nvm3.s37"
+                    if "EFR32MG12" == self._args.mcu_family:
+                        inputImage = self.BASE_MG12_FILE
+                    elif "EFR32MG24" == self._args.mcu_family:
+                        inputImage = self.BASE_MG24_FILE
                 else:
                     print("Connect debug port or provide the mcu_family")
                     return
@@ -138,18 +213,50 @@ class FactoryDataWriter:
         SaltByteArray = bytes(self._args.spake2_salt, 'utf-8').hex()
         VerifierByteArray = bytes(self._args.spake2_verifier, 'utf-8').hex()
 
+        productId = self._args.product_id.to_bytes(2, "little").hex()
+        vendorId = self._args.vendor_id.to_bytes(2, "little").hex()
+
         # create the binary containing the new nvm3 data
-        results = subprocess.run(
-            [
-                "commander", "nvm3", "set", inputImage,
-                "--object", self.DISCRIMINATOR_NVM3_KEY + str(Discriminator),
-                "--object", self.PASSCODE_NVM3_KEY + str(Passcode),
-                "--object", self.ITERATIONCOUNT_NVM3_KEY + str(Spake2pIterationCount),
-                "--object", self.SALT_NVM3_KEY + str(SaltByteArray),
-                "--object", self.VERIFIER_NVM3_KEY + str(VerifierByteArray),
-                "--outfile", self.OUT_FILE,
-            ]
-        )
+        cmd = [
+            "commander", "nvm3", "set", inputImage,
+            "--object", self.DISCRIMINATOR_NVM3_KEY + str(Discriminator),
+            "--object", self.SETUP_PAYLOAD_NVM3_KEY + self.generateQrCodeBitSet(),
+            "--object", self.ITERATIONCOUNT_NVM3_KEY + str(Spake2pIterationCount),
+            "--object", self.SALT_NVM3_KEY + str(SaltByteArray),
+            "--object", self.VERIFIER_NVM3_KEY + str(VerifierByteArray),
+            "--object", self.PRODUCT_ID_NVM3_KEY + str(productId),
+            "--object", self.VENDOR_ID_NVM3_KEY + str(vendorId),
+        ]
+
+        if self._args.product_name:
+            ProductNameByteArray = bytes(self._args.product_name, 'utf-8').hex()
+            cmd.extend(["--object", self.PRODUCT_NAME_NVM3_KEY + str(ProductNameByteArray)])
+
+        if self._args.vendor_name:
+            VendorNameByteArray = bytes(self._args.vendor_name, 'utf-8').hex()
+            cmd.extend(["--object", self.VENDOR_NAME_NVM3_KEY + str(VendorNameByteArray)])
+
+        if self._args.hw_version:
+            HwVersionByteArray = self._args.hw_version.to_bytes(2, "little").hex()
+            cmd.extend(["--object", self.HW_VER_NVM3_KEY + str(HwVersionByteArray)])
+
+        if self._args.hw_version_str:
+            HwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
+            cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(HwVersionByteArray)])
+
+        if self._args.rotating_id:
+            cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.rotating_id])
+
+        if self._args.manufacturing_date:
+            DateByteArray = bytes(self._args.manufacturing_date, 'utf-8').hex()
+            cmd.extend(["--object", self.MANUFACTURING_DATE_NVM3_KEY + str(DateByteArray)])
+
+        if self._args.serial_number:
+            serialNumberByteArray = bytes(self._args.serial_number, 'utf-8').hex()
+            cmd.extend(["--object", self.SERIAL_NUMBER_NVM3_KEY + str(serialNumberByteArray)])
+
+        cmd.extend(["--outfile", self.OUT_FILE])
+        results = subprocess.run(cmd)
 
         # A tempfile was create/used, delete it.
         if inputImage == self.TEMP_FILE:
@@ -185,7 +292,24 @@ def main():
                         help="[string] mcu Family target. Only need if your board isn't plugged in")
     parser.add_argument("--jtag_serial", type=str,
                         help="[string] Provide the serial number of the jtag if you have more than one board connected")
-
+    parser.add_argument("--product_id", type=all_int_format, default=32773,
+                        help="[int | hex int] Provide the product ID")
+    parser.add_argument("--vendor_id", type=all_int_format, default=65521,
+                        help="[int | hex int] Provide the vendor ID")
+    parser.add_argument("--product_name", type=str,
+                        help="[string] Provide the product name [optional]")
+    parser.add_argument("--vendor_name", type=str,
+                        help="[string] Provide the vendor name [optional]")
+    parser.add_argument("--hw_version", type=all_int_format,
+                        help="[int | hex int] Provide the harware version value[optional]")
+    parser.add_argument("--hw_version_str", type=str,
+                        help="[string] Provide the harware version string[optional]")
+    parser.add_argument("--rotating_id", type=str,
+                        help="[hex_string] A 128 bits hex string unique id (without 0x) [optional]")
+    parser.add_argument("--serial_number", type=str,
+                        help="[string] Provide serial number of the device")
+    parser.add_argument("--manufacturing_date", type=str,
+                        help="[string] Provide Manufacturing date in YYYY-MM-DD format [optional]")
     args = parser.parse_args()
     writer = FactoryDataWriter(args)
     writer.create_nvm3injected_image()
