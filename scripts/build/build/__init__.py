@@ -6,6 +6,7 @@ from typing import Sequence
 
 from .targets import BUILD_TARGETS
 
+
 class BuildSteps(Enum):
     GENERATED = auto()
 

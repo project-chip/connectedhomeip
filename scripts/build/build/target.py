@@ -292,7 +292,7 @@ class BuildTarget:
                     for m in c:
                         suffix += "-" + m.name
                     option = f"{self.name}-{prefix}{suffix}"
-                    
+
                     if self.StringIntoTargetParts(option) is not None:
                         yield option
 
@@ -310,7 +310,6 @@ class BuildTarget:
             if move_idx < 0:
                 # done iterating through all
                 return
-
 
     def StringIntoTargetParts(self, value: str):
         """Given an input string, process through all the input rules and return
