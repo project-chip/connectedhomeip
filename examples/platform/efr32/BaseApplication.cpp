@@ -37,6 +37,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#include "EFR32DeviceDataProvider.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -218,24 +219,24 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     ConfigurationMgr().LogDeviceConfig();
 
-// Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
     // Create buffer for QR code that can fit max size and null terminator.
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
+        // Print setup info on LCD if available
+#ifdef QR_CODE_ENABLED
         slLCD.SetQRCode((uint8_t *) QRCode.data(), QRCode.size());
         slLCD.ShowQRCode(true, true);
+#else
+        PrintQrCodeURL(QRCode);
+#endif // QR_CODE_ENABLED
     }
     else
     {
         EFR32_LOG("Getting QR code failed!");
     }
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif // QR_CODE_ENABLED
 
     return err;
 }
