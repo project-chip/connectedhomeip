@@ -165,21 +165,21 @@ def cmd_targets(context, expand):
             for s in target.AllVariants():
                 print(s)
         else:
-            print(target.HumanString()
+            print(target.HumanString())
 
 
-@ main.command('build', help='generate and run ninja/make as needed to compile')
-@ click.option(
+@main.command('build', help='generate and run ninja/make as needed to compile')
+@click.option(
     '--copy-artifacts-to',
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
-@ click.option(
+@click.option(
     '--create-archives',
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix of compressed archives of the generated files.')
-@ click.pass_context
+@click.pass_context
 def cmd_build(context, copy_artifacts_to, create_archives):
     context.obj.Build()
 
