@@ -171,6 +171,7 @@ def BuildEfr32Target():
 
     return target
 
+
 def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
