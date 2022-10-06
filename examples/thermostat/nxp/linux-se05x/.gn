@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
-  chip_crypto = ""
-  chip_with_se05x = 0
+import("//build_overrides/build.gni")
+
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  import("//args.gni")
 }

@@ -58,10 +58,6 @@ buildconfig_header("crypto_buildconfig") {
     defines += [ "CHIP_CRYPTO_HSM=0" ]
     defines += [ "CHIP_CRYPTO_HSM_NXP=0" ]
   }
-
-  if (chip_with_se05x_da == 1) {
-    defines += [ "ENABLE_HSM_DEVICE_ATTESTATION=1" ]
-  }
 }
 
 source_set("public_headers") {
