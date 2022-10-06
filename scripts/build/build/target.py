@@ -246,10 +246,14 @@ class BuildTarget:
            like:
 
            foo-{bar,baz}[-modifier1][modifier2][modifier3]
+           foo-bar-{a,b,c}[-m1][-m2]
         """
         result = self.name
         for fixed in self.fixed_targets:
-            result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
+            if len(fixed) > 1:
+                result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
+            else:
+                result += '-' + fixed[0].name
 
         for modifier in self.modifiers:
             result += f"[-{modifier.name}]"

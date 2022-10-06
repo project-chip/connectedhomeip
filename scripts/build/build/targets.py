@@ -171,12 +171,18 @@ def BuildEfr32Target():
 
     return target
 
+def BuildNrfNativeTarget():
+    target = BuildTarget('nrf', NrfConnectBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+    ])
+
+    return target
+
 
 def BuildNrfTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
-
-    # FIXME: what now? native would be nice
-    # yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
 
     # board
     target.AppendFixedTargets([
@@ -480,6 +486,7 @@ BUILD_TARGETS = [
     BuildMbedTarget(),
     BuildMW320Target(),
     BuildNrfTarget(),
+    BuildNrfNativeTarget(),
     BuildQorvoTarget(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
