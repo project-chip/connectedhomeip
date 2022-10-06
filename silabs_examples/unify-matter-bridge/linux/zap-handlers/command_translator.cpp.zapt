@@ -49,10 +49,9 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
     case Commands::{{asUpperCamelCase label}}::Id:
     {
     cmd = "{{asUpperCamelCase label}}";
-    {{#zcl_command_arguments}}
-    {
-      Commands::{{asUpperCamelCase parent.label}}::DecodableType data;
-      if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+    Commands::{{asUpperCamelCase label}}::DecodableType data;
+    if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR){
+      {{#zcl_command_arguments}}
         {{#isOptional}}
         if( data.{{asLowerCamelCase label}}.HasValue() ) {
           try {
@@ -67,10 +66,9 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
           } catch (std::exception &ex) {
           sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
           }
-        {{/isOptional}}
+        {{/isOptional}}      
+        {{/zcl_command_arguments}}
       }
-    }
-    {{/zcl_command_arguments}}
     }
     break;
     {{/zcl_commands_source_client}}

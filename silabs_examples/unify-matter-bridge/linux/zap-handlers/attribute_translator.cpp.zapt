@@ -37,6 +37,7 @@ using namespace unify::matter_bridge;
 #include "unify_accessors.hpp"
 
 {{#zcl_clusters}}
+{{#if (supportedCluster label)}}
 CHIP_ERROR
 {{asUpperCamelCase label}}AttributeAccess::Read(const ConcreteReadAttributePath &aPath,
                            AttributeValueEncoder &aEncoder)
@@ -114,7 +115,7 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
     std::string payload_str;
     std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep"
                   + std::to_string(unify_node->unify_endpoint)
-                  + "/{{asUpperCamelCase label}}/Attributes/" + attribute_name + "/Desired";
+                  + "/{{matterClusterConversion label}}/Attributes/" + attribute_name + "/Desired";
     payload_str = jsn.dump();
     uic_mqtt_publish(topic.c_str(),
                      payload_str.c_str(),
@@ -181,4 +182,5 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
   }
 }
 
+{{/if}}
 {{/zcl_clusters}}

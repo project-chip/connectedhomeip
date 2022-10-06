@@ -25,7 +25,7 @@
 namespace unify::matter_bridge
 {
 {{#zcl_clusters}}
-
+{{#if (supportedCluster label)}}
 class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_interface
 {
   public:
@@ -45,8 +45,8 @@ class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_in
                         const std::string& attribute,
                         const nlohmann::json &unify_value) override;
 
-   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{asUpperCamelCase label}}" });}
+   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{matterClusterConversion label}}" });}
 };
-
+{{/if}}
 {{/zcl_clusters}}
 }  // namespace unify::matter_bridge

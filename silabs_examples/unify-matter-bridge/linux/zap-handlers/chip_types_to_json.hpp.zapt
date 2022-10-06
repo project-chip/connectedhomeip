@@ -12,14 +12,15 @@
  *
  ******************************************************************************/
 
+#include "app/data-model/NullObject.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <nlohmann/json.hpp>
 
 // Default translation
-#include <app-common/zap-generated/cluster-objects.h>
-
 template <typename T>
 nlohmann::json inline to_json(const T & value)
 {
-    return __FUNCTION__;
+    return "unknown value";
 }
 
 /***************************** Simple types Convertes **************/
@@ -63,6 +64,16 @@ template<>
 nlohmann::json inline to_json(const uint64_t & value)
 {
     return value;
+}
+
+template <typename T>
+nlohmann::json inline to_json(chip::app::DataModel::Nullable<T> & value)
+{
+    if (value.HasValidValue())
+    {
+        return to_json(value.Value());
+    }
+    return nlohmann::json::value_t::null;
 }
 
 /***************************** Bitmap Convertes **************/
