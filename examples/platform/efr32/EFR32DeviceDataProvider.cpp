@@ -223,7 +223,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersionString(char * buf, size_t 
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
     CHIP_ERROR err =
         EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING) && CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, sizeof(bufSize));
@@ -239,13 +239,13 @@ CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVersio
     uint32_t hardwareVersion32;
 
     err = EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_HardwareVersion, hardwareVersion32);
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION) && CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         hardwareVersion32 = CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION;
         err               = CHIP_NO_ERROR;
     }
-#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION) && CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
+#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION)
 
     hardwareVersion = static_cast<uint16_t>(hardwareVersion32);
     return err;
@@ -260,7 +260,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan 
 
     size_t uniqueIdLen = 0;
     err = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
-#if CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
@@ -292,7 +292,8 @@ CHIP_ERROR EFR32DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_
     size_t dateLen;
     char * parseEnd;
 
-    err = mGenericConfigManager.ReadConfigValueStr(EFR32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    err = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_ManufacturingDate, reinterpret_cast<uint8_t *>(dateStr),
+                                          sizeof(dateStr), dateLen);
     SuccessOrExit(err);
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
