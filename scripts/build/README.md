@@ -56,4 +56,3 @@ Usage examples:
     ```sh
     ./scripts/build/build_examples.py--log-level fatal targets
     ```
-
