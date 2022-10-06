@@ -72,7 +72,10 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob 'qpg-{lock,light,shell,persistent-storage}' \
+                        --target qpg-qpg6105-lock \
+                        --target qpg-qpg6105-light \
+                        --target qpg-qpg6105-shell \
+                        --target qpg-qpg6105-persistent-storage \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
