@@ -79,7 +79,7 @@ def BuildHostTarget():
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
-        TargetPart('tests', app=HostApp.TESTS, extra_tests=True),
+        TargetPart('tests', app=HostApp.TESTS),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -105,6 +105,7 @@ def BuildHostTarget():
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
+    target.AppendModifier('test', extra_tests=True)
 
     return target
 
