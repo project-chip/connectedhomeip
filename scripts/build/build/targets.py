@@ -559,6 +559,9 @@ def K32WTargets():
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
                         low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
+    yield target.Extend('contact-release', app=K32WApp.CONTACT, tokenizer=True, release=True, tinycrypt=True)
+    yield target.Extend('contact-low-power-release', app=K32WApp.CONTACT, tokenizer=True, tinycrypt=True,
+                        low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
 
 
 def cc13x2x7_26x2x7Targets():

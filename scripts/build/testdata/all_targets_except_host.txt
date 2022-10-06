@@ -213,6 +213,8 @@ infineon-psoc6-lock
 infineon-psoc6-lock-ota (NOGLOB: Reduce default build variants)
 infineon-psoc6-lock-ota-updateimage (NOGLOB: Reduce default build variants)
 infineon-psoc6-lock-updateimage (NOGLOB: Reduce default build variants)
+k32w-contact-low-power-release (NOGLOB: Only on demand build)
+k32w-contact-release
 k32w-light-ota-se (NOGLOB: Only on demand build)
 k32w-light-release-no-ota
 k32w-lock-low-power-release (NOGLOB: Only on demand build)
