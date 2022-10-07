@@ -22,7 +22,16 @@
     3. [Running Matter Demo over Wi-Fi](wifi/RUN_DEMO.md)
        <br><br>
 
-5. Development using VS Code
+5. Matter Bridging to Zigbee/Z-Wave
+
+    1. [Unify Matter Bridge Overview](../../silabs_examples/unify-matter-bridge/readme_overview.md)
+    2. [Building the Matter Bridge](../../silabs_examples/unify-matter-bridge/readme_building.md)
+    3. [Getting Started](../../silabs_examples/unify-matter-bridge/readme_user.md#Running-the-Matter-Bridge)
+    4. [Control a Z-Wave OnOff device](../../silabs_examples/unify-matter-bridge/readme_user.md#Testing-the-bridge-using-the-chip-tool)
+    5. [Toggle a group of OnOff devices](../../silabs_examples/unify-matter-bridge/readme_user.md#toggle-a-group-of-onoff-devices)
+<br><br>
+
+6. Development using VS Code
 
     1. [Setting up environment](dev/vscode/SETUP.md)
     2. [Running tasks](dev/vscode/TASKS.md)
@@ -30,7 +39,7 @@
         2. [Flash](dev/vscode/FLASH.md)
         3. [Debug](dev/vscode/DEBUG.md) <br><br>
 
-6. Reference Guides
+7. Reference Guides
 
     1. [Matter Hardware Requirements](general/HARDWARE_REQUIREMENTS.md)
     2. [Matter Software Requirements](general/SOFTWARE_REQUIREMENTS.md)
@@ -47,7 +56,7 @@
     13. [Using Simplicity Studio's Energy Profiler with Matter](./general/EP.md)
     14. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)<br><br>
 
-7. Frequently Asked Questions (FAQ) / Troubleshooting
+8. Frequently Asked Questions (FAQ) / Troubleshooting
 
     - [Thread FAQ](thread/FAQ.md)
     - [Wi-Fi FAQ](wifi/FAQ.md)

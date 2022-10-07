@@ -5,11 +5,11 @@
 ### Fixed
 
 - Fixed the issue of the bridge service does not persists mapping between endpoint numbers and
-  unify UNIDs. As a consequence the endpoints may swap ids on each program
+  Unify UNIDs. As a consequence the endpoints may swap ids on each program
   startup.
 
-- Fixed the issue of group mapping does not check for existing unify groups. As a consequence the
-  matter bridge may use an already assigned unify group.
+- Fixed the issue of group mapping does not check for existing Unify groups. As a consequence the
+  Matter Bridge may use an already assigned Unify group.
 
 ### Added
 
