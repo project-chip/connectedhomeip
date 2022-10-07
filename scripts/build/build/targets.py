@@ -39,6 +39,7 @@ from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBu
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
 
+
 def BuildHostTestRunnerTarget():
     target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
@@ -55,6 +56,29 @@ def BuildHostTestRunnerTarget():
     return target
 
 
+def BuildHostFakeTarget():
+    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('fake', board=HostBoard.FAKE),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('tests', app=HostApp.TESTS),
+    ])
+
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
+    target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
+    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
+    target.AppendModifier('dmalloc', use_dmalloc=True)
+    target.AppendModifier('clang', use_clang=True)
+
+    return target
+
+
 def BuildHostTarget():
     native_board_name = HostBoard.NATIVE.BoardName()
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (native_board_name != HostBoard.ARM64.BoardName())
@@ -63,7 +87,6 @@ def BuildHostTarget():
 
     board_parts = [
         TargetPart(native_board_name, board=HostBoard.NATIVE),
-        TargetPart('fake', board=HostBoard.FAKE),
     ]
 
     if cross_compile:
@@ -93,7 +116,6 @@ def BuildHostTarget():
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
-        TargetPart('tests', app=HostApp.TESTS),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -497,6 +519,7 @@ BUILD_TARGETS = [
     BuildEfr32Target(),
     BuildEsp32Target(),
     BuildGenioTarget(),
+    BuildHostFakeTarget(),
     BuildHostTarget(),
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
