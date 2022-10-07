@@ -132,7 +132,7 @@ static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedu
     const auto currentTime = System::SystemClock().GetMonotonicTimestamp();
 
     // Subsequent call
-    if (callbackSchedule.runTime)
+    if (callbackSchedule.runTime.count())
     {
         // Check whether the previous scheduled callback was late and whether its running time
         // is smaller than the desired delay
