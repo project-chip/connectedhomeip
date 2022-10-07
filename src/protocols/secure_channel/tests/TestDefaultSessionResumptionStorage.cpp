@@ -126,12 +126,13 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     // Construct only a few unique node identities to simiulate talking to a
     // couple peers.
     chip::ScopedNodeId nodes[3];
-    static_assert(ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE);
+    static_assert(ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
+                  "must have fewer nodes than slots in session resumption storage");
     for (size_t i = 0; i < ARRAY_SIZE(nodes); ++i)
     {
         do
         {
-            nodes[i] = chip::ScopedNodeId(rand(), static_cast<chip::FabricIndex>(i + 1));
+            nodes[i] = chip::ScopedNodeId(static_cast<chip::NodeId>(rand()), static_cast<chip::FabricIndex>(i + 1));
         } while (!nodes[i].IsOperational());
     }
 
