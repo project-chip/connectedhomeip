@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-
-#include <lib/support/TestPersistentStorageDelegate.h>
 
 // DefaultSessionResumptionStorage is a partial implementation.
 // Use SimpleSessionResumptionStorage, which extends it, to test.
@@ -253,6 +253,24 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) != CHIP_NO_ERROR);
     }
+
+    // Verify no state table persistent storage entries were leaked.
+    for (const auto & node : nodes)
+    {
+        uint16_t size;
+        chip::DefaultStorageKeyAllocator keyAlloc;
+        auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node), nullptr, size);
+        NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
+    // Verify no link table persistent storage entries were leaked.
+    for (auto & vector : vectors)
+    {
+        uint16_t size;
+        chip::DefaultStorageKeyAllocator keyAlloc;
+        auto rv =
+            storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId), nullptr, size);
+        NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
 }
 
 void TestDelete(nlTestSuite * inSuite, void * inContext)
@@ -303,6 +321,23 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) !=
                            CHIP_NO_ERROR);
+    }
+
+    // Verify no state or link table persistent storage entries were leaked.
+    for (auto & vector : vectors)
+    {
+        uint16_t size;
+        chip::DefaultStorageKeyAllocator keyAlloc;
+        {
+            auto rv =
+                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.node), nullptr, size);
+            NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        }
+        {
+            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId),
+                                              nullptr, size);
+            NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        }
     }
 }
 
@@ -370,6 +405,25 @@ void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
         {
             NL_TEST_ASSERT(
                 inSuite, sessionStorage.FindByScopedNodeId(node.node, outResumptionId, outSharedSecret, outCats) != CHIP_NO_ERROR);
+        }
+    }
+    // Verify no state or link table persistent storage entries were leaked.
+    for (auto & vector : vectors)
+    {
+        for (auto & node : vector.nodes)
+        {
+            uint16_t size;
+            chip::DefaultStorageKeyAllocator keyAlloc;
+            {
+                auto rv =
+                    storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.node), nullptr, size);
+                NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+            }
+            {
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.resumptionId),
+                                                  nullptr, size);
+                NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+            }
         }
     }
 }

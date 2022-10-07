@@ -56,10 +56,10 @@ public:
                          Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
     CHIP_ERROR DeleteState(const ScopedNodeId & node) override;
 
-private:
     static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, const ScopedNodeId & node);
     static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId);
 
+private:
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 
     static constexpr size_t MaxIndexSize()
