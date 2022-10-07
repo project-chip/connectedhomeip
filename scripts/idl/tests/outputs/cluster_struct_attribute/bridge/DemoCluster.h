@@ -27,7 +27,7 @@ struct DemoClusterCluster : public GeneratedCluster
 
 
   Attribute<ArmFailSafeRequest> mSingleFailSafe;
-  ListAttribute<::chip::app::DataModel::AsList<std::vector<ArmFailSafeRequest>>> mArmFailsafes;
+  ListAttribute<::chip::app::DataModel::ListContainer<std::vector<ArmFailSafeRequest>>> mArmFailsafes;
 };
 
 }

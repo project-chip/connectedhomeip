@@ -24,7 +24,7 @@ struct SecondCluster : public GeneratedCluster
   }
 
 
-  Attribute<::chip::app::DataModel::AsString<std::string>> mSomeBytes;
+  Attribute<::chip::app::DataModel::StringContainer<std::string>> mSomeBytes;
 };
 
 }

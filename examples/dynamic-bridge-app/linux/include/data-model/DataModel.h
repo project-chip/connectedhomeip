@@ -21,11 +21,14 @@ namespace DataModel {
 // size_type size();
 // T must be byte sized
 template <typename X>
-class AsString : public X
+class StringContainer : public X
 {
-public:
-    static_assert(sizeof(std::decay_t<typename X::pointer>) == sizeof(char));
+    static_assert(sizeof(std::remove_pointer_t<typename X::pointer>) == sizeof(char));
+    using __assign = decltype(std::declval<X>().assign(std::declval<typename X::pointer>(), std::declval<typename X::pointer>()));
+    static_assert(std::is_integral_v<decltype(std::declval<X>().size())>);
+    static_assert(std::is_same_v<decltype(std::declval<X>().data()), typename X::pointer>);
 
+public:
     using X::X;
 };
 
@@ -40,8 +43,18 @@ public:
 // iterator_type must conform to LegacyForwardIterator
 // The contained type must be default-constructible
 template <typename X>
-class AsList : public X
+class ListContainer : public X
 {
+    static_assert(std::is_default_constructible_v<std::remove_pointer_t<typename X::pointer>>);
+    using __clear = decltype(std::declval<X>().clear());
+    static_assert(std::is_integral_v<decltype(std::declval<X>().size())>);
+    static_assert(std::is_same_v<decltype(std::declval<X>().back()),
+                                 std::add_lvalue_reference_t<std::remove_pointer_t<typename X::pointer>>>);
+    using __emplace = decltype(std::declval<X>().emplace_back());
+    static_assert(std::is_same_v<decltype(std::declval<X>().begin()), decltype(std::declval<X>().end())>);
+    static_assert(std::is_same_v<decltype(std::declval<X>().begin().operator*()),
+                                 std::add_lvalue_reference_t<std::remove_pointer_t<typename X::pointer>>>);
+
 public:
     using X::X;
 };
@@ -59,11 +72,11 @@ struct IsRawDatatype<Nullable<X>> : public std::false_type
 {
 };
 template <typename X>
-struct IsRawDatatype<AsString<X>> : public std::false_type
+struct IsRawDatatype<StringContainer<X>> : public std::false_type
 {
 };
 template <typename X>
-struct IsRawDatatype<AsList<X>> : public std::false_type
+struct IsRawDatatype<ListContainer<X>> : public std::false_type
 {
 };
 
@@ -78,7 +91,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath &, AttributeValueEncoder & aEn
  * Lists that are string-like should be encoded as char/byte spans.
  */
 template <typename X>
-CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const AsString<X> & x)
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const StringContainer<X> & x)
 {
     return aEncoder.Encode(Span<std::decay_t<typename X::pointer>>(x.data(), x.size()));
 }
@@ -96,7 +109,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder
  * be chosen if possible.
  */
 template <typename X>
-CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const AsList<X> & x)
+CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder, const ListContainer<X> & x)
 {
     if (aPath.mListIndex.HasValue())
     {
@@ -180,7 +193,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath &, AttributeValueDecoder & aDe
  * Lists that are string-like should be decoded as char/byte spans.
  */
 template <typename X>
-CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, AsString<X> & x)
+CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, StringContainer<X> & x)
 {
     Span<std::decay_t<typename X::pointer>> span;
     CHIP_ERROR err = aDecoder.Decode(span);
@@ -192,7 +205,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
 }
 
 template <typename X>
-CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, AsList<X> & x)
+CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder, ListContainer<X> & x)
 {
     switch (aPath.mListOp)
     {

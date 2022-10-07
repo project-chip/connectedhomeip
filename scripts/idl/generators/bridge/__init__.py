@@ -97,9 +97,9 @@ def get_struct_field_type(definition: Field, cluster: Cluster, idl: Idl):
 def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(definition, cluster, idl)
     if container == 'OctetString':
-        cType = '::chip::app::DataModel::AsString<std::string>'
+        cType = '::chip::app::DataModel::StringContainer<std::string>'
     if definition.is_list:
-        cType = '::chip::app::DataModel::AsList<std::vector<{}>>'.format(cType)
+        cType = '::chip::app::DataModel::ListContainer<std::vector<{}>>'.format(cType)
     if definition.is_nullable:
         cType = '::chip::app::DataModel::Nullable<{}>'.format(cType)
     if definition.is_nullable:

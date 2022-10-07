@@ -27,7 +27,7 @@ struct DemoClusterCluster : public GeneratedCluster
 
 
   Attribute<LabelStruct> mSingleLabel;
-  ListAttribute<::chip::app::DataModel::AsList<std::vector<LabelStruct>>> mSomeLabels;
+  ListAttribute<::chip::app::DataModel::ListContainer<std::vector<LabelStruct>>> mSomeLabels;
 };
 
 }
