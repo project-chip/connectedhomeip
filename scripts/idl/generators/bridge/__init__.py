@@ -87,12 +87,19 @@ def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
     return '{}, {}'.format(matterType, size)
 
 
+def get_struct_field_type(definition: Field, cluster: Cluster, idl: Idl):
+    container, cType, size, matterType = get_field_info(definition, cluster, idl)
+    if container == 'OctetString':
+        cType = 'std::string'
+    return cType
+
+
 def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(definition, cluster, idl)
     if container == 'OctetString':
-        return 'std::string'
+        cType = '::chip::app::DataModel::AsString<std::string>'
     if definition.is_list:
-        cType = 'std::vector<{}>'.format(cType)
+        cType = '::chip::app::DataModel::AsList<std::vector<{}>>'.format(cType)
     if definition.is_nullable:
         cType = '::chip::app::DataModel::Nullable<{}>'.format(cType)
     if definition.is_nullable:
@@ -150,6 +157,7 @@ class BridgeGenerator(CodeGenerator):
         self.jinja_env.filters['getType'] = get_attr_type
         self.jinja_env.filters['getRawSizeAndType'] = get_raw_size_and_type
         self.jinja_env.filters['getField'] = get_field_type
+        self.jinja_env.filters['getStructField'] = get_struct_field_type
         self.jinja_env.filters['getMask'] = get_attr_mask
         self.jinja_env.filters['getInit'] = get_attr_init
         self.jinja_env.filters['dynamicCluster'] = is_dynamic_cluster

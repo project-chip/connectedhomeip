@@ -2,6 +2,7 @@
 
 #include "BridgeGlobalStructs.h"
 #include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/data-model/DataModel.h"
 
 namespace clusters {
 struct FirstCluster : public GeneratedCluster

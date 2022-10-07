@@ -2,6 +2,7 @@
 
 #include "BridgeGlobalStructs.h"
 #include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/data-model/DataModel.h"
 
 namespace clusters {
 struct DemoClusterCluster : public GeneratedCluster
@@ -26,7 +27,7 @@ struct DemoClusterCluster : public GeneratedCluster
 
 
   Attribute<LabelStruct> mSingleLabel;
-  ListAttribute<std::vector<LabelStruct>> mSomeLabels;
+  ListAttribute<::chip::app::DataModel::AsList<std::vector<LabelStruct>>> mSomeLabels;
 };
 
 }

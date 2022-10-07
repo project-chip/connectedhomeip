@@ -2,6 +2,7 @@
 
 #include "BridgeGlobalStructs.h"
 #include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/GeneratedClusters.h"
+#include "third_party/connectedhomeip/examples/dynamic-bridge-app/linux/include/data-model/DataModel.h"
 
 namespace clusters {
 struct SecondCluster : public GeneratedCluster
@@ -23,7 +24,7 @@ struct SecondCluster : public GeneratedCluster
   }
 
 
-  Attribute<std::string> mSomeBytes;
+  Attribute<::chip::app::DataModel::AsString<std::string>> mSomeBytes;
 };
 
 }

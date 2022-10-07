@@ -34,7 +34,7 @@ struct {{struct.name}}
   }
 
   {%-   for field in struct.fields %}
-  {{field | getField(None, idl)}} {{field.name}};
+  {{field | getStructField(None, idl)}} {{field.name}};
   {%-  endfor  %}
 };
 {%- endfor %}
