@@ -77,8 +77,14 @@ Matter Accessory Devices for Matter over Thread on the following platforms:
         > supported in the Silicon Labs build flow.
     -   BRD2601B / MG24 Explorer Kit
         -   [XG24-DK2601B](https://www.silabs.com/development-tools/wireless/efr32xg24-dev-kit?tab=overview)
+    -   BRD4319A / SLWSTK6006A / Wireless Starter Kit/ 2.4GHz@20dBm
+        > Note: This board has yet to be released to the public, but it is
+        > supported in the Silicon Labs build flow.
+    -   BRD4316A / SLWSTK6006A / Wireless Start Kit / 2.4GHz@10dBm
+        - [XGM240-RB4316A](https://www.silabs.com/development-tools/wireless/xgm240-rb4316a-xgm240p-module-radio-board?tab=overview)
+    -   BRD4317A / SLWSTK6006A / Wireless Starter Kit/ 2.4GHz@20dBm
+        - [XGM240-RB4317A](https://www.silabs.com/development-tools/wireless/xgm240-rb4317a-xgm240p-module-radio-board?tab=overview)
 <br><br>
-
 -   **MG12 boards:**
 
     -   [EFR32MG12 Development Kit](https://www.silabs.com/development-tools/wireless/zigbee/efr32mg12-dual-band-starter-kit)
@@ -114,11 +120,9 @@ following boards are supported for the Matter over Wi-Fi demos and development:
 
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
         -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm -
-        [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
-        <br><br>
-
-
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+        - [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
+<br><br>
 -   **MG12 boards:**
 
     -   [EFR32MG12 Development Kit](https://www.silabs.com/development-tools/wireless/zigbee/efr32mg12-dual-band-starter-kit)
