@@ -1518,6 +1518,14 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     std::unique_ptr<GVariant, GVariantDeleter> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
     std::unique_ptr<GVariant, GVariantDeleter> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
 
+    // Network scan is performed in the background, so the BSS
+    // may be gone when we try to get the properties.
+    if (ssid == nullptr || bssid == nullptr)
+    {
+        ChipLogDetail(DeviceLayer, "wpa_supplicant: BSS not found: %s", bssPath);
+        return false;
+    }
+
     const guchar * ssidStr       = nullptr;
     const guchar * bssidBuf      = nullptr;
     char bssidStr[2 * 6 + 5 + 1] = { 0 };

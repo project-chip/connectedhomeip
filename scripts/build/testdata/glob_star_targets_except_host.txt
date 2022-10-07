@@ -38,6 +38,13 @@ efr32-brd4161a-lock-rpc
 efr32-brd4161a-switch
 efr32-brd4161a-unit-test
 efr32-brd4161a-window-covering
+efr32-brd4187c-light
+efr32-brd4187c-light-rpc
+efr32-brd4187c-lock
+efr32-brd4187c-lock-rpc
+efr32-brd4187c-switch
+efr32-brd4187c-unit-test
+efr32-brd4187c-window-covering
 esp32-c3devkit-all-clusters
 esp32-c3devkit-all-clusters-minimal
 esp32-devkitc-all-clusters
@@ -81,6 +88,7 @@ infineon-psoc6-all-clusters
 infineon-psoc6-all-clusters-minimal
 infineon-psoc6-light
 infineon-psoc6-lock
+k32w-contact-release
 k32w-light-release-no-ota
 k32w-lock-release
 k32w-shell-release

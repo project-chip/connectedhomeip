@@ -696,6 +696,7 @@ def main() -> int:
             elif config['ameba']['MODEL'] == 'Z2':
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
+                shell.run_cmd("rm -f project_include.mk")
                 with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
@@ -819,8 +820,11 @@ def main() -> int:
                 shell.run_cmd(
                     f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
             else:
-                flush_print(
-                    "Ameba Z2 currently does not support flashing image through script, stil WIP")
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
+                shell.run_cmd(
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin", raise_on_returncode=False)
 
     #
     # Terminal interaction

@@ -1,12 +1,13 @@
 steps:
-    - name: gcr.io/cloud-builders/git
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+      entrypoint: "bash"
       args:
-          - submodule
-          - update
-          - "--init"
-          - "--recursive"
+          - "-c"
+          - |
+              git config --global --add safe.directory "*"
+              git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -21,14 +22,17 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*-m5stack-*' build --create-archives
+              ./scripts/build/build_examples.py --enable-flashbundle --target
+              esp32-m5stack-all-clusters-ipv6only --target
+              esp32-m5stack-all-clusters-minimal-rpc-ipv6only --target
+              esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-ota-requestor build --create-archives
               /workspace/artifacts/
       waitFor:
           - Bootstrap
@@ -37,7 +41,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -54,7 +58,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -71,15 +75,43 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob 'linux-*' --skip-target-glob '*-tests*' build
-              --create-archives /workspace/artifacts/
+              ./scripts/build/build_examples.py --enable-flashbundle --target
+              linux-arm64-clang-all-clusters --target
+              linux-arm64-clang-all-clusters-app-nodeps-ipv6only --target
+              linux-arm64-clang-all-clusters-minimal-ipv6only --target
+              linux-arm64-clang-bridge-ipv6only --target
+              linux-arm64-clang-chip-tool-ipv6only --target
+              linux-arm64-clang-chip-tool-nodeps-ipv6only --target
+              linux-arm64-clang-dynamic-bridge-ipv6only --target
+              linux-arm64-clang-light-rpc-ipv6only --target
+              linux-arm64-clang-lock-ipv6only --target linux-arm64-clang-minmdns
+              --target linux-arm64-clang-ota-provider-nodeps-ipv6only --target
+              linux-arm64-clang-ota-requestor-nodeps-ipv6only --target
+              linux-arm64-clang-python-bindings --target
+              linux-arm64-clang-shell-ipv6only --target
+              linux-arm64-clang-thermostat-ipv6only --target
+              linux-arm64-clang-tv-app-ipv6only --target
+              linux-arm64-clang-tv-casting-app-ipv6only --target
+              linux-x64-address-resolve-tool --target
+              linux-x64-all-clusters-app-nodeps-ipv6only --target
+              linux-x64-all-clusters-coverage --target linux-x64-bridge-ipv6only
+              --target linux-x64-chip-cert --target linux-x64-chip-tool-ipv6only
+              --target linux-x64-dynamic-bridge-ipv6only --target
+              linux-x64-light-rpc-ipv6only --target linux-x64-lock-ipv6only
+              --target linux-x64-minmdns-ipv6only --target
+              linux-x64-ota-provider-ipv6only --target
+              linux-x64-ota-requestor-ipv6only --target
+              linux-x64-python-bindings --target linux-x64-rpc-console --target
+              linux-x64-shell-ipv6only --target linux-x64-thermostat-ipv6only
+              --target linux-x64-tv-app-ipv6only --target
+              linux-x64-tv-casting-app-ipv6only build --create-archives
+              /workspace/artifacts/
       waitFor:
           - Bootstrap
           - EFR32
@@ -88,7 +120,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.99"
+    - name: "connectedhomeip/chip-build-vscode:0.6.02"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

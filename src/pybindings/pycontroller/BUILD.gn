@@ -132,7 +132,10 @@ pw_python_action("pycontroller") {
   }
 
   if (current_os == "mac") {
-    platform_tag = "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     platform_tag = current_os
   }
