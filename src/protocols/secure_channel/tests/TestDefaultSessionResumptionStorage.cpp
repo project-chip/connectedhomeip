@@ -257,7 +257,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     // Verify no state table persistent storage entries were leaked.
     for (const auto & node : nodes)
     {
-        uint16_t size;
+        uint16_t size = 0;
         chip::DefaultStorageKeyAllocator keyAlloc;
         auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node), nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -265,7 +265,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     // Verify no link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
-        uint16_t size;
+        uint16_t size = 0;
         chip::DefaultStorageKeyAllocator keyAlloc;
         auto rv =
             storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId), nullptr, size);
@@ -326,7 +326,7 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     // Verify no state or link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
-        uint16_t size;
+        uint16_t size = 0;
         chip::DefaultStorageKeyAllocator keyAlloc;
         {
             auto rv =
@@ -412,7 +412,7 @@ void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
     {
         for (auto & node : vector.nodes)
         {
-            uint16_t size;
+            uint16_t size = 0;
             chip::DefaultStorageKeyAllocator keyAlloc;
             {
                 auto rv =
