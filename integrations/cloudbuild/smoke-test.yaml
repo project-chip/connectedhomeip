@@ -115,7 +115,7 @@ steps:
               --target linux-x64-chip-cert
               --target linux-x64-chip-tool-ipv6only
               --target linux-x64-dynamic-bridge-ipv6only
-              --target linux-x64-esp32-test-runner
+              --target linux-x64-efr32-test-runner
               --target linux-x64-light-rpc-ipv6only
               --target linux-x64-lock-ipv6only
               --target linux-x64-minmdns-ipv6only
