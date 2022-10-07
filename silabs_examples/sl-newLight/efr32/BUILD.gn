@@ -95,9 +95,6 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B") {
   rgb_led = true
 }
 
-# Enables LCD on supported devices
-lcd_on = show_qr_code
-
 # Enables RGB LEDs on supported devices
 rgb_on = rgb_led
 
