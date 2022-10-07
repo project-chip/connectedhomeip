@@ -61,19 +61,28 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
             ResumptionIdStorage oldResumptionId;
             Crypto::P256ECDHDerivedSecret oldSharedSecret;
             CATValues oldPeerCATs;
+            // This follows the approach in Delete.  Removal of the old
+            // resumption-id-keyed link is best effort.  If we cannot load
+            // state to lookup the resumption ID for the key, the entry in
+            // the link table will be leaked.
             err = LoadState(node, oldResumptionId, oldSharedSecret, oldPeerCATs);
-            // This follows the approach in Delete.  Removal of the old link is
-            // best effort.  Leaks will occur if an entry in the link table does
-            // not have a corresponding entry in the state table.
-            if (err == CHIP_NO_ERROR)
-            {
-                err = DeleteLink(oldResumptionId);
-            }
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(SecureChannel,
-                             "Unable to delete session resumption link for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             "LoadState failed; unable to fully delete session resumption record for node " ChipLogFormatX64
+                             ": %" CHIP_ERROR_FORMAT,
                              ChipLogValueX64(node.GetNodeId()), err.Format());
+            }
+            else
+            {
+                err = DeleteLink(oldResumptionId);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SecureChannel,
+                                 "DeleteLink failed; unable to fully delete session resumption record for node " ChipLogFormatX64
+                                 ": %" CHIP_ERROR_FORMAT,
+                                 ChipLogValueX64(node.GetNodeId()), err.Format());
+                }
             }
             ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
             ReturnErrorOnFailure(SaveLink(resumptionId, node));
