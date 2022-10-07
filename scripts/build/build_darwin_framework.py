@@ -56,14 +56,11 @@ def build_darwin_framework(args):
         '-derivedDataPath',
         abs_path,
         "PLATFORM_PREFERRED_ARCH={}".format(arch),
+        # Build Matter.framework as a static library
+        "SUPPORTS_TEXT_BASED_API=NO",
+        "MACH_O_TYPE=staticlib",
+        "GCC_INLINES_ARE_PRIVATE_EXTERN=NO",
     ]
-
-    if sdk != "macosx":
-        command += [
-            # Build Matter.framework as a static library
-            "SUPPORTS_TEXT_BASED_API=NO",
-            "MACH_O_TYPE=staticlib",
-        ]
     command_result = run_command(command)
 
     print("Build Framework Result: {}".format(command_result))
