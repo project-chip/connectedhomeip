@@ -10,7 +10,6 @@ Pay attention to if the command should be executed on the host machine or inside
 of the docker build environment. A `docker/<dir>$` means inside the docker and
 docker left out means on your host machine.
 
-
 ### Checkout submodules
 
 For the Unify bridge we checkout the necessary submodules with the below

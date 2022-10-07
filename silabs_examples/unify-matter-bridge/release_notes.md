@@ -24,6 +24,8 @@
 
 - Endpoint 0 of the bridge shows support for the Identify cluster, but the
   identify commands has no effects.
+- When using Google Home with unify-matter-bridge only commissioning works, all
+  Unify nodes appear as offline after commissioning.
 
 ## [0.1.0] - Aug 8th 2022
 
