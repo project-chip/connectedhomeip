@@ -93,7 +93,7 @@ OR use GN/Ninja directly
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${EFR32_BOARD}\""
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:

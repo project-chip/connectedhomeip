@@ -17,6 +17,8 @@ import("BUILD.generated.gni")
 config("boringssl_config") {
   include_dirs = [ "src/include" ]
 
+  cflags = [ "-Wno-unused-variable" ]
+
   # We want the basic crypto impl with no asm primitives until we hook-up platform-based
   # support to the build later.
   defines = [ "OPENSSL_NO_ASM=1" ]
