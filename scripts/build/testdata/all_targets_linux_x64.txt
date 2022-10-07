@@ -9,7 +9,6 @@ esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,ota-req
 genio-lighting-app
 linux-{x64,fake,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,minmdns,light,light-rpc,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool,tests}[-nodeps][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang][-test]
 linux-x64-esp32-test-runner[-clang]
-linux-{x64,fake,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,minmdns,light,light-rpc,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool,tests}[-nodeps][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang][-test]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage]
 k32w-{light,shell,lock,contact}[-no-ota][-low-power][-nologs]

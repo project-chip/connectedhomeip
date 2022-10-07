@@ -499,7 +499,6 @@ BUILD_TARGETS = [
     BuildGenioTarget(),
     BuildHostTarget(),
     BuildHostTestRunnerTarget(),
-    BuildHostTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
     BuildK32WTarget(),
