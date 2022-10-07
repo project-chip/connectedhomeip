@@ -39,6 +39,21 @@ from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBu
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
 
+def BuildHostTestRunnerTarget():
+    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('esp32-test-runner', app=HostApp.EFR32_TEST_RUNNER)
+    ])
+
+    target.AppendModifier('clang', use_clang=True)
+
+    return target
+
 
 def BuildHostTarget():
     native_board_name = HostBoard.NATIVE.BoardName()
@@ -59,7 +74,6 @@ def BuildHostTarget():
     # Add all the applications
     app_parts = [
         TargetPart('rpc-console', app=HostApp.RPC_CONSOLE).OnlyIfRe(f'{native_board_name}-'),
-        TargetPart('nl-test-runner', app=HostApp.NL_TEST_RUNNER).OnlyIfRe(f'{native_board_name}-'),
         TargetPart('all-clusters', app=HostApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
@@ -483,6 +497,8 @@ BUILD_TARGETS = [
     BuildEfr32Target(),
     BuildEsp32Target(),
     BuildGenioTarget(),
+    BuildHostTarget(),
+    BuildHostTestRunnerTarget(),
     BuildHostTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
