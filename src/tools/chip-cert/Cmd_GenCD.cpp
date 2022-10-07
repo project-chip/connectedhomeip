@@ -281,7 +281,7 @@ public:
 
     bool IsErrorTestCaseEnabled() { return mEnabled; }
     bool IsFormatVersionPresent() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kFormatVersionMissing)); }
-    int GetFormatVersion() { return (mEnabled && mFlags.Has(CDConfigFlags::kFormatVersionWrong)) ? 2 : 1; }
+    uint8_t GetFormatVersion() { return (mEnabled && mFlags.Has(CDConfigFlags::kFormatVersionWrong)) ? 2 : 1; }
     bool IsVIDPresent() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kVIDMissing)); }
     bool IsVIDCorrect() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kVIDWrong)); }
     bool IsPIDArrayPresent() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kPIDArrayMissing)); }
@@ -304,7 +304,7 @@ public:
     bool IsDACOriginPIDCorrect() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kDACOriginPID)); }
     bool IsDACOriginVIDPresent() { return (mEnabled && mFlags.Has(CDConfigFlags::kDACOriginVIDPresent)); }
     bool IsDACOriginPIDPresent() { return (mEnabled && mFlags.Has(CDConfigFlags::kDACOriginPIDPresent)); }
-    bool IsAuthPAAListPresent() { return (mEnabled || mFlags.Has(CDConfigFlags::kAuthPAAListPresent)); }
+    bool IsAuthPAAListPresent() { return (mFlags.Has(CDConfigFlags::kAuthPAAListPresent)); }
     bool IsAuthPAAListCorrect() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kAuthPAAListWrong)); }
     uint8_t GetAuthPAAListCount() const { return mAuthPAAListCount; }
     bool IsSignerInfoVersionCorrect() { return (!mEnabled || !mFlags.Has(CDConfigFlags::kSignerInfoVersion)); }
