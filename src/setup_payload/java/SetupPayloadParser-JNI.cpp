@@ -288,7 +288,7 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
     payload.productID         = env->GetIntField(jPayload, productId);
     payload.commissioningFlow = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
     payload.discriminator.SetLongValue(env->GetIntField(jPayload, discriminator));
-    payload.setUpPINCode = env->GetLongField(jPayload, setUpPinCode);
+    payload.setUpPINCode = static_cast<uint32_t>(env->GetLongField(jPayload, setUpPinCode));
 
     jobject discoveryCapabilitiesObj = env->GetObjectField(jPayload, discoveryCapabilities);
     CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj,
