@@ -11,6 +11,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+#include "app/data-model/NullObject.h"
 
 // Default translation
 template <typename T>
@@ -18,7 +19,6 @@ std::optional<T> from_json(const nlohmann::json & value)
 {
     return std::nullopt;
 }
-
 /***************************** Simple types Convertes **************/
 
 template <>
@@ -39,6 +39,86 @@ inline std::optional<std::string> from_json(const nlohmann::json & value)
     return value;
 }
 
+template <>
+inline std::optional<uint8_t> from_json(const nlohmann::json & value)
+{
+    return value;
+}
+template <>
+inline std::optional<uint16_t> from_json(const nlohmann::json & value)
+{
+    return value;
+}
+template <>
+inline std::optional<uint32_t> from_json(const nlohmann::json & value)
+{
+    return value;
+}
+template <>
+inline std::optional<uint64_t> from_json(const nlohmann::json & value)
+{
+    return value;
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<int>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<int>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<uint8_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<uint8_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<uint16_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<uint16_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<uint32_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<uint32_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<uint64_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<uint64_t>(value);
+    }
+}
 /***************************** Bitmap Convertes **************/
 //
 //
