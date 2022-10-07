@@ -82,7 +82,7 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
                 cluster_builder.incoming_commands.push_back(command.value());
             }
         }
-
+        cluster_builder.incoming_commands.push_back(chip::kInvalidCommandId);
         for (const auto & outgoing : cluster.generated_commands)
         {
             auto command = translator.get_command_id(cluster_name, outgoing);
@@ -91,7 +91,7 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
                 cluster_builder.outgoing_commands.push_back(command.value());
             }
         }
-
+        cluster_builder.outgoing_commands.push_back(chip::kInvalidCommandId);
         for (const auto & attribute : cluster.attributes)
         {
             if (auto attribute_id = translator.get_attribute_id(cluster_name, attribute))
