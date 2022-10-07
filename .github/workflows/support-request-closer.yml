@@ -1,0 +1,28 @@
+# This workflow auto closes issues with specific tags at least 24 hours after the tag has been set.
+#
+# You can adjust the behavior by modifying this file.
+# For more information, see:
+# https://github.com/marketplace/actions/tiangolo-s-issue-manager
+name: Support Request Closer
+
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+jobs:
+  issue-manager:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tiangolo/issue-manager@0.4.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config: >
+            {
+                "support-request": {
+                    "delay": 86400,
+                    "message": "This issue requires community support. Automatically closing the issue.",
+                    "remove_label_on_comment": false,
+                    "remove_label_on_close": false
+                }
+            }

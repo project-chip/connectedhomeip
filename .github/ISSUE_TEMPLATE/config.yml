@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support Request
+    url: https://community.silabs.com/s/topic/0TO1M000000qHZgWAM/matter?language=en_US
+    about: For support requests, please ask your questions in Silabs Matter Community

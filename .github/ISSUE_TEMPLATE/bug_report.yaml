@@ -1,0 +1,99 @@
+name: "Bug report"
+description: "File a bug report for Silabs Matter"
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for reporting an issue against the Silabs Matter Repository! To correctly address your issue, please fill out the necessary information."
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description of the issue"
+      placeholder: "Textual description of the issue and of its symptoms."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce_steps
+    attributes:
+      label: "Steps to reproduce the issue"
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      placeholder: |
+        1.
+        2.
+        3.
+        ...
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: network
+    attributes:
+      label: "Device type(s) and network topology"
+      description: "Description of the network in which this issue happens (devices/types/connections/etc)."
+      placeholder: "Mattertool Raspberry Pi connected over OpenThread with two FTDs."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed solution(s)"
+      description: "If available, any steps, changes, etc. that can solve the reported issue."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: smg-version
+    attributes:
+      label: "SMG version"
+      description: "What Matter SMG version are you using?"
+      options:
+        - release_0.1.0
+        - release_0.2.0
+        - release_0.3.0
+        - release_0.4.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: protocol
+    attributes:
+      label: "Protocol(s)"
+      description: "What protocol(s) is(are) affected? (multiple choices allowed)"
+      multiple: true
+      options:
+        - "Openthread"
+        - "Wifi"
+        - "Bluetooth"
+    validations:
+      required: true
+
+  - type: input
+    id: hardware_platform
+    attributes:
+      label: "Hardware platform(s)"
+      description: "What hardware platform(s) are you using such as radio part, host part/host OS (if any), etc.?"
+      placeholder: "ex: MG24 Explorer Kit, BRD4186C"
+    validations:
+      required: true
+
+  - type: input
+    id: platform-version
+    attributes:
+      label: "Development platform(s)"
+      description: "What development platform(s) are you using"
+      placeholder: "If relevant to the bug report, please add details about your development environment used where the bug occurs."
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Captured data or logs"
+      description: |
+        Attach any relevant logs or network captures.
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false

@@ -1,0 +1,20 @@
+# This workflow auto assigns Matter-Apps team to a newly created issue
+#
+# You can adjust the behavior by modifying this file.
+# For more information, see:
+# https://github.com/marketplace/actions/auto-assign-issue
+name: Issue assignment
+
+on:
+    issues:
+        types: [opened]
+
+jobs:
+    auto-assign:
+        runs-on: ubuntu-latest
+        steps:
+            - name: "Auto-assign issue"
+              uses: pozil/auto-assign-issue@v1
+              with:
+                  assignees: ${{secrets.APPS_MATTER_SUPPORT}}
+                  allowSelfAssign: true

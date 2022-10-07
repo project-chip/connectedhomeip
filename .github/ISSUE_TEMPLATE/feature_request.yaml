@@ -1,0 +1,73 @@
+name: "Feature request"
+description: "File a feature request for Matter development"
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for requesting a new feature! To help us understand your request, please fill out the necessary information."
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "General description of the feature"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed solution"
+      description: "High level description of a possible implementation"
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives"
+      description: "Describe any alternatives already considered or attempted and the results."
+    validations:
+      required: false
+
+  - type: input
+    id: bug_relation
+    attributes:
+      label: "Related bug"
+      description: "If this feature request is related to a bug, please link it here."
+      placeholder: "ex: #12345"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: smg-version
+    attributes:
+      label: "SMG version"
+      description: "What Matter SMG version are you using?"
+      options:
+        - release_0.1.0
+        - release_0.2.0
+        - release_0.3.0
+        - release_0.4.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: Protocol
+    attributes:
+      label: "Protocol(s)"
+      description: "What protocol(s) is(are) affected? (multiple choices allowed)"
+      multiple: true
+      options:
+        - "Openthread"
+        - "Wifi"
+        - "Bluetooth"
+    validations:
+      required: true
+
+  - type: input
+    id: hardware_platform
+    attributes:
+      label: "Hardware platform(s)"
+      description: "What hardware platform(s) are you using such as radio part, host part or host OS (if any), etc.?"
+      placeholder: "ex: MG24 Explorer Kit, BRD4186C"
+    validations:
+      required: true
