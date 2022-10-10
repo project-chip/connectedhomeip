@@ -28,8 +28,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Zephyr/InetUtils.h>
 
-#include <net/net_stats.h>
-#include <zephyr.h>
+#include <zephyr/net/net_stats.h>
+#include <zephyr/kernel.h>
 #include <zephyr/net/net_event.h>
 
 extern "C" {

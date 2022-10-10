@@ -28,8 +28,8 @@
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemLayer.h>
 
-#include <net/net_if.h>
-#include <net/wifi_mgmt.h>
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/wifi_mgmt.h>
 
 extern "C" {
 #include <src/utils/common.h>
