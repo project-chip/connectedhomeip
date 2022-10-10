@@ -15,6 +15,7 @@ RUN set -x \
     clang \
     clang-format \
     clang-tidy \
+    clang-12 \
     curl \
     flex \
     g++ \
@@ -22,12 +23,14 @@ RUN set -x \
     git-lfs \
     gperf \
     iproute2 \
+    iwyu \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
     libcairo-dev \
     libcairo2-dev \
+    libclang-12-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
@@ -118,6 +121,24 @@ RUN set -x \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
+    && : # last line
+
+# Need newer version of include-what-you-use
+# iwyu_tool default use python from env must be linked
+RUN set -x \
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && cd /tmp \
+    && git clone https://github.com/include-what-you-use/include-what-you-use.git \
+    && cd include-what-you-use \
+    && git checkout clang_12 \
+    && cp -Rf iwyu_tool.py /bin/iwyu_tool \
+    && mkdir build \
+    && cd build \
+    && cmake -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 .. \
+    && make \
+    && cp -Rf bin /usr \
+    && cd ../../ \
+    && rm -rf include-what-you-use* \
     && : # last line
 
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
