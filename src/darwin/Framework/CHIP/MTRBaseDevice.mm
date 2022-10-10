@@ -402,6 +402,34 @@ public:
                                   }];
 }
 
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(MTRSubscribeParams * _Nullable)params
+             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+               errorHandler:(MTRDeviceErrorHandler)errorHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+{
+    if (params == nil) {
+        params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minInterval) maxInterval:@(maxInterval)];
+    } else {
+        params.minInterval = @(minInterval);
+        params.maxInterval = @(maxInterval);
+    }
+
+    [self subscribeWithQueue:queue
+                            params:params
+        clusterStateCacheContainer:attributeCacheContainer
+            attributeReportHandler:attributeReportHandler
+                eventReportHandler:eventReportHandler
+                      errorHandler:errorHandler
+           subscriptionEstablished:subscriptionEstablishedHandler
+           resubscriptionScheduled:resubscriptionScheduledHandler];
+}
+
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
 id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
 {
@@ -887,6 +915,21 @@ private:
         });
 }
 
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(MTRReadParams * _Nullable)params
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    [self readAttributePathWithEndpointID:endpointId
+                                clusterID:clusterId
+                              attributeID:attributeId
+                                   params:params
+                                    queue:clientQueue
+                               completion:completion];
+}
+
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                          attributeID:(NSNumber *)attributeID
@@ -954,6 +997,23 @@ private:
                 onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
                 onDoneCb, NullOptional);
         });
+}
+
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
+                               value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                         clientQueue:(dispatch_queue_t)clientQueue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    [self writeAttributeWithEndpointID:endpointId
+                             clusterID:clusterId
+                           attributeID:attributeId
+                                 value:value
+                     timedWriteTimeout:timeoutMs
+                                 queue:clientQueue
+                            completion:completion];
 }
 
 class NSObjectCommandCallback final : public app::CommandSender::Callback {
@@ -1121,6 +1181,23 @@ exit:
         });
 }
 
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
+                      commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    [self invokeCommandWithEndpointID:endpointId
+                            clusterID:clusterId
+                            commandID:commandId
+                        commandFields:commandFields
+                   timedInvokeTimeout:timeoutMs
+                                queue:clientQueue
+                           completion:completion];
+}
+
 - (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
                                    clusterID:(NSNumber * _Nullable)clusterID
                                  attributeID:(NSNumber * _Nullable)attributeID
@@ -1258,11 +1335,42 @@ exit:
                }];
 }
 
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(MTRSubscribeParams * _Nullable)params
+                             clientQueue:(dispatch_queue_t)clientQueue
+                           reportHandler:(MTRDeviceResponseHandler)reportHandler
+                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+{
+    if (params == nil) {
+        params = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+    } else {
+        params.minInterval = minInterval;
+        params.maxInterval = maxInterval;
+    }
+
+    [self subscribeAttributePathWithEndpointID:endpointId
+                                     clusterID:clusterId
+                                   attributeID:attributeId
+                                        params:params
+                                         queue:clientQueue
+                                 reportHandler:reportHandler
+                       subscriptionEstablished:subscriptionEstablishedHandler];
+}
+
 - (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
 {
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");
     PurgeReadClientContainers(self.nodeID, queue, completion);
+}
+
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
+{
+    [self deregisterReportHandlersWithQueue:clientQueue completion:completion];
 }
 
 namespace {
@@ -1534,6 +1642,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return [[MTRAttributePath alloc] initWithPath:path];
 }
 
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId attributeId:(NSNumber *)attributeId
+{
+    return [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:clusterId attributeID:attributeId];
+}
+
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
 {
     return [self isEqualToClusterPath:attributePath] && [_attribute isEqualToNumber:attributePath.attribute];
@@ -1575,6 +1688,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return [[MTREventPath alloc] initWithPath:path];
 }
 
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId
+{
+    return [MTREventPath eventPathWithEndpointID:endpoint clusterID:clusterId eventID:eventId];
+}
+
 - (id)copyWithZone:(NSZone *)zone
 {
     return [MTREventPath eventPathWithEndpointID:self.endpoint clusterID:self.cluster eventID:_event];
@@ -1596,6 +1714,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));
 
     return [[MTRCommandPath alloc] initWithPath:path];
+}
+
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId commandId:(NSNumber *)commandId
+{
+    return [MTRCommandPath commandPathWithEndpointID:endpoint clusterID:clusterId commandID:commandId];
 }
 
 - (id)copyWithZone:(NSZone *)zone

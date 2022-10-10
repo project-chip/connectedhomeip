@@ -19,6 +19,10 @@
 
 #import <Matter/MTRCluster.h>
 
+// TODO: Figure out what these versions should actually be?
+#define TODOVERSION ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)
+#define TODODEPRECATIONVERSION ios(16.1, 16.2), macos(13.0, 13.1), watchos(9.1, 9.2), tvos(16.1, 16.2)
+
 @class MTRSetupPayload;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -116,6 +120,8 @@ extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
 
 @class MTRClusterStateCacheContainer;
+// TODO: Sort out how to do this right: https://github.com/project-chip/connectedhomeip/issues/23117
+typedef MTRClusterStateCacheContainer MTRAttributeCacheContainer;
 @class MTRReadParams;
 @class MTRSubscribeParams;
 @class MTRDeviceController;
@@ -131,7 +137,7 @@ extern NSString * const MTRArrayValueType;
  * fabric, but attempts to actually use the MTRBaseDevice will fail
  * (asynchronously) in that case.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller API_AVAILABLE(TODOVERSION);
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -179,7 +185,27 @@ extern NSString * const MTRArrayValueType;
             eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                   errorHandler:(MTRDeviceErrorHandler)errorHandler
        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled;
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
+    API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of the subscribeWithQueue API.  The passed-in minInterval
+ * and maxInterval will override the ones in the MTRSubscribeParams, if params
+ * are passed in.
+ */
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(MTRSubscribeParams * _Nullable)params
+             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+               errorHandler:(MTRDeviceErrorHandler)errorHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+    API_DEPRECATED("Use subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:"
+                   "eventReportHandler:errorHandler:subscriptionEstablished:resubscriptionScheduled:",
+        TODODEPRECATIONVERSION);
 
 /**
  * Reads the given attribute path from the device.
@@ -196,7 +222,19 @@ extern NSString * const MTRArrayValueType;
                             attributeID:(NSNumber * _Nullable)attributeID
                                  params:(MTRReadParams * _Nullable)params
                                   queue:(dispatch_queue_t)queue
-                             completion:(MTRDeviceResponseHandler)completion;
+                             completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of readAttributePathWithEndpointID.
+ */
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                             params:(MTRReadParams * _Nullable)params
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    API_DEPRECATED_WITH_REPLACEMENT(
+        "-readAttributePathWithEndpointID:clusterID:attributeID:params:queue:completion:", TODODEPRECATIONVERSION);
 
 /**
  * Write to attribute in a designated attribute path
@@ -217,7 +255,20 @@ extern NSString * const MTRArrayValueType;
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                                queue:(dispatch_queue_t)queue
-                          completion:(MTRDeviceResponseHandler)completion;
+                          completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of writeAttributeWithEndpointID.
+ */
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
+                               value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                         clientQueue:(dispatch_queue_t)clientQueue
+                          completion:(MTRDeviceResponseHandler)completion
+    API_DEPRECATED_WITH_REPLACEMENT(
+        "-writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:", TODODEPRECATIONVERSION);
 
 /**
  * Invoke a command with a designated command path
@@ -237,7 +288,21 @@ extern NSString * const MTRArrayValueType;
                       commandFields:(id)commandFields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion;
+                         completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of invokeCommandWithEndpointID.
+ */
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
+                      commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    API_DEPRECATED_WITH_REPLACEMENT(
+        "-invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion:",
+        TODODEPRECATIONVERSION);
 
 /**
  * Subscribes to the given attribute path on the device.
@@ -255,7 +320,26 @@ extern NSString * const MTRArrayValueType;
                                       params:(MTRSubscribeParams *)params
                                        queue:(dispatch_queue_t)queue
                                reportHandler:(MTRDeviceResponseHandler)reportHandler
-                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
+                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+    API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of subscribeAttributePathWithEndpointID.  The passed-in
+ * minInterval and maxInterval will override the ones in the MTRSubscribeParams,
+ * if params are passed in.
+ */
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(MTRSubscribeParams * _Nullable)params
+                             clientQueue:(dispatch_queue_t)clientQueue
+                           reportHandler:(MTRDeviceResponseHandler)reportHandler
+                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    API_DEPRECATED(
+        "Use subscribeAttributePathWithEndpointID:clusterID:attributeID:params:queue:reportHandler:subscriptionEstablished:",
+        TODODEPRECATIONVERSION);
 
 /**
  * Deregister all local report handlers for a remote device
@@ -264,7 +348,15 @@ extern NSString * const MTRArrayValueType;
  * There could be multiple clients accessing a node through a remote controller object and hence it is not appropriate
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
-- (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion;
+- (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue
+                               completion:(dispatch_block_t)completion API_AVAILABLE(TODOVERSION);
+
+/**
+ * Deprecated version of deregisterReportHandlersWithQueue.
+ */
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue
+                                     completion:(void (^)(void))completion
+    API_DEPRECATED_WITH_REPLACEMENT("-deregisterReportHandlersWithQueue:", TODODEPRECATIONVERSION);
 
 /**
  * Open a commissioning window on the device.
@@ -284,7 +376,7 @@ extern NSString * const MTRArrayValueType;
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion API_AVAILABLE(TODOVERSION);
 
 @end
 
@@ -292,6 +384,11 @@ extern NSString * const MTRArrayValueType;
  * A path indicating a specific cluster on a device (i.e. without any
  * wildcards).
  */
+// TODO: https://github.com/project-chip/connectedhomeip/issues/23118 -- figure
+// out whether the introduction of MTRClusterPath is ABI-compatible with what we
+// used to have.
+
+API_AVAILABLE(TODOVERSION)
 @interface MTRClusterPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
@@ -311,7 +408,12 @@ extern NSString * const MTRArrayValueType;
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
                                   clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID;
+                                attributeID:(NSNumber *)attributeID API_AVAILABLE(TODOVERSION);
+
++ (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
+                                  clusterId:(NSNumber *)clusterId
+                                attributeId:(NSNumber *)attributeId
+    API_DEPRECATED_WITH_REPLACEMENT("+attributePathWithEndpointID:clusterID:attributeID:", TODODEPRECATIONVERSION);
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -325,7 +427,14 @@ extern NSString * const MTRArrayValueType;
 @interface MTREventPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID;
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
+                              clusterID:(NSNumber *)clusterID
+                                eventID:(NSNumber *)eventID API_AVAILABLE(TODOVERSION);
+
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint
+                              clusterId:(NSNumber *)clusterId
+                                eventId:(NSNumber *)eventId
+    API_DEPRECATED_WITH_REPLACEMENT("+eventPathWithEndpointID:clusterID:eventID:", TODODEPRECATIONVERSION);
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -338,7 +447,13 @@ extern NSString * const MTRArrayValueType;
 @interface MTRCommandPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * command;
 
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID;
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID API_AVAILABLE(TODOVERSION);
++ (instancetype)commandPathWithEndpointId:(NSNumber *)endpoint
+                                clusterId:(NSNumber *)clusterId
+                                commandId:(NSNumber *)commandId
+    API_DEPRECATED_WITH_REPLACEMENT("+commandPathWithEndpointID:clusterID:commandID:", TODODEPRECATIONVERSION);
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
