@@ -544,18 +544,6 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "CHIP Trait Manager"
-
-        config ENABLE_TRAIT_MANAGER
-            bool "Enable Trait Manager"
-            default y
-            help
-                Enable support for the CHIP Trait Manager.
-
-                The Trait Manager is an experimental feature of the CHIP Device Layer.
-
-    endmenu
-
     menu "Time Sync Options"
 
         config ENABLE_SERVICE_DIRECTORY_TIME_SYNC
