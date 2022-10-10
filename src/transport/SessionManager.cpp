@@ -802,11 +802,16 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
     {
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
+        if (msgCopy.IsNull())
+        {
+            ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
+            return;
+        }
 
         if (packetHeader.HasPrivacyFlag())
         {
             // Perform privacy deobfuscation, if applicable.
-            uint8_t * privacyHeader = msgCopy->Start() + Header::kPrivacyHeaderOffset;
+            uint8_t * privacyHeader = msgCopy->Start() + PacketHeader::kPrivacyHeaderOffset;
             size_t privacyLength    = packetHeader.PrivacyHeaderLength();
             ReturnOnFailure(context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
         }
@@ -815,7 +820,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
 
         if (msgCopy.IsNull())
         {
-            ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
+            ChipLogError(Inet, "Secure transport received Groupcast with NULL payload. Discarding.");
             return;
         }
 

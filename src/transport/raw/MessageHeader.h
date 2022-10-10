@@ -34,6 +34,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
@@ -49,13 +50,6 @@ static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 typedef int PacketHeaderFlags;
 
 namespace Header {
-
-enum Consts
-{
-    kHeaderMinLength        = 8,
-    kPrivacyHeaderMinLength = 4,
-    kPrivacyHeaderOffset    = 4,
-};
 
 enum class SessionType : uint8_t
 {
@@ -141,6 +135,13 @@ using ExFlags = BitFlags<ExFlagValues>;
 class PacketHeader
 {
 public:
+    enum
+    {
+        kHeaderMinLength        = 8,
+        kPrivacyHeaderMinLength = 4,
+        kPrivacyHeaderOffset    = 4,
+    };
+
     /**
      * Gets the message counter set in the header.
      *
@@ -327,7 +328,7 @@ public:
 
     size_t PrivacyHeaderLength() const
     {
-        size_t length = Header::kPrivacyHeaderMinLength;
+        size_t length = kPrivacyHeaderMinLength;
         if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
         {
             length += sizeof(NodeId);
@@ -345,7 +346,7 @@ public:
 
     size_t PayloadOffset() const
     {
-        size_t offset = Header::kPrivacyHeaderMinLength;
+        size_t offset = kPrivacyHeaderMinLength;
         offset += PrivacyHeaderLength();
         return offset;
     }
@@ -357,6 +358,18 @@ public:
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
     uint16_t EncodeSizeBytes() const;
+
+    /**
+     * Decodes the fixed portion of the header fields from the stream reader.
+     * The fixed header includes: message flags, session id, and security flags.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeFixedCommon(Encoding::LittleEndian::Reader & reader);
 
     /**
      * Decodes the fixed portion of the header fields from the given buffer.
