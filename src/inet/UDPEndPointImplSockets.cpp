@@ -478,13 +478,15 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         int res           = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
         static_cast<void>(res);
 
-#ifdef SO_REUSEPORT
-        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
-        if (res != 0)
-        {
-            ChipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
-        }
-#endif // defined(SO_REUSEPORT)
+        // Do not set SO_REUSEPORT.  Where available, this only changes behavior
+        // for unicast addresses, but for these we do not wish to allow port
+        // reuse, as this will allow multiple sockets to listen on the same
+        // ip:port (possibly in separate processes), with the kernel
+        // multiplexing between these.
+        //
+        // We only want to allow port reuse for multicast (in which case all
+        // bound sockets will receieve a copy of the datagram), and SO_REUSEADDR
+        // already gives us that behavior.
 
         // If creating an IPv6 socket, tell the kernel that it will be
         // IPv6 only.  This makes it posible to bind two sockets to
