@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 /* Open session to se05x */
-CHIP_ERROR se05x_sessionOpen(void);
+void se05x_sessionOpen(void);
 
 /* Delete key in se05x */
 void se05x_delete_key(uint32_t keyid);

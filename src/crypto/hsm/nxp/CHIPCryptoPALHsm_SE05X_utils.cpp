@@ -77,18 +77,12 @@ static Mutex sSEObjMutex;
 #endif //#if ENABLE_REENTRANCY
 
 /* Open session to se05x */
-CHIP_ERROR se05x_sessionOpen(void)
+void se05x_sessionOpen(void)
 {
     static int is_session_open = 0;
     if (is_session_open)
     {
-        return CHIP_NO_ERROR;
-    }
-
-    if(se05x_enable_contact_interface())
-    {
-        ChipLogError(Crypto, "se05x error: %s\n", "se05x_enable_contact_interface failed");
-        return CHIP_ERROR_INTERNAL;
+        return;
     }
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
@@ -98,14 +92,14 @@ CHIP_ERROR se05x_sessionOpen(void)
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
-        return CHIP_ERROR_INTERNAL;
+        return;
     }
 
     status = ex_sss_boot_open(&gex_sss_chip_ctx, portName);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_open failed");
-        return CHIP_ERROR_INTERNAL;
+        return;
     }
 
     status = ex_sss_key_store_and_object_init(&gex_sss_chip_ctx);
@@ -116,7 +110,7 @@ CHIP_ERROR se05x_sessionOpen(void)
     }
 
     is_session_open = 1;
-    return CHIP_NO_ERROR;
+    return;
 }
 
 /* Delete key in se05x */
