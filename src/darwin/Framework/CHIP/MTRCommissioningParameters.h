@@ -17,6 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
+// TODO: Figure out what these versions should actually be?  In particular, what
+// non-ios bits do we need here, if any?
+#define TODOVERSION ios(16.2)
+#define TODODEPRECATIONVERSION ios(16.1, 16.2)
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRDeviceAttestationDelegate;
@@ -34,7 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be 32 bytes of data.
  */
-@property (nonatomic, copy, nullable) NSData * csrNonce;
+@property (nonatomic, copy, nullable) NSData * csrNonce API_AVAILABLE(TODOVERSION);
+@property (nonatomic, copy, nullable) NSData * CSRNonce API_DEPRECATED_WITH_REPLACEMENT("csrNonce", TODODEPRECATIONVERSION);
 /**
  * The nonce to use when requesting attestation information from the device.
  *
@@ -68,9 +74,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If nil, the fail-safe will not be extended before calling into the
  * deviceAttestationDelegate.
-
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout;
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout API_AVAILABLE(TODOVERSION);
+@property (nonatomic, copy, nullable)
+    NSNumber * failSafeExpiryTimeoutSecs API_DEPRECATED_WITH_REPLACEMENT("failSafeExpiryTimeout", TODODEPRECATIONVERSION);
 
 @end
 
