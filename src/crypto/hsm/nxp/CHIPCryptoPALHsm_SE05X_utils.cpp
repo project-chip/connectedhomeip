@@ -24,7 +24,6 @@
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
 #include "fsl_sss_policy.h"
-#include "se05x_t4t_utils.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
@@ -106,11 +105,10 @@ void se05x_sessionOpen(void)
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_key_store_and_object_init failed");
-        return CHIP_ERROR_INTERNAL;
+        return;
     }
 
     is_session_open = 1;
-    return;
 }
 
 /* Delete key in se05x */
