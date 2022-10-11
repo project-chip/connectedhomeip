@@ -25,7 +25,7 @@
 @implementation CHIPToolDeviceControllerDelegate
 - (void)onStatusUpdate:(MTRCommissioningStatus)status
 {
-    NSLog(@"Pairing Status Update: %lu", status);
+    NSLog(@"Pairing Status Update: %tu", status);
     switch (status) {
     case MTRCommissioningStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");

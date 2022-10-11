@@ -76,7 +76,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
-    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
+    NSLog(@"Custom flow:   %tu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
     {
         if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
             NSLog(@"Capabilities:  UNKNOWN");
@@ -100,7 +100,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 [humanFlags appendString:@"ON NETWORK"];
             }
 
-            NSLog(@"Capabilities:  0x%02lX (%@)", value, humanFlags);
+            NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);
         }
     }
     NSLog(@"Discriminator: %@", payload.discriminator);
