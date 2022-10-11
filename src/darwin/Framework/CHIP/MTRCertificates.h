@@ -23,6 +23,11 @@
 typedef NSData MTRCertificateDERBytes;
 typedef NSData MTRCertificateTLVBytes;
 
+// TODO: Figure out what these versions should actually be?  In particular, what
+// non-ios bits do we need here, if any?
+#define TODOVERSION ios(16.2)
+#define TODODEPRECATIONVERSION ios(16.1, 16.2)
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRKeypair;
@@ -45,7 +50,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (MTRCertificateDERBytes * _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
                                                    issuerID:(NSNumber * _Nullable)issuerID
                                                    fabricID:(NSNumber * _Nullable)fabricID
-                                                      error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                                      error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_AVAILABLE(TODOVERSION);
+
++ (nullable NSData *)generateRootCertificate:(id<MTRKeypair>)keypair
+                                    issuerId:(nullable NSNumber *)issuerId
+                                    fabricId:(nullable NSNumber *)fabricId
+                                       error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_DEPRECATED_WITH_REPLACEMENT("+createRootCertificate:issuerID:fabricID:error:", TODODEPRECATIONVERSION);
 
 /**
  * Create an intermediate X.509 DER encoded certificate that has the
@@ -65,7 +77,17 @@ NS_ASSUME_NONNULL_BEGIN
                                               intermediatePublicKey:(SecKeyRef)intermediatePublicKey
                                                            issuerID:(NSNumber * _Nullable)issuerID
                                                            fabricID:(NSNumber * _Nullable)fabricID
-                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_AVAILABLE(TODOVERSION);
+
++ (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                     rootCertificate:(NSData *)rootCertificate
+                               intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                            issuerId:(nullable NSNumber *)issuerId
+                                            fabricId:(nullable NSNumber *)fabricId
+                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_DEPRECATED_WITH_REPLACEMENT(
+        "+createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:", TODODEPRECATIONVERSION);
 
 /**
  * Create an X.509 DER encoded certificate that has the
@@ -94,7 +116,19 @@ NS_ASSUME_NONNULL_BEGIN
                                                           fabricID:(NSNumber *)fabricID
                                                             nodeID:(NSNumber *)nodeID
                                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
-                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_AVAILABLE(TODOVERSION);
+
++ (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                 signingCertificate:(NSData *)signingCertificate
+                               operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                           fabricId:(NSNumber *)fabricId
+                                             nodeId:(NSNumber *)nodeId
+                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_DEPRECATED_WITH_REPLACEMENT(
+        "+createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:",
+        TODODEPRECATIONVERSION);
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
@@ -103,7 +137,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Will return NO on failures to extract public keys from the objects.
  */
-+ (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate;
++ (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(MTRCertificateDERBytes *)certificate;
 
 /**
  * Check whether two X.509 DER encoded certificates are equivalent, in the sense
@@ -126,7 +160,12 @@ NS_ASSUME_NONNULL_BEGIN
  * error.
  */
 + (NSData * _Nullable)createCertificateSigningRequest:(id<MTRKeypair>)keypair
-                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_AVAILABLE(TODOVERSION);
+
++ (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    API_DEPRECATED_WITH_REPLACEMENT("+createCertificateSigningRequest:error:", TODODEPRECATIONVERSION);
 
 /**
  * Convert the given X.509v3 DER encoded certificate to the Matter certificate

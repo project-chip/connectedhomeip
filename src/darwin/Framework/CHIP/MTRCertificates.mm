@@ -53,6 +53,14 @@ using namespace chip::Credentials;
     return rootCert;
 }
 
++ (nullable NSData *)generateRootCertificate:(id<MTRKeypair>)keypair
+                                    issuerId:(nullable NSNumber *)issuerId
+                                    fabricId:(nullable NSNumber *)fabricId
+                                       error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    return [MTRCertificates createRootCertificate:keypair issuerID:issuerId fabricID:fabricId error:error];
+}
+
 + (MTRCertificateDERBytes * _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                                     rootCertificate:(MTRCertificateDERBytes *)rootCertificate
                                               intermediatePublicKey:(SecKeyRef)intermediatePublicKey
@@ -76,6 +84,21 @@ using namespace chip::Credentials;
     }
 
     return intermediate;
+}
+
++ (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                     rootCertificate:(NSData *)rootCertificate
+                               intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                            issuerId:(nullable NSNumber *)issuerId
+                                            fabricId:(nullable NSNumber *)fabricId
+                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    return [MTRCertificates createIntermediateCertificate:rootKeypair
+                                          rootCertificate:rootCertificate
+                                    intermediatePublicKey:intermediatePublicKey
+                                                 issuerID:issuerId
+                                                 fabricID:fabricId
+                                                    error:error];
 }
 
 + (MTRCertificateDERBytes * _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
@@ -102,6 +125,23 @@ using namespace chip::Credentials;
     }
 
     return opcert;
+}
+
++ (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                 signingCertificate:(NSData *)signingCertificate
+                               operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                           fabricId:(NSNumber *)fabricId
+                                             nodeId:(NSNumber *)nodeId
+                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    return [MTRCertificates createOperationalCertificate:signingKeypair
+                                      signingCertificate:signingCertificate
+                                    operationalPublicKey:operationalPublicKey
+                                                fabricID:fabricId
+                                                  nodeID:nodeId
+                                   caseAuthenticatedTags:caseAuthenticatedTags
+                                                   error:error];
 }
 
 + (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate
@@ -195,6 +235,12 @@ using namespace chip::Credentials;
         *error = [MTRError errorForCHIPErrorCode:err];
     }
     return nil;
+}
+
++ (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    return [MTRCertificates createCertificateSigningRequest:keypair error:error];
 }
 
 + (MTRCertificateTLVBytes * _Nullable)convertX509Certificate:(MTRCertificateDERBytes *)x509Certificate
