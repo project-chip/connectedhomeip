@@ -163,6 +163,11 @@ private:
     return [controller deviceForNodeID:nodeID];
 }
 
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
+{
+    return [MTRDevice deviceWithNodeID:@(nodeID) controller:deviceController];
+}
+
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
@@ -472,6 +477,27 @@ private:
                          }];
 
     [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
+}
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    [self invokeCommandWithEndpointID:endpointID
+                            clusterID:clusterID
+                            commandID:commandID
+                        commandFields:commandFields
+                       expectedValues:expectedValues
+                expectedValueInterval:expectedValueInterval
+                   timedInvokeTimeout:timeout
+                                queue:clientQueue
+                           completion:completion];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode

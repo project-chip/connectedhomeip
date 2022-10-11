@@ -18,6 +18,10 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 
+// TODO: Figure out what these versions should actually be?
+#define TODOVERSION ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)
+#define TODODEPRECATIONVERSION ios(16.1, 16.2), macos(13.0, 13.1), watchos(9.1, 9.2), tvos(16.1, 16.2)
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
@@ -44,7 +48,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller API_AVAILABLE(TODOVERSION);
+
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID
+                deviceController:(MTRDeviceController *)deviceController
+    API_DEPRECATED_WITH_REPLACEMENT("+deviceWithNodeID:controller:", TODODEPRECATIONVERSION);
 
 /**
  * The current state of the device.
@@ -135,7 +143,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion;
+                         completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(TODOVERSION);
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+    API_DEPRECATED_WITH_REPLACEMENT("-invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:"
+                                    "expectedValueInterval:timedInvokeTimeout:queue:completion:",
+        TODODEPRECATIONVERSION);
 
 /**
  * Open a commissioning window on the device.
@@ -155,7 +176,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion API_AVAILABLE(TODOVERSION);
 
 @end
 
