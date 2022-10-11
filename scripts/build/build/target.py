@@ -45,7 +45,7 @@ import re
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 report_rejected_parts = True
@@ -57,7 +57,7 @@ class TargetPart:
     name: str
 
     # The build arguments to apply to a builder if this part is active
-    build_arguments: dict[str, Any]
+    build_arguments: Dict[str, Any]
 
     # Part should be included if and only if the final string MATCHES the
     # given regular expression
@@ -122,7 +122,7 @@ def _HasVariantPrefix(value: str, prefix: str):
         return value[len(prefix)+1:]
 
 
-def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[list[TargetPart]], modifiers: list[TargetPart]):
+def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[List[TargetPart]], modifiers: List[TargetPart]):
     """Given an input string, process through all the input rules and return
        the underlying list of target parts for the input.
 
@@ -196,13 +196,13 @@ class BuildTarget:
         #   - esp32-devkitc-light is OK
         #   - esp32-light is NOT ok
         #   - esp32-m5stack is NOT ok
-        self.fixed_targets: list[list[TargetPart]] = []
+        self.fixed_targets: List[List[TargetPart]] = []
 
         # a list of all available modifiers for this build target
         # Modifiers can be combined in any way
-        self.modifiers: list[TargetPart] = []
+        self.modifiers: List[TargetPart] = []
 
-    def AppendFixedTargets(self, parts: list[TargetPart]):
+    def AppendFixedTargets(self, parts: List[TargetPart]):
         """Append a list of potential targets/variants.
 
         Example:
