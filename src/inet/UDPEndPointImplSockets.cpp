@@ -485,7 +485,7 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         // multiplexing between these.
         //
         // We only want to allow port reuse for multicast (in which case all
-        // bound sockets will receieve a copy of the datagram), and SO_REUSEADDR
+        // bound sockets will receive a copy of the datagram), and SO_REUSEADDR
         // already gives us that behavior.
 
         // If creating an IPv6 socket, tell the kernel that it will be
