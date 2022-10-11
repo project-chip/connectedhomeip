@@ -71,7 +71,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light \
+                      --target k32w-light-no-ble-se05x \
                       --target k32w-light-no-ota \
                       --target k32w-lock-low-power-nologs \
                       --target k32w-contact-low-power-nologs \
