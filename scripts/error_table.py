@@ -29,11 +29,13 @@ from enum import IntEnum
 from pathlib import Path
 from operator import attrgetter
 
+
 @dataclass
 class ErrorCode:
     code: int
     name: str
     description: str
+
 
 @dataclass
 class ErrorDescriptor:
@@ -43,9 +45,11 @@ class ErrorDescriptor:
     macro_regex: str
     omit_description: bool = False
 
+
 class CommentState(IntEnum):
     WAIT_START_COMMENT = 0
     ACCUMULATE_COMMENT = 1
+
 
 class ErrorCodeLoader:
     def __init__(self) -> None:
@@ -72,7 +76,7 @@ class ErrorCodeLoader:
         if match is None:
             return
 
-        last_comment = "".join(self._last_comment).replace("   ", " ").replace("  ", " ").replace("*", "").replace(".","")
+        last_comment = "".join(self._last_comment).replace("   ", " ").replace("  ", " ").replace("*", "").replace(".", "")
         last_comment = last_comment.split("@brief")[-1].strip()
 
         code = int(match.group("code"), 0)
@@ -93,11 +97,13 @@ class ErrorCodeLoader:
 
         return self._error_codes
 
+
 def get_section_title(section: str) -> tuple[str, str]:
     markdown_title = f"{section} errors"
     anchor_name = f'#{markdown_title.lower().replace(" ","-").replace(".","-")}'
 
     return markdown_title, anchor_name
+
 
 def dump_table(header_path: Path, descriptor: ErrorDescriptor):
     loader = ErrorCodeLoader()
@@ -113,6 +119,7 @@ def dump_table(header_path: Path, descriptor: ErrorDescriptor):
         print(f"| {code.code} | 0x{code.code:02X} | `{code.name}` | {code.description} |")
 
     print()
+
 
 def main():
     descriptors = {
@@ -138,6 +145,7 @@ def main():
 
     for filename, descriptor in descriptors.items():
         dump_table(Path(filename), descriptor)
+
 
 if __name__ == "__main__":
     main()
