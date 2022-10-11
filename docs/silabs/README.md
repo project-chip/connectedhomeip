@@ -54,17 +54,10 @@
     11. [Using Simplicity Studio's Pin Tool and Project Configurator with Matter](./general/PINTOOL.md)
     12. [Using Simplicity Studio's BLE GATT Configurator with Matter](./general/GATT.md)
     13. [Using Simplicity Studio's Energy Profiler with Matter](./general/EP.md)
-    14. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)<br><br>
+    14. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)
+    15. [Matter EFR32 Flash Savings Guide](general/CODE_SIZE_SAVINGS.md)<br><br>
 
 8. Frequently Asked Questions (FAQ) / Troubleshooting
 
     - [Thread FAQ](thread/FAQ.md)
     - [Wi-Fi FAQ](wifi/FAQ.md)
-
-<!--
-(WIP)
-Build Arguments (Sleepy End Device) (1 task)
-Bootloader (Studio) (1 task)
-Studio Integration
-Non Raspi based controllers
--->
