@@ -44,7 +44,7 @@ import os
 import re
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Iterable
+from typing import Any, Dict, List, Iterable, Optional
 
 
 @dataclass(init=False)
@@ -116,7 +116,7 @@ def _HasVariantPrefix(value: str, prefix: str):
         return value[len(prefix)+1:]
 
 
-def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: list[list[TargetPart]], modifiers: list[TargetPart]):
+def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[List[TargetPart]], modifiers: List[TargetPart]):
     """Given an input string, process through all the input rules and return
        the underlying list of target parts for the input.
 
@@ -190,13 +190,13 @@ class BuildTarget:
         #   - esp32-devkitc-light is OK
         #   - esp32-light is NOT ok
         #   - esp32-m5stack is NOT ok
-        self.fixed_targets: list[list[TargetPart]] = []
+        self.fixed_targets: List[List[TargetPart]] = []
 
         # a list of all available modifiers for this build target
         # Modifiers can be combined in any way
-        self.modifiers: list[TargetPart] = []
+        self.modifiers: List[TargetPart] = []
 
-    def AppendFixedTargets(self, parts: list[TargetPart]):
+    def AppendFixedTargets(self, parts: List[TargetPart]):
         """Append a list of potential targets/variants.
 
         Example:
