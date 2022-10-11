@@ -98,7 +98,7 @@ Or build using build script from the root
 
     ```
     cd <connectedhomeip>
-    ./scripts/build/build_examples.py --target-glob '*nl-test-runner' build
+    ./scripts/build/build_examples.py --target linux-x64-nl-test-runner build
     ```
 
 The runner will be installed into the venv and python wheels will be packaged in

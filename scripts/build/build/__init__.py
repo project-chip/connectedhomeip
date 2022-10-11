@@ -4,9 +4,7 @@ import shutil
 from enum import Enum, auto
 from typing import Sequence
 
-from .targets import ALL, Target
-
-ALL_TARGETS = ALL
+from .targets import BUILD_TARGETS
 
 
 class BuildSteps(Enum):
@@ -26,7 +24,7 @@ class Context:
         self.output_prefix = output_prefix
         self.completed_steps = set()
 
-    def SetupBuilders(self, targets: Sequence[Target],
+    def SetupBuilders(self, targets: Sequence[str],
                       enable_flashbundle: bool):
         """
         Configures internal builders for the given platform/board/app
@@ -35,9 +33,15 @@ class Context:
 
         self.builders = []
         for target in targets:
-            self.builders.append(target.Create(
-                self.runner, self.repository_path, self.output_prefix,
-                enable_flashbundle))
+            found = False
+            for choice in BUILD_TARGETS:
+                builder = choice.Create(target, self.runner, self.repository_path, self.output_prefix, enable_flashbundle)
+                if builder:
+                    self.builders.append(builder)
+                    found = True
+
+            if not found:
+                logging.error(f"Target '{target}' could not be found. Nothing executed for it")
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)
