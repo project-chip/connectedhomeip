@@ -45,7 +45,7 @@ import re
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 
 @dataclass(init=False)
@@ -54,7 +54,7 @@ class TargetPart:
     name: str
 
     # The build arguments to apply to a builder if this part is active
-    build_arguments: dict[str, Any]
+    build_arguments: Dict[str, Any]
 
     # Part should be included if and only if the final string MATCHES the
     # given regular expression
