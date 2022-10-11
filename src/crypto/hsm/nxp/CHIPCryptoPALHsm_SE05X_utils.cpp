@@ -24,6 +24,7 @@
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
 #include "fsl_sss_policy.h"
+#include "se05x_t4t_utils.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
@@ -76,12 +77,18 @@ static Mutex sSEObjMutex;
 #endif //#if ENABLE_REENTRANCY
 
 /* Open session to se05x */
-void se05x_sessionOpen(void)
+CHIP_ERROR se05x_sessionOpen(void)
 {
     static int is_session_open = 0;
     if (is_session_open)
     {
-        return;
+        return CHIP_NO_ERROR;
+    }
+
+    if(se05x_enable_contact_interface())
+    {
+        ChipLogError(Crypto, "se05x error: %s\n", "se05x_enable_contact_interface failed");
+        return CHIP_ERROR_INTERNAL;
     }
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
@@ -91,24 +98,25 @@ void se05x_sessionOpen(void)
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_boot_open(&gex_sss_chip_ctx, portName);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_open failed");
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_key_store_and_object_init(&gex_sss_chip_ctx);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_key_store_and_object_init failed");
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
 
     is_session_open = 1;
+    return CHIP_NO_ERROR;
 }
 
 /* Delete key in se05x */
