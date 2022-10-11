@@ -24,6 +24,16 @@ if (config_use_interactive_mode) {
 
 assert(chip_build_tools)
 
+declare_args() {
+  chip_codesign = current_os == "ios"
+}
+
+if (current_os == "ios") {
+  output_sdk_type = "Debug-iphoneos"
+} else {
+  output_sdk_type = "Debug"
+}
+
 action("build-darwin-framework") {
   script = "${chip_root}/scripts/build/build_darwin_framework.py"
 
@@ -47,7 +57,7 @@ action("build-darwin-framework") {
 
   output_name = "Matter.framework"
   outputs = [
-    "${root_out_dir}/macos_framework_output/Build/Products/Debug/${output_name}",
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/${output_name}",
     "${root_build_dir}/darwin_framework_build.log",
     "${root_out_dir}/macos_framework_output/ModuleCache.noindex/",
     "${root_out_dir}/macos_framework_output/Logs",
@@ -64,11 +74,12 @@ config("config") {
     "${chip_root}/zzz_generated/controller-clusters",
     "${chip_root}/examples/chip-tool",
     "${chip_root}/zzz_generated/chip-tool",
-    "${root_out_dir}/macos_framework_output/Build/Products/Debug/",
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/",
   ]
 
-  framework_dirs =
-      [ "${root_out_dir}/macos_framework_output/Build/Products/Debug/" ]
+  framework_dirs = [
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/",
+  ]
 
   defines = [
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
@@ -139,7 +150,7 @@ executable("darwin-framework-tool") {
 
   ldflags = [
     "-rpath",
-    "@executable_path/macos_framework_output/Build/Products/Debug/",
+    "@executable_path/macos_framework_output/Build/Products/${output_sdk_type}/",
   ]
 
   frameworks = [
@@ -150,4 +161,21 @@ executable("darwin-framework-tool") {
   public_configs = [ ":config" ]
 
   output_dir = root_out_dir
+}
+
+if (chip_codesign) {
+  action("codesign") {
+    script = "entitlements/codesign.py"
+    public_deps = [ ":darwin-framework-tool" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/darwin-framework-tool", root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
 }

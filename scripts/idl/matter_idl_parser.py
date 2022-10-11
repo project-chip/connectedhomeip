@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import enum
+import functools
 import logging
 
 from lark import Lark
@@ -14,6 +15,12 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
     from matter_idl_types import *
+
+
+def UnionOfAllFlags(flags_list):
+    if not flags_list:
+        return None
+    return functools.reduce(lambda a, b: a | b, flags_list)
 
 
 class AddServerClusterToEndpointTransform:
@@ -164,13 +171,13 @@ class MatterIdlTransformer(Transformer):
         return AttributeQuality.NOSUBSCRIBE
 
     def attribute_qualities(self, qualities):
-        return qualities
+        return UnionOfAllFlags(qualities) or AttributeQuality.NONE
 
     def struct_fabric_scoped(self, _):
         return StructQuality.FABRIC_SCOPED
 
     def struct_qualities(self, qualities):
-        return qualities
+        return UnionOfAllFlags(qualities) or StructQuality.NONE
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -185,7 +192,7 @@ class MatterIdlTransformer(Transformer):
         return EventQuality.FABRIC_SENSITIVE
 
     def event_qualities(selt, qualities):
-        return set(qualities)
+        return UnionOfAllFlags(qualities) or EventQuality.NONE
 
     def timed_command(self, _):
         return CommandQuality.TIMED_INVOKE
@@ -194,14 +201,13 @@ class MatterIdlTransformer(Transformer):
         return CommandQuality.FABRIC_SCOPED
 
     def command_qualities(self, attrs):
-        # List because attrs is a tuple
-        return set(list(attrs))
+        return UnionOfAllFlags(attrs) or CommandQuality.NONE
 
     def struct_field(self, args):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
-        field.qualities = set(args[:-1])
+        field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
         return field
 
     def server_cluster(self, _):
@@ -317,22 +323,20 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(inline=True)
     def attribute(self, qualities, definition_tuple):
-
-        qualities = set(qualities)
         (definition, acl) = definition_tuple
 
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
         # read/write
         if AttributeQuality.READABLE not in qualities:
-            qualities.add(AttributeQuality.READABLE)
-            qualities.add(AttributeQuality.WRITABLE)
+            qualities |= AttributeQuality.READABLE
+            qualities |= AttributeQuality.WRITABLE
 
         return Attribute(definition=definition, qualities=qualities, **acl)
 
     @v_args(inline=True)
     def struct(self, qualities, id, *fields):
-        return Struct(name=id, qualities=set(qualities), fields=list(fields))
+        return Struct(name=id, qualities=qualities, fields=list(fields))
 
     @v_args(inline=True)
     def request_struct(self, value):

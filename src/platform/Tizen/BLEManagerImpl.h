@@ -86,18 +86,19 @@ public:
 private:
     // ===== Members that implement the BLEManager internal interface.
 
-    CHIP_ERROR _Init(void);
-    void _Shutdown() {}
-    bool _IsAdvertisingEnabled(void);
+    CHIP_ERROR _Init();
+    void _Shutdown();
+    bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsAdvertising(void);
+    bool _IsAdvertising();
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
-    uint16_t _NumConnections(void);
+    uint16_t _NumConnections();
+
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void);
+    BleLayer * _GetBleLayer();
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -131,8 +132,8 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
+    friend BLEManager & BLEMgr();
+    friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
 
@@ -172,7 +173,7 @@ private:
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
     // ==== Connection.
-    void InitConnectionData(void);
+    void InitConnectionData();
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
@@ -202,10 +203,10 @@ private:
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
     void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
-    int RegisterGATTServer(void);
-    int StartAdvertising(void);
-    int StopAdvertising(void);
-    void CleanScanConfig(void);
+    int RegisterGATTServer();
+    int StartBLEAdvertising();
+    int StopBLEAdvertising();
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
@@ -230,7 +231,7 @@ private:
  * Internal components should use this to access features of the BLEManager object
  * that are common to all platforms.
  */
-inline BLEManager & BLEMgr(void)
+inline BLEManager & BLEMgr()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -241,7 +242,7 @@ inline BLEManager & BLEMgr(void)
  * Internal components can use this to gain access to features of the BLEManager
  * that are specific to the Tizen platforms.
  */
-inline BLEManagerImpl & BLEMgrImpl(void)
+inline BLEManagerImpl & BLEMgrImpl()
 {
     return BLEManagerImpl::sInstance;
 }

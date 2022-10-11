@@ -101,10 +101,10 @@ namespace {
 
 class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
 public:
-    SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
+    SubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
         SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler)
-        : MTRBaseSubscriptionCallback(queue, attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
+        : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
             subscriptionEstablishedHandler, onDoneHandler)
     {
     }
@@ -314,30 +314,41 @@ private:
                                   std::unique_ptr<ReadClient> readClient;
                                   std::unique_ptr<ClusterStateCache> clusterStateCache;
                                   callback = std::make_unique<SubscriptionCallback>(
-                                      self.queue,
                                       ^(NSArray * value) {
-                                          // OnAttributeData (after OnReportEnd)
-                                          [self _handleAttributeReport:value];
+                                          dispatch_async(self.queue, ^{
+                                              // OnAttributeData (after OnReportEnd)
+                                              [self _handleAttributeReport:value];
+                                          });
                                       },
                                       ^(NSArray * value) {
-                                          // OnEventReport (after OnReportEnd)
-                                          [self _handleEventReport:value];
+                                          dispatch_async(self.queue, ^{
+                                              // OnEventReport (after OnReportEnd)
+                                              [self _handleEventReport:value];
+                                          });
                                       },
                                       ^(NSError * error) {
-                                          // OnError
-                                          [self _handleSubscriptionError:error];
+                                          dispatch_async(self.queue, ^{
+                                              // OnError
+                                              [self _handleSubscriptionError:error];
+                                          });
                                       },
                                       ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                          // OnResubscriptionNeeded
-                                          [self _handleResubscriptionNeeded];
+                                          dispatch_async(self.queue, ^{
+                                              // OnResubscriptionNeeded
+                                              [self _handleResubscriptionNeeded];
+                                          });
                                       },
                                       ^(void) {
-                                          // OnSubscriptionEstablished
-                                          [self _handleSubscriptionEstablished];
+                                          dispatch_async(self.queue, ^{
+                                              // OnSubscriptionEstablished
+                                              [self _handleSubscriptionEstablished];
+                                          });
                                       },
                                       ^(void) {
-                                          // OnDone
-                                          [self _handleSubscriptionReset];
+                                          dispatch_async(self.queue, ^{
+                                              // OnDone
+                                              [self _handleSubscriptionReset];
+                                          });
                                       });
                                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
                                       callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);

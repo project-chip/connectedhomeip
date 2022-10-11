@@ -16,5 +16,4 @@ declare_args() {
   # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
-  chip_with_se05x_da = 0
 }
