@@ -34,6 +34,10 @@ config("se05x_config") {
     ]
   }
 
+  if (chip_rpi_se05x_t4t_demo == 1) {
+    defines += ["CHIP_RPI_SE05X_T4T_DEMO"]
+  }
+
   include_dirs = [
     "${chip_root}/third_party/simw-top-mini/repo",
     "${chip_root}/third_party/simw-top-mini/repo/sss/inc",
@@ -84,6 +88,7 @@ source_set("se05x") {
     "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_apis.c",
     "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_mw.c",
     "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_policy.c",
+    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/se05x_t4t_utils.cpp",
   ]
 
   sources += [
