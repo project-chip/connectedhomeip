@@ -61,6 +61,9 @@ access to a Raspberry Pi that will work as well.
 The following commands are for building the Matter application. Depending on which device
 you are using, select the appropriate command to build.
 
+> **Note:** 
+> Below build commands are for the `lighting-app` application. In order to build different applicatons, for example `lock-app`, `window-app` or `thermostat`, replace appropriate application name.
+
 Run the following:
 
 ```shell
@@ -68,7 +71,7 @@ $ cd matter
 $ <run_appropriate_build_command_from_below>
 ```
 
-Build command for EFR32MG12 + RS911x:
+Build command for EFR32MG12 + RS9116:
 
 ```shell
 $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx --wifi rs911x |& tee out/rs911x_lighting.log
@@ -81,20 +84,22 @@ $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32 out/wf200_l
 ```
 
 
-Build command for EFR32MG24 + RS911x:
+Build command for EFR32MG24 + RS9116:
 
 ```shell
-$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi rs911x
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi rs911x |& tee out/rs911x_lighting.log
 ```
 
 Build command for EFR32MG24 + SiWx917:
 
-`$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi siwx917`
+```shell
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi rs911x |& tee out/siwx917_lighting.log
+```
 
 Build command for EFR32MG24 + WF200:
 
 ```shell
-$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=false --wifi wf200
+$ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/wf200_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=false --wifi wf200 |& tee out/wf200_lighting.log
 ```
 
 A complete list of hardware supported is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
