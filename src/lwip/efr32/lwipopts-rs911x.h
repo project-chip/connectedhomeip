@@ -99,6 +99,7 @@
 #define LWIP_IPV6_REASS (0)
 #define LWIP_IPV6_DHCP6 0
 #define LWIP_IPV6_AUTOCONFIG (1)
+#define LWIP_IPV6_DUP_DETECT_ATTEMPTS 0 // TODO: Enable this after a fix for NS loopback
 #define LWIP_IPV6_ROUTER_SUPPORT 1
 #define LWIP_ND6_LISTEN_RA 1
 

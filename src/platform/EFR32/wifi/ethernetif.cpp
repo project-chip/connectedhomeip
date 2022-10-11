@@ -97,6 +97,10 @@ static void low_level_init(struct netif * netif)
 
     /* Accept broadcast address and ARP traffic */
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP;
+
+#if LWIP_IPV6_MLD
+    netif->flags |= NETIF_FLAG_MLD6;
+#endif /* LWIP_IPV6_MLD */
 }
 
 /********************************************************************************
