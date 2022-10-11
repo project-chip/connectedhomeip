@@ -289,7 +289,7 @@ class BuildTarget:
 
         fixed_indices = [0]*len(self.fixed_targets)
 
-        # Make the log a bit less spammy. Expand is expected to hit a lot 
+        # Make the log a bit less spammy. Expand is expected to hit a lot
         # of these
         while True:
 
