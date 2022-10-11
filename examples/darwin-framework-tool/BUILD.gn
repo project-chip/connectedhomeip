@@ -28,11 +28,12 @@ declare_args() {
   chip_codesign = current_os == "ios"
 }
 
-if (current_os == "ios") {
-  output_sdk_type = "Debug-iphoneos"
-} else {
-  output_sdk_type = "Debug"
+sdk_build_dir_suffix = ""
+if (getenv("SDKROOT") != "") {
+  sdk_root_parts = string_split(getenv("SDKROOT"), ".")
+  sdk_build_dir_suffix = "-${sdk_root_parts[0]}"
 }
+output_sdk_type = "Debug${sdk_build_dir_suffix}"
 
 action("build-darwin-framework") {
   script = "${chip_root}/scripts/build/build_darwin_framework.py"
