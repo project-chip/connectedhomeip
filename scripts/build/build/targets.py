@@ -350,6 +350,8 @@ def BuildK32WTarget():
         TargetPart('contact', app=K32WApp.CONTACT, release=True),
     ])
 
+    target.AppendModifier(name="se05x", se05x=True)
+    target.AppendModifier(name="no-ble", disable_ble=True)
     target.AppendModifier(name="no-ota", disable_ota=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
     target.AppendModifier(name="nologs", disable_logs=True)
