@@ -43,9 +43,8 @@ import logging
 import os
 import re
 
-from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Iterable, Optional
 
 
 @dataclass(init=False)
