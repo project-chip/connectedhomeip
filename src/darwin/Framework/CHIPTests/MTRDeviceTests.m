@@ -52,6 +52,9 @@ static MTRBaseDevice * mConnectedDevice;
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
 
+// Keys we can use to restart the controller.
+static MTRTestKeys * sTestKeys = nil;
+
 static void WaitForCommissionee(XCTestExpectation * expectation)
 {
     MTRDeviceController * controller = sController;
@@ -155,6 +158,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
+    sTestKeys = testKeys;
+
+    // Needs to match what createControllerOnExistingFabric calls elsewhere in
+    // this file do.
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
     params.vendorID = @(kTestVendorId);
 
@@ -1179,6 +1186,131 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)test015_FailedSubscribeWithQueueAcrossShutdown
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+    XCTestExpectation * firstSubscribeExpectation = [self expectationWithDescription:@"First subscription complete"];
+    XCTestExpectation * errorExpectation = [self expectationWithDescription:@"First subscription errored out"];
+
+    // Create first subscription.  It needs to be using subscribeWithQueue and
+    // must have a clusterStateCacheContainer to exercise the onDone case.
+    NSLog(@"Subscribing...");
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(2)];
+    params.autoResubscribe = NO;
+    [device subscribeWithQueue:queue
+        params:params
+        clusterStateCacheContainer:clusterStateCacheContainer
+        attributeReportHandler:nil
+        eventReportHandler:nil
+        errorHandler:^(NSError * error) {
+            NSLog(@"Received report error: %@", error);
+
+            // Restart the controller here, to exercise our various event queue bits.
+            [controller shutdown];
+
+            // Wait a bit before restart, to allow whatever async things are going on after this is called to try to happen.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), queue, ^{
+                __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+                XCTAssertNotNil(factory);
+
+                // Needs to match what initStack does.
+                __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:sTestKeys.ipk
+                                                                                    fabricID:@(1)
+                                                                                   nocSigner:sTestKeys];
+                __auto_type * newController = [factory createControllerOnExistingFabric:params error:nil];
+                XCTAssertNotNil(newController);
+
+                sController = newController;
+                mConnectedDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:newController];
+                [errorExpectation fulfill];
+            });
+        }
+        subscriptionEstablished:^() {
+            [firstSubscribeExpectation fulfill];
+        }
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ firstSubscribeExpectation ] timeout:60];
+
+    // Create second subscription which will cancel the first subscription.  We
+    // can use a non-existent path here to cut down on the work that gets done.
+    [device subscribeAttributePathWithEndpointID:@10000
+                                       clusterID:@6
+                                     attributeID:@0
+                                          params:params
+                                           queue:queue
+                                   reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                   }
+                         subscriptionEstablished:^ {
+                         }];
+    [self waitForExpectations:@[ errorExpectation ] timeout:60];
+}
+
+- (void)test016_FailedSubscribeWithCacheReadDuringFailure
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+    XCTestExpectation * firstSubscribeExpectation = [self expectationWithDescription:@"First subscription complete"];
+    XCTestExpectation * errorExpectation = [self expectationWithDescription:@"First subscription errored out"];
+
+    // Create first subscription.  It needs to be using subscribeWithQueue and
+    // must have a clusterStateCacheContainer to exercise the onDone case.
+    NSLog(@"Subscribing...");
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(2)];
+    params.autoResubscribe = NO;
+    [device subscribeWithQueue:queue
+        params:params
+        clusterStateCacheContainer:clusterStateCacheContainer
+        attributeReportHandler:nil
+        eventReportHandler:nil
+        errorHandler:^(NSError * error) {
+            NSLog(@"Received report error: %@", error);
+
+            [MTRBaseClusterOnOff readAttributeOnOffWithClusterStateCache:clusterStateCacheContainer
+                                                                endpoint:@1
+                                                                   queue:queue
+                                                              completion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                  [errorExpectation fulfill];
+                                                              }];
+        }
+        subscriptionEstablished:^() {
+            [firstSubscribeExpectation fulfill];
+        }
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ firstSubscribeExpectation ] timeout:60];
+
+    // Create second subscription which will cancel the first subscription.  We
+    // can use a non-existent path here to cut down on the work that gets done.
+    [device subscribeAttributePathWithEndpointID:@10000
+                                       clusterID:@6
+                                     attributeID:@0
+                                          params:params
+                                           queue:queue
+                                   reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                   }
+                         subscriptionEstablished:^ {
+                         }];
+    [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
 - (void)test900_SubscribeAllAttributes
