@@ -791,19 +791,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
 #endif
 
-// -------------------- Trait Manager Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
- *
- * Enable or disable the chip Trait Manager.
- *
- * NOTE: The Trait Manager is an experimental feature of the chip Device Layer.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
-#define CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER 0
-#endif
-
 // -------------------- Network Telemetry Configuration --------------------
 
 /**

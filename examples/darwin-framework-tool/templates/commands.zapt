@@ -27,7 +27,7 @@
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
@@ -35,7 +35,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -99,7 +99,7 @@ private:
 class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ReadAttribute
 {
 public:
-    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 
@@ -143,15 +143,15 @@ public:
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("attr-name", "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}");
         {{#if_chip_complex}}
         AddArgument("attr-value", &mComplex);
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
-        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
+        AddArgument("attr-value", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mValue);
         {{/if_chip_complex}}
         WriteAttribute::AddArguments();
     }
@@ -206,7 +206,7 @@ private:
 class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public SubscribeAttribute
 {
 public:
-    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
+    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}")
     {
     }
 

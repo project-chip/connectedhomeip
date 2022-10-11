@@ -127,7 +127,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
     EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogDetail(Zcl, "ERR: writing name support %x", status);
+        ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
     status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupClusterFeature::kGroupNames));

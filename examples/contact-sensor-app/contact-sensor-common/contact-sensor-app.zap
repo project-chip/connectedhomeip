@@ -235,7 +235,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5613,7 +5613,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8682,6 +8682,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 21
     }
-  ],
-  "log": []
+  ]
 }
