@@ -431,8 +431,12 @@ err_t sta_ethernetif_init(struct netif * netif)
     netif->name[0] = STATION_NETIF0;
     netif->name[1] = STATION_NETIF1;
 
-    netif->output     = etharp_output;
+#if LWIP_IPV4 && LWIP_ARP
+    netif->output = etharp_output;
+#endif /* #if LWIP_IPV4 && LWIP_ARP */
+#if LWIP_IPV6 && LWIP_ETHERNET
     netif->output_ip6 = ethip6_output;
+#endif /* LWIP_IPV6 && LWIP_ETHERNET */
     netif->linkoutput = low_level_output;
 
     /* initialize the hardware */

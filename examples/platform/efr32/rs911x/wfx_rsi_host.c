@@ -294,7 +294,7 @@ sl_status_t wfx_sta_discon(void)
     WFX_RSI_LOG("%s: completed.", __func__);
     return status;
 }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 /*********************************************************************
  * @fn  bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
  * @brief
@@ -317,6 +317,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
     WFX_RSI_LOG("%s: status: %d", __func__, status);
     return status;
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 /*********************************************************************
  * @fn  bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
