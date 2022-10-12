@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
@@ -27,24 +28,10 @@ if (chip_enable_pw_rpc) {
 
 assert(chip_build_tools)
 
-action("chip-bridge-codegen") {
-  script = "${chip_root}/scripts/codegen.py"
-  sources =
-      [ "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter" ]
 
-  # Also several other files, but this is sufficient for dependency purposes.
-  outputs = [ "$target_gen_dir/bridge/BridgeClustersImpl.h" ]
-
-  args = [
-    "--generator",
-    "bridge",
-    "--output-dir",
-    rebase_path(target_gen_dir, root_build_dir),
-    rebase_path(
-        "${chip_root}/examples/dynamic-bridge-app/bridge-common/bridge-app.matter",
-        root_build_dir),
-  ]
-  deps = [ "${chip_root}/scripts/idl" ]
+chip_codegen("chip-bridge-codegen") {
+  idl = "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter"
+  generator = "bridge"
 }
 
 executable("dynamic-chip-bridge-app") {
