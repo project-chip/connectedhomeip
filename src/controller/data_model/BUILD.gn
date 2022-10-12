@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("data_model") {
@@ -29,40 +30,9 @@ chip_data_model("data_model") {
 }
 
 if (current_os == "android") {
-  pw_python_action("java-jni-generate") {
-    script = "${chip_root}/scripts/codegen.py"
-
-    _idl_file = "controller-clusters.matter"
-    _output_files =
-        exec_script("${chip_root}/scripts/codegen.py",
-                    [
-                      "--generator",
-                      "java",
-                      "--log-level",
-                      "fatal",
-                      "--name-only",
-                      rebase_path("controller-clusters.matter", root_build_dir),
-                    ],
-                    "list lines",
-                    [ "controller-clusters.matter" ])
-
-    args = [
-      "--generator",
-      "java",
-      "--output-dir",
-      rebase_path(target_gen_dir, root_build_dir),
-      rebase_path(_idl_file, root_build_dir),
-    ]
-
-    deps = [ "${chip_root}/scripts/idl" ]
-
-    inputs = [ _idl_file ]
-    sources = [ _idl_file ]
-    outputs = []
-
-    foreach(name, _output_files) {
-      outputs += [ "$target_gen_dir/${name}" ]
-    }
+  chip_codegen("java-jni-generate") {
+    idl = "controller-clusters.matter"
+    generator = "java"
   }
 
   source_set("java-jni-sources") {
