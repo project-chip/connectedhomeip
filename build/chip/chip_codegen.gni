@@ -52,7 +52,7 @@ template("chip_codegen") {
                       "--log-level",
                       "fatal",
                       "--name-only",
-                      rebase_path("controller-clusters.matter", root_build_dir),
+                      rebase_path(_idl_file, root_build_dir),
                     ],
                     "list lines",
                     [ "controller-clusters.matter" ])
