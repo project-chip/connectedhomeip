@@ -1,1 +1,1 @@
-0.6.02 Version bump reason: Update NXP SDK PATH
+0.6.03 Version bump reason: [Ameba] Replace C2 notify with indicate as required by Matter spec

@@ -97,12 +97,18 @@ public:
     static constexpr Key kConfigKey_MfrDeviceCert         = EFR32ConfigKey(kMatterFactory_KeyBase, 0x02);
     static constexpr Key kConfigKey_MfrDevicePrivateKey   = EFR32ConfigKey(kMatterFactory_KeyBase, 0x03);
     static constexpr Key kConfigKey_ManufacturingDate     = EFR32ConfigKey(kMatterFactory_KeyBase, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode          = EFR32ConfigKey(kMatterFactory_KeyBase, 0x05);
+    static constexpr Key kConfigKey_SetupPayloadBitSet    = EFR32ConfigKey(kMatterFactory_KeyBase, 0x05);
     static constexpr Key kConfigKey_MfrDeviceICACerts     = EFR32ConfigKey(kMatterFactory_KeyBase, 0x06);
     static constexpr Key kConfigKey_SetupDiscriminator    = EFR32ConfigKey(kMatterFactory_KeyBase, 0x07);
     static constexpr Key kConfigKey_Spake2pIterationCount = EFR32ConfigKey(kMatterFactory_KeyBase, 0x08);
     static constexpr Key kConfigKey_Spake2pSalt           = EFR32ConfigKey(kMatterFactory_KeyBase, 0x09);
     static constexpr Key kConfigKey_Spake2pVerifier       = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0A);
+    static constexpr Key kConfigKey_ProductId             = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0B);
+    static constexpr Key kConfigKey_VendorId              = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0C);
+    static constexpr Key kConfigKey_VendorName            = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0D);
+    static constexpr Key kConfigKey_ProductName           = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0E);
+    static constexpr Key kConfigKey_HardwareVersionString = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0F);
+    static constexpr Key kConfigKey_UniqueId              = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = EFR32ConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = EFR32ConfigKey(kMatterConfig_KeyBase, 0x02);
@@ -125,11 +131,10 @@ public:
     static constexpr Key kConfigKey_WeekDaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x15);
     static constexpr Key kConfigKey_YearDaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x16);
     static constexpr Key kConfigKey_HolidaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x17);
+    static constexpr Key kConfigKey_OpKeyMap           = EFR32ConfigKey(kMatterConfig_KeyBase, 0x20);
 
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
-    static constexpr Key kConfigKey_UniqueId = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);
-    static constexpr Key kConfigKey_OpKeyMap = EFR32ConfigKey(kMatterConfig_KeyBase, 0x20);
 
     // Matter Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kMatterCounter_KeyBase, 0x00);
@@ -143,7 +148,7 @@ public:
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0A);
+    static constexpr Key kMaxConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);
     static constexpr Key kMinConfigKey_MatterConfig  = EFR32ConfigKey(kMatterConfig_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_MatterConfig  = EFR32ConfigKey(kMatterConfig_KeyBase, 0x20);
 

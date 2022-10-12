@@ -204,6 +204,10 @@ public:
     void Complete(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
+    /// Mark all browse-type scheduled attemptes as a success, removing them
+    /// from the internal list.
+    CHIP_ERROR CompleteAllBrowses();
+
     /// Mark that a resolution is pending, adding it to the internal list
     ///
     /// Once this complete, this peer id will be returned immediately

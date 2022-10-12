@@ -484,7 +484,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const chip::Ble::ChipBLE
     ConnectHandler(deviceInfo->remote_address);
 }
 
-void BLEManagerImpl::OnChipScanComplete(void)
+void BLEManagerImpl::OnChipScanComplete()
 {
     if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
         mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
@@ -579,7 +579,7 @@ exit:
     return ret;
 }
 
-int BLEManagerImpl::StartAdvertising()
+int BLEManagerImpl::StartBLEAdvertising()
 {
     int ret                                                    = BT_ERROR_NONE;
     CHIP_ERROR err                                             = CHIP_NO_ERROR;
@@ -649,7 +649,7 @@ exit:
     return ret;
 }
 
-int BLEManagerImpl::StopAdvertising()
+int BLEManagerImpl::StopBLEAdvertising()
 {
     int ret = BT_ERROR_NONE;
 
@@ -664,7 +664,7 @@ exit:
     return ret;
 }
 
-void BLEManagerImpl::InitConnectionData(void)
+void BLEManagerImpl::InitConnectionData()
 {
     /* Initialize Hashmap */
     if (!mConnectionMap)
@@ -872,13 +872,13 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (!mFlags.Has(Flags::kAdvertising))
         {
-            ret = StartAdvertising();
+            ret = StartBLEAdvertising();
             VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Start Advertising Failed. ret: %d", ret));
         }
         else if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
         {
             ChipLogProgress(DeviceLayer, "Advertising Refreshed Needed. Stop Advertising");
-            ret = StopAdvertising();
+            ret = StopBLEAdvertising();
             VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Stop Advertising Failed. ret: %d", ret));
         }
     }
@@ -886,7 +886,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         ChipLogProgress(DeviceLayer, "Stop Advertising");
 
-        ret = StopAdvertising();
+        ret = StopBLEAdvertising();
         VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Stop Advertising Failed. ret: %d", ret));
 
         ret = bt_adapter_le_destroy_advertiser(mAdvertiser);
@@ -906,7 +906,7 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     sInstance.DriveBLEState();
 }
 
-CHIP_ERROR BLEManagerImpl::_Init(void)
+CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
     bool ret;
@@ -924,6 +924,12 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::_Shutdown()
+{
+    int ret = bt_deinitialize();
+    VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_deinitialize() failed. ret: %d", ret));
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -994,7 +1000,7 @@ exit:
     return err;
 }
 
-uint16_t BLEManagerImpl::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections()
 {
     return 0;
 }
@@ -1006,7 +1012,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::CleanScanConfig(void)
+void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         chip::DeviceLayer::SystemLayer().CancelTimer(HandleConnectionTimeout, nullptr);

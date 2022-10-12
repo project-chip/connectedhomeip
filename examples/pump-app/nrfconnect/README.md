@@ -37,7 +37,8 @@ device works as a Thread Minimal End Device.
     -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
+    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
+    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
 
 <hr>
 
@@ -494,7 +495,13 @@ directory:
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)

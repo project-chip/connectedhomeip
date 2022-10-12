@@ -31,6 +31,10 @@ declare_args() {
 
   kvs_max_entries = 75
   use_external_flash = true
+
+  # Use Silabs factory data provider example.
+  # Users can implement their own.
+  use_efr32_factory_data_provider = true
 }
 
 # Explorer Kit and MGM240L do not have external flash

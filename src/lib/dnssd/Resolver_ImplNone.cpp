@@ -42,6 +42,7 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopDiscovery() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 NoneResolver gResolver;
@@ -69,6 +70,11 @@ CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::StopDiscovery()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

@@ -598,6 +598,12 @@ public:
     CHIP_ERROR DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter);
 
     /**
+     * Stop commissionable discovery triggered by a previous
+     * DiscoverCommissionableNodes call.
+     */
+    CHIP_ERROR StopCommissionableDiscovery();
+
+    /**
      * @brief
      *   Returns information about discovered devices.
      *   Should be called on main loop thread.

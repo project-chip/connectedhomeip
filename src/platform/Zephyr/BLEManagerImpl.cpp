@@ -234,8 +234,7 @@ struct BLEManagerImpl::ServiceData
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    int err                       = 0;
-    const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
+    int err = 0;
 
     // At first run always select fast advertising, on the next attempt slow down interval.
     const uint32_t intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN

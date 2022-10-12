@@ -314,8 +314,10 @@ chip_python_wheel_action("chip-core") {
   }
 
   if (current_os == "mac") {
-    py_platform_tag =
-        "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     py_platform_tag = current_os
   }

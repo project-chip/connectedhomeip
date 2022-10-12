@@ -25,7 +25,7 @@
 class {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): ClusterCommand("{{asDelimitedCommand name}}", credsIssuerConfig){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): ClusterCommand("{{cleanse_label_as_kebab_case name}}", credsIssuerConfig){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#zcl_command_arguments}}
         {{#if_chip_complex}}
@@ -33,7 +33,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
@@ -89,40 +89,24 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22341 }}
-        {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
-        make_unique<ReadAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
-        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22507 }}
-        {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}
-        make_unique<ReadAttribute>(Id, "device-list", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
+        make_unique<ReadAttribute>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_attributes_server}}
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
         {{#if isWritable}}
         {{#if_chip_complex}}
-        make_unique<WriteAttributeAsComplex<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{else if (isString type)}}
-        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{else}}
-        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if_chip_complex}}
         {{/if}}
         {{/zcl_attributes_server}}
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
         {{#if isReportable}}
-        make_unique<SubscribeAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22341 }}
-        {{#if (isStrEqual (asUpperCamelCase name) "ColorTemperatureMireds")}}
-        make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
-        {{! TODO: Remove after 1.0. See https://github.com/project-chip/connectedhomeip/issues/22507 }}
-        {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}
-        make_unique<SubscribeAttribute>(Id, "device-list", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
+        make_unique<SubscribeAttribute>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if}}
         {{/zcl_attributes_server}}
         //
@@ -130,11 +114,11 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         //
         make_unique<ReadEvent>(Id, credsIssuerConfig), //
         {{#zcl_events}}
-        make_unique<ReadEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_events}}
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
         {{#zcl_events}}
-        make_unique<SubscribeEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_events}}
     };
 

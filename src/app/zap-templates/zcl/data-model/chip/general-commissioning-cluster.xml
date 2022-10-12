@@ -46,9 +46,9 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="administer"/>
     </attribute>
-    <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
-    <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
-    <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
+    <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
+    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
+    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
     <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
 
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">

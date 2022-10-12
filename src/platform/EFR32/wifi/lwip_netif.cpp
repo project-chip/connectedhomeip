@@ -91,6 +91,10 @@ void wfx_lwip_set_sta_link_up(void)
     /*
      * Enable IPV6
      */
+
+#if LWIP_IPV6_AUTOCONFIG
+    sta_netif.ip6_autoconfig_enabled = 1;
+#endif /* LWIP_IPV6_AUTOCONFIG */
     netif_create_ip6_linklocal_address(&sta_netif, MAC_48_BIT_SET);
 }
 
