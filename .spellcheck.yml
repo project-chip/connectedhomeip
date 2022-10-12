@@ -57,6 +57,10 @@ matrix:
           # Ignore code markers
           - open: '<code>'
             close: '</code>'
+          # Ignore blocks of markdown with special comments. Useful for
+          # generated files.
+          - open: '[//]: # (start_ignore_spellcheck)'
+            close: '[//]: # (end_ignore_spellcheck)'
 
       # converts markdown to HTML
       - pyspelling.filters.markdown:
