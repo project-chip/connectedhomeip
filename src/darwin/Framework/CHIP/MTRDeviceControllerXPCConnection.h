@@ -19,8 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^MTRXPCReportHandler)(id _Nullable values, NSError * _Nullable error);
-
 /**
  * handle for XPC remote object proxy for remote device controller
  *
@@ -33,8 +31,6 @@ typedef void (^MTRXPCReportHandler)(id _Nullable values, NSError * _Nullable err
 
 @end
 
-typedef void (^MTRGetProxyHandleHandler)(dispatch_queue_t queue, MTRDeviceControllerXPCProxyHandle * _Nullable container);
-
 /**
  * class to manage XPC connection for remote device controller
  *
@@ -45,15 +41,16 @@ typedef void (^MTRGetProxyHandleHandler)(dispatch_queue_t queue, MTRDeviceContro
 /**
  * This method is just for test purpsoe.
  */
-+ (instancetype)connectionWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(MTRXPCConnectBlock)connectBlock;
++ (instancetype)connectionWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock;
 
-- (void)getProxyHandleWithCompletion:(MTRGetProxyHandleHandler)completion;
+- (void)getProxyHandleWithCompletion:(void (^)(dispatch_queue_t queue,
+                                         MTRDeviceControllerXPCProxyHandle * _Nullable container))completion;
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller
-                                     nodeID:(NSNumber *)nodeID
-                                    handler:(MTRXPCReportHandler)handler;
+                                     nodeId:(NSUInteger)nodeId
+                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler;
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
-                                        nodeID:(NSNumber *)nodeID
-                                    completion:(dispatch_block_t)completion;
+                                        nodeId:(NSUInteger)nodeId
+                                    completion:(void (^)(void))completion;
 
 @end
 

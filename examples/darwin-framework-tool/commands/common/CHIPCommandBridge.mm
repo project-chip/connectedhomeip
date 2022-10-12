@@ -111,15 +111,15 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
 
     mOTADelegate = [[OTAProviderDelegate alloc] init];
 
-    auto factory = [MTRDeviceControllerFactory sharedInstance];
+    auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {
         ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    auto params = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    auto params = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
-    params.shouldStartServer = YES;
+    params.startServer = YES;
     params.otaProviderDelegate = mOTADelegate;
     NSArray<NSData *> * paaCertResults;
     ReturnLogErrorOnFailure(GetPAACertsFromFolder(&paaCertResults));
@@ -127,10 +127,9 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         params.paaCerts = paaCertResults;
     }
 
-    NSError * error;
-    if ([factory startControllerFactory:params error:&error] == NO) {
+    if ([factory startup:params] == NO) {
         ChipLogError(chipTool, "Controller factory startup failed");
-        return MTRErrorToCHIPErrorCode(error);
+        return CHIP_ERROR_INTERNAL;
     }
 
     ReturnLogErrorOnFailure([gNocSigner createOrLoadKeys:storage]);
@@ -139,19 +138,21 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithIPK:ipk fabricID:@(i + 1) nocSigner:gNocSigner];
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
-        auto controller = [factory createControllerOnExistingFabric:controllerParams error:&error];
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
-            controllerParams.vendorID = @(chip::VendorId::TestVendor1);
-            controller = [factory createControllerOnNewFabric:controllerParams error:&error];
+            controllerParams.vendorId = @(chip::VendorId::TestVendor1);
+            controller = [factory startControllerOnNewFabric:controllerParams];
         }
         if (controller == nil) {
             ChipLogError(chipTool, "Controller startup failure.");
-            return MTRErrorToCHIPErrorCode(error);
+            return CHIP_ERROR_INTERNAL;
         }
 
         mControllers[identities[i]] = controller;
@@ -194,14 +195,16 @@ void CHIPCommandBridge::RestartCommissioners()
 {
     StopCommissioners();
 
-    auto factory = [MTRDeviceControllerFactory sharedInstance];
+    auto factory = [MTRControllerFactory sharedInstance];
     NSData * ipk = [gNocSigner getIPK];
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithIPK:ipk fabricID:@(i + 1) nocSigner:gNocSigner];
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:gNocSigner
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
 
-        auto controller = [factory createControllerOnExistingFabric:controllerParams error:nil];
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
         mControllers[identities[i]] = controller;
     }
 }
@@ -213,7 +216,7 @@ void CHIPCommandBridge::ShutdownCommissioner()
     mControllers.clear();
     mCurrentController = nil;
 
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+    [[MTRControllerFactory sharedInstance] shutdown];
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
