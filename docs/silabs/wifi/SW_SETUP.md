@@ -63,6 +63,8 @@ you are using, select the appropriate command to build.
 
 > **Note:** 
 > Below build commands are for the `lighting-app` application. In order to build different applicatons, for example `lock-app`, `window-app` or `thermostat`, replace appropriate application name.
+> Additional examples are provided in [/examples](../../../examples/) directory,
+    or [/silabs_examples](../../../silabs_examples/) (such as `onoff-plug-app`).
 
 Run the following:
 

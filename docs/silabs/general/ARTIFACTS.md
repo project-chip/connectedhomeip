@@ -65,12 +65,12 @@ directory, `./third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
 
 ## SiWx917 Firmware
 
-The SiWx917 firmware is used to update the SiWx917 - it can be found in the
-repository you have cloned, at the following relative path from the `/matter`
-directory, `./third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
+SiWx917 Firmware(rps) images are available in
+the Assets section of this page:
+
+https://github.com/SiliconLabs/matter/releases/tag/v0.4.0
 
 <br>
-
 ---
 
 [Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |

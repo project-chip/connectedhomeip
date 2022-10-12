@@ -162,7 +162,9 @@ Pre-Built SiWx917 firmware is available on the
 [Matter Artifacts page](../general/ARTIFACTS.md). The following instructions are found on the docs.silabs.com website:
 
 1. [Setting up TeraTerm](https://docs.silabs.com/SiWx917/wiseconnect/2.0/tera-term-setup)
-2. [Updating the SiWx917 Firmware](https://docs.silabs.com/siwx917/wiseconnect/2.0/update-evk-firmware)
+2. For updating the SiWx917 Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). Instructions are the same for both SiWx917 and RS9116.
+
+
 
 ---
 

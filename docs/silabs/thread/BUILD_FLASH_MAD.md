@@ -43,6 +43,9 @@ use one of the following options:
     the lighting-app. If you wish to build other examples such as the sleepy end
     device you are welcome to, but it is not necessary for the demo.
 
+    > Additional examples are provided in [/examples](../../../examples/) directory,
+    or [/silabs_examples](../../../silabs_examples/) (such as `onoff-plug-app`).
+
     The build process puts all image files in the following location:
 
     `<git location>/matter/out/<app name>/<board name>`
