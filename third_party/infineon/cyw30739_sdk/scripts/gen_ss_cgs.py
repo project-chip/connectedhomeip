@@ -35,8 +35,7 @@ MATTER_FACTORY_KEY_BASE = 0x2100
 def main():
     args = parse_args()
 
-    configs = OrderedDict()
-    add_thread_factory_config(configs)
+    configs = gen_thread_factory_config()
 
     gen_ss_hdf(args.ss_hdf, configs)
     gen_ss_cgs(args.ss_cgs, args.ss_hdf, configs)
@@ -51,8 +50,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def add_thread_factory_config(configs: OrderedDict):
+def gen_thread_factory_config() -> OrderedDict:
+    configs = OrderedDict()
     configs["ExtendedAddress"] = {"key": THREAD_FACTORY_KEY_BASE, "value": os.urandom(8)}
+    return configs
 
 
 def gen_ss_hdf(path: pathlib.Path, configs: OrderedDict):
@@ -125,4 +126,4 @@ ENTRY "{name}"
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

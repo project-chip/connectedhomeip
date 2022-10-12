@@ -39,9 +39,8 @@ MATTER_FACTORY_KEY_BASE = 0x2100
 def main():
     args = parse_args()
 
-    configs = OrderedDict()
-    add_thread_factory_config(configs)
-    add_matter_factory_config(configs, args.config_header)
+    configs = gen_thread_factory_config()
+    configs.update(gen_matter_factory_config(args.config_header))
 
     parse_config_args(configs, args.config)
 
@@ -62,11 +61,13 @@ def parse_args():
     return parser.parse_args()
 
 
-def add_thread_factory_config(configs: OrderedDict):
+def gen_thread_factory_config() -> OrderedDict:
+    configs = OrderedDict()
     configs["ExtendedAddress"] = {"key": THREAD_FACTORY_KEY_BASE, "value": os.urandom(8)}
+    return configs
 
 
-def add_matter_factory_config(configs: OrderedDict, path: pathlib.Path):
+def gen_matter_factory_config(path: pathlib.Path) -> OrderedDict:
     # compile the regex for extracting name and key of factory configurations.
     factory_config_re = re.compile(r"""
       .*                    # Prefix
@@ -77,6 +78,7 @@ def add_matter_factory_config(configs: OrderedDict, path: pathlib.Path):
       (0x[0-9a-fA-F]+)      # Parse the config key
     """, re.VERBOSE)
 
+    configs = OrderedDict()
     with open(str(path), mode="r") as config_file:
         for line in config_file:
             match = factory_config_re.match(line.strip())
@@ -84,11 +86,16 @@ def add_matter_factory_config(configs: OrderedDict, path: pathlib.Path):
                 name = match[1]
                 key = MATTER_FACTORY_KEY_BASE + int(match[2], 0)
                 configs[name] = {"key": key}
+    return configs
 
 
 def parse_config_args(configs: OrderedDict, args: list):
     for arg in args:
         name, category, value = arg.split(":")
+
+        if name not in configs:
+            print(f"[Warning] Ignored unknown config: {name}")
+            continue
 
         if category == "address":
             addr = bytearray.fromhex(value)
@@ -134,4 +141,4 @@ def insert_config(origin_hex: IntelHex, configs: OrderedDict):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
