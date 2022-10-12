@@ -1,3 +1,5 @@
 [
     { ref: "../iwyu.imp" },
+    { include: [ '"platform/Linux/CHIPDevicePlatformConfig.h"', "private", '<platform/CHIPDeviceConfig.h>', "public" ] },
+    { include: [ '"platform/Linux/SystemPlatformConfig.h"', "private", '<system/SystemConfig.h>', "public" ] },
 ]

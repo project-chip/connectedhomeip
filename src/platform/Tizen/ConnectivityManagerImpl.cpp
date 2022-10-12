@@ -17,32 +17,38 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
+// Note: Due to circular dependency include platform/ConnectivityManager.h before
+//       platform/Tizen/ConnectivityManagerImpl.h (the former includes the latter).
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
+#include <platform/Tizen/ConnectivityManagerImpl.h>
 
-#include <cstdlib>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <wifi-manager.h>
+#endif
 
+#include <inet/InetBuildConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
-
+#include "platform/internal/GenericConnectivityManagerImpl_UDP.ipp"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_TCP.ipp"
 #endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_BLE.ipp"
 #endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_Thread.ipp"
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "platform/internal/GenericConnectivityManagerImpl_WiFi.ipp"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include "WiFiManager.h"
 #endif
 
 namespace chip {

@@ -1,2 +1,5 @@
 [
+    { include: [ '"platform/CHIPDeviceEvent.h"', "private", '<platform/CHIPDeviceEvent.h>', "public" ] },
+    { include: [ '"system/SystemClock.h"', "private", '<system/SystemClock.h>', "public" ] },
+    { include: [ '"system/SystemLayer.h"', "private", '<system/SystemLayer.h>', "public" ] },
 ]
