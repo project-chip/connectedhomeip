@@ -744,7 +744,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 
     NSLog(@"Subscribing...");
-    __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
+    // reportHandler returns TRUE if it got the things it was looking for or if there's an error.
+    __block BOOL (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
     [device subscribeWithQueue:queue
         params:params
@@ -754,7 +755,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             if (reportHandler) {
                 __auto_type handler = reportHandler;
                 reportHandler = nil;
-                handler(value, nil);
+                BOOL done = handler(value, nil);
+                if (done == NO) {
+                    // Keep waiting.
+                    reportHandler = handler;
+                }
             }
         }
         eventReportHandler:nil
@@ -820,6 +825,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __auto_type reportExpectation = [self expectationWithDescription:@"Report handler called"];
     reportHandler = ^(NSArray * _Nullable value, NSError * _Nullable error) {
+        if (error != nil) {
+            return YES;
+        }
         NSLog(@"Report received: %@, error: %@", value, error);
         for (MTRAttributeReport * report in value) {
             if ([report.path.endpoint isEqualToNumber:@1] && [report.path.cluster isEqualToNumber:@6] &&
@@ -829,9 +837,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
                 XCTAssertEqual([report.value boolValue], NO);
                 [reportExpectation fulfill];
-                break;
+                return YES;
             }
         }
+
+        return NO;
     };
 
     NSLog(@"Invoking another command...");
