@@ -254,11 +254,11 @@ int AppTask::Init()
 
     PlatformMgr().LockChipStack();
     {
-        uint8_t  numberOfCredentialsPerUser      = 0;
-        uint16_t numberOfUsers                   = 0;
-        uint8_t  numberOfWeekdaySchedulesPerUser = 0;
-        uint8_t  numberOfYeardaySchedulesPerUser = 0;
-        uint8_t  numberOfHolidaySchedules        = 0;
+        uint8_t numberOfCredentialsPerUser      = 0;
+        uint16_t numberOfUsers                  = 0;
+        uint8_t numberOfWeekdaySchedulesPerUser = 0;
+        uint8_t numberOfYeardaySchedulesPerUser = 0;
+        uint8_t numberOfHolidaySchedules        = 0;
         chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
         EndpointId endpointId{ 1 };
 
@@ -397,7 +397,6 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction)
     {
         uiUnlocking();
     }
-
 }
 
 void AppTask::ActionCompleted(LockManager::Action_t aAction)

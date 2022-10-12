@@ -179,8 +179,7 @@ public:
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex);
 
-    bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
-                      DlOperationError & err);
+    bool checkPin(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
 
     bool ReadConfigValues();

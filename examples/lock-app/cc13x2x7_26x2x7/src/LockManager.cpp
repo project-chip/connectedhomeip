@@ -264,11 +264,13 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     {
         lock->mState    = kState_LockCompleted;
         actionCompleted = LOCK_ACTION;
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked);
     }
     else if (lock->mState == kState_UnlockInitiated)
     {
         lock->mState    = kState_UnlockCompleted;
         actionCompleted = UNLOCK_ACTION;
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kUnlocked);
     }
 
     if (actionCompleted != INVALID_ACTION)
@@ -282,12 +284,12 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
 bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(endpointId, DlLockState::kLocked, pin, err);
+    return checkPin(endpointId, DlLockState::kLocked, pin, err);
 }
 
 bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
-    return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
+    return checkPin(endpointId, DlLockState::kUnlocked, pin, err);
 }
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -643,10 +645,9 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
-                               DlOperationError & err)
+bool LockManager::checkPin(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                           DlOperationError & err)
 {
-
     // Assume pin is required until told otherwise
     bool requirePin = true;
     chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
@@ -661,8 +662,6 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         {
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
-
-            DoorLockServer::Instance().SetLockState(endpointId, lockState);
 
             return true;
         }
@@ -688,8 +687,6 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                           lockStateToString(lockState), endpointId);
-
-            DoorLockServer::Instance().SetLockState(endpointId, lockState);
 
             return true;
         }
