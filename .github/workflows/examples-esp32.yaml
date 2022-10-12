@@ -70,7 +70,9 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob '*-m5stack-{all-clusters,all-clusters-minimal,all-clusters-rpc-ipv6only}' \
+                        --target esp32-m5stack-all-clusters \
+                        --target esp32-m5stack-all-clusters-minimal \
+                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "

@@ -77,7 +77,12 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target-glob '*-brd4187c-{lock,light,switch,window-covering,unit-test}' \
+                --target efr32-brd4187c-window-covering \
+                --target efr32-brd4187c-switch \
+                --target efr32-brd4187c-unit-test \
+                --target efr32-brd4187c-light \
+                --target efr32-brd4187c-light-rpc \
+                --target efr32-brd4187c-lock-rpc \
                 build \
                 --copy-artifacts-to out/artifacts \
              "

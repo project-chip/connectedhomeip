@@ -71,7 +71,11 @@ jobs:
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob '*-chip-cert' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps \
+                      --target linux-x64-chip-cert \
+                      --target linux-arm64-chip-cert \
+                      build \
+                  "
             - name: Build minmdns example with platform dns
               timeout-minutes: 10
               run: |
