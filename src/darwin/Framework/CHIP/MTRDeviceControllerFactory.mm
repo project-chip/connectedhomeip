@@ -20,6 +20,7 @@
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRCertificates.h"
 #import "MTRControllerAccessControl.h"
+#import "MTRControllerFactory.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
@@ -625,6 +626,29 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     return controller;
 }
 
+// Implementation of selectors from MTRControllerFactory so we can
+// cast from MTRDeviceControllerFactory to MTRControllerFactory
+// safely.
+- (BOOL)startup:(MTRControllerFactoryParams *)startupParams
+{
+    return [self startControllerFactory:startupParams error:nil];
+}
+
+- (void)shutdown
+{
+    [self stopControllerFactory];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [self createControllerOnExistingFabric:startupParams error:nil];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [self createControllerOnNewFabric:startupParams error:nil];
+}
+
 @end
 
 @implementation MTRDeviceControllerFactory (InternalMethods)
@@ -710,6 +734,58 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _shouldStartServer = NO;
 
     return self;
+}
+
+@end
+
+@implementation MTRControllerFactoryParams
+
+- (void)setStartServer:(BOOL)startServer
+{
+    self.shouldStartServer = startServer;
+    _startServer = startServer;
+}
+
+- (instancetype)initWithStorage:(id<MTRStorage>)storage
+{
+    if (!(self = [super initWithStorage:storage])) {
+        return nil;
+    }
+
+    // Cast is safe because MTRPersistentStorageDelegate does not have
+    // any extra methods compared to MTRStorage.
+    _storageDelegate = static_cast<id<MTRPersistentStorageDelegate>>(storage);
+    return self;
+}
+
+@end
+
+@implementation MTRControllerFactory
+
++ (instancetype)sharedInstance
+{
+    // Cast is safe because MTRDeviceControllerFactory implements all our selectors.
+    return static_cast<MTRControllerFactory *>([MTRDeviceControllerFactory sharedInstance]);
+}
+
+- (BOOL)startup:(MTRControllerFactoryParams *)startupParams
+{
+    return [super startup:startupParams];
+}
+
+- (void)shutdown
+{
+    [super shutdown];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [super startControllerOnExistingFabric:startupParams];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [super startControllerOnNewFabric:startupParams];
 }
 
 @end

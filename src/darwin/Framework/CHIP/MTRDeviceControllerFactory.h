@@ -25,12 +25,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRStorage;
+@protocol MTRPersistentStorageDelegate;
 @protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
 @class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
 
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDeviceControllerFactoryParams : NSObject
 /*
  * Storage delegate must be provided for correct functioning of Matter
@@ -70,6 +72,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
+@end
+
+API_DEPRECATED(
+    "Please use MTRDeviceControllerFactoryParams", ios(16.1, 16.2), macos(13.0, 13.1), watchos(9.1, 9.2), tvos(16.1, 16.2))
+@interface MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
+@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate;
+@property (nonatomic, assign) BOOL startServer;
 @end
 
 @interface MTRDeviceControllerFactory : NSObject

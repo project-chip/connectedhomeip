@@ -29,6 +29,7 @@
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissioningParameters.h>
+#import <Matter/MTRControllerFactory.h>
 #import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceController+XPC.h>
@@ -41,6 +42,7 @@
 #import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
+#import <Matter/MTRPersistentStorageDelegate.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
