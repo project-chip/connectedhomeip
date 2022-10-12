@@ -28,12 +28,25 @@ import("$dir_pw_build/python.gni")
 #   generator
 #     Name of the generator to use (e.g. java, cpp-app)
 #
+#   outputs
+#     Explicit names of the expected outputs. Enforced to validate that
+#     expected data from input idl files
+#
+# NOTE: content of "outputs" is currently verified
+#       but it is still forced to be included in the codegen command to
+#       have build rules explicit.
 #
 # Example usage:
 #
 #  chip_codegen("java-jni-generate") {
-#    idl = "controler-clusters.matter"
+#    idl = "controller-clusters.matter"
 #    generator = "java"
+#
+#    outputs = [
+#       "jni/IdentifyClient-ReadImpl.cpp",
+#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
+#       # ... more to follow
+#    ]
 #  }
 #
 template("chip_codegen") {
@@ -60,6 +73,8 @@ template("chip_codegen") {
                                 "list lines",
                                 [ _idl_file ])
 
+    assert(_output_files == invoker.outputs, "Expected outputs must match.")
+
     args = [
       "--generator",
       _generator,
@@ -73,10 +88,10 @@ template("chip_codegen") {
 
     inputs = [ _idl_file ]
     sources = [ _idl_file ]
-    outputs = []
 
-    foreach(name, _output_files) {
-      outputs += [ "$target_gen_dir/${name}" ]
+    outputs = []
+    foreach (name, invoker.outputs) {
+      outputs += ["${target_gen_dir}/${name}"]
     }
   }
 }

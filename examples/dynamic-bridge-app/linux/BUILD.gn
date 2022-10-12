@@ -31,6 +31,16 @@ assert(chip_build_tools)
 chip_codegen("chip-bridge-codegen") {
   idl = "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter"
   generator = "bridge"
+
+  outputs = [
+    "bridge/OnOff.h",
+    "bridge/LevelControl.h",
+    "bridge/Descriptor.h",
+    "bridge/Switch.h",
+    "bridge/TemperatureMeasurement.h",
+    "bridge/BridgeClustersImpl.h",
+    "bridge/BridgeGlobalStructs.h",
+  ]
 }
 
 executable("dynamic-chip-bridge-app") {
