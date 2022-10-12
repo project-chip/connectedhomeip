@@ -40,6 +40,10 @@ template("chip_codegen") {
   _name = target_name
   _generator = invoker.generator
 
+  config("${_name}_config") {
+    include_dirs = [target_gen_dir]
+  }
+
   pw_python_action(_name) {
     script = "${chip_root}/scripts/codegen.py"
 
@@ -66,6 +70,7 @@ template("chip_codegen") {
     ]
 
     deps = [ "${chip_root}/scripts/idl" ]
+    public_configs = [":${_name}_config"]
 
     inputs = [ _idl_file ]
     sources = [ _idl_file ]
