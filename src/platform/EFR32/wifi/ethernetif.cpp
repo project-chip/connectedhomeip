@@ -125,6 +125,16 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     { /* 60 : LWIP frame alignment */
         len = 60;
     }
+
+    /* Drop packets originated from the same interface and is a multicast destination */
+    if ((netif->hwaddr[0] == b[6] && netif->hwaddr[1] == b[7] && netif->hwaddr[2] == b[8] && netif->hwaddr[3] == b[9] &&
+         netif->hwaddr[4] == b[10] && netif->hwaddr[5] == b[11]) &&
+        !(netif->hwaddr[0] == b[0] && netif->hwaddr[1] == b[1] && netif->hwaddr[2] == b[2] && netif->hwaddr[3] == b[3] &&
+          netif->hwaddr[4] == b[4] && netif->hwaddr[5] == b[5]))
+    {
+        return;
+    }
+
     /* We allocate a pbuf chain of pbufs from the Lwip buffer pool
      * and copy the data to the pbuf chain
      */
