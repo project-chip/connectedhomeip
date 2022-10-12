@@ -162,6 +162,7 @@ def cmd_generate(context):
 def cmd_targets(context, expand):
     for target in build.targets.BUILD_TARGETS:
         if expand:
+            build.target.report_rejected_parts = False
             for s in target.AllVariants():
                 print(s)
         else:

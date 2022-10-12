@@ -47,6 +47,9 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Iterable, Optional
 
 
+report_rejected_parts = True
+
+
 @dataclass(init=False)
 class TargetPart:
     # SubTarget/Modifier name
@@ -78,14 +81,16 @@ class TargetPart:
     def Accept(self, full_input: str):
         if self.except_if_re:
             if self.except_if_re.search(full_input):
-                # likely nothing will match when we get such an error
-                logging.error(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
+                if report_rejected_parts:
+                    # likely nothing will match when we get such an error
+                    logging.error(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
                 return False
 
         if self.only_if_re:
             if not self.only_if_re.search(full_input):
-                # likely nothing will match when we get such an error
-                logging.error(f"'{self.name}' does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
+                if report_rejected_parts:
+                    # likely nothing will match when we get such an error
+                    logging.error(f"'{self.name}' does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
                 return False
 
         return True
