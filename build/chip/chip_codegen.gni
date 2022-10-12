@@ -55,7 +55,7 @@ template("chip_codegen") {
                       rebase_path(_idl_file, root_build_dir),
                     ],
                     "list lines",
-                    [ "controller-clusters.matter" ])
+                    [ _idl_file ])
 
     args = [
       "--generator",
