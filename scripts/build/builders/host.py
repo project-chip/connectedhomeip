@@ -222,7 +222,7 @@ class HostBuilder(GnBuilder):
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
-                 minmdns_high_verbosity = False,
+                 minmdns_high_verbosity=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
