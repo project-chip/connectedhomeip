@@ -92,6 +92,7 @@ steps:
               --target linux-arm64-lock-clang
               --target linux-arm64-lock-ipv6only-clang
               --target linux-arm64-minmdns-clang
+              --target linux-arm64-minmdns-clang-minmdns-verbose
               --target linux-arm64-ota-provider-nodeps-ipv6only
               --target linux-arm64-ota-requestor-nodeps-ipv6only
               --target linux-arm64-shell-ipv6only-clang
@@ -102,6 +103,7 @@ steps:
               --target linux-x64-all-clusters
               --target linux-x64-all-clusters-nodeps
               --target linux-x64-all-clusters-nodeps-ipv6only
+              --target linux-x64-all-clusters-nodeps-ipv6only-minmdns-verbose
               --target linux-x64-all-clusters-coverage
               --target linux-x64-all-clusters-ipv6only
               --target linux-x64-all-clusters-minimal
@@ -111,9 +113,11 @@ steps:
               --target linux-x64-chip-tool
               --target linux-x64-chip-tool-coverage
               --target linux-x64-chip-tool-nodeps-ipv6only
+              --target linux-x64-chip-tool-nodeps-ipv6only-minmdns-verbose
               --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-efr32-test-runner
               --target linux-x64-light-rpc-ipv6only
+              --target linux-x64-light-rpc-ipv6only-minmdns-verbose
               --target linux-x64-lock-ipv6only
               --target linux-x64-minmdns
               --target linux-x64-nl-test-runner
