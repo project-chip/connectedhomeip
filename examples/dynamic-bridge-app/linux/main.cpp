@@ -294,9 +294,6 @@ void ApplicationInit()
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
-    // It's not possible to unregister attribute overrides, nor is it possible to register for everything-except-EP0,
-    // nor can we re-register anything, so register the full set of all clusters for all endpoints in case there's any
-    // overlap with EP0 clusters.
     for(chip::EndpointId i = 0; i < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; i++)
         RegisterOverridesForEndpoint(gFirstDynamicEndpointId + i);
 
@@ -306,6 +303,17 @@ void ApplicationInit()
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    std::vector<CommonAttributeAccessInterface> clusterAccess;
+    clusterAccess.reserve(std::extent<decltype(clusters::kKnownClusters)>::value);
+    for (auto & entry : clusters::kKnownClusters)
+    {
+        // Desciptor clusters should not be overridden.
+        if (entry.id != 29) {
+            clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
+            registerAttributeAccessOverride(&clusterAccess.back());
+        }
+    }
 
     ChipLinuxAppMainLoop();
     return 0;
