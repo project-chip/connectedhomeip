@@ -20,6 +20,7 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import androidx.annotation.Nullable;
+import chip.devicecontroller.DeviceAttestationDelegate.DeviceAttestationCompletionCallback;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
@@ -122,7 +123,116 @@ public class ChipDeviceController {
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
       pairDevice(
-          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials);
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials, null, 0);
+    } else {
+      Log.e(TAG, "Bluetooth connection already in use.");
+      completionListener.onError(new Exception("Bluetooth connection already in use."));
+    }
+  }
+
+  /**
+   * Pair a device connected through BLE.
+   * 
+   * If the completionCallback non-null, when
+   * {@link DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long, long, AttestationInfo, int)}
+   * is received, {@link #continueCommissioning(long, boolean)} must be called.
+   *
+   * @param bleServer             the BluetoothGatt representing the BLE
+   *                              connection to the
+   *                              device
+   * @param connId                the BluetoothGatt Id representing the BLE
+   *                              connection to
+   *                              the device
+   * @param deviceId              the node ID to assign to the device
+   * @param setupPincode          the pincode for the device
+   * @param csrNonce              the 32-byte CSR nonce to use, or null if we want
+   *                              to use an internally randomlygenerated CSR
+   *                              nonce.
+   * @param networkCredentials    the credentials (Wi-Fi or Thread) to be
+   *                              provisioned
+   * @param completionCallback    the callback will be invoked when
+   *                              deviceattestation completed with device
+   *                              info for additional verification.
+   * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
+   *                              onDeviceAttestationCompleted is invoked.
+   */
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback,
+      int failSafeExpiryTimeout) {
+    if (connectionId == 0) {
+      connectionId = connId;
+
+      if (connectionId == 0) {
+        Log.e(TAG, "Failed to add Bluetooth connection.");
+        completionListener.onError(new Exception("Failed to add Bluetooth connection."));
+        return;
+      }
+
+      Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
+      Log.d(TAG, "Pairing device with ID: " + deviceId);
+      pairDevice(
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials,
+          completionCallback, failSafeExpiryTimeout);
+    } else {
+      Log.e(TAG, "Bluetooth connection already in use.");
+      completionListener.onError(new Exception("Bluetooth connection already in use."));
+    }
+  }
+
+  /**
+   * Pair a device connected through BLE.
+   * 
+   * If the failureCallback non-null, when
+   * {@link DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long, long, int)}
+   * is received, {@link #continueCommissioning(long, boolean)} must be called.
+   *
+   * @param bleServer             the BluetoothGatt representing the BLE
+   *                              connection to the
+   *                              device
+   * @param connId                the BluetoothGatt Id representing the BLE
+   *                              connection to
+   *                              the device
+   * @param deviceId              the node ID to assign to the device
+   * @param setupPincode          the pincode for the device
+   * @param csrNonce              the 32-byte CSR nonce to use, or null if we want
+   *                              to use an internally randomly generated CSR
+   *                              nonce.
+   * @param networkCredentials    the credentials (Wi-Fi or Thread) to be
+   *                              provisioned
+   * @param failureCallback       the callback will be invoked when device
+   *                              attestation failed.
+   * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
+   *                              onDeviceAttestationFailed is invoked.
+   */
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback,
+      int failSafeExpiryTimeout) {
+    if (connectionId == 0) {
+      connectionId = connId;
+
+      if (connectionId == 0) {
+        Log.e(TAG, "Failed to add Bluetooth connection.");
+        completionListener.onError(new Exception("Failed to add Bluetooth connection."));
+        return;
+      }
+
+      Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
+      Log.d(TAG, "Pairing device with ID: " + deviceId);
+      pairDevice(
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials,
+          failureCallback, failSafeExpiryTimeout);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -137,7 +247,36 @@ public class ChipDeviceController {
       long pinCode,
       @Nullable byte[] csrNonce) {
     pairDeviceWithAddress(
-        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce, null, 0);
+  }
+
+  public void pairDeviceWithAddress(
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback,
+      int failSafeExpiryTimeout) {
+    pairDeviceWithAddress(
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce, completionCallback,
+        failSafeExpiryTimeout);
+  }
+
+  public void pairDeviceWithAddress(
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback,
+      int failSafeExpiryTimeout) {
+    pairDeviceWithAddress(
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce,
+        failureCallback,
+        failSafeExpiryTimeout);
   }
 
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
@@ -181,7 +320,7 @@ public class ChipDeviceController {
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
    */
   public void commissionDevice(long deviceId, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials, null, 0);
   }
 
   /**
@@ -195,9 +334,76 @@ public class ChipDeviceController {
    */
   public void commissionDevice(
       long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, null, 0);
   }
 
+  /**
+   * Initiates the automatic commissioning flow using the specified network
+   * credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   * 
+   * If the completionCallback non-null, when
+   * {@link DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long, long, AttestationInfo, int)}
+   * is received, {@link #continueCommissioning(long, boolean)} must be called.
+   *
+   * @param deviceId              the ID of the node to be commissioned
+   * @param csrNonce              a nonce to be used for the CSR request
+   * @param networkCredentials    the credentials (Wi-Fi or Thread) to be
+   *                              provisioned
+   * @param completionCallback    the callback will be invoked when device
+   *                              attestation completed with device
+   *                              info for additional verification.
+   * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
+   *                              onDeviceAttestationCompleted is invoked.
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback,
+      int failSafeExpiryTimeout) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, completionCallback,
+        failSafeExpiryTimeout);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network
+   * credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   * 
+   * If the failureCallback non-null, when
+   * {@link DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long, long, int)}
+   * is received, {@link #continueCommissioning(long, boolean)} must be called.
+   *
+   * @param deviceId              the ID of the node to be commissioned
+   * @param csrNonce              a nonce to be used for the CSR request
+   * @param networkCredentials    the credentials (Wi-Fi or Thread) to be
+   *                              provisioned
+   * @param failureCallback       the callback will be invoked when device
+   *                              attestation failed.
+   * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
+   *                              onDeviceAttestationFailed is invoked.
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback,
+      int failSafeExpiryTimeout) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials,
+        failureCallback,
+        failSafeExpiryTimeout);
+  }
+
+  /**
+   * This function instructs the commissioner to proceed to the next stage of
+   * commissioning after attestation is reported.
+   * 
+   * @param devicePtr                a pointer to the device which is being
+   *                                 commissioned.
+   * @param ignoreAttestationFailure whether to ignore device attestation failure.
+   */
+  public void continueCommissioning(long devicePtr, boolean ignoreAttestationFailure) {
+    continueCommissioning(deviceControllerPtr, devicePtr, ignoreAttestationFailure);
+  }
   /**
    * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
    * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
@@ -618,7 +824,9 @@ public class ChipDeviceController {
       int connectionId,
       long pinCode,
       @Nullable byte[] csrNonce,
-      NetworkCredentials networkCredentials);
+      NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate delegate,
+      int failSafeExpiryTimeout);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
@@ -627,7 +835,9 @@ public class ChipDeviceController {
       int port,
       int discriminator,
       long pinCode,
-      @Nullable byte[] csrNonce);
+      @Nullable byte[] csrNonce,
+      @Nullable DeviceAttestationDelegate delegate,
+      int failSafeExpiryTimeout);
 
   private native void establishPaseConnection(
       long deviceControllerPtr, long deviceId, int connId, long setupPincode);
@@ -639,7 +849,12 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       @Nullable byte[] csrNonce,
-      @Nullable NetworkCredentials networkCredentials);
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable DeviceAttestationDelegate delegate,
+      int failSafeExpiryTimeout);
+
+  private native void continueCommissioning(
+      long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 

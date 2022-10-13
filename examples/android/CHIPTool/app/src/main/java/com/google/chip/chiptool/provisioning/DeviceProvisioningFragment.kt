@@ -19,14 +19,19 @@
 package com.google.chip.chiptool.provisioning
 
 import android.bluetooth.BluetoothGatt
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import chip.devicecontroller.AttestationInfo
+import chip.devicecontroller.DeviceAttestationDelegate.DeviceAttestationCompletionCallback
+import chip.devicecontroller.DeviceAttestationDelegate.DeviceAttestationFailureCallback
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -37,6 +42,7 @@ import com.google.chip.chiptool.util.DeviceIdUtil
 import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -120,7 +126,37 @@ class DeviceProvisioningFragment : Fragment() {
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
       val connId = bluetoothManager.connectionId
-      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, networkCredentials)
+      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, null, networkCredentials, object: DeviceAttestationFailureCallback {
+        override fun onDeviceAttestationFailed(
+          deviceControllerPtr: Long,
+          devicePtr: Long,
+          errorCode: Int
+        ) {
+          requireActivity().runOnUiThread(Runnable {
+            val alertDialog: AlertDialog? = activity?.let {
+              val builder = AlertDialog.Builder(it)
+              builder.apply {
+                setPositiveButton("Continue",
+                  DialogInterface.OnClickListener { dialog, id ->
+                    deviceController.continueCommissioning(devicePtr, true)
+                  })
+                setNegativeButton("No",
+                  DialogInterface.OnClickListener { dialog, id ->
+                    deviceController.continueCommissioning(devicePtr, false)
+                  })
+              }
+              builder.setTitle("Device Attestation")
+              builder.setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
+
+              // Create the AlertDialog
+              builder.create()
+            }
+            alertDialog?.show()
+          })
+        }
+
+
+      }, 600)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
