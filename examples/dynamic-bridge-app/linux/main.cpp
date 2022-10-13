@@ -283,7 +283,6 @@ void ApplicationInit()
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
-
     StartUserInput();
 }
 
@@ -296,7 +295,8 @@ int main(int argc, char * argv[])
     for (auto & entry : clusters::kKnownClusters)
     {
         // Desciptor clusters should not be overridden.
-        if (entry.id != 29) {
+        if (entry.id != 29)
+        {
             clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
             registerAttributeAccessOverride(&clusterAccess.back());
         }
