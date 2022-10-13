@@ -61,25 +61,17 @@ template("chip_codegen") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = invoker.input
-    _output_files = exec_script("${chip_root}/scripts/codegen.py",
-                                [
-                                  "--generator",
-                                  _generator,
-                                  "--log-level",
-                                  "fatal",
-                                  "--name-only",
-                                  rebase_path(_idl_file, root_build_dir),
-                                ],
-                                "list lines",
-                                [ _idl_file ])
-
-    assert(_output_files == invoker.outputs, "Expected outputs must match.")
+    _expected_outputs = "${target_gen_dir}/${_name}.expected.outputs"
+    
+    write_file(_expected_outputs, invoker.outputs, "list lines")
 
     args = [
       "--generator",
       _generator,
       "--output-dir",
       rebase_path(target_gen_dir, root_build_dir),
+      "--expected-outputs",
+      _expected_outputs,
       rebase_path(_idl_file, root_build_dir),
     ]
 
