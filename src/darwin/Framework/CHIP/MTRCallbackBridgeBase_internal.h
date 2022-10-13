@@ -34,10 +34,8 @@
  */
 
 // TODO: ADD NS_ASSUME_NONNULL_BEGIN to this header.  When that happens, note
-// that in MTRActionBlock the two callback pointers are nonnull and the two
-// arguments of ResponseHandler are both nullable.
+// that in MTRActionBlock the two callback pointers are nonnull.
 
-typedef void (^ResponseHandler)(id value, NSError * error);
 typedef CHIP_ERROR (^MTRActionBlock)(chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
     chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
 typedef CHIP_ERROR (^MTRLocalActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
@@ -138,10 +136,10 @@ public:
         LogRequestStart();
 
         BOOL ok = [controller getSessionForNode:nodeID
-                                     completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                         const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                                         MaybeDoAction(exchangeManager, session, error);
-                                     }];
+                              completionHandler:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                  MaybeDoAction(exchangeManager, session, error);
+                              }];
 
         if (ok == NO) {
             OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);

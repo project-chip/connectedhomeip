@@ -17,8 +17,8 @@
 @interface MTRSetupPayload ()
 
 #ifdef __cplusplus
-- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-- (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
+- (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
+- (NSNumber *)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
 - (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif
 

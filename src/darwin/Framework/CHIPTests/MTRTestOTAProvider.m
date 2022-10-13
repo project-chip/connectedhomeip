@@ -22,22 +22,24 @@
 @implementation MTRTestOTAProvider
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
-                       completion:(MTRQueryImageCompletionHandler)completion
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
 {
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
-                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                               completion:(MTRApplyUpdateRequestCompletionHandler)completion
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
 {
 }
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
-                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                                completion:(MTRStatusCompletion)completion
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler
 {
 }
 
@@ -45,7 +47,7 @@
                                     controller:(MTRDeviceController * _Nonnull)controller
                                 fileDesignator:(NSString * _Nonnull)fileDesignator
                                         offset:(NSNumber * _Nonnull)offset
-                                    completion:(MTRStatusCompletion)completion
+                             completionHandler:(void (^)(NSError * error))completionHandler
 {
 }
 
@@ -60,7 +62,7 @@
                       blockSize:(NSNumber * _Nonnull)blockSize
                      blockIndex:(NSNumber * _Nonnull)blockIndex
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-                     completion:(MTRBDXQueryCompletionHandler)completion
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
 {
 }
 

@@ -22,34 +22,26 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRDeviceAttestationDelegate;
 
 /**
- * Information that can be provided to commissionWithNodeID to commision devices.
+ * The class definition for the CHIPCommissioningParameters
+ *
  */
 @interface MTRCommissioningParameters : NSObject
 
 /**
- * The nonce to use when requesting a CSR for the node's operational
- * certificate.
- *
- * If nil, a random nonce will be generated automatically.
- *
- * If not nil, must be 32 bytes of data.
+ *  The CSRNonce
  */
-@property (nonatomic, copy, nullable) NSData * csrNonce;
+@property (nonatomic, copy, nullable) NSData * CSRNonce;
 /**
- * The nonce to use when requesting attestation information from the device.
- *
- * If nil, a random nonce will be generated automatically.
- *
- * If not nil, must be 32 bytes of data.
+ *  The AttestationNonce
  */
 @property (nonatomic, copy, nullable) NSData * attestationNonce;
 /**
- * The Wi-Fi SSID, if available.
+ *  The Wi-Fi SSID, if available.
  */
 @property (nonatomic, copy, nullable) NSData * wifiSSID;
 /**
- * The Wi-Fi Credentials.  Allowed to be nil or 0-length data for an open
- * network, as long as wifiSSID is not nil.
+ *  The Wi-Fi Credentials.  Allowed to be nil or 0-length data for an open
+ *  network, as long as wifiSSID is not nil.
  */
 @property (nonatomic, copy, nullable) NSData * wifiCredentials;
 /**
@@ -57,20 +49,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSData * threadOperationalDataset;
 /**
- * An optional delegate that can be notified upon completion of device
- * attestation.  See documentation for MTRDeviceAttestationDelegate for
- * details.
+ *  The Device Attestation status delegate
  */
 @property (nonatomic, strong, nullable) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
 /**
- * The timeout, in seconds, to set for the fail-safe when calling into the
- * deviceAttestationDelegate and waiting for it to respond.
- *
- * If nil, the fail-safe will not be extended before calling into the
- * deviceAttestationDelegate.
-
+ *  The timeout in secs to set for fail-safe when attestation fails
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout;
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs;
 
 @end
 
