@@ -155,7 +155,6 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
 
                 sys.exit(1)
 
-
     logging.info("Done")
 
 
