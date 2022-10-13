@@ -199,8 +199,7 @@ class NetworkCommissioningTests:
         logger.info(f"Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
             networkID=TEST_WIFI_SSID.encode(), breadcrumb=self.with_breadcrumb())
-        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req, interactionTimeoutMs=interactionTimeoutMs)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Got response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
@@ -279,8 +278,7 @@ class NetworkCommissioningTests:
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
             ssid=b'', breadcrumb=self.with_breadcrumb())
-        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req, interactionTimeoutMs=interactionTimeoutMs)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
@@ -335,8 +333,7 @@ class NetworkCommissioningTests:
         logger.info(f"Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
             networkID=TEST_THREAD_NETWORK_IDS[0], breadcrumb=self.with_breadcrumb())
-        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req, interactionTimeoutMs=interactionTimeoutMs)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Got response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
