@@ -36,6 +36,9 @@ import("$dir_pw_build/python.gni")
 #       exactly. It is not inferred on purpose, to make build-rules explicit
 #       and verifiable (even though codege.py can at runtime report its outputs)
 #
+#       To find the list of generated files, you can run codegen.py with the
+#       "--name-only" argument
+#
 # Example usage:
 #
 #  chip_codegen("java-jni-generate") {
