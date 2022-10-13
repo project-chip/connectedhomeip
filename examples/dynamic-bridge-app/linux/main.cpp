@@ -272,16 +272,6 @@ chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId)
     return chip::Span<Action *>();
 }
 
-void RegisterOverridesForEndpoint(chip::EndpointId ep)
-{
-    static std::vector<std::unique_ptr<CommonAttributeAccessInterface>> clusterAccess;
-    for (auto & entry : clusters::kKnownClusters)
-    {
-        clusterAccess.emplace_back(std::make_unique<CommonAttributeAccessInterface>(chip::Optional<EndpointId>(ep), entry.id));
-        registerAttributeAccessOverride(clusterAccess.back().get());
-    }
-}
-
 void ApplicationInit()
 {
 #ifdef PW_RPC_ENABLED
@@ -293,9 +283,6 @@ void ApplicationInit()
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
-
-    for(chip::EndpointId i = 0; i < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; i++)
-        RegisterOverridesForEndpoint(gFirstDynamicEndpointId + i);
 
     StartUserInput();
 }
