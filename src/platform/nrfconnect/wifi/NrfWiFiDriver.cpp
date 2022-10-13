@@ -226,7 +226,7 @@ exit:
 
 void NrfWiFiDriver::LoadFromStorage()
 {
-    WiFiNetwork network;
+    WiFiManager::WiFiNetwork network;
 
     mStagingNetwork = {};
     ReturnOnFailure(KeyValueStoreMgr().Get(kSsidKey, network.ssid, sizeof(network.ssid), &network.ssidLen));
@@ -242,20 +242,16 @@ void NrfWiFiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status)
     mScanCallback = nullptr;
 }
 
-void NrfWiFiDriver::OnScanWiFiNetworkResult(WiFiScanResponse * response)
+void NrfWiFiDriver::OnScanWiFiNetworkResult(const WiFiScanResponse & response)
 {
-    if (response != nullptr)
-    {
-        mScanResponseIterator.Add(*response);
-        return;
-    }
+    mScanResponseIterator.Add(response);
 }
 
 void NrfWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
     mScanCallback    = callback;
     CHIP_ERROR error = WiFiManager::Instance().Scan(
-        ssid, [](WiFiScanResponse * response) { Instance().OnScanWiFiNetworkResult(response); },
+        ssid, [](const WiFiScanResponse & response) { Instance().OnScanWiFiNetworkResult(response); },
         [](WiFiManager::WiFiRequestStatus status) { Instance().OnScanWiFiNetworkDone(status); });
 
     if (error != CHIP_NO_ERROR)

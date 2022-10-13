@@ -65,19 +65,6 @@ public:
         bool mExhausted{ false };
     };
 
-    struct WiFiNetwork
-    {
-        uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-        size_t ssidLen = 0;
-        uint8_t pass[DeviceLayer::Internal::kMaxWiFiKeyLength];
-        size_t passLen = 0;
-
-        bool IsConfigured() const { return ssidLen > 0; }
-        ByteSpan GetSsidSpan() const { return ByteSpan(ssid, ssidLen); }
-        ByteSpan GetPassSpan() const { return ByteSpan(pass, passLen); }
-        void Clear() { ssidLen = 0; }
-    };
-
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
@@ -107,7 +94,7 @@ public:
     }
 
     void OnNetworkStatusChanged(Status status);
-    void OnScanWiFiNetworkResult(WiFiScanResponse * result);
+    void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
     void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
 
 private:
@@ -115,7 +102,7 @@ private:
 
     ConnectCallback * mpConnectCallback{ nullptr };
     NetworkStatusChangeCallback * mpNetworkStatusChangeCallback{ nullptr };
-    WiFiNetwork mStagingNetwork;
+    WiFiManager::WiFiNetwork mStagingNetwork;
     NrfWiFiScanResponseIterator mScanResponseIterator;
     ScanCallback * mScanCallback{ nullptr };
 };
