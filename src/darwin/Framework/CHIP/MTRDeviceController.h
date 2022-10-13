@@ -40,6 +40,38 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @property (readonly, nonatomic, nullable) NSNumber * controllerNodeId;
 
 /**
+ * Set up a commissioning session for a device, using the provided setup payload
+ * to discover it and connect to it.
+ *
+ * @param payload a setup payload (probably created from a QR code or numeric
+ *                code onboarding payload).
+ * @param newNodeID the planned node id for the node.
+ * @error error indication if discovery can't start at all (e.g. because the
+ *              setup payload is invalid).
+ *
+ * The IP and port for the device will be discovered automatically based on the
+ * provided discriminator.
+ *
+ * Then a PASE session will be established with the device, unless an error
+ * occurs.  MTRDevicePairingDelegate will be notified as follows:
+ *
+ * * Discovery fails: onStatusUpdate with MTRPairingStatusFailed.
+ *
+ * * Discovery succeeds but commissioning session setup fails: onPairingComplete
+ *   with an error.
+ *
+ * * Commissioning session setup succeeds: onPairingComplete with no error.
+ *
+ * Once a commissioning session is set up, getDeviceBeingCommissioned
+ * can be used to get an MTRBaseDevice and discover what sort of network
+ * credentials the device might need, and commissionDevice can be used to
+ * commission the device.
+ */
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error;
+
+/**
  * Start pairing for a device with the given ID, using the provided setup PIN
  * to establish a PASE connection.
  *
