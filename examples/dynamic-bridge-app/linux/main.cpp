@@ -272,6 +272,16 @@ chip::Span<Action *> GetActionListInfo(chip::EndpointId parentId)
     return chip::Span<Action *>();
 }
 
+void RegisterOverridesForEndpoint(chip::EndpointId ep)
+{
+    static std::vector<std::unique_ptr<CommonAttributeAccessInterface>> clusterAccess;
+    for (auto & entry : clusters::kKnownClusters)
+    {
+        clusterAccess.emplace_back(std::make_unique<CommonAttributeAccessInterface>(chip::Optional<EndpointId>(ep), entry.id));
+        registerAttributeAccessOverride(clusterAccess.back().get());
+    }
+}
+
 void ApplicationInit()
 {
 #ifdef PW_RPC_ENABLED
@@ -283,20 +293,19 @@ void ApplicationInit()
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
+
+    // It's not possible to unregister attribute overrides, nor is it possible to register for everything-except-EP0,
+    // nor can we re-register anything, so register the full set of all clusters for all endpoints in case there's any
+    // overlap with EP0 clusters.
+    for(chip::EndpointId i = 0; i < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; i++)
+        RegisterOverridesForEndpoint(gFirstDynamicEndpointId + i);
+
     StartUserInput();
 }
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    std::vector<CommonAttributeAccessInterface> clusterAccess;
-    clusterAccess.reserve(std::extent<decltype(clusters::kKnownClusters)>::value);
-    for (auto & entry : clusters::kKnownClusters)
-    {
-        clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
-        registerAttributeAccessOverride(&clusterAccess.back());
-    }
 
     ChipLinuxAppMainLoop();
     return 0;
