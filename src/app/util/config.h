@@ -31,8 +31,6 @@
 #include <zap-generated/endpoint_config.h>
 #endif
 
-#include <zap-generated/gen_tokens.h> // For GENERATED_TOKEN_LOADER/SAVER macros
-
 // *******************************************************************
 // pre-defined Devices
 //

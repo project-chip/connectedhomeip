@@ -20,14 +20,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^MTRQueryImageCompletionHandler)(
-    MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
-
-typedef void (^MTRApplyUpdateRequestCompletionHandler)(
-    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
-
-typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
-
 /**
  * The protocol definition for the MTROTAProviderDelegate
  *
@@ -40,41 +32,43 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  * The controller identifies the fabric the node is on, and the nodeID
  * identifies the node within that fabric.
  *
- * If completion is passed a non-nil error, that will be converted into
+ * If completionHandler is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
-                       completion:(MTRQueryImageCompletionHandler)completion;
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
 
 /**
  * Notify the delegate when the apply update request command is received from
  * some node.  The controller identifies the fabric the node is on, and the
  * nodeID identifies the node within that fabric.
  *
- * If completion is passed a non-nil error, that will be converted into
+ * If completionHandler is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
  */
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
-                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                               completion:(MTRApplyUpdateRequestCompletionHandler)completion;
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler;
 
 /**
  * Notify the delegate when the notify update applied command is received from
  * some node.  The controller identifies the fabric the node is on, and the
  * nodeID identifies the node within that fabric.
  *
- * If completion is passed a non-nil error, that will be converted into
+ * If completionHandler is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise a success response will be sent.
  */
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
-                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                                completion:(MTRStatusCompletion)completion;
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler;
 
 /**
  * Notify the delegate when a BDX Session starts for some node.  The controller
@@ -85,7 +79,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
                                     controller:(MTRDeviceController *)controller
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
-                                    completion:(MTRStatusCompletion)completion;
+                             completionHandler:(void (^)(NSError * error))completionHandler;
 
 /**
  * Notify the delegate when a BDX Session ends for some node.  The controller
@@ -106,7 +100,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
                       blockSize:(NSNumber *)blockSize
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
-                     completion:(MTRBDXQueryCompletionHandler)completion;
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -23,6 +23,8 @@
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 
+@class MTRDeviceController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRBaseDevice ()
@@ -54,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
 /**
- * Controllers are created via the MTRDeviceControllerFactory object.
+ * Controllers are created via the MTRControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -65,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the controller's fabric, but attempts to actually use the MTRBaseDevice will
  * fail (asynchronously) in that case.
  */
-- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
+- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller;
 
 @end
 
@@ -83,8 +85,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRAttributeReport ()
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path
-                       value:(id _Nullable)value
-                       error:(NSError * _Nullable)error;
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
 @end
 
 @interface MTREventReport ()
@@ -92,8 +94,8 @@ NS_ASSUME_NONNULL_BEGIN
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
                    timestamp:(NSNumber *)timestamp
-                       value:(id _Nullable)value
-                       error:(NSError * _Nullable)error;
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
 @end
 
 // Exported utility function
