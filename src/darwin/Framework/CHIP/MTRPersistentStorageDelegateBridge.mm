@@ -19,7 +19,7 @@
 
 #define LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE 0
 
-MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRStorage> delegate)
+MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRPersistentStorageDelegate> delegate)
     : mDelegate(delegate)
     , mWorkQueue(dispatch_queue_create("com.csa.matter.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
 {

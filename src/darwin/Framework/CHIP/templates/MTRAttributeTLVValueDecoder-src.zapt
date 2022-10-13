@@ -1,4 +1,4 @@
-{{> header excludeZapComment=true}}
+{{> header}}
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 

@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPToolPersistentStorageDelegate : NSObject <MTRStorage>
+@interface CHIPToolPersistentStorageDelegate : NSObject <MTRPersistentStorageDelegate>
 - (nullable NSData *)storageDataForKey:(NSString *)key;
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 - (BOOL)removeStorageDataForKey:(NSString *)key;
