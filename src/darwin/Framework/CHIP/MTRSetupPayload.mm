@@ -289,20 +289,29 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     return [NSString stringWithUTF8String:outDecimalString.c_str()];
 }
 
-- (NSString * _Nullable)qrCodeString
+- (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
 {
     if (self.commissioningFlow == MTRCommissioningFlowInvalid) {
         // No idea how to map this to the standard codes.
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
         return nil;
     }
 
     if (self.hasShortDiscriminator) {
         // Can't create a QR code with a short discriminator.
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
         return nil;
     }
 
     if (self.rendezvousInformation == nil) {
         // Can't create a QR code if we don't know the discovery capabilities.
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
         return nil;
     }
 
@@ -320,6 +329,9 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(outDecimalString);
 
     if (err != CHIP_NO_ERROR) {
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
         return nil;
     }
 
