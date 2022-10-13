@@ -1,4 +1,4 @@
-{{> header excludeZapComment=true}}
+{{> header}}
 
 #import "MTRStructsObjc.h"
 
@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_structs}}
-@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
+@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -17,9 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(NSZone * _Nullable)zone
+- (id)copyWithZone:(nullable NSZone *)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}} alloc] init];
+  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} alloc] init];
 
   {{#zcl_struct_items}}
   other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
@@ -36,10 +36,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+{{!Backwards compat for now: Add a DeviceType thing that inherits from DeviceTypeStruct. }}
+{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
+{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
+@implementation MTRDescriptorClusterDeviceType
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MTRDescriptorClusterDeviceType alloc] init];
+    other.type = self.type;
+    other.revision = self.revision;
+
+    return other;
+}
+
+@end
+{{/if}}
+{{/if}}
+
 {{/zcl_structs}}
 
 {{#zcl_events}}
-@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -50,9 +68,9 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(NSZone * _Nullable)zone
+- (id)copyWithZone:(nullable NSZone *)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event alloc] init];
+  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event alloc] init];
 
   {{#zcl_event_fields}}
   other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};

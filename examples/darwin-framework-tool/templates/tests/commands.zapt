@@ -10,8 +10,6 @@
 
 #include <math.h> // For INFINITY
 
-typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
-
 class TestList : public Command
 {
 public:

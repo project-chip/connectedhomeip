@@ -26,8 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 static NSString * const kFabricFilteredKey = @"fabricFiltered";
 static NSString * const kKeepPreviousSubscriptionsKey = @"keepPreviousSubscriptions";
 static NSString * const kAutoResubscribeKey = @"autoResubscribe";
-static NSString * const kMinIntervalKey = @"minInterval";
-static NSString * const kMaxIntervalKey = @"maxInterval";
 
 static NSArray * _Nullable encodeAttributePath(MTRAttributePath * _Nullable path)
 {
@@ -50,7 +48,7 @@ static MTRAttributePath * _Nullable decodeAttributePath(NSArray * _Nullable path
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
     }
-    return [MTRAttributePath attributePathWithEndpointID:pathArray[0] clusterID:pathArray[1] attributeID:pathArray[2]];
+    return [MTRAttributePath attributePathWithEndpointId:pathArray[0] clusterId:pathArray[1] attributeId:pathArray[2]];
 }
 
 static MTRCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArray)
@@ -58,20 +56,20 @@ static MTRCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArra
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
     }
-    return [MTRCommandPath commandPathWithEndpointID:pathArray[0] clusterID:pathArray[1] commandID:pathArray[2]];
+    return [MTRCommandPath commandPathWithEndpointId:pathArray[0] clusterId:pathArray[1] commandId:pathArray[2]];
 }
 
 static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadParams * outParams)
 {
-    outParams.fabricFiltered = [inParams[kFabricFilteredKey] boolValue];
+    outParams.fabricFiltered = inParams[kFabricFilteredKey];
 }
 
 @implementation MTRDeviceController (XPC)
 
-+ (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
+                                xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
-    return [MTRDeviceControllerOverXPC sharedControllerWithID:controllerID xpcConnectBlock:xpcConnectBlock];
+    return [MTRDeviceControllerOverXPC sharedControllerWithId:controllerId xpcConnectBlock:connectBlock];
 }
 
 + (NSArray<NSDictionary<NSString *, id> *> * _Nullable)encodeXPCResponseValues:
@@ -129,7 +127,9 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
         return nil;
     }
     NSMutableDictionary<NSString *, id> * result = [NSMutableDictionary dictionary];
-    result[kFabricFilteredKey] = @(params.fabricFiltered);
+    if (params.fabricFiltered) {
+        result[kFabricFilteredKey] = params.fabricFiltered;
+    }
     return result;
 }
 
@@ -143,24 +143,31 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     return result;
 }
 
-+ (NSDictionary<NSString *, id> *)encodeXPCSubscribeParams:(MTRSubscribeParams *)params
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams *)params
 {
+    if (!params) {
+        return nil;
+    }
     NSMutableDictionary<NSString *, id> * result =
         [NSMutableDictionary dictionaryWithDictionary:[MTRDeviceController encodeXPCReadParams:params]];
-    result[kKeepPreviousSubscriptionsKey] = @(params.keepPreviousSubscriptions);
-    result[kAutoResubscribeKey] = @(params.autoResubscribe);
-    result[kMinIntervalKey] = params.minInterval;
-    result[kMaxIntervalKey] = params.maxInterval;
+    if (params.keepPreviousSubscriptions) {
+        result[kKeepPreviousSubscriptionsKey] = params.keepPreviousSubscriptions;
+    }
+    if (params.autoResubscribe) {
+        result[kAutoResubscribeKey] = params.autoResubscribe;
+    }
     return result;
 }
 
-+ (MTRSubscribeParams *)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> *)params
++ (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params
 {
-    MTRSubscribeParams * result = [[MTRSubscribeParams alloc] initWithMinInterval:params[kMinIntervalKey]
-                                                                      maxInterval:params[kMaxIntervalKey]];
+    if (!params) {
+        return nil;
+    }
+    MTRSubscribeParams * result = [[MTRSubscribeParams alloc] init];
     decodeReadParams(params, result);
-    result.keepPreviousSubscriptions = [params[kKeepPreviousSubscriptionsKey] boolValue];
-    result.autoResubscribe = [params[kAutoResubscribeKey] boolValue];
+    result.keepPreviousSubscriptions = params[kKeepPreviousSubscriptionsKey];
+    result.autoResubscribe = params[kAutoResubscribeKey];
     return result;
 }
 
