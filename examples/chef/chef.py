@@ -583,7 +583,6 @@ def main() -> int:
             shell.run_cmd(
                 f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
 
-
     #
     # Menuconfig
     #
