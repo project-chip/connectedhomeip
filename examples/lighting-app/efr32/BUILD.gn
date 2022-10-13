@@ -22,7 +22,6 @@ import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/platform/EFR32/wifi_args.gni")
 import("${chip_root}/src/platform/device.gni")
 
 if (chip_enable_pw_rpc) {
@@ -80,6 +79,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
+  import("${chip_root}/src/platform/EFR32/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
