@@ -19,33 +19,24 @@
 import Foundation
 import os.log
 
-class CommissioningViewModel: ObservableObject {
+class ConnectionViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",
-                     category: "CommissioningViewModel")
+                     category: "ConnectionViewModel")
     
-    @Published var udcRequestSent: Bool?;
+    @Published var requestSent: Bool?;
     
-    @Published var commisisoningWindowOpened: Bool?;
-
-    @Published var commisisoningComplete: Bool?;
-
     @Published var connectionSuccess: Bool?;
 
     @Published var connectionStatus: String?;
 
-    func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
+    func verifyOrEstablishConnection(selectedVideoPlayer: VideoPlayer?) {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            castingServerBridge.openBasicCommissioningWindow(DispatchQueue.main,
-                commissioningWindowRequestedHandler: { (result: Bool) -> () in
+            castingServerBridge.verifyOrEstablishConnection(selectedVideoPlayer!, clientQueue: DispatchQueue.main,
+                requestSentHandler: { (error: MatterError) -> () in
                     DispatchQueue.main.async {
-                        self.commisisoningWindowOpened = result
-                    }
-                },
-                commissioningCompleteCallback: { (result: Bool) -> () in
-                    self.Log.info("Commissioning status: \(result)")
-                    DispatchQueue.main.async {
-                        self.commisisoningComplete = result
+                        self.requestSent = (error.code == 0)
+                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.requestSentHandler called with \(error)")
                     }
                 },
                 onConnectionSuccessCallback: { (videoPlayer: VideoPlayer) -> () in
@@ -64,24 +55,9 @@ class CommissioningViewModel: ObservableObject {
                 },
                 onNewOrUpdatedEndpointCallback: { (contentApp: ContentApp) -> () in
                     DispatchQueue.main.async {
-                        self.Log.info("CommissioningViewModel.openBasicCommissioningWindow.onNewOrUpdatedEndpointCallback called with \(contentApp.endpointId)")
+                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onNewOrUpdatedEndpointCallback called with \(contentApp.endpointId)")
                     }
                 })
-        }
-                
-        // Send User directed commissioning request if a commissioner with a known IP addr was selected
-        if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
-        {
-            sendUserDirectedCommissioningRequest(selectedCommissioner: selectedCommissioner)
-        }
-    }
-    
-    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {        
-        if let castingServerBridge = CastingServerBridge.getSharedInstance()
-        {
-            castingServerBridge.sendUserDirectedCommissioningRequest(selectedCommissioner!, clientQueue: DispatchQueue.main, udcRequestSentHandler: { (result: Bool) -> () in
-                self.udcRequestSent = result
-            })
         }
     }
 }
