@@ -78,7 +78,10 @@ template("chip_codegen") {
     deps = [ "${chip_root}/scripts/idl" ]
     public_configs = [ ":${_name}_config" ]
 
-    inputs = [ _idl_file ]
+    inputs = [
+      _idl_file,
+      _expected_outputs,
+    ]
     sources = [ _idl_file ]
 
     outputs = []
