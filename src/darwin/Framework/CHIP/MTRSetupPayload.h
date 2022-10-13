@@ -104,7 +104,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * Returns nil on failure (e.g. if the setup payload does not have all the
  * information a QR code needs).
  */
-- (NSString * _Nullable)qrCodeString;
+- (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error;
 
 @end
 

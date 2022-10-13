@@ -373,7 +373,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
-        NSString * pairingCode = [payload qrCodeString];
+        NSString * pairingCode = [payload qrCodeString:nil];
         if (pairingCode == nil) {
             pairingCode = [payload manualEntryCode];
         }
