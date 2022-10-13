@@ -21,15 +21,46 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Tizen platforms.
  */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
+// Note: Due to circular dependency include platform/CHIPDeviceLayer.h before
+//       BLEManagerImpl.h (the former includes the latter).
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/Tizen/BLEManagerImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <strings.h>
 
-#include "MainLoop.h"
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+
 #include <bluetooth.h>
+#include <glib.h>
+
+#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SetupDiscriminator.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
+#include <system/SystemConfig.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "CHIPDevicePlatformEvent.h"
+#include "ChipDeviceScanner.h"
+#include "MainLoop.h"
+#include "PlatformManagerImpl.h"
+#include "platform/internal/BLEManager.h"
 
 namespace chip {
 namespace DeviceLayer {

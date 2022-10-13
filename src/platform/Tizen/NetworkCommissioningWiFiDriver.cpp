@@ -29,12 +29,11 @@
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemConfig.h>
 
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-#include "platform/internal/DeviceNetworkInfo.h"
-
 #include "KeyValueStoreManagerImpl.h"
 #include "NetworkCommissioningDriver.h"
 #include "WiFiManager.h"
+#include "platform/internal/CHIPDeviceLayerInternal.h"
+#include "platform/internal/DeviceNetworkInfo.h"
 
 namespace chip {
 namespace DeviceLayer {

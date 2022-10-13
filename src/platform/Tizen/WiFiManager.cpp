@@ -15,14 +15,23 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/CHIPDeviceLayer.h> // IWYU pragma: keep
+#include <platform/Tizen/WiFiManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
+#include <utility>
+
+#include <tizen.h>
 #include <wifi-manager.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+
 #include "MainLoop.h"
-#include "WiFiManager.h"
 
 namespace {
 static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)

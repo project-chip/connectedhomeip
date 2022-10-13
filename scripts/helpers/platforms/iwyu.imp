@@ -1,5 +1,79 @@
 [
-    { include: [ '"platform/CHIPDeviceEvent.h"', "private", '<platform/CHIPDeviceEvent.h>', "public" ] },
+    ## C/C++/*
+    { include: [ '"cstdlib"', "private", '<cstdlib>', "public" ] },
+    { include: [ '"stdlib.h"', "private", '<cstdlib>', "public" ] },
+    { include: [ '"type_traits"', "private", '<type_traits>', "public" ] },
+    { include: [ '"dns-sd.h"', "private", '<dns-sd.h>', "public" ] },
+    { include: [ '"ostream"', "private", '<ostream>', "public" ] },
+    { include: [ '"iosfwd"', "private", '<iosfwd>', "public" ] },
+    { include: [ '"thread"', "private", '<thread>', "public" ] },
+
+    ## app-common/*
+    { include: [ '"app-common/zap-generated/cluster-enums.h"', "private", '<app-common/zap-generated/cluster-enums.h>', "public" ] },
+    { include: [ '"app-common/zap-generated/ids/Attributes.h"', "private", '<app-common/zap-generated/ids/Attributes.h>', "public" ] },
+    { include: [ '"app/AttributeAccessInterface.h"', "private", '<app/AttributeAccessInterface.h>', "public" ] },
+
+    ## system/*
     { include: [ '"system/SystemClock.h"', "private", '<system/SystemClock.h>', "public" ] },
     { include: [ '"system/SystemLayer.h"', "private", '<system/SystemLayer.h>', "public" ] },
+    { include: [ '"system/SystemPacketBuffer.h"', "private", '<system/SystemPacketBuffer.h>', "public" ] },
+    { include: [ '"system/SystemConfig.h"', "private", '<system/SystemConfig.h>', "public" ] },
+    { include: [ '"system/SystemError.h"', "private", '<system/SystemError.h>', "public" ] },
+
+    ## ble/*
+    { include: [ '"ble/BleConfig.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BLEEndPoint.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BleApplicationDelegate.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BleConnectionDelegate.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BleError.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BleLayer.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BlePlatformDelegate.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BleUUID.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/BtpEngine.h"', "private", '<ble/Ble.h>', "public" ] },
+    { include: [ '"ble/CHIPBleServiceData.h"', "private", '<ble/CHIPBleServiceData.h>', "public" ] },
+
+    ## core/*
+    { include: [ '"core/CHIPBuildConfig.h"', "private", '<core/CHIPBuildConfig.h>', "public" ] },
+
+    ## inet/*
+    { include: [ '"inet/IPAddress.h"', "private", '<inet/IPAddress.h>', "public" ] },
+    { include: [ '"inet/InetInterface.h"', "private", '<inet/InetInterface.h>', "public" ] },
+    { include: [ '"inet/InetBuildConfig.h"', "private", '<inet/InetBuildConfig.h>', "public" ] },
+
+    ## lib/*
+    { include: [ '"lib/core/CHIPError.h"', "private", '<lib/core/CHIPError.h>', "public" ] },
+    { include: [ '"lib/core/DataModelTypes.h"', "private", '<lib/core/DataModelTypes.h>', "public" ] },
+
+    { include: [ '"lib/dnssd/Constants.h"', "private", '<lib/dnssd/Constants.h>', "public" ] },
+    { include: [ '"lib/dnssd/ServiceNaming.h"', "private", '<lib/dnssd/platform/Dnssd.h>', "public" ] },
+    { include: [ '"lib/dnssd/platform/Dnssd.h"', "private", '<lib/dnssd/platform/Dnssd.h>', "public" ] },
+
+    { include: [ '"lib/support/ScopedBuffer.h"', "private", '<lib/support/ScopedBuffer.h>', "public" ] },
+    { include: [ '"lib/support/logging/CHIPLogging.h"', "private", '<lib/support/logging/CHIPLogging.h>', "public" ] },
+    { include: [ '"lib/support/BitFlags.h"', "private", '<lib/support/BitFlags.h>', "public" ] },
+    { include: [ '"lib/support/BitFlags.h"', "private", '<lib/support/BitFlags.h>', "public" ] },
+    { include: [ '"lib/support/SetupDiscriminator.h"', "private", '<lib/support/SetupDiscriminator.h>', "public" ] },
+    { include: [ '"lib/support/CodeUtils.h"', "private", '<lib/support/CodeUtils.h>', "public" ] },
+    { include: [ '"lib/support/ErrorStr.h"', "private", '<lib/support/ErrorStr.h>', "public" ] },
+    { include: [ '"lib/support/Span.h"', "private", '<lib/support/Span.h>', "public" ] },
+    { include: [ '"lib/support/ThreadOperationalDataset.h"', "private", '<lib/support/ThreadOperationalDataset.h>', "public" ] },
+
+    ## platform/*
+    { include: [ '"platform/CHIPDeviceEvent.h"', "private", '<platform/CHIPDeviceEvent.h>', "public" ] },
+    { include: [ '"platform/CHIPDeviceBuildConfig.h"', "private", '<platform/CHIPDeviceBuildConfig.h>', "public" ] },
+    { include: [ '"platform/CHIPDeviceLayer.h"', "private", '<platform/CHIPDeviceLayer.h>', "public" ] },
+    { include: [ '"platform/ConfigurationManager.h"', "private", '<platform/ConfigurationManager.h>', "public" ] },
+    { include: [ '"platform/PlatformManager.h"', "private", '<platform/PlatformManager.h>', "public" ] },
+    { include: [ '"platform/PersistedStorage.h"', "private", '<platform/PersistedStorage.h>', "public" ] },
+    { include: [ '"platform/ConnectivityManager.h"', "private", '<platform/ConnectivityManager.h>', "public" ] },
+    { include: [ '"platform/DeviceInstanceInfoProvider.h"', "private", '<platform/DeviceInstanceInfoProvider.h>', "public" ] },
+    { include: [ '"platform/DeviceInstanceInfoProvider.h"', "private", '<platform/DeviceInstanceInfoProvider.h>', "public" ] },
+    { include: [ '"platform/NetworkCommissioning.h"', "private", '<platform/NetworkCommissioning.h>', "public" ] },
+
+    ## Hack
+    { include: [ '<bits/shared_ptr.h>', private, '<memory>', public ] },
+    { include: [ '"bits/shared_ptr.h"', private, '<memory>', public ] },
+
+    { symbol: [ 'tm', private, '<sys/time.h>', public ] },
+
 ]

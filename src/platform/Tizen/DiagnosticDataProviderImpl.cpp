@@ -20,12 +20,11 @@
  *          Provides an implementation of the DiagnosticDataProvider object
  *          for Tizen platform.
  */
+#include "DiagnosticDataProviderImpl.h"
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Tizen/DiagnosticDataProviderImpl.h>
+
+#include "platform/internal/CHIPDeviceLayerInternal.h"
 
 namespace chip {
 namespace DeviceLayer {

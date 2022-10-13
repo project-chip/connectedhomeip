@@ -23,13 +23,20 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h> // IWYU pragma: keep
+#include <platform/Tizen/PlatformManagerImpl.h>
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/PlatformManager.h>
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
-#include <platform/Tizen/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+
+#include "PosixConfig.h"
+#include "platform/internal/CHIPDeviceLayerInternal.h"
+#include "platform/internal/GenericPlatformManagerImpl.h"
+#include "platform/internal/GenericPlatformManagerImpl.ipp"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.ipp"
 
 namespace chip {
 namespace DeviceLayer {

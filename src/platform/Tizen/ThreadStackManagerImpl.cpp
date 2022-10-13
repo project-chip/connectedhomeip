@@ -20,18 +20,24 @@
  *          Provides an implementation of the ThreadStackManager singleton object
  *          for Tizen platform.
  */
+#include <platform/internal/CHIPDeviceLayerInternal.h> // IWYU pragma: keep
+#include <platform/Tizen/ThreadStackManagerImpl.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+#include <endian.h>
 
+#include <cstring>
+
+#include <lib/dnssd/Constants.h>
+#include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
 
+#include "PlatformManagerImpl.h"
 #include "ThreadStackManagerImpl.h"
-#include <lib/dnssd/platform/Dnssd.h>
+#include "platform/internal/CHIPDeviceLayerInternal.h"
 
 namespace chip {
 namespace DeviceLayer {

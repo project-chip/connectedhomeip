@@ -21,8 +21,16 @@
  *          Platform-specific key value storage implementation for Tizen.
  */
 
+// Note: Due to circular dependency include platform/ConnectivityManager.h before
+//       platform/Tizen/ConnectivityManagerImpl.h (the former includes the latter).
+#include <platform/KeyValueStoreManager.h> // IWYU pragma: keep
+#include <platform/Tizen/KeyValueStoreManagerImpl.h>
+
+#include <cstddef>
+
+#include <lib/core/CHIPError.h>
+
 #include "AppPreference.h"
-#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {
