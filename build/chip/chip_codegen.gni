@@ -62,7 +62,7 @@ template("chip_codegen") {
 
     _idl_file = invoker.input
     _expected_outputs = "${target_gen_dir}/${_name}.expected.outputs"
-    
+
     write_file(_expected_outputs, invoker.outputs, "list lines")
 
     args = [
@@ -71,7 +71,7 @@ template("chip_codegen") {
       "--output-dir",
       rebase_path(target_gen_dir, root_build_dir),
       "--expected-outputs",
-      _expected_outputs,
+      rebase_path(_expected_outputs, root_build_dir),
       rebase_path(_idl_file, root_build_dir),
     ]
 
