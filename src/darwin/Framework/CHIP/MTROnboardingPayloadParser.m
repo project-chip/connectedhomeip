@@ -27,8 +27,8 @@
     return [codeString hasPrefix:@"MT:"];
 }
 
-+ (MTRSetupPayload * _Nullable)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
-                                                          error:(NSError * __autoreleasing *)error
++ (nullable MTRSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
+                                                         error:(NSError * __autoreleasing *)error
 {
     MTRSetupPayload * payload;
     // MTROnboardingPayloadTypeNFC is of type QR code and handled same as QR code
@@ -47,16 +47,16 @@
     return payload;
 }
 
-+ (MTRSetupPayload * _Nullable)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                error:(NSError * __autoreleasing *)error
++ (nullable MTRSetupPayload *)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
+                                                               error:(NSError * __autoreleasing *)error
 {
     MTRQRCodeSetupPayloadParser * qrCodeParser =
         [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:onboardingPayload];
     return [qrCodeParser populatePayload:error];
 }
 
-+ (MTRSetupPayload * _Nullable)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                    error:(NSError * __autoreleasing *)error
++ (nullable MTRSetupPayload *)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
+                                                                   error:(NSError * __autoreleasing *)error
 {
     MTRManualSetupPayloadParser * manualParser =
         [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:onboardingPayload];

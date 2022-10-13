@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRStorage.h"
+#import "MTRPersistentStorageDelegate.h"
 
 #import "MTRError_Internal.h"
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 class MTRPersistentStorageDelegateBridge : public chip::PersistentStorageDelegate
 {
 public:
-    MTRPersistentStorageDelegateBridge(id<MTRStorage> delegate);
+    MTRPersistentStorageDelegateBridge(id<MTRPersistentStorageDelegate> delegate);
     ~MTRPersistentStorageDelegateBridge();
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -35,7 +35,7 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
-    id<MTRStorage> mDelegate;
+    id<MTRPersistentStorageDelegate> mDelegate;
     dispatch_queue_t mWorkQueue;
 };
 

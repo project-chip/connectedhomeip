@@ -21,8 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceControllerXPCConnection;
 
-typedef NSXPCConnection * _Nonnull (^MTRXPCConnectBlock)(void);
-
 @interface MTRDeviceControllerOverXPC : MTRDeviceController
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -32,8 +30,8 @@ typedef NSXPCConnection * _Nonnull (^MTRXPCConnectBlock)(void);
  * Returns a shared remote device controller associated with an implementation specific id and implementation specific way to
  * connect to an XPC listener.
  */
-+ (MTRDeviceControllerOverXPC *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                       xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock;
++ (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
+                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
 
 @end
 
