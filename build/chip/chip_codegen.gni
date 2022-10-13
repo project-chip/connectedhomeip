@@ -32,9 +32,9 @@ import("$dir_pw_build/python.gni")
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
 #
-# NOTE: content of "outputs" is currently verified
-#       but it is still forced to be included in the codegen command to
-#       have build rules explicit.
+# NOTE: content of "outputs" is verified to match the output of codegen.py
+#       exactly. It is not inferred on purpose, to make build-rules explicit
+#       and verifiable (even though codege.py can at runtime report its outputs)
 #
 # Example usage:
 #
