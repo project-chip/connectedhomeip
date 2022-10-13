@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRSetupPayload;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -86,6 +88,11 @@ typedef void (^MTRDeviceErrorHandler)(NSError * error);
  *        automatic resubscription will be attempted.
  */
 typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumber * resubscriptionDelay);
+
+/**
+ * Handler for openCommissioningWindowWithSetupPasscode.
+ */
+typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
 
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
@@ -237,6 +244,26 @@ extern NSString * const MTRArrayValueType;
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called on queue with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
 @end
 

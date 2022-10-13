@@ -886,6 +886,28 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return YES;
 }
 
+- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                      errorHandler:(void (^)(NSError *))errorHandler
+{
+    {
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            errorHandler(error);
+            return;
+        }
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            errorHandler(error);
+            return;
+        }
+
+        block(self.cppCommissioner);
+    });
+}
+
 @end
 
 @implementation MTRDeviceController (InternalMethods)
