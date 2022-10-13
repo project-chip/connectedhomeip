@@ -474,6 +474,20 @@ private:
     [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
 }
 
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
+                                           discriminator:discriminator
+                                                duration:duration
+                                                   queue:queue
+                                              completion:completion];
+}
+
 #pragma mark - Cache management
 
 // assume lock is held

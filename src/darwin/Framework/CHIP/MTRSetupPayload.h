@@ -76,6 +76,11 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 + (NSUInteger)generateRandomPIN;
 
+/**
+ * Generate a random Matter-valid setup passcode.
+ */
++ (NSNumber *)generateRandomSetupPasscode;
+
 /** Get 11 digit manual entry code from the setup payload. */
 - (nullable NSString *)manualEntryCode;
 
