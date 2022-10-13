@@ -90,8 +90,8 @@ template("chip_codegen") {
     sources = [ _idl_file ]
 
     outputs = []
-    foreach (name, invoker.outputs) {
-      outputs += ["${target_gen_dir}/${name}"]
+    foreach(name, invoker.outputs) {
+      outputs += [ "${target_gen_dir}/${name}" ]
     }
   }
 }
