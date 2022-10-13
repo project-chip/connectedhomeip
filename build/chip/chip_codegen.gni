@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,15 +22,15 @@ import("$dir_pw_build/python.gni")
 # scripts/codegen.py
 #
 # Arguments:
-#   idl
-#     Name of the matter file to use to start the code generation
+#   input
+#     The ".matter" file to use to start the code generation
 #
 #   generator
 #     Name of the generator to use (e.g. java, cpp-app)
 #
 #   outputs
 #     Explicit names of the expected outputs. Enforced to validate that
-#     expected data from input idl files
+#     expected outputs are generated when processing input files.
 #
 # NOTE: content of "outputs" is currently verified
 #       but it is still forced to be included in the codegen command to
@@ -39,7 +39,7 @@ import("$dir_pw_build/python.gni")
 # Example usage:
 #
 #  chip_codegen("java-jni-generate") {
-#    idl = "controller-clusters.matter"
+#    input = "controller-clusters.matter"
 #    generator = "java"
 #
 #    outputs = [
@@ -60,7 +60,7 @@ template("chip_codegen") {
   pw_python_action(_name) {
     script = "${chip_root}/scripts/codegen.py"
 
-    _idl_file = invoker.idl
+    _idl_file = invoker.input
     _output_files = exec_script("${chip_root}/scripts/codegen.py",
                                 [
                                   "--generator",

@@ -31,7 +31,7 @@ chip_data_model("data_model") {
 
 if (current_os == "android") {
   chip_codegen("java-jni-generate") {
-    idl = "controller-clusters.matter"
+    input = "controller-clusters.matter"
     generator = "java"
 
     outputs = [
