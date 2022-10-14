@@ -121,17 +121,27 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     {
         return;
     }
-    if (len < 60)
+    if (len < LWIP_FRAME_ALIGNMENT)
     { /* 60 : LWIP frame alignment */
-        len = 60;
+        len = LWIP_FRAME_ALIGNMENT;
     }
 
     /* Drop packets originated from the same interface and is a multicast destination */
-    if ((netif->hwaddr[0] == b[6] && netif->hwaddr[1] == b[7] && netif->hwaddr[2] == b[8] && netif->hwaddr[3] == b[9] &&
-         netif->hwaddr[4] == b[10] && netif->hwaddr[5] == b[11]) &&
-        !(netif->hwaddr[0] == b[0] && netif->hwaddr[1] == b[1] && netif->hwaddr[2] == b[2] && netif->hwaddr[3] == b[3] &&
-          netif->hwaddr[4] == b[4] && netif->hwaddr[5] == b[5]))
+    const uint8_t * src_mac = b + netif->hwaddr_len;
+    const uint8_t * dst_mac = b;
+
+    if ((memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
+#ifdef WIFI_DEBUG_ENABLED
+        EFR32_LOG("%s: DROP %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                  bufferoffset,
+
+                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+
+                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+
+                  b[12], b[13]);
+#endif
         return;
     }
 
@@ -145,10 +155,15 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
             memcpy((uint8_t *) q->payload, (uint8_t *) b + bufferoffset, q->len);
             bufferoffset += q->len;
         }
-
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("EN:IN %d,[%02x:%02x:%02x:%02x:%02x%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", bufferoffset, b[0], b[1],
-                  b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+        EFR32_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                  bufferoffset,
+
+                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+
+                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+
+                  b[12], b[13]);
 #endif
 
         if (netif->input(p, netif) != ERR_OK)
