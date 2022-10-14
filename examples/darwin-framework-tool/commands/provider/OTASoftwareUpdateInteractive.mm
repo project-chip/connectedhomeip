@@ -39,7 +39,7 @@ MTROTAHeader * ParseOTAHeader(const char * otaFilePath)
     }
 
     NSError * error;
-    return [MTROTAHeader headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
+    return [MTROTAHeaderParser headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
 }
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
@@ -161,14 +161,14 @@ CHIP_ERROR OTASoftwareUpdateBase::SetActionReplyStatus(uint16_t action)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (action == 0) {
-        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed");
+        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed");
     } else if (action == 1) {
-        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction");
+        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction");
     } else if (action == 2) {
-        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue");
+        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue");
     } else {
         ChipLogError(chipTool, "Only accepts the following: 0 (Proceed), 1 (Await Next Action), 2 (Discontinue)");
         error = CHIP_ERROR_INTERNAL;
@@ -179,18 +179,18 @@ CHIP_ERROR OTASoftwareUpdateBase::SetReplyStatus(uint16_t status)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (status == 0) {
-        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable");
+        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable");
     } else if (status == 1) {
-        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusBusy;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusBusy");
+        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusBusy");
     } else if (status == 2) {
-        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable");
+        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable");
     } else if (status == 4) {
-        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported;
+        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported;
         ChipLogDetail(
-            chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported");
+            chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported");
     } else {
         ChipLogError(chipTool, "Only accepts the following: 0 (Available), 1 (Busy), 2 (Not Available), 3 (Not Supported)");
         error = CHIP_ERROR_INTERNAL;

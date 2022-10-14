@@ -43,6 +43,10 @@ chip_with_lwip = false
 
 chip_build_tests = false
 
+# Transitional CommissionableDataProvider not used anymore
+# examples/platform/efr32/EFR32DeviceDataProvider is now used.
+chip_use_transitional_commissionable_data_provider = false
+
 openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
 openthread_core_config_platform_check_file =
     "openthread-core-efr32-config-check.h"

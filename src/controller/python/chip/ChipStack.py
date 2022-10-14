@@ -328,11 +328,14 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        # Make sure PersistentStorage is destructed before chipStack
-        # to avoid accessing builtins.chipStack after destruction.
+        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
+
+        #
+        # We only shutdown the persistent storage layer AFTER we've shut down the stack,
+        # since there is a possibility of interactions with the storage layer during shutdown.
+        #
         self._persistentStorage.Shutdown()
         self._persistentStorage = None
-        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
 
         #
         # Stack init happens in native, but shutdown happens here unfortunately.

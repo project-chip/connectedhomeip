@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <device.h>
 #include <vector>
+#include <zephyr/device.h>
 
 #define STATE_HIGH 1
 #define STATE_LOW 0

@@ -299,6 +299,12 @@ void BrowseContext::DispatchSuccess()
     MdnsContexts::GetInstance().Remove(this);
 }
 
+void BrowseContext::DispatchPartialSuccess()
+{
+    callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    services.clear();
+}
+
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
 {
     type     = ContextType::Resolve;

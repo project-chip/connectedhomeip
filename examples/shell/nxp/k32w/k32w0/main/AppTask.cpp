@@ -30,14 +30,18 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app/util/attribute-storage.h>
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
 #include "app_config.h"
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_EVENT_QUEUE_SIZE 10
+constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
+constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -46,7 +50,6 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 
 static bool sIsThreadProvisioned = false;
-static bool sIsThreadEnabled     = false;
 static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
@@ -60,25 +63,15 @@ CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreate(kAppEventQueueSize, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
         err = APP_ERROR_EVENT_QUEUE_FAILED;
         K32W_LOG("Failed to allocate app event queue");
-        assert(err == CHIP_NO_ERROR);
+        assert(false);
     }
 
     return err;
-}
-
-void LockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
-}
-
-void UnlockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 }
 
 CHIP_ERROR AppTask::Init()
@@ -86,14 +79,7 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model and start server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-    chip::Server::GetInstance().Init(initParams);
+    PlatformMgr().ScheduleWork(InitServer, 0);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -126,21 +112,45 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
-    err = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
+    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
+    err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
 
-    K32W_LOG("Current Software Version: %s", softwareVersionString);
+    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
 
 #if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
     return err;
+}
+
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+
+void AppTask::InitServer(intptr_t arg)
+{
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    // Init ZCL Data Model and start server
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
@@ -156,7 +166,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        TickType_t xTicksToWait  = pdMS_TO_TICKS(10);
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, xTicksToWait);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -170,9 +181,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -190,7 +199,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -205,7 +214,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
-        HandleKeyboard();
     }
 }
 
@@ -242,6 +250,8 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 void AppTask::KBD_Callback(uint8_t events)
 {
     eventMask = eventMask | (uint32_t)(1 << events);
+
+    HandleKeyboard();
 }
 
 void AppTask::HandleKeyboard(void)
@@ -319,7 +329,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        uint32_t resetTimeout = FACTORY_RESET_TRIGGER_TIMEOUT;
+        uint32_t resetTimeout = kFactoryResetTriggerTimeout;
 
         if (sAppTask.mFunction != kFunction_NoneSelected)
         {
@@ -334,7 +344,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
 
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+        sAppTask.StartTimer(kFactoryResetTriggerTimeout);
     }
 }
 
@@ -369,9 +379,21 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
+    if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
+    {
+        if (event->ServiceProvisioningChange.IsServiceProvisioned)
+        {
+            sIsThreadProvisioned = TRUE;
+        }
+        else
+        {
+            sIsThreadProvisioned = FALSE;
+        }
+    }
+
+#if CONFIG_CHIP_NFC_COMMISSIONING
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
         if (!NFCMgr().IsTagEmulationStarted())
@@ -397,8 +419,8 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
             K32W_LOG("Started NFC Tag Emulation!");
         }
     }
-}
 #endif
+}
 
 void AppTask::CancelTimer()
 {
@@ -431,9 +453,21 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        if (__get_IPSR())
+        {
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+            if (taskToWake)
+            {
+                portYIELD_FROM_ISR(taskToWake);
+            }
+        }
+        else if (!xQueueSend(sAppEventQueue, aEvent, 0))
         {
             K32W_LOG("Failed to post event to app task event queue");
         }

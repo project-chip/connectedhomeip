@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRQRCodeSetupPayloadParser : NSObject
 - (instancetype)initWithBase38Representation:(NSString *)base38Representation;
-- (MTRSetupPayload * _Nullable)populatePayload:(NSError * __autoreleasing *)error;
+- (nullable MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error;
 @end
 
 NS_ASSUME_NONNULL_END

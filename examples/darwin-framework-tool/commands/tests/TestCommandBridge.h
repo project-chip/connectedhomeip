@@ -43,14 +43,15 @@ const char * getScriptsFolder() { return basePath; }
 
 constexpr const char * kDefaultKey = "default";
 
-@interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
+@interface TestPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property TestCommandBridge * commandBridge;
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status;
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
+- (void)onStatusUpdate:(MTRPairingStatus)status;
+- (void)onPairingComplete:(NSError * _Nullable)error;
+- (void)onPairingDeleted:(NSError * _Nullable)error;
+- (void)onCommissioningComplete:(NSError * _Nullable)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithTestCommandBridge:(TestCommandBridge *)commandBridge;
@@ -69,7 +70,7 @@ class TestCommandBridge : public CHIPCommandBridge,
 public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
-        , mDeviceControllerDelegate([[TestDeviceControllerDelegate alloc] initWithTestCommandBridge:this])
+        , mPairingDelegate([[TestPairingDelegate alloc] initWithTestCommandBridge:this])
     {
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
@@ -155,10 +156,9 @@ public:
 
         SetIdentity(identity);
 
-        // Invalidate our existing CASE session; otherwise trying to work with
-        // our device will just reuse it without establishing a new CASE
-        // session when a reboot is done on the server, and then our next
-        // interaction will time out.
+        // Invalidate our existing CASE session; otherwise getConnectedDevice
+        // will just hand it right back to us without establishing a new CASE
+        // session when a reboot is done on the server.
         if (value.expireExistingSession.ValueOr(true)) {
             if (GetDevice(identity) != nil) {
                 [GetDevice(identity) invalidateCASESession];
@@ -166,10 +166,17 @@ public:
             }
         }
 
-        mConnectedDevices[identity] = [MTRBaseDevice deviceWithNodeID:@(value.nodeId) controller:controller];
-        dispatch_async(mCallbackQueue, ^{
-            NextTest();
-        });
+        [controller getBaseDevice:value.nodeId
+                            queue:mCallbackQueue
+                completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                    if (error != nil) {
+                        SetCommandExitStatus(error);
+                        return;
+                    }
+
+                    mConnectedDevices[identity] = device;
+                    NextTest();
+                }];
         return CHIP_NO_ERROR;
     }
 
@@ -182,9 +189,9 @@ public:
 
         SetIdentity(identity);
 
-        [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
-        [mDeviceControllerDelegate setDeviceId:value.nodeId];
-        [mDeviceControllerDelegate setActive:YES];
+        [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
+        [mPairingDelegate setDeviceId:value.nodeId];
+        [mPairingDelegate setActive:YES];
 
         NSString * payloadStr = [[NSString alloc] initWithBytes:value.payload.data()
                                                          length:value.payload.size()
@@ -231,9 +238,7 @@ public:
         VerifyOrReturn(commissioner != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
-        [commissioner commissionNodeWithID:@(nodeId)
-                       commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                     error:&commissionError];
+        [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
         CHIP_ERROR err = MTRErrorToCHIPErrorCode(commissionError);
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
@@ -520,7 +525,7 @@ protected:
     }
 
 private:
-    TestDeviceControllerDelegate * _Nonnull mDeviceControllerDelegate;
+    TestPairingDelegate * _Nonnull mPairingDelegate;
 
     // Set of our connected devices, keyed by identity.
     std::map<std::string, MTRBaseDevice *> mConnectedDevices;
@@ -528,13 +533,13 @@ private:
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation TestDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
+@implementation TestPairingDelegate
+- (void)onStatusUpdate:(MTRPairingStatus)status
 {
     if (_active) {
-        if (status == MTRCommissioningStatusSuccess) {
+        if (status == MTRPairingStatusSuccess) {
             NSLog(@"Secure pairing success");
-        } else if (status == MTRCommissioningStatusFailed) {
+        } else if (status == MTRPairingStatusFailed) {
             _active = NO;
             NSLog(@"Secure pairing failed");
             _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));
@@ -542,7 +547,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (_active) {
         if (error != nil) {
@@ -556,7 +561,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
+- (void)onPairingDeleted:(NSError * _Nullable)error
+{
+    if (_active) {
+        _commandBridge->PairingDeleted();
+    }
+}
+
+- (void)onCommissioningComplete:(NSError * _Nullable)error
 {
     if (_active) {
         _active = NO;

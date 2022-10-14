@@ -95,6 +95,11 @@ std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePat
                         MutableByteSpan kidSpan{ kidBuf };
                         ByteSpan certSpan{ certificate.data(), certificate.size() };
 
+                        if (CHIP_NO_ERROR != VerifyAttestationCertificateFormat(certSpan, Crypto::AttestationCertType::kPAA))
+                        {
+                            continue;
+                        }
+
                         if (CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(certSpan, kidSpan))
                         {
                             certs.push_back(certificate);

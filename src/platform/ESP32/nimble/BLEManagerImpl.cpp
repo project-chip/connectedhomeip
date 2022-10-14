@@ -39,6 +39,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#include "esp_bt.h"
 #include "esp_log.h"
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
@@ -140,6 +141,21 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
+#if CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        ESP_LOGI(TAG, "Thread credentials already provisioned, not initializing BLE");
+#else
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+    {
+        ESP_LOGI(TAG, "WiFi station already provisioned, not initializing BLE");
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+        esp_bt_mem_release(ESP_BT_MODE_BTDM);
+        return CHIP_NO_ERROR;
+    }
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+
     CHIP_ERROR err;
 
     // Initialize the Chip BleLayer.
@@ -1177,8 +1193,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
 
-    ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable, device name %s)",
-                    (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
+    ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable)",
+                    (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-");
 
     {
         if (ble_gap_adv_active())

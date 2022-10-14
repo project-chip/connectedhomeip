@@ -25,6 +25,9 @@ pw_python_package("idl") {
     "matter_grammar.lark",
 
     # Templates used for generation
+    "generators/bridge/BridgeClustersCpp.jinja",
+    "generators/bridge/BridgeClustersCommon.jinja",
+    "generators/bridge/BridgeClustersGlobalStructs.jinja",
     "generators/java/ChipClustersCpp.jinja",
     "generators/java/ChipClustersRead.jinja",
 
@@ -35,18 +38,32 @@ pw_python_package("idl") {
     "tests/inputs/optional_argument.matter",
     "tests/inputs/several_clusters.matter",
     "tests/inputs/simple_attribute.matter",
+    "tests/outputs/cluster_struct_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/cluster_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/cluster_struct_attribute/bridge/DemoCluster.h",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/global_struct_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/global_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/global_struct_attribute/bridge/DemoCluster.h",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp",
     "tests/outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/several_clusters/bridge/BridgeClustersImpl.h",
+    "tests/outputs/several_clusters/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/several_clusters/bridge/First.h",
+    "tests/outputs/several_clusters/bridge/Second.h",
+    "tests/outputs/several_clusters/bridge/Third.h",
     "tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/SecondClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/simple_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/simple_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/simple_attribute/bridge/MyCluster.h",
     "tests/outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp",
     "tests/outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
   ]
@@ -54,15 +71,24 @@ pw_python_package("idl") {
   sources = [
     "__init__.py",
     "generators/__init__.py",
+    "generators/bridge/__init__.py",
     "generators/filters.py",
     "generators/java/__init__.py",
     "generators/types.py",
     "matter_idl_parser.py",
     "matter_idl_types.py",
+    "xml_parser.py",
+    "zapxml/__init__.py",
+    "zapxml/handlers/__init__.py",
+    "zapxml/handlers/base.py",
+    "zapxml/handlers/context.py",
+    "zapxml/handlers/handlers.py",
+    "zapxml/handlers/parsing.py",
   ]
 
   tests = [
     "test_matter_idl_parser.py",
     "test_generators.py",
+    "test_xml_parser.py",
   ]
 }

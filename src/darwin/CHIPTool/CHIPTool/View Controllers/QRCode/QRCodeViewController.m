@@ -419,7 +419,7 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeMTR();
-    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
+    [self.chipController setPairingDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -489,8 +489,8 @@
     }
 }
 
-// MARK: MTRDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+// MARK: MTRDevicePairingDelegate
+- (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
@@ -506,9 +506,9 @@
         } else {
             MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
             params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
-            params.failSafeExpiryTimeout = @600;
+            params.failSafeExpiryTimeoutSecs = @600;
             NSError * error;
-            if (![controller commissionNodeWithID:@(deviceId) commissioningParams:params error:&error]) {
+            if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
                 NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
             }
         }
@@ -674,16 +674,16 @@
     params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
     params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
-    params.failSafeExpiryTimeout = @600;
+    params.failSafeExpiryTimeoutSecs = @600;
 
     uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
 
-    if (![controller commissionNodeWithID:@(deviceId) commissioningParams:params error:&error]) {
+    if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
         NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
     }
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
+- (void)onCommissioningComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
@@ -706,10 +706,10 @@
     } else {
         _manualCodeLabel.hidden = YES;
         _versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
-        if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
+        if (payload.rendezvousInformation == nil) {
             _rendezVousInformation.text = NOT_APPLICABLE_STRING;
         } else {
-            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.discoveryCapabilities];
+            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", [payload.rendezvousInformation unsignedLongValue]];
         }
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
@@ -719,7 +719,7 @@
     }
 
     _discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
-    _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setupPasscode];
+    _setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
@@ -747,7 +747,7 @@
             continue;
         }
 
-        BOOL isTypeString = (info.infoType == MTROptionalQRCodeInfoTypeString);
+        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:MTROptionalQRCodeInfoTypeString]];
         if (!isTypeString) {
             return;
         }
@@ -767,29 +767,26 @@
 
 - (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
-    if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
+    if (payload.rendezvousInformation == nil) {
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         return;
     }
 
-    // Avoid SoftAP if we have other options.
-    if ((payload.discoveryCapabilities & MTRDiscoveryCapabilitiesOnNetwork)
-        || (payload.discoveryCapabilities & MTRDiscoveryCapabilitiesBLE)) {
+    // TODO: This is a pretty broken way to handle a bitmask.
+    switch ([payload.rendezvousInformation unsignedLongValue]) {
+    case MTRDiscoveryCapabilitiesNone:
+    case MTRDiscoveryCapabilitiesOnNetwork:
+    case MTRDiscoveryCapabilitiesBLE:
+    case MTRDiscoveryCapabilitiesAllMask:
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
-        return;
-    }
-
-    if (payload.discoveryCapabilities & MTRDiscoveryCapabilitiesSoftAP) {
+        break;
+    case MTRDiscoveryCapabilitiesSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
-        return;
+        break;
     }
-
-    // Just fall back on the default.
-    NSLog(@"Rendezvous Default");
-    [self handleRendezVousDefault:rawPayload];
 }
 
 - (NSString *)getNetworkName:(NSNumber *)discriminator
@@ -803,7 +800,7 @@
 {
     self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
+    [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
@@ -814,18 +811,9 @@
     // restart the Matter Stack before pairing (for reliability + testing restarts)
     [self _restartMatterStack];
 
-    __auto_type * setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
-    if (setupPayload == nil) {
-        NSLog(@"Could not parse setup payload: %@", [error localizedDescription]);
-        return;
-    }
-
-    ;
-    if ([self.chipController setupCommissioningSessionWithPayload:setupPayload newNodeID:@(deviceID) error:&error]) {
+    if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;
         MTRSetNextAvailableDeviceID(deviceID);
-    } else {
-        NSLog(@"Could not start commissioning session setup: %@", [error localizedDescription]);
     }
 }
 
@@ -891,8 +879,9 @@
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
+    MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
-    _setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:qrCode error:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
 
@@ -963,8 +952,9 @@
     NSString * decimalString = _manualCodeTextField.text;
     [self manualCodeEnteredStartState];
 
+    MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
-    _setupPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:decimalString error:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
         [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
@@ -1105,7 +1095,7 @@
     return self;
 }
 
-- (void)deviceAttestationFailedForController:(MTRDeviceController *)controller device:(void *)device error:(NSError * _Nonnull)error
+- (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController

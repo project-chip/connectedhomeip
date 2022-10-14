@@ -163,17 +163,20 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
     auto & discriminator = payload.discriminator;
     if (discriminator.IsShortDiscriminator())
     {
-        currentFilter.type = Dnssd::DiscoveryFilterType::kShortDiscriminator;
-        currentFilter.code = discriminator.GetShortValue();
+        mCurrentFilter.type = Dnssd::DiscoveryFilterType::kShortDiscriminator;
+        mCurrentFilter.code = discriminator.GetShortValue();
     }
     else
     {
-        currentFilter.type = Dnssd::DiscoveryFilterType::kLongDiscriminator;
-        currentFilter.code = discriminator.GetLongValue();
+        mCurrentFilter.type = Dnssd::DiscoveryFilterType::kLongDiscriminator;
+        mCurrentFilter.code = discriminator.GetLongValue();
     }
+    mPayloadVendorID  = payload.vendorID;
+    mPayloadProductID = payload.productID;
+
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kIPTransport] = true;
-    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(currentFilter);
+    CHIP_ERROR err                     = mCommissioner->DiscoverCommissionableNodes(mCurrentFilter);
     if (err != CHIP_NO_ERROR)
     {
         mWaitingForDiscovery[kIPTransport] = false;
@@ -186,7 +189,11 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
     ChipLogDetail(Controller, "Stopping commissioning discovery over DNS-SD");
 
     mWaitingForDiscovery[kIPTransport] = false;
-    currentFilter.type                 = Dnssd::DiscoveryFilterType::kNone;
+    mCurrentFilter.type                = Dnssd::DiscoveryFilterType::kNone;
+    mPayloadVendorID                   = kNotAvailable;
+    mPayloadProductID                  = kNotAvailable;
+
+    mCommissioner->StopCommissionableDiscovery();
     return CHIP_NO_ERROR;
 }
 
@@ -284,6 +291,11 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
+{
+    return vendorOrProductID != kNotAvailable;
+}
+
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
     if (nodeData.commissionData.commissioningMode == 0)
@@ -291,12 +303,26 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
         return false;
     }
 
-    switch (currentFilter.type)
+    // The advertisement may not include a vendor id.
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.commissionData.vendorId) &&
+        mPayloadVendorID != nodeData.commissionData.vendorId)
+    {
+        return false;
+    }
+
+    // The advertisement may not include a product id.
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.commissionData.productId) &&
+        mPayloadProductID != nodeData.commissionData.productId)
+    {
+        return false;
+    }
+
+    switch (mCurrentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
-        return ((nodeData.commissionData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
+        return ((nodeData.commissionData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code;
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
-        return nodeData.commissionData.longDiscriminator == currentFilter.code;
+        return nodeData.commissionData.longDiscriminator == mCurrentFilter.code;
     default:
         return false;
     }

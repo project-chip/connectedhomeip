@@ -22,6 +22,17 @@ from pathlib import Path
 import subprocess
 import sys
 import urllib.request
+from dataclasses import dataclass
+
+
+@dataclass
+class CmdLineArgs:
+    zapFile: str
+    zclFile: str
+    templateFile: str
+    outputDir: str
+    runBootstrap: bool
+
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
@@ -77,7 +88,7 @@ def detectZclFile(zapFile):
     return getFilePath(path)
 
 
-def runArgumentsParser():
+def runArgumentsParser() -> CmdLineArgs:
     default_templates = 'src/app/zap-templates/app-templates.json'
     default_output_dir = 'zap-generated/'
 
@@ -90,6 +101,8 @@ def runArgumentsParser():
                         help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: automatically selected)')
+    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+                        help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
@@ -113,7 +126,7 @@ def runArgumentsParser():
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
-    return (zap_file, zcl_file, templates_file, output_dir)
+    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap)
 
 
 def extractGeneratedIdl(output_dir, zap_config_path):
@@ -209,13 +222,18 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
+def runBootstrap():
+    subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+
+
 def main():
     checkPythonVersion()
-
-    # The maximum meory usage is over 4GB (#15620)
+    cmdLineArgs = runArgumentsParser()
+    if cmdLineArgs.runBootstrap:
+        runBootstrap()
+    # The maximum memory usage is over 4GB (#15620)
     os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
-    zap_file, zcl_file, templates_file, output_dir = runArgumentsParser()
-    runGeneration(zap_file, zcl_file, templates_file, output_dir)
+    runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir)
 
     prettifiers = [
         runClangPrettifier,
@@ -223,7 +241,7 @@ def main():
     ]
 
     for prettifier in prettifiers:
-        prettifier(templates_file, output_dir)
+        prettifier(cmdLineArgs.templateFile, cmdLineArgs.outputDir)
 
 
 if __name__ == '__main__':

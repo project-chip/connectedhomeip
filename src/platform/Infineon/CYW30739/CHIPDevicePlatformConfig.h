@@ -65,6 +65,5 @@
 
 // -------------------- Event Logging Configuration --------------------
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE 256
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE 256
 
 // -------------------- Software Update Manager Configuration --------------------

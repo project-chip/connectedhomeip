@@ -22,6 +22,7 @@
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags);
 void PrintOnboardingCodes(const chip::PayloadContents & payload);
+void PrintQrCodeURL(const chip::MutableCharSpan qrCode);
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags);
 
 /**

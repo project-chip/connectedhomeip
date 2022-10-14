@@ -32,6 +32,8 @@ _bootstrap_or_activate() {
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
         [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
+        # Make sure our submodule remotes are correct for this revision.
+        git submodule sync --recursive
         git submodule update --init
     fi
 

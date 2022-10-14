@@ -35,7 +35,7 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
-#include <sys/reboot.h>
+#include <zephyr/sys/reboot.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 

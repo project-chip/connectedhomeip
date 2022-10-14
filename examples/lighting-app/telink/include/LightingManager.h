@@ -23,7 +23,7 @@
 #include <system/SystemError.h>
 
 #include <cstdint>
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
 
 class LightingManager
 {

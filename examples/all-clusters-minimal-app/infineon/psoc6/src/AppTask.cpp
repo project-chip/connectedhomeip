@@ -23,7 +23,6 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "qrcodegen.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>

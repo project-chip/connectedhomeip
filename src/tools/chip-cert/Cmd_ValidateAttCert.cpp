@@ -205,6 +205,14 @@ bool Cmd_ValidateAttCert(int argc, char * argv[])
         return false;
     }
 
+    // Validate Proper Certificate Format
+    VerifyOrExit(VerifyAttestationCertificateFormat(paa, AttestationCertType::kPAA) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+    VerifyOrExit(VerifyAttestationCertificateFormat(pai, AttestationCertType::kPAI) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+    VerifyOrExit(VerifyAttestationCertificateFormat(dac, AttestationCertType::kDAC) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kDacFormatInvalid);
+
     // Verify certificate is valid at the current time
     VerifyOrExit(IsCertificateValidAtCurrentTime(dac) == CHIP_NO_ERROR,
                  attestationError = AttestationVerificationResult::kDacExpired);
