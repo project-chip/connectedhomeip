@@ -126,7 +126,8 @@ def BuildHostTarget():
     target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
-    target.AppendModifier('libnl', minmdns_address_policy="libnl").OnlyIfRe('-minmdns')
+    target.AppendModifier('minmdns-verbose', minmdns_high_verbosity=True)
+    target.AppendModifier('libnl', minmdns_address_policy="libnl")
     target.AppendModifier('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)')
     target.AppendModifier('no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
@@ -266,6 +267,7 @@ def BuildAndroidTarget():
         TargetPart('chip-test', app=AndroidApp.CHIP_TEST),
         TargetPart('tv-server', app=AndroidApp.TV_SERVER),
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
+        TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
     ])
 
     return target

@@ -222,6 +222,7 @@ class HostBuilder(GnBuilder):
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
+                 minmdns_high_verbosity=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -296,6 +297,9 @@ class HostBuilder(GnBuilder):
             # Flag for testing purpose
             self.extra_gn_options.append(
                 'chip_im_force_fabric_quota_check=true')
+
+        if minmdns_high_verbosity:
+            self.extra_gn_options.append('chip_minmdns_high_verbosity=true')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')

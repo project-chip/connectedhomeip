@@ -16,14 +16,6 @@
             "path": "partials/header.zapt"
         },
         {
-            "name": "clusters_header",
-            "path": "partials/clusters_header.zapt"
-        },
-        {
-            "name": "cluster_header",
-            "path": "partials/cluster_header.zapt"
-        },
-        {
             "name": "im_command_handler_cluster_commands",
             "path": "partials/im_command_handler_cluster_commands.zapt"
         },
