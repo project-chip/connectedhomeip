@@ -25,11 +25,21 @@ from .filters import RegisterCommonFilters
 
 class GeneratorStorage:
     """
-    Handles file operations for generator output. Specificall can create
+    Handles file operations for generator output. Specifically can create
     required files for output.
 
     Is overriden for unit tests.
     """
+
+    def __init__(self):
+        self._generated_paths = set()
+
+    @property
+    def generated_paths(self):
+        return self._generated_paths
+
+    def report_output_file(self, relative_path: str):
+        self._generated_paths.add(relative_path)
 
     def get_existing_data(self, relative_path: str):
         """Gets the existing data at the given path.
@@ -49,6 +59,7 @@ class FileSystemGeneratorStorage(GeneratorStorage):
     """
 
     def __init__(self, output_dir: str):
+        super().__init__()
         self.output_dir = output_dir
 
     def get_existing_data(self, relative_path: str):
@@ -147,6 +158,11 @@ class CodeGenerator:
             return
 
         rendered = self.jinja_env.get_template(template_path).render(vars)
+
+        # Report regardless if it has changed or not. This is because even if
+        # files are unchanged, validation of what the correct output is should
+        # still be done.
+        self.storage.report_output_file(output_file_name)
 
         if rendered == self.storage.get_existing_data(output_file_name):
             logging.info("File content not changed")
