@@ -278,7 +278,7 @@ class NetworkCommissioningTests:
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
             ssid=b'', breadcrumb=self.with_breadcrumb())
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req, responseType=None, timedRequestTimeoutMs=None, interactionTimeoutMs=15000)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req, responseType=None, timedRequestTimeoutMs=None, interactionTimeoutMs=30000)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
