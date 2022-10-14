@@ -91,7 +91,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
                 err = esp_nimble_hci_and_controller_deinit();
 #endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-                err += esp_bt_mem_release(ESP_BT_MODE_BLE);
+                err += esp_bt_mem_release(ESP_BT_MODE_BTDM);
                 if (err == ESP_OK)
                 {
                     ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");

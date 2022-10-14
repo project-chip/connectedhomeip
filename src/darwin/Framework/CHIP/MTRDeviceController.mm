@@ -361,6 +361,36 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return nodeID;
 }
 
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturnValue([self checkIsRunning:error], NO);
+
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        // Try to get a QR code if possible (because it has a better
+        // discriminator, etc), then fall back to manual code if that fails.
+        NSString * pairingCode = [payload qrCodeString:nil];
+        if (pairingCode == nil) {
+            pairingCode = [payload manualEntryCode];
+        }
+        if (pairingCode == nil) {
+            success = ![self checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
+            return;
+        }
+
+        chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
+        _operationalCredentialsDelegate->SetDeviceID(nodeId);
+        CHIP_ERROR errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+
+    return success;
+}
+
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode

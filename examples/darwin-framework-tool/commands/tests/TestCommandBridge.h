@@ -197,7 +197,11 @@ public:
                                                          length:value.payload.size()
                                                        encoding:NSUTF8StringEncoding];
         NSError * err;
-        BOOL ok = [controller pairDevice:value.nodeId onboardingPayload:payloadStr error:&err];
+        auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadStr error:&err];
+        if (err != nil) {
+            return MTRErrorToCHIPErrorCode(err);
+        }
+        BOOL ok = [controller setupCommissioningSessionWithPayload:payload newNodeID:@(value.nodeId) error:&err];
         if (ok == YES) {
             return CHIP_NO_ERROR;
         }
