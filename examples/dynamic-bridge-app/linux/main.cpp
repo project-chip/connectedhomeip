@@ -40,7 +40,6 @@
 #include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <zzz-generated/app-common/app-common/zap-generated/ids/Clusters.h>
 
 #include "ActionCluster.h"
 #include "Backend.h"
