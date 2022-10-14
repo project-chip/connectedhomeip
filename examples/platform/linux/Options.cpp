@@ -28,6 +28,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/SafeInt.h>
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -233,16 +234,11 @@ bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & 
     outVector.resize(maxSize);
 
     size_t argLen = strlen(arg);
-    if (argLen > maxBase64Size)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(argLen <= maxBase64Size, false);
+    VerifyOrReturnValue(chip::CanCastTo<uint32_t>(argLen), false);
 
-    size_t decodedLen = chip::Base64Decode32(arg, argLen, reinterpret_cast<uint8_t *>(outVector.data()));
-    if (decodedLen == 0)
-    {
-        return false;
-    }
+    size_t decodedLen = chip::Base64Decode32(arg, static_cast<uint32_t>(argLen), reinterpret_cast<uint8_t *>(outVector.data()));
+    VerifyOrReturnValue(decodedLen != 0, false);
 
     outVector.resize(decodedLen);
     return true;
