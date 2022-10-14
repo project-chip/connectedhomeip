@@ -132,7 +132,7 @@ public class ChipDeviceController {
 
   /**
    * Pair a device connected through BLE.
-   * 
+   *
    * If the completionCallback non-null, when
    * {@link DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long, long, AttestationInfo, int)}
    * is received, {@link #continueCommissioning(long, boolean)} must be called.
@@ -187,7 +187,7 @@ public class ChipDeviceController {
 
   /**
    * Pair a device connected through BLE.
-   * 
+   *
    * If the failureCallback non-null, when
    * {@link DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long, long, int)}
    * is received, {@link #continueCommissioning(long, boolean)} must be called.
@@ -342,7 +342,7 @@ public class ChipDeviceController {
    * credentials. It is
    * expected that a secure session has already been established via {@link
    * #establishPaseConnection(long, int, long)}.
-   * 
+   *
    * If the completionCallback non-null, when
    * {@link DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long, long, AttestationInfo, int)}
    * is received, {@link #continueCommissioning(long, boolean)} must be called.
@@ -370,7 +370,7 @@ public class ChipDeviceController {
    * credentials. It is
    * expected that a secure session has already been established via {@link
    * #establishPaseConnection(long, int, long)}.
-   * 
+   *
    * If the failureCallback non-null, when
    * {@link DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long, long, int)}
    * is received, {@link #continueCommissioning(long, boolean)} must be called.
@@ -396,7 +396,7 @@ public class ChipDeviceController {
   /**
    * This function instructs the commissioner to proceed to the next stage of
    * commissioning after attestation is reported.
-   * 
+   *
    * @param devicePtr                a pointer to the device which is being
    *                                 commissioned.
    * @param ignoreAttestationFailure whether to ignore device attestation failure.

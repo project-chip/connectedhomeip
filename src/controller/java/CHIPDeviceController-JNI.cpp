@@ -80,7 +80,7 @@ static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndp
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
 static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
-static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate, jint failSafeExpiryTimeout, 
+static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate, jint failSafeExpiryTimeout,
  DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge);
 
 namespace {
@@ -403,7 +403,7 @@ JNI_METHOD(void, commissionDevice)
     {
         wrapper->ClearDeviceAttestationDelegateBridge();
         DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = nullptr;
-        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, 
+        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate,
             failSafeExpiryTimeout, &deviceAttestationDelegateBridge);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
@@ -452,7 +452,7 @@ JNI_METHOD(void, pairDevice)
     {
         wrapper->ClearDeviceAttestationDelegateBridge();
         DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = nullptr;
-        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, 
+        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate,
             failSafeExpiryTimeout, &deviceAttestationDelegateBridge);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
@@ -495,7 +495,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
     {
         wrapper->ClearDeviceAttestationDelegateBridge();
         DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = nullptr;
-        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, 
+        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate,
             failSafeExpiryTimeout, &deviceAttestationDelegateBridge);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
@@ -1421,19 +1421,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate, jint failSafeExpiryTimeout, 
+CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate, jint failSafeExpiryTimeout,
  DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<uint16_t> timeoutSecs = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeout));
     bool shouldWaitAfterDeviceAttestation = false;
     jclass completionCallbackCls = nullptr;
-    jobject deviceAttestationDelegateRef = env->NewGlobalRef(deviceAttestationDelegate);    
+    jobject deviceAttestationDelegateRef = env->NewGlobalRef(deviceAttestationDelegate);
     VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
     JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback",
-                                            completionCallbackCls);                      
+                                            completionCallbackCls);
     VerifyOrExit(completionCallbackCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    
+
     if(env->IsInstanceOf(deviceAttestationDelegate, completionCallbackCls))
     {
         shouldWaitAfterDeviceAttestation = true;

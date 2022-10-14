@@ -89,7 +89,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Control
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr, ChipLogError(Controller, "Could not find deviceAttestation completed method"));
             jobject javaAttestationInfo;
             CHIP_ERROR err = N2J_AttestationInfo(env, info, javaAttestationInfo);
-            VerifyOrReturn(err == CHIP_NO_ERROR, 
+            VerifyOrReturn(err == CHIP_NO_ERROR,
                     ChipLogError(Controller, "Failed to create AttestationInfo, error: %s", err.AsString()));
             env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, mDeviceController, reinterpret_cast<jlong>(device), javaAttestationInfo, static_cast<jint>(attestationResult));
         }
@@ -102,7 +102,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Control
             env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationFailedMethod, mDeviceController, reinterpret_cast<jlong>(device), static_cast<jint>(attestationResult));
         }
     }
-    
+
 }
 
 DeviceAttestationDelegateBridge::~DeviceAttestationDelegateBridge()

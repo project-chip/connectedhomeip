@@ -25,7 +25,7 @@ class DeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestat
 public:
     DeviceAttestationDelegateBridge(jlong deviceController,
         jobject deviceAttestationDelegate,
-        chip::Optional<uint16_t> expiryTimeoutSecs, 
+        chip::Optional<uint16_t> expiryTimeoutSecs,
         bool shouldWaitAfterDeviceAttestation)
         : mResult(chip::Credentials::AttestationVerificationResult::kSuccess)
         , mDeviceController(deviceController)
@@ -39,7 +39,7 @@ public:
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
-    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, 
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
         chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
         chip::Credentials::AttestationVerificationResult attestationResult) override;
 
