@@ -40,6 +40,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <zzz-generated/app-common/app-common/zap-generated/ids/Clusters.h>
 
 #include "ActionCluster.h"
 #include "Backend.h"
@@ -295,7 +296,7 @@ int main(int argc, char * argv[])
     for (auto & entry : clusters::kKnownClusters)
     {
         // Desciptor clusters should not be overridden.
-        if (entry.id != 29)
+        if (entry.id != chip::app::Clusters::Descriptor::Id)
         {
             clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
             registerAttributeAccessOverride(&clusterAccess.back());
