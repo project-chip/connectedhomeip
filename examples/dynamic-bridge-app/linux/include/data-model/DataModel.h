@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
@@ -41,7 +42,7 @@ public:
 // iterator_type begin();
 // iterator_type end();
 // iterator_type must conform to LegacyForwardIterator
-// The contained type must be default-constructible
+// The contained type must be default and copy-constructible
 template <typename X>
 class ListContainer : public X
 {
@@ -234,9 +235,18 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
             return aDecoder.Decode(*it);
         }
 
-    case ConcreteDataAttributePath::ListOperation::ReplaceAll:
+    case ConcreteDataAttributePath::ListOperation::ReplaceAll: {
         x.clear();
-        // fallthrough
+        DecodableList<std::remove_pointer_t<typename X::pointer>> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+        auto it = list.begin();
+        while(it.Next())
+        {
+            x.emplace_back(it.GetValue());
+        }
+        return it.GetStatus();
+    }
+
     default:
         x.emplace_back();
         return aDecoder.Decode(x.back());
