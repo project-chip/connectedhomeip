@@ -46,6 +46,17 @@ static void SetupXPCQueue(void)
                                                        connectBlock:connectBlock];
 }
 
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDeviceController doesn't support setupCommissioningSessionWithPayload over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode

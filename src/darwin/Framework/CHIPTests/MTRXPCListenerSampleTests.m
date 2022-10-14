@@ -436,10 +436,8 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static const uint32_t kSetupPINCode = 20202021;
-static const uint16_t kRemotePort = 5540;
+static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kLocalPort = 5541;
-static NSString * kAddress = @"::1";
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
@@ -544,8 +542,12 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
     NSError * error;
-    [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
-    XCTAssertEqual(error.code, 0);
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
+    XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
