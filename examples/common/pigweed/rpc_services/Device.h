@@ -317,7 +317,7 @@ public:
         }
         else
         {
-            response.vendor_id = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+            return pw::Status::Internal();
         }
 
         uint16_t product_id;
@@ -327,7 +327,7 @@ public:
         }
         else
         {
-            response.product_id = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+            return pw::Status::Internal();
         }
 
         uint32_t software_version;
@@ -337,14 +337,13 @@ public:
         }
         else
         {
-            response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
+            return pw::Status::Internal();
         }
 
         if (DeviceLayer::ConfigurationMgr().GetSoftwareVersionString(response.software_version_string,
                                                                      sizeof(response.software_version_string)) != CHIP_NO_ERROR)
         {
-            snprintf(response.software_version_string, sizeof(response.software_version_string),
-                     CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+            return pw::Status::Internal();
         }
 
         uint32_t code;
@@ -364,7 +363,7 @@ public:
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
             CHIP_NO_ERROR)
         {
-            snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+            return pw::Status::Internal();
         }
 
         // Create buffer for QR code that can fit max size and null terminator.
