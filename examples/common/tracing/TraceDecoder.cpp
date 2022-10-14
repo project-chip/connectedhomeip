@@ -130,7 +130,7 @@ CHIP_ERROR TraceDecoder::ReadString(const char * str)
 
 CHIP_ERROR TraceDecoder::LogJSON(Json::Value & json)
 {
-    uint32_t protocol   = json[kProtocolIdKey].asLargestUInt();
+    auto protocol       = json[kProtocolIdKey].asLargestUInt();
     uint16_t vendorId   = protocol >> 16;
     uint16_t protocolId = protocol & 0xFFFF;
     if (!mOptions.IsProtocolEnabled(chip::Protocols::Id(chip::VendorId(vendorId), protocolId)))

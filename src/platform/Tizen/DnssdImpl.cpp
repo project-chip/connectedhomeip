@@ -671,10 +671,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
 
 exit:
     if (err != CHIP_NO_ERROR)
-    { // Notify caller about error
-        callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
         RemoveContext(resolveCtx);
-    }
     return err;
 }
 

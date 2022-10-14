@@ -61,7 +61,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
 
 // Per 5.2.5.2. Commencement Section of CHIP spec, BLE advertisement is
 // disabled for Locks and Barrier Access Devices.
