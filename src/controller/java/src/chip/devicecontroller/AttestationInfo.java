@@ -12,10 +12,7 @@ public final class AttestationInfo {
   private byte[] certificationDeclaration;
   private byte[] firmwareInfo;
 
-  public AttestationInfo(
-      byte[] dac,
-      byte[] pai,
-      byte[] certificationDeclaration) {
+  public AttestationInfo(byte[] dac, byte[] pai, byte[] certificationDeclaration) {
     this.dac = dac;
     this.pai = pai;
     this.certificationDeclaration = certificationDeclaration;
