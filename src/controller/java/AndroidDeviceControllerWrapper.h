@@ -158,13 +158,16 @@ public:
         return mOpCredsIssuer.get();
     }
 
-    void SetDeviceAttestationDelegateBridge(DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge) { mDeviceAttestationDelegateBridge = deviceAttestationDelegateBridge; }
+    void SetDeviceAttestationDelegateBridge(DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge)
+    {
+        mDeviceAttestationDelegateBridge = deviceAttestationDelegateBridge;
+    }
 
     DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
 
     void ClearDeviceAttestationDelegateBridge()
     {
-        if(mDeviceAttestationDelegateBridge != nullptr)
+        if (mDeviceAttestationDelegateBridge != nullptr)
         {
             delete mDeviceAttestationDelegateBridge;
             mDeviceAttestationDelegateBridge = nullptr;

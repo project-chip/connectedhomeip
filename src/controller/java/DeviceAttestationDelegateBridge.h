@@ -15,33 +15,29 @@
  *    limitations under the License.
  */
 
+#include <jni.h>
 #include <lib/core/NodeId.h>
 #include <platform/CHIPDeviceBuildConfig.h>
-#include <jni.h>
 
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 
-class DeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate {
+class DeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate
+{
 public:
-    DeviceAttestationDelegateBridge(jlong deviceController,
-        jobject deviceAttestationDelegate,
-        chip::Optional<uint16_t> expiryTimeoutSecs,
-        bool shouldWaitAfterDeviceAttestation)
-        : mResult(chip::Credentials::AttestationVerificationResult::kSuccess)
-        , mDeviceController(deviceController)
-        , mDeviceAttestationDelegate(deviceAttestationDelegate)
-        , mExpiryTimeoutSecs(expiryTimeoutSecs)
-        , mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
-    {
-    }
+    DeviceAttestationDelegateBridge(jlong deviceController, jobject deviceAttestationDelegate,
+                                    chip::Optional<uint16_t> expiryTimeoutSecs, bool shouldWaitAfterDeviceAttestation) :
+        mResult(chip::Credentials::AttestationVerificationResult::kSuccess),
+        mDeviceController(deviceController), mDeviceAttestationDelegate(deviceAttestationDelegate),
+        mExpiryTimeoutSecs(expiryTimeoutSecs), mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
+    {}
 
     ~DeviceAttestationDelegateBridge();
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
-    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
-        chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
-        chip::Credentials::AttestationVerificationResult attestationResult) override;
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+                                      const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                      chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     bool ShouldWaitAfterDeviceAttestation() override { return mShouldWaitAfterDeviceAttestation; }
 

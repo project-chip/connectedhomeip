@@ -16,25 +16,25 @@
  */
 
 #include "DeviceAttestationDelegateBridge.h"
-#include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
 CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                jobject & outAttestationInfo)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jclass infoClass = nullptr;
-    jmethodID constructor = nullptr;
-    jbyteArray javaDAC = nullptr;
-    jbyteArray javaPAI = nullptr;
-    jbyteArray javaCD = nullptr;
-    const ByteSpan DAC = info.dacDerBuffer();
-    const ByteSpan PAI = info.paiDerBuffer();
+    CHIP_ERROR err                                        = CHIP_NO_ERROR;
+    jclass infoClass                                      = nullptr;
+    jmethodID constructor                                 = nullptr;
+    jbyteArray javaDAC                                    = nullptr;
+    jbyteArray javaPAI                                    = nullptr;
+    jbyteArray javaCD                                     = nullptr;
+    const ByteSpan DAC                                    = info.dacDerBuffer();
+    const ByteSpan PAI                                    = info.paiDerBuffer();
     const Optional<ByteSpan> certificationDeclarationSpan = info.cdBuffer();
 
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
@@ -49,10 +49,10 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
     SuccessOrExit(err);
     err = JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), PAI.size(), javaPAI);
     SuccessOrExit(err);
-    if(certificationDeclarationSpan.HasValue())
+    if (certificationDeclarationSpan.HasValue())
     {
-        err = JniReferences::GetInstance().N2J_ByteArray(env, certificationDeclarationSpan.Value().data(), certificationDeclarationSpan.Value().size(),
-                                        javaCD);
+        err = JniReferences::GetInstance().N2J_ByteArray(env, certificationDeclarationSpan.Value().data(),
+                                                         certificationDeclarationSpan.Value().size(), javaCD);
         SuccessOrExit(err);
     }
     outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD);
@@ -61,53 +61,60 @@ exit:
     return err;
 }
 
-void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
-    chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
+    chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+    const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
     ChipLogProgress(Controller, "OnDeviceAttestationCompleted with result: %hu", attestationResult);
 
     mResult = attestationResult;
-    if(mDeviceAttestationDelegate != nullptr)
+    if (mDeviceAttestationDelegate != nullptr)
     {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        JNIEnv * env                 = JniReferences::GetInstance().GetEnvForCurrentThread();
         jclass completionCallbackCls = nullptr;
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback",
-                                                completionCallbackCls);
+        JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback", completionCallbackCls);
         VerifyOrReturn(completionCallbackCls != nullptr,
-                    ChipLogError(Controller, "Could not find device attestation completion callback class."));
+                       ChipLogError(Controller, "Could not find device attestation completion callback class."));
         jclass failureCallbackCls = nullptr;
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationFailureCallback",
-                                                failureCallbackCls);
+        JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationFailureCallback", failureCallbackCls);
         VerifyOrReturn(failureCallbackCls != nullptr,
-                    ChipLogError(Controller, "Could not find device attestation failure callback class."));
+                       ChipLogError(Controller, "Could not find device attestation failure callback class."));
 
-        if(env->IsInstanceOf(mDeviceAttestationDelegate, completionCallbackCls))
+        if (env->IsInstanceOf(mDeviceAttestationDelegate, completionCallbackCls))
         {
             jmethodID onDeviceAttestationCompletedMethod;
-            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationCompleted", "(JJLchip/devicecontroller/AttestationInfo;I)V", &onDeviceAttestationCompletedMethod);
-            VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr, ChipLogError(Controller, "Could not find deviceAttestation completed method"));
+            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationCompleted",
+                                                    "(JJLchip/devicecontroller/AttestationInfo;I)V",
+                                                    &onDeviceAttestationCompletedMethod);
+            VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
+                           ChipLogError(Controller, "Could not find deviceAttestation completed method"));
             jobject javaAttestationInfo;
             CHIP_ERROR err = N2J_AttestationInfo(env, info, javaAttestationInfo);
             VerifyOrReturn(err == CHIP_NO_ERROR,
-                    ChipLogError(Controller, "Failed to create AttestationInfo, error: %s", err.AsString()));
-            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, mDeviceController, reinterpret_cast<jlong>(device), javaAttestationInfo, static_cast<jint>(attestationResult));
+                           ChipLogError(Controller, "Failed to create AttestationInfo, error: %s", err.AsString()));
+            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, mDeviceController,
+                                reinterpret_cast<jlong>(device), javaAttestationInfo, static_cast<jint>(attestationResult));
         }
-        else if((attestationResult != chip::Credentials::AttestationVerificationResult::kSuccess) &&
-            env->IsInstanceOf(mDeviceAttestationDelegate, failureCallbackCls))
+        else if ((attestationResult != chip::Credentials::AttestationVerificationResult::kSuccess) &&
+                 env->IsInstanceOf(mDeviceAttestationDelegate, failureCallbackCls))
         {
             jmethodID onDeviceAttestationFailedMethod;
-            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationFailed", "(JJI)V", &onDeviceAttestationFailedMethod);
-            VerifyOrReturn(onDeviceAttestationFailedMethod != nullptr, ChipLogError(Controller, "Could not find deviceAttestation failed method"));
-            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationFailedMethod, mDeviceController, reinterpret_cast<jlong>(device), static_cast<jint>(attestationResult));
+            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationFailed", "(JJI)V",
+                                                    &onDeviceAttestationFailedMethod);
+            VerifyOrReturn(onDeviceAttestationFailedMethod != nullptr,
+                           ChipLogError(Controller, "Could not find deviceAttestation failed method"));
+            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationFailedMethod, mDeviceController,
+                                reinterpret_cast<jlong>(device), static_cast<jint>(attestationResult));
         }
     }
-
 }
 
 DeviceAttestationDelegateBridge::~DeviceAttestationDelegateBridge()
 {
-    if(mDeviceAttestationDelegate != nullptr)
+    if (mDeviceAttestationDelegate != nullptr)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
