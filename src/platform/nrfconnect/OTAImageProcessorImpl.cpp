@@ -213,8 +213,8 @@ void FlashHandler::DoAction(Action aAction)
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR && !CONFIG_SOC_NRF52840 // nRF52 is optimized per default
     // utilize the QSPI driver sleep power mode
-    const auto * qspi_dev = device_get_binding(DT_LABEL(DT_INST(0, nordic_qspi_nor)));
-    if (qspi_dev)
+    const auto * qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
+    if (device_is_ready(qspi_dev))
     {
         const auto requestedAction = Action::WAKE_UP == aAction ? PM_DEVICE_ACTION_RESUME : PM_DEVICE_ACTION_SUSPEND;
         (void) pm_device_action_run(qspi_dev, requestedAction); // not much can be done in case of a failure
