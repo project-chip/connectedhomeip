@@ -162,7 +162,7 @@ CHIP_ERROR SubscribeAttribute(
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnResubscriptionAttemptCallbackType onResubscriptionAttemptCb =
         nullptr,
     bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
-    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr)
+    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr, System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -175,6 +175,7 @@ CHIP_ERROR SubscribeAttribute(
     params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     params.mIsFabricFiltered            = fabricFiltered;
+    params.mTimeout                     = aInteractionTimeout;
     return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params), aDataVersion);
 }
 
@@ -198,7 +199,8 @@ CHIP_ERROR SubscribeAttribute(
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnResubscriptionAttemptCallbackType
         onResubscriptionAttemptCb = nullptr,
     bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
-    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr)
+    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr,
+    System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
