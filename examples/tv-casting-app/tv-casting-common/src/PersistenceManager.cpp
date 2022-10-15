@@ -149,7 +149,7 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
     size_t castingDataSize = 0;
     ReturnErrorOnFailure(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kCastingDataKey, castingData,
                                                                                      kCastingDataMaxBytes, &castingDataSize));
-    ChipLogProgress(AppServer, "PersistenceManager::ReadAllVideoPlayers Read TLV(CastingData) from KVS store with size: %zu bytes",
+    ChipLogProgress(AppServer, "PersistenceManager::ReadAllVideoPlayers Read TLV(CastingData) from KVS store with size: %lu bytes",
                     castingDataSize);
 
     TLV::TLVReader reader;

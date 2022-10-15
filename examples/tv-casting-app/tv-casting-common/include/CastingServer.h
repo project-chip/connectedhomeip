@@ -65,12 +65,8 @@ public:
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Dnssd::DiscoveredNodeData * selectedCommissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    TargetVideoPlayerInfo * GetActiveTargetVideoPlayer()
-    {
-        return mActiveTargetVideoPlayerInfo.IsInitialized() && mActiveTargetVideoPlayerInfo.GetOperationalDeviceProxy() != nullptr
-            ? &mActiveTargetVideoPlayerInfo
-            : nullptr;
-    }
+    TargetVideoPlayerInfo * GetActiveTargetVideoPlayer() { return &mActiveTargetVideoPlayerInfo; }
+
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
                                          std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                          std::function<void(CHIP_ERROR)> onConnectionFailure,

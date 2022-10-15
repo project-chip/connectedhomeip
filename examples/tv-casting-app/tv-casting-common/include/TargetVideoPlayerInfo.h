@@ -73,8 +73,9 @@ private:
         _this->mDeviceProxy           = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);
         _this->mInitialized           = true;
         ChipLogProgress(AppServer,
-                        "HandleDeviceConnected created an instance of OperationalDeviceProxy for nodeId: %lu, fabricIndex: %d",
-                        _this->GetNodeId(), _this->GetFabricIndex());
+                        "HandleDeviceConnected created an instance of OperationalDeviceProxy for nodeId: 0x" ChipLogFormatX64
+                        ", fabricIndex: %d",
+                        ChipLogValueX64(_this->GetNodeId()), _this->GetFabricIndex());
 
         if (_this->mOnConnectionSuccessClientCallback)
         {
@@ -85,10 +86,10 @@ private:
 
     static void HandleDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
     {
-        ChipLogError(
-            AppServer,
-            "HandleDeviceConnectionFailure called for peerId.nodeId: %lu, peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
-            peerId.GetNodeId(), peerId.GetFabricIndex(), error.AsString());
+        ChipLogError(AppServer,
+                     "HandleDeviceConnectionFailure called for peerId.nodeId: 0x" ChipLogFormatX64
+                     ", peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex(), error.AsString());
         TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mDeviceProxy           = chip::OperationalDeviceProxy();
         if (_this->mOnConnectionFailureClientCallback)

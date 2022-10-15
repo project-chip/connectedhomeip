@@ -255,7 +255,7 @@ CHIP_ERROR CastingServer::VerifyOrEstablishConnection(TargetVideoPlayerInfo & ta
     mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
 
     return targetVideoPlayerInfo.FindOrEstablishCASESession(
-        [](TargetVideoPlayerInfo * targetVideoPlayerInfo) {
+        [](TargetVideoPlayerInfo * videoPlayer) {
             ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda called");
             chip::OperationalDeviceProxy * prevDeviceProxy =
                 CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo.GetOperationalDeviceProxy();
@@ -264,8 +264,8 @@ CHIP_ERROR CastingServer::VerifyOrEstablishConnection(TargetVideoPlayerInfo & ta
                 ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda Disconnecting deviceProxy");
                 prevDeviceProxy->Disconnect();
             }
-            CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo = *targetVideoPlayerInfo;
-            CastingServer::GetInstance()->mOnConnectionSuccessClientCallback(targetVideoPlayerInfo);
+            CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo = *videoPlayer;
+            CastingServer::GetInstance()->mOnConnectionSuccessClientCallback(videoPlayer);
         },
         onConnectionFailure);
 }

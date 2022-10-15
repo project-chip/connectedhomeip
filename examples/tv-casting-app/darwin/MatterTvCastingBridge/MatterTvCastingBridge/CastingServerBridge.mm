@@ -317,8 +317,9 @@
             videoPlayers = [NSMutableArray new];
             for (size_t i = 0; cppTargetVideoPlayerInfos[i].IsInitialized(); i++) {
                 ChipLogProgress(AppServer,
-                    "CastingServerBridge().readCachedVideoPlayers() with nodeId: %lu fabricIndex: %d deviceName: %s vendorId: %d",
-                    cppTargetVideoPlayerInfos[i].GetNodeId(), cppTargetVideoPlayerInfos[i].GetFabricIndex(),
+                    "CastingServerBridge().readCachedVideoPlayers() with nodeId: 0x" ChipLogFormatX64
+                    " fabricIndex: %d deviceName: %s vendorId: %d",
+                    ChipLogValueX64(cppTargetVideoPlayerInfos[i].GetNodeId()), cppTargetVideoPlayerInfos[i].GetFabricIndex(),
                     cppTargetVideoPlayerInfos[i].GetDeviceName(), cppTargetVideoPlayerInfos[i].GetVendorId());
                 videoPlayers[i] = [ConversionUtils convertToObjCVideoPlayerFrom:&cppTargetVideoPlayerInfos[i]];
             }

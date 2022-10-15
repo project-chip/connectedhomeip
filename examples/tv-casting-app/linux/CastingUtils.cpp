@@ -210,9 +210,10 @@ void doCastingDemoActions(TargetEndpointInfo * endpoint)
 void OnConnectionSuccess(TargetVideoPlayerInfo * videoPlayer)
 {
     ChipLogProgress(AppServer,
-                    "OnConnectionSuccess with Video Player(nodeId: %lu, fabricIndex: %d, deviceName: %s, vendorId: %d, productId: "
+                    "OnConnectionSuccess with Video Player(nodeId: 0x" ChipLogFormatX64
+                    ", fabricIndex: %d, deviceName: %s, vendorId: %d, productId: "
                     "%d, deviceType: %d)",
-                    videoPlayer->GetNodeId(), videoPlayer->GetFabricIndex(), videoPlayer->GetDeviceName(),
+                    ChipLogValueX64(videoPlayer->GetNodeId()), videoPlayer->GetFabricIndex(), videoPlayer->GetDeviceName(),
                     videoPlayer->GetVendorId(), videoPlayer->GetProductId(), videoPlayer->GetDeviceType());
 
     TargetEndpointInfo * endpoints = videoPlayer->GetEndpoints();
@@ -245,15 +246,15 @@ CHIP_ERROR ConnectToCachedVideoPlayer()
         {
             if (cachedVideoPlayers[i].IsInitialized())
             {
-                ChipLogProgress(AppServer, "Found a Cached video player with nodeId: %lu, fabricIndex: %d",
-                                cachedVideoPlayers[i].GetNodeId(), cachedVideoPlayers[i].GetFabricIndex());
+                ChipLogProgress(AppServer, "Found a Cached video player with nodeId: 0x" ChipLogFormatX64 ", fabricIndex: %d",
+                                ChipLogValueX64(cachedVideoPlayers[i].GetNodeId()), cachedVideoPlayers[i].GetFabricIndex());
                 if (CastingServer::GetInstance()->VerifyOrEstablishConnection(
                         cachedVideoPlayers[i], OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint) == CHIP_NO_ERROR)
                 {
-                    ChipLogProgress(
-                        AppServer,
-                        "FindOrEstablish CASESession attempted for cached video player with nodeId: %lu, fabricIndex: %d",
-                        cachedVideoPlayers[i].GetNodeId(), cachedVideoPlayers[i].GetFabricIndex());
+                    ChipLogProgress(AppServer,
+                                    "FindOrEstablish CASESession attempted for cached video player with nodeId: 0x" ChipLogFormatX64
+                                    ", fabricIndex: %d",
+                                    ChipLogValueX64(cachedVideoPlayers[i].GetNodeId()), cachedVideoPlayers[i].GetFabricIndex());
                     return CHIP_NO_ERROR;
                 }
             }

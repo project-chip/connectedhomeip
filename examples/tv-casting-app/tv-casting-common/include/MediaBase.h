@@ -31,8 +31,10 @@ public:
         auto deviceProxy = targetVideoPlayerInfo.GetOperationalDeviceProxy();
         if (deviceProxy == nullptr)
         {
-            ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy for nodeId: %lu, fabricIndex: %d",
-                         targetVideoPlayerInfo.GetNodeId(), targetVideoPlayerInfo.GetFabricIndex());
+            ChipLogError(AppServer,
+                         "Failed in getting an instance of OperationalDeviceProxy for nodeId: 0x" ChipLogFormatX64
+                         ", fabricIndex: %d",
+                         ChipLogValueX64(targetVideoPlayerInfo.GetNodeId()), targetVideoPlayerInfo.GetFabricIndex());
             return CHIP_ERROR_PEER_NODE_NOT_FOUND;
         }
         mTargetVideoPlayerInfo = &targetVideoPlayerInfo;
