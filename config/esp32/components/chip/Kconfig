@@ -716,13 +716,6 @@ menu "CHIP Device Layer"
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
                 optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
-        config LOG_PROVISIONING_HASH
-            bool "Enable Provisioning Hash Logging"
-            default n
-            help
-                Compute and log a hash of the device's provisioning data on boot.  The generated hash value confirms
-                to the form described in the CHIP: Factory Provisioning Specification.
-
     endmenu
 
     menu "Network Telemetry Options"

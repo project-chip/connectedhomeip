@@ -92,18 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
- *
- * Compute and log a hash of the device's provisioning data on boot.
- *
- * The generated hash value confirms to the form described in the CHIP: Factory
- * Provisioning Specification.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 1
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_SED
  *
  * Enable support for sleepy end device behavior.

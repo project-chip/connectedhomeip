@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
 
 CHIPBooleanAttributeCallback::CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -665,9 +666,10 @@ void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::By
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
-    jbyteArray valueArr = env->NewByteArray(value.size());
+    VerifyOrReturn(chip::CanCastTo<uint32_t>(value.size()), ChipLogError(Zcl, "Value too long"));
+    jbyteArray valueArr = env->NewByteArray(static_cast<uint32_t>(value.size()));
     env->ExceptionClear();
-    env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
+    env->SetByteArrayRegion(valueArr, 0, static_cast<uint32_t>(value.size()), reinterpret_cast<const jbyte *>(value.data()));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
 }
