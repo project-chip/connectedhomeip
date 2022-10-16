@@ -58,6 +58,7 @@ class GeneratorTestCase:
 
 class TestCaseStorage(GeneratorStorage):
     def __init__(self, test_case: GeneratorTestCase, checker: unittest.TestCase):
+        super().__init__()
         self.test_case = test_case
         self.checker = checker
         self.checked_files = set()

@@ -92,18 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
- *
- * Compute and log a hash of the device's provisioning data on boot.
- *
- * The generated hash value confirms to the form described in the CHIP: Factory
- * Provisioning Specification.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 1
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_SED
  *
  * Enable support for sleepy end device behavior.
@@ -789,19 +777,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
-#endif
-
-// -------------------- Trait Manager Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
- *
- * Enable or disable the chip Trait Manager.
- *
- * NOTE: The Trait Manager is an experimental feature of the chip Device Layer.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
-#define CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

@@ -78,7 +78,7 @@ private:
     void PairWithCode(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void Unpair();
-    void SetUpDeviceControllerDelegate();
+    void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;

@@ -20,6 +20,9 @@
 #include <platform/PlatformManager.h>
 #include <vector>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
@@ -75,3 +78,5 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}
+
+#pragma clang diagnostic pop

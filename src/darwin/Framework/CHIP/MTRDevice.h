@@ -44,13 +44,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
 
 /**
  * The current state of the device.
  *
  * The three states:
- *   MTRDeviceStateUnknkown
+ *   MTRDeviceStateUnknown
  *      Unable to determine the state of the device at the moment.
  *
  *   MTRDeviceStateReachable
@@ -134,13 +134,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
+                        clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion;
 
 /**
  * Open a commissioning window on the device.
  *
- * On success, completion will be called with the MTRSetupPayload that
+ * On success, completion will be called on queue with the MTRSetupPayload that
  * can be used to commission the device.
  *
  * @param setupPasscode The setup passcode to use for the commissioning window.

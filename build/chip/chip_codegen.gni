@@ -1,0 +1,95 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/python.gni")
+
+# Defines a target that runs code generation based on
+# scripts/codegen.py
+#
+# Arguments:
+#   input
+#     The ".matter" file to use to start the code generation
+#
+#   generator
+#     Name of the generator to use (e.g. java, cpp-app)
+#
+#   outputs
+#     Explicit names of the expected outputs. Enforced to validate that
+#     expected outputs are generated when processing input files.
+#
+# NOTE: content of "outputs" is verified to match the output of codegen.py
+#       exactly. It is not inferred on purpose, to make build-rules explicit
+#       and verifiable (even though codege.py can at runtime report its outputs)
+#
+#       To find the list of generated files, you can run codegen.py with the
+#       "--name-only" argument
+#
+# Example usage:
+#
+#  chip_codegen("java-jni-generate") {
+#    input = "controller-clusters.matter"
+#    generator = "java"
+#
+#    outputs = [
+#       "jni/IdentifyClient-ReadImpl.cpp",
+#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
+#       # ... more to follow
+#    ]
+#  }
+#
+template("chip_codegen") {
+  _name = target_name
+  _generator = invoker.generator
+
+  config("${_name}_config") {
+    include_dirs = [ target_gen_dir ]
+  }
+
+  pw_python_action(_name) {
+    script = "${chip_root}/scripts/codegen.py"
+
+    _idl_file = invoker.input
+    _expected_outputs = "${target_gen_dir}/${_name}.expected.outputs"
+
+    write_file(_expected_outputs, invoker.outputs, "list lines")
+
+    args = [
+      "--generator",
+      _generator,
+      "--output-dir",
+      rebase_path(target_gen_dir, root_build_dir),
+      "--expected-outputs",
+      rebase_path(_expected_outputs, root_build_dir),
+      rebase_path(_idl_file, root_build_dir),
+    ]
+
+    deps = [ "${chip_root}/scripts/idl" ]
+    public_configs = [ ":${_name}_config" ]
+
+    inputs = [
+      _idl_file,
+      _expected_outputs,
+    ]
+    sources = [ _idl_file ]
+
+    outputs = []
+    foreach(name, invoker.outputs) {
+      outputs += [ "${target_gen_dir}/${name}" ]
+    }
+  }
+}

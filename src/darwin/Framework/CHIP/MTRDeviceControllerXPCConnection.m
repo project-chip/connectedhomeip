@@ -83,7 +83,8 @@
     return [[MTRDeviceControllerXPCConnection alloc] initWithWorkQueue:workQueue connectBlock:connectBlock];
 }
 
-- (void)getProxyHandleWithCompletion:(MTRGetProxyHandleHandler)completion
+- (void)getProxyHandleWithCompletion:(void (^)(
+                                         dispatch_queue_t queue, MTRDeviceControllerXPCProxyHandle * _Nullable container))completion
 {
     dispatch_async(_workQueue, ^{
         MTRDeviceControllerXPCProxyHandle * container = self.proxyHandle;
@@ -118,7 +119,9 @@
     });
 }
 
-- (void)registerReportHandlerWithController:(id<NSCopying>)controller nodeID:(NSNumber *)nodeID handler:(MTRXPCReportHandler)handler
+- (void)registerReportHandlerWithController:(id<NSCopying>)controller
+                                     nodeId:(NSUInteger)nodeId
+                                    handler:(void (^)(id _Nullable values, NSError * _Nullable error))handler
 {
     dispatch_async(_workQueue, ^{
         BOOL shouldRetainProxyForReport = ([self.reportRegistry count] == 0);
@@ -127,10 +130,11 @@
             controllerDictionary = [[NSMutableDictionary alloc] init];
             [self.reportRegistry setObject:controllerDictionary forKey:controller];
         }
-        NSMutableArray * nodeArray = controllerDictionary[nodeID];
+        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
         if (!nodeArray) {
             nodeArray = [[NSMutableArray alloc] init];
-            [controllerDictionary setObject:nodeArray forKey:nodeID];
+            [controllerDictionary setObject:nodeArray forKey:nodeIdKey];
         }
         [nodeArray addObject:handler];
         if (shouldRetainProxyForReport) {
@@ -140,8 +144,8 @@
 }
 
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
-                                        nodeID:(NSNumber *)nodeID
-                                    completion:(dispatch_block_t)completion
+                                        nodeId:(NSUInteger)nodeId
+                                    completion:(void (^)(void))completion
 {
     dispatch_async(_workQueue, ^{
         __auto_type clearRegistry = ^{
@@ -150,12 +154,13 @@
                 completion();
                 return;
             }
-            NSMutableArray * nodeArray = controllerDictionary[nodeID];
+            NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+            NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
             if (!nodeArray) {
                 completion();
                 return;
             }
-            [controllerDictionary removeObjectForKey:nodeID];
+            [controllerDictionary removeObjectForKey:nodeIdKey];
             if ([controllerDictionary count] == 0) {
                 // Dereference proxy retainer for reports so that XPC connection may be invalidated if no longer used.
                 self.proxyRetainerForReports = nil;
@@ -167,7 +172,7 @@
                 if (handle) {
                     MTR_LOG_DEBUG("CHIP XPC connection requests to stop reports");
                     [handle.proxy stopReportsWithController:controller
-                                                     nodeID:nodeID
+                                                     nodeId:nodeId
                                                  completion:^{
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;
@@ -182,7 +187,7 @@
 }
 
 - (void)handleReportWithController:(id)controller
-                            nodeID:(NSNumber *)nodeID
+                            nodeId:(NSUInteger)nodeId
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
@@ -191,7 +196,8 @@
         if (!controllerDictionary) {
             return;
         }
-        NSMutableArray * nodeArray = controllerDictionary[nodeID];
+        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
         if (!nodeArray) {
             return;
         }

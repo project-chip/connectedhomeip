@@ -61,6 +61,6 @@ matrix:
       # converts markdown to HTML
       - pyspelling.filters.markdown:
     sources:
-      - '**/*.md|!third_party/**|!examples/common/**/repo/**'
+      - '**/*.md|!third_party/**|!examples/common/**/repo/**|!docs/ERROR_CODES.md'
     aspell:
       ignore-case: true

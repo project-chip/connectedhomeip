@@ -51,8 +51,6 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
-
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 8192
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE

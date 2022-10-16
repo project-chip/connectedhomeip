@@ -8675,7 +8675,6 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "device-type-list", Attributes::DeviceTypeList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "device-list", Attributes::DeviceTypeList::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),                             //
@@ -8687,7 +8686,6 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "device-type-list", Attributes::DeviceTypeList::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "device-list", Attributes::DeviceTypeList::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),                        //
@@ -11423,7 +11421,6 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "drift-compensation", Attributes::DriftCompensation::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "color-temperature-mireds", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "color-temperature", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),           //
@@ -11516,7 +11513,6 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "compensation-text", Attributes::CompensationText::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "color-temperature-mireds", Attributes::ColorTemperatureMireds::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "color-temperature", Attributes::ColorTemperatureMireds::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "color-mode", Attributes::ColorMode::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "number-of-primaries", Attributes::NumberOfPrimaries::Id, credsIssuerConfig),       //

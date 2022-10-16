@@ -16,7 +16,7 @@
 
 /**
  * Parts of MTRDeviceController that are not part of the framework API.  Mostly
- * for use from MTRDeviceControllerFactory.
+ * for use from MTRControllerFactory.
  */
 
 #import <Foundation/Foundation.h>
@@ -31,7 +31,7 @@
 #import "MTRDeviceController.h"
 
 @class MTRDeviceControllerStartupParamsInternal;
-@class MTRDeviceControllerFactory;
+@class MTRControllerFactory;
 @class MTRDevice;
 
 namespace chip {
@@ -46,17 +46,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController (InternalMethods)
 
-#pragma mark - MTRDeviceControllerFactory methods
+#pragma mark - MTRControllerFactory methods
 
 /**
  * Start a new controller.  Returns whether startup succeeded.  If this fails,
  * it guarantees that it has called controllerShuttingDown on the
- * MTRDeviceControllerFactory.
+ * MTRControllerFactory.
  *
  * The return value will always match [controller isRunning] for this
  * controller.
  *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Only MTRControllerFactory should be calling this.
  */
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams;
 
@@ -69,9 +69,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Init a newly created controller.
  *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Only MTRControllerFactory should be calling this.
  */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MTRControllerFactory *)factory queue:(dispatch_queue_t)queue;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Might return failure, in which case we don't know whether it's running on the
  * given fabric.  Otherwise it will set *isRunning to the right boolean value.
  *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Only MTRControllerFactory should be calling this.
  */
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
                     fabricIndex:(chip::FabricIndex)fabricIndex
@@ -92,16 +92,16 @@ NS_ASSUME_NONNULL_BEGIN
  * Shut down the underlying C++ controller.  Must be called on the Matter work
  * queue or after the Matter work queue has been shut down.
  *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Only MTRControllerFactory should be calling this.
  */
 - (void)shutDownCppController;
 
 /**
- * Notification that the MTRDeviceControllerFactory has finished shutting down
+ * Notification that the MTRControllerFactory has finished shutting down
  * this controller and will not be touching it anymore.  This is guaranteed to
  * be called after initWithFactory succeeds.
  *
- * Only MTRDeviceControllerFactory should be calling this.
+ * Only MTRControllerFactory should be calling this.
  */
 - (void)deinitFromFactory;
 
@@ -114,11 +114,11 @@ NS_ASSUME_NONNULL_BEGIN
  * dispatch to the Matter queue).
  *
  * If the controller is not running when this function is called, will return NO
- * and never invoke the completion.  If the controller is not running when the
- * async dispatch on the Matter queue would happen, an error will be dispatched
- * to the completion handler.
+ * and never invoke the completionHandler.  If the controller is not running
+ * when the async dispatch on the Matter queue would happen, an error will be
+ * dispatched to the completion handler.
  */
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may
@@ -152,18 +152,11 @@ NS_ASSUME_NONNULL_BEGIN
  * synchronously during the callback invocation.
  */
 - (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                      errorHandler:(void (^)(NSError *))erroHandler;
-
-/**
- * Get an MTRBaseDevice for the given node id.  This exists to allow subclasses
- * of MTRDeviceController (e.g. MTRDeviceControllerOverXPC) to override what
- * sort of MTRBaseDevice they return.
- */
-- (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
+                      errorHandler:(void (^)(NSError *))errorHandler;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+- (MTRDevice *)deviceForNodeID:(uint64_t)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
 
 @end

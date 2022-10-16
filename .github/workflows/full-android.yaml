@@ -111,4 +111,4 @@ jobs:
             # - name: Build Android Studio build (arm64 only)
             #   run: |
             #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-androidstudio-arm64-chip-tool' build"
+            #       "./scripts/build/build_examples.py --no-log-timestamps --target android-androidstudio-arm64-chip-tool  build"

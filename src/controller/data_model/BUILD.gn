@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("data_model") {
@@ -29,40 +30,142 @@ chip_data_model("data_model") {
 }
 
 if (current_os == "android") {
-  pw_python_action("java-jni-generate") {
-    script = "${chip_root}/scripts/codegen.py"
+  chip_codegen("java-jni-generate") {
+    input = "controller-clusters.matter"
+    generator = "java"
 
-    _idl_file = "controller-clusters.matter"
-    _output_files =
-        exec_script("${chip_root}/scripts/codegen.py",
-                    [
-                      "--generator",
-                      "java",
-                      "--log-level",
-                      "fatal",
-                      "--name-only",
-                      rebase_path("controller-clusters.matter", root_build_dir),
-                    ],
-                    "list lines",
-                    [ "controller-clusters.matter" ])
-
-    args = [
-      "--generator",
-      "java",
-      "--output-dir",
-      rebase_path(target_gen_dir, root_build_dir),
-      rebase_path(_idl_file, root_build_dir),
+    outputs = [
+      "jni/IdentifyClient-ReadImpl.cpp",
+      "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
+      "jni/GroupsClient-ReadImpl.cpp",
+      "jni/GroupsClient-InvokeSubscribeImpl.cpp",
+      "jni/ScenesClient-ReadImpl.cpp",
+      "jni/ScenesClient-InvokeSubscribeImpl.cpp",
+      "jni/OnOffClient-ReadImpl.cpp",
+      "jni/OnOffClient-InvokeSubscribeImpl.cpp",
+      "jni/OnOffSwitchConfigurationClient-ReadImpl.cpp",
+      "jni/OnOffSwitchConfigurationClient-InvokeSubscribeImpl.cpp",
+      "jni/LevelControlClient-ReadImpl.cpp",
+      "jni/LevelControlClient-InvokeSubscribeImpl.cpp",
+      "jni/BinaryInputBasicClient-ReadImpl.cpp",
+      "jni/BinaryInputBasicClient-InvokeSubscribeImpl.cpp",
+      "jni/DescriptorClient-ReadImpl.cpp",
+      "jni/DescriptorClient-InvokeSubscribeImpl.cpp",
+      "jni/BindingClient-ReadImpl.cpp",
+      "jni/BindingClient-InvokeSubscribeImpl.cpp",
+      "jni/AccessControlClient-ReadImpl.cpp",
+      "jni/AccessControlClient-InvokeSubscribeImpl.cpp",
+      "jni/ActionsClient-ReadImpl.cpp",
+      "jni/ActionsClient-InvokeSubscribeImpl.cpp",
+      "jni/BasicClient-ReadImpl.cpp",
+      "jni/BasicClient-InvokeSubscribeImpl.cpp",
+      "jni/OtaSoftwareUpdateProviderClient-ReadImpl.cpp",
+      "jni/OtaSoftwareUpdateProviderClient-InvokeSubscribeImpl.cpp",
+      "jni/OtaSoftwareUpdateRequestorClient-ReadImpl.cpp",
+      "jni/OtaSoftwareUpdateRequestorClient-InvokeSubscribeImpl.cpp",
+      "jni/LocalizationConfigurationClient-ReadImpl.cpp",
+      "jni/LocalizationConfigurationClient-InvokeSubscribeImpl.cpp",
+      "jni/TimeFormatLocalizationClient-ReadImpl.cpp",
+      "jni/TimeFormatLocalizationClient-InvokeSubscribeImpl.cpp",
+      "jni/UnitLocalizationClient-ReadImpl.cpp",
+      "jni/UnitLocalizationClient-InvokeSubscribeImpl.cpp",
+      "jni/PowerSourceConfigurationClient-ReadImpl.cpp",
+      "jni/PowerSourceConfigurationClient-InvokeSubscribeImpl.cpp",
+      "jni/PowerSourceClient-ReadImpl.cpp",
+      "jni/PowerSourceClient-InvokeSubscribeImpl.cpp",
+      "jni/GeneralCommissioningClient-ReadImpl.cpp",
+      "jni/GeneralCommissioningClient-InvokeSubscribeImpl.cpp",
+      "jni/NetworkCommissioningClient-ReadImpl.cpp",
+      "jni/NetworkCommissioningClient-InvokeSubscribeImpl.cpp",
+      "jni/DiagnosticLogsClient-ReadImpl.cpp",
+      "jni/DiagnosticLogsClient-InvokeSubscribeImpl.cpp",
+      "jni/GeneralDiagnosticsClient-ReadImpl.cpp",
+      "jni/GeneralDiagnosticsClient-InvokeSubscribeImpl.cpp",
+      "jni/SoftwareDiagnosticsClient-ReadImpl.cpp",
+      "jni/SoftwareDiagnosticsClient-InvokeSubscribeImpl.cpp",
+      "jni/ThreadNetworkDiagnosticsClient-ReadImpl.cpp",
+      "jni/ThreadNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
+      "jni/WiFiNetworkDiagnosticsClient-ReadImpl.cpp",
+      "jni/WiFiNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
+      "jni/EthernetNetworkDiagnosticsClient-ReadImpl.cpp",
+      "jni/EthernetNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
+      "jni/BridgedDeviceBasicClient-ReadImpl.cpp",
+      "jni/BridgedDeviceBasicClient-InvokeSubscribeImpl.cpp",
+      "jni/SwitchClient-ReadImpl.cpp",
+      "jni/SwitchClient-InvokeSubscribeImpl.cpp",
+      "jni/AdministratorCommissioningClient-ReadImpl.cpp",
+      "jni/AdministratorCommissioningClient-InvokeSubscribeImpl.cpp",
+      "jni/OperationalCredentialsClient-ReadImpl.cpp",
+      "jni/OperationalCredentialsClient-InvokeSubscribeImpl.cpp",
+      "jni/GroupKeyManagementClient-ReadImpl.cpp",
+      "jni/GroupKeyManagementClient-InvokeSubscribeImpl.cpp",
+      "jni/FixedLabelClient-ReadImpl.cpp",
+      "jni/FixedLabelClient-InvokeSubscribeImpl.cpp",
+      "jni/UserLabelClient-ReadImpl.cpp",
+      "jni/UserLabelClient-InvokeSubscribeImpl.cpp",
+      "jni/BooleanStateClient-ReadImpl.cpp",
+      "jni/BooleanStateClient-InvokeSubscribeImpl.cpp",
+      "jni/ModeSelectClient-ReadImpl.cpp",
+      "jni/ModeSelectClient-InvokeSubscribeImpl.cpp",
+      "jni/DoorLockClient-ReadImpl.cpp",
+      "jni/DoorLockClient-InvokeSubscribeImpl.cpp",
+      "jni/WindowCoveringClient-ReadImpl.cpp",
+      "jni/WindowCoveringClient-InvokeSubscribeImpl.cpp",
+      "jni/BarrierControlClient-ReadImpl.cpp",
+      "jni/BarrierControlClient-InvokeSubscribeImpl.cpp",
+      "jni/PumpConfigurationAndControlClient-ReadImpl.cpp",
+      "jni/PumpConfigurationAndControlClient-InvokeSubscribeImpl.cpp",
+      "jni/ThermostatClient-ReadImpl.cpp",
+      "jni/ThermostatClient-InvokeSubscribeImpl.cpp",
+      "jni/FanControlClient-ReadImpl.cpp",
+      "jni/FanControlClient-InvokeSubscribeImpl.cpp",
+      "jni/ThermostatUserInterfaceConfigurationClient-ReadImpl.cpp",
+      "jni/ThermostatUserInterfaceConfigurationClient-InvokeSubscribeImpl.cpp",
+      "jni/ColorControlClient-ReadImpl.cpp",
+      "jni/ColorControlClient-InvokeSubscribeImpl.cpp",
+      "jni/BallastConfigurationClient-ReadImpl.cpp",
+      "jni/BallastConfigurationClient-InvokeSubscribeImpl.cpp",
+      "jni/IlluminanceMeasurementClient-ReadImpl.cpp",
+      "jni/IlluminanceMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/TemperatureMeasurementClient-ReadImpl.cpp",
+      "jni/TemperatureMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/PressureMeasurementClient-ReadImpl.cpp",
+      "jni/PressureMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/FlowMeasurementClient-ReadImpl.cpp",
+      "jni/FlowMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/RelativeHumidityMeasurementClient-ReadImpl.cpp",
+      "jni/RelativeHumidityMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/OccupancySensingClient-ReadImpl.cpp",
+      "jni/OccupancySensingClient-InvokeSubscribeImpl.cpp",
+      "jni/WakeOnLanClient-ReadImpl.cpp",
+      "jni/WakeOnLanClient-InvokeSubscribeImpl.cpp",
+      "jni/ChannelClient-ReadImpl.cpp",
+      "jni/ChannelClient-InvokeSubscribeImpl.cpp",
+      "jni/TargetNavigatorClient-ReadImpl.cpp",
+      "jni/TargetNavigatorClient-InvokeSubscribeImpl.cpp",
+      "jni/MediaPlaybackClient-ReadImpl.cpp",
+      "jni/MediaPlaybackClient-InvokeSubscribeImpl.cpp",
+      "jni/MediaInputClient-ReadImpl.cpp",
+      "jni/MediaInputClient-InvokeSubscribeImpl.cpp",
+      "jni/LowPowerClient-ReadImpl.cpp",
+      "jni/LowPowerClient-InvokeSubscribeImpl.cpp",
+      "jni/KeypadInputClient-ReadImpl.cpp",
+      "jni/KeypadInputClient-InvokeSubscribeImpl.cpp",
+      "jni/ContentLauncherClient-ReadImpl.cpp",
+      "jni/ContentLauncherClient-InvokeSubscribeImpl.cpp",
+      "jni/AudioOutputClient-ReadImpl.cpp",
+      "jni/AudioOutputClient-InvokeSubscribeImpl.cpp",
+      "jni/ApplicationLauncherClient-ReadImpl.cpp",
+      "jni/ApplicationLauncherClient-InvokeSubscribeImpl.cpp",
+      "jni/ApplicationBasicClient-ReadImpl.cpp",
+      "jni/ApplicationBasicClient-InvokeSubscribeImpl.cpp",
+      "jni/AccountLoginClient-ReadImpl.cpp",
+      "jni/AccountLoginClient-InvokeSubscribeImpl.cpp",
+      "jni/ElectricalMeasurementClient-ReadImpl.cpp",
+      "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/TestClusterClient-ReadImpl.cpp",
+      "jni/TestClusterClient-InvokeSubscribeImpl.cpp",
     ]
-
-    deps = [ "${chip_root}/scripts/idl" ]
-
-    inputs = [ _idl_file ]
-    sources = [ _idl_file ]
-    outputs = []
-
-    foreach(name, _output_files) {
-      outputs += [ "$target_gen_dir/${name}" ]
-    }
   }
 
   source_set("java-jni-sources") {
