@@ -275,6 +275,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
                                                         &getFailsafeTimerSeconds);
     SuccessOrExit(err);
 
+    jmethodID getCASEFailsafeTimerSeconds;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCASEFailsafeTimerSeconds", "()I",
+                                                        &getCASEFailsafeTimerSeconds);
+    SuccessOrExit(err);
+
     jmethodID getAttemptNetworkScanWiFi;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanWiFi", "()Z",
                                                         &getAttemptNetworkScanWiFi);
@@ -327,6 +332,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
+        uint16_t caseFailsafeTimerSeconds  = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
@@ -340,6 +346,18 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
             failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
         SuccessOrExit(err);
+
+        if (caseFailsafeTimerSeconds > 0)
+        {
+            CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetCASEFailsafeTimerSeconds(caseFailsafeTimerSeconds);
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
 
         if (adminSubject != kUndefinedNodeId)
         {

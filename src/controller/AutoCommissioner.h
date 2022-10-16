@@ -51,6 +51,7 @@ protected:
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
+    void finalizePASESession();
     void ReleaseDAC();
     void ReleasePAI();
 

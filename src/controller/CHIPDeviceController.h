@@ -670,6 +670,10 @@ public:
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
+    // Reset the arm failsafe timer during commissioning.
+    void ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                           Optional<System::Clock::Timeout> timeout);
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 
