@@ -77,12 +77,11 @@
 #include "CommissionableInit.h"
 
 #if CHIP_CRYPTO_HSM
-#include "se05x_t4t_utils.h"
 #include "DeviceAttestationSe05xCredsExample.h"
+#include "se05x_t4t_utils.h"
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
 #endif
-
 
 using namespace chip;
 using namespace chip::ArgParser;
