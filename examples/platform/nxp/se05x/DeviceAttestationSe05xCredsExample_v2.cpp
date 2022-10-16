@@ -185,7 +185,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     ByteSpan tagvalue;
     uint8_t tempBuf[2] = {0,};
 
-    tempBuf[0] = 0x15;
+    tempBuf[0] = (uint8_t)TLV::TLVElementType::Structure;
     VerifyOrReturnError(CHIP_NO_ERROR ==
                             se05xSetCertificate(START_CONTAINER_SE05X_ID, tempBuf, 1),
                         CHIP_ERROR_INTERNAL);
@@ -221,7 +221,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         }
     }
 
-    tempBuf[0] = 0x18;
+    tempBuf[0] = (uint8_t)TLV::TLVElementType::EndOfContainer;
     VerifyOrReturnError(CHIP_NO_ERROR ==
                             se05xSetCertificate(END_CONTAINER_SE05X_ID, tempBuf, 1),
                         CHIP_ERROR_INTERNAL);
