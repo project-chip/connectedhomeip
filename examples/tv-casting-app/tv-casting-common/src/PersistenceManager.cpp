@@ -35,7 +35,7 @@ CHIP_ERROR PersistenceManager::AddVideoPlayer(TargetVideoPlayerInfo * targetVide
     {
         ChipLogError(AppServer,
                      "PersistenceManager::AddVideoPlayer status of reading previously cached video players %" CHIP_ERROR_FORMAT,
-                     err.AsString());
+                     err.Format());
     }
 
     // Add active video player to the list of video players from cache
@@ -104,7 +104,7 @@ CHIP_ERROR PersistenceManager::WriteAllVideoPlayers(TargetVideoPlayerInfo videoP
                 {
                     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kEndpointIdTag), endpoints[endpointIndex].GetEndpointId()));
 
-                    chip::ClusterId * clusterIds = endpoints[endpointIndex].getClusters();
+                    chip::ClusterId * clusterIds = endpoints[endpointIndex].GetClusters();
                     if (clusterIds != nullptr)
                     {
                         TLV::TLVType clusterIdsContainerType = TLV::kTLVType_Array;

@@ -80,7 +80,7 @@
     if (cppTargetEndpointInfo->IsInitialized()) {
         objCContentApp.endpointId = cppTargetEndpointInfo->GetEndpointId();
         objCContentApp.clusterIds = [NSMutableArray new];
-        chip::ClusterId * clusterIds = cppTargetEndpointInfo->getClusters();
+        chip::ClusterId * clusterIds = cppTargetEndpointInfo->GetClusters();
         for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint && clusterIds[i] != chip::kInvalidClusterId; i++) {
             objCContentApp.clusterIds[i] = @(clusterIds[i]);
         }

@@ -31,7 +31,7 @@ public:
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
     bool HasCluster(chip::ClusterId clusterId);
-    chip::ClusterId * getClusters();
+    chip::ClusterId * GetClusters();
     bool AddCluster(chip::ClusterId clusterId);
     void PrintInfo();
 

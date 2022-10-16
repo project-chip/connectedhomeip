@@ -17,28 +17,47 @@
  */
 package com.chip.casting;
 
-public class ContentApp
-{
-    private short endpointId;
-    private List<Integer> clusterIds;
+import java.util.List;
+import java.util.Objects;
 
-    private boolean isInitialized = false;
+public class ContentApp {
+  private short endpointId;
+  private List<Integer> clusterIds;
 
-    public ContentApp(short endpointId, List<Integer> clusterIds) {
-        this.endpointId = endpointId;
-        this.clusterIds = clusterIds;
-        this.isInitialized = true;
-    }
+  private boolean isInitialized = false;
 
-    public short getEndpointId() {
-        return endpointId;
-    }
+  public ContentApp(short endpointId, List<Integer> clusterIds) {
+    this.endpointId = endpointId;
+    this.clusterIds = clusterIds;
+    this.isInitialized = true;
+  }
 
-    public List<Integer> getClusterIds() {
-        return clusterIds;
-    }
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    if (!super.equals(object)) return false;
+    ContentApp that = (ContentApp) object;
+    return endpointId == that.endpointId;
+  }
 
-    public boolean isInitialized() {
-        return isInitialized;
-    }
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), endpointId);
+  }
+
+  @java.lang.Override
+  public java.lang.String toString() {
+    return "endpointId=" + endpointId;
+  }
+
+  public short getEndpointId() {
+    return endpointId;
+  }
+
+  public List<Integer> getClusterIds() {
+    return clusterIds;
+  }
+
+  public boolean isInitialized() {
+    return isInitialized;
+  }
 }

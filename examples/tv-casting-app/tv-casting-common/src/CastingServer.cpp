@@ -203,7 +203,7 @@ void CastingServer::OnDescriptorReadSuccessResponse(void * context, const app::D
         &CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.AsString());
+        ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     if (CastingServer::GetInstance()->mOnNewOrUpdatedEndpoint)
@@ -221,7 +221,7 @@ void CastingServer::OnDescriptorReadFailureResponse(void * context, CHIP_ERROR e
         &CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.AsString());
+        ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     if (CastingServer::GetInstance()->mOnNewOrUpdatedEndpoint)
@@ -235,7 +235,7 @@ TargetVideoPlayerInfo * CastingServer::ReadCachedTargetVideoPlayerInfos()
     CHIP_ERROR err = mPersistenceManager.ReadAllVideoPlayers(mCachedTargetVideoPlayerInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ReadAllVideoPlayers error: %" CHIP_ERROR_FORMAT, err.AsString());
+        ChipLogError(AppServer, "ReadAllVideoPlayers error: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
     }
     return mCachedTargetVideoPlayerInfo;

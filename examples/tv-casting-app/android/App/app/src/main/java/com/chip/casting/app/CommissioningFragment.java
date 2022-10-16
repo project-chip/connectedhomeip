@@ -8,10 +8,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.chip.casting.ContentApp;
+import com.chip.casting.DiscoveredNodeData;
+import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterCallbackHandler;
 import com.chip.casting.MatterError;
+import com.chip.casting.SuccessCallback;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.dnssd.DiscoveredNodeData;
+import com.chip.casting.VideoPlayer;
 import com.chip.casting.util.GlobalCastingConstants;
 
 /** A {@link Fragment} to get the TV Casting App commissioned. */
@@ -56,9 +60,25 @@ public class CommissioningFragment extends Fragment {
               @Override
               public void handle(MatterError error) {
                 Log.d(TAG, "handle() called on CommissioningComplete event with " + error);
-                if (error.isNoError()) {
-                  callback.handleCommissioningComplete();
-                }
+              }
+            },
+            new SuccessCallback<VideoPlayer>() {
+              @Override
+              public void handle(VideoPlayer videoPlayer) {
+                Log.d(TAG, "handle() called on OnConnectionSuccess with " + videoPlayer);
+                callback.handleCommissioningComplete();
+              }
+            },
+            new FailureCallback() {
+              @Override
+              public void handle(MatterError matterError) {
+                Log.d(TAG, "handle() called on OnConnectionFailure with " + matterError);
+              }
+            },
+            new SuccessCallback<ContentApp>() {
+              @Override
+              public void handle(ContentApp contentApp) {
+                Log.d(TAG, "handle() called on OnNewOrUpdatedEndpoint with " + contentApp);
               }
             });
     if (this.openCommissioningWindowSuccess) {
@@ -71,9 +91,7 @@ public class CommissioningFragment extends Fragment {
                 + " port: "
                 + selectedCommissioner.getPort());
 
-        this.sendUdcSuccess =
-            tvCastingApp.sendUserDirectedCommissioningRequest(
-                ipAddress, selectedCommissioner.getPort());
+        this.sendUdcSuccess = tvCastingApp.sendCommissioningRequest(selectedCommissioner);
       }
     }
 

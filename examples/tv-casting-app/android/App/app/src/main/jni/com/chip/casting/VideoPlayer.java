@@ -17,76 +17,105 @@
  */
 package com.chip.casting;
 
-public class VideoPlayer
-{
-    private long nodeId;
-    private byte fabricIndex;
-    private String deviceName;
-    private short vendorId;
-    private short productId;
-    private short deviceType;
-    private List<ContentApp> contentApps;
-    private boolean isConnected = false;
+import java.util.List;
+import java.util.Objects;
 
-    private boolean isInitialized = false;
+public class VideoPlayer {
+  private long nodeId;
+  private byte fabricIndex;
+  private String deviceName;
+  private int vendorId;
+  private int productId;
+  private int deviceType;
+  private List<ContentApp> contentApps;
+  private boolean isConnected = false;
 
-    public VideoPlayer(long nodeId, byte fabricIndex, String deviceName, short vendorId, short productId, short deviceType, List<ContentApp> contentApps, boolean isConnected) {
-        this.nodeId = nodeId;
-        this.fabricIndex = fabricIndex;
-        this.deviceName = deviceName;
-        this.vendorId = vendorId;
-        this.productId = productId;
-        this.deviceType = deviceType;
-        this.contentApps = contentApps;
-        this.isConnected = isConnected;
-        this.isInitialized = true;
-    }
+  private boolean isInitialized = false;
 
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        VideoPlayer that = (VideoPlayer) object;
-        return nodeId == that.nodeId && fabricIndex == that.fabricIndex;
-    }
+  public VideoPlayer(
+      long nodeId,
+      byte fabricIndex,
+      String deviceName,
+      int vendorId,
+      int productId,
+      int deviceType,
+      List<ContentApp> contentApps,
+      boolean isConnected) {
+    this.nodeId = nodeId;
+    this.fabricIndex = fabricIndex;
+    this.deviceName = deviceName;
+    this.vendorId = vendorId;
+    this.productId = productId;
+    this.deviceType = deviceType;
+    this.contentApps = contentApps;
+    this.isConnected = isConnected;
+    this.isInitialized = true;
+  }
 
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), nodeId, fabricIndex);
-    }
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    if (!super.equals(object)) return false;
+    VideoPlayer that = (VideoPlayer) object;
+    return nodeId == that.nodeId && fabricIndex == that.fabricIndex;
+  }
 
-    public long getNodeId() {
-        return nodeId;
-    }
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), nodeId, fabricIndex);
+  }
 
-    public byte getFabricIndex() {
-        return fabricIndex;
-    }
+  @java.lang.Override
+  public java.lang.String toString() {
+    return "VideoPlayer{"
+        + "nodeId="
+        + nodeId
+        + ", fabricIndex="
+        + fabricIndex
+        + ", deviceName='"
+        + deviceName
+        + '\''
+        + ", vendorId="
+        + vendorId
+        + ", productId="
+        + productId
+        + ", isConnected="
+        + isConnected
+        + '}';
+  }
 
-    public boolean isConnected() {
-        return isConnected;
-    }
+  public long getNodeId() {
+    return nodeId;
+  }
 
-    public List<ContentApp> getContentApps() {
-        return contentApps;
-    }
+  public byte getFabricIndex() {
+    return fabricIndex;
+  }
 
-    public String getDeviceName() {
-        return deviceName;
-    }
+  public boolean isConnected() {
+    return isConnected;
+  }
 
-    public short getVendorId() {
-        return vendorId;
-    }
+  public List<ContentApp> getContentApps() {
+    return contentApps;
+  }
 
-    public short getProductId() {
-        return productId;
-    }
+  public String getDeviceName() {
+    return deviceName;
+  }
 
-    public short getDeviceType() {
-        return deviceType;
-    }
+  public int getVendorId() {
+    return vendorId;
+  }
 
-    public boolean isInitialized() {
-        return isInitialized;
-    }
+  public int getProductId() {
+    return productId;
+  }
+
+  public int getDeviceType() {
+    return deviceType;
+  }
+
+  public boolean isInitialized() {
+    return isInitialized;
+  }
 }

@@ -41,7 +41,7 @@ bool TargetEndpointInfo::HasCluster(ClusterId clusterId)
     return false;
 }
 
-chip::ClusterId * TargetEndpointInfo::getClusters()
+chip::ClusterId * TargetEndpointInfo::GetClusters()
 {
     return mClusters;
 }

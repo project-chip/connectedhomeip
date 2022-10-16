@@ -89,7 +89,7 @@ private:
         ChipLogError(AppServer,
                      "HandleDeviceConnectionFailure called for peerId.nodeId: 0x" ChipLogFormatX64
                      ", peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex(), error.AsString());
+                     ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex(), error.Format());
         TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mDeviceProxy           = chip::OperationalDeviceProxy();
         if (_this->mOnConnectionFailureClientCallback)
