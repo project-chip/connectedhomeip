@@ -164,7 +164,7 @@ class TestGenerators(unittest.TestCase):
 
 if __name__ == '__main__':
     if 'IDL_GOLDEN_REGENERATE' in os.environ:
-        # run with `IDL_GOLDEN_REGENERATE=1` to cause a regeneration of test 
+        # run with `IDL_GOLDEN_REGENERATE=1` to cause a regeneration of test
         # data. Then one can use `git diff` to see if the deltas make sense
         REGENERATE_GOLDEN_IMAGES = True
     unittest.main()
