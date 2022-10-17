@@ -89,7 +89,7 @@ public:
     // All options must start false
     enum CredentialIssuerOptions : uint8_t
     {
-        kAllowTestCdSigningKey    = 1, // If set, allow development/test SDK CD verifying key to be used
+        kAllowTestCdSigningKey = 1, // If set, allow development/test SDK CD verifying key to be used
     };
 
     virtual void SetCredentialIssuerOption(CredentialIssuerOptions option, bool isEnabled)
