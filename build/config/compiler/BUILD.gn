@@ -267,6 +267,7 @@ config("strict_warnings") {
       "-Wheader-hygiene",
       "-Wshorten-64-to-32",
       "-Wformat-type-confusion",
+      "-Wthread-safety",
     ]
 
     # TODO: can make this back fatal in once pigweed updates can be taken again.
