@@ -782,8 +782,7 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-    VerifyOrReturnError(out_csr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(csr_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(isBufferNonEmpty(out_csr, csr_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     MutableByteSpan csr(out_csr, csr_length);
