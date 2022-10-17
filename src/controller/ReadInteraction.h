@@ -162,7 +162,8 @@ CHIP_ERROR SubscribeAttribute(
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnResubscriptionAttemptCallbackType onResubscriptionAttemptCb =
         nullptr,
     bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
-    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr, System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
+    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr,
+    System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -205,7 +206,7 @@ CHIP_ERROR SubscribeAttribute(
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
         onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-        fabricFiltered, keepPreviousSubscriptions, aDataVersion, onDoneCb);
+        fabricFiltered, keepPreviousSubscriptions, aDataVersion, onDoneCb, aInteractionTimeout);
 }
 
 namespace detail {
