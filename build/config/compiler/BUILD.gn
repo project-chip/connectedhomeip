@@ -263,8 +263,8 @@ config("strict_warnings") {
     # TODO: can make this back fatal in once pigweed updates can be take again
     #
     # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
-    # fails in third_party/pigweed/repo/pw_protobuf 
-    if ((current_cpu == "arm64") && (current_os == "linux")) {
+    # fails in third_party/pigweed/repo/pw_protobuf
+    if (current_cpu == "arm64" && current_os == "linux") {
       cflags += [ "-Wno-error=shorten-64-to-32" ]
     }
   }
