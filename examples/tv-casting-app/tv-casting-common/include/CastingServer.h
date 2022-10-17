@@ -25,6 +25,7 @@
 #include "KeypadInput.h"
 #include "LevelControl.h"
 #include "MediaPlayback.h"
+#include "PersistenceManager.h"
 #include "TargetEndpointInfo.h"
 #include "TargetNavigator.h"
 #include "TargetVideoPlayerInfo.h"
@@ -37,7 +38,6 @@
 #include <zap-generated/CHIPClusters.h>
 
 constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
-constexpr chip::EndpointId kTvEndpoint                               = 4;
 
 /**
  * @brief Represents a TV Casting server that can get the casting app commissioned
@@ -55,41 +55,59 @@ public:
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
-    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback);
+    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
+                                            std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                                            std::function<void(CHIP_ERROR)> onConnectionFailure,
+                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Dnssd::DiscoveredNodeData * selectedCommissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
-    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
-    void ReadServerClusters(chip::EndpointId endpointId);
+    TargetVideoPlayerInfo * GetActiveTargetVideoPlayer() { return &mActiveTargetVideoPlayerInfo; }
+
+    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
+                                         std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                                         std::function<void(CHIP_ERROR)> onConnectionFailure,
+                                         std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
     void ReadServerClustersForNode(chip::NodeId nodeId);
     static void OnDescriptorReadSuccessResponse(void * context,
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
 
     [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] CHIP_ERROR
-    ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+    ContentLauncherLaunchURL(TargetEndpointInfo * endpoint, const char * contentUrl, const char * contentDisplayStr,
                              std::function<void(CHIP_ERROR)> launchURLResponseCallback);
 
     chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
     chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
-    chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
-    void SetDefaultFabricIndex();
+    chip::FabricIndex CurrentFabricIndex() { return mActiveTargetVideoPlayerInfo.GetFabricIndex(); }
+    void SetDefaultFabricIndex(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                               std::function<void(CHIP_ERROR)> onConnectionFailure,
+                               std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
+    TargetVideoPlayerInfo * ReadCachedTargetVideoPlayerInfos();
+    CHIP_ERROR VerifyOrEstablishConnection(TargetVideoPlayerInfo & targetVideoPlayerInfo,
+                                           std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                                           std::function<void(CHIP_ERROR)> onConnectionFailure,
+                                           std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
+
+    CHIP_ERROR PurgeVideoPlayerCache();
 
     /**
      * @brief Content Launcher cluster
      */
     CHIP_ERROR ContentLauncher_LaunchURL(
-        const char * contentUrl, const char * contentDisplayStr,
+        TargetEndpointInfo * endpoint, const char * contentUrl, const char * contentDisplayStr,
         chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
         std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+    CHIP_ERROR ContentLauncher_LaunchContent(TargetEndpointInfo * endpoint,
+                                             chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
                                              bool autoPlay, chip::Optional<chip::CharSpan> data,
                                              std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR
     ContentLauncher_SubscribeToAcceptHeader(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableArgType>
             successFn,
@@ -97,7 +115,7 @@ public:
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
     ContentLauncher_SubscribeToSupportedStreamingProtocols(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType>
             successFn,
@@ -107,21 +125,22 @@ public:
     /**
      * @brief Level Control cluster
      */
-    CHIP_ERROR LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime,
-                                 uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                                        std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepMode stepMode,
+                                 uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                                 std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR LevelControl_MoveToLevel(TargetEndpointInfo * endpoint, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                        uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR
     LevelControl_SubscribeToCurrentLevel(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
-    LevelControl_SubscribeToMinLevel(void * context,
+    LevelControl_SubscribeToMinLevel(TargetEndpointInfo * endpoint, void * context,
                                      chip::Controller::ReadResponseSuccessCallback<
                                          chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType>
                                          successFn,
@@ -129,7 +148,7 @@ public:
                                      uint16_t maxInterval,
                                      chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
-    LevelControl_SubscribeToMaxLevel(void * context,
+    LevelControl_SubscribeToMaxLevel(TargetEndpointInfo * endpoint, void * context,
                                      chip::Controller::ReadResponseSuccessCallback<
                                          chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType>
                                          successFn,
@@ -140,23 +159,26 @@ public:
     /**
      * @brief Media Playback cluster
      */
-    CHIP_ERROR MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_Pause(std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_StopPlayback(std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_Next(std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_Seek(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_SkipForward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR MediaPlayback_SkipBackward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Play(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Pause(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_StopPlayback(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Next(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Seek(TargetEndpointInfo * endpoint, uint64_t position,
+                                  std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_SkipForward(TargetEndpointInfo * endpoint, uint64_t deltaPositionMilliseconds,
+                                         std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_SkipBackward(TargetEndpointInfo * endpoint, uint64_t deltaPositionMilliseconds,
+                                          std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR MediaPlayback_SubscribeToCurrentState(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
-    MediaPlayback_SubscribeToStartTime(void * context,
+    MediaPlayback_SubscribeToStartTime(TargetEndpointInfo * endpoint, void * context,
                                        chip::Controller::ReadResponseSuccessCallback<
                                            chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType>
                                            successFn,
@@ -164,7 +186,7 @@ public:
                                        uint16_t maxInterval,
                                        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
-    MediaPlayback_SubscribeToDuration(void * context,
+    MediaPlayback_SubscribeToDuration(TargetEndpointInfo * endpoint, void * context,
                                       chip::Controller::ReadResponseSuccessCallback<
                                           chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType>
                                           successFn,
@@ -172,28 +194,28 @@ public:
                                       uint16_t maxInterval,
                                       chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR MediaPlayback_SubscribeToSampledPosition(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR MediaPlayback_SubscribeToPlaybackSpeed(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR MediaPlayback_SubscribeToSeekRangeEnd(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR MediaPlayback_SubscribeToSeekRangeStart(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType>
             successFn,
@@ -203,16 +225,19 @@ public:
     /**
      * @brief Application Launcher cluster
      */
-    CHIP_ERROR ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR ApplicationLauncher_LaunchApp(TargetEndpointInfo * endpoint,
+                                             chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                              chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR ApplicationLauncher_StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR ApplicationLauncher_StopApp(TargetEndpointInfo * endpoint,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR ApplicationLauncher_HideApp(TargetEndpointInfo * endpoint,
+                                           chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                            std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR
     ApplicationLauncher_SubscribeToCurrentApp(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableArgType>
             successFn,
@@ -222,18 +247,19 @@ public:
     /**
      * @brief Target Navigator cluster
      */
-    CHIP_ERROR TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
+    CHIP_ERROR TargetNavigator_NavigateTarget(TargetEndpointInfo * endpoint, const uint8_t target,
+                                              const chip::Optional<chip::CharSpan> data,
                                               std::function<void(CHIP_ERROR)> responseCallback);
 
     CHIP_ERROR TargetNavigator_SubscribeToTargetList(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR TargetNavigator_SubscribeToCurrentTarget(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType>
             successFn,
@@ -243,49 +269,49 @@ public:
     /**
      * @brief Keypad Input cluster
      */
-    CHIP_ERROR KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+    CHIP_ERROR KeypadInput_SendKey(TargetEndpointInfo * endpoint, const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
                                    std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
      * @brief Application Basic cluster
      */
     CHIP_ERROR ApplicationBasic_SubscribeToVendorName(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToVendorID(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToApplicationName(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToProductID(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToApplication(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR
-    ApplicationBasic_SubscribeToStatus(void * context,
+    ApplicationBasic_SubscribeToStatus(TargetEndpointInfo * endpoint, void * context,
                                        chip::Controller::ReadResponseSuccessCallback<
                                            chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
                                            successFn,
@@ -293,14 +319,14 @@ public:
                                        uint16_t maxInterval,
                                        chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToApplicationVersion(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
     CHIP_ERROR ApplicationBasic_SubscribeToAllowedVendorList(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<
             chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
             successFn,
@@ -310,26 +336,38 @@ public:
     /*
      * @brief Channel cluster
      */
-    CHIP_ERROR Channel_ChangeChannelCommand(const chip::CharSpan & match, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Channel_ChangeChannelCommand(TargetEndpointInfo * endpoint, const chip::CharSpan & match,
+                                            std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR Channel_SubscribeToLineup(
-        void * context,
+        TargetEndpointInfo * endpoint, void * context,
         chip::Controller::ReadResponseSuccessCallback<chip::app::Clusters::Channel::Attributes::Lineup::TypeInfo::DecodableArgType>
             successFn,
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
 
 private:
-    CHIP_ERROR InitBindingHandlers();
-    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
     static CastingServer * castingServer_;
     CastingServer();
 
+    CHIP_ERROR InitBindingHandlers();
+    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void ReadServerClusters(chip::EndpointId endpointId);
+
+    PersistenceManager mPersistenceManager;
     bool mInited = false;
-    TargetVideoPlayerInfo mTargetVideoPlayerInfo;
+    TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
+    TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
+    uint16_t mTargetVideoPlayerVendorId                                   = 0;
+    uint16_t mTargetVideoPlayerProductId                                  = 0;
+    uint16_t mTargetVideoPlayerDeviceType                                 = 0;
+    char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
-    std::function<void(CHIP_ERROR)> mLaunchURLResponseCallback;
     std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
+
+    std::function<void(TargetEndpointInfo *)> mOnNewOrUpdatedEndpoint;
+    std::function<void(TargetVideoPlayerInfo *)> mOnConnectionSuccessClientCallback;
+    std::function<void(CHIP_ERROR)> mOnConnectionFailureClientCallback;
 
     /**
      * @brief Content Launcher cluster

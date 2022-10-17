@@ -27,6 +27,19 @@ class TvCastingAppJNI
 {
 public:
     MatterCallbackHandlerJNI & getCommissioningCompleteHandler() { return mCommissioningCompleteHandler; }
+    OnConnectionSuccessHandlerJNI & getOnConnectionSuccessHandler(bool preCommissioned)
+    {
+        return preCommissioned ? mPreCommissionedOnConnectionSuccessHandler : mCommissioningOnConnectionSuccessHandler;
+    }
+    FailureHandlerJNI & getOnConnectionFailureHandler(bool preCommissioned)
+    {
+        return preCommissioned ? mPreCommissionedOnConnectionFailureHandler : mCommissioningOnConnectionFailureHandler;
+    }
+    OnNewOrUpdatedEndpointHandlerJNI & getOnNewOrUpdatedEndpointHandler(bool preCommissioned)
+    {
+        return preCommissioned ? mPreCommissionedOnNewOrUpdatedEndpointHandler : mCommissioningOnNewOrUpdatedEndpointHandler;
+    }
+
     MatterCallbackHandlerJNI & getMediaCommandResponseHandler(enum MediaCommandName name)
     {
         return mMediaCommandResponseHandler[name];
@@ -73,6 +86,14 @@ private:
     static TvCastingAppJNI sInstance;
 
     MatterCallbackHandlerJNI mCommissioningCompleteHandler;
+    OnConnectionSuccessHandlerJNI mCommissioningOnConnectionSuccessHandler;
+    FailureHandlerJNI mCommissioningOnConnectionFailureHandler;
+    OnNewOrUpdatedEndpointHandlerJNI mCommissioningOnNewOrUpdatedEndpointHandler;
+
+    OnConnectionSuccessHandlerJNI mPreCommissionedOnConnectionSuccessHandler;
+    FailureHandlerJNI mPreCommissionedOnConnectionFailureHandler;
+    OnNewOrUpdatedEndpointHandlerJNI mPreCommissionedOnNewOrUpdatedEndpointHandler;
+
     MatterCallbackHandlerJNI mMediaCommandResponseHandler[MEDIA_COMMAND_COUNT];
     FailureHandlerJNI mSubscriptionReadFailureHandler[MEDIA_ATTRIBUTE_COUNT];
     SubscriptionEstablishedHandlerJNI mSubscriptionEstablishedHandler[MEDIA_ATTRIBUTE_COUNT];
