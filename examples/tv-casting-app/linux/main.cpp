@@ -41,7 +41,6 @@ using namespace chip;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
-using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -97,9 +96,9 @@ Commands gCommands;
 
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
-    if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
+    if (!CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
     {
-        CastingServer::GetInstance()->SetDefaultFabricIndex();
+        CastingServer::GetInstance()->SetDefaultFabricIndex(OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint);
     }
     gCommands.Run(argc, argv);
     return CHIP_NO_ERROR;
@@ -140,13 +139,20 @@ int main(int argc, char * argv[])
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
-    // Send discover commissioners request
-    SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
+    if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Skipping commissioner discovery / User directed commissioning flow.");
+    }
+    else
+    {
+        // Send discover commissioners request
+        SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
-    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+        // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
+        DeviceLayer::SystemLayer().StartTimer(
+            chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
+            [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+    }
 
     registerClusters(gCommands, &gCredIssuerCommands);
     registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
