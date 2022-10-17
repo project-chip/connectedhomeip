@@ -126,15 +126,15 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         len = LWIP_FRAME_ALIGNMENT;
     }
 
-    /* Drop packets originated from the same interface and is a multicast destination */
+    /* Drop packets originated from the same interface and is not destined for the said interface */
     const uint8_t * src_mac = b + netif->hwaddr_len;
     const uint8_t * dst_mac = b;
 
-    if ((memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) && (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
+    if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0))) && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) &&
+        (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("%s: DROP %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
-                  bufferoffset,
+        EFR32_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
 
                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
