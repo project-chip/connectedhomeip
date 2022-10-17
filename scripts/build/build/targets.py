@@ -144,7 +144,6 @@ def BuildHostTarget():
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
 
-
     return target
 
 
