@@ -170,7 +170,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
         if not modifier.Accept(full_input):
             continue
 
-        result = _StringIntoParts(full_input, suffix, fixed_targets[1:], filter(lambda x: x != modifier, modifiers))
+        result = _StringIntoParts(full_input, suffix, fixed_targets[1:], [x for x in modifiers if x != modifier])
         if result is not None:
             return [modifier] + result
 

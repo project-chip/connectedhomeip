@@ -69,10 +69,10 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target nrf-nrf52840dk-light
-              --target nrf-nrf52840dk-light-rpc
-              --target nrf-nrf52840dk-lock
-              --target nrf-nrf52840dongle-light
+              --target efr32-brd4161a-light
+              --target efr32-brd4161a-light-rpc
+              --target efr32-brd4161a-lock
+              --target efr32-brd4161a-lock-rpc
               build
               --create-archives /workspace/artifacts/
       waitFor:
@@ -98,7 +98,8 @@ steps:
               --target linux-arm64-chip-tool-ipv6only-clang
               --target linux-arm64-chip-tool-nodeps-ipv6only-clang
               --target linux-arm64-dynamic-bridge-ipv6only-clang
-              --target linux-arm64-light-rpc-ipv6only-clang
+              --target linux-arm64-light-clang-rpc-ipv6only
+              --target linux-arm64-light-clang-rpc-ipv6only-minmdns-verbose
               --target linux-arm64-lock-ipv6only-clang
               --target linux-arm64-minmdns-clang
               --target linux-arm64-ota-provider-nodeps-ipv6only-clang
