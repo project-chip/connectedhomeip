@@ -698,13 +698,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
     mConnectivityFlag.ClearAll();
-    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
-    mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-    mWpaSupplicant.proxy         = nullptr;
-    mWpaSupplicant.iface         = nullptr;
-    mWpaSupplicant.bss           = nullptr;
-    mWpaSupplicant.interfacePath = nullptr;
-    mWpaSupplicant.networkPath   = nullptr;
+    mWpaSupplicant = GDBusWpaSupplicant{};
 
     ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
 
