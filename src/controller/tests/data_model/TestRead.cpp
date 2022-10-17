@@ -2634,7 +2634,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion,
+                           System::Clock::Milliseconds32(30000)) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
