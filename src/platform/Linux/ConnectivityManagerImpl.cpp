@@ -147,7 +147,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-bool ConnectivityManagerImpl::mAssociattionStarted = false;
+
+bool ConnectivityManagerImpl::mAssociationStarted = false;
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
@@ -397,7 +398,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
             {
                 if (g_strcmp0(value_str, "\'associating\'") == 0)
                 {
-                    mAssociattionStarted = true;
+                    mAssociationStarted = true;
                 }
                 else if (g_strcmp0(value_str, "\'disconnected\'") == 0)
                 {
@@ -409,7 +410,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
                     }
 
-                    if (mAssociattionStarted)
+                    if (mAssociationStarted)
                     {
                         uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
                         uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
@@ -447,7 +448,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
 
-                    mAssociattionStarted = false;
+                    mAssociationStarted = false;
                 }
                 else if (g_strcmp0(value_str, "\'associated\'") == 0)
                 {
@@ -460,7 +461,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                 }
                 else if (g_strcmp0(value_str, "\'completed\'") == 0)
                 {
-                    if (mAssociattionStarted)
+                    if (mAssociationStarted)
                     {
                         DeviceLayer::SystemLayer().ScheduleLambda([]() {
                             if (mpConnectCallback != nullptr)
@@ -471,7 +472,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                             ConnectivityMgrImpl().PostNetworkConnect();
                         });
                     }
-                    mAssociattionStarted = false;
+                    mAssociationStarted = false;
                 }
             }
 
