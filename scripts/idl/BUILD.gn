@@ -94,4 +94,8 @@ pw_python_package("idl") {
     "test_generators.py",
     "test_xml_parser.py",
   ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
 }
