@@ -190,6 +190,9 @@ def cmd_list(context):
     '--tv-app',
     help='what tv app to use')
 @click.option(
+    '--bridge-app',
+    help='what bridge app to use')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
@@ -200,7 +203,7 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -218,6 +221,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if tv_app is None:
         tv_app = FindBinaryPath('chip-tv-app')
 
+    if bridge_app is None:
+        bridge_app = FindBinaryPath('chip-bridge-app')
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
@@ -225,7 +231,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         lock_app=[lock_app],
         ota_provider_app=[ota_provider_app],
         ota_requestor_app=[ota_requestor_app],
-        tv_app=[tv_app]
+        tv_app=[tv_app],
+        bridge_app=[bridge_app]
     )
 
     if sys.platform == 'linux':
