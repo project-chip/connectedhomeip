@@ -17,12 +17,12 @@ import click
 import logging
 import coloredlogs
 import enum
+import sys
 
 try:
     from idl.matter_idl_parser import CreateParser
 except:
     import os
-    import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl.matter_idl_parser import CreateParser
 
@@ -53,6 +53,9 @@ class ListGeneratedFilesStorage(GeneratorStorage):
     """
     A storage that prints out file names that would have content in them.
     """
+
+    def __init__(self):
+        super().__init__()
 
     def get_existing_data(self, relative_path: str):
         return None  # stdout has no pre-existing data
@@ -102,10 +105,15 @@ __GENERATORS__ = {
     default=False,
     is_flag=True,
     help='Output just a list of file names that would be generated')
+@click.option(
+    '--expected-outputs',
+    type=click.Path(exists=True),
+    default=None,
+    help='A file containing all expected outputs. Script will fail if outputs do not match')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -124,6 +132,29 @@ def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
     generator = __GENERATORS__[
         generator].CreateGenerator(storage, idl=idl_tree)
     generator.render(dry_run)
+
+    if expected_outputs:
+        with open(expected_outputs, 'rt') as fin:
+            expected = set()
+            for l in fin.readlines():
+                l = l.strip()
+                if l:
+                    expected.add(l)
+
+            if expected != storage.generated_paths:
+                logging.fatal("expected and generated files do not match.")
+
+                extra = storage.generated_paths - expected
+                missing = expected - storage.generated_paths
+
+                for name in extra:
+                    logging.fatal("   '%s' was generated but not expected" % name)
+
+                for name in missing:
+                    logging.fatal("   '%s' was expected but not generated" % name)
+
+                sys.exit(1)
+
     logging.info("Done")
 
 

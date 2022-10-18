@@ -83,7 +83,7 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
+    tv.tv_usec = static_cast<__darwin_suseconds_t>(aNewCurTime.count() % UINT64_C(1000000));
     if (settimeofday(&tv, nullptr) != 0)
     {
         return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : CHIP_ERROR_POSIX(errno);
