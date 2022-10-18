@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,28 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#TODO: Decouple Android Bluetooth stuff from ChipDeviceController.Java, remove dummy implemenation here.
+#TODO: Decouple Android Logging from from ChipDeviceController.Java, remove dummy implemenation here.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
-import("${chip_root}/build/chip/tools.gni")
 
-build_java_matter_controller = true
+android_library("stub_src") {
+  output_name = "Android.jar"
 
-android_binary("java-matter-controller") {
-  output_name = "java-matter-controller"
-  deps = [
-    "${chip_root}/src/controller/java",
-    "${chip_root}/src/setup_payload/java",
-    "${chip_root}/third_party/java_deps:annotation",
+  sources = [
+    "android/bluetooth/BluetoothGatt.java",
+    "android/bluetooth/BluetoothGattCallback.java",
+    "android/bluetooth/BluetoothGattCharacteristic.java",
+    "android/bluetooth/BluetoothGattDescriptor.java",
+    "android/bluetooth/BluetoothGattService.java",
+    "android/bluetooth/BluetoothProfile.java",
+    "android/os/Build.java",
+    "android/util/Log.java",
   ]
 
-  sources = [ "java/src/com/matter/controller/Main.java" ]
-
   javac_flags = [ "-Xlint:deprecation" ]
-}
-
-group("default") {
-  deps = [ ":java-matter-controller" ]
 }
