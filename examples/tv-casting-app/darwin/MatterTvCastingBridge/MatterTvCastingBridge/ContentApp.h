@@ -17,16 +17,34 @@
 
 #import <Foundation/Foundation.h>
 
-#import "DiscoveredNodeData.h"
-#include <lib/dnssd/Resolver.h>
+#ifndef ContentApp_h
+#define ContentApp_h
 
-#ifndef DiscoveredNodeDataConverter_h
-#define DiscoveredNodeDataConverter_h
+@interface ContentApp : NSObject
 
-@interface DiscoveredNodeDataConverter : NSObject
+@property uint16_t endpointId;
 
-+ (DiscoveredNodeData *)convertToObjC:(const chip::Dnssd::DiscoveredNodeData *)chipDiscoveredNodedata;
+@property NSMutableArray * clusterIds;
+
+/**
+ @brief true, if all the fields are initialized, false otherwise
+ */
+@property BOOL isInitialized;
+
+- (instancetype)initWithEndpointId:(uint16_t)endpointId clusterIds:(NSMutableArray *)clusterIds;
+
+- (BOOL)supportsClusterWithId:(uint32_t)clusterId;
+
+- (BOOL)supportsApplicationLauncher;
+
+- (BOOL)supportsContentLauncher;
+
+- (BOOL)supportsMediaPlayback;
+
+- (BOOL)supportsLevelControl;
+
+- (BOOL)supportsTargetNavigator;
 
 @end
 
-#endif /* DiscoveredNodeDataConverter_h */
+#endif /* ContentApp_h */
