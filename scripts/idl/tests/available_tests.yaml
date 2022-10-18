@@ -59,6 +59,5 @@ bridge:
         bridge/Third.h: outputs/several_clusters/bridge/Third.h
 
 cpp-app:
-   inputs/several_clusters.matter:
+    inputs/several_clusters.matter:
         app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
-
