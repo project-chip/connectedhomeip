@@ -493,17 +493,17 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
     }
 
+    mState = aTargetState;
+    ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
+
     //
     // If we just unblocked sending reports, let's go ahead and schedule the reporting
     // engine to run to kick that off.
     //
-    if (aTargetState == HandlerState::GeneratingReports)
+    if (aTargetState == HandlerState::GeneratingReports && IsReportable())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
-
-    mState = aTargetState;
-    ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
 
 bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
@@ -643,7 +643,7 @@ void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, voi
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
     readHandler->mFlags.Set(ReadHandlerFlags::HoldReport, false);
-    if (readHandler->IsDirty())
+    if (readHandler->IsReportable())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
@@ -659,7 +659,10 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     readHandler->mFlags.Set(ReadHandlerFlags::HoldSync, false);
     ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
                     readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    if (readHandler->IsReportable())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
@@ -717,6 +720,11 @@ void ReadHandler::SetDirty(const AttributePathParams & aAttributeChanged)
         mAttributePathExpandIterator.ResetCurrentCluster();
         mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
     }
+
+    if (IsReportable())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
 }
 
 Transport::SecureSession * ReadHandler::GetSession() const
@@ -727,5 +735,15 @@ Transport::SecureSession * ReadHandler::GetSession() const
     }
     return mSessionHandle->AsSecureSession();
 }
+
+void ReadHandler::UnblockUrgentEventDelivery()
+{
+    mFlags.Set(ReadHandlerFlags::ForceDirty);
+    if (IsReportable())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+}
+
 } // namespace app
 } // namespace chip
