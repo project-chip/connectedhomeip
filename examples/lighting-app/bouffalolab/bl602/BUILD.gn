@@ -105,7 +105,7 @@ bl602_executable("lighting_app") {
 
   include_dirs = [ "include" ]
 
-  if ("BL602-IoT-Matter-V1" == board || "BL602-IOT-DVK-3S" == board ) {
+  if ("BL602-IoT-Matter-V1" == board || "BL602-IOT-DVK-3S" == board) {
     defines = [ "BOARD_ID=1" ]
   } else {
     defines = [ "BOARD_ID=0" ]

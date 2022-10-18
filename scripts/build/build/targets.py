@@ -482,6 +482,7 @@ def BuildIMXTarget():
 
     return target
 
+
 def BuildMW320Target():
     target = BuildTarget('mw320', MW320Builder)
     target.AppendFixedTargets([TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])

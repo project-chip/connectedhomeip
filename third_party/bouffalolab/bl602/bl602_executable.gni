@@ -62,11 +62,10 @@ template("bl602_executable") {
 
   if (invoker.board == "BL602-IOT-DVK-3S") {
     flashing_options +=
-      [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
-  }
-  else {
+        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  } else {
     flashing_options +=
-      [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
   }
 
   flashing_options += [ "--ota" ]

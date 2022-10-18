@@ -23,7 +23,6 @@ import bflb_iot_tool
 import bflb_iot_tool.__main__
 
 
-
 # Additional options that can be use to configure an `Flasher`
 # object (as dictionary keys) and/or passed as command line options.
 BOUFFALO_OPTIONS = {
@@ -104,21 +103,21 @@ class Flasher(firmware_utils.Flasher):
 
         boot_image_guess = None
 
-        for root,dirs,files in os.walk (config_path, topdown=False):
+        for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
                 if name == "boot2_isp_release.bin":
                     return os.path.join(root, name)
-                elif not boot_image_guess and name.find("release") >=0:
+                elif not boot_image_guess and name.find("release") >= 0:
                     boot_image_guess = os.path.join(root, name)
 
         return boot_image_guess
 
     def get_dts_file(self, config_path, xtal_value):
 
-        for root,dirs,files in os.walk (config_path, topdown=False):
+        for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
                 if name.find(xtal_value) >= 0:
-                    return  os.path.join(config_path, name)
+                    return os.path.join(config_path, name)
 
         return None
 
@@ -188,9 +187,9 @@ class Flasher(firmware_utils.Flasher):
 
             arguments.append(arg)
 
-            print (key, value)
+            print(key, value)
 
-        print (dts_path, xtal_value)
+        print(dts_path, xtal_value)
         if not dts_path and xtal_value:
             chip_config_path = os.path.join(tool_path, "chips", chip_name, "device_tree")
             dts_path = self.get_dts_file(chip_config_path, xtal_value)
@@ -210,14 +209,14 @@ class Flasher(firmware_utils.Flasher):
         arguments[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', arguments[0])
         sys.argv = arguments
 
-        print ("arguments", arguments)
+        print("arguments", arguments)
         bflb_iot_tool.__main__.run_main()
 
         return self
 
 
 if __name__ == '__main__':
-    
+
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
 
     sys.exit(Flasher().flash_command(sys.argv))

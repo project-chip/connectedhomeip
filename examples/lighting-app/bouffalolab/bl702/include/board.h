@@ -59,7 +59,7 @@
 
 #define MAX_PWM_CHANNEL 3
 
-#elif defined (XT_ZB6_DevKit)
+#elif defined(XT_ZB6_DevKit)
 
 #define LED_B_PIN_PORT 3
 #define LED_B_PIN 18
@@ -80,7 +80,7 @@
 
 #endif
 
-#if defined (BOARD_BTN_BOOT_PIN)
+#if defined(BOARD_BTN_BOOT_PIN)
 #define LED_BTN_RESET 31
 #endif
 

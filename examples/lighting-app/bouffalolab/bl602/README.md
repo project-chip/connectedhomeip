@@ -2,10 +2,13 @@
 
 This example functions as a wifi light bulb device type, with on/off
 capabilities. The steps were verified on following boards:
-- BL602-IoT-Matter-V1, [here](https://www.amazon.com/dp/B0B9ZVGXD8) to purchase.
-- BL602-NIGHT-LIGHT
+
+-   BL602-IoT-Matter-V1, [here](https://www.amazon.com/dp/B0B9ZVGXD8) to
+    purchase.
+-   BL602-NIGHT-LIGHT
 
 ## BL602-IoT-Matter-V1 board
+
 <img src="../../../platform/bouffalolab/bl602/doc/images/BL602-IoT-Matter_V1.png" style="zoom:25%;" />
 
 ## Initial setup
@@ -32,7 +35,9 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     source ./scripts/activate.sh
     ```
 
-    > Note, Bouffalolab flash tool, `bflb-iot-tool`, imports under this environment. If not, please try `scripts/bootstrap.sh` for matter environment update.
+    > Note, Bouffalolab flash tool, `bflb-iot-tool`, imports under this
+    > environment. If not, please try `scripts/bootstrap.sh` for matter
+    > environment update.
 
 ## Build CHIP BL602 Lighting App example
 
@@ -44,23 +49,28 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     ./scripts/build/build_examples.py --target bouffalolab-bl602-night-light-light build
     ```
 
--   Build target name with `-115200` appended for UART baudrate 115200 command enabled as following commands.
+-   Build target name with `-115200` appended for UART baudrate 115200 command
+    enabled as following commands.
+
     ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
     ```
+
     > UART baudrate is 2000000 by default.
 
--   Build target name with `-rpc` appended for rpc enabled as following commands.
-    ```shell
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
-    ```
-> For multiple build options, such as UART baudrate 115200 + rpc, please try build command as `./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc-115200 build`
+-   Build target name with `-rpc` appended for rpc enabled as following
+    commands.
+    `shell ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build`
+    > For multiple build options, such as UART baudrate 115200 + rpc, please try
+    > build command as
+    > `./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc-115200 build`
 
 ## Download image
-After building gets done, a python
-`chip-bl602-lighting-example.flash.py` will generated under build output
-folder. Such as chip-bl602-lighting-example.flash.py for lighting-app
-example. Please check `help` option of script for more detail.
+
+After building gets done, a python `chip-bl602-lighting-example.flash.py` will
+generated under build output folder. Such as
+chip-bl602-lighting-example.flash.py for lighting-app example. Please check
+`help` option of script for more detail.
 
 -   Connect the board to your flashing station (MacOS, Ubuntu, Windows).
 
@@ -70,7 +80,8 @@ example. Please check `help` option of script for more detail.
     -   Press the RESET button and release it.
     -   Release the BOOT button.
 
--   Enter build out folder, download image as following execution under build output folder:
+-   Enter build out folder, download image as following execution under build
+    output folder:
 
     ```shell
     ./chip-bl602-lighting-example.flash.py --port /dev/tty.usbserial-3
