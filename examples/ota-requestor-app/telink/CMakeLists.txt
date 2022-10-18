@@ -24,6 +24,19 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
+include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
+
+# TODO: this CMakeFile should use src/app/chip_data_model.cmake
+#       and then codegen would be inherited
+chip_codegen(app-codegen
+  INPUT     "${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.matter"
+  GENERATOR "cpp-app"
+  OUTPUTS
+      "app/PluginApplicationCallbacks.h"
+  OUTPUT_PATH   APP_GEN_DIR
+  OUTPUT_FILES  APP_GEN_FILES
+)
+
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
@@ -36,11 +49,13 @@ target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
                            include
+                           ${APP_GEN_DIR}
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/ota-requestor-app
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
+add_dependencies(app app-codegen)
 
 add_definitions(
     "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"

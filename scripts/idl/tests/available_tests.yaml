@@ -57,3 +57,8 @@ bridge:
         bridge/First.h: outputs/several_clusters/bridge/First.h
         bridge/Second.h: outputs/several_clusters/bridge/Second.h
         bridge/Third.h: outputs/several_clusters/bridge/Third.h
+
+cpp-app:
+   inputs/several_clusters.matter:
+        app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
+

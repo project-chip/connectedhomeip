@@ -22,6 +22,8 @@ chip_data_model("dynamic-bridge-common") {
 
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/dynamic-bridge-app/zap-generated"
+
+
   is_server = true
 
   # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
