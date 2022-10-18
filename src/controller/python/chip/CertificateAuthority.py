@@ -192,11 +192,9 @@ class CertificateAuthority:
 
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
-        res = self._chipStack.Call(
+        self._chipStack.Call(
             lambda: self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
-        )
-
-        res.raise_on_error()
+        ).raise_on_error()
 
         self._maximizeCertChains = enabled
 

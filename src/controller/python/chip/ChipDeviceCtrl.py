@@ -177,7 +177,7 @@ class DeviceProxyWrapper():
 
         builtins.chipStack.Call(
             lambda: self._dmLib.pychip_GetLocalSessionId(self._deviceProxy, pointer(localSessionId))
-        )
+        ).raise_on_error()
 
         return localSessionId.value
 
@@ -190,7 +190,7 @@ class DeviceProxyWrapper():
 
         builtins.chipStack.Call(
             lambda: self._dmLib.pychip_GetNumSessionsToPeer(self._deviceProxy, pointer(numSessions))
-        )
+        ).raise_on_error()
 
         return numSessions.value
 
@@ -331,7 +331,7 @@ class ChipDeviceController():
                 self._ChipStack.Call(
                     lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
                         self.devCtrl)
-                )
+                ).raise_on_error()
                 self.devCtrl = None
 
             ChipDeviceController.activeList.remove(self)
@@ -372,18 +372,6 @@ class ChipDeviceController():
                 self.devCtrl)
         )
 
-    def ConnectBle(self, bleConnection):
-        self.CheckIsActive()
-
-        self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_ValidateBTP(
-                self.devCtrl,
-                bleConnection,
-                self._ChipStack.cbHandleComplete,
-                self._ChipStack.cbHandleError,
-            )
-        )
-
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.CheckIsActive()
 
@@ -393,7 +381,7 @@ class ChipDeviceController():
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
-        )
+        ).raise_on_error()
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
             return False
@@ -596,6 +584,7 @@ class ChipDeviceController():
         address = create_string_buffer(64)
         port = c_uint16(0)
 
+        # Intentially return None instead of raising exceptions on error
         error = self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetAddressAndPort(
                 self.devCtrl, nodeid, address, 64, pointer(port))
@@ -715,15 +704,6 @@ class ChipDeviceController():
             return devices
 
         return self._ChipStack.Call(lambda: GetDevices(self))
-
-    def ParseQRCode(self, qrCode, output):
-        self.CheckIsActive()
-
-        print(output)
-        return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_ParseQRCode(
-                qrCode, output)
-        )
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
         self.CheckIsActive()
@@ -1428,3 +1408,6 @@ class ChipDeviceController():
 
             self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
             self._dmLib.pychip_DeviceController_GetFabricId.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_GetLogFilter = [None]
+            self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8

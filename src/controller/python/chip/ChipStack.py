@@ -328,7 +328,7 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
+        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown()).raise_on_error()
 
         #
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,

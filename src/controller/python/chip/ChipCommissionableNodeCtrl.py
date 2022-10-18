@@ -54,9 +54,8 @@ class ChipCommissionableNodeController(object):
         self._InitLib()
 
         commissionableNodeCtrl = c_void_p(None)
-        res = self._dmLib.pychip_CommissionableNodeController_NewController(
-            pointer(commissionableNodeCtrl))
-        res.raise_on_error()
+        self._dmLib.pychip_CommissionableNodeController_NewController(
+            pointer(commissionableNodeCtrl)).raise_on_error()
 
         self.commissionableNodeCtrl = commissionableNodeCtrl
         self._ChipStack.commissionableNodeCtrl = commissionableNodeCtrl
@@ -68,16 +67,16 @@ class ChipCommissionableNodeController(object):
             self.commissionableNodeCtrl = None
 
     def PrintDiscoveredCommissioners(self):
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
                 self.commissionableNodeCtrl)
         )
 
     def DiscoverCommissioners(self):
-        return self._ChipStack.Call(
+        self._ChipStack.Call(
             lambda: self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners(
                 self.commissionableNodeCtrl)
-        )
+        ).raise_on_error()
 
     # ----- Private Members -----
     def _InitLib(self):
