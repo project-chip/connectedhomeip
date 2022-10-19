@@ -55,6 +55,16 @@
             "type": "string",
             "maxLength": 32
         },
+        "product_label": {
+            "description": "more user-friendly human-readable product name",
+            "type": "string",
+            "maxLength": 64
+        },
+        "part_number": {
+            "description": "human-readable vendor assigned part number",
+            "type": "string",
+            "maxLength": 32
+        },
         "date": {
             "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
             "type": "string",
