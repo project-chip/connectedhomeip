@@ -1718,6 +1718,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 2);
 
         GenerateEvents(apSuite, apContext);
+
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
@@ -1728,14 +1729,14 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
 
-        // wait for min interval 2 seconds(in test, we use 1.9second considering the time variation), expect no event is received,
-        // then wait for 0.5 seconds, then the urgent event would be sent out
+        // wait for min interval 2 seconds (in test, we use 1.6 seconds considering the time variation), expect no event is
+        // received, then wait for 0.8 seconds, then the urgent event would be sent out
         //  currently DriveIOUntil will call `DriveIO` at least once, which means that if there is any CPU scheduling issues,
         // there's a chance 1.9s will already have elapsed by the time we get there, which will result in DriveIO being called when
         // it shouldn't. Better fix could happen inside DriveIOUntil, not sure the sideeffect there.
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1900))
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1600))
             {
                 break;
             }
@@ -1748,7 +1749,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         startTime = System::SystemClock().GetMonotonicTimestamp();
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(800))
             {
                 break;
             }
