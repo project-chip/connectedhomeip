@@ -188,7 +188,7 @@ efr32_executable("lock_app") {
   }
 
   if (chip_build_libshell) {
-    sources += [ "src/EventHandler.cpp" ]
+    sources += [ "src/EventHandlerLibShell.cpp" ]
   }
 
   deps = [

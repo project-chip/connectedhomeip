@@ -15,22 +15,20 @@
  *    limitations under the License.
  */
 
-#include "EventHandler.h"
-
-#if defined(ENABLE_CHIP_SHELL)
+#include "EventHandlerLibShell.h"
 #include "AppTask.h"
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
 
-#define ENDPOINT_1 1
-
-#include <lib/support/CodeUtils.h>
-
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <lib/support/CodeUtils.h>
+
+constexpr uint8_t lockEndpoint = 1;
 
 using namespace chip;
 using namespace chip::app;
+using namespace Clusters::DoorLock;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -105,9 +103,10 @@ CHIP_ERROR AlarmEventHandler(int argc, char ** argv)
     }
 
     AlarmEventData * data = Platform::New<AlarmEventData>();
+    data->eventId         = Events::DoorLockAlarm::Id;
     data->alarmCode       = static_cast<DlAlarmCode>(atoi(argv[0]));
 
-    DeviceLayer::PlatformMgr().ScheduleWork(AlarmEventWorkerFunction, reinterpret_cast<intptr_t>(data));
+    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
     return CHIP_NO_ERROR;
 }
@@ -136,9 +135,10 @@ CHIP_ERROR DoorStateEventHandler(int argc, char ** argv)
     }
 
     DoorStateEventData * data = Platform::New<DoorStateEventData>();
+    data->eventId             = Events::DoorStateChange::Id;
     data->doorState           = static_cast<DlDoorState>(atoi(argv[0]));
 
-    DeviceLayer::PlatformMgr().ScheduleWork(DoorStateEventWorkerFunction, reinterpret_cast<intptr_t>(data));
+    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
     return CHIP_NO_ERROR;
 }
@@ -183,22 +183,29 @@ CHIP_ERROR RegisterLockEvents()
     return CHIP_NO_ERROR;
 }
 
-void AlarmEventWorkerFunction(intptr_t context)
+void EventWorkerFunction(intptr_t context)
 {
-    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "AlarmEventWorkerFunction - Invalid work data"));
+    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "EventWorkerFunction - Invalid work data"));
 
-    AlarmEventData * data = reinterpret_cast<AlarmEventData *>(context);
+    EventData * data = reinterpret_cast<EventData *>(context);
 
-    DoorLockServer::Instance().SendLockAlarmEvent(ENDPOINT_1, data->alarmCode);
+    switch (data->eventId)
+    {
+    case Events::DoorLockAlarm::Id: {
+        AlarmEventData * alarmData = reinterpret_cast<AlarmEventData *>(context);
+        DoorLockServer::Instance().SendLockAlarmEvent(lockEndpoint, alarmData->alarmCode);
+        break;
+    }
+
+    case Events::DoorStateChange::Id: {
+        DoorStateEventData * doorStateData = reinterpret_cast<DoorStateEventData *>(context);
+        DoorLockServer::Instance().SetDoorState(lockEndpoint, doorStateData->doorState);
+        break;
+    }
+
+    default: {
+        ChipLogError(Zcl, "Invalid Event Id %s, line %d", __func__, __LINE__);
+        break;
+    }
+    }
 }
-
-void DoorStateEventWorkerFunction(intptr_t context)
-{
-    VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "DoorStateEventWorkerFunction - Invalid work data"));
-
-    DoorStateEventData * data = reinterpret_cast<DoorStateEventData *>(context);
-
-    DoorLockServer::Instance().SetDoorState(ENDPOINT_1, data->doorState);
-}
-
-#endif // ENABLE_CHIP_SHELL

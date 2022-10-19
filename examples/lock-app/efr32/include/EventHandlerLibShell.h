@@ -16,21 +16,25 @@
  */
 #pragma once
 
-#if defined(ENABLE_CHIP_SHELL)
-
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
-struct AlarmEventData
+class EventData
 {
+public:
+    chip::EventId eventId;
+};
+
+class AlarmEventData : public EventData
+{
+public:
     DlAlarmCode alarmCode;
 };
 
-struct DoorStateEventData
+class DoorStateEventData : public EventData
 {
+public:
     DlDoorState doorState;
 };
 
 CHIP_ERROR RegisterLockEvents();
-void AlarmEventWorkerFunction(intptr_t context);
-void DoorStateEventWorkerFunction(intptr_t context);
-#endif
+void EventWorkerFunction(intptr_t context);

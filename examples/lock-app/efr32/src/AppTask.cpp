@@ -21,8 +21,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #if defined(ENABLE_CHIP_SHELL)
-#include "EventHandler.h"
-#endif
+#include "EventHandlerLibShell.h"
+#endif // ENABLE_CHIP_SHELL
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
