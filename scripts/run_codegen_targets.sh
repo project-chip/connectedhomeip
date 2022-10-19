@@ -24,28 +24,28 @@ set -e
 OUT_DIR="$1"
 
 if [ ! -d "$OUT_DIR" ]; then
-    echo "Input directory '${OUT_DIR}' does not exist. "
+    echo "Input directory '$OUT_DIR' does not exist. "
     echo "USAGE: $0 <build_dir>"
     exit 1
 fi
 
 # Code generation for build config files (via buildconfig_header)
-for name in $(ninja -C "${OUT_DIR}" -t targets | grep -E '^gen_.*_buildconfig:' | sed 's/: .*//'); do
-       echo "Generating $name ..."
-       ninja -C "${OUT_DIR}" $name
+for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_.*_buildconfig:' | sed 's/: .*//')"; do
+    echo "Generating $name ..."
+    ninja -C "$OUT_DIR" "$name"
 done
 
 # Code generation (based on zap/matter)
-for name in $(ninja -C "${OUT_DIR}" -t targets | grep -E '_codegen:' | sed 's/: .*//'); do
-       echo "Generating $name ..."
-       ninja -C "${OUT_DIR}" $name
+for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '_codegen:' | sed 's/: .*//')"; do
+    echo "Generating $name ..."
+    ninja -C "$OUT_DIR" "$name"
 done
 
 # Linus targets: dbus generate hdeaders
-for name in $(ninja -C "${OUT_DIR}" -t targets | grep -E 'dbus.*codegen:' | sed 's/: .*//'); do
-       echo "Generating $name ..."
-       ninja -C "${OUT_DIR}" $name
+for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed 's/: .*//')"; do
+    echo "Generating $name ..."
+    ninja -C "$OUT_DIR" "$name"
 done
 
 # ASN1 has no specific rule
-ninja -C "${OUT_DIR}" gen_asn1oid
+ninja -C "$OUT_DIR" gen_asn1oid
