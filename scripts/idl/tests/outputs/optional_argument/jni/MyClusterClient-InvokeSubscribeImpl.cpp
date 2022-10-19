@@ -76,3 +76,4 @@ JNI_METHOD(void, MyClusterCluster,
     onSuccess.release();
     onFailure.release();
 }
+

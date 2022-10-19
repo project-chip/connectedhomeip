@@ -27,6 +27,8 @@ def target_for_name(name: str):
         return TestTarget.LOCK
     if name.startswith("OTA_"):
         return TestTarget.OTA
+    if name.startswith("Test_TC_BRBINFO_"):
+        return TestTarget.BRIDGE
     return TestTarget.ALL_CLUSTERS
 
 

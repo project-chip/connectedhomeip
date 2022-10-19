@@ -52,7 +52,7 @@ struct CommissionerDiscoveryView: View {
             }
             else if(!viewModel.commissioners.isEmpty)
             {
-                Text("Select a commissioner TV...")
+                Text("Select a commissioner video player...")
                 ForEach(viewModel.commissioners) { commissioner in
                     NavigationLink(
                         destination: CommissioningView(_selectedCommissioner: commissioner),
@@ -68,7 +68,7 @@ struct CommissionerDiscoveryView: View {
                 }
             }
         }
-        .navigationTitle("TV Discovery")
+        .navigationTitle("Video Player Discovery")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
     }
 }

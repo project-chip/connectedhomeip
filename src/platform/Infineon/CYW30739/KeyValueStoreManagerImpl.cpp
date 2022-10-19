@@ -46,6 +46,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     {
         KeyStorage keyStorage;
         size_t keyStorageLength;
+        memset(keyStorage.mKey, 0, sizeof(keyStorage.mKey));
         err = CYW30739Config::ReadConfigValueBin(CYW30739ConfigKey(Config::kChipKvsKey_KeyBase, configID), &keyStorage,
                                                  sizeof(keyStorage), keyStorageLength);
         if (err != CHIP_NO_ERROR)
@@ -188,7 +189,7 @@ KeyValueStoreManagerImpl::KeyStorage::KeyStorage(const char * key) : mValueSize(
 
 bool KeyValueStoreManagerImpl::KeyStorage::IsMatchKey(const char * key) const
 {
-    return strncmp(mKey, key, sizeof(mKey)) == 0;
+    return strcmp(mKey, key) == 0;
 }
 
 KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateEntry(const char * key)

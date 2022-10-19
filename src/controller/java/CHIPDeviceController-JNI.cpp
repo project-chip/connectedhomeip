@@ -253,7 +253,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = NULL;
-    long result                              = 0;
+    jlong result                             = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
 

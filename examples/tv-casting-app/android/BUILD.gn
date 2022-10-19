@@ -25,6 +25,8 @@ shared_library("jni") {
   sources = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
     "App/app/src/main/jni/cpp/Constants.h",
+    "App/app/src/main/jni/cpp/ConversionUtils.cpp",
+    "App/app/src/main/jni/cpp/ConversionUtils.h",
     "App/app/src/main/jni/cpp/JNIDACProvider.cpp",
     "App/app/src/main/jni/cpp/JNIDACProvider.h",
     "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.cpp",
@@ -60,17 +62,22 @@ android_library("java") {
   ]
 
   sources = [
+    "App/app/src/main/jni/com/chip/casting/ContentApp.java",
     "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
     "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
+    "App/app/src/main/jni/com/chip/casting/DiscoveredNodeData.java",
     "App/app/src/main/jni/com/chip/casting/FailureCallback.java",
     "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
     "App/app/src/main/jni/com/chip/casting/MatterError.java",
     "App/app/src/main/jni/com/chip/casting/MediaPlaybackTypes.java",
+    "App/app/src/main/jni/com/chip/casting/NsdDiscoveryListener.java",
+    "App/app/src/main/jni/com/chip/casting/NsdResolveListener.java",
     "App/app/src/main/jni/com/chip/casting/SubscriptionEstablishedCallback.java",
     "App/app/src/main/jni/com/chip/casting/SuccessCallback.java",
     "App/app/src/main/jni/com/chip/casting/TargetNavigatorTypes.java",
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
+    "App/app/src/main/jni/com/chip/casting/VideoPlayer.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

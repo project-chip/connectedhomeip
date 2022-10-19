@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.chip.casting.ContentApp;
 import com.chip.casting.MatterCallbackHandler;
 import com.chip.casting.MatterError;
 import com.chip.casting.TvCastingApp;
@@ -20,6 +21,8 @@ public class ContentLauncherFragment extends Fragment {
   private final TvCastingApp tvCastingApp;
 
   private View.OnClickListener launchUrlButtonClickListener;
+
+  private static final ContentApp kContentApp = new ContentApp((short) 4, null);
 
   public ContentLauncherFragment(TvCastingApp tvCastingApp) {
     this.tvCastingApp = tvCastingApp;
@@ -52,6 +55,7 @@ public class ContentLauncherFragment extends Fragment {
             EditText contentDisplayString =
                 getView().findViewById(R.id.contentDisplayStringEditText);
             tvCastingApp.contentLauncherLaunchURL(
+                kContentApp,
                 contentUrl.getText().toString(),
                 contentDisplayString.getText().toString(),
                 new MatterCallbackHandler() {
