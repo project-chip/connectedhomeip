@@ -44,6 +44,7 @@ steps:
               --target efr32-brd4161a-lock
               --target efr32-brd4161a-switch
               --target efr32-brd4161a-window-covering
+              --target efr32-brd4161a-unit-test
               --target efr32-brd4187c-window-covering
               --target esp32-c3devkit-all-clusters
               --target esp32-c3devkit-all-clusters-minimal
