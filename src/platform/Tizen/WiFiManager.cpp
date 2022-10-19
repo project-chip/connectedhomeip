@@ -15,10 +15,8 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h> // IWYU pragma: keep
 #include <platform/Tizen/WiFiManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -30,6 +28,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "MainLoop.h"
 
@@ -876,4 +875,3 @@ CHIP_ERROR WiFiManager::GetConnectionState(wifi_manager_connection_state_e * con
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

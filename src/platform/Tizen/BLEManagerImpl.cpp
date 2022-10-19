@@ -21,10 +21,15 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Tizen platforms.
  */
-// Note: Due to circular dependency include platform/CHIPDeviceLayer.h before
-//       BLEManagerImpl.h (the former includes the latter).
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/Tizen/BLEManagerImpl.h>
+
+/**
+ * Note: Fix circular dependency between ThreadStackManager and ConnectivityManager */
+#include <platform/ConnectivityManager.h>
+
+/**
+ * Note: Use public include for BLEManager which includes our local
+ *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
+#include "platform/internal/BLEManager.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <strings.h>
@@ -48,19 +53,16 @@
 #include <lib/support/SetupDiscriminator.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
-#include <system/SystemConfig.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #include "CHIPDevicePlatformEvent.h"
 #include "ChipDeviceScanner.h"
 #include "MainLoop.h"
-#include "PlatformManagerImpl.h"
-#include "platform/internal/BLEManager.h"
 
 namespace chip {
 namespace DeviceLayer {

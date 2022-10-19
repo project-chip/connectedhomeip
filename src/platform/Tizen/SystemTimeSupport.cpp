@@ -23,12 +23,12 @@
  *          time/clock functions that are suitable for use on the Tizen platform.
  */
 
+#include <sys/time.h>
+
 #include <cerrno>
 #include <chrono>
-#include <cinttypes>
+#include <cstdint>
 #include <ctime>
-
-#include <sys/time.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPError.h>

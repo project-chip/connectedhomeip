@@ -23,8 +23,11 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h> // IWYU pragma: keep
-#include <platform/Tizen/PlatformManagerImpl.h>
+/**
+ * Note: Use public include for PlatformManager which includes our local
+ *       platform/<PLATFORM>/PlatformManager.h after defining interface
+ *       class. */
+#include <platform/PlatformManager.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

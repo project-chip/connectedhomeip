@@ -29,7 +29,6 @@
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemConfig.h>
 
-#include "KeyValueStoreManagerImpl.h"
 #include "NetworkCommissioningDriver.h"
 #include "WiFiManager.h"
 #include "platform/internal/CHIPDeviceLayerInternal.h"

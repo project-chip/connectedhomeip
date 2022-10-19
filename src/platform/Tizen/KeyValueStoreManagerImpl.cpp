@@ -21,10 +21,11 @@
  *          Platform-specific key value storage implementation for Tizen.
  */
 
-// Note: Due to circular dependency include platform/ConnectivityManager.h before
-//       platform/Tizen/ConnectivityManagerImpl.h (the former includes the latter).
-#include <platform/KeyValueStoreManager.h> // IWYU pragma: keep
-#include <platform/Tizen/KeyValueStoreManagerImpl.h>
+/**
+ * Note: Use public include for KeyValueStoreManager which includes our local
+ *       platform/<PLATFORM>/KeyValueStoreManagerImpl.h after defining interface
+ *       class. */
+#include <platform/KeyValueStoreManager.h>
 
 #include <cstddef>
 

@@ -69,11 +69,13 @@
     { include: [ '"platform/DeviceInstanceInfoProvider.h"', "private", '<platform/DeviceInstanceInfoProvider.h>', "public" ] },
     { include: [ '"platform/DeviceInstanceInfoProvider.h"', "private", '<platform/DeviceInstanceInfoProvider.h>', "public" ] },
     { include: [ '"platform/NetworkCommissioning.h"', "private", '<platform/NetworkCommissioning.h>', "public" ] },
+    { include: [ '<platform/internal/BLEManager.h>', "public", '"platform/internal/BLEManager.h"', "private" ] },
 
     ## Hack
     { include: [ '<bits/shared_ptr.h>', private, '<memory>', public ] },
     { include: [ '"bits/shared_ptr.h"', private, '<memory>', public ] },
 
     { symbol: [ 'tm', private, '<sys/time.h>', public ] },
+    { symbol: [ 'declval', 'private', '<utility>', 'public' ] },
 
 ]

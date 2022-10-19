@@ -25,16 +25,15 @@
 //      will not be included.
 #define _LINUX_IF_H
 
-#include <unistd.h>
-
-#include <cstring>
-
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 #include <linux/wireless.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <unistd.h>
+
+#include <cstring>
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <lib/support/CHIPMemString.h>

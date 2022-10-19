@@ -23,12 +23,11 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceLayer.h> // IWYU pragma: keep
+#include <platform/ConnectivityManager.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/ThreadStackManager.h>
 #include <system/SystemConfig.h>
 
-#include "ConnectivityManagerImpl.h"
 #include "NetworkCommissioningDriver.h"
 #include "ThreadStackManagerImpl.h"
 

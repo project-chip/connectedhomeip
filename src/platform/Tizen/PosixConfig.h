@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <cinttypes>
+#include <cstdint>
 #include <cstring>
 
 #include <lib/core/CHIPError.h>

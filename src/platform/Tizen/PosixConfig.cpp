@@ -23,12 +23,12 @@
  *          Utilities for interacting with multiple file partitions and maps
  *          key-value config calls to the correct partition.
  */
+
 #include "PosixConfig.h"
 
 #include <lib/support/CodeUtils.h>
 #include <platform/KeyValueStoreManager.h>
 
-#include "KeyValueStoreManagerImpl.h"
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 #include "platform/internal/testing/ConfigUnitTest.h"
 

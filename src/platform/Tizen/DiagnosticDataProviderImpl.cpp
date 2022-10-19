@@ -20,6 +20,7 @@
  *          Provides an implementation of the DiagnosticDataProvider object
  *          for Tizen platform.
  */
+
 #include "DiagnosticDataProviderImpl.h"
 
 #include <platform/DiagnosticDataProvider.h>
