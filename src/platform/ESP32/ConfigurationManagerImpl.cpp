@@ -111,6 +111,23 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
                      CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION, esp_err);
         SuccessOrExit(MapConfigError(esp_err));
     }
+
+    esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION, &cfg);
+    if (esp_err == ESP_ERR_NVS_NO_FREE_PAGES || esp_err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
+                     CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION, esp_err);
+        SuccessOrExit(MapConfigError(esp_err));
+    }
+
+    esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION, &cfg);
+    if (esp_err == ESP_ERR_NVS_NO_FREE_PAGES || esp_err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize NVS partition %s err:0x%02x",
+                     CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION, esp_err);
+        SuccessOrExit(MapConfigError(esp_err));
+    }
+
 #else
     // Initialize the nvs partitions,
     // nvs_flash_init_partition() will initialize the partition only if it is not already initialized.
@@ -121,6 +138,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION);
+    SuccessOrExit(MapConfigError(esp_err));
+    esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
 #endif
 

@@ -850,12 +850,30 @@ menu "CHIP Device Layer"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-counters" namespace.
-        
+
         config CHIP_KVS_NAMESPACE_PARTITION_LABEL
             string "chip-kvs namespace partition label"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-kvs" namespace.
+
+        config CHIP_DEVICE_ATTESTATION_PARTITION_LABEL
+            string "matter device attestation partition label"
+            default "sec_da"
+            help
+                Label of the partition to store PAI Certification, Device Attestation Certification and DAC Public Key.
+
+        config CHIP_DAC_PRIVATE_KEY_PARTITION_LABEL
+            string "matter DAC private key partition label"
+            default "dac_prv_key"
+            help
+                Label of the partition to store DAC Private Key. It should be flash encrypted.
+
+        config CHIP_CERTIFICATION_DECLARATION_PARTITION_LABEL
+            string "matter certification declaration partition label"
+            default "sec_cd"
+            help
+                Label of the partition to store Certification Declaration.
 
     endmenu
 

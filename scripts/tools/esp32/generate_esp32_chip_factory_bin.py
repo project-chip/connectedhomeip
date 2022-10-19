@@ -46,8 +46,6 @@ TOOLS = {}
 
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
-NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
-
 
 FACTORY_DATA = {
     # CommissionableDataProvider
@@ -69,33 +67,6 @@ FACTORY_DATA = {
     'verifier': {
         'type': 'data',
         'encoding': 'string',
-        'value': None,
-    },
-
-    # CommissionableDataProvider
-    'dac-cert': {
-        'type': 'file',
-        'encoding': 'binary',
-        'value': None,
-    },
-    'dac-key': {
-        'type': 'file',
-        'encoding': 'binary',
-        'value': None,
-    },
-    'dac-pub-key': {
-        'type': 'file',
-        'encoding': 'binary',
-        'value': None,
-    },
-    'pai-cert': {
-        'type': 'file',
-        'encoding': 'binary',
-        'value': None,
-    },
-    'cert-dclrn': {
-        'type': 'file',
-        'encoding': 'binary',
         'value': None,
     },
 
@@ -287,11 +258,6 @@ def populate_factory_data(args, spake2p_params):
     FACTORY_DATA['iteration-count']['value'] = spake2p_params['Iteration Count']
     FACTORY_DATA['salt']['value'] = spake2p_params['Salt']
     FACTORY_DATA['verifier']['value'] = spake2p_params['Verifier']
-    FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
-    FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
-    FACTORY_DATA['cert-dclrn']['value'] = os.path.abspath(args.cd)
-    FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
-    FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
 
     if args.serial_num is not None:
         FACTORY_DATA['serial-num']['value'] = args.serial_num
@@ -358,32 +324,6 @@ def populate_factory_data(args, spake2p_params):
                 FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
                 FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
 
-
-def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
-    with open(key_file, 'rb') as f:
-        key_data = f.read()
-
-    logging.warning('Leaking of DAC private keys may lead to attestation chain revokation')
-    logging.warning('Please make sure the DAC private is key protected using a password')
-
-    # WARNING: Below line assumes that the DAC private key is not protected by a password,
-    #          please be careful and use the password-protected key if reusing this code
-    key_der = cryptography.hazmat.primitives.serialization.load_der_private_key(
-        key_data, None, cryptography.hazmat.backends.default_backend())
-
-    private_number_val = key_der.private_numbers().private_value
-    with open(privkey_raw_file, 'wb') as f:
-        f.write(private_number_val.to_bytes(32, byteorder='big'))
-
-    public_key_first_byte = 0x04
-    public_number_x = key_der.public_key().public_numbers().x
-    public_number_y = key_der.public_key().public_numbers().y
-    with open(pubkey_raw_file, 'wb') as f:
-        f.write(public_key_first_byte.to_bytes(1, byteorder='big'))
-        f.write(public_number_x.to_bytes(32, byteorder='big'))
-        f.write(public_number_y.to_bytes(32, byteorder='big'))
-
-
 def generate_nvs_bin(args):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'
@@ -396,38 +336,21 @@ def generate_nvs_bin(args):
     with open(FACTORY_PARTITION_CSV, 'w') as f:
         f.write(csv_content)
 
-    if args.encrypt:
-        nvs_args = SimpleNamespace(version=2,
-                                   keygen=True,
-                                   keyfile=NVS_KEY_PARTITION_BIN,
-                                   inputkey=None,
-                                   outdir=os.getcwd(),
-                                   input=FACTORY_PARTITION_CSV,
-                                   output=FACTORY_PARTITION_BIN,
-                                   size=hex(args.size))
-        nvs_partition_gen.encrypt(nvs_args)
-    else:
-        nvs_args = SimpleNamespace(input=FACTORY_PARTITION_CSV,
-                                   output=FACTORY_PARTITION_BIN,
-                                   size=hex(args.size),
-                                   outdir=os.getcwd(),
-                                   version=2)
-        nvs_partition_gen.generate(nvs_args)
+    nvs_args = SimpleNamespace(input=FACTORY_PARTITION_CSV,
+                               output=FACTORY_PARTITION_BIN,
+                               size=hex(args.size),
+                               outdir=os.getcwd(),
+                               version=2)
+    nvs_partition_gen.generate(nvs_args)
 
 
-def print_flashing_help(encrypt):
+def print_flashing_help():
     logging.info('Run below command to flash {}'.format(FACTORY_PARTITION_BIN))
     logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), FACTORY_PARTITION_BIN)))
-    if (encrypt):
-        logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
-        logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
-            os.path.join(os.getcwd(), 'keys', NVS_KEY_PARTITION_BIN)))
 
 
 def clean_up():
     os.remove(FACTORY_PARTITION_CSV)
-    os.remove(FACTORY_DATA['dac-pub-key']['value'])
-    os.remove(FACTORY_DATA['dac-key']['value'])
 
 
 def main():
@@ -440,16 +363,6 @@ def main():
                         help='The setup passcode for pairing, range: 0x01-0x5F5E0FE')
     parser.add_argument('-d', '--discriminator', type=any_base_int, required=True,
                         help='The discriminator for pairing, range: 0x00-0x0FFF')
-
-    # These will be used by DeviceAttestationCredentialsProvider
-    parser.add_argument('--dac-cert', type=str, required=True,
-                        help='The path to the DAC certificate in der format')
-    parser.add_argument('--dac-key', type=str, required=True,
-                        help='The path to the DAC private key in der format')
-    parser.add_argument('--pai-cert', type=str, required=True,
-                        help='The path to the PAI certificate in der format')
-    parser.add_argument('--cd', type=str, required=True,
-                        help='The path to the certificate declaration der format')
 
     # These will be used by DeviceInstanceInfoProvider
     parser.add_argument('--vendor-id', type=any_base_int, required=False, help='Vendor id')
@@ -471,19 +384,16 @@ def main():
     parser.add_argument('--fixed-labels', type=str, nargs='+', required=False,
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
 
-    parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
-                        help='The size of the partition.bin, default: 0x6000')
-    parser.add_argument('-e', '--encrypt', action='store_true', required=False,
-                        help='Encrypt the factory parititon NVS binary')
+    parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x5000,
+                        help='The size of the partition.bin, default: 0x5000')
 
     args = parser.parse_args()
     validate_args(args)
     check_tools_exists()
     spake2p_params = gen_spake2p_params(args.passcode)
     populate_factory_data(args, spake2p_params)
-    gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
     generate_nvs_bin(args)
-    print_flashing_help(args.encrypt)
+    print_flashing_help()
     clean_up()
 
 

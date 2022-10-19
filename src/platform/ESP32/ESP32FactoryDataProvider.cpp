@@ -16,6 +16,7 @@
  */
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <nvs.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #include <platform/ESP32/ScopedNvsHandle.h>
@@ -98,9 +99,22 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifi
 
 CHIP_ERROR ESP32FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-    size_t certSize;
-    ReturnErrorOnFailure(
-        ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_CertDeclaration, outBuffer.data(), outBuffer.size(), certSize));
+    size_t certSize = outBuffer.size();
+    ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open("cert-dcl", NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION));
+    esp_err_t err = nvs_get_blob(handle, "cert-dclrn", outBuffer.data(), &certSize);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    if (outBuffer.data() != nullptr)
+    {
+        if (err == ESP_ERR_NVS_INVALID_LENGTH)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        ReturnMappedErrorOnFailure(err);
+    }
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
 }
@@ -114,18 +128,45 @@ CHIP_ERROR ESP32FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & ou
 
 CHIP_ERROR ESP32FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    size_t certSize;
-    ReturnErrorOnFailure(
-        ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACCert, outBuffer.data(), outBuffer.size(), certSize));
+    size_t certSize = outBuffer.size();
+    ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open("dev-att", NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION));
+    esp_err_t err = nvs_get_blob(handle, "dac-cert", outBuffer.data(), &certSize);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    if (outBuffer.data() != nullptr)
+    {
+        if (err == ESP_ERR_NVS_INVALID_LENGTH)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        ReturnMappedErrorOnFailure(err);
+    }
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
-    size_t certSize;
-    ReturnErrorOnFailure(
-        ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_PAICert, outBuffer.data(), outBuffer.size(), certSize));
+    size_t certSize = outBuffer.size();
+    ;
+    ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open("dev-att", NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION));
+    esp_err_t err = nvs_get_blob(handle, "pai-cert", outBuffer.data(), &certSize);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    if (outBuffer.data() != nullptr)
+    {
+        if (err == ESP_ERR_NVS_INVALID_LENGTH)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        ReturnMappedErrorOnFailure(err);
+    }
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
 }
@@ -143,10 +184,28 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     uint8_t pubKeyBuf[kDACPublicKeySize];
     size_t privKeyLen = sizeof(privKeyBuf);
     size_t pubKeyLen  = sizeof(pubKeyBuf);
+    ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open("dev-att", NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION));
 
-    ReturnErrorOnFailure(
-        ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPrivateKey, privKeyBuf, privKeyLen, privKeyLen));
-    ReturnErrorOnFailure(ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPublicKey, pubKeyBuf, pubKeyLen, pubKeyLen));
+    esp_err_t err = nvs_get_blob(handle, "dac-pub-key", pubKeyBuf, &pubKeyLen);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    if (err == ESP_ERR_NVS_INVALID_LENGTH)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    ReturnMappedErrorOnFailure(err);
+
+    const esp_partition_t * partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY,
+                                                                 CHIP_DEVICE_CONFIG_CHIP_DAC_PRIV_KEY_PARTITION);
+    if (!partition)
+    {
+        ESP_LOGE("factory", "Failed to find partition to store DAC private key");
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    ReturnMappedErrorOnFailure(esp_partition_read(partition, 0, privKeyBuf, privKeyLen));
 
     ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen), keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
