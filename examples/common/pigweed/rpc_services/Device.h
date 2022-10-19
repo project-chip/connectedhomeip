@@ -22,6 +22,7 @@
 #include <platform/CommissionableDataProvider.h>
 
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
+#include "app/server/CommissioningWindowManager.h"
 #include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
@@ -418,6 +419,41 @@ public:
         {
             mCommissionableDataProvider.SetSpake2pVerifier(ByteSpan(request.verifier.bytes, request.verifier.size));
         }
+
+        if (Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
+            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
+                app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen)
+        {
+            // Cache values before closing to restore them after restart.
+            app::DataModel::Nullable<VendorId> vendorId = Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
+            app::DataModel::Nullable<FabricIndex> fabricIndex =
+                Server::GetInstance().GetCommissioningWindowManager().GetOpenerFabricIndex();
+
+            // Restart commissioning window to recache the spakeInfo values:
+            {
+                DeviceLayer::StackLock lock;
+                Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+            }
+            // Let other tasks possibly work since Commissioning window close/open are "heavy"
+            if (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
+                    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+                !vendorId.IsNull() && !fabricIndex.IsNull())
+            {
+                DeviceLayer::StackLock lock;
+                System::Clock::Seconds16 commissioningTimeout =
+                    System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS); // Use default for timeout for now.
+                Server::GetInstance()
+                    .GetCommissioningWindowManager()
+                    .OpenBasicCommissioningWindowForAdministratorCommissioningCluster(commissioningTimeout, fabricIndex.Value(),
+                                                                                      vendorId.Value());
+            }
+            else
+            {
+                DeviceLayer::StackLock lock;
+                Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+            }
+        }
+
         return pw::OkStatus();
     }
 
