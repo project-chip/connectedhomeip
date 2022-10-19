@@ -302,7 +302,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -376,6 +376,10 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+
+    // Helpers for managing our state flags properly.
+    void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
+    void ClearStateFlag(ReadHandlerFlags aFlag);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
