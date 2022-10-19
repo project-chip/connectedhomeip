@@ -38,19 +38,19 @@ fi
 # ...
 #
 # Most are buildconfig rules, but asn1oid is special
-for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_' | sed 's/: .*//')"; do
+for name in $(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
 
 # Code generation (based on zap/matter)
-for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '_codegen:' | sed 's/: .*//')"; do
+for name in $(ninja -C "$OUT_DIR" -t targets | grep -E '_codegen:' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
 
 # Linus targets: dbus generate hdeaders
-for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed 's/: .*//')"; do
+for name in $(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
