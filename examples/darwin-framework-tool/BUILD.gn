@@ -102,6 +102,10 @@ config("config") {
   cflags = [
     "-Wconversion",
     "-fobjc-arc",
+
+    # For now disable unguarded-availability-new warnings because we
+    # are not building against a system Matter.framework here anyway.
+    "-Wno-unguarded-availability-new",
   ]
 }
 
