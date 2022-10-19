@@ -99,6 +99,12 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
 
 CHIP_ERROR CastingServer::DiscoverCommissioners()
 {
+    TargetVideoPlayerInfo * connectableVideoPlayerList = ReadCachedTargetVideoPlayerInfos();
+    if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
+    {
+        ChipLogProgress(AppServer, "No cached video players found during discovery");
+    }
+
     // Send discover commissioners request
     return mCommissionableNodeController.DiscoverCommissioners(
         Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
@@ -131,15 +137,32 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Discovered
     mTargetVideoPlayerVendorId   = selectedCommissioner->commissionData.vendorId;
     mTargetVideoPlayerProductId  = selectedCommissioner->commissionData.productId;
     mTargetVideoPlayerDeviceType = selectedCommissioner->commissionData.deviceType;
+    mTargetVideoPlayerNumIPs     = selectedCommissioner->resolutionData.numIPs;
+    for (size_t i = 0; i < mTargetVideoPlayerNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+    {
+        mTargetVideoPlayerIpAddress[i] = selectedCommissioner->resolutionData.ipAddress[i];
+    }
     chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
                                selectedCommissioner->commissionData.deviceName);
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-const Dnssd::DiscoveredNodeData * CastingServer::GetDiscoveredCommissioner(int index)
+const Dnssd::DiscoveredNodeData *
+CastingServer::GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer)
 {
-    return mCommissionableNodeController.GetDiscoveredCommissioner(index);
+    const Dnssd::DiscoveredNodeData * discoveredNodeData = mCommissionableNodeController.GetDiscoveredCommissioner(index);
+    if (discoveredNodeData != nullptr)
+    {
+        for (size_t i = 0; i < kMaxCachedVideoPlayers && mCachedTargetVideoPlayerInfo[i].IsInitialized(); i++)
+        {
+            if (mCachedTargetVideoPlayerInfo[i].IsSameAs(discoveredNodeData))
+            {
+                outAssociatedConnectableVideoPlayer = MakeOptional(&mCachedTargetVideoPlayerInfo[i]);
+            }
+        }
+    }
+    return discoveredNodeData;
 }
 
 void CastingServer::ReadServerClustersForNode(NodeId nodeId)
@@ -312,7 +335,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             CastingServer::GetInstance()->mOnConnectionSuccessClientCallback,
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback,
             CastingServer::GetInstance()->mTargetVideoPlayerVendorId, CastingServer::GetInstance()->mTargetVideoPlayerProductId,
-            CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName);
+            CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
+            CastingServer::GetInstance()->mTargetVideoPlayerNumIPs, CastingServer::GetInstance()->mTargetVideoPlayerIpAddress);
 
         CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
     }

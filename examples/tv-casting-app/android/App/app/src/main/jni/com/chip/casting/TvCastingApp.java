@@ -47,11 +47,14 @@ public class TvCastingApp {
     multicastLock.setReferenceCounted(true);
     multicastLock.acquire();
 
+    List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
+
     NsdDiscoveryListener nsdDiscoveryListener =
         new NsdDiscoveryListener(
             nsdManager,
             TARGET_SERVICE_TYPE,
             DEVICE_TYPE_FILTER,
+            preCommissionedVideoPlayers,
             discoverySuccessCallback,
             discoveryFailureCallback);
 
@@ -63,6 +66,7 @@ public class TvCastingApp {
             new Runnable() {
               @Override
               public void run() {
+                Log.d(TAG, "TvCastingApp stopping Video Player commissioner discovery");
                 nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
                 multicastLock.release();
               }
@@ -287,7 +291,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_subscribeToVendorID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,
@@ -303,7 +307,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_subscribeToProductID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,

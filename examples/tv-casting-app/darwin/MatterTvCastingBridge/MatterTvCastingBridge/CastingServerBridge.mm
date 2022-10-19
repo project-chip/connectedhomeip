@@ -180,11 +180,17 @@
     ChipLogProgress(AppServer, "CastingServerBridge().getDiscoveredCommissioner() called");
 
     dispatch_async(_chipWorkQueue, ^{
+        chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
         DiscoveredNodeData * commissioner = nil;
         const chip::Dnssd::DiscoveredNodeData * cppDiscoveredNodeData
-            = CastingServer::GetInstance()->GetDiscoveredCommissioner(index);
+            = CastingServer::GetInstance()->GetDiscoveredCommissioner(index, associatedConnectableVideoPlayer);
         if (cppDiscoveredNodeData != nullptr) {
             commissioner = [ConversionUtils convertToObjCDiscoveredNodeDataFrom:cppDiscoveredNodeData];
+            if (associatedConnectableVideoPlayer.HasValue()) {
+                VideoPlayer * connectableVideoPlayer =
+                    [ConversionUtils convertToObjCVideoPlayerFrom:associatedConnectableVideoPlayer.Value()];
+                [commissioner setConnectableVideoPlayer:connectableVideoPlayer];
+            }
         }
 
         dispatch_async(clientQueue, ^{

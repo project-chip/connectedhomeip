@@ -26,8 +26,8 @@ public:
     MediaReadBase(chip::ClusterId clusterId) : MediaBase(clusterId) {}
 
     CHIP_ERROR ReadAttribute(void * context,
-                                  chip::Controller::ReadResponseSuccessCallback<typename TypeInfo::DecodableArgType> successFn,
-                                  chip::Controller::ReadResponseFailureCallback failureFn)
+                             chip::Controller::ReadResponseSuccessCallback<typename TypeInfo::DecodableArgType> successFn,
+                             chip::Controller::ReadResponseFailureCallback failureFn)
     {
         VerifyOrDieWithMsg(mTargetVideoPlayerInfo != nullptr, AppServer, "Target unknown");
 

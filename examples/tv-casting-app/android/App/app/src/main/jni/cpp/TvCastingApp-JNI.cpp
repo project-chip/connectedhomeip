@@ -232,6 +232,7 @@ JNI_METHOD(jobject, getActiveTargetVideoPlayers)(JNIEnv * env, jobject)
 
 JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject, jstring addressJStr, jint port)
 {
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD sendUserDirectedCommissioningRequest called with port %d", port);
     Inet::IPAddress addressInet;
     JniUtfString addressJniString(env, addressJStr);
@@ -255,6 +256,7 @@ JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject
 
 JNI_METHOD(jboolean, sendCommissioningRequest)(JNIEnv * env, jobject, jobject jDiscoveredNodeData)
 {
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD sendCommissioningRequest called");
 
     chip::Dnssd::DiscoveredNodeData commissioner;

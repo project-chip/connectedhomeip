@@ -24,7 +24,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
     implements CommissionerDiscoveryFragment.Callback,
-        CommissioningFragment.Callback,
+        ConnectionFragment.Callback,
         SelectClusterFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleCommissioningButtonClicked(DiscoveredNodeData commissioner) {
-    showFragment(CommissioningFragment.newInstance(tvCastingApp, commissioner));
+    showFragment(ConnectionFragment.newInstance(tvCastingApp, commissioner));
   }
 
   @Override
