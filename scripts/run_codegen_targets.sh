@@ -29,8 +29,16 @@ if [ ! -d "$OUT_DIR" ]; then
     exit 1
 fi
 
-# Code generation for build config files (via buildconfig_header)
-for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_.*_buildconfig:' | sed 's/: .*//')"; do
+# Code generation for build config files and asn1. Captures things like:
+#
+# gen_additional_data_payload_buildconfig
+# gen_app_buildconfig
+# gen_asn1oid
+# gen_ble_buildconfig
+# ...
+#
+# Most are buildconfig rules, but asn1oid is special
+for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_' | sed 's/: .*//')"; do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
@@ -46,6 +54,3 @@ for name in "$(ninja -C "$OUT_DIR" -t targets | grep -E 'dbus.*codegen:' | sed '
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done
-
-# ASN1 has no specific rule
-ninja -C "$OUT_DIR" gen_asn1oid
