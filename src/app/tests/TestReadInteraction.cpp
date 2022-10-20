@@ -2925,6 +2925,40 @@ void CheckForInvalidAction(nlTestSuite * apSuite, Test::MessageCapturer & messag
 
 } // anonymous namespace
 
+/**
+ * Helper macro we can use to pretend we got a reply from the server in cases
+ * when the reply was actually dropped due to us not wanting the client's state
+ * machine to advance.
+ *
+ * When this macro is used, the client has sent a message and is waiting for an
+ * ack+response, and the server has sent a response that got dropped and is
+ * waiting for an ack (and maybe a response).
+ *
+ * What this macro then needs to do is:
+ *
+ * 1. Pretend that the client got an ack (and clear out the corresponding ack
+ *    state).
+ * 2. Pretend that the client got a message from the server, with the id of the
+ *    message that was dropped, which requires an ack, so the client will send
+ *    that ack in its next message.
+ *
+ * This is a macro so we get useful line numbers on assertion failures
+ */
+#define PretendWeGotReplyFromServer(aSuite, aContext, aClientExchange)                                                             \
+    {                                                                                                                              \
+        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 2);                                                          \
+                                                                                                                                   \
+        localRm->ClearRetransTable(localExchange);                                                                                 \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 1);                                                          \
+                                                                                                                                   \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
+            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
+            return Loop::Break;                                                                                                    \
+        });                                                                                                                        \
+    }
+
 // Read Client sends the read request, Read Handler drops the response, then test injects unknown status reponse message for Read
 // Client.
 void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSuite, void * apContext)
@@ -2956,8 +2990,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
     readPrepareParams.mAttributePathParamsListSize = 2;
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Read);
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 1;
@@ -2966,6 +2999,9 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         err                                                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
 
         System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
         NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
@@ -2982,9 +3018,11 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage(nlTestSuite * apSu
         Test::MessageCapturer messageLog(ctx);
         messageLog.mCaptureStandaloneAcks = false;
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
-        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
-        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -3064,13 +3102,16 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse(nlTest
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
-
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
+
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -3154,13 +3195,16 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse(nlT
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
-
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
+
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
         ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -3242,12 +3286,15 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage(nlTestS
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
@@ -3406,12 +3453,15 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::SubscribeResponse);
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
 
         ctx.GetLoopback().mSentMessageCount                 = 0;
         ctx.GetLoopback().mNumMessagesToDrop                = 0;
@@ -3573,7 +3623,11 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId(nlTestSuite * ap
 
         NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
 
-        rm->ClearRetransTable(readClient.mExchange.Get());
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
@@ -3779,17 +3833,21 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage(nlTestSuite * apSuite,
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
-
-        ctx.GetLoopback().mSentMessageCount = 0;
-        rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+
+        ctx.GetLoopback().mSentMessageCount = 0;
+
         // Server sends out status report, client should send status report along with Piggybacking ack, but we don't do that
-        // Instead, we send out unknown message to server,but server is still waiting for ack, so we need
-        // clear out retranstable
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
+        // Instead, we send out unknown message to server
+
         System::PacketBufferHandle msgBuf;
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
@@ -3852,13 +3910,17 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport(nlTestSuite * apS
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
+        // Since we are dropping packets, things are not getting acked.  Set up
+        // our MRP state to look like what it would have looked like if the
+        // packet had not gotten dropped.
+        PretendWeGotReplyFromServer(apSuite, ctx, readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mDroppedMessageCount == 1);
         ctx.GetLoopback().mSentMessageCount = 0;
-        rm->ClearRetransTable(readClient.mExchange.Get());
+
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
 
         System::PacketBufferHandle msgBuf;
         StatusResponseMessage::Builder request;
