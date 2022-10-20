@@ -4,6 +4,7 @@
 #include "bridge/First.h"
 #include "bridge/Second.h"
 #include "bridge/Third.h"
+#include "bridge/Third.h"
 
 namespace clusters {
 
@@ -29,6 +30,14 @@ struct ClusterInfo
     sizeof(SecondCluster),
     [](void *mem) -> GeneratedCluster* {
       return new(mem) SecondCluster();
+    },
+  },
+  {
+    3,
+    "Third",
+    sizeof(ThirdCluster),
+    [](void *mem) -> GeneratedCluster* {
+      return new(mem) ThirdCluster();
     },
   },
   {
