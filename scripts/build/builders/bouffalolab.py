@@ -42,12 +42,12 @@ class BouffalolabApp(Enum):
 
 
 class BouffalolabBoard(Enum):
-    BL602_IoT_Matter_V1 = 1
-    BL602_IOT_DVK_3S = 2
-    BL602_NIGHT_LIGHT = 3
-    XT_ZB6_DevKit = 101
-    BL706_IoT_DVK = 102
-    BL706_NIGHT_LIGHT = 103
+    BL602_IoT_Matter_V1 = auto()
+    BL602_IOT_DVK_3S = auto()
+    BL602_NIGHT_LIGHT = auto()
+    XT_ZB6_DevKit = auto()
+    BL706_IoT_DVK = auto()
+    BL706_NIGHT_LIGHT = auto()
 
     def GnArgName(self):
         if self == BouffalolabBoard.BL602_IoT_Matter_V1:
@@ -75,7 +75,7 @@ class BouffalolabBuilder(GnBuilder):
                  board: BouffalolabBoard = BouffalolabBoard.BL706_IoT_DVK,
                  enable_rpcs: bool = False,
                  module_type: str = "BL706C-22",
-                 baudrate: str = "2000000",
+                 baudrate = 2000000,
                  enable_shell: bool = False
                  ):
 

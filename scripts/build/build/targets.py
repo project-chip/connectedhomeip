@@ -460,7 +460,7 @@ def BuildBouffalolabTarget():
     ])
 
     target.AppendModifier('shell', enable_shell=True)
-    target.AppendModifier('115200', baudrate="115200")
+    target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
 
     return target
