@@ -38,11 +38,11 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-namespace chip{
-namespace trace{
+namespace chip {
+namespace trace {
 extern void ResetTraceStream(void);
 }
-}
+} // namespace chip
 
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 namespace chip {
