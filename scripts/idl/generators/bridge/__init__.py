@@ -166,9 +166,9 @@ class BridgeGenerator(CodeGenerator):
                 continue
 
             if cluster.side != ClusterSide.SERVER:
-                output_file_name = "bridge/%s.h" % cluster.name
+                output_file_name = "bridge/%sServer.h" % cluster.name
             else:
-                output_file_name = "bridge/%sClient.h" % cluster.name
+                output_file_name = "bridge/%s.h" % cluster.name
 
             self.internal_render_one_output(
                 template_path="bridge/BridgeClustersCpp.jinja",

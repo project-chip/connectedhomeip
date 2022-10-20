@@ -31,7 +31,7 @@ chip_data_model("dynamic-bridge-common") {
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
-  import("$dir_pw_protobuf_compiler/proto.gni")
+  IMPORT("$dir_pw_protobuf_compiler/proto.gni")
 
   pw_proto_library("bridge_service") {
     sources = [ "protos/bridge_service.proto" ]
