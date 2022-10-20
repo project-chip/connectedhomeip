@@ -1,0 +1,12 @@
+<gatt>
+  <service advertise="false" id="ota" name="Silicon Labs OTA" requirement="mandatory" sourceId="com.silabs.service.ota" type="primary" uuid="1D14D6EE-FD63-4FA1-BFA4-8F47B42119F0">
+    <informativeText>Abstract: The Silicon Labs OTA Service enables in-place over-the-air firmware update of the device. </informativeText>
+    <characteristic const="false" id="ota_control" name="Silicon Labs OTA Control" sourceId="com.silabs.characteristic.ota_control" uuid="F7BF3564-FB6D-4E53-88A4-5E37E0326063">
+      <informativeText>Abstract: Silicon Labs OTA Control. </informativeText>
+      <value length="1" type="user" variable_length="false"/>
+      <properties write="true">
+        <write authenticated="false" bonded="false" encrypted="false"/>
+      </properties>
+    </characteristic>
+  </service>
+</gatt>
