@@ -97,6 +97,9 @@ jobs:
                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
 
+                     # Test files are intentionally small and not spec-compilant, just parse-compliant
+                     if [[ "$idl_file" == "./scripts/idl/tests/inputs/"* ]]; then continue; fi
+
                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                  done
 
