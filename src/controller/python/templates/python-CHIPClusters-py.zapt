@@ -28,11 +28,11 @@ class ChipClusters:
 {{/chip_cluster_commands}}
             },
             "attributes": {
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
                 {{asHex code 8}}: {
                     "attributeName": "{{asUpperCamelCase name}}",
                     "attributeId": {{asHex code 8}},
-                    "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
+                    "type": "{{get_underlying_language_specific_zcl_type type language="python" boolean="bool"}}",
                     {{#if isReportableAttribute}}
                     "reportable": True,
                     {{/if}}
@@ -40,7 +40,7 @@ class ChipClusters:
                     "writable": True,
                     {{/if}}
                 },
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
             },
     }
 {{/chip_client_clusters}}

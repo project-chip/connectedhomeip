@@ -196,7 +196,7 @@ private:
     {{else if (isCharString type)}}
     chip::ByteSpan mValue;
     {{else}}
-    {{chipType}} mValue;
+      {{get_underlying_language_specific_zcl_type type prefix="uint" signedPrefix="int" postfix="_t" sizeIn='bits' roundUpToPowerOfTwo=1 language="c++" boolean="bool"}} mValue;
     {{/if_chip_complex}}
 };
 

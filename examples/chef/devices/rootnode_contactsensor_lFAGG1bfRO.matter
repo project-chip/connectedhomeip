@@ -128,10 +128,7 @@ client cluster Binding = 30 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 

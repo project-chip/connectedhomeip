@@ -250,6 +250,7 @@ client cluster OnOff = 6 {
   attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
@@ -297,6 +298,7 @@ server cluster OnOff = 6 {
   attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
@@ -335,6 +337,7 @@ client cluster LevelControl = 8 {
   attribute nullable int8u defaultMoveRate = 20;
   attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
   readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToLevelRequest {
@@ -434,6 +437,7 @@ server cluster LevelControl = 8 {
   attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToLevelRequest {
     INT8U level = 0;
@@ -519,6 +523,7 @@ client cluster Descriptor = 29 {
   readonly attribute ENDPOINT_NO partsList[] = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster Descriptor = 29 {
@@ -532,6 +537,7 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
   readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1686,9 +1692,6 @@ client cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute ChannelInfo channelList[] = 0;
-  readonly attribute nullable LineupInfo lineup = 1;
-  readonly attribute nullable ChannelInfo currentChannel = 2;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {
@@ -1721,7 +1724,6 @@ client cluster TargetNavigator = 1285 {
     char_string<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequest {
@@ -1808,7 +1810,6 @@ client cluster MediaInput = 1287 {
     char_string<32> description = 3;
   }
 
-  readonly attribute InputInfo inputList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {
@@ -2011,8 +2012,6 @@ client cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
@@ -2051,7 +2050,6 @@ client cluster AudioOutput = 1291 {
     char_string<32> name = 2;
   }
 
-  readonly attribute OutputInfo outputList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {
@@ -2083,7 +2081,6 @@ client cluster ApplicationLauncher = 1292 {
     char_string applicationId = 1;
   }
 
-  readonly attribute INT16U catalogList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
@@ -2112,12 +2109,6 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  readonly attribute char_string<32> vendorName = 0;
-  readonly attribute vendor_id vendorID = 1;
-  readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productID = 3;
-  readonly attribute ApplicationStatusEnum status = 5;
-  readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute int16u clusterRevision = 65533;
 }
 

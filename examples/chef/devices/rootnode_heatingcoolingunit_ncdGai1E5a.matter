@@ -265,10 +265,7 @@ client cluster Binding = 30 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1216,14 +1213,7 @@ client cluster Thermostat = 513 {
     kAutomode = 0x20;
   }
 
-  readonly attribute nullable int16s localTemperature = 0;
-  attribute int16s occupiedCoolingSetpoint = 17;
-  attribute int16s occupiedHeatingSetpoint = 18;
-  attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 

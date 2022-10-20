@@ -36,6 +36,7 @@ client cluster Identify = 3 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster Identify = 3 {
@@ -67,6 +68,7 @@ server cluster Identify = 3 {
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
@@ -157,12 +159,6 @@ client cluster Scenes = 5 {
     int8u attributeValue[] = 1;
   }
 
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
@@ -284,13 +280,6 @@ client cluster OnOff = 6 {
     kSceneNames = 0x1;
   }
 
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   command Off(): DefaultSuccess = 0;
@@ -1553,27 +1542,6 @@ client cluster ColorControl = 768 {
     kUpdateStartHue = 0x8;
   }
 
-  readonly attribute int8u currentHue = 0;
-  readonly attribute int8u currentSaturation = 1;
-  readonly attribute int16u remainingTime = 2;
-  readonly attribute int16u currentX = 3;
-  readonly attribute int16u currentY = 4;
-  readonly attribute int16u colorTemperatureMireds = 7;
-  readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 options = 15;
-  readonly attribute nullable int8u numberOfPrimaries = 16;
-  readonly attribute int16u enhancedCurrentHue = 16384;
-  readonly attribute enum8 enhancedColorMode = 16385;
-  readonly attribute int8u colorLoopActive = 16386;
-  readonly attribute int8u colorLoopDirection = 16387;
-  readonly attribute int16u colorLoopTime = 16388;
-  readonly attribute int16u colorLoopStartEnhancedHue = 16389;
-  readonly attribute int16u colorLoopStoredEnhancedHue = 16390;
-  readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMinMireds = 16395;
-  readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
-  readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) nullable int16u startUpColorTemperatureMireds = 16400;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {

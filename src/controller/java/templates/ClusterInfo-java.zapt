@@ -235,7 +235,7 @@ public class ClusterInfoMapping {
       }
 
   {{/chip_cluster_responses}}
-      {{#chip_server_cluster_attributes}}
+      {{#zcl_attributes_server}}
       {{#if isArray}}
       {{#if isStruct}}
 
@@ -264,7 +264,7 @@ public class ClusterInfoMapping {
         }
       }
       {{/if}}
-      {{/chip_server_cluster_attributes}}
+      {{/zcl_attributes_server}}
 
   {{/chip_client_clusters}}
 

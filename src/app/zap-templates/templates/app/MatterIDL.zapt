@@ -45,7 +45,7 @@
   }
 
   {{/zcl_events}}
-  {{#chip_server_cluster_attributes}}
+  {{#all_user_cluster_attributes_irrespective_of_manufatucuring_specification name side}}
   {{! ensure indent }}{{#unless isWritableAttribute~}}
     readonly {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
@@ -72,7 +72,7 @@
     {{/unless}} {{asLowerCamelCase name~}}
     {{~#if isArray~}} [] {{~/if}} = {{code~}}
     ;
-  {{/chip_server_cluster_attributes}}
+  {{/all_user_cluster_attributes_irrespective_of_manufatucuring_specification}}
   {{~!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
     {{#all_incoming_commands_for_cluster name side}}

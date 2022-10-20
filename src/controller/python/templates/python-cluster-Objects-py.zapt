@@ -24,7 +24,7 @@ class {{asUpperCamelCase name}}(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-{{#zcl_attributes_server}}
+{{#zcl_attributes_server hasIsOptional=true}}
             {{#if entryType}}
                 ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}),
             {{else}}
@@ -33,7 +33,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{/zcl_attributes_server}}
             ])
 
-{{#zcl_attributes_server}}
+{{#zcl_attributes_server hasIsOptional=true}}
 {{#if entryType}}
     {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
 {{else}}
@@ -111,7 +111,7 @@ class {{asUpperCamelCase name}}(Cluster):
 
 {{/zcl_commands}}
 
-{{#zcl_attributes_server}}
+{{#zcl_attributes_server hasIsOptional=true}}
 {{#first}}
     class Attributes:
 {{/first}}

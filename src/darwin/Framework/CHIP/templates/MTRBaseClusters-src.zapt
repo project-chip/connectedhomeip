@@ -101,7 +101,7 @@ using chip::SessionHandle;
 }
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -228,7 +228,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 }
 
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 @end
 
