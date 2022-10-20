@@ -75,7 +75,7 @@ class BouffalolabBuilder(GnBuilder):
                  board: BouffalolabBoard = BouffalolabBoard.BL706_IoT_DVK,
                  enable_rpcs: bool = False,
                  module_type: str = "BL706C-22",
-                 baudrate = 2000000,
+                 baudrate=2000000,
                  enable_shell: bool = False
                  ):
 
