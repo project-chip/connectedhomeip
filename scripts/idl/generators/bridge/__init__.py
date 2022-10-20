@@ -18,7 +18,7 @@ import logging
 import re
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import (Idl, Field, Attribute, Cluster)
+from idl.matter_idl_types import Idl, Field, Attribute, Cluster, ClusterSide
 from idl import matter_idl_types
 from idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
                                   IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext)
@@ -163,6 +163,9 @@ class BridgeGenerator(CodeGenerator):
         """
         for cluster in self.idl.clusters:
             if not is_dynamic_cluster(cluster, self.idl):
+                continue
+
+            if cluster.side != ClusterSide.CLIENT:
                 continue
 
             self.internal_render_one_output(

@@ -87,6 +87,7 @@ class TestCaseStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if REGENERATE_GOLDEN_IMAGES:
+            print("RE-GENERATING %r" % relative_path)
             # Expect writing only on regeneration
             with open(self.get_existing_data_path(relative_path), 'wt') as golden:
                 golden.write(content)
