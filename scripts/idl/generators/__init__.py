@@ -113,7 +113,8 @@ class CodeGenerator:
         self.storage = storage
         self.idl = idl
         self.jinja_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(searchpath=os.path.dirname(__file__)))
+            loader=jinja2.FileSystemLoader(searchpath=os.path.dirname(__file__)),
+            keep_trailing_newline=True)
         self.dry_run = False
 
         RegisterCommonFilters(self.jinja_env.filters)

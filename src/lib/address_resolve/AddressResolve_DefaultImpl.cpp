@@ -35,13 +35,21 @@ enum class IpScore : unsigned
     // "Other" IPv6 include:
     //   - invalid addresses (have seen router bugs during interop testing)
     //   - embedded IPv4 (::/80)
-    kOtherIpv6                     = 1,
-    kIpv4                          = 2, // Not Matter SPEC, so low priority
+    kOtherIpv6 = 1,
+    kIpv4      = 2, // Not Matter SPEC, so low priority
+#ifdef __APPLE__
+    kUniqueLocal                   = 3, // ULA. Thread devices use this
+    kGlobalUnicast                 = 4, // Maybe routable, not local subnet
+    kUniqueLocalWithSharedPrefix   = 5, // Prefix seems to match a local interface
+    kGlobalUnicastWithSharedPrefix = 6, // Prefix seems to match a local interface
+    kLinkLocal                     = 7, // Valid only on an interface
+#else
     kLinkLocal                     = 3, // Valid only on an interface
     kUniqueLocal                   = 4, // ULA. Thread devices use this
     kGlobalUnicast                 = 5, // Maybe routable, not local subnet
     kUniqueLocalWithSharedPrefix   = 6, // Prefix seems to match a local interface
     kGlobalUnicastWithSharedPrefix = 7, // Prefix seems to match a local interface
+#endif // __APPLE__
 };
 
 constexpr unsigned ScoreValue(IpScore score)
@@ -57,6 +65,13 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 {
     if (ip.IsIPv6())
     {
+#ifdef __APPLE__
+        if (ip.IsIPv6LinkLocal())
+        {
+            return IpScore::kLinkLocal;
+        }
+#endif // __APPLE__
+
         if (interfaceId.MatchLocalIPv6Subnet(ip))
         {
             if (ip.IsIPv6GlobalUnicast())
@@ -78,10 +93,12 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
             return IpScore::kUniqueLocal;
         }
 
+#ifndef __APPLE__
         if (ip.IsIPv6LinkLocal())
         {
             return IpScore::kLinkLocal;
         }
+#endif // __APPLE__
 
         return IpScore::kOtherIpv6;
     }

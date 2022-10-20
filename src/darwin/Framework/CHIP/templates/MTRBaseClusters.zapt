@@ -32,16 +32,17 @@ NS_ASSUME_NONNULL_BEGIN
 {{#chip_server_cluster_attributes}}
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
 {{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
+{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
   Params:(MTRReadParams * _Nullable)params completionHandler:
 {{~else~}}
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
-(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
 {{/if}}
 {{#if isReportableAttribute}}
 /**
@@ -50,8 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(MTRSubscribeParams * _Nullable)params
-subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
+subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
@@ -76,7 +77,19 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName ../name label}})
    {{#zcl_bitmap_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
    {{/zcl_bitmap_items}}
-};
+}
+{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
+{{#if (isStrEqual (asUpperCamelCase ../name) "Switch")}}
+{{#if (isStrEqual (asUpperCamelCase label) "SwitchFeature")}}
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+{{/if}}
+{{/if}}
+{{#if (isStrEqual (asUpperCamelCase ../name) "MediaPlayback")}}
+{{#if (isStrEqual (asUpperCamelCase label) "MediaPlaybackFeature")}}
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+{{/if}}
+{{/if}}
+;
 
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
