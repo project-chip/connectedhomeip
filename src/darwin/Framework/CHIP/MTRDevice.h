@@ -155,7 +155,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 

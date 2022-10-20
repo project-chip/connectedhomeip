@@ -21927,12 +21927,16 @@ labels.
                                                    completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeWriteOnlyInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                             NSError * _Nullable error))completionHandler;
-- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)readAttributeWriteOnlyInt8uWithCompletionHandler:
+    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
-                            completionHandler:(StatusCompletion)completionHandler;
+                            completionHandler:(StatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
@@ -21942,12 +21946,14 @@ labels.
                                                  params:(MTRSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
-                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 + (void)readAttributeWriteOnlyInt8uWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
                                     completionHandler:
-                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -22558,7 +22564,7 @@ typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
     MTRSwitchFeatureMomentarySwitchRelease = 0x4,
     MTRSwitchFeatureMomentarySwitchLongPress = 0x8,
     MTRSwitchFeatureMomentarySwitchMultiPress = 0x10,
-};
+} API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
     MTRAdministratorCommissioningCommissioningWindowStatusWindowNotOpen = 0x00,
@@ -23255,7 +23261,7 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
 typedef NS_OPTIONS(uint32_t, MTRMediaPlaybackFeature) {
     MTRMediaPlaybackFeatureAdvancedSeek = 0x1,
     MTRMediaPlaybackFeatureVariableSpeed = 0x2,
-};
+} API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
     MTRMediaInputInputTypeInternal = 0x00,

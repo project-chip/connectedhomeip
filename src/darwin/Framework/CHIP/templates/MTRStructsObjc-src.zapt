@@ -6,7 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_structs}}
-@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
+{{#*inline "interfaceImpl"}}
+@implementation {{interfaceName}}
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -19,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} alloc] init];
+  auto other = [[{{interfaceName}} alloc] init];
 
   {{#zcl_struct_items}}
   other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
@@ -35,22 +36,14 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+{{/inline}}
 
-{{!Backwards compat for now: Add a DeviceType thing that inherits from DeviceTypeStruct. }}
+{{> interfaceImpl interfaceName=(concat "MTR" (asUpperCamelCase parent.name) "Cluster" (asUpperCamelCase name))}}
+
+{{!Backwards compat for now: Add a DeviceType thing that is API-compatible with DeviceTypeStruct. }}
 {{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
-@implementation MTRDescriptorClusterDeviceType
-
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    auto other = [[MTRDescriptorClusterDeviceType alloc] init];
-    other.type = self.type;
-    other.revision = self.revision;
-
-    return other;
-}
-
-@end
+{{> interfaceImpl interfaceName="MTRDescriptorClusterDeviceType"}}
 {{/if}}
 {{/if}}
 
