@@ -165,12 +165,14 @@ class BridgeGenerator(CodeGenerator):
             if not is_dynamic_cluster(cluster, self.idl):
                 continue
 
-            if cluster.side != ClusterSide.CLIENT:
-                continue
+            if cluster.side != ClusterSide.SERVER:
+                output_file_name = "bridge/%s.h" % cluster.name
+            else:
+                output_file_name = "bridge/%sClient.h" % cluster.name
 
             self.internal_render_one_output(
                 template_path="bridge/BridgeClustersCpp.jinja",
-                output_file_name="bridge/%s.h" % cluster.name,
+                output_file_name=output_file_name,
                 vars={
                     'cluster': cluster,
                     'idl': self.idl,
