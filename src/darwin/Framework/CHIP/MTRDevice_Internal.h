@@ -35,6 +35,7 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 @property (nonatomic, readonly, strong, nonnull) MTRDeviceController * deviceController;
 @property (nonatomic, readonly) uint64_t nodeID;
+@property (nonatomic, readonly) MTRAsyncCallbackWorkQueue * asyncCallbackWorkQueue;
 
 @end
 
