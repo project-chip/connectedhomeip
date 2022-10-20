@@ -89,6 +89,15 @@ public:
         return (mStreams.size());
     }
 
+    void CleanJsonBuf(void)
+    {
+        std::lock_guard<std::mutex> guard(mLock);
+        for (auto stream : mStreams)
+        {
+            stream->CleanJsonBuf();
+        }
+    }
+
 private:
     mutable std::mutex mLock;
     std::vector<TraceStream *> mStreams;
@@ -348,6 +357,11 @@ void InitTrace()
 void DeInitTrace()
 {
     gTraceOutputs.UnregisterAllStreams();
+}
+
+void ResetTraceStream(void)
+{
+    gTraceOutputs.CleanJsonBuf();
 }
 
 } // namespace trace

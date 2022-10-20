@@ -37,7 +37,14 @@
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+namespace chip{
+namespace trace{
+extern void ResetTraceStream(void);
+}
+}
 
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 namespace chip {
 namespace Messaging {
 
@@ -72,7 +79,9 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
             reliableMessageMgr->ClearRetransTable(*e);
         };
         std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
-
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        chip::trace::ResetTraceStream();
+#endif
         ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
         CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
         err            = ReliableMessageMgr::MapSendError(err, exchangeId, isInitiator);
@@ -84,6 +93,9 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
         // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
         EncryptedPacketBufferHandle preparedMessage;
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        chip::trace::ResetTraceStream();
+#endif
         ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
         ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
     }
