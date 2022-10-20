@@ -37,6 +37,7 @@ from idl.generators import GeneratorStorage
 
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
+REGENERATE_GOLDEN_IMAGES = False
 
 
 @dataclass
@@ -63,19 +64,33 @@ class TestCaseStorage(GeneratorStorage):
         self.checker = checker
         self.checked_files = set()
 
+    def get_existing_data_path(self, relative_path: str):
+        for expected in self.test_case.outputs:
+            if expected.file_name == relative_path:
+                return os.path.join(TESTS_DIR, expected.golden_path)
+
+        self.checker.fail("Expected output %s not found" % relative_path)
+        return None
+
     def get_existing_data(self, relative_path: str):
         self.checked_files.add(relative_path)
 
-        for expected in self.test_case.outputs:
-            if expected.file_name == relative_path:
-                with open(os.path.join(TESTS_DIR, expected.golden_path), 'rt') as golden:
-                    return golden.read()
+        path = self.get_existing_data_path(relative_path)
+        if path:
+            with open(path, 'rt') as golden:
+                return golden.read()
 
         # This will attempt a new write, causing a unit test failure
         self.checker.fail("Expected output %s not found" % relative_path)
         return None
 
     def write_new_data(self, relative_path: str, content: str):
+        if REGENERATE_GOLDEN_IMAGES:
+            # Expect writing only on regeneration
+            with open(self.get_existing_data_path(relative_path), 'wt') as golden:
+                golden.write(content)
+                return
+
         # This is a unit test failure: we do NOT expect
         # to write any new data
 
@@ -148,4 +163,8 @@ class TestGenerators(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    if 'IDL_GOLDEN_REGENERATE' in os.environ:
+        # run with `IDL_GOLDEN_REGENERATE=1` to cause a regeneration of test
+        # data. Then one can use `git diff` to see if the deltas make sense
+        REGENERATE_GOLDEN_IMAGES = True
     unittest.main()

@@ -105,6 +105,7 @@ declare -a args=(
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
+    'mac_target_arch="'"$PLATFORM_PREFERRED_ARCH"'"'
     'mac_deployment_target="'"$LLVM_TARGET_TRIPLE_OS_VERSION"''"$LLVM_TARGET_TRIPLE_SUFFIX"'"'
 )
 

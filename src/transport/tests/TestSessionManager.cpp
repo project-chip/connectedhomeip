@@ -991,6 +991,58 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void TestFindSecureSessionForNode(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+
+    SessionManager sessionManager;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                           &fabricTableHolder.GetFabricTable()));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    aliceToBobSession->AsSecureSession()->MarkActive();
+
+    SessionHolder newAliceToBobSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastActivityTime())
+    {
+        // Wait for the clock to advance so the new session is
+        // more-recently-active.
+    }
+    newAliceToBobSession->AsSecureSession()->MarkActive();
+
+    auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                                MakeOptional(SecureSession::Type::kCASE));
+    NL_TEST_ASSERT(inSuite, foundSession.HasValue());
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession.Contains(foundSession.Value()));
+    NL_TEST_ASSERT(inSuite, !aliceToBobSession.Contains(foundSession.Value()));
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -1008,6 +1060,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
     NL_TEST_DEF("Session Counter Exhausted Test", SessionCounterExhaustedTest),
     NL_TEST_DEF("SessionShiftingTest",            SessionShiftingTest),
+    NL_TEST_DEF("TestFindSecureSessionForNode",   TestFindSecureSessionForNode),
 
     NL_TEST_SENTINEL()
 };

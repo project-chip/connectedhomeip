@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/config/mac/mac_sdk.gni")
 import("${chip_root}/examples//chip-tool/chip-tool.gni")
 
 if (config_use_interactive_mode) {
@@ -28,8 +29,10 @@ declare_args() {
   chip_codesign = current_os == "ios"
 }
 
+sdk = "macosx"
 sdk_build_dir_suffix = ""
 if (getenv("SDKROOT") != "") {
+  sdk = getenv("SDKROOT")
   sdk_root_parts = string_split(getenv("SDKROOT"), ".")
   sdk_build_dir_suffix = "-${sdk_root_parts[0]}"
 }
@@ -55,6 +58,15 @@ action("build-darwin-framework") {
     "--log_path",
     rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
   ]
+
+  if (sdk != "macosx") {
+    args += [
+      "--target_sdk",
+      sdk,
+      "--target_arch",
+      mac_target_arch,
+    ]
+  }
 
   output_name = "Matter.framework"
   outputs = [
@@ -90,6 +102,10 @@ config("config") {
   cflags = [
     "-Wconversion",
     "-fobjc-arc",
+
+    # For now disable unguarded-availability-new warnings because we
+    # are not building against a system Matter.framework here anyway.
+    "-Wno-unguarded-availability-new",
   ]
 }
 
