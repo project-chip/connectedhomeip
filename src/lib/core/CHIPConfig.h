@@ -1283,5 +1283,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
 /**
+ * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
+ *
+ * @brief Number of custom CD signing keys supported by default CD keystore
+ *
+ */
+#ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
+#define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
+#endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
+/**
  * @}
  */
