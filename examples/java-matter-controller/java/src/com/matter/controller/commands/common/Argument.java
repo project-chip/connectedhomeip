@@ -18,6 +18,8 @@
 
 package com.matter.controller.commands.common;
 
+import java.util.Optional;
+
 public class Argument {
   public static final byte kOptional = (1 << 0);
   public static final byte kNullable = (1 << 1);
@@ -27,7 +29,7 @@ public class Argument {
   public long max;
   public byte flags;
   public Object value;
-  public String desc;
+  public Optional<String> desc;
 
   public boolean isOptional() {
     return ((flags & kOptional) != 0);

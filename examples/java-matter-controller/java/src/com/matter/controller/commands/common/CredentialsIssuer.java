@@ -18,15 +18,9 @@
 
 package com.matter.controller.commands.common;
 
-public class IPAddress {
-  private String ipAddress;
-
-  public boolean fromString(String s) {
-    this.ipAddress = s;
-    return true;
-  }
-
-  public String toString() {
-    return ipAddress;
-  }
-}
+/**
+ * @brief Credentials Issuer for the Command
+ * @details Contains all credential information of the issuer of the command, such as operational
+ *     credentials for a given fabric, the DAC verifier of the commisioner, etc ..
+ */
+public class CredentialsIssuer {}

@@ -23,7 +23,7 @@ import com.matter.controller.config.PersistentStorageOpCertStore;
 import com.matter.controller.config.PersistentStorageOperationalKeystore;
 import java.util.Optional;
 
-public abstract class CHIPCommand extends Command {
+public abstract class MatterCommand extends Command {
 
   public static final short kMaxGroupsPerFabric = 5;
   public static final short kMaxGroupKeysPerFabric = 8;
@@ -34,22 +34,22 @@ public abstract class CHIPCommand extends Command {
       new PersistentStorageOperationalKeystore();
   protected PersistentStorageOpCertStore mOpCertStore = new PersistentStorageOpCertStore();
 
-  protected CredentialIssuerCommands mCredIssuerCmds = null;
-  protected String mCommissionerName = null;
-  protected String mPaaTrustStorePath = null;
-  protected String mCDTrustStorePath = null;
+  protected Optional<CredentialsIssuer> mCredIssuerCmds;
+  protected StringBuffer mCommissionerName = new StringBuffer();
+  protected StringBuffer mPaaTrustStorePath = new StringBuffer();
+  protected StringBuffer mCDTrustStorePath = new StringBuffer();
   protected Optional<Long> mCommissionerNodeId;
   protected Optional<Short> mBleAdapterId;
   protected Optional<Boolean> mUseMaxSizedCerts;
   protected Optional<Boolean> mOnlyAllowTrustedCdKeys;
 
-  public CHIPCommand(String commandName, CredentialIssuerCommands credIssuerCmds) {
+  public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds) {
     this(commandName, credIssuerCmds, null);
   }
 
-  public CHIPCommand(String commandName, CredentialIssuerCommands credIssuerCmds, String helpText) {
+  public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds, String helpText) {
     super(commandName, helpText);
-    this.mCredIssuerCmds = credIssuerCmds;
+    this.mCredIssuerCmds = Optional.ofNullable(credIssuerCmds);
 
     addArgument(
         "paa-trust-store-path",
@@ -87,28 +87,14 @@ public abstract class CHIPCommand extends Command {
 
   /////////// Command Interface /////////
   @Override
-  public int run() {
-    if (maybeSetUpStack() != 0) {
-      System.out.println("Failed to setup stack");
-      return -1;
-    }
-
-    int err = runCommand();
-
+  public void run() throws Exception {
+    maybeSetUpStack();
+    runCommand();
     shutdown();
-
     maybeTearDownStack();
-
-    return err;
   }
 
-  // Will be called in a setting in which it's safe to touch the CHIP
-  // stack. The rules for Run() are as follows:
-  //
-  // 1) If error is returned, Run() must not call SetCommandExitStatus.
-  // 2) If success is returned Run() must either have called
-  //    SetCommandExitStatus() or scheduled async work that will do that.
-  protected abstract int runCommand();
+  protected abstract void runCommand();
 
   // Shut down the command.  After a Shutdown call the command object is ready
   // to be used for another command invocation.
@@ -116,28 +102,10 @@ public abstract class CHIPCommand extends Command {
     resetArguments();
   }
 
-  private int maybeSetUpStack() {
-    int err;
-
-    err = mDefaultStorage.init();
-    if (err != 0) {
-      System.out.println("Failed to init mDefaultStorage");
-      return -1;
-    }
-
-    err = mOperationalKeystore.init(mDefaultStorage);
-    if (err != 0) {
-      System.out.println("Failed to init mOperationalKeystore");
-      return -1;
-    }
-
-    err = mOpCertStore.init(mDefaultStorage);
-    if (err != 0) {
-      System.out.println("Failed to init mOpCertStore");
-      return -1;
-    }
-
-    return 0;
+  private void maybeSetUpStack() throws Exception {
+    mDefaultStorage.init();
+    mOperationalKeystore.init(mDefaultStorage);
+    mOpCertStore.init(mDefaultStorage);
   }
 
   private void maybeTearDownStack() {}

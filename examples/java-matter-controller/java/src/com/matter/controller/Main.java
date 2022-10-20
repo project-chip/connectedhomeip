@@ -20,32 +20,29 @@ package com.matter.controller;
 
 import chip.devicecontroller.ChipDeviceController;
 import chip.devicecontroller.ControllerParams;
-import com.matter.controller.commands.common.ChipDeviceController;
 import com.matter.controller.commands.common.Command;
-import com.matter.controller.commands.common.CredentialIssuerCommands;
+import com.matter.controller.commands.common.CredentialsIssuer;
 import java.util.Arrays;
 
 public class Main {
   private static void ShowUsage(Command[] commands) {
-    String arguments = "";
-    String attributes = "";
+    StringBuffer arguments = new StringBuffer();
+    StringBuffer attributes = new StringBuffer();
 
-    for (int i = 0; i < commands.length; i++) {
-      Command command = commands[i];
-
-      arguments += "    ";
-      arguments += command.getName();
+    for (Command command : commands) {
+      arguments.append("    ");
+      arguments.append(command.getName());
 
       int argumentsCount = command.getArgumentsCount();
       for (int j = 0; j < argumentsCount; j++) {
-        arguments += " ";
-        arguments += command.getArgumentName(j);
+        arguments.append(" ");
+        arguments.append(command.getArgumentName(j));
       }
 
-      arguments += "\n";
+      arguments.append("\n");
 
-      if ("read" == command.getName()) {
-        attributes += "    " + command.getAttribute() + "\n";
+      if ("read" == command.getName() && command.getAttribute().isPresent()) {
+        attributes.append("    " + command.getAttribute().get() + "\n");
       }
     }
 
@@ -58,43 +55,33 @@ public class Main {
             arguments, attributes));
   }
 
-  private static int runCommand(
-      ChipDeviceController dc, CredentialIssuerCommands credIssuerCmds, String[] args) {
-    // Start list of available commands
-    On on = new On(credIssuerCmds);
-    Off off = new Off(credIssuerCmds);
+  private static void runCommand(CredentialsIssuer credIssuerCmds, String[] args) {
 
-    Command[] commands = {on, off};
+    // TODO::Start list of available commands, this hard coded list need to be replaced by command
+    // registration mechanism.
+    Command[] commands = {new On(credIssuerCmds), new Off(credIssuerCmds)};
     // End list of available commands
 
     if (args.length == 0) {
       ShowUsage(commands);
-      return 0;
+      return;
     }
 
-    int err = 0;
-
-    for (int i = 0; i < commands.length; i++) {
-      Command cmd = commands[i];
-
+    for (Command cmd : commands) {
       if (cmd.getName().equals(args[0])) {
         String[] temp = Arrays.copyOfRange(args, 1, args.length);
 
-        if (cmd.initArguments(args.length - 1, temp) == false) {
-          System.out.println("Invalid arguments number");
-          err = -1;
+        try {
+          cmd.initArguments(args.length - 1, temp);
+          cmd.run();
+        } catch (IllegalArgumentException e) {
+          System.out.println("Arguments init failed with exception: " + e.getMessage());
+        } catch (Exception e) {
+          System.out.println("Run command failed with exception: " + e.getMessage());
         }
-
-        if (cmd.run() != 0) {
-          System.out.println("run command failure");
-          err = -1;
-        }
-
         break;
       }
     }
-
-    return err;
   }
 
   public static void main(String[] args) {
@@ -105,9 +92,8 @@ public class Main {
                 .setControllerVendorId(0xFFF1)
                 .build());
 
-    ChipDeviceController dc = new ChipDeviceController();
-    CredentialIssuerCommands credIssuerCmds = new CredentialIssuerCommands();
+    CredentialsIssuer credentialsIssuer = new CredentialsIssuer();
 
-    runCommand(dc, credIssuerCmds, args);
+    runCommand(credentialsIssuer, args);
   }
 }

@@ -19,7 +19,7 @@
 package com.matter.controller.config;
 
 public class PersistentStorage {
-  public int init() {
-    return 0;
+  public void init() throws Exception {
+    throw new Exception("Failed to initialize PersistentStorage");
   }
 }

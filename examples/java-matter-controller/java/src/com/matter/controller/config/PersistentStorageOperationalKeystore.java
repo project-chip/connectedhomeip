@@ -19,7 +19,7 @@
 package com.matter.controller.config;
 
 public class PersistentStorageOperationalKeystore {
-  public int init(PersistentStorage storage) {
-    return 0;
+  public int init(PersistentStorage storage) throws Exception {
+    throw new Exception("Failed to initialize PersistentStorageOperationalKeystore");
   }
 }

@@ -18,22 +18,20 @@
 
 package com.matter.controller;
 
-import com.matter.controller.commands.common.CHIPCommand;
-import com.matter.controller.commands.common.CredentialIssuerCommands;
+import com.matter.controller.commands.common.CredentialsIssuer;
+import com.matter.controller.commands.common.MatterCommand;
 import com.matter.controller.commands.common.MutableInteger;
 
-public class On extends CHIPCommand {
+public class On extends MatterCommand {
   private MutableInteger mNodeId;
   private MutableInteger mFabricId;
 
-  public On(CredentialIssuerCommands credIssuerCmds) {
+  public On(CredentialsIssuer credIssuerCmds) {
     super("on", credIssuerCmds);
     addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId);
     addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId);
   }
 
   @Override
-  protected final int runCommand() {
-    return 0;
-  }
+  protected final void runCommand() {}
 }
