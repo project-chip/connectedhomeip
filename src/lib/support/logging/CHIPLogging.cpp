@@ -69,70 +69,56 @@ namespace {
 std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
 
 /*
- * Array of strings containing the names for each of the chip log
- * modules.
+ * Array of strings containing the names for each of the chip log modules.
  *
- * NOTE: The names must be in the order defined in the LogModule
- *       enumeration. Each name must be a fixed number of characters
- *       long (chip::Logging::kMaxModuleNameLen) padded with nulls as
- *       necessary.
- *
+ * NOTE: The names must be in the order defined in the LogModule enumeration.
  */
-const char ModuleNames[] = "-\0\0" // None
-                           "IN\0"  // Inet
-                           "BLE"   // BLE
-                           "ML\0"  // MessageLayer
-                           "SM\0"  // SecurityManager
-                           "EM\0"  // ExchangeManager
-                           "TLV"   // TLV
-                           "ASN"   // ASN1
-                           "CR\0"  // Crypto
-                           "CTL"   // Controller
-                           "AL\0"  // Alarm
-                           "SC\0"  // SecureChannel
-                           "BDX"   // BulkDataTransfer
-                           "DMG"   // DataManagement
-                           "DC\0"  // DeviceControl
-                           "DD\0"  // DeviceDescription
-                           "ECH"   // Echo
-                           "FP\0"  // FabricProvisioning
-                           "NP\0"  // NetworkProvisioning
-                           "SD\0"  // ServiceDirectory
-                           "SP\0"  // ServiceProvisioning
-                           "SWU"   // SoftwareUpdate
-                           "FS\0"  // FailSafe
-                           "TS\0"  // TimeService
-                           "HB\0"  // Heartbeat
-                           "CSL"   // chipSystemLayer
-                           "EVL"   // Event Logging
-                           "SPT"   // Support
-                           "TOO"   // chipTool
-                           "ZCL"   // Zcl
-                           "SH\0"  // Shell
-                           "DL\0"  // DeviceLayer
-                           "SPL"   // SetupPayload
-                           "SVR"   // AppServer
-                           "DIS"   // Discovery
-                           "IM\0"  // InteractionModel
-                           "TST"   // Test
-                           "OSS"   // OperationalSessionSetup
-                           "ATM"   // Automation
-                           "CSM"   // CASESessionManager
-    ;
+static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
+    "-",   // None
+    "IN",  // Inet
+    "BLE", // BLE
+    "ML",  // MessageLayer
+    "SM",  // SecurityManager
+    "EM",  // ExchangeManager
+    "TLV", // TLV
+    "ASN", // ASN1
+    "CR",  // Crypto
+    "CTL", // Controller
+    "AL",  // Alarm
+    "SC",  // SecureChannel
+    "BDX", // BulkDataTransfer
+    "DMG", // DataManagement
+    "DC",  // DeviceControl
+    "DD",  // DeviceDescription
+    "ECH", // Echo
+    "FP",  // FabricProvisioning
+    "NP",  // NetworkProvisioning
+    "SD",  // ServiceDirectory
+    "SP",  // ServiceProvisioning
+    "SWU", // SoftwareUpdate
+    "FS",  // FailSafe
+    "TS",  // TimeService
+    "HB",  // Heartbeat
+    "CSL", // chipSystemLayer
+    "EVL", // Event Logging
+    "SPT", // Support
+    "TOO", // chipTool
+    "ZCL", // Zcl
+    "SH",  // Shell
+    "DL",  // DeviceLayer
+    "SPL", // SetupPayload
+    "SVR", // AppServer
+    "DIS", // Discovery
+    "IM",  // InteractionModel
+    "TST", // Test
+    "OSS", // OperationalSessionSetup
+    "ATM", // Automation
+    "CSM", // CASESessionManager
+};
 
-#define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
-
-void GetModuleName(char (&buf)[chip::Logging::kMaxModuleNameLen + 1], uint8_t module)
+static char const * GetModuleName(LogModule module)
 {
-
-    const char * module_name = ModuleNames;
-    if (module < ModuleNamesCount)
-    {
-        module_name += module * chip::Logging::kMaxModuleNameLen;
-    }
-
-    memcpy(buf, module_name, chip::Logging::kMaxModuleNameLen);
-    buf[chip::Logging::kMaxModuleNameLen] = 0; // ensure null termination
+    return ModuleNames[(module < kLogModule_Max) ? module : kLogModule_NotSpecified];
 }
 
 } // namespace
@@ -211,9 +197,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
         return;
     }
 
-    char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-    GetModuleName(moduleName, module);
-
+    const char * moduleName = GetModuleName(static_cast<LogModule>(module));
     LogRedirectCallback_t redirect = sLogRedirectCallback.load();
 
     if (redirect != nullptr)
