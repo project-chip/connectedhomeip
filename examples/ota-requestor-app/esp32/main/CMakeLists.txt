@@ -100,7 +100,7 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 if (CONFIG_ENABLE_PW_RPC)
 
 
-set(PIGWEED_ROOT "${cHIP_ROOT}/third_party/pigweed/repo")
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
