@@ -33,6 +33,7 @@ except:
 from idl.matter_idl_types import Idl
 from idl.generators.java import JavaGenerator
 from idl.generators.bridge import BridgeGenerator
+from idl.generators.cpp.application import CppApplicationGenerator
 from idl.generators import GeneratorStorage
 
 
@@ -86,6 +87,7 @@ class TestCaseStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if REGENERATE_GOLDEN_IMAGES:
+            print("RE-GENERATING %r" % relative_path)
             # Expect writing only on regeneration
             with open(self.get_existing_data_path(relative_path), 'wt') as golden:
                 golden.write(content)
@@ -96,7 +98,7 @@ class TestCaseStorage(GeneratorStorage):
 
         # This will display actual diffs in the output files
         self.checker.assertEqual(
-            self.get_existing_data(relative_path), content)
+            self.get_existing_data(relative_path), content, "Content of %s" % relative_path)
 
         # Even if no diff, to be build system friendly, we do NOT expect any
         # actual data writes.
@@ -119,6 +121,8 @@ class GeneratorTest:
             return JavaGenerator(storage, idl)
         if self.generator_name.lower() == 'bridge':
             return BridgeGenerator(storage, idl)
+        if self.generator_name.lower() == 'cpp-app':
+            return CppApplicationGenerator(storage, idl)
         else:
             raise Exception("Unknown generator for testing: %s",
                             self.generator_name.lower())

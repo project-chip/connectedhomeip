@@ -1,0 +1,9 @@
+#pragma once
+
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+
+#define MATTER_PLUGINS_INIT \
+{%- for cluster in clusters | sort(attribute='name') %}
+    Matter{{ cluster.name }}Plugin{{ cluster.side | clusterSideString }}InitCallback();{{ " \\" if not loop.last else ""}}
+{%- endfor %}
+

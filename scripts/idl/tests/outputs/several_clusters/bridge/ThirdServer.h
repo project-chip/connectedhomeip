@@ -8,8 +8,7 @@ struct ThirdCluster : public GeneratedCluster
 {
 
   ThirdCluster() :
-      mSomeEnum(chip::CharSpan("someEnum"), 10, ATTRIBUTE_MASK_WRITABLE, ZCL_ENUM8_ATTRIBUTE_TYPE, 1),
-      mClusterRevision(chip::CharSpan("clusterRevision"), 65533, 0, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ZCL_THIRD_CLUSTER_REVISION)
+      mSomeEnum(chip::CharSpan("someEnum"), 10, ATTRIBUTE_MASK_WRITABLE, ZCL_ENUM8_ATTRIBUTE_TYPE, 1)
   {
   }
 
@@ -20,13 +19,11 @@ struct ThirdCluster : public GeneratedCluster
   {
     return std::vector<AttributeInterface*>({
       static_cast<AttributeInterface*>(&mSomeEnum),
-      static_cast<AttributeInterface*>(&mClusterRevision),
     });
   }
 
 
   Attribute<uint8_t> mSomeEnum;
-  Attribute<uint16_t> mClusterRevision;
 };
 
 }

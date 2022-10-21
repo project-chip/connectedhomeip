@@ -42,11 +42,6 @@
     ],
     "templates": [
         {
-            "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
-            "name": "Matter Application Callbacks header",
-            "output": "PluginApplicationCallbacks.h"
-        },
-        {
             "path": "templates/app/callback-stub-src.zapt",
             "name": "ZCL callback-stub source",
             "output": "callback-stub.cpp"
