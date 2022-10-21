@@ -68,7 +68,7 @@
  *        - #CHIP_ERROR_LOGGING
  *        - #CHIP_PROGRESS_LOGGING
  *        - #CHIP_DETAIL_LOGGING
- *         - #CHIP_AUTOMATION_LOGGING
+ *        - #CHIP_AUTOMATION_LOGGING
  *
  */
 
@@ -91,14 +91,6 @@ void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
 
 uint8_t GetLogFilter();
 void SetLogFilter(uint8_t category);
-
-#ifndef CHIP_ERROR_LOGGING
-#define CHIP_ERROR_LOGGING 1
-#endif
-
-#ifndef CHIP_LOG_FILTERING
-#define CHIP_LOG_FILTERING 1
-#endif
 
 #if CHIP_ERROR_LOGGING
 /**
@@ -123,10 +115,6 @@ void SetLogFilter(uint8_t category);
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif
 
-#ifndef CHIP_PROGRESS_LOGGING
-#define CHIP_PROGRESS_LOGGING 1
-#endif
-
 #if CHIP_PROGRESS_LOGGING
 /**
  * @def ChipLogProgress(MOD, MSG, ...)
@@ -148,10 +136,6 @@ void SetLogFilter(uint8_t category);
 #endif
 #else
 #define ChipLogProgress(MOD, MSG, ...) ((void) 0)
-#endif
-
-#ifndef CHIP_DETAIL_LOGGING
-#define CHIP_DETAIL_LOGGING 1
 #endif
 
 #if CHIP_DETAIL_LOGGING
@@ -184,10 +168,6 @@ void SetLogFilter(uint8_t category);
 #endif
 #else
 #define ChipLogByteSpan(MOD, DATA) ((void) 0)
-#endif
-
-#ifndef CHIP_AUTOMATION_LOGGING
-#define CHIP_AUTOMATION_LOGGING 1
 #endif
 
 #if CHIP_AUTOMATION_LOGGING
