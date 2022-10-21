@@ -19,4 +19,4 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-chip_enable_ble = true
+chip_enable_ble = false

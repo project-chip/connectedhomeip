@@ -45,19 +45,19 @@ public:
 private:
     static CHIP_ERROR ConvertToQueryImageParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
-        MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams);
+        MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams);
     static void ConvertFromQueryImageResponseParms(
-        const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
+        const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
     static void ConvertToApplyUpdateRequestParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
-        MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
+        MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
     static void ConvertFromApplyUpdateRequestResponseParms(
-        const MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
+        const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type & response);
     static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
-        MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
+        MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 
     _Nullable id<MTROTAProviderDelegate> mDelegate;
     dispatch_queue_t mWorkQueue;

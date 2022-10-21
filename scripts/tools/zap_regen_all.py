@@ -21,9 +21,23 @@ from pathlib import Path
 import sys
 import subprocess
 import logging
+from dataclasses import dataclass
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
+
+
+@dataclass(eq=True, frozen=True)
+class ZapDistinctOutput:
+    """Defines the properties that determine if some output seems unique or 
+       not, for the purposes of detecting codegen overlap.
+
+       Not perfect, since separate templates may use the same file names, but
+       better than nothing.
+    """
+
+    input_template: str
+    output_directory: str
 
 
 class ZAPGenerateTarget:
@@ -37,6 +51,9 @@ class ZAPGenerateTarget:
             self.output_dir = str(output_dir)
         else:
             self.output_dir = None
+
+    def distinct_output(self):
+        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -93,7 +110,9 @@ def setupArgumentsParser():
     parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
-                        help="Don't do any generationl just log what targets would be generated (default: False)")
+                        help="Don't do any generation, just log what targets would be generated (default: False)")
+    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+                        help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     return parser.parse_args()
 
 
@@ -133,10 +152,17 @@ def getGlobalTemplatesTargets():
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
 
+        generate_subdir = example_name
+
+        # Special casing lighting app because separate folders
+        if example_name == "lighting-app":
+            if 'nxp' in str(filepath):
+                generate_subdir = f"{example_name}/nxp"
+
         # The name zap-generated is to make includes clear by using
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
-            'zzz_generated', example_name, 'zap-generated')
+            'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
 
     targets.append(ZAPGenerateTarget(
@@ -159,19 +185,6 @@ def getTestsTemplatesTargets(test_target):
             'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
         }
     }
-
-    # Place holder has apps within each build
-    for filepath in Path('./examples/placeholder').rglob('*.zap'):
-        example_name = filepath.as_posix()
-        example_name = example_name[example_name.index(
-            'apps/') + len('apps/'):]
-        example_name = example_name[:example_name.index('/')]
-
-        templates[example_name] = {
-            'zap': filepath,
-            'template': 'examples/placeholder/templates/templates.json',
-            'output_dir': os.path.join('zzz_generated', 'placeholder', example_name, 'zap-generated')
-        }
 
     targets = []
     for key, target in templates.items():
@@ -221,7 +234,27 @@ def getTargets(type, test_target):
     for target in targets:
         target.log_command()
 
+    # validate that every target as a DISTINCT directory (we had bugs here
+    # for various examples duplicating zap files)
+    distinct_outputs = set()
+    for target in targets:
+        o = target.distinct_output()
+
+        if o in distinct_outputs:
+            logging.error("Same output %r:" % o)
+            for t in targets:
+                if t.distinct_output() == o:
+                    logging.error("   %s" % t.zap_config)
+
+            raise Exception("Duplicate/overlapping output directory: %r" % o)
+
+        distinct_outputs.add(o)
+
     return targets
+
+
+def runBootstrap():
+    subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
 
 def main():
@@ -236,6 +269,8 @@ def main():
     targets = getTargets(args.type, args.tests)
 
     if (not args.dry_run):
+        if (args.run_bootstrap):
+            runBootstrap()
         for target in targets:
             target.generate()
 

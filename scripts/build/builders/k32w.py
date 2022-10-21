@@ -22,6 +22,7 @@ class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
+    CONTACT = auto()
 
     def ExampleName(self):
         if self == K32WApp.LIGHT:
@@ -30,6 +31,8 @@ class K32WApp(Enum):
             return 'lock-app'
         elif self == K32WApp.SHELL:
             return 'shell'
+        elif self == K32WApp.CONTACT:
+            return "contact-sensor-app"
         else:
             raise Exception('Unknown app type: %r' % self)
 

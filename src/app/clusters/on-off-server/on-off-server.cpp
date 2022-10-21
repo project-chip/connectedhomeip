@@ -15,29 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief Routines for the On-Off plugin, which
- *implements the On-Off server cluster.
- *******************************************************************************
- ******************************************************************************/
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -210,15 +187,19 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
-#endif
-
-        // write the new on/off value
-        status = Attributes::OnOff::Set(endpoint, newValue);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        else
         {
-            emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
-            return status;
+#endif
+            // write the new on/off value
+            status = Attributes::OnOff::Set(endpoint, newValue);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
+                return status;
+            }
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         }
+#endif
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -264,7 +245,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         EmberAfStatus status      = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = setOnOffValue(endpoint, onOffValueForStartUp, false);
+            status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT

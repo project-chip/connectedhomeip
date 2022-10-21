@@ -30,29 +30,29 @@ using namespace chip;
 
 @implementation MTRDeviceControllerStartupParams
 
-- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    if (!IsValidFabricId([fabricID unsignedLongLongValue])) {
-        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", [fabricID unsignedLongLongValue]);
+    if (!IsValidFabricId(fabricId)) {
+        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
         return nil;
     }
 
     _nocSigner = nocSigner;
-    _fabricID = [fabricID copy];
-    _ipk = [ipk copy];
+    _fabricId = fabricId;
+    _ipk = ipk;
 
     return self;
 }
 
-- (instancetype)initWithIPK:(NSData *)ipk
-         operationalKeypair:(id<MTRKeypair>)operationalKeypair
-     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes *)rootCertificate
+- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
+                    operationalCertificate:(NSData *)operationalCertificate
+                   intermediateCertificate:(nullable NSData *)intermediateCertificate
+                           rootCertificate:(NSData *)rootCertificate
+                                       ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {
         return nil;
@@ -75,14 +75,14 @@ using namespace chip;
             MTR_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
             return nil;
         }
-        _fabricID = @(fabricId);
+        _fabricId = fabricId;
     }
 
     _operationalKeypair = operationalKeypair;
-    _operationalCertificate = [operationalCertificate copy];
-    _intermediateCertificate = [intermediateCertificate copy];
-    _rootCertificate = [rootCertificate copy];
-    _ipk = [ipk copy];
+    _operationalCertificate = operationalCertificate;
+    _intermediateCertificate = intermediateCertificate;
+    _rootCertificate = rootCertificate;
+    _ipk = ipk;
 
     return self;
 }
@@ -94,10 +94,10 @@ using namespace chip;
     }
 
     _nocSigner = params.nocSigner;
-    _fabricID = params.fabricID;
+    _fabricId = params.fabricId;
     _ipk = params.ipk;
-    _vendorID = params.vendorID;
-    _nodeID = params.nodeID;
+    _vendorId = params.vendorId;
+    _nodeId = params.nodeId;
     _rootCertificate = params.rootCertificate;
     _intermediateCertificate = params.intermediateCertificate;
     _operationalCertificate = params.operationalCertificate;
@@ -136,8 +136,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
-    if (self.operationalCertificate != nil && self.nodeID != nil) {
-        MTR_LOG_ERROR("nodeID must be nil if operationalCertificate is not nil");
+    if (self.operationalCertificate != nil && self.nodeId != nil) {
+        MTR_LOG_ERROR("nodeId must be nil if operationalCertificate is not nil");
         return nil;
     }
 
@@ -169,20 +169,20 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
-    if (self.operationalCertificate == nil && self.nodeID == nil) {
+    if (self.operationalCertificate == nil && self.nodeId == nil) {
         // Just avoid setting the top bit, to avoid issues with node
         // ids outside the operational range.
         uint64_t nodeId = arc4random();
         nodeId = (nodeId << 31) | (arc4random() >> 1);
-        self.nodeID = @(nodeId);
+        self.nodeId = @(nodeId);
     }
 
     if (self.rootCertificate == nil) {
         NSError * error;
-        self.rootCertificate = [MTRCertificates createRootCertificate:self.nocSigner
-                                                             issuerID:nil
-                                                             fabricID:self.fabricID
-                                                                error:&error];
+        self.rootCertificate = [MTRCertificates generateRootCertificate:self.nocSigner
+                                                               issuerId:nil
+                                                               fabricId:@(self.fabricId)
+                                                                  error:&error];
         if (error != nil || self.rootCertificate == nil) {
             MTR_LOG_ERROR("Failed to generate root certificate: %@", error);
             return nil;
@@ -206,13 +206,13 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     const FabricInfo * fabric = fabricTable->FindFabricWithIndex(fabricIndex);
 
-    if (self.vendorID == nil) {
-        self.vendorID = @(fabric->GetVendorId());
+    if (self.vendorId == nil) {
+        self.vendorId = @(fabric->GetVendorId());
     }
 
     BOOL usingExistingNOC = NO;
-    if (self.operationalCertificate == nil && self.nodeID == nil) {
-        self.nodeID = @(fabric->GetNodeId());
+    if (self.operationalCertificate == nil && self.nodeId == nil) {
+        self.nodeId = @(fabric->GetNodeId());
 
         if (self.operationalKeypair == nil) {
             uint8_t nocBuf[Credentials::kMaxCHIPCertLength];

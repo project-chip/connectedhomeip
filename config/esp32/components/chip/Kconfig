@@ -175,13 +175,6 @@ menu "CHIP Core"
 
     menu "Security Options"
 
-        config MAX_SESSION_KEYS
-            int "Max Session Keys"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active session keys.
-
         menu "Debugging"
 
             config SECURITY_TEST_MODE
@@ -192,17 +185,6 @@ menu "CHIP Core"
 
                     WARNING: This option makes it possible to circumvent basic CHIP security functionality,
                     including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
-
-            config DISABLE_PROVISIONING_AUTH
-                bool "Disable Provisioning Authentication Checks"
-                default n
-                help
-                    Disable authentication checks for CHIP provisioning operations.  This makes it possible to
-                    perform device provisioning operations (e.g. adding a network or joining a fabric) without
-                    establishing a secure session.
-
-                    WARNING: This option makes it possible to circumvent basic CHIP security functionality.
-                    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
         endmenu # "Debugging"
 
@@ -245,14 +227,6 @@ menu "CHIP Device Layer"
             default 25
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
-
-        config SERVICE_DIRECTORY_CACHE_SIZE
-            int "CHIP Service Directory Cache Size"
-            range 0 65535
-            default 512
-            help
-                The size (in bytes) of the service directory cache.  This limits the maximum size of the directory
-                that can be returned in response to a service directory query.
         
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
@@ -570,18 +544,6 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "CHIP Trait Manager"
-
-        config ENABLE_TRAIT_MANAGER
-            bool "Enable Trait Manager"
-            default y
-            help
-                Enable support for the CHIP Trait Manager.
-
-                The Trait Manager is an experimental feature of the CHIP Device Layer.
-
-    endmenu
-
     menu "Time Sync Options"
 
         config ENABLE_SERVICE_DIRECTORY_TIME_SYNC
@@ -754,13 +716,6 @@ menu "CHIP Device Layer"
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
                 optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
-        config LOG_PROVISIONING_HASH
-            bool "Enable Provisioning Hash Logging"
-            default n
-            help
-                Compute and log a hash of the device's provisioning data on boot.  The generated hash value confirms
-                to the form described in the CHIP: Factory Provisioning Specification.
-
     endmenu
 
     menu "Network Telemetry Options"
@@ -808,15 +763,6 @@ menu "CHIP Device Layer"
             default 4096
             help
                 A size, in bytes, of the individual critical production event logging buffer.
-
-                This critical production event buffer must exist.
-
-        config EVENT_LOGGING_PROD_BUFFER_SIZE
-            int "Event Logging Production Buffer Size"
-            range 0 65535
-            default 2048
-            help
-                A size, in bytes, of the individual production event logging buffer.
 
                 This critical production event buffer must exist.
 

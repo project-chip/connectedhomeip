@@ -79,12 +79,15 @@ case $PLATFORM_PREFERRED_ARCH in
         ;;
 esac
 
-declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
+declare target_cflags=""
 
 read -r -a archs <<<"$ARCHS"
 
 for arch in "${archs[@]}"; do
-    target_cflags+=',"-arch","'"$arch"'"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-arch","'"$arch"'"'
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
@@ -96,11 +99,14 @@ declare -a args=(
     'chip_crypto="boringssl"'
     'chip_build_tools=false'
     'chip_build_tests=false'
+    'chip_enable_wifi=false'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
+    'mac_target_arch="'"$PLATFORM_PREFERRED_ARCH"'"'
+    'mac_deployment_target="'"$LLVM_TARGET_TRIPLE_OS_VERSION"''"$LLVM_TARGET_TRIPLE_SUFFIX"'"'
 )
 
 [[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'

@@ -671,10 +671,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
 
 exit:
     if (err != CHIP_NO_ERROR)
-    { // Notify caller about error
-        callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
         RemoveContext(resolveCtx);
-    }
     return err;
 }
 
@@ -783,11 +780,14 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
     VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(protocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
@@ -798,6 +798,11 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
     return DnssdTizen::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,

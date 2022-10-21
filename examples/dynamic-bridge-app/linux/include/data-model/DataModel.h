@@ -53,7 +53,7 @@ struct IsOptionalOrNullable<Nullable<X>>
     static constexpr bool value = true;
 };
 
-static_assert(IsList<std::vector<unsigned char>>::value);
+static_assert(IsList<std::vector<unsigned char>>::value, "Vector of chars must be a list");
 
 template <typename X,
           std::enable_if_t<!IsOptionalOrNullable<std::decay_t<X>>::value && !IsList<std::decay_t<X>>::value, bool> = true>
@@ -180,7 +180,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
 {
     Span<std::decay_t<typename X::pointer>> span;
     CHIP_ERROR err = aDecoder.Decode(span);
-    if (err = CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         x = X(span.data(), span.size());
     }

@@ -16,8 +16,8 @@ import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.chip.casting.DACProviderStub;
+import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
 
     initJni();
 
-    Fragment fragment = CommissionerDiscoveryFragment.newInstance();
+    Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.main_fragment_container, fragment, fragment.getClass().getSimpleName())

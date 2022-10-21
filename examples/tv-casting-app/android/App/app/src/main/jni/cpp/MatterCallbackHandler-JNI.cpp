@@ -55,6 +55,7 @@ void FailureHandlerJNI::Handle(CHIP_ERROR callbackErr)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniCallbackErrString(env, callbackErr.AsString());
 
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -72,6 +73,7 @@ void SubscriptionEstablishedHandlerJNI::Handle()
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -166,8 +168,32 @@ jobject ConvertToIntegerJObject(uint32_t responseData)
     return env->NewObject(responseTypeClass, constructor, responseData);
 }
 
-// MEDIA PLAYBACK
+// COMMISSIONING AND CONNECTION
+jobject OnConnectionSuccessHandlerJNI::ConvertToJObject(TargetVideoPlayerInfo * targetVideoPlayerInfo)
+{
+    ChipLogProgress(AppServer, "OnConnectionSuccessHandlerJNI::ConvertToJObject called");
+    jobject videoPlayer = nullptr;
+    CHIP_ERROR err      = convertTargetVideoPlayerInfoToJVideoPlayer(targetVideoPlayerInfo, videoPlayer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "OnConnectionSuccessHandlerJNI::ConvertToJObject failed with %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return nullptr;
+}
 
+jobject OnNewOrUpdatedEndpointHandlerJNI::ConvertToJObject(TargetEndpointInfo * targetEndpointInfo)
+{
+    ChipLogProgress(AppServer, "OnNewOrUpdatedEndpointHandlerJNI::ConvertToJObject called");
+    jobject contentApp = nullptr;
+    CHIP_ERROR err     = convertTargetEndpointInfoToJContentApp(targetEndpointInfo, contentApp);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "OnNewOrUpdatedEndpointHandlerJNI::ConvertToJObject failed with %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return contentApp;
+}
+
+// MEDIA PLAYBACK
 jobject CurrentStateSuccessHandlerJNI::ConvertToJObject(
     chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData)
 {
@@ -307,7 +333,8 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
         }
 
         jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Integer;java/lang/String;)V");
-        jobject jTargetInfo   = env->NewObject(responseTypeClass, constructor, targetInfo.identifier, targetInfo.name);
+        chip::UtfString targetInfoName(env, targetInfo.name);
+        jobject jTargetInfo = env->NewObject(responseTypeClass, constructor, targetInfo.identifier, targetInfoName.jniValue());
 
         chip::JniReferences::GetInstance().AddToList(jArrayList, jTargetInfo);
     }

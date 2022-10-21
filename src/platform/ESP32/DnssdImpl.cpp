@@ -459,7 +459,8 @@ void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     mdns_search_once_t * searchHandle =
@@ -477,7 +478,16 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     {
         chip::Platform::Delete(ctx);
     }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
     return error;
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 80,
+  "featureLevel": 81,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -275,7 +275,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8691,7 +8691,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -20747,7 +20747,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",

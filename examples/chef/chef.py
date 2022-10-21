@@ -345,8 +345,8 @@ def main() -> int:
     parser.add_option(
         "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
     parser.add_option(
-        "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
-        action="store_true")
+        "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
+        action="store_true", default=False)
     parser.add_option(
         "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
@@ -534,6 +534,16 @@ def main() -> int:
             flush_print("Ameba toolchain update not supported. Skipping")
 
     #
+    # Clean environment
+    #
+    if options.do_clean:
+        if options.build_target == "esp32":
+            shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
+            shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
+            shell.run_cmd("idf.py fullclean")
+
+    #
     # Cluster customization
     #
 
@@ -551,6 +561,27 @@ def main() -> int:
             f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
         # af-gen-event.h is not generated
         shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
+
+    #
+    # Setup environment
+    #
+    if options.do_rpc:
+        flush_print("RPC PW enabled")
+        if options.build_target == "esp32":
+            shell.run_cmd(
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
+            shell.run_cmd(
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+        else:
+            flush_print(f"RPC PW on {options.build_target} not supported")
+
+    else:
+        flush_print("RPC PW disabled")
+        if (options.build_target == "esp32"):
+            shell.run_cmd(
+                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
+            shell.run_cmd(
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
 
     #
     # Menuconfig
@@ -611,19 +642,6 @@ def main() -> int:
             shutil.rmtree(gen_dir, ignore_errors=True)
             shutil.copytree(zzz_dir, gen_dir)
         flush_print("Building...")
-        if options.do_rpc:
-            flush_print("RPC PW enabled")
-            if options.build_target == "esp32":
-                shell.run_cmd(
-                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
-            else:
-                flush_print(f"RPC PW on {options.build_target} not supported")
-
-        else:
-            flush_print("RPC PW disabled")
-            if (options.build_target == "esp32"):
-                shell.run_cmd(
-                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
 
         flush_print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
@@ -640,11 +658,12 @@ def main() -> int:
 
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
-            if options.do_clean:
-                shell.run_cmd(f"rm -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
-                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
-                shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
-                shell.run_cmd("idf.py fullclean")
+            if options.enable_ipv4:
+                shell.run_cmd(
+                    f"sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+            else:
+                shell.run_cmd(
+                    f"sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
@@ -696,6 +715,7 @@ def main() -> int:
             elif config['ameba']['MODEL'] == 'Z2':
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
+                shell.run_cmd("rm -f project_include.mk")
                 with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
@@ -761,7 +781,9 @@ def main() -> int:
                     flush_print(
                         f"Unable to cross compile for x64 on {uname_resp}")
                     exit(1)
-            if options.ipv6only:
+            if options.enable_ipv4:
+                linux_args.append("chip_inet_config_enable_ipv4=true")
+            else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
             if sw_ver_string:
@@ -819,8 +841,11 @@ def main() -> int:
                 shell.run_cmd(
                     f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
             else:
-                flush_print(
-                    "Ameba Z2 currently does not support flashing image through script, stil WIP")
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
+                shell.run_cmd(
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin", raise_on_returncode=False)
 
     #
     # Terminal interaction

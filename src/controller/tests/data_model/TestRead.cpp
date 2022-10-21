@@ -102,7 +102,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         {
             ConcreteAttributePath path(aPath);
             // Use an incorrect attribute id for some of the responses.
-            path.mAttributeId = path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath);
+            path.mAttributeId =
+                static_cast<AttributeId>(path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath));
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, path,

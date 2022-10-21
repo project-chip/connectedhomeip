@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.6.02
+            image: connectedhomeip/chip-build-k32w:0.6.03
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -71,10 +71,11 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light-ota-se \
-                      --target k32w-light-release-no-ota \
-                      --target k32w-lock-low-power-release \
-                      --target k32w-shell-release \
+                      --target k32w-light-no-ble-se05x \
+                      --target k32w-light-no-ota \
+                      --target k32w-lock-low-power-nologs \
+                      --target k32w-contact-low-power-nologs \
+                      --target k32w-shell \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -83,14 +84,21 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w0+release light \
-                    out/artifacts/k32w-light-release-no-ota/chip-k32w0x-light-example \
+                    out/artifacts/k32w-light-no-ota/chip-k32w0x-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w0+release lock \
-                    out/artifacts/k32w-lock-low-power-release/chip-k32w0x-lock-example \
+                    out/artifacts/k32w-lock-low-power-nologs/chip-k32w0x-lock-example \
+                    /tmp/bloat_reports/
+            - name: Get contact size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    k32w k32w0+release contact \
+                    out/artifacts/k32w-contact-low-power-nologs/chip-k32w0x-contact-example \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

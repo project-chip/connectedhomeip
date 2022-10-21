@@ -1632,6 +1632,11 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
+        // TODO: Fix
+        // https://github.com/project-chip/connectedhomeip/issues/23260 so this
+        // test is testing what it thinks it's testing.
+        // Make sure the reporting engine actually runs.
+
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
@@ -1656,10 +1661,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     MockInteractionModelApp delegate;
+    MockInteractionModelApp nonUrgentDelegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+    NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
@@ -1673,26 +1680,22 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
     readPrepareParams.mEventPathParamsListSize = 2;
 
-    chip::app::AttributePathParams attributePathParams[2];
-    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
-    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
-
-    readPrepareParams.mpAttributePathParamsList[1].mEndpointId  = kTestEndpointId;
-    readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
-    readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
-
-    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpAttributePathParamsList    = nullptr;
+    readPrepareParams.mAttributePathParamsListSize = 0;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 2;
-    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 3600;
     printf("\nSend first subscribe request message with wildcard urgent event to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    delegate.mNumAttributeResponse       = 0;
-    readPrepareParams.mKeepSubscriptions = false;
+    readPrepareParams.mKeepSubscriptions = true;
 
     {
+        app::ReadClient nonUrgentReadClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                            nonUrgentDelegate, chip::app::ReadClient::InteractionType::Subscribe);
+        nonUrgentDelegate.mGotReport = false;
+        err                          = nonUrgentReadClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
         readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
@@ -1704,47 +1707,122 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
 
-        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 2);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
+        nonUrgentDelegate.mpReadHandler = engine->ActiveHandlerAt(0);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(1) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(1);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
-        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+        NL_TEST_ASSERT(apSuite, nonUrgentDelegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 2);
 
         GenerateEvents(apSuite, apContext);
+
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
 
-        // wait for min interval 2 seconds(in test, we use 1.9second considering the time variation), expect no event is received,
-        // then wait for 0.5 seconds, then the urgent event would be sent out
+        NL_TEST_ASSERT(apSuite, nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
+        nonUrgentDelegate.mGotEventResponse = false;
+        nonUrgentDelegate.mGotReport        = false;
+
+        // wait for min interval 2 seconds (in test, we use 1.6 seconds considering the time variation), expect no event is
+        // received, then wait for 0.8 seconds, then the urgent event would be sent out
         //  currently DriveIOUntil will call `DriveIO` at least once, which means that if there is any CPU scheduling issues,
         // there's a chance 1.9s will already have elapsed by the time we get there, which will result in DriveIO being called when
         // it shouldn't. Better fix could happen inside DriveIOUntil, not sure the sideeffect there.
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1900))
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(1600))
             {
                 break;
             }
             ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
         }
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse != true);
+        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
         startTime = System::SystemClock().GetMonotonicTimestamp();
         while (true)
         {
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(500))
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(800))
             {
                 break;
             }
             ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
         }
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse == true);
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
+
+        // Since we just sent a report for our urgent subscription, we should have our min interval timer
+        // running again.
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
+        delegate.mGotEventResponse = false;
+
+        // For our non-urgent subscription, we did not send anything, so we
+        // should not have a min interval timer running there.
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
+
+        // Wait for the min interval timer to fire.
+        startTime = System::SystemClock().GetMonotonicTimestamp();
+        while (true)
+        {
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= System::Clock::Milliseconds32(2100))
+            {
+                break;
+            }
+            ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
+        }
+
+        // No reporting should have happened.
+        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
+
+        // min-interval timer should have fired, and our handler should still
+        // not be dirty or even reportable.
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
+
+        // And the non-urgent one should not have changed state either, since
+        // it's waiting for the max-interval.
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+
+        // There should be no reporting run scheduled.  This is very important;
+        // otherwise we can get a false-positive pass below because the run was
+        // already scheduled by here.
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().mRunScheduled);
+
+        // Generate some events, which should get reported.
+        GenerateEvents(apSuite, apContext);
+
+        // Urgent read handler should now be dirty, and reportable.
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportable());
+
+        // Non-urgent read handler should not be reportable.
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+
+        // Still no reporting should have happened.
+        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
+
+        ctx.DrainAndServiceIO();
+
+        // Should get those urgent events reported.
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+
+        // Should get nothing reported on the non-urgent handler.
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
     }
 
     // By now we should have closed all exchanges and sent all pending acks, so
@@ -2110,6 +2188,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
+        // TODO: This bit is not testing anything, because removing that flag
+        // manually like this will not cause the reporting engine to run!
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
 
         ctx.DrainAndServiceIO();
@@ -2594,9 +2674,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2695,9 +2776,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 

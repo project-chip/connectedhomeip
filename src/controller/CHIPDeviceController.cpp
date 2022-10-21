@@ -1431,6 +1431,11 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilte
     return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
+CHIP_ERROR DeviceCommissioner::StopCommissionableDiscovery()
+{
+    return mDNSResolver.StopDiscovery();
+}
+
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
     return GetDiscoveredNode(idx);

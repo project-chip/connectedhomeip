@@ -17,19 +17,81 @@
  */
 package com.chip.casting;
 
+import android.net.nsd.NsdManager;
+import android.net.wifi.WifiManager;
+import android.util.Log;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 public class TvCastingApp {
   private static final String TAG = TvCastingApp.class.getSimpleName();
 
+  private final String TARGET_SERVICE_TYPE = "_matterd._udp.";
+  private final List<Long> DEVICE_TYPE_FILTER = Arrays.asList(35L); // Video player = 35;
+
+  public native void init();
+
   public native void setDACProvider(DACProvider provider);
 
+  public void discoverVideoPlayerCommissioners(
+      WifiManager wifiManager,
+      NsdManager nsdManager,
+      long discoveryDurationSeconds,
+      SuccessCallback<DiscoveredNodeData> discoverySuccessCallback,
+      FailureCallback discoveryFailureCallback) {
+    Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners called");
+    WifiManager.MulticastLock multicastLock = wifiManager.createMulticastLock("multicastLock");
+    multicastLock.setReferenceCounted(true);
+    multicastLock.acquire();
+
+    NsdDiscoveryListener nsdDiscoveryListener =
+        new NsdDiscoveryListener(
+            nsdManager,
+            TARGET_SERVICE_TYPE,
+            DEVICE_TYPE_FILTER,
+            discoverySuccessCallback,
+            discoveryFailureCallback);
+
+    nsdManager.discoverServices(
+        TARGET_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, nsdDiscoveryListener);
+
+    Executors.newSingleThreadScheduledExecutor()
+        .schedule(
+            new Runnable() {
+              @Override
+              public void run() {
+                nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
+                multicastLock.release();
+              }
+            },
+            discoveryDurationSeconds,
+            TimeUnit.SECONDS);
+    Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners ended");
+  }
+
   public native boolean openBasicCommissioningWindow(
-      int duration, Object commissioningCompleteHandler);
+      int duration,
+      Object commissioningCompleteHandler,
+      SuccessCallback<VideoPlayer> onConnectionSuccess,
+      FailureCallback onConnectionFailure,
+      SuccessCallback<ContentApp> onNewOrUpdatedEndpointCallback);
+
+  public native boolean sendCommissioningRequest(DiscoveredNodeData commissioner);
 
   public native boolean sendUserDirectedCommissioningRequest(String address, int port);
 
-  public native boolean discoverCommissioners();
+  public native List<VideoPlayer> readCachedVideoPlayers();
 
-  public native void init();
+  public native boolean verifyOrEstablishConnection(
+      VideoPlayer targetVideoPlayer,
+      SuccessCallback<VideoPlayer> onConnectionSuccess,
+      FailureCallback onConnectionFailure,
+      SuccessCallback<ContentApp> onNewOrUpdatedEndpointCallback);
+
+  public native List<VideoPlayer> getActiveTargetVideoPlayers();
 
   /*
    * CONTENT LAUNCHER CLUSTER
@@ -37,15 +99,17 @@ public class TvCastingApp {
    * TODO: Add API to subscribe to AcceptHeader
    */
   public native boolean contentLauncherLaunchURL(
-      String contentUrl, String contentDisplayStr, Object launchURLHandler);
+      ContentApp contentApp, String contentUrl, String contentDisplayStr, Object launchURLHandler);
 
   public native boolean contentLauncher_launchContent(
+      ContentApp contentApp,
       ContentLauncherTypes.ContentSearch search,
       boolean autoPlay,
       String data,
       Object responseHandler);
 
   public native boolean contentLauncher_subscribeToSupportedStreamingProtocols(
+      ContentApp contentApp,
       SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -56,6 +120,7 @@ public class TvCastingApp {
    * LEVEL CONTROL CLUSTER
    */
   public native boolean levelControl_step(
+      ContentApp contentApp,
       byte stepMode,
       byte stepSize,
       short transitionTime,
@@ -64,6 +129,7 @@ public class TvCastingApp {
       Object responseHandler);
 
   public native boolean levelControl_moveToLevel(
+      ContentApp contentApp,
       byte level,
       short transitionTime,
       byte optionMask,
@@ -71,6 +137,7 @@ public class TvCastingApp {
       Object responseHandler);
 
   public native boolean levelControl_subscribeToCurrentLevel(
+      ContentApp contentApp,
       SuccessCallback<Byte> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -78,6 +145,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean levelControl_subscribeToMinLevel(
+      ContentApp contentApp,
       SuccessCallback<Byte> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -85,6 +153,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean levelControl_subscribeToMaxLevel(
+      ContentApp contentApp,
       SuccessCallback<Byte> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -94,23 +163,25 @@ public class TvCastingApp {
   /*
    * MEDIA PLAYBACK CLUSTER
    */
-  public native boolean mediaPlayback_play(Object responseHandler);
+  public native boolean mediaPlayback_play(ContentApp contentApp, Object responseHandler);
 
-  public native boolean mediaPlayback_pause(Object responseHandler);
+  public native boolean mediaPlayback_pause(ContentApp contentApp, Object responseHandler);
 
-  public native boolean mediaPlayback_stopPlayback(Object responseHandler);
+  public native boolean mediaPlayback_stopPlayback(ContentApp contentApp, Object responseHandler);
 
-  public native boolean mediaPlayback_next(Object responseHandler);
+  public native boolean mediaPlayback_next(ContentApp contentApp, Object responseHandler);
 
-  public native boolean mediaPlayback_seek(long position, Object responseHandler);
+  public native boolean mediaPlayback_seek(
+      ContentApp contentApp, long position, Object responseHandler);
 
   public native boolean mediaPlayback_skipForward(
-      long deltaPositionMilliseconds, Object responseHandler);
+      ContentApp contentApp, long deltaPositionMilliseconds, Object responseHandler);
 
   public native boolean mediaPlayback_skipBackward(
-      long deltaPositionMilliseconds, Object responseHandler);
+      ContentApp contentApp, long deltaPositionMilliseconds, Object responseHandler);
 
   public native boolean mediaPlayback_subscribeToCurrentState(
+      ContentApp contentApp,
       SuccessCallback<MediaPlaybackTypes.PlaybackStateEnum> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -118,6 +189,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean mediaPlayback_subscribeToDuration(
+      ContentApp contentApp,
       SuccessCallback<Long> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -125,6 +197,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean mediaPlayback_subscribeToSampledPosition(
+      ContentApp contentApp,
       SuccessCallback<MediaPlaybackTypes.PlaybackPosition> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -132,6 +205,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean mediaPlayback_subscribeToPlaybackSpeed(
+      ContentApp contentApp,
       SuccessCallback<Float> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -139,6 +213,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean mediaPlayback_subscribeToSeekRangeEnd(
+      ContentApp contentApp,
       SuccessCallback<Long> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -146,6 +221,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean mediaPlayback_subscribeToSeekRangeStart(
+      ContentApp contentApp,
       SuccessCallback<Long> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -156,21 +232,26 @@ public class TvCastingApp {
    * APPLICATION LAUNCHER CLUSTER
    */
   public native boolean applicationLauncher_launchApp(
-      short catalogVendorId, String applicationId, byte[] data, Object responseHandler);
+      ContentApp contentApp,
+      short catalogVendorId,
+      String applicationId,
+      byte[] data,
+      Object responseHandler);
 
   public native boolean applicationLauncher_stopApp(
-      short catalogVendorId, String applicationId, Object responseHandler);
+      ContentApp contentApp, short catalogVendorId, String applicationId, Object responseHandler);
 
   public native boolean applicationLauncher_hideApp(
-      short catalogVendorId, String applicationId, Object responseHandler);
+      ContentApp contentApp, short catalogVendorId, String applicationId, Object responseHandler);
 
   /*
    * TARGET NAVIGATOR CLUSTER
    */
   public native boolean targetNavigator_navigateTarget(
-      byte target, String data, Object responseHandler);
+      ContentApp contentApp, byte target, String data, Object responseHandler);
 
   public native boolean targetNavigator_subscribeToCurrentTarget(
+      ContentApp contentApp,
       SuccessCallback<Byte> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -178,7 +259,8 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean targetNavigator_subscribeToTargetList(
-      SuccessCallback<TargetNavigatorTypes.TargetInfo> readSuccessHandler,
+      ContentApp contentApp,
+      SuccessCallback<ArrayList<TargetNavigatorTypes.TargetInfo>> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,
@@ -187,7 +269,8 @@ public class TvCastingApp {
   /*
    * KEYPAD INPUT CLUSTER
    */
-  public native boolean keypadInput_sendKey(byte keyCode, Object responseHandler);
+  public native boolean keypadInput_sendKey(
+      ContentApp contentApp, byte keyCode, Object responseHandler);
 
   /**
    * APPLICATION BASIC
@@ -195,6 +278,7 @@ public class TvCastingApp {
    * <p>TODO: Add APIs to subscribe to Application, Status and AllowedVendorList
    */
   public native boolean applicationBasic_subscribeToVendorName(
+      ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -202,6 +286,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean applicationBasic_subscribeToVendorID(
+      ContentApp contentApp,
       SuccessCallback<Short> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -209,6 +294,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean applicationBasic_subscribeToApplicationName(
+      ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -216,6 +302,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean applicationBasic_subscribeToProductID(
+      ContentApp contentApp,
       SuccessCallback<Short> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
@@ -223,6 +310,7 @@ public class TvCastingApp {
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
 
   public native boolean applicationBasic_subscribeToApplicationVersion(
+      ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,

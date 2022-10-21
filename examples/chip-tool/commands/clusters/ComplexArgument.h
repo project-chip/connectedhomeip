@@ -196,7 +196,7 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
-        chip::Platform::CopyString(buffer, size, value.asCString());
+        memcpy(buffer, value.asCString(), size);
 
         request = chip::CharSpan(buffer, size);
         return CHIP_NO_ERROR;

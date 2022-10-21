@@ -1784,6 +1784,7 @@ CHIP_ERROR ExtractKIDFromX509Cert(bool extractSKID, const ByteSpan & certificate
             {
                 kid.reduce_size(len);
             }
+            ExitNow(error = CHIP_NO_ERROR);
             break;
         }
         p += len;

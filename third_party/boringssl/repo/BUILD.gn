@@ -12,10 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
 import("BUILD.generated.gni")
 
 config("boringssl_config") {
   include_dirs = [ "src/include" ]
+
+  cflags = [ "-Wno-unused-variable" ]
+
+  if (is_clang) {
+    cflags += [ "-Wno-shorten-64-to-32" ]
+  }
 
   # We want the basic crypto impl with no asm primitives until we hook-up platform-based
   # support to the build later.

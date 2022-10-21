@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.chip.casting.ContentApp;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
 import com.chip.casting.MediaPlaybackTypes;
@@ -22,6 +23,8 @@ public class MediaPlaybackFragment extends Fragment {
   private final TvCastingApp tvCastingApp;
 
   private View.OnClickListener subscribeToCurrentStateButtonClickListener;
+
+  private static final ContentApp kContentApp = new ContentApp((short) 4, null);
 
   public MediaPlaybackFragment(TvCastingApp tvCastingApp) {
     this.tvCastingApp = tvCastingApp;
@@ -107,6 +110,7 @@ public class MediaPlaybackFragment extends Fragment {
 
             boolean retVal =
                 tvCastingApp.mediaPlayback_subscribeToCurrentState(
+                    kContentApp,
                     successCallback,
                     failureCallback,
                     Integer.parseInt(minInterval.getText().toString()),

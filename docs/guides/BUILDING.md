@@ -7,7 +7,7 @@ that generates inputs to [ninja](https://ninja-build.org/).
 Tested on:
 
 -   macOS 10.15
--   Debian 11
+-   Debian 11 (64 bit required)
 -   Ubuntu 22.04 LTS
 
 Build system features:

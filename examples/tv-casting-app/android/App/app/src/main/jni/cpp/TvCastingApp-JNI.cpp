@@ -19,6 +19,7 @@
 #include "TvCastingApp-JNI.h"
 #include "CastingServer.h"
 #include "Constants.h"
+#include "ConversionUtils.h"
 #include "JNIDACProvider.h"
 
 #include <app/server/Server.h>
@@ -29,7 +30,9 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
@@ -58,7 +61,9 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
     }
 }
 
-JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv * env, jobject, jint duration, jobject jCommissioningCompleteHandler)
+JNI_METHOD(jboolean, openBasicCommissioningWindow)
+(JNIEnv * env, jobject, jint duration, jobject jCommissioningCompleteHandler, jobject jOnConnectionSuccessHandler,
+ jobject jOnConnectionFailureHandler, jobject jOnNewOrUpdatedEndpointHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -67,8 +72,23 @@ JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv * env, jobject, jint d
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
+    err = TvCastingAppJNIMgr().getOnConnectionSuccessHandler(false).SetUp(env, jOnConnectionSuccessHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnConnectionSuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = TvCastingAppJNIMgr().getOnConnectionFailureHandler(false).SetUp(env, jOnConnectionFailureHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnConnectionFailureHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(false).SetUp(env, jOnNewOrUpdatedEndpointHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnNewOrUpdatedEndpointHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
     err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getCommissioningCompleteHandler().Handle(err); });
+        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getCommissioningCompleteHandler().Handle(err); },
+        [](TargetVideoPlayerInfo * videoPlayer) { TvCastingAppJNIMgr().getOnConnectionSuccessHandler(false).Handle(videoPlayer); },
+        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(false).Handle(err); },
+        [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(false).Handle(endpoint); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -79,6 +99,105 @@ exit:
     }
 
     return true;
+}
+
+JNI_METHOD(jobject, readCachedVideoPlayers)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD readCachedVideoPlayers called");
+
+    jobject jVideoPlayerList                          = nullptr;
+    TargetVideoPlayerInfo * targetVideoPlayerInfoList = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+    if (targetVideoPlayerInfoList != nullptr)
+    {
+        chip::JniReferences::GetInstance().CreateArrayList(jVideoPlayerList);
+        for (size_t i = 0; targetVideoPlayerInfoList[i].IsInitialized(); i++)
+        {
+            jobject jVideoPlayer = nullptr;
+            CHIP_ERROR err       = convertTargetVideoPlayerInfoToJVideoPlayer(&targetVideoPlayerInfoList[i], jVideoPlayer);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Conversion from TargetVideoPlayerInfo * to jobject VideoPlayer failed: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                continue;
+            }
+            chip::JniReferences::GetInstance().AddToList(jVideoPlayerList, jVideoPlayer);
+        }
+    }
+
+    return jVideoPlayerList;
+}
+
+JNI_METHOD(jboolean, verifyOrEstablishConnection)
+(JNIEnv * env, jobject, jobject videoPlayer, jobject jOnConnectionSuccessHandler, jobject jOnConnectionFailureHandler,
+ jobject jOnNewOrUpdatedEndpointHandler)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD verifyOrEstablishConnection called");
+
+    TargetVideoPlayerInfo targetVideoPlayerInfo;
+    CHIP_ERROR err = convertJVideoPlayerToTargetVideoPlayerInfo(videoPlayer, targetVideoPlayerInfo);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer,
+                              "Conversion from jobject VideoPlayer to TargetVideoPlayerInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getOnConnectionSuccessHandler(true).SetUp(env, jOnConnectionSuccessHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnConnectionSuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = TvCastingAppJNIMgr().getOnConnectionFailureHandler(true).SetUp(env, jOnConnectionFailureHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnConnectionFailureHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(true).SetUp(env, jOnNewOrUpdatedEndpointHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "OnNewOrUpdatedEndpointHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
+        targetVideoPlayerInfo,
+        [](TargetVideoPlayerInfo * videoPlayer) { TvCastingAppJNIMgr().getOnConnectionSuccessHandler(true).Handle(videoPlayer); },
+        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(true).Handle(err); },
+        [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(true).Handle(endpoint); });
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jobject, getActiveTargetVideoPlayers)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD getActiveTargetVideoPlayers called");
+
+    jobject jVideoPlayerList                      = nullptr;
+    TargetVideoPlayerInfo * targetVideoPlayerInfo = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
+    if (targetVideoPlayerInfo != nullptr)
+    {
+        chip::JniReferences::GetInstance().CreateArrayList(jVideoPlayerList);
+        jobject jVideoPlayer = nullptr;
+        CHIP_ERROR err       = convertTargetVideoPlayerInfoToJVideoPlayer(targetVideoPlayerInfo, jVideoPlayer);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Conversion from TargetVideoPlayerInfo * to jobject VideoPlayer failed: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+        }
+        else
+        {
+            chip::JniReferences::GetInstance().AddToList(jVideoPlayerList, jVideoPlayer);
+        }
+    }
+    return jVideoPlayerList;
 }
 
 JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject, jstring addressJStr, jint port)
@@ -104,16 +223,25 @@ JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject
     return true;
 }
 
-JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
+JNI_METHOD(jboolean, sendCommissioningRequest)(JNIEnv * env, jobject, jobject jDiscoveredNodeData)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD discoverCommissioners called");
-    CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+    ChipLogProgress(AppServer, "JNI_METHOD sendCommissioningRequest called");
+
+    chip::Dnssd::DiscoveredNodeData commissioner;
+    CHIP_ERROR err = convertJDiscoveredNodeDataToCppDiscoveredNodeData(jDiscoveredNodeData, commissioner);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer,
+                              "Conversion from jobject DiscoveredNodeData to Cpp DiscoveredNodeData failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(&commissioner);
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "TVCastingApp-JNI::discoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "TVCastingApp-JNI::sendCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-
     return true;
 }
 
@@ -124,7 +252,7 @@ JNI_METHOD(void, init)(JNIEnv *, jobject)
 }
 
 JNI_METHOD(jboolean, contentLauncherLaunchURL)
-(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jstring contentUrl, jstring contentDisplayStr, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -132,13 +260,19 @@ JNI_METHOD(jboolean, contentLauncherLaunchURL)
     const char * nativeContentUrl        = env->GetStringUTFChars(contentUrl, 0);
     const char * nativeContentDisplayStr = env->GetStringUTFChars(contentDisplayStr, 0);
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ContentLauncher_LaunchURL).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ContentLauncher_LaunchURL).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr, [](CHIP_ERROR err) {
-        TvCastingAppJNIMgr().getMediaCommandResponseHandler(ContentLauncher_LaunchURL).Handle(err);
-    });
+    err = CastingServer::GetInstance()->ContentLauncherLaunchURL(
+        &endpoint, nativeContentUrl, nativeContentDisplayStr,
+        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(ContentLauncher_LaunchURL).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer::ContentLauncherLaunchURL failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -173,7 +307,7 @@ CHIP_ERROR CreateParameter(JNIEnv * env, jobject jParameter,
 }
 
 CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
-                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search)
+                               chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & search, ListFreer & listFreer)
 {
     jclass jContentSearchClass;
     ReturnErrorOnFailure(
@@ -192,24 +326,27 @@ CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
     jmethodID jNextMid    = env->GetMethodID(env->GetObjectClass(jIterator), "next", "()Ljava/lang/Object;");
     jmethodID jHasNextMid = env->GetMethodID(env->GetObjectClass(jIterator), "hasNext", "()Z");
 
-    chip::app::Clusters::ContentLauncher::Structs::Parameter::Type * parameterList =
-        new chip::app::Clusters::ContentLauncher::Structs::Parameter::Type[parameterListSize];
+    auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(parameterListSize);
+    listFreer.add(parameterListHolder);
     int parameterIndex = 0;
     while (env->CallBooleanMethod(jIterator, jHasNextMid))
     {
         jobject jParameter = env->CallObjectMethod(jIterator, jNextMid);
         chip::app::Clusters::ContentLauncher::Structs::Parameter::Type parameter;
         ReturnErrorOnFailure(CreateParameter(env, jParameter, parameter));
-        parameterList[parameterIndex++] = parameter;
+        parameterListHolder->mList[parameterIndex].type           = parameter.type;
+        parameterListHolder->mList[parameterIndex].value          = parameter.value;
+        parameterListHolder->mList[parameterIndex].externalIDList = parameter.externalIDList;
+        parameterIndex++;
     }
     search.parameterList = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(
-        parameterList, parameterListSize);
+        parameterListHolder->mList, parameterListSize);
 
     return CHIP_NO_ERROR;
 }
 
 JNI_METHOD(jboolean, contentLauncher_1launchContent)
-(JNIEnv * env, jobject, jobject jSearch, jboolean jAutoplay, jstring jData, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jSearch, jboolean jAutoplay, jstring jData, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -221,8 +358,16 @@ JNI_METHOD(jboolean, contentLauncher_1launchContent)
     const char * nativeData             = env->GetStringUTFChars(jData, 0);
     chip::Optional<chip::CharSpan> data = MakeOptional(CharSpan::fromCharString(nativeData));
 
+    ListFreer listFreer;
     chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search;
-    CHIP_ERROR err = CreateContentSearch(env, jSearch, search);
+    CHIP_ERROR err = CreateContentSearch(env, jSearch, search, listFreer);
+
+    TargetEndpointInfo endpoint;
+    err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer,
                               "contentLauncher_1launchContent::Could not create ContentSearch object %" CHIP_ERROR_FORMAT,
@@ -232,7 +377,7 @@ JNI_METHOD(jboolean, contentLauncher_1launchContent)
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->ContentLauncher_LaunchContent(search, autoplay, data, [](CHIP_ERROR err) {
+    err = CastingServer::GetInstance()->ContentLauncher_LaunchContent(&endpoint, search, autoplay, data, [](CHIP_ERROR err) {
         TvCastingAppJNIMgr().getMediaCommandResponseHandler(ContentLauncher_LaunchContent).Handle(err);
     });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -250,14 +395,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, contentLauncher_1subscribeToSupportedStreamingProtocols)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD ContentLauncher_subscribeToSupportedStreamingProtocols called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getSupportedStreamingProtocolsSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getSupportedStreamingProtocolsSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr()
@@ -273,7 +424,7 @@ JNI_METHOD(jboolean, contentLauncher_1subscribeToSupportedStreamingProtocols)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ContentLauncher_SubscribeToSupportedStreamingProtocols(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getSupportedStreamingProtocolsSuccessHandler().Handle(responseData);
@@ -301,19 +452,25 @@ exit:
 }
 
 JNI_METHOD(jboolean, levelControl_1step)
-(JNIEnv * env, jobject, jbyte stepMode, jbyte stepSize, jshort transitionTime, jbyte optionMask, jbyte optionOverride,
- jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jbyte stepMode, jbyte stepSize, jshort transitionTime, jbyte optionMask,
+ jbyte optionOverride, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD levelControl_step called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_Step).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_Step).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_Step(
-        static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), static_cast<uint8_t>(stepSize),
+        &endpoint, static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), static_cast<uint8_t>(stepSize),
         static_cast<uint16_t>(transitionTime), static_cast<uint8_t>(optionMask), static_cast<uint8_t>(optionOverride),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_Step).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -329,18 +486,25 @@ exit:
 }
 
 JNI_METHOD(jboolean, levelControl_1moveToLevel)
-(JNIEnv * env, jobject, jbyte level, jshort transitionTime, jbyte optionMask, jbyte optionOverride, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jbyte level, jshort transitionTime, jbyte optionMask, jbyte optionOverride,
+ jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD levelControl_moveToLevel called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_MoveToLevel).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_MoveToLevel).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_MoveToLevel(
-        static_cast<uint8_t>(level), static_cast<uint16_t>(transitionTime), static_cast<uint8_t>(optionMask),
+        &endpoint, static_cast<uint8_t>(level), static_cast<uint16_t>(transitionTime), static_cast<uint8_t>(optionMask),
         static_cast<uint8_t>(optionOverride),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_MoveToLevel).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -356,14 +520,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, levelControl_1subscribeToCurrentLevel)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD levelControl_subscribeToCurrentLevel called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getCurrentLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getCurrentLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_CurrentLevel).SetUp(env, jReadFailureHandler);
@@ -377,7 +547,7 @@ JNI_METHOD(jboolean, levelControl_1subscribeToCurrentLevel)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_SubscribeToCurrentLevel(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getCurrentLevelSuccessHandler().Handle(responseData);
         },
@@ -401,14 +571,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, levelControl_1subscribeToMinLevel)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD levelControl_subscribeToMinLevel called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMinLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMinLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_MinLevel).SetUp(env, jReadFailureHandler);
@@ -420,7 +596,7 @@ JNI_METHOD(jboolean, levelControl_1subscribeToMinLevel)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_SubscribeToMinLevel(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getMinLevelSuccessHandler().Handle(responseData);
         },
@@ -444,14 +620,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, levelControl_1subscribeToMaxLevel)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD levelControl_subscribeToMaxLevel called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMaxLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMaxLevelSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_MaxLevel).SetUp(env, jReadFailureHandler);
@@ -463,7 +645,7 @@ JNI_METHOD(jboolean, levelControl_1subscribeToMaxLevel)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_SubscribeToMaxLevel(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getMaxLevelSuccessHandler().Handle(responseData);
         },
@@ -487,18 +669,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1play)
-(JNIEnv * env, jobject, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_play called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Play).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Play).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_Play(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Play).Handle(err); });
+        &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Play).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_Play failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -512,18 +700,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1pause)
-(JNIEnv * env, jobject, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_pause called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Pause).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Pause).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_Pause(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Pause).Handle(err); });
+        &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Pause).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_Pause failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -537,18 +731,25 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1stopPlayback)
-(JNIEnv * env, jobject, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_stopPlayback called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StopPlayback).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StopPlayback).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->MediaPlayback_StopPlayback(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StopPlayback).Handle(err); });
+    err = CastingServer::GetInstance()->MediaPlayback_StopPlayback(&endpoint, [](CHIP_ERROR err) {
+        TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StopPlayback).Handle(err);
+    });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_StopPlayback failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -562,18 +763,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1next)
-(JNIEnv * env, jobject, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_next called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Next).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Next).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_Next(
-        [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Next).Handle(err); });
+        &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Next).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_Next failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -587,17 +794,23 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1seek)
-(JNIEnv * env, jobject, jlong position, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jlong position, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_seek called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Seek).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Seek).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->MediaPlayback_Seek(static_cast<uint64_t>(position), [](CHIP_ERROR err) {
+    err = CastingServer::GetInstance()->MediaPlayback_Seek(&endpoint, static_cast<uint64_t>(position), [](CHIP_ERROR err) {
         TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Seek).Handle(err);
     });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -613,18 +826,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1skipForward)
-(JNIEnv * env, jobject, jlong deltaPositionMilliseconds, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jlong deltaPositionMilliseconds, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_skipForward called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipForward).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipForward).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SkipForward(
-        static_cast<uint64_t>(deltaPositionMilliseconds),
+        &endpoint, static_cast<uint64_t>(deltaPositionMilliseconds),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipForward).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_SkipForward failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -639,18 +858,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1skipBackward)
-(JNIEnv * env, jobject, jlong deltaPositionMilliseconds, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jlong deltaPositionMilliseconds, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_skipBackward called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipBackward).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipBackward).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SkipBackward(
-        static_cast<uint64_t>(deltaPositionMilliseconds),
+        &endpoint, static_cast<uint64_t>(deltaPositionMilliseconds),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_SkipBackward).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.MediaPlayback_SkipBackward failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -665,14 +890,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToCurrentState)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_subscribeToCurrentState called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getCurrentStateSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getCurrentStateSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_CurrentState).SetUp(env, jReadFailureHandler);
@@ -686,7 +917,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToCurrentState)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getCurrentStateSuccessHandler().Handle(responseData);
         },
@@ -710,14 +941,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToDuration)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_1subscribeToDuration called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getDurationSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getDurationSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_Duration).SetUp(env, jReadFailureHandler);
@@ -730,7 +967,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToDuration)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getDurationSuccessHandler().Handle(responseData);
         },
@@ -754,14 +991,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToSampledPosition)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_1subscribeToSampledPosition called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getSampledPositionSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getSampledPositionSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SampledPosition).SetUp(env, jReadFailureHandler);
@@ -775,7 +1018,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSampledPosition)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToSampledPosition(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getSampledPositionSuccessHandler().Handle(responseData);
@@ -800,14 +1043,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToPlaybackSpeed)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_1subscribeToPlaybackSpeed called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getPlaybackSpeedSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getPlaybackSpeedSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_PlaybackSpeed).SetUp(env, jReadFailureHandler);
@@ -821,7 +1070,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToPlaybackSpeed)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToPlaybackSpeed(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getPlaybackSpeedSuccessHandler().Handle(responseData);
         },
@@ -845,14 +1094,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeEnd)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_1subscribeToSeekRangeEnd called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getSeekRangeEndSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getSeekRangeEndSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SeekRangeEnd).SetUp(env, jReadFailureHandler);
@@ -866,7 +1121,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeEnd)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToSeekRangeEnd(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getSeekRangeEndSuccessHandler().Handle(responseData);
         },
@@ -890,14 +1145,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeStart)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD mediaPlayback_1subscribeToSeekRangeStart called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getSeekRangeStartSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getSeekRangeStartSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SeekRangeStart).SetUp(env, jReadFailureHandler);
@@ -911,7 +1172,7 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeStart)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->MediaPlayback_SubscribeToSeekRangeStart(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getSeekRangeStartSuccessHandler().Handle(responseData);
@@ -936,7 +1197,8 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationLauncher_1launchApp)
-(JNIEnv * env, jobject, jshort catalogVendorId, jstring applicationId, jbyteArray data, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jshort catalogVendorId, jstring applicationId, jbyteArray data,
+ jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -948,13 +1210,18 @@ JNI_METHOD(jboolean, applicationLauncher_1launchApp)
     application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
     JniByteArray dataByteArray(env, data);
 
-    CHIP_ERROR err =
-        TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_LaunchApp).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_LaunchApp).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationLauncher_LaunchApp(
-        application, chip::MakeOptional(dataByteArray.byteSpan()),
+        &endpoint, application, chip::MakeOptional(dataByteArray.byteSpan()),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_LaunchApp).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.ApplicationLauncher_LaunchApp failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -970,7 +1237,7 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationLauncher_1stopApp)
-(JNIEnv * env, jobject, jshort catalogVendorId, jstring applicationId, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jshort catalogVendorId, jstring applicationId, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -981,11 +1248,17 @@ JNI_METHOD(jboolean, applicationLauncher_1stopApp)
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
     application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_StopApp).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_StopApp).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->ApplicationLauncher_StopApp(application, [&](CHIP_ERROR err) {
+    err = CastingServer::GetInstance()->ApplicationLauncher_StopApp(&endpoint, application, [&](CHIP_ERROR err) {
         TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_StopApp).Handle(err);
     });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -1002,7 +1275,7 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationLauncher_1hideApp)
-(JNIEnv * env, jobject, jshort catalogVendorId, jstring applicationId, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jshort catalogVendorId, jstring applicationId, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -1013,11 +1286,17 @@ JNI_METHOD(jboolean, applicationLauncher_1hideApp)
     const char * nativeApplicationId = env->GetStringUTFChars(applicationId, 0);
     application.applicationId        = CharSpan::fromCharString(nativeApplicationId);
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_HideApp).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_HideApp).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = CastingServer::GetInstance()->ApplicationLauncher_HideApp(application, [](CHIP_ERROR err) {
+    err = CastingServer::GetInstance()->ApplicationLauncher_HideApp(&endpoint, application, [](CHIP_ERROR err) {
         TvCastingAppJNIMgr().getMediaCommandResponseHandler(ApplicationLauncher_HideApp).Handle(err);
     });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -1034,7 +1313,7 @@ exit:
 }
 
 JNI_METHOD(jboolean, targetNavigator_1navigateTarget)
-(JNIEnv * env, jobject, jbyte target, jstring data, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jbyte target, jstring data, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -1042,13 +1321,18 @@ JNI_METHOD(jboolean, targetNavigator_1navigateTarget)
 
     const char * nativeData = env->GetStringUTFChars(data, 0);
 
-    CHIP_ERROR err =
-        TvCastingAppJNIMgr().getMediaCommandResponseHandler(TargetNavigator_NavigateTarget).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(TargetNavigator_NavigateTarget).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->TargetNavigator_NavigateTarget(
-        static_cast<uint8_t>(target), chip::MakeOptional(CharSpan::fromCharString(nativeData)),
+        &endpoint, static_cast<uint8_t>(target), chip::MakeOptional(CharSpan::fromCharString(nativeData)),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(TargetNavigator_NavigateTarget).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.TargetNavigator_NavigateTarget failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -1064,14 +1348,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, targetNavigator_1subscribeToCurrentTarget)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD targetNavigator_1subscribeToCurrentTarget called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getCurrentTargetSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getCurrentTargetSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(TargetNavigator_CurrentTarget).SetUp(env, jReadFailureHandler);
@@ -1085,7 +1375,7 @@ JNI_METHOD(jboolean, targetNavigator_1subscribeToCurrentTarget)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->TargetNavigator_SubscribeToCurrentTarget(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getCurrentTargetSuccessHandler().Handle(responseData);
@@ -1110,14 +1400,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, targetNavigator_1subscribeToTargetList)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD targetNavigator_1subscribeToTargetList called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getTargetListSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getTargetListSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(TargetNavigator_TargetList).SetUp(env, jReadFailureHandler);
@@ -1131,7 +1427,7 @@ JNI_METHOD(jboolean, targetNavigator_1subscribeToTargetList)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->TargetNavigator_SubscribeToTargetList(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getTargetListSuccessHandler().Handle(responseData);
         },
@@ -1155,18 +1451,24 @@ exit:
 }
 
 JNI_METHOD(jboolean, keypadInput_1sendKey)
-(JNIEnv * env, jobject, jbyte keyCode, jobject jResponseHandler)
+(JNIEnv * env, jobject, jobject contentApp, jbyte keyCode, jobject jResponseHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD keypadInput_sendKey called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(KeypadInput_SendKey).SetUp(env, jResponseHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(KeypadInput_SendKey).SetUp(env, jResponseHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->KeypadInput_SendKey(
-        static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode),
+        &endpoint, static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(KeypadInput_SendKey).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.KeypadInput_SendKey failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -1182,14 +1484,20 @@ exit:
 
 // APPLICATION BASIC
 JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorName)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationBasic_1subscribeToVendorName called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getVendorNameSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getVendorNameSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_VendorName).SetUp(env, jReadFailureHandler);
@@ -1203,7 +1511,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorName)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorName(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getVendorNameSuccessHandler().Handle(responseData);
         },
@@ -1227,14 +1535,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorID)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationBasic_1subscribeToVendorID called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getVendorIDSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getVendorIDSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_VendorID).SetUp(env, jReadFailureHandler);
@@ -1248,7 +1562,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorID)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorID(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getVendorIDSuccessHandler().Handle(responseData);
         },
@@ -1272,14 +1586,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationName)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationBasic_1subscribeToApplicationName called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getApplicationNameSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getApplicationNameSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_ApplicationName).SetUp(env, jReadFailureHandler);
@@ -1293,7 +1613,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationName)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationName(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getApplicationNameSuccessHandler().Handle(responseData);
@@ -1318,14 +1638,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationBasic_1subscribeToProductID)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationBasic_1subscribeToProductID called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getProductIDSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getProductIDSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_ProductID).SetUp(env, jReadFailureHandler);
@@ -1339,7 +1665,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToProductID)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToProductID(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getProductIDSuccessHandler().Handle(responseData);
         },
@@ -1363,14 +1689,20 @@ exit:
 }
 
 JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationVersion)
-(JNIEnv * env, jobject, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval, jint maxInterval,
- jobject jSubscriptionEstablishedHandler)
+(JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
+ jint maxInterval, jobject jSubscriptionEstablishedHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD applicationBasic_1subscribeToApplicationVersion called");
 
-    CHIP_ERROR err = TvCastingAppJNIMgr().getApplicationVersionSuccessHandler().SetUp(env, jReadSuccessHandler);
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getApplicationVersionSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err =
@@ -1385,7 +1717,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationVersion)
                  ChipLogError(AppServer, "SubscriptionEstablishedHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationVersion(
-        nullptr,
+        &endpoint, nullptr,
         [](void * context,
            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType responseData) {
             TvCastingAppJNIMgr().getApplicationVersionSuccessHandler().Handle(responseData);

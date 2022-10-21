@@ -54,7 +54,7 @@ class HostApp(Enum):
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
-    NL_TEST_RUNNER = auto()
+    EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
     DYNAMIC_BRIDGE = auto()
@@ -90,7 +90,7 @@ class HostApp(Enum):
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
             return '../'
-        elif self == HostApp.NL_TEST_RUNNER:
+        elif self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
         elif self == HostApp.TV_CASTING:
             return 'tv-casting-app/linux'
@@ -157,7 +157,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
-        elif self == HostApp.NL_TEST_RUNNER:
+        elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_nl_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
@@ -165,6 +165,9 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            yield 'dynamic-chip-bridge-app'
+            yield 'dynamic-chip-bridge-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -219,6 +222,7 @@ class HostBuilder(GnBuilder):
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
+                 minmdns_high_verbosity=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -294,11 +298,14 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(
                 'chip_im_force_fabric_quota_check=true')
 
+        if minmdns_high_verbosity:
+            self.extra_gn_options.append('chip_minmdns_high_verbosity=true')
+
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
 
-        if app == HostApp.NL_TEST_RUNNER:
+        if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
