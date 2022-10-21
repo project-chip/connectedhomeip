@@ -26,6 +26,7 @@ from dataclasses import dataclass
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
+
 @dataclass(eq=True, frozen=True)
 class ZapDistinctOutput:
     """Defines the properties that determine if some output seems unique or 
@@ -52,7 +53,7 @@ class ZAPGenerateTarget:
             self.output_dir = None
 
     def distinct_output(self):
-        return ZapDistinctOutput(input_template = self.template, output_directory = self.output_dir)
+        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -243,7 +244,7 @@ def getTargets(type, test_target):
             logging.error("Same output %r:" % o)
             for t in targets:
                 if t.distinct_output() == o:
-                   logging.error("   %s" % t.zap_config)
+                    logging.error("   %s" % t.zap_config)
 
             raise Exception("Duplicate/overlapping output directory: %r" % o)
 
