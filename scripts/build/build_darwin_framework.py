@@ -53,6 +53,11 @@ def build_darwin_framework(args):
         '-derivedDataPath',
         abs_path,
         "PLATFORM_PREFERRED_ARCH={}".format(args.target_arch),
+        # For now disable unguarded-availability-new warnings because we
+        # internally use APIs that we are annotating as only available on
+        # new enough versions.  Maybe we should change out deployment
+        # target versions instead?
+        "OTHER_CFLAGS=${inherited} -Wno-unguarded-availability-new",
     ]
 
     if args.target_sdk != "macosx":

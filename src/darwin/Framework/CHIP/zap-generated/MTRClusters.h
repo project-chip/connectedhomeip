@@ -5304,12 +5304,15 @@ labels.
                                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                       params:(MTRWriteParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
+- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                       params:(MTRWriteParams * _Nullable)params;
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                       params:(MTRWriteParams * _Nullable)params
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
