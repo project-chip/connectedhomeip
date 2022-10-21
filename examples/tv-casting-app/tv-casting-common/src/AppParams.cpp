@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +16,21 @@
  *    limitations under the License.
  */
 
-import SwiftUI
+#include "AppParams.h"
 
-struct ContentView: View {
-    var body: some View {
-        NavigationView {
-            StartFromCacheView()
-        }
-    }
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+AppParams::AppParams(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueId)
+{
+    mRotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+void AppParams::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueId)
+{
+    mRotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
 }
+
+chip::Optional<chip::ByteSpan> AppParams::GetRotatingDeviceIdUniqueId()
+{
+    return mRotatingDeviceIdUniqueId;
+}
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID

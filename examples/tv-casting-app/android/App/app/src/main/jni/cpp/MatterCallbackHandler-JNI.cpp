@@ -178,7 +178,7 @@ jobject OnConnectionSuccessHandlerJNI::ConvertToJObject(TargetVideoPlayerInfo * 
     {
         ChipLogError(AppServer, "OnConnectionSuccessHandlerJNI::ConvertToJObject failed with %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return nullptr;
+    return videoPlayer;
 }
 
 jobject OnNewOrUpdatedEndpointHandlerJNI::ConvertToJObject(TargetEndpointInfo * targetEndpointInfo)

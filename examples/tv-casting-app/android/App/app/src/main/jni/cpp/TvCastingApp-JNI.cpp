@@ -52,6 +52,36 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
 
+JNI_METHOD(jboolean, init)(JNIEnv *, jobject, jobject jAppParameters)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD init called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (jAppParameters == nullptr)
+    {
+        err = CastingServer::GetInstance()->Init();
+    }
+    else
+    {
+        AppParams appParams;
+        err = convertJAppParametersToCppAppParams(jAppParameters, appParams);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Conversion of AppParameters from jobject to Cpp type failed: %" CHIP_ERROR_FORMAT,
+                                  err.Format()));
+        err = CastingServer::GetInstance()->Init(&appParams);
+    }
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Call to CastingServer::GetInstance()->Init() failed: %" CHIP_ERROR_FORMAT, err.Format()));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
@@ -243,12 +273,6 @@ exit:
         return false;
     }
     return true;
-}
-
-JNI_METHOD(void, init)(JNIEnv *, jobject)
-{
-    ChipLogProgress(AppServer, "JNI_METHOD init called");
-    CastingServer::GetInstance()->Init();
 }
 
 JNI_METHOD(jboolean, contentLauncherLaunchURL)

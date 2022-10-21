@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "AppParams.h"
 #include "ApplicationBasic.h"
 #include "ApplicationLauncher.h"
 #include "Channel.h"
@@ -51,7 +52,7 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
-    void Init();
+    CHIP_ERROR Init(AppParams * AppParams = nullptr);
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);

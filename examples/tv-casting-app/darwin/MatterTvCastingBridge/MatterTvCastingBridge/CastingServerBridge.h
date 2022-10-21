@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "AppParameters.h"
 #import "ContentApp.h"
 #import "ContentLauncherTypes.h"
 #import "DiscoveredNodeData.h"
@@ -31,6 +32,10 @@
 @interface CastingServerBridge : NSObject
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
+
+- (void)initApp:(AppParameters * _Nullable)appParameters
+             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
 /*!
  @brief Browse for on-network commissioner TVs

@@ -25,20 +25,7 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 CastingServer * CastingServer::castingServer_ = nullptr;
 
-CastingServer::CastingServer()
-{
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    // generate and set a random uniqueId for generating rotatingId
-    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
-    {
-        rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
-    }
-
-    ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
-    chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
-#endif // CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-}
+CastingServer::CastingServer() {}
 
 CastingServer * CastingServer::GetInstance()
 {
@@ -49,20 +36,44 @@ CastingServer * CastingServer::GetInstance()
     return castingServer_;
 }
 
-void CastingServer::Init()
+CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 {
     if (mInited)
     {
-        return;
+        return CHIP_NO_ERROR;
     }
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // if this class's client provided a RotatingDeviceIdUniqueId, use that
+    if (AppParams != nullptr && AppParams->GetRotatingDeviceIdUniqueId().HasValue())
+    {
+        ByteSpan rotatingDeviceIdUniqueId(AppParams->GetRotatingDeviceIdUniqueId().Value());
+        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
+    }
+#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    else
+    {
+        // otherwise, generate and set a random uniqueId for generating rotatingId
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
+        {
+            rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
+        }
+
+        // ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(ByteSpan(rotatingDeviceIdUniqueId));
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+
     // Initialize binding handlers
-    ReturnOnFailure(InitBindingHandlers());
+    ReturnErrorOnFailure(InitBindingHandlers());
 
     // Add callback to send Content casting commands after commissioning completes
-    ReturnOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mInited = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CastingServer::InitBindingHandlers()

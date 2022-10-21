@@ -32,7 +32,7 @@ public class TvCastingApp {
   private final String TARGET_SERVICE_TYPE = "_matterd._udp.";
   private final List<Long> DEVICE_TYPE_FILTER = Arrays.asList(35L); // Video player = 35;
 
-  public native void init();
+  public native boolean init(AppParameters appParameters);
 
   public native void setDACProvider(DACProvider provider);
 

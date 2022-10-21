@@ -22,6 +22,27 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams & outAppParams)
+{
+    ChipLogProgress(AppServer, "convertJContentAppToTargetEndpointInfo called");
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(appParameters != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    jclass jAppParametersClass;
+    ReturnErrorOnFailure(
+        chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
+
+    jfieldID jRotatingDeviceIdUniqueIdField = env->GetFieldID(jAppParametersClass, "rotatingDeviceIdUniqueId", "[B");
+    jobject jRotatingDeviceIdUniqueId       = env->GetObjectField(appParameters, jRotatingDeviceIdUniqueIdField);
+    if (jRotatingDeviceIdUniqueId != nullptr)
+    {
+        chip::JniByteArray jniRotatingDeviceIdUniqueIdByteArray(env, static_cast<jbyteArray>(jRotatingDeviceIdUniqueId));
+        outAppParams.SetRotatingDeviceIdUniqueId(MakeOptional(jniRotatingDeviceIdUniqueIdByteArray.byteSpan()));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndpointInfo & outTargetEndpointInfo)
 {
     ChipLogProgress(AppServer, "convertJContentAppToTargetEndpointInfo called");
@@ -166,8 +187,9 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
                 chip::JniReferences::GetInstance().AddToList(jContentAppList, contentApp);
             }
         }
-        jstring deviceName = env->NewStringUTF(targetVideoPlayerInfo->GetDeviceName());
-        outVideoPlayer     = env->NewObject(jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(),
+        jstring deviceName =
+            targetVideoPlayerInfo->GetDeviceName() == nullptr ? nullptr : env->NewStringUTF(targetVideoPlayerInfo->GetDeviceName());
+        outVideoPlayer = env->NewObject(jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(),
                                         targetVideoPlayerInfo->GetFabricIndex(), deviceName, targetVideoPlayerInfo->GetVendorId(),
                                         targetVideoPlayerInfo->GetProductId(), targetVideoPlayerInfo->GetDeviceType(),
                                         jContentAppList, targetVideoPlayerInfo->GetOperationalDeviceProxy() != nullptr);

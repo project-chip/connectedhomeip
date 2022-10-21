@@ -122,10 +122,33 @@
         _subscriptionReadFailureCallbacks = [NSMutableDictionary dictionary];
 
         chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-
-        CastingServer::GetInstance()->Init();
     }
     return self;
+}
+
+- (void)initApp:(AppParameters * _Nullable)appParameters
+             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
+
+    dispatch_async(_chipWorkQueue, ^{
+        bool initAppStatus = true;
+
+        AppParams appParams;
+
+        CHIP_ERROR err = CastingServer::GetInstance()->Init();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "CastingServerBridge().initApp() failed: %" CHIP_ERROR_FORMAT, err.Format());
+            initAppStatus = false;
+        }
+
+        dispatch_async(clientQueue, ^{
+            initAppStatusHandler(initAppStatus);
+        });
+    });
+
+    CastingServer::GetInstance()->Init();
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
