@@ -71,6 +71,14 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 static constexpr size_t kLevelControlStateTableSize =
     EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+struct CallbackScheduleState
+{
+    System::Clock::Timestamp idealTimestamp; // The ideal time-stamp for the next callback to be scheduled.
+    System::Clock::Milliseconds32 runTime;   // The duration of the previous scheduled callback function.
+                                             // e.g. running time of emberAfLevelControlClusterServerTickCallback
+                                             // when called consecutively
+};
+
 typedef struct
 {
     CommandId commandId;
@@ -83,6 +91,7 @@ typedef struct
     uint32_t eventDurationMs;
     uint32_t transitionTimeMs;
     uint32_t elapsedTimeMs;
+    CallbackScheduleState callbackSchedule;
 } EmberAfLevelControlState;
 
 static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
@@ -114,6 +123,46 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint);
 static void timerCallback(System::Layer *, void * callbackContext)
 {
     emberAfLevelControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
+}
+
+static uint32_t computeCallbackWaitTimeMs(CallbackScheduleState & callbackSchedule, uint32_t delayMs)
+{
+    auto delay             = System::Clock::Milliseconds32(delayMs);
+    auto waitTime          = delay;
+    const auto currentTime = System::SystemClock().GetMonotonicTimestamp();
+
+    // Subsequent call
+    if (callbackSchedule.runTime.count())
+    {
+        // Check whether the previous scheduled callback was late and whether its running time
+        // is smaller than the desired delay
+        // If the running time of the scheduled callback is greater than the desired delay
+        // then do nothing; do not flood the event loop if the device is not fast enough
+        if ((currentTime > callbackSchedule.idealTimestamp) && (callbackSchedule.runTime < delay))
+        {
+            System::Clock::Timestamp latency = currentTime - callbackSchedule.idealTimestamp;
+
+            if (latency >= delay)
+            {
+                waitTime = System::Clock::Milliseconds32(0);
+            }
+            else
+            {
+                waitTime -= latency;
+            }
+        }
+    }
+    // First-time call
+    else
+    {
+        // initialize idealTimestamp
+        callbackSchedule.idealTimestamp = currentTime;
+    }
+
+    callbackSchedule.idealTimestamp += System::Clock::Milliseconds32(delayMs);
+    callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
+    return waitTime.count();
 }
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
@@ -159,6 +208,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     app::DataModel::Nullable<uint8_t> currentLevel;
+    const auto callbackStartTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (state == nullptr)
     {
@@ -173,6 +223,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
     {
         emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
     }
@@ -205,6 +256,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
     }
@@ -242,12 +294,14 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
             }
         }
 
+        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
     }
     else
     {
+        state->callbackSchedule.runTime = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
-        schedule(endpoint, state->eventDurationMs);
+        schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     }
 }
 
@@ -677,8 +731,10 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
 
     state->storedLevel = storedLevel;
 
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
     if (commandId == Commands::MoveToLevelWithOnOff::Id)
@@ -803,8 +859,10 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     // storedLevel is not used for Move commands.
     state->storedLevel = INVALID_STORED_LEVEL;
 
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
 send_default_response:
@@ -929,8 +987,10 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     // storedLevel is not used for Step commands
     state->storedLevel = INVALID_STORED_LEVEL;
 
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
     // The setup was successful, so mark the new state as active and return.
-    schedule(endpoint, state->eventDurationMs);
+    schedule(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
     status = EMBER_ZCL_STATUS_SUCCESS;
 
 send_default_response:

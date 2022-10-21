@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include "ConversionUtils.h"
+#include "TargetEndpointInfo.h"
+#include "TargetVideoPlayerInfo.h"
+
 #include <controller/CHIPCluster.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -80,6 +84,7 @@ public:
         JNIEnv * env          = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject jResponseData = ConvertToJObject(responseData);
 
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -94,6 +99,21 @@ public:
 
 template <typename T>
 SuccessHandlerJNI<T>::~SuccessHandlerJNI(){};
+
+// COMMISSIONING AND CONNECTION
+class OnConnectionSuccessHandlerJNI : public SuccessHandlerJNI<TargetVideoPlayerInfo *>
+{
+public:
+    OnConnectionSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject ConvertToJObject(TargetVideoPlayerInfo * responseData);
+};
+
+class OnNewOrUpdatedEndpointHandlerJNI : public SuccessHandlerJNI<TargetEndpointInfo *>
+{
+public:
+    OnNewOrUpdatedEndpointHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
+    jobject ConvertToJObject(TargetEndpointInfo * responseData);
+};
 
 // MEDIA PLAYBACK
 class CurrentStateSuccessHandlerJNI

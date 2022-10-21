@@ -20,6 +20,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
+
 class TargetEndpointInfo
 {
 public:
@@ -29,11 +31,11 @@ public:
     chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
     bool HasCluster(chip::ClusterId clusterId);
+    chip::ClusterId * GetClusters();
     bool AddCluster(chip::ClusterId clusterId);
     void PrintInfo();
 
 private:
-    static constexpr size_t kMaxNumberOfClustersPerEndpoint    = 10;
     chip::ClusterId mClusters[kMaxNumberOfClustersPerEndpoint] = {};
     chip::EndpointId mEndpointId;
     bool mInitialized = false;

@@ -35,3 +35,4 @@ JNI_METHOD(void, ThirdCluster, readSomeEnumAttribute)(JNIEnv * env, jobject self
     onFailure.release();
 }
 
+

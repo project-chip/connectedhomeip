@@ -6,7 +6,7 @@ steps:
           - "--init"
           - "--recursive"
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -21,7 +21,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -44,6 +44,7 @@ steps:
               --target efr32-brd4161a-lock
               --target efr32-brd4161a-switch
               --target efr32-brd4161a-window-covering
+              --target efr32-brd4161a-unit-test
               --target efr32-brd4187c-window-covering
               --target esp32-c3devkit-all-clusters
               --target esp32-c3devkit-all-clusters-minimal

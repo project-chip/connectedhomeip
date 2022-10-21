@@ -103,7 +103,6 @@ def BuildHostTarget():
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
-        TargetPart('light-rpc', app=HostApp.LIGHT, enable_rpcs=True),
         TargetPart('lock', app=HostApp.LOCK),
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
@@ -143,6 +142,7 @@ def BuildHostTarget():
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
+    target.AppendModifier('rpc', enable_rpcs=True)
 
     return target
 

@@ -60,7 +60,8 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 {
     CastingServer::GetInstance()->Init();
 
-    CastingServer::GetInstance()->OpenBasicCommissioningWindow(HandleCommissioningCompleteCallback);
+    CastingServer::GetInstance()->OpenBasicCommissioningWindow(HandleCommissioningCompleteCallback, OnConnectionSuccess,
+                                                               OnConnectionFailure, OnNewOrUpdatedEndpoint);
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -158,27 +159,113 @@ void OnCurrentStateSubscriptionEstablished(void * context)
     }
 }
 
+void doCastingDemoActions(TargetEndpointInfo * endpoint)
+{
+    if (endpoint != nullptr && endpoint->IsInitialized())
+    {
+        if (endpoint->HasCluster(chip::app::Clusters::MediaPlayback::Id))
+        {
+            // Subscribe to MediaPlayback::CurrentState
+            ChipLogProgress(AppServer,
+                            "doCastingDemoActions requesting subscription on MediaPlayback:CurrentState on endpoint ID: %d",
+                            endpoint->GetEndpointId());
+            CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
+                endpoint, static_cast<void *>(&gInitialContextVal), OnCurrentStateReadResponseSuccess,
+                OnCurrentStateReadResponseFailure, 0, 4000, OnCurrentStateSubscriptionEstablished);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "MediaPlayback_SubscribeToCurrentState call failed!");
+            }
+        }
+        else
+        {
+            ChipLogProgress(AppServer,
+                            "doCastingDemoActions: Not subscribing to MediaPlayback:CurrentState on endpoint ID %d as it does not "
+                            "support the MediaPlayback cluster",
+                            endpoint->GetEndpointId());
+        }
+
+        if (endpoint->HasCluster(chip::app::Clusters::ContentLauncher::Id))
+        {
+            // Send a ContentLauncher::LaunchURL command
+            ChipLogProgress(AppServer, "doCastingDemoActions sending ContentLauncher:LaunchURL on endpoint ID: %d",
+                            endpoint->GetEndpointId());
+            CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncherLaunchURL(endpoint, kContentUrl, kContentDisplayStr,
+                                                                                    LaunchURLResponseCallback);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "ContentLauncherLaunchURL call failed!");
+            }
+        }
+        else
+        {
+            ChipLogProgress(AppServer,
+                            "doCastingDemoActions: Not sending ContentLauncher:LaunchURL on endpoint ID %d as it does not support "
+                            "the ContentLauncher cluster",
+                            endpoint->GetEndpointId());
+        }
+    }
+}
+
+void OnConnectionSuccess(TargetVideoPlayerInfo * videoPlayer)
+{
+    ChipLogProgress(AppServer,
+                    "OnConnectionSuccess with Video Player(nodeId: 0x" ChipLogFormatX64
+                    ", fabricIndex: %d, deviceName: %s, vendorId: %d, productId: "
+                    "%d, deviceType: %d)",
+                    ChipLogValueX64(videoPlayer->GetNodeId()), videoPlayer->GetFabricIndex(), videoPlayer->GetDeviceName(),
+                    videoPlayer->GetVendorId(), videoPlayer->GetProductId(), videoPlayer->GetDeviceType());
+
+    TargetEndpointInfo * endpoints = videoPlayer->GetEndpoints();
+    if (endpoints != nullptr)
+    {
+        for (size_t i = 0; i < kMaxNumberOfEndpoints && endpoints[i].IsInitialized(); i++)
+        {
+            doCastingDemoActions(&endpoints[i]); // LaunchURL and Subscribe to CurrentState
+        }
+    }
+}
+
+void OnConnectionFailure(CHIP_ERROR err)
+{
+    ChipLogError(AppServer, "OnConnectionFailure error: %" CHIP_ERROR_FORMAT, err.AsString());
+}
+
+void OnNewOrUpdatedEndpoint(TargetEndpointInfo * endpoint)
+{
+    ChipLogProgress(AppServer, "OnNewOrUpdatedEndpoint called");
+    doCastingDemoActions(endpoint); // LaunchURL and Subscribe to CurrentState
+}
+
+CHIP_ERROR ConnectToCachedVideoPlayer()
+{
+    TargetVideoPlayerInfo * cachedVideoPlayers = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+    if (cachedVideoPlayers != nullptr)
+    {
+        for (size_t i = 0; i < kMaxCachedVideoPlayers; i++)
+        {
+            if (cachedVideoPlayers[i].IsInitialized())
+            {
+                ChipLogProgress(AppServer, "Found a Cached video player with nodeId: 0x" ChipLogFormatX64 ", fabricIndex: %d",
+                                ChipLogValueX64(cachedVideoPlayers[i].GetNodeId()), cachedVideoPlayers[i].GetFabricIndex());
+                if (CastingServer::GetInstance()->VerifyOrEstablishConnection(
+                        cachedVideoPlayers[i], OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint) == CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(AppServer,
+                                    "FindOrEstablish CASESession attempted for cached video player with nodeId: 0x" ChipLogFormatX64
+                                    ", fabricIndex: %d",
+                                    ChipLogValueX64(cachedVideoPlayers[i].GetNodeId()), cachedVideoPlayers[i].GetFabricIndex());
+                    return CHIP_NO_ERROR;
+                }
+            }
+        }
+    }
+    return CHIP_ERROR_INVALID_CASE_PARAMETER;
+}
+
 void HandleCommissioningCompleteCallback(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback called with %" CHIP_ERROR_FORMAT, err.Format());
-    if (err == CHIP_NO_ERROR)
-    {
-        // Subscribe to a media attribute
-        err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
-            static_cast<void *>(&gInitialContextVal), OnCurrentStateReadResponseSuccess, OnCurrentStateReadResponseFailure, 0, 4000,
-            OnCurrentStateSubscriptionEstablished);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "MediaPlayback_SubscribeToCurrentState call failed!");
-        }
-
-        // Send a media command
-        err = CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr, LaunchURLResponseCallback);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "ContentLauncherLaunchURL call failed!");
-        }
-    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
@@ -187,9 +274,7 @@ void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
     Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
 
     // Send User Directed commissioning request
-    ReturnOnFailure(CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port,
-        selectedCommissioner->resolutionData.interfaceId)));
+    ReturnOnFailure(CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(selectedCommissioner));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
