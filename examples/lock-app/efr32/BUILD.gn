@@ -187,6 +187,10 @@ efr32_executable("lock_app") {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
+  if (chip_build_libshell) {
+    sources += [ "src/EventHandlerLibShell.cpp" ]
+  }
+
   deps = [
     ":sdk",
     "${chip_root}/examples/lock-app/lock-common",
