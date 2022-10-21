@@ -2643,8 +2643,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
             numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
     });
 
-    ChipLogError(Zcl, "Success call cnt: %u (expect %u) subscription cnt: %u (expect %u)", numSuccessCalls,
-                 uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
+    ChipLogError(Zcl, "Success call cnt: %" PRIu32 " (expect %" PRIu32 ") subscription cnt: %" PRIu32 " (expect %" PRIu32 ")",
+                 numSuccessCalls, uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
                  uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
