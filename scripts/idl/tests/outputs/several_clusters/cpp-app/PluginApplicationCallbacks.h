@@ -1,10 +1,6 @@
 #pragma once
-
-#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+void MatterThirdPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
-    MatterFirstPluginClientInitCallback(); \
-    MatterSecondPluginClientInitCallback(); \
-    MatterThirdPluginClientInitCallback(); \
     MatterThirdPluginServerInitCallback();
 

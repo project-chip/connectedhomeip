@@ -27,7 +27,6 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;

@@ -79,11 +79,6 @@
             "output": "print-cluster.h"
         },
         {
-            "path": "../../zap-templates/templates/app/callbacks/PluginCallbacks.zapt",
-            "name": "Matter Callbacks header",
-            "output": "callbacks/PluginCallbacks.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
             "name": "Attributes Accessors header",
             "output": "attributes/Accessors.h"
