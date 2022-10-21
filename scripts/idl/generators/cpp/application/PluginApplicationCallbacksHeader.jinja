@@ -1,6 +1,8 @@
 #pragma once
 
-#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+{%- for cluster in clusters | sort(attribute='name') %}
+void Matter{{asUpperCamelCase label}}PluginServerInitCallback();
+{%- endfor %}
 
 #define MATTER_PLUGINS_INIT \
 {%- for cluster in clusters | sort(attribute='name') %}
