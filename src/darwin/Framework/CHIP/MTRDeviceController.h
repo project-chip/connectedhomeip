@@ -73,6 +73,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
+ * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
+ *
  * Start pairing for a device with the given ID, using the provided setup PIN
  * to establish a PASE connection.
  *
@@ -90,6 +92,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
              error:(NSError * __autoreleasing *)error;
 
 /**
+ * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
+ *
  * Start pairing for a device with the given ID, using the provided IP address
  * and port to connect to the device and the provided setup PIN to establish a
  * PASE connection.
@@ -106,6 +110,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
              error:(NSError * __autoreleasing *)error;
 
 /**
+ * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
+ *
  * Start pairing for a device with the given ID and onboarding payload (QR code
  * or manual setup code).  The payload will be used to discover the device and
  * establish a PASE connection.
