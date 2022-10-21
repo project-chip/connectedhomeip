@@ -162,7 +162,8 @@ public:
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp:
-            return GetRemoteMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            return GetRetransmissionTimeout(mRemoteMRPConfig.mActiveRetransTimeout, mRemoteMRPConfig.mIdleRetransTimeout,
+                                            GetLastPeerActivityTime(), kMinActiveTime);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
