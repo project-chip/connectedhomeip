@@ -1,13 +1,14 @@
 # Matter Controller Java App Example
 
-This is a Matter Controller Java app that can be used to uses Matter to send
-messages to a Matter server.
+This is a Matter Controller Java app that can be used to commission and control
+Matter accessory devices. It offers the following features: - Commission a
+Matter device - Send echo requests to the Matter echo server - Send on/off
+cluster requests to a Matter device
 
 <hr>
 
 -   [Matter Controller Java App Example](#matter-controller-java-app-example)
     -   [Requirements for building](#requirements-for-building)
-        -   [Gradle & JDK Version](#gradle--jdk-version)
     -   [Preparing for build](#preparing-for-build)
     -   [Building & Running the app](#building--running-the-app)
 
@@ -17,23 +18,41 @@ messages to a Matter server.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK downloaded to your machine. Set the
+You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
 
-<a name="jdk"></a>
+1. Install [Android Studio](https://developer.android.com/studio)
+2. Install NDK:
+    1. Tools -> SDK Manager -> SDK Tools Tab
+    2. Click [x] Show Package Details
+    3. Select NDK (Side by Side) -> 21.4.7075529
+    4. Apply
+3. Install Command Line Tools:
+    1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
+       (latest)
+    2. Apply
+4. Install SDK 21:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 5.0 (Lollipop) SDK
+       Level 21
+    2. Apply
+5. Install Emulator:
+    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
+       -> Download
 
-### Gradle & JDK Version
+### Linux
 
-We are using Gradle 7.1.1 for all android project which does not support Java 17
-(https://docs.gradle.org/current/userguide/compatibility.html) while the default
-JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
+```
+export ANDROID_HOME=~/Android/Sdk
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/21.4.7075529
+```
 
-Using JDK bundled with Android Studio will help with that.
+### MacOS
 
-```shell
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+export ANDROID_HOME=~/Library/Android/sdk
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.4.7075529
 ```
 
 <hr>

@@ -73,6 +73,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::TLV;
@@ -1077,6 +1081,10 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
 }
+#endif
+
+#if CHIP_CRYPTO_PSA
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext) {}
 #endif
 
 #if CHIP_CRYPTO_BORINGSSL
@@ -2471,6 +2479,11 @@ int TestCHIPCryptoPAL_Setup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+
+#if CHIP_CRYPTO_PSA
+    psa_crypto_init();
+#endif
+
     return SUCCESS;
 }
 

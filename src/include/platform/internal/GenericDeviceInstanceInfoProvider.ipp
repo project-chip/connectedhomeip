@@ -66,7 +66,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char 
         ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err = CHIP_NO_ERROR;
+        err          = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     ReturnErrorOnFailure(err);
@@ -150,14 +150,19 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUn
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
-                  "Length of unique ID for rotating device ID is smaller than minimum.");
-    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    if (chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(uniqueIdSpan) != CHIP_NO_ERROR)
+    {
+        static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >=
+                          ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                      "Length of unique ID for rotating device ID is smaller than minimum.");
 
-    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
-    uniqueIdSpan.reduce_size(sizeof(uniqueId));
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdSpan.reduce_size(sizeof(uniqueId));
+    }
     return CHIP_NO_ERROR;
 #endif
     return err;

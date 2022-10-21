@@ -27,11 +27,12 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode
 // Cluster {{asUpperCamelCase parent.label}} attributes
 {{/first}}
 {{#if clusterRef}}
-MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID {{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}} {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} = {{asMEI manufacturerCode code}},
 {{!Backwards compat for now: DeviceList as an alias for DeviceTypeList}}
 {{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
-MTRClusterDescriptorAttributeDeviceListID = MTRClusterDescriptorAttributeDeviceTypeListID,
+MTRClusterDescriptorAttributeDeviceListID = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/if}}
 {{else}}
