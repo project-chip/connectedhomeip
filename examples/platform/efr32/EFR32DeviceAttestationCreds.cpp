@@ -37,7 +37,7 @@ class DeviceAttestationCredsEFR32 : public DeviceAttestationCredentialsProvider
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_buffer) override
     {
-        ByteSpan cd_span(((uint8_t *) &__attestation_credentials_base) + EFR32_CREDENTIALS_CD_OFFSET, EFR32_CREDENTIALS_CD_SIZE);
+        ByteSpan cd_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_CD_OFFSET, EFR32_CREDENTIALS_CD_SIZE);
         return CopySpanToMutableSpan(cd_span, out_buffer);
     }
 
@@ -50,14 +50,14 @@ public:
 
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_buffer) override
     {
-        ByteSpan cert_span(((uint8_t *) &__attestation_credentials_base) + EFR32_CREDENTIALS_DAC_OFFSET,
+        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_DAC_OFFSET,
                            EFR32_CREDENTIALS_DAC_SIZE);
         return CopySpanToMutableSpan(cert_span, out_buffer);
     }
 
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override
     {
-        ByteSpan cert_span(((uint8_t *) &__attestation_credentials_base) + EFR32_CREDENTIALS_PAI_OFFSET,
+        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_PAI_OFFSET,
                            EFR32_CREDENTIALS_PAI_SIZE);
         return CopySpanToMutableSpan(cert_span, out_pai_buffer);
     }
