@@ -49,7 +49,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
 // ========== Platform-specific Configuration =========
