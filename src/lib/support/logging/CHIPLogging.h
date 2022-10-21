@@ -226,20 +226,6 @@ void SetLogFilter(uint8_t category);
  * CHIP logging length constants
  */
 static constexpr uint16_t kMaxModuleNameLen  = 3;
-static constexpr uint16_t kMaxPrefixLen      = 3;
-static constexpr uint16_t kMaxSeparatorLen   = 2;
-static constexpr uint16_t kMaxTrailerLen     = 2;
-static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + chip::Logging::kMaxModuleNameLen +
-                                                chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
-
-void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-
-#else
-
-static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
-{
-    return;
-}
 
 #endif // _CHIP_USE_LOGGING
 
