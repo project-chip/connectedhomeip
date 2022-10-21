@@ -167,27 +167,18 @@ get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
 # Find required programs
 
-find_program(GN_EXECUTABLE gn)
-if (${GN_EXECUTABLE} STREQUAL GN_EXECUTABLE-NOTFOUND)
-    message(FATAL_ERROR "The 'gn' command was not found. Make sure you have GN installed.")
-else()
-    # Parse the 'gn --version' output to find the installed version.
-    set(MIN_GN_VERSION 1851)
-    execute_process(
-        COMMAND
-        ${GN_EXECUTABLE} --version
-        OUTPUT_VARIABLE gn_version_output
-        ERROR_VARIABLE  gn_error_output
-        RESULT_VARIABLE gn_status
-    )
+find_program(GN_EXECUTABLE gn REQUIRED)
 
-    if(${gn_status} EQUAL 0)
-        if(gn_version_output VERSION_LESS ${MIN_GN_VERSION})
-            message(FATAL_ERROR "Found unsuitable version of 'gn'. Required is at least ${MIN_GN_VERSION}")
-        endif()
-    else()
-        message(FATAL_ERROR "Could NOT find working gn: Found gn (${GN_EXECUTABLE}), but failed to load with:\n ${gn_error_output}")
-    endif()
+# Parse the 'gn --version' output to find the installed version.
+set(MIN_GN_VERSION 1851)
+execute_process(
+    COMMAND ${GN_EXECUTABLE} --version
+    OUTPUT_VARIABLE GN_VERSION
+    COMMAND_ERROR_IS_FATAL ANY
+)
+
+if(GN_VERSION VERSION_LESS MIN_GN_VERSION)
+    message(FATAL_ERROR "Found unsuitable version of 'gn'. Required is at least ${MIN_GN_VERSION}")
 endif()
 
 find_package(Python3 REQUIRED)
@@ -351,20 +342,17 @@ add_dependencies(chip chip-gn)
 # ==============================================================================
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-
     chip_ota_image(chip-ota-image
         INPUT_FILES ${PROJECT_BINARY_DIR}/dfu_multi_image.bin
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
-
-    add_dependencies(chip-ota-image dfu_multi_image_pkg)
 endif()
 
 # ==============================================================================
 # Define 'factory_data' target for generating a factory data partition
 # ==============================================================================
 
-if(CONFIG_CHIP_FACTORY_DATA_BUILD)
+if (CONFIG_CHIP_FACTORY_DATA_BUILD)
     nrfconnect_generate_factory_data()
 endif()
 
