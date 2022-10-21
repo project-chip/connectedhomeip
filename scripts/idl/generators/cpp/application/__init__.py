@@ -23,13 +23,8 @@ import enum
 import logging
 
 
-def clusterSideString(side: ClusterSide):
-    if side == ClusterSide.CLIENT:
-        return "Client"
-    elif side == ClusterSide.SERVER:
-        return "Server"
-    else:
-        raise Exception("Unknown cluster side %r" % (side, ))
+def serverClustersOnly(clusters: List[Cluster]) -> List[Cluster]:
+    return [c for c in clusters if c.side == ClusterSide.SERVER]
 
 
 class CppApplicationGenerator(CodeGenerator):
@@ -44,7 +39,7 @@ class CppApplicationGenerator(CodeGenerator):
         """
         super().__init__(storage, idl)
 
-        self.jinja_env.filters['clusterSideString'] = clusterSideString
+        self.jinja_env.filters['serverClustersOnly'] = serverClustersOnly
 
     def internal_render_all(self):
         """
