@@ -16,6 +16,7 @@
  */
 #include <lib/dnssd/IncrementalResolve.h>
 
+#include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
@@ -351,6 +352,8 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
 CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
     VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
+
+    IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
     outputData.resolutionData = mCommonResolutionData;
     outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
