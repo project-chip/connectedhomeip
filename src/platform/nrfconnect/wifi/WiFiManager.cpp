@@ -193,7 +193,8 @@ CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credenti
     mWiFiState = WIFI_STATE_ASSOCIATING;
 
     // Store SSID and credentials and perform the scan to detect the security mode supported by the AP.
-    // Connect() will be called in the callback when we have the SSID match.
+    // Zephyr WiFi connect request will be issued in the callback when we have the SSID match.
+    mWantedNetwork.Erase();
     memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
     memcpy(mWantedNetwork.pass, credentials.data(), credentials.size());
     mWantedNetwork.ssidLen = ssid.size();
@@ -382,6 +383,8 @@ void WiFiManager::ConnectHandler(uint8_t * data)
         }
         Instance().PostConnectivityStatusChange(kConnectivity_Established);
     }
+    // cleanup the provisioning data as it is configured per each connect request
+    Instance().ClearStationProvisioningData();
 }
 
 void WiFiManager::DisconnectHandler(uint8_t * data)

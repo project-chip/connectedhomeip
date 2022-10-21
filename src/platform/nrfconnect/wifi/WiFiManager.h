@@ -155,6 +155,13 @@ public:
         ByteSpan GetSsidSpan() const { return ByteSpan(ssid, ssidLen); }
         ByteSpan GetPassSpan() const { return ByteSpan(pass, passLen); }
         void Clear() { ssidLen = 0; }
+        void Erase()
+        {
+            memset(ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            memset(pass, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
+            ssidLen = 0;
+            passLen = 0;
+        }
     };
 
     CHIP_ERROR Init();
