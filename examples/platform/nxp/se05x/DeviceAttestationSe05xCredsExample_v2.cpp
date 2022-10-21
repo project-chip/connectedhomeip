@@ -170,6 +170,8 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
                                                                    MutableByteSpan & out_signature_buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
+    size_t signature_se05x_len                                       = sizeof(signature_se05x);
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -186,59 +188,59 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         0,
     };
 
+
     tempBuf[0] = (uint8_t) TLV::TLVElementType::Structure;
-    VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(START_CONTAINER_SE05X_ID, tempBuf, 1), CHIP_ERROR_INTERNAL);
+    SuccessOrExit(se05xSetCertificate(START_CONTAINER_SE05X_ID, tempBuf, 1));
 
     for (int i = 1; i <= 3; i++)
     {
-        if (TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader) == CHIP_NO_ERROR)
+        CHIP_ERROR tlverr = CHIP_NO_ERROR;
+        tlverr = TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader);
+        if (tlverr == CHIP_ERROR_TLV_TAG_NOT_FOUND){
+            continue;
+        }
+        SuccessOrExit(tlverr);
+
+        taglen     = tagReader.GetLength();
+        tempBuf[0] = tagReader.GetControlByte();
+        ;
+        tempBuf[1] = i;
+        SuccessOrExit(se05xSetCertificate(TAG1_ID + (3 * (i - 1)), tempBuf, 2));
+        if (taglen > 256)
         {
-            taglen     = tagReader.GetLength();
-            tempBuf[0] = tagReader.GetControlByte();
-            ;
-            tempBuf[1] = i;
-            VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(TAG1_ID + (3 * (i - 1)), tempBuf, 2), CHIP_ERROR_INTERNAL);
-            if (taglen > 256)
-            {
-                tempBuf[0] = taglen & 0xFF;
-                tempBuf[1] = (taglen >> 8) & 0xFF;
-                VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 2),
-                                    CHIP_ERROR_INTERNAL);
-            }
-            else
-            {
-                tempBuf[0] = taglen;
-                VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 1),
-                                    CHIP_ERROR_INTERNAL);
-            }
-            if (taglen > 0)
-            {
-                ReturnErrorOnFailure(tagReader.Get(tagvalue));
-                VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen),
-                                    CHIP_ERROR_INTERNAL);
-            }
+            tempBuf[0] = taglen & 0xFF;
+            tempBuf[1] = (taglen >> 8) & 0xFF;
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 2));
+        }
+        else
+        {
+            tempBuf[0] = taglen;
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 1));
+        }
+        if (taglen > 0)
+        {
+            SuccessOrExit(tagReader.Get(tagvalue));
+            SuccessOrExit(se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen));
         }
     }
 
     tempBuf[0] = (uint8_t) TLV::TLVElementType::EndOfContainer;
-    VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(END_CONTAINER_SE05X_ID, tempBuf, 1), CHIP_ERROR_INTERNAL);
+    SuccessOrExit(se05xSetCertificate(END_CONTAINER_SE05X_ID, tempBuf, 1));
 
     if ((tagReader.GetRemainingLength() + 1 /* End container */) >= 16)
     {
         /* Set attestation challenge */
-        VerifyOrReturnError(CHIP_NO_ERROR == se05xSetCertificate(ATTEST_CHALLENGE_ID, (message_to_sign.end() - 16), 16),
-                            CHIP_ERROR_INTERNAL);
+        SuccessOrExit(se05xSetCertificate(ATTEST_CHALLENGE_ID, (message_to_sign.end() - 16), 16));
     }
 
-    uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
-    size_t signature_se05x_len                                       = sizeof(signature_se05x);
-
-    err = se05xPerformInternalSign(DEV_ATTESTATION_KEY_SE05X_ID_IS, signature_se05x, &signature_se05x_len);
-    ReturnErrorOnFailure(err);
+    SuccessOrExit(se05xPerformInternalSign(DEV_ATTESTATION_KEY_SE05X_ID_IS, signature_se05x, &signature_se05x_len));
 
     err = chip::Crypto::EcdsaAsn1SignatureToRaw(chip::Crypto::kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len },
                                                 out_signature_buffer);
 
+exit:
+    // Delete existing objects if any
+    se05x_delete_key(START_CONTAINER_SE05X_ID);
     se05x_delete_key(TAG1_ID);
     se05x_delete_key(TAG1_LEN_ID);
     se05x_delete_key(TAG1_VALUE_ID);
@@ -248,6 +250,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     se05x_delete_key(TAG3_ID);
     se05x_delete_key(TAG3_LEN_ID);
     se05x_delete_key(TAG3_VALUE_ID);
+    se05x_delete_key(END_CONTAINER_SE05X_ID);
     se05x_delete_key(ATTEST_CHALLENGE_ID);
 
     return err;
