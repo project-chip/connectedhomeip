@@ -393,30 +393,28 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     switch (event->Type)
     {
-        case AppEvent::kEventType_Lock:
+    case AppEvent::kEventType_Lock: {
+        action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
+        actor  = event->LockEvent.Actor;
+        break;
+    }
+
+    case AppEvent::kEventType_Button: {
+        if (LockMgr().NextState() == true)
         {
-            action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
-            actor  = event->LockEvent.Actor;
-            break;
+            action = LockManager::LOCK_ACTION;
+        }
+        else
+        {
+            action = LockManager::UNLOCK_ACTION;
         }
 
-        case AppEvent::kEventType_Button:
-        {
-            if (LockMgr().NextState() == true)
-            {
-                action = LockManager::LOCK_ACTION;
-            }
-            else
-            {
-                action = LockManager::UNLOCK_ACTION;
-            }
+        actor = AppEvent::kEventType_Button;
+        break;
+    }
 
-            actor = AppEvent::kEventType_Button;
-            break;
-        }
-
-        default:
-            return;
+    default:
+        return;
     }
 
     if (!LockMgr().InitiateAction(actor, action))

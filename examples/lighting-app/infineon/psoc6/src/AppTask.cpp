@@ -310,30 +310,28 @@ void AppTask::LightActionEventHandler(AppEvent * event)
 
     switch (event->Type)
     {
-        case AppEvent::kEventType_Light:
+    case AppEvent::kEventType_Light: {
+        action = static_cast<LightingManager::Action_t>(event->LightEvent.Action);
+        actor  = event->LightEvent.Actor;
+        break;
+    }
+
+    case AppEvent::kEventType_Button: {
+        if (LightMgr().IsLightOn())
         {
-            action = static_cast<LightingManager::Action_t>(event->LightEvent.Action);
-            actor  = event->LightEvent.Actor;
-            break;
+            action = LightingManager::OFF_ACTION;
+        }
+        else
+        {
+            action = LightingManager::ON_ACTION;
         }
 
-        case AppEvent::kEventType_Button:
-        {
-            if (LightMgr().IsLightOn())
-            {
-                action = LightingManager::OFF_ACTION;
-            }
-            else
-            {
-                action = LightingManager::ON_ACTION;
-            }
+        actor = AppEvent::kEventType_Button;
+        break;
+    }
 
-            actor = AppEvent::kEventType_Button;
-            break;
-        }
-
-        default:
-            return;
+    default:
+        return;
     }
 
     if (!LightMgr().InitiateAction(actor, action))
