@@ -334,6 +334,55 @@ public:
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
 
+    CHIP_ERROR
+    ApplicationBasic_ReadVendorName(TargetEndpointInfo * endpoint, void * context,
+                                    chip::Controller::ReadResponseSuccessCallback<
+                                        chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+                                        successFn,
+                                    chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadVendorID(TargetEndpointInfo * endpoint, void * context,
+                                  chip::Controller::ReadResponseSuccessCallback<
+                                      chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+                                      successFn,
+                                  chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadApplicationName(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadProductID(TargetEndpointInfo * endpoint, void * context,
+                                   chip::Controller::ReadResponseSuccessCallback<
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+                                       successFn,
+                                   chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadApplication(TargetEndpointInfo * endpoint, void * context,
+                                     chip::Controller::ReadResponseSuccessCallback<
+                                         chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
+                                         successFn,
+                                     chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadStatus(TargetEndpointInfo * endpoint, void * context,
+                                chip::Controller::ReadResponseSuccessCallback<
+                                    chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
+                                    successFn,
+                                chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadApplicationVersion(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadAllowedVendorList(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+
     /*
      * @brief Channel cluster
      */
@@ -441,6 +490,15 @@ private:
     StatusSubscriber mStatusSubscriber;
     ApplicationVersionSubscriber mApplicationVersionSubscriber;
     AllowedVendorListSubscriber mAllowedVendorListSubscriber;
+
+    VendorNameReader mVendorNameReader;
+    VendorIDReader mVendorIDReader;
+    ApplicationNameReader mApplicationNameReader;
+    ProductIDReader mProductIDReader;
+    ApplicationReader mApplicationReader;
+    StatusReader mStatusReader;
+    ApplicationVersionReader mApplicationVersionReader;
+    AllowedVendorListReader mAllowedVendorListReader;
 
     /*
      * @brief Channel cluster

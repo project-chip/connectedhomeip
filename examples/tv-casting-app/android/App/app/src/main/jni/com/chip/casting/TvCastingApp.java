@@ -275,7 +275,7 @@ public class TvCastingApp {
   /**
    * APPLICATION BASIC
    *
-   * <p>TODO: Add APIs to subscribe to Application, Status and AllowedVendorList
+   * <p>TODO: Add APIs to subscribe to & read Application, Status and AllowedVendorList
    */
   public native boolean applicationBasic_subscribeToVendorName(
       ContentApp contentApp,
@@ -316,6 +316,31 @@ public class TvCastingApp {
       int minInterval,
       int maxInterval,
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
+
+  public native boolean applicationBasic_readVendorName(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readVendorID(
+      ContentApp contentApp,
+      SuccessCallback<Short> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readApplicationName(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readProductID(
+      ContentApp contentApp,
+      SuccessCallback<Short> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readApplicationVersion(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandlerr);
 
   static {
     System.loadLibrary("TvCastingApp");

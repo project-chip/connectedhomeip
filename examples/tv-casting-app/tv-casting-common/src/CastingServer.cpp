@@ -834,6 +834,97 @@ CHIP_ERROR CastingServer::ApplicationBasic_SubscribeToAllowedVendorList(
                                                            onSubscriptionEstablished);
 }
 
+CHIP_ERROR CastingServer::ApplicationBasic_ReadVendorName(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mVendorNameReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mVendorNameReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadVendorID(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mVendorIDReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mVendorIDReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplicationName(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationNameReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationNameReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadProductID(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mProductIDReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mProductIDReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplication(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadStatus(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mStatusReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mStatusReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplicationVersion(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationVersionReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationVersionReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadAllowedVendorList(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mAllowedVendorListReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mAllowedVendorListReader.ReadAttribute(context, successFn, failureFn);
+}
+
 /*
  * @brief Channel cluster
  */

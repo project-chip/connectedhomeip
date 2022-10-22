@@ -54,6 +54,10 @@
 
 @property NSMutableDictionary * subscriptionReadFailureCallbacks;
 
+@property NSMutableDictionary * readSuccessCallbacks;
+
+@property NSMutableDictionary * readFailureCallbacks;
+
 @end
 
 @implementation CastingServerBridge
@@ -1740,6 +1744,187 @@
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeApplicationVersion"];
                 callback();
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
+- (void)applicationBasic_readVendorName:(ContentApp * _Nonnull)contentApp
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                     requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                        successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                        failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationBasic_readVendorName() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readVendorName"];
+    [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readVendorName"];
+
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorName(
+            &endpoint, nullptr,
+            [](void * context,
+                chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                    objectForKey:@"applicationBasic_readVendorName"];
+                callback([NSString stringWithUTF8String:vendorName.data()]);
+            },
+            [](void * context, CHIP_ERROR err) {
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                    objectForKey:@"applicationBasic_readVendorName"];
+                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
+- (void)applicationBasic_readVendorID:(ContentApp * _Nonnull)contentApp
+                          clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                      successCallback:(void (^_Nonnull)(NSNumber * _Nonnull))successCallback
+                      failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationBasic_readVendorID() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readVendorID"];
+    [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readVendorID"];
+
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorID(
+            &endpoint, nullptr,
+            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType vendorID) {
+                void (^callback)(NSNumber * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                    objectForKey:@"applicationBasic_readVendorID"];
+                callback(@(vendorID));
+            },
+            [](void * context, CHIP_ERROR err) {
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                    objectForKey:@"applicationBasic_readVendorID"];
+                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
+- (void)applicationBasic_readApplicationName:(ContentApp * _Nonnull)contentApp
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                          requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                             successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                             failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+{
+    ChipLogProgress(AppServer,
+        "CastingServerBridge().applicationBasic_readApplicationName() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readApplicationName"];
+    [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readApplicationName"];
+
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationName(
+            &endpoint, nullptr,
+            [](void * context,
+                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType applicationName) {
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                    objectForKey:@"applicationBasic_readApplicationName"];
+                callback([NSString stringWithUTF8String:applicationName.data()]);
+            },
+            [](void * context, CHIP_ERROR err) {
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                    objectForKey:@"applicationBasic_readApplicationName"];
+                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
+- (void)applicationBasic_readProductID:(ContentApp * _Nonnull)contentApp
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                       successCallback:(void (^_Nonnull)(uint16_t))successCallback
+                       failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationBasic_readProductID() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readProductID"];
+    [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readProductID"];
+
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadProductID(
+            &endpoint, nullptr,
+            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType productID) {
+                void (^callback)(uint16_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                    objectForKey:@"applicationBasic_readProductID"];
+                callback(productID);
+            },
+            [](void * context, CHIP_ERROR err) {
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                    objectForKey:@"applicationBasic_readProductID"];
+                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
+- (void)applicationBasic_readApplicationVersion:(ContentApp * _Nonnull)contentApp
+                                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                             requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                                successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                                failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
+{
+    ChipLogProgress(AppServer,
+        "CastingServerBridge().applicationBasic_readApplicationVersion() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readApplicationVersion"];
+    [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readApplicationVersion"];
+
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationVersion(
+            &endpoint, nullptr,
+            [](void * context,
+                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType
+                    applicationVersion) {
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                    objectForKey:@"applicationBasic_readApplicationVersion"];
+                callback([NSString stringWithUTF8String:applicationVersion.data()]);
+            },
+            [](void * context, CHIP_ERROR err) {
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                    objectForKey:@"applicationBasic_readApplicationVersion"];
+                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
             requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
