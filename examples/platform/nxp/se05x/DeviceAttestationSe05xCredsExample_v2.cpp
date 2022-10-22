@@ -169,7 +169,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::GetFirmwareInformation(MutableByteSpan & o
 CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                    MutableByteSpan & out_signature_buffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                                   = CHIP_NO_ERROR;
     uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len                                       = sizeof(signature_se05x);
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
@@ -188,22 +188,21 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         0,
     };
 
-
     tempBuf[0] = (uint8_t) TLV::TLVElementType::Structure;
     SuccessOrExit(se05xSetCertificate(START_CONTAINER_SE05X_ID, tempBuf, 1));
 
     for (int i = 1; i <= 3; i++)
     {
         CHIP_ERROR tlverr = CHIP_NO_ERROR;
-        tlverr = TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader);
-        if (tlverr == CHIP_ERROR_TLV_TAG_NOT_FOUND){
+        tlverr            = TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader);
+        if (tlverr == CHIP_ERROR_TLV_TAG_NOT_FOUND)
+        {
             continue;
         }
         SuccessOrExit(tlverr);
 
         taglen     = tagReader.GetLength();
         tempBuf[0] = tagReader.GetControlByte();
-        ;
         tempBuf[1] = i;
         SuccessOrExit(se05xSetCertificate(TAG1_ID + (3 * (i - 1)), tempBuf, 2));
         if (taglen > 256)
