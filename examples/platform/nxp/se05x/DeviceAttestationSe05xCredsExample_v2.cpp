@@ -71,7 +71,7 @@ namespace Examples {
 namespace {
 
 // Note: The example DAC provider class is only for demonstration purpose.
-// Modification to SignWithDeviceAttestationKey memeber will be required in case there is a change in device attestation sign
+// Modification to SignWithDeviceAttestationKey member will be required in case there is a change in device attestation sign
 // message (other TLVs are added). In the current implementation of SignWithDeviceAttestationKey only TLV1, TLV2 and TLV3 are
 // expected in the sign message.
 
@@ -210,7 +210,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
 
         // Transisnet binary object ids starting from location 0x7D300005 (TAG1_ID) to 0x7D30000D (TAG3_VALUE_ID)
         // are used to store the TLV contents.
-        // Binary object id are calulated using the loop iterator in the below code.
+        // Binary object id are calculated using the loop iterator in the below code.
 
         taglen     = tagReader.GetLength();
         tempBuf[0] = tagReader.GetControlByte();
