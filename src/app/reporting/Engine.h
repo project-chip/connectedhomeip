@@ -39,6 +39,9 @@
 
 namespace chip {
 namespace app {
+
+class TestReadInteraction;
+
 namespace reporting {
 /*
  *  @class Engine
@@ -138,6 +141,7 @@ private:
     void Run();
 
     friend class TestReportingEngine;
+    friend class ::chip::app::TestReadInteraction;
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
