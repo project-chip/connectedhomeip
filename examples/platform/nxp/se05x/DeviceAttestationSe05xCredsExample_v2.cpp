@@ -215,23 +215,23 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         taglen     = tagReader.GetLength();
         tempBuf[0] = tagReader.GetControlByte();
         tempBuf[1] = i;
-        SuccessOrExit(se05xSetCertificate(TAG1_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 2));
+        SuccessOrExit(se05xSetCertificate(TAG1_ID + (3 /* tag + length + value ids */ * (i - 1)), tempBuf, 2));
         if (taglen > 256)
         {
             tempBuf[0] = taglen & 0xFF;
             tempBuf[1] = (taglen >> 8) & 0xFF;
-            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 2));
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 2));
         }
         else
         {
             tempBuf[0] = taglen;
-            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 1));
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 1));
         }
         if (taglen > 0)
         {
             SuccessOrExit(tagReader.Get(tagvalue));
             SuccessOrExit(
-                se05xSetCertificate(TAG1_VALUE_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tagvalue.data(), taglen));
+                se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen));
         }
     }
 
