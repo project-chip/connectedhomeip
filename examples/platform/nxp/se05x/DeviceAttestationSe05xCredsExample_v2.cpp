@@ -57,6 +57,8 @@
 #define START_CONTAINER_SE05X_ID 0x7D30000F
 #define END_CONTAINER_SE05X_ID 0x7D300010
 
+#define NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE 3 /* Starting with TAG1 */
+
 extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 extern CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen);
 extern CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen);
@@ -67,6 +69,11 @@ namespace Credentials {
 namespace Examples {
 
 namespace {
+
+// Note: The example DAC provider class is only for demonstration purpose.
+// Modification to SignWithDeviceAttestationKey memeber will be required in case there is a change in device attestation sign
+// message (other TLVs are added). In the current implementation of SignWithDeviceAttestationKey only TLV1, TLV2 and TLV3 are
+// expected in the sign message.
 
 class ExampleSe05xDACProviderv2 : public DeviceAttestationCredentialsProvider
 {
@@ -191,7 +198,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     tempBuf[0] = (uint8_t) TLV::TLVElementType::Structure;
     SuccessOrExit(se05xSetCertificate(START_CONTAINER_SE05X_ID, tempBuf, 1));
 
-    for (int i = 1; i <= 3; i++)
+    for (int i = 1; i <= NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE; i++)
     {
         CHIP_ERROR tlverr = CHIP_NO_ERROR;
         tlverr            = TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader);
@@ -201,25 +208,30 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         }
         SuccessOrExit(tlverr);
 
+        // Transisnet binary object ids starting from location 0x7D300005 (TAG1_ID) to 0x7D30000D (TAG3_VALUE_ID)
+        // are used to store the TLV contents.
+        // Binary object id are calulated using the loop iterator in the below code.
+
         taglen     = tagReader.GetLength();
         tempBuf[0] = tagReader.GetControlByte();
         tempBuf[1] = i;
-        SuccessOrExit(se05xSetCertificate(TAG1_ID + (3 * (i - 1)), tempBuf, 2));
+        SuccessOrExit(se05xSetCertificate(TAG1_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 2));
         if (taglen > 256)
         {
             tempBuf[0] = taglen & 0xFF;
             tempBuf[1] = (taglen >> 8) & 0xFF;
-            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 2));
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 2));
         }
         else
         {
             tempBuf[0] = taglen;
-            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (3 * (i - 1)), tempBuf, 1));
+            SuccessOrExit(se05xSetCertificate(TAG1_LEN_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tempBuf, 1));
         }
         if (taglen > 0)
         {
             SuccessOrExit(tagReader.Get(tagvalue));
-            SuccessOrExit(se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen));
+            SuccessOrExit(
+                se05xSetCertificate(TAG1_VALUE_ID + (NO_OF_DEV_ATTEST_MSG_TAGS_TO_PARSE * (i - 1)), tagvalue.data(), taglen));
         }
     }
 
