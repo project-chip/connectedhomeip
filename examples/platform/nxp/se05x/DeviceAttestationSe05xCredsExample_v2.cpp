@@ -202,7 +202,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     {
         CHIP_ERROR tlverr = CHIP_NO_ERROR;
         tlverr            = TLV::Utilities::Find(msg_reader, TLV::ContextTag(i), tagReader);
-        if (tlverr == CHIP_ERROR_TLV_TAG_NOT_FOUND)
+        if ((i == 3) && (tlverr == CHIP_ERROR_TLV_TAG_NOT_FOUND))
         {
             continue;
         }
