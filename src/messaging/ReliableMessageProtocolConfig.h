@@ -156,6 +156,21 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig();
  */
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
 
+/**
+ * @brief
+ * Returns the maximum transmission time depending on the last activity time.
+ *
+ * @param[in] activeInterval    The active interval to use for the backoff calculation.
+ * @param[in] idleInterval      The idle interval to use for the backoff calculation.
+ * @param[in] lastActivityTime  The last time some activity has been recorded.
+ * @param[in] activityThreshold The activity threshold for a node to be considered active.
+ *
+ * @return The maximum transmission time
+ */
+System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
+                                                  System::Clock::Timestamp lastActivityTime,
+                                                  System::Clock::Timestamp activityThreshold);
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 /**
