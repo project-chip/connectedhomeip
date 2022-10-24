@@ -87,7 +87,8 @@ if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
 
-set(GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn)
+set(CHIP_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CHIP_GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn)
 
 # Prepare compiler flags
 
@@ -131,6 +132,15 @@ if (NOT CHIP_LIBRARIES)
     set(CHIP_LIBRARIES -lCHIP)
 endif()
 
+if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
+    list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)
+endif()
+
+list(TRANSFORM CHIP_LIBRARIES REPLACE
+    "-l(.*)"
+    "${CHIP_LIB_DIR}/lib\\1.a"
+)
+
 # Set up CHIP project configuration file
 
 if (CONFIG_CHIP_PROJECT_CONFIG)
@@ -167,21 +177,20 @@ get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
 # Find required programs
 
+find_package(Python3 REQUIRED)
 find_program(GN_EXECUTABLE gn REQUIRED)
 
 # Parse the 'gn --version' output to find the installed version.
+
 set(MIN_GN_VERSION 1851)
 execute_process(
     COMMAND ${GN_EXECUTABLE} --version
     OUTPUT_VARIABLE GN_VERSION
     COMMAND_ERROR_IS_FATAL ANY
 )
-
-if(GN_VERSION VERSION_LESS MIN_GN_VERSION)
-    message(FATAL_ERROR "Found unsuitable version of 'gn'. Required is at least ${MIN_GN_VERSION}")
+if (GN_VERSION VERSION_LESS MIN_GN_VERSION)
+    message(FATAL_ERROR "Found unsupported version of gn: ${MIN_GN_VERSION}+ is required")
 endif()
-
-find_package(Python3 REQUIRED)
 
 # ==============================================================================
 # Generate configuration for CHIP GN build system
@@ -208,20 +217,20 @@ chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHEL
 chip_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
 chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
-chip_gn_arg_bool  ("chip_automation_logging"                "false")
+chip_gn_arg_bool  ("chip_automation_logging"                FALSE)
 chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 chip_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF700X)
 
 if (CONFIG_CHIP_FACTORY_DATA)
-    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
-    chip_gn_arg_bool  ("chip_enable_factory_data"                            "true")
+    chip_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
+    chip_gn_arg_bool("chip_enable_factory_data"                           TRUE)
 elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
-    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+    chip_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
 endif()
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
-    chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
-    chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")
+    chip_gn_arg_bool("chip_enable_rotating_device_id"          TRUE)
+    chip_gn_arg_bool("chip_enable_additional_data_advertising" TRUE)
 endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
@@ -263,8 +272,7 @@ if (CONFIG_CHIP_PW_RPC)
 endif()
 
 if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
-    chip_gn_arg_bool("chip_build_example_providers" "true")
-    list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)
+    chip_gn_arg_bool("chip_build_example_providers" TRUE)
 endif()
 
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
@@ -282,8 +290,8 @@ ExternalProject_Add(
                                 @args.tmp > args.gn &&
                             ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
-                                --root-target=${GN_ROOT_TARGET}
-                                --dotfile=${GN_ROOT_TARGET}/.gn
+                                --root-target=${CHIP_GN_ROOT_TARGET}
+                                --dotfile=${CHIP_GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
                                 --export-compile-commands
                                 gen --check --fail-on-unused-args . &&
@@ -291,7 +299,6 @@ ExternalProject_Add(
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
     BUILD_ALWAYS            TRUE
-    USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
 )
 add_dependencies(chip-gn kernel)
@@ -305,19 +312,22 @@ target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
 target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include
-    ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
     ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
-target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
-if (CONFIG_CHIP_LIB_SHELL)
-    target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
-endif()
 
 if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
     target_include_directories(chip INTERFACE ${CHIP_ROOT}/examples/providers)
+endif()
+
+if (CONFIG_CHIP_LIB_SHELL)
+    target_link_options(chip INTERFACE -Wl,--whole-archive ${CHIP_LIB_DIR}/libCHIPShell.a -Wl,--no-whole-archive)
+endif()
+
+if (CONFIG_CHIP_BUILD_TESTS)
+    target_link_options(chip INTERFACE -Wl,--whole-archive ${CHIP_LIB_DIR}/libCHIP_tests.a -Wl,--no-whole-archive)
 endif()
 
 if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
