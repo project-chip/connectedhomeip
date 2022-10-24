@@ -61,15 +61,6 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
  */
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                 chip::AttributeId attributeId);
-
-/**
- * @brief Returns true if endpoint contains the ZCL cluster with specified id.
- *
- * This function returns true regardless of whether
- * the endpoint contains server, client or both in the Zigbee cluster Library.
- */
-bool emberAfContainsCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
 /**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
  *
@@ -88,14 +79,6 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
-
-/**
- * @brief Returns true if endpoint contains the ZCL client with specified id.
- *
- * This function returns true if
- * the endpoint contains client of a given cluster.
- */
-bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -291,11 +274,6 @@ uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t ms
  * @brief Function that extracts a ZCL long string from the message buffer
  */
 uint8_t * emberAfGetLongString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-/*
- * @brief Function that extracts a ZCL Date from the message buffer and returns it
- * in the given destination. Returns the number of bytes copied.
- */
-uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen, EmberAfDate * destination);
 
 /**
  * @brief Macro for consistency, that extracts single byte out of the message
@@ -411,12 +389,6 @@ bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
  * sequence numbers.
  */
 #define EMBER_AF_ZCL_SEQUENCE_MASK 0x7F
-
-/**
- * @brief The mask applied to generated message tags used by the framework when sending messages via EZSP.
- * Customers who call ezspSend functions directly must use message tags outside this mask
- */
-#define EMBER_AF_MESSAGE_TAG_MASK 0x7F
 
 /**
  * @brief Increments the ZCL sequence number and returns the value.
