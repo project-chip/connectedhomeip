@@ -102,5 +102,19 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
         </LinearLayout>
+
+        <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+            <Button
+                android:id="@+id/shutdownAllSubscriptionsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/shutdown_all_subscriptions_button_text"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:layout_marginRight="10sp" />
+        </LinearLayout>
+
     </LinearLayout>
 </FrameLayout>

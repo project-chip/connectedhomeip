@@ -167,6 +167,24 @@
      onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback;
 
 /*!
+ @brief Tears down all active subscriptions.
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Called after the request has been sent
+ */
+- (void)shutdownAllSubscriptions:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
+
+/*!
+ @brief  Mark any open session with the currently connected Video player as expired.
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Called after the request has been sent
+ */
+- (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
+
+/*!
  @brief Send a ContentLauncher:LaunchURL request to a TV
 
  @param contentApp Content app endpoint to target
