@@ -87,7 +87,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *                    MTRDeviceResponseHandler.
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeoutMs
+ * written. This value must be within [1, UINT32_MAX], and will be clamped to this range, or timeoutMs if it exists.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
@@ -96,7 +96,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *  3. We succeed at writing the attribute.
  *  4. We fail at writing the attribute and give up on the write
  *
- * @param timeout   timeout in milliseconds for timed write, or nil.
+ * @param timeout   timeout in milliseconds for timed write, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  * TODO: make timeout arguments uniform
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -123,9 +124,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * readAttribute will get these values
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeout. This argument is ignored if expectedValues is nil.
+ * written. This value must be within [1, UINT32_MAX], and will be clamped to this range, or timeoutMs if it exists. This argument is
+ * ignored if expectedValues is nil.
  *
- * @param timeout   timeout in milliseconds for timed invoke, or nil.
+ * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  *
  * @param completion  response handler will receive either values or error.
  */

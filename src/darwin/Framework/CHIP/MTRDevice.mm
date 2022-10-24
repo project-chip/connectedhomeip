@@ -92,6 +92,16 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 @end
 
+NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
+{
+    if ([aNumber compare:min] == NSOrderedAscending) {
+        return min;
+    } else if ([aNumber compare:max] == NSOrderedDescending) {
+        return max;
+    }
+    return aNumber;
+}
+
 #pragma mark - SubscriptionCallback class declaration
 using namespace chip;
 using namespace chip::app;
@@ -422,6 +432,10 @@ private:
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
+    if (timeout) {
+        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
+    }
+    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), timeout ?: @(UINT16_MAX));
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -461,6 +475,16 @@ private:
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    if (timeout) {
+        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
+    }
+    if (expectedValueInterval) {
+        if ([expectedValueInterval compare:@(0)] == NSOrderedAscending) {
+            expectedValues = nil;
+        } else {
+            expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), timeout ?: @(UINT16_MAX));
+        }
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];

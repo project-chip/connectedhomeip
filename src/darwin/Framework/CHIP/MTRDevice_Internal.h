@@ -39,4 +39,9 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 @end
 
+#pragma mark - Utility for clamping numbers
+// Returns a NSNumber object that is aNumber if it falls within the range [min, max].
+// Returns min or max, if it is below or above, respectively.
+NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
 NS_ASSUME_NONNULL_END

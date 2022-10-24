@@ -53,6 +53,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber *timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+      timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
@@ -75,10 +79,8 @@ using chip::SessionHandle;
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
             ListFreer listFreer;
             {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-            if (params != nil) {
-              if (params.timedInvokeTimeoutMs != nil) {
-                timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-              }
+            if (timedInvokeTimeoutMsParam != nil) {
+              timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
             }
             {{#if mustUseTimedInvoke}}
             if (!timedInvokeTimeoutMs.HasValue()) {
@@ -108,7 +110,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+      expectedValues = nil;
+    } else {
+      expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+      [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 {{/chip_cluster_commands}}
 

@@ -64,6 +64,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -78,10 +82,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Identify::Commands::Identify::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.identifyTime = params.identifyTime.unsignedShortValue;
 
@@ -95,7 +97,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
@@ -105,6 +114,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -119,10 +132,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Identify::Commands::TriggerEffect::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
                     params.effectIdentifier.unsignedCharValue);
@@ -139,7 +150,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params
@@ -242,6 +260,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -251,10 +273,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::AddGroup::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
@@ -269,7 +289,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
@@ -280,6 +307,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -289,10 +320,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::ViewGroup::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
@@ -306,7 +335,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
@@ -317,6 +353,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -326,10 +366,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::GetGroupMembership::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.groupList)>;
@@ -364,7 +402,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
@@ -375,6 +420,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -384,10 +433,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::RemoveGroup::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
@@ -401,7 +448,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -420,6 +474,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -434,10 +492,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::RemoveAllGroups::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -450,7 +506,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
@@ -460,6 +523,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -474,10 +541,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::AddGroupIfIdentifying::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
@@ -492,7 +557,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
@@ -568,6 +640,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -577,10 +653,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::AddScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -671,7 +745,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
@@ -682,6 +763,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -691,10 +776,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::ViewScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -709,7 +792,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
@@ -720,6 +810,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -729,10 +823,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RemoveScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -747,7 +839,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
@@ -758,6 +857,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -767,10 +870,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RemoveAllScenes::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
@@ -784,7 +885,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
@@ -795,6 +903,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -804,10 +916,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::StoreScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -822,7 +932,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
@@ -832,6 +949,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -846,10 +967,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RecallScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -873,7 +992,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
@@ -884,6 +1010,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -893,10 +1023,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::GetSceneMembership::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
@@ -910,7 +1038,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
@@ -921,6 +1056,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -930,10 +1069,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::EnhancedAddScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -1024,7 +1161,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
@@ -1035,6 +1179,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1044,10 +1192,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::EnhancedViewScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
@@ -1062,7 +1208,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
@@ -1073,6 +1226,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1082,10 +1239,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::CopyScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
                 request.groupIdFrom = params.groupIdFrom.unsignedShortValue;
@@ -1103,7 +1258,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params
@@ -1227,6 +1389,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1241,10 +1407,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::Off::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -1257,7 +1421,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1276,6 +1447,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1290,10 +1465,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::On::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -1306,7 +1479,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1325,6 +1505,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1339,10 +1523,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::Toggle::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -1355,7 +1537,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
@@ -1365,6 +1554,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1379,10 +1572,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OffWithEffect::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.effectId
                     = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
@@ -1399,7 +1590,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1418,6 +1616,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1432,10 +1634,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OnWithRecallGlobalScene::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -1448,7 +1648,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
@@ -1458,6 +1665,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1472,10 +1683,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OnWithTimedOff::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.onOffControl
                     = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(params.onOffControl.unsignedCharValue);
@@ -1492,7 +1701,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params
@@ -1748,6 +1964,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1762,10 +1982,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToLevel::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.level = params.level.unsignedCharValue;
                 if (params.transitionTime == nil) {
@@ -1787,7 +2005,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
@@ -1797,6 +2022,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1811,10 +2040,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Move::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -1837,7 +2064,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
@@ -1847,6 +2081,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1861,10 +2099,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Step::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -1888,7 +2124,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
@@ -1898,6 +2141,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1912,10 +2159,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Stop::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
@@ -1930,7 +2175,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
@@ -1940,6 +2192,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -1954,10 +2210,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToLevelWithOnOff::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.level = params.level.unsignedCharValue;
                 if (params.transitionTime == nil) {
@@ -1979,7 +2233,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
@@ -1989,6 +2250,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -2003,10 +2268,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveWithOnOff::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -2029,7 +2292,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
@@ -2039,6 +2309,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -2053,10 +2327,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::StepWithOnOff::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -2080,7 +2352,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
@@ -2090,6 +2369,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -2104,10 +2387,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::StopWithOnOff::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
@@ -2122,7 +2403,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
@@ -2132,6 +2420,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -2146,10 +2438,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToClosestFrequency::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.frequency = params.frequency.unsignedShortValue;
 
@@ -2163,7 +2453,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params
@@ -3026,6 +3323,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3040,10 +3341,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::InstantAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3061,7 +3360,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
@@ -3071,6 +3377,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3085,10 +3395,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::InstantActionWithTransition::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3107,7 +3415,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
@@ -3117,6 +3432,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3131,10 +3450,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StartAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3152,7 +3469,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
@@ -3162,6 +3486,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3176,10 +3504,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StartActionWithDuration::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3198,7 +3524,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
@@ -3208,6 +3541,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3222,10 +3559,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StopAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3243,7 +3578,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
@@ -3253,6 +3595,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3267,10 +3613,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::PauseAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3288,7 +3632,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
@@ -3298,6 +3649,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3312,10 +3667,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::PauseActionWithDuration::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3334,7 +3687,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
@@ -3344,6 +3704,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3358,10 +3722,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::ResumeAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3379,7 +3741,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
@@ -3389,6 +3758,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3403,10 +3776,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::EnableAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3424,7 +3795,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
@@ -3434,6 +3812,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3448,10 +3830,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::EnableActionWithDuration::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3470,7 +3850,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
@@ -3480,6 +3867,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3494,10 +3885,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::DisableAction::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3515,7 +3904,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
@@ -3525,6 +3921,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3539,10 +3939,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::DisableActionWithDuration::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.actionID = params.actionID.unsignedShortValue;
                 if (params.invokeID != nil) {
@@ -3561,7 +3959,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params
@@ -3661,6 +4066,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3675,10 +4084,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Basic::Commands::MfgSpecificPing::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -3691,7 +4098,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params
@@ -3976,6 +4390,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -3985,10 +4403,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.vendorId
                     = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
@@ -4044,7 +4460,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
@@ -4055,6 +4478,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -4064,10 +4491,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.updateToken = [self asByteSpan:params.updateToken];
                 request.newVersion = params.newVersion.unsignedIntValue;
@@ -4082,7 +4507,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
@@ -4092,6 +4524,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -4106,10 +4542,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.updateToken = [self asByteSpan:params.updateToken];
                 request.softwareVersion = params.softwareVersion.unsignedIntValue;
@@ -4124,7 +4558,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -4191,6 +4632,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -4205,10 +4650,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.providerNodeId = params.providerNodeId.unsignedLongLongValue;
                 request.vendorId
@@ -4231,7 +4674,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
@@ -5015,6 +5465,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5024,10 +5478,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralCommissioning::Commands::ArmFailSafe::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.expiryLengthSeconds = params.expiryLengthSeconds.unsignedShortValue;
                 request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
@@ -5042,7 +5494,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
@@ -5053,6 +5512,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5063,10 +5526,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.newRegulatoryConfig = static_cast<std::remove_reference_t<decltype(request.newRegulatoryConfig)>>(
                     params.newRegulatoryConfig.unsignedCharValue);
@@ -5084,7 +5545,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -5107,6 +5575,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5117,10 +5589,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralCommissioning::Commands::CommissioningComplete::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn
@@ -5134,7 +5604,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params
@@ -5261,6 +5738,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5270,10 +5751,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ScanNetworks::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (params != nil) {
                     if (params.ssid != nil) {
@@ -5301,7 +5780,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
@@ -5312,6 +5798,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5321,10 +5811,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.ssid = [self asByteSpan:params.ssid];
                 request.credentials = [self asByteSpan:params.credentials];
@@ -5343,7 +5831,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
@@ -5354,6 +5849,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5363,10 +5862,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.operationalDataset = [self asByteSpan:params.operationalDataset];
                 if (params.breadcrumb != nil) {
@@ -5384,7 +5881,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
@@ -5395,6 +5899,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5404,10 +5912,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::RemoveNetwork::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.networkID = [self asByteSpan:params.networkID];
                 if (params.breadcrumb != nil) {
@@ -5425,7 +5931,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
@@ -5436,6 +5949,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5445,10 +5962,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ConnectNetwork::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.networkID = [self asByteSpan:params.networkID];
                 if (params.breadcrumb != nil) {
@@ -5466,7 +5981,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
@@ -5477,6 +5999,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5486,10 +6012,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ReorderNetwork::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.networkID = [self asByteSpan:params.networkID];
                 request.networkIndex = params.networkIndex.unsignedCharValue;
@@ -5508,7 +6032,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params
@@ -5659,6 +6190,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5668,10 +6203,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(params.intent.unsignedCharValue);
                 request.requestedProtocol = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(
@@ -5688,7 +6221,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -5755,6 +6295,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5769,10 +6313,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralDiagnostics::Commands::TestEventTrigger::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.enableKey = [self asByteSpan:params.enableKey];
                 request.eventTrigger = params.eventTrigger.unsignedLongLongValue;
@@ -5787,7 +6329,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params
@@ -5935,6 +6484,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -5949,10 +6502,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -5965,7 +6516,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params
@@ -6073,6 +6631,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -6087,10 +6649,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -6103,7 +6663,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params
@@ -6684,6 +7251,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -6698,10 +7269,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -6714,7 +7283,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
@@ -6894,6 +7470,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -6908,10 +7488,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -6924,7 +7502,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params
@@ -7340,6 +7925,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7354,10 +7943,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -7378,7 +7965,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
@@ -7388,6 +7982,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7402,10 +8000,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -7422,7 +8018,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -7441,6 +8044,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7455,10 +8062,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -7474,7 +8079,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params
@@ -7566,6 +8178,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7575,10 +8191,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AttestationRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.attestationNonce = [self asByteSpan:params.attestationNonce];
 
@@ -7592,7 +8206,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
@@ -7603,6 +8224,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7613,10 +8238,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::CertificateChainRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.certificateType = params.certificateType.unsignedCharValue;
 
@@ -7631,7 +8254,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
@@ -7642,6 +8272,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7651,10 +8285,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::CSRRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.CSRNonce = [self asByteSpan:params.csrNonce];
                 if (params.isForUpdateNOC != nil) {
@@ -7672,7 +8304,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
@@ -7683,6 +8322,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7692,10 +8335,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AddNOC::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.NOCValue = [self asByteSpan:params.nocValue];
                 if (params.icacValue != nil) {
@@ -7717,7 +8358,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
@@ -7728,6 +8376,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7737,10 +8389,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::UpdateNOC::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.NOCValue = [self asByteSpan:params.nocValue];
                 if (params.icacValue != nil) {
@@ -7758,7 +8408,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
@@ -7769,6 +8426,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7778,10 +8439,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::UpdateFabricLabel::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.label = [self asCharSpan:params.label];
 
@@ -7795,7 +8454,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
@@ -7806,6 +8472,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7815,10 +8485,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::RemoveFabric::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.fabricIndex = params.fabricIndex.unsignedCharValue;
 
@@ -7832,7 +8500,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
@@ -7842,6 +8517,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -7856,10 +8535,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.rootCertificate = [self asByteSpan:params.rootCertificate];
 
@@ -7873,7 +8550,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
@@ -7988,6 +8672,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8002,10 +8690,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetWrite::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
                 request.groupKeySet.groupKeySecurityPolicy
@@ -8058,7 +8744,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
@@ -8069,6 +8762,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8078,10 +8775,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetRead::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
@@ -8095,7 +8790,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
@@ -8105,6 +8807,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8119,10 +8825,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetRemove::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
@@ -8136,7 +8840,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
@@ -8147,6 +8858,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8157,10 +8872,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
@@ -8196,7 +8909,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params
@@ -8528,6 +9248,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8542,10 +9266,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ModeSelect::Commands::ChangeToMode::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.newMode = params.newMode.unsignedCharValue;
 
@@ -8559,7 +9281,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
@@ -8712,6 +9441,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8726,10 +9459,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::LockDoor::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -8751,7 +9482,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
@@ -8761,6 +9499,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8775,10 +9517,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::UnlockDoor::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -8800,7 +9540,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
@@ -8810,6 +9557,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8824,10 +9575,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::UnlockWithTimeout::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -8848,7 +9597,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
@@ -8858,6 +9614,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8872,10 +9632,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetWeekDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -8896,7 +9654,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
@@ -8907,6 +9672,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8916,10 +9685,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetWeekDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -8934,7 +9701,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
@@ -8944,6 +9718,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -8958,10 +9736,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearWeekDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -8976,7 +9752,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
@@ -8986,6 +9769,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9000,10 +9787,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetYearDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -9020,7 +9805,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
@@ -9031,6 +9823,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9040,10 +9836,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetYearDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -9058,7 +9852,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
@@ -9068,6 +9869,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9082,10 +9887,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearYearDaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
@@ -9100,7 +9903,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
@@ -9110,6 +9920,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9124,10 +9938,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetHolidaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.holidayIndex = params.holidayIndex.unsignedCharValue;
                 request.localStartTime = params.localStartTime.unsignedIntValue;
@@ -9145,7 +9957,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
@@ -9156,6 +9975,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9165,10 +9988,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetHolidaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
@@ -9182,7 +10003,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
@@ -9192,6 +10020,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9206,10 +10038,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearHolidaySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
@@ -9223,7 +10053,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
@@ -9233,6 +10070,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9247,10 +10088,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetUser::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -9302,7 +10141,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
@@ -9313,6 +10159,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9322,10 +10172,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetUser::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.userIndex = params.userIndex.unsignedShortValue;
 
@@ -9339,7 +10187,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
@@ -9349,6 +10204,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9363,10 +10222,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearUser::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -9383,7 +10240,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
@@ -9394,6 +10258,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9403,10 +10271,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetCredential::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -9449,7 +10315,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
@@ -9460,6 +10333,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9469,10 +10346,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetCredentialStatus::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.credential.credentialType
                     = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
@@ -9489,7 +10364,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
@@ -9499,6 +10381,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -9513,10 +10399,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearCredential::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -9540,7 +10424,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params
@@ -10260,6 +11151,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10274,10 +11169,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::UpOrOpen::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -10290,7 +11183,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -10309,6 +11209,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10323,10 +11227,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::DownOrClose::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -10339,7 +11241,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -10358,6 +11267,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10372,10 +11285,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::StopMotion::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -10388,7 +11299,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
@@ -10398,6 +11316,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10412,10 +11334,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToLiftValue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.liftValue = params.liftValue.unsignedShortValue;
 
@@ -10429,7 +11349,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
@@ -10439,6 +11366,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10453,10 +11384,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToLiftPercentage::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
 
@@ -10470,7 +11399,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
@@ -10480,6 +11416,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10494,10 +11434,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToTiltValue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.tiltValue = params.tiltValue.unsignedShortValue;
 
@@ -10511,7 +11449,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
@@ -10521,6 +11466,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10535,10 +11484,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToTiltPercentage::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
 
@@ -10552,7 +11499,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params
@@ -10814,6 +11768,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10828,10 +11786,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 BarrierControl::Commands::BarrierControlGoToPercent::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.percentOpen = params.percentOpen.unsignedCharValue;
 
@@ -10845,7 +11801,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -10864,6 +11827,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -10878,10 +11845,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 BarrierControl::Commands::BarrierControlStop::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -10894,7 +11859,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params
@@ -11478,6 +12450,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -11492,10 +12468,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::SetpointRaiseLower::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
                 request.amount = params.amount.charValue;
@@ -11510,7 +12484,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
@@ -11520,6 +12501,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -11534,10 +12519,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::SetWeeklySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.numberOfTransitionsForSequence = params.numberOfTransitionsForSequence.unsignedCharValue;
                 request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
@@ -11589,7 +12572,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
@@ -11600,6 +12590,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -11609,10 +12603,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::GetWeeklySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.daysToReturn
                     = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(params.daysToReturn.unsignedCharValue);
@@ -11629,7 +12621,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -11648,6 +12647,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -11662,10 +12665,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::ClearWeeklySchedule::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -11678,7 +12679,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
@@ -13074,6 +14082,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13088,10 +14100,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.hue = params.hue.unsignedCharValue;
                 request.direction
@@ -13110,7 +14120,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
@@ -13120,6 +14137,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13134,10 +14155,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -13155,7 +14174,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
@@ -13165,6 +14191,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13179,10 +14209,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -13201,7 +14229,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
@@ -13211,6 +14246,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13225,10 +14264,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToSaturation::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.saturation = params.saturation.unsignedCharValue;
                 request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -13245,7 +14282,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
@@ -13255,6 +14299,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13269,10 +14317,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveSaturation::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -13290,7 +14336,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
@@ -13300,6 +14353,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13314,10 +14371,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepSaturation::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -13336,7 +14391,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
@@ -13346,6 +14408,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13360,10 +14426,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToHueAndSaturation::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.hue = params.hue.unsignedCharValue;
                 request.saturation = params.saturation.unsignedCharValue;
@@ -13381,7 +14445,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
@@ -13391,6 +14462,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13405,10 +14480,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToColor::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.colorX = params.colorX.unsignedShortValue;
                 request.colorY = params.colorY.unsignedShortValue;
@@ -13426,7 +14499,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
@@ -13436,6 +14516,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13450,10 +14534,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveColor::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.rateX = params.rateX.shortValue;
                 request.rateY = params.rateY.shortValue;
@@ -13470,7 +14552,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
@@ -13480,6 +14569,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13494,10 +14587,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepColor::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepX = params.stepX.shortValue;
                 request.stepY = params.stepY.shortValue;
@@ -13515,7 +14606,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
@@ -13525,6 +14623,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13539,10 +14641,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToColorTemperature::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.colorTemperature = params.colorTemperature.unsignedShortValue;
                 request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -13559,7 +14659,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
@@ -13569,6 +14676,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13583,10 +14694,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveToHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.enhancedHue = params.enhancedHue.unsignedShortValue;
                 request.direction
@@ -13605,7 +14714,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
@@ -13615,6 +14731,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13629,10 +14749,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -13650,7 +14768,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
@@ -13660,6 +14785,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13674,10 +14803,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedStepHue::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -13696,7 +14823,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
@@ -13706,6 +14840,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13720,10 +14858,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.enhancedHue = params.enhancedHue.unsignedShortValue;
                 request.saturation = params.saturation.unsignedCharValue;
@@ -13741,7 +14877,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
@@ -13751,6 +14894,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13765,10 +14912,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::ColorLoopSet::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.updateFlags
                     = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(params.updateFlags.unsignedCharValue);
@@ -13790,7 +14935,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
@@ -13800,6 +14952,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13814,10 +14970,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StopMoveStep::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
@@ -13832,7 +14986,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
@@ -13842,6 +15003,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13856,10 +15021,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveColorTemperature::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.moveMode
                     = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
@@ -13879,7 +15042,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
@@ -13889,6 +15059,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -13903,10 +15077,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepColorTemperature::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.stepMode
                     = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
@@ -13927,7 +15099,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params
@@ -15927,6 +17106,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -15936,10 +17119,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::ChangeChannel::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.match = [self asCharSpan:params.match];
 
@@ -15953,7 +17134,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
@@ -15963,6 +17151,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -15977,10 +17169,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::ChangeChannelByNumber::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.majorNumber = params.majorNumber.unsignedShortValue;
                 request.minorNumber = params.minorNumber.unsignedShortValue;
@@ -15995,7 +17185,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
@@ -16005,6 +17202,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16019,10 +17220,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::SkipChannel::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.count = params.count.unsignedShortValue;
 
@@ -16036,7 +17235,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params
@@ -16128,6 +17334,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16137,10 +17347,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TargetNavigator::Commands::NavigateTarget::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.target = params.target.unsignedCharValue;
                 if (params.data != nil) {
@@ -16158,7 +17366,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params
@@ -16252,6 +17467,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16261,10 +17480,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Play::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16277,7 +17494,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16298,6 +17522,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16307,10 +17535,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Pause::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16323,7 +17549,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16344,6 +17577,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16353,10 +17590,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::StopPlayback::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16369,7 +17604,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16390,6 +17632,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16399,10 +17645,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::StartOver::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16415,7 +17659,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16436,6 +17687,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16445,10 +17700,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Previous::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16461,7 +17714,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16482,6 +17742,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16491,10 +17755,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Next::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16507,7 +17769,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16528,6 +17797,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16537,10 +17810,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Rewind::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16553,7 +17824,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16574,6 +17852,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16583,10 +17865,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::FastForward::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
@@ -16599,7 +17879,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
@@ -16610,6 +17897,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16619,10 +17910,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::SkipForward::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
@@ -16636,7 +17925,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
@@ -16647,6 +17943,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16656,10 +17956,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::SkipBackward::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
@@ -16673,7 +17971,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
@@ -16684,6 +17989,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16693,10 +18002,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Seek::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.position = params.position.unsignedLongLongValue;
 
@@ -16710,7 +18017,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params
@@ -16833,6 +18147,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16847,10 +18165,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::SelectInput::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.index = params.index.unsignedCharValue;
 
@@ -16864,7 +18180,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16883,6 +18206,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16897,10 +18224,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::ShowInputStatus::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -16913,7 +18238,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16932,6 +18264,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16946,10 +18282,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::HideInputStatus::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -16962,7 +18296,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
@@ -16972,6 +18313,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -16986,10 +18331,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::RenameInput::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.index = params.index.unsignedCharValue;
                 request.name = [self asCharSpan:params.name];
@@ -17004,7 +18347,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params
@@ -17096,6 +18446,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17110,10 +18464,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LowPower::Commands::Sleep::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -17126,7 +18478,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -17194,6 +18553,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17203,10 +18566,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 KeypadInput::Commands::SendKey::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
 
@@ -17220,7 +18581,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -17288,6 +18656,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17297,10 +18669,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ContentLauncher::Commands::LaunchContent::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
@@ -17371,7 +18741,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
@@ -17382,6 +18759,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17391,10 +18772,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ContentLauncher::Commands::LaunchURL::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.contentURL = [self asCharSpan:params.contentURL];
                 if (params.displayString != nil) {
@@ -17506,7 +18885,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params
@@ -17610,6 +18996,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17624,10 +19014,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AudioOutput::Commands::SelectOutput::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.index = params.index.unsignedCharValue;
 
@@ -17641,7 +19029,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
@@ -17651,6 +19046,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17665,10 +19064,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AudioOutput::Commands::RenameOutput::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.index = params.index.unsignedCharValue;
                 request.name = [self asCharSpan:params.name];
@@ -17683,7 +19080,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params
@@ -17767,6 +19171,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17776,10 +19184,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::LaunchApp::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
                 request.application.applicationId = [self asCharSpan:params.application.applicationId];
@@ -17798,7 +19204,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
@@ -17809,6 +19222,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17818,10 +19235,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::StopApp::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
                 request.application.applicationId = [self asCharSpan:params.application.applicationId];
@@ -17836,7 +19251,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
@@ -17847,6 +19269,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -17856,10 +19282,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::HideApp::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
                 request.application.applicationId = [self asCharSpan:params.application.applicationId];
@@ -17874,7 +19298,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params
@@ -18098,6 +19529,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -18107,10 +19542,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::GetSetupPIN::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -18127,7 +19560,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
@@ -18137,6 +19577,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -18151,10 +19595,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::Login::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -18172,7 +19614,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -18191,6 +19640,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -18205,10 +19658,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::Logout::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -18224,7 +19675,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -18300,6 +19758,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -18314,10 +19776,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ElectricalMeasurement::Commands::GetProfileInfoCommand::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -18330,7 +19790,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
@@ -18340,6 +19807,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -18354,10 +19825,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.attributeId = params.attributeId.unsignedShortValue;
                 request.startTime = params.startTime.unsignedIntValue;
@@ -18373,7 +19842,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
@@ -19637,6 +21113,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19651,10 +21131,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::Test::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -19667,7 +21145,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -19686,6 +21171,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19700,10 +21189,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNotHandled::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -19716,7 +21203,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -19737,6 +21231,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19746,10 +21244,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSpecific::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<TestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(success);
@@ -19762,7 +21258,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -19781,6 +21284,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19795,10 +21302,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestUnknownCommand::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
@@ -19811,7 +21316,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
@@ -19822,6 +21334,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19831,10 +21347,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestAddArguments::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
                 request.arg2 = params.arg2.unsignedCharValue;
@@ -19849,7 +21363,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
@@ -19860,6 +21381,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19869,10 +21394,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSimpleArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.boolValue;
 
@@ -19886,7 +21409,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
@@ -19898,6 +21428,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -19907,10 +21441,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestStructArrayArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
@@ -20135,7 +21667,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
@@ -20146,6 +21685,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20155,10 +21698,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestStructArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1.a = params.arg1.a.unsignedCharValue;
                 request.arg1.b = params.arg1.b.boolValue;
@@ -20179,7 +21720,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
@@ -20190,6 +21738,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20199,10 +21751,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1.a = params.arg1.a.unsignedCharValue;
                 request.arg1.b = params.arg1.b.boolValue;
@@ -20227,7 +21777,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
@@ -20238,6 +21795,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20247,10 +21808,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListStructArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
@@ -20294,7 +21853,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
@@ -20305,6 +21871,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20314,10 +21884,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
@@ -20352,7 +21920,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
@@ -20363,6 +21938,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20372,10 +21951,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1.a = params.arg1.a.unsignedCharValue;
                 request.arg1.b = params.arg1.b.boolValue;
@@ -20497,7 +22074,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListNestedStructListArgumentRequestWithParams:
@@ -20509,6 +22093,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20518,10 +22106,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
@@ -20668,7 +22254,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
@@ -20679,6 +22272,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20688,10 +22285,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListInt8UReverseRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
@@ -20726,7 +22321,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
@@ -20737,6 +22339,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20746,10 +22352,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEnumsRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
@@ -20764,7 +22368,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
@@ -20775,6 +22386,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20784,10 +22399,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNullableOptionalRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (params != nil) {
                     if (params.arg1 != nil) {
@@ -20811,7 +22424,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
@@ -20823,6 +22443,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -20833,10 +22457,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestComplexNullableOptionalRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (params.nullableInt == nil) {
                     request.nullableInt.SetNull();
@@ -21020,7 +22642,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
@@ -21031,6 +22660,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -21040,10 +22673,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::SimpleStructEchoRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1.a = params.arg1.a.unsignedCharValue;
                 request.arg1.b = params.arg1.b.boolValue;
@@ -21064,7 +22695,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -21083,6 +22721,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -21097,10 +22739,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TimedInvokeRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (!timedInvokeTimeoutMs.HasValue()) {
                     timedInvokeTimeoutMs.SetValue(10000);
@@ -21116,7 +22756,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
@@ -21126,6 +22773,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -21140,10 +22791,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 if (params != nil) {
                     if (params.arg1 != nil) {
@@ -21162,7 +22811,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
@@ -21173,6 +22829,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -21182,10 +22842,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEmitTestEventRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
@@ -21201,7 +22859,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
@@ -21214,6 +22879,10 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
@@ -21224,10 +22893,8 @@ using chip::SessionHandle;
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type request;
-                if (params != nil) {
-                    if (params.timedInvokeTimeoutMs != nil) {
-                        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-                    }
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
 
@@ -21242,7 +22909,14 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), timedInvokeTimeoutMsParam ?: @(UINT16_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params
