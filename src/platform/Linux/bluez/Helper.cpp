@@ -1432,7 +1432,7 @@ static ConnectionDataBundle * MakeConnectionDataBundle(BLE_CONNECTION_OBJECT apC
     return bundle;
 }
 
-bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
     bool success = false;
 
@@ -1441,7 +1441,7 @@ bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffe
     success = MainLoop::Instance().Schedule(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
 
 exit:
-    return success;
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 static gboolean BluezDisconnect(void * apClosure)
@@ -1470,9 +1470,10 @@ static int CloseBleconnectionCB(void * apAppState)
     return G_SOURCE_REMOVE;
 }
 
-bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 {
-    return MainLoop::Instance().RunOnBluezThread(CloseBleconnectionCB, apConn);
+    bool success = MainLoop::Instance().RunOnBluezThread(CloseBleconnectionCB, apConn);
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
@@ -1649,7 +1650,7 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
     bool success = false;
 
@@ -1658,7 +1659,7 @@ bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuf
     success = MainLoop::Instance().RunOnBluezThread(SendWriteRequestImpl, MakeConnectionDataBundle(apConn, apBuf));
 
 exit:
-    return success;
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 // BluezSubscribeCharacteristic callbacks
@@ -1707,9 +1708,10 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 {
-    return MainLoop::Instance().Schedule(SubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    bool success = MainLoop::Instance().Schedule(SubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 // BluezUnsubscribeCharacteristic callbacks
@@ -1742,9 +1744,10 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 {
-    return MainLoop::Instance().Schedule(UnsubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    bool success = MainLoop::Instance().Schedule(UnsubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 // ConnectDevice callbacks
