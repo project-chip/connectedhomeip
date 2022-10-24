@@ -54,7 +54,7 @@
 #undef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
 
 #ifdef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
-#define ChipLogDebugBleEndPoint(MOD, MSG, ...) ChipLogError(MOD, MSG, ## __VA_ARGS__)
+#define ChipLogDebugBleEndPoint(MOD, MSG, ...) ChipLogDetail(MOD, MSG, ## __VA_ARGS__)
 #else
 #define ChipLogDebugBleEndPoint(MOD, MSG, ...)
 #endif
