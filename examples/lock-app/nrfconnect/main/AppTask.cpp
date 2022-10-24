@@ -457,12 +457,9 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdPlatformInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
-        {
-            InitBasicOTARequestor();
-        }
+        InitBasicOTARequestor();
 #endif
         break;
     default:
