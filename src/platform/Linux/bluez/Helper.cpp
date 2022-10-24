@@ -1196,13 +1196,6 @@ void EndpointCleanup(BluezEndpoint * apEndpoint)
     }
 }
 
-int BluezObjectsCleanup(BluezEndpoint * apEndpoint)
-{
-    g_object_unref(apEndpoint->mpAdapter);
-    EndpointCleanup(apEndpoint);
-    return 0;
-}
-
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
 {
@@ -1376,11 +1369,6 @@ static int StartupEndpointBindings(BluezEndpoint * endpoint)
     g_signal_connect(manager, "object-added", G_CALLBACK(BluezSignalOnObjectAdded), endpoint);
     g_signal_connect(manager, "object-removed", G_CALLBACK(BluezSignalOnObjectRemoved), endpoint);
     g_signal_connect(manager, "interface-proxy-properties-changed", G_CALLBACK(BluezSignalInterfacePropertiesChanged), endpoint);
-
-    if (!MainLoop::Instance().SetCleanupFunction(BluezObjectsCleanup, endpoint))
-    {
-        ChipLogError(DeviceLayer, "Failed to schedule cleanup function");
-    }
 
 exit:
     if (error != nullptr)
@@ -1613,6 +1601,14 @@ exit:
     }
 
     return err;
+}
+
+CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
+{
+    VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    g_object_unref(apEndpoint->mpAdapter);
+    EndpointCleanup(apEndpoint);
+    return CHIP_NO_ERROR;
 }
 
 // BluezSendWriteRequest callbacks

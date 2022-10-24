@@ -98,12 +98,6 @@ void * MainLoop::Thread(void * self)
     g_main_loop_run(loop->mBluezMainLoop);
     ChipLogDetail(DeviceLayer, "TRACE: Bluez mainloop stopping %s", __func__);
 
-    if (loop->mCleanup != nullptr)
-    {
-        ChipLogDetail(DeviceLayer, "TRACE: Executing cleanup %s", __func__);
-        loop->mCleanup(loop->mCleanupArgument);
-    }
-
     return nullptr;
 }
 

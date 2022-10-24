@@ -97,6 +97,9 @@ void BLEManagerImpl::_Shutdown()
 {
     // ensure scan resources are cleared (e.g. timeout timers)
     mDeviceScanner.reset();
+    // Release BLE connection resources (unregister from BlueZ).
+    ShutdownBluezBleLayer(mpEndpoint);
+    mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)

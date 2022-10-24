@@ -63,29 +63,6 @@ public:
         return RunOnBluezThreadAndWait(G_SOURCE_FUNC(callback), value);
     }
 
-    /// Schedules a method to be executed after the main loop has finished
-    ///
-    /// A single cleanup method can exist and the main loop has to be running
-    /// to set a cleanup method.
-    template <class T>
-    bool SetCleanupFunction(int (*callback)(T *), T * value)
-    {
-        if (mCleanup != nullptr)
-        {
-            return false;
-        }
-
-        if ((mBluezMainLoop == nullptr) || !g_main_loop_is_running(mBluezMainLoop))
-        {
-            return false;
-        }
-
-        mCleanup         = G_SOURCE_FUNC(callback);
-        mCleanupArgument = static_cast<void *>(value);
-
-        return true;
-    }
-
     static MainLoop & Instance();
 
 private:
@@ -95,10 +72,6 @@ private:
 
     GMainLoop * mBluezMainLoop = nullptr;
     pthread_t mThread          = 0;
-
-    // allow a single cleanup method
-    GSourceFunc mCleanup    = nullptr;
-    void * mCleanupArgument = nullptr;
 };
 
 } // namespace Internal

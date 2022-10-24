@@ -59,6 +59,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
+CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
 bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
 bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
 bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
