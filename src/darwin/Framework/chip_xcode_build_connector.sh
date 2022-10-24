@@ -69,8 +69,8 @@ for arch in "${archs[@]}"; do
     if [ -z "$target_arch"] ]; then
         target_arch="$arch"
         case "$arch" in
-            x86_64) target_cpu="x64";;
-            *)      target_cpu="$arch";;
+            x86_64) target_cpu="x64" ;;
+            *) target_cpu="$arch" ;;
         esac
     fi
     if [ -n "$target_cflags" ]; then
