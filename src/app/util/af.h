@@ -467,94 +467,11 @@ void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
  */
 EmberNodeId emberAfGetNodeId(void);
 
-#if defined(DOXYGEN_SHOULD_SKIP_THIS) || defined(EZSP_HOST)
-/**
- * @brief Generates a random key (link, network, or master).
- */
-EmberStatus emberAfGenerateRandomKey(EmberKeyData * result);
-#else
-#define emberAfGenerateRandomKey(result) emberGenerateRandomKey(result)
-#endif
-
-/**
- * @brief Returns the PAN ID of the local node.
- */
-EmberPanId emberAfGetPanId(void);
-
-/**
- * @brief Returns the radioChannel of the current network
- */
-uint8_t emberAfGetRadioChannel(void);
-
-/*
- * @brief Returns a binding index that matches the current incoming message, if
- * known.
- */
-uint8_t emberAfGetBindingIndex(void);
-
-/*
- * @brief Returns an address index that matches the current incoming message,
- * if known.
- */
-uint8_t emberAfGetAddressIndex(void);
-
 /**
  * @brief Returns the current network state.  This call caches the results
  *   on the host to prevent frequent EZSP transactions.
  */
 EmberNetworkStatus emberAfNetworkState(void);
-
-/**
- * @brief Returns the current network parameters.
- */
-EmberStatus emberAfGetNetworkParameters(EmberNodeType * nodeType, EmberNetworkParameters * parameters);
-
-/**
- * @brief Returns the current node type.
- */
-EmberStatus emberAfGetNodeType(EmberNodeType * nodeType);
-
-/**
- */
-#define EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE 0xA0
-#define EMBER_AF_REJOIN_DUE_TO_TC_KEEPALIVE_FAILURE 0xA1
-#define EMBER_AF_REJOIN_DUE_TO_CLI_COMMAND 0xA2
-#define EMBER_AF_REJOIN_DUE_TO_WWAH_CONNECTIVITY_MANAGER 0xA3
-
-#define EMBER_AF_REJOIN_FIRST_REASON EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
-#define EMBER_AF_REJOIN_LAST_REASON EMBER_AF_REJOIN_DUE_TO_END_DEVICE_MOVE
-
-/**
- * @brief Enables local permit join and optionally broadcasts the ZDO
- * Mgmt_Permit_Join_req message. This API can be called from any device
- * type and still return EMBER_SUCCESS. If the API is called from an
- * end device, the permit association bit will just be left off.
- *
- * @param duration the duration that the permit join bit will remain on
- * and other devices will be able to join the current network.
- * @param broadcastMgmtPermitJoin whether or not to broadcast the ZDO
- * Mgmt_Permit_Join_req message.
- *
- * @returns status of whether or not permit join was enabled.
- */
-EmberStatus emberAfPermitJoin(uint8_t duration, bool broadcastMgmtPermitJoin);
-
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/**
- * @brief Enables local permit join and broadcasts the ZDO
- * Mgmt_Permit_Join_req message. This API can be called from any device
- * type and still return EMBER_SUCCESS. If the API is called from an
- * end device, the permit association bit will just be left off.
- *
- * @param duration the duration that the permit join bit will remain on
- * and other devices will be able to join the current network.
- *
- * @returns status of whether or not permit join was enabled.
- */
-EmberStatus emberAfBroadcastPermitJoin(uint8_t duration);
-#else
-#define emberAfBroadcastPermitJoin(duration) emberAfPermitJoin((duration), true)
-#endif
 
 /** @} END Miscellaneous */
 
