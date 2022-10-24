@@ -94,25 +94,21 @@ void set_level(uint8_t currLevel)
     para.duty_cycle = currLevel * PWM_DUTY_CYCLE / 254;
     para.freq       = PWM_FREQ;
 
-    printf("[set_level] currLevel:0x%02x\r\n", currLevel);
     demo_hosal_pwm_change_param(&para);
 }
 
 void set_color_red(uint8_t currLevel)
 {
-    printf("set_color_red\r\n");
     set_color(currLevel, 0, 254);
 }
 
 void set_color_green(uint8_t currLevel)
 {
-    printf("set_color_green\r\n");
     set_color(currLevel, 84, 254);
 }
 
 void set_color_yellow(uint8_t currLevel)
 {
-    printf("set_color_yellow\r\n");
     set_color(currLevel, 42, 254);
 }
 
@@ -182,10 +178,6 @@ void set_color(uint8_t currLevel, uint8_t currHue, uint8_t currSat)
     para[1].freq       = PWM_FREQ;
     para[2].duty_cycle = green * PWM_DUTY_CYCLE / 254;
     para[2].freq       = PWM_FREQ;
-
-    printf("[set_color] currLevel:0x%02x, currHue:0x%02x, currSat:0x%02x, hue:0x%04x, sat:0x%02x, red:0x%lx, green:0x%lx, "
-           "blue:0x%lx \r\n",
-           currLevel, currHue, currSat, hue, sat, red, green, blue);
 
     demo_hosal_pwm_change_param(para);
 #else

@@ -154,6 +154,9 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
+//
+// TODO: we likely now only have mask as CLUSTER_MASK_SERVER so this
+//       method should be renamed to emberAfFindServerCluster or similar and simplify the code.
 const EmberAfCluster * emberAfFindCluster(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
@@ -186,15 +189,6 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-// Calls the default response callback for a specific cluster.
-// with the EMBER_NULL_MANUFACTURER_CODE
-void emberAfClusterDefaultResponseCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::CommandId commandId,
-                                           EmberAfStatus status, uint8_t clientServerMask);
-
-// Calls the message sent callback for a specific cluster.
-void emberAfClusterMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                       uint8_t * message, EmberStatus status);
 
 // Checks a cluster mask byte against ticks passed bitmask
 // returns true if the mask matches a passed interval

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - Bouffalolab BL702
+name: Build example - BouffaloLab
 
 on:
   push:
@@ -23,6 +23,62 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  bl602:
+    name: BL602
+    timeout-minutes: 90
+
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+
+    container:
+      image: connectedhomeip/chip-build:latest
+      volumes:
+        - "/tmp/bloat_reports:/tmp/bloat_reports"
+    steps:
+      - uses: Wandalen/wretry.action@v1.0.15
+        name: Checkout
+        with:
+          action: actions/checkout@v3
+          with: |
+            token: ${{ github.token }}
+          attempt_limit: 3
+          attempt_delay: 2000
+      - name: Checkout submodules
+        run: scripts/checkout_submodules.py --shallow --platform bl602
+
+      - name: Set up environment for size reports
+        if: ${{ !env.ACT }}
+        env:
+          GH_CONTEXT: ${{ toJson(github) }}
+        run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
+      - name: Build example BL602 Lighting App
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build"
+
+      - name: Get Lighting size stats
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl602 bl602 lighting-app \
+            out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.out /tmp/bloat_reports/
+
+      - name: Build example BL602 Lighting App with RPCs
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200-rpc build"
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl602 bl602+rpc lighting-app \
+            out/bouffalolab-bl602-iot-matter-v1-light-115200-rpc/chip-bl602-lighting-example.out /tmp/bloat_reports/
+
+      - name: Uploading Size Reports
+        uses: actions/upload-artifact@v2
+        if: ${{ !env.ACT }}
+        with:
+          name: Size,BL602-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+          path: |
+            /tmp/bloat_reports/
+
   bl702:
     name: BL702
     timeout-minutes: 90
@@ -52,21 +108,22 @@ jobs:
           GH_CONTEXT: ${{ toJson(github) }}
         run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
+
       - name: Build example BL702 Lighting App
         timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-bl706-iot-dvk-light build"
+            "./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702 lighting-app \
-            out/bouffalolab-bl706-iot-dvk-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
+            out/bouffalolab-xt-zb6-devkit-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
 
       - name: Build example BL702 Lighting App with RPCs
         timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-bl706-iot-dvk-light-rpc build"
+            "./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-115200-rpc build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702+rpc lighting-app \
-            out/bouffalolab-bl706-iot-dvk-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
+            out/bouffalolab-xt-zb6-devkit-light-115200-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
 
       - name: Uploading Size Reports
         uses: actions/upload-artifact@v2
