@@ -1565,8 +1565,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
 
-        printf("HereHere\n");
-
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
@@ -1918,13 +1916,16 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
-
             //
-            // Not sure why I had to add this, and didn't have cycles to figure out why.
-            // Tracked in Issue #17528.
+            // We need to DrainAndServiceIO() until attribute callback will be called.
+            // This is not correct behavior and is tracked in Issue #17528.
             //
-            ctx.DrainAndServiceIO();
+            int last;
+            do
+            {
+                last = delegate.mNumAttributeResponse;
+                ctx.DrainAndServiceIO();
+            } while (last != delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.

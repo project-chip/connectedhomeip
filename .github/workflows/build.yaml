@@ -210,6 +210,10 @@ jobs:
                         BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
                         BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |
@@ -401,6 +405,10 @@ jobs:
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |

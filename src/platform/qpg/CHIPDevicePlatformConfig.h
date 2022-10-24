@@ -37,8 +37,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 1
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the platform.

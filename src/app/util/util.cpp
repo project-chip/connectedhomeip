@@ -25,7 +25,9 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/ember-compatibility-functions.h>
-#include <zap-generated/PluginApplicationCallbacks.h>
+
+// TODO: figure out a clear path for compile-time codegen
+#include <app/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>

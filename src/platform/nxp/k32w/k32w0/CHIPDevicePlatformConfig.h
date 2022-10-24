@@ -37,8 +37,6 @@
 #define CHIP_DEVICE_CHIP0BLE_DEBUG 0
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.
