@@ -117,11 +117,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param expectedValues  array of dictionaries containing the expected values in the same format as
  *                       attribute read completion handler. Requires MTRAttributePathKey values.
  *                       See MTRDeviceResponseHandler definition for dictionary details.
+ *                       This argument is ignored if expectedValueInterval is <= 0.
+ *
  * TODO: document better the expectedValues is how this command is expected to change attributes when read, and that the next
  * readAttribute will get these values
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeout
+ * written. This value will be clamped to timeout. This argument is ignored if expectedValues is nil.
  *
  * @param timeout   timeout in milliseconds for timed invoke, or nil.
  *
