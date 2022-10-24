@@ -1,21 +1,26 @@
-# CHIP EFR32 Lighting Example
+# Matter EFR32 Lighting Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [CHIP EFR32 Lighting Example](#chip-efr32-lighting-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Note](#note)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
+- [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Running RPC console](#running-rpc-console)
+  - [Device Tracing](#device-tracing)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -54,7 +59,7 @@ Silicon Labs platform.
 
 -   Install some additional tools (likely already present for CHIP developers):
 
-    -   Linux: `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
+    -   Linux: `sudo apt-get install git ninja-build`
 
     -   Mac OS X: `brew install ninja`
 

@@ -1,19 +1,23 @@
-#CHIP EFR32 Lock Example
+# Matter EFR32 Lock Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [CHIP EFR32 Lock Example](#chip-efr32-lock-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Note](#note)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
+- [Matter EFR32 Lock Example](#matter-efr32-lock-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -22,13 +26,13 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 ## Introduction
 
 The EFR32 lock example provides a baseline demonstration of a door lock control
-device, built using CHIP and the Silicon Labs gecko SDK. It can be controlled by
-a Chip controller over Openthread network..
+device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
+by a Chip controller over an Openthread or Wifi network..
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
-procedure. Thread Network credentials are then provided to the EFR32 device
-which will then join the network.
+procedure. If using Thread, Thread Network credentials are then provided to the
+EFR32 device which will then join the network.
 
 The LCD on the Silabs WSTK shows a QR Code containing the needed commissioning
 information for the BLE connection and starting the Rendez-vous procedure.
@@ -52,9 +56,13 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
+Linux
 
-#Mac OS X `brew install ninja`
+    sudo apt-get install git ninja-build
+
+Mac OS X
+
+    brew install ninja
 
 -   Supported hardware:
 
