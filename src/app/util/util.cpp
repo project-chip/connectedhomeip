@@ -408,23 +408,23 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
 }
 
 void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-    data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
+    data[index + 3] = (uint8_t) (((x) >> 24) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
@@ -572,34 +572,6 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetInactive(&controls[index]);
-    return EMBER_SUCCESS;
-}
-
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFFFF && emberEventControlGetActive(&controls[index]));
-}
-
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetActive(&controls[index]);
-    return EMBER_SUCCESS;
-}
-
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen)
 {
@@ -677,8 +649,7 @@ void slabAssert(const char * file, int line)
     (void) line; // Unused parameter
     // Wait forever until the watchdog fires
     while (true)
-    {
-    }
+    {}
 }
 
 #define ENCODED_8BIT_CHANPG_PAGE_MASK 0xE0         // top 3 bits
