@@ -324,6 +324,7 @@ def populate_factory_data(args, spake2p_params):
                 FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
                 FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
 
+
 def generate_nvs_bin(args):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'

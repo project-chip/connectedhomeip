@@ -42,6 +42,7 @@ else:
 CD_PARTITION_CSV = 'cd_partition.csv'
 CD_PARTITION_BIN = 'cd_partition.bin'
 
+
 def generate_nvs_bin(args):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'cert-dcl,namespace,,\n'

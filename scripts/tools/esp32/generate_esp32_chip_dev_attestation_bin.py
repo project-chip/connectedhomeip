@@ -61,6 +61,7 @@ DA_DATA = {
     },
 }
 
+
 def populate_factory_data(args):
     DA_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
     DA_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
@@ -104,7 +105,7 @@ def generate_nvs_bin(args):
     with open(DA_PARTITION_CSV, 'w') as f:
         f.write(csv_content)
     nvs_args = SimpleNamespace(input=DA_PARTITION_CSV,
-                              output=DA_PARTITION_BIN,
+                               output=DA_PARTITION_BIN,
                                size=hex(args.size),
                                outdir=os.getcwd(),
                                version=2)
