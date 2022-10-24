@@ -896,29 +896,32 @@ In this command:
     closes
 -   _<iteration\>_ is number of PBKDF iterations to use to derive the PAKE
     verifier
--   _<discriminator\>_ is device specific value determined during commissioning
+-   _<discriminator\>_ is device specific discriminator determined during
+    commissioning
+
+> **Note:** The _<iteration\>_ and _<discriminator\>_ values are ignored if the
+> _<option\>_ is set to 0.
 
 **Example of command:**
 
 ```
-$ ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+$ ./chip-tool pairing open-commissioning-window 1 1 300 1000 2365
 ```
 
-Note manual pairing code printed in the command output, as it will be required
-to use by the second Matter admin to join Matter device to its fabric.
+Note manual pairing code or QR code payload printed in the command output, as it
+will be required by the second Matter admin to join Matter device to its fabric.
 
 **Example of output:**
 
-```bash
+```
 [1663675289.149337][56387:56392] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
-
 [1663675289.149356][56387:56392] CHIP:CTL: Successfully opened pairing window on the device
-
-[1663675289.149409][56387:56392] CHIP:CTL: Manual pairing code: [36310944684]
+[1663675289.149409][56387:56392] CHIP:CTL: Manual pairing code: [36281602573]
+[1663675289.149445][56387:56392] CHIP:CTL: SetupQRCode: [MT:4CT91AFN00YHEE7E300]
 ```
 
 To commission the Matter device to a new fabric, you need to run another
-instance of CHIPTool, using the following command pattern:
+instance of CHIP Tool, using the following command pattern:
 
 ```
 $ ./chip-tool pairing code <payload> <node_id> --commissioner-name <commissioner_name>
@@ -937,7 +940,7 @@ In this command:
 **Example of command:**
 
 ```
-$ ./chip-tool pairing code 36310944684 1 --commissioner-name beta
+$ ./chip-tool pairing code 36281602573 1 --commissioner-name beta
 ```
 
 After completing the above steps, the Matter device should be able to receive
