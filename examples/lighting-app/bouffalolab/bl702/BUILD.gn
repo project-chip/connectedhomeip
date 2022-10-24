@@ -43,7 +43,7 @@ declare_args() {
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 
-  board = "BL706-IoT-DVK"
+  board = "XT-ZB6-DevKit"
   module_type = "BL706C-22"
   enable_psram = true
   baudrate = 2000000
@@ -95,13 +95,16 @@ bl702_executable("lighting_app") {
     defines += [ "CFG_USE_PSRAM=1" ]
   }
 
-  if ("BL706-NIGHT-LIGHT" == board) {
-    defines += [ "APP_BOARD_LED_STATUS=0" ]
+  if ("BL706C-22" == module_type) {
+    defines += [ "BOARD_BTN_BOOT_PIN" ]
+  }
+
+  if ("XT-ZB6-DevKit" == board) {
+    defines += [ "XT_ZB6_DevKit" ]
+  } else if ("BL706-NIGHT-LIGHT" == board) {
     defines += [ "BL706_NIGHT_LIGHT" ]
-    defines += [ "APP_BOARD_BTN=0" ]
   } else if ("BL702-IoT-DVK" == board || "BL706-IoT-DVK" == board) {
-    defines += [ "APP_BOARD_LED_STATUS=1" ]
-    defines += [ "APP_BOARD_BTN=1" ]
+    defines += [ "BL706_IOT_DVK" ]
   }
 
   sources = [
