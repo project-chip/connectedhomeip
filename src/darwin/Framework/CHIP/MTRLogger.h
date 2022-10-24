@@ -27,12 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * An enumeration of the log levels supported by the Matter SDK.
  */
-typedef NS_ENUM(NSUInteger, MTRLogLevel) {
-    MTRLogLevelFault = 0,
-    MTRLogLevelError,
-    MTRLogLevelInfo,
-    MTRLogLevelDebug
-};
+typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelFault = 0, MTRLogLevelError, MTRLogLevelInfo, MTRLogLevelDebug };
 
 // MARK: - MTRLogger
 
@@ -47,15 +42,14 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) {
  * @param level The log level to test.
  * @returns `true` if logs may be emitted at the given log level; `false` otherwise.
  */
-- (BOOL)isLoggingEnabledAtLevel: (MTRLogLevel)level;
+- (BOOL)isLoggingEnabledAtLevel:(MTRLogLevel)level;
 
 /**
-  * Logs a message at the given level.
+ * Logs a message at the given level.
  *
  * @note Messages will only be passed to this method if `isLoggingEnabledAtLevel` is `true` for the given log level.
  */
-- (void)logAtLevel: (MTRLogLevel)level
-           message: (NSString *)message;
+- (void)logAtLevel:(MTRLogLevel)level message:(NSString *)message;
 
 @end
 
@@ -64,7 +58,8 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) {
 /**
  * A static entry point for configuring logging in the Matter C++ and Objective C SDKs.
  */
-@interface MTRLoggingConfiguration : NSObject {}
+@interface MTRLoggingConfiguration : NSObject {
+}
 
 // Disable construction
 - (instancetype)init NS_UNAVAILABLE;
@@ -75,7 +70,7 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) {
  *
  * @param logger The `MTRLogger` that will be used to log messages from the Matter SDK.
  */
-+ (void)setLogger: (id<MTRLogger>)logger;
++ (void)setLogger:(id<MTRLogger>)logger;
 
 /**
  * Gets the `MTRLogger` that will be used to log messages from the Matter SDK.

@@ -37,8 +37,8 @@
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDevicePairingDelegate.h>
 #import <Matter/MTRError.h>
-#import <Matter/MTRLogger.h>
 #import <Matter/MTRKeypair.h>
+#import <Matter/MTRLogger.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
 #import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROTAHeaderParser.h>

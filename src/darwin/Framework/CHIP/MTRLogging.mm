@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import <lib/support/logging/CHIPLogging.h>
 #import <MTRLogging.h>
+#import <lib/support/logging/CHIPLogging.h>
 #import <os/log.h>
 #import <pthread.h>
 
@@ -56,27 +56,28 @@
     return self;
 }
 
-- (BOOL)isLoggingEnabledAtLevel: (MTRLogLevel)level {
+- (BOOL)isLoggingEnabledAtLevel:(MTRLogLevel)level
+{
     return true;
 }
 
-- (void)logAtLevel: (MTRLogLevel)level
-           message: (NSString *)message {
+- (void)logAtLevel:(MTRLogLevel)level message:(NSString *)message
+{
     switch (level) {
-        case MTRLogLevelFault:
-            os_log_fault(OS_LOG_DEFAULT, "%@", message);
-            break;
-        case MTRLogLevelError:
-            os_log_error(OS_LOG_DEFAULT, "%@", message);
-            break;
-        case MTRLogLevelInfo:
-            os_log_info(OS_LOG_DEFAULT, "%@", message);
-            break;
-        case MTRLogLevelDebug:
-            os_log_debug(OS_LOG_DEFAULT, "%@", message);
-            break;
-        default:
-            break;
+    case MTRLogLevelFault:
+        os_log_fault(OS_LOG_DEFAULT, "%@", message);
+        break;
+    case MTRLogLevelError:
+        os_log_error(OS_LOG_DEFAULT, "%@", message);
+        break;
+    case MTRLogLevelInfo:
+        os_log_info(OS_LOG_DEFAULT, "%@", message);
+        break;
+    case MTRLogLevelDebug:
+        os_log_debug(OS_LOG_DEFAULT, "%@", message);
+        break;
+    default:
+        break;
     }
 }
 
@@ -97,8 +98,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
     // logging.
     char formatted_msg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     int32_t formatted_msg_length = vsnprintf(formatted_msg, sizeof(formatted_msg), msg, args);
-    if (formatted_msg_length < 0)
-    {
+    if (formatted_msg_length < 0) {
         // In the event that we could not format the message, simply copy over the
         // unformatted message. It won't contain all the information that we need, but
         // it's better than dropping a log on the floor.
@@ -117,47 +117,28 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
     // Delegate the log to the MTRLogging system
     switch (category) {
-        case chip::Logging::LogCategory::kLogCategory_Error:
-            [MTRLogging logAtLevel:MTRLogLevelError
-                            format:@"%@ [%lld:%lld] CHIP: [%s] %s",
-                 @"🔴",
-                 (long long) pid,
-                 (long long) ktid,
-                 module,
-                 formatted_msg];
-            break;
+    case chip::Logging::LogCategory::kLogCategory_Error:
+        [MTRLogging logAtLevel:MTRLogLevelError
+                        format:@"%@ [%lld:%lld] CHIP: [%s] %s", @"🔴", (long long) pid, (long long) ktid, module, formatted_msg];
+        break;
 
-        case chip::Logging::LogCategory::kLogCategory_Progress:
-            [MTRLogging logAtLevel:MTRLogLevelInfo
-                            format:@"%@ [%lld:%lld] CHIP: [%s] %s",
-                 @"🔵",
-                 (long long) pid,
-                 (long long) ktid,
-                 module,
-             formatted_msg];
-            break;
+    case chip::Logging::LogCategory::kLogCategory_Progress:
+        [MTRLogging logAtLevel:MTRLogLevelInfo
+                        format:@"%@ [%lld:%lld] CHIP: [%s] %s", @"🔵", (long long) pid, (long long) ktid, module, formatted_msg];
+        break;
 
-        case chip::Logging::LogCategory::kLogCategory_Detail:
-            [MTRLogging logAtLevel:MTRLogLevelDebug
-                            format:@"%@ [%lld:%lld] CHIP: [%s] %s",
-                 @"🟢",
-                 (long long) pid,
-                 (long long) ktid,
-                 module,
-                 formatted_msg];
-            break;
-        default:
-            [MTRLogging logAtLevel:MTRLogLevelInfo
-                            format:@"[%lld:%lld] CHIP: [%s] %s",
-                (long long) pid,
-                (long long) ktid,
-                module,
-                formatted_msg];
-            break;
+    case chip::Logging::LogCategory::kLogCategory_Detail:
+        [MTRLogging logAtLevel:MTRLogLevelDebug
+                        format:@"%@ [%lld:%lld] CHIP: [%s] %s", @"🟢", (long long) pid, (long long) ktid, module, formatted_msg];
+        break;
+    default:
+        [MTRLogging logAtLevel:MTRLogLevelInfo
+                        format:@"[%lld:%lld] CHIP: [%s] %s", (long long) pid, (long long) ktid, module, formatted_msg];
+        break;
     }
 }
 
-+ (void)setLogger: (id<MTRLogger>)logger
++ (void)setLogger:(id<MTRLogger>)logger
 {
     singleton_logger = logger;
     chip::Logging::SetLogRedirectCallback(cpp_log_redirect_callback);
@@ -172,36 +153,29 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
 @implementation MTRLogging
 
-+ (void)logAtLevel: (MTRLogLevel)level
-            format: (NSString*) format, ... NS_FORMAT_FUNCTION(2,3) {
++ (void)logAtLevel:(MTRLogLevel)level format:(NSString *)format, ... NS_FORMAT_FUNCTION(2, 3)
+{
     va_list args;
     va_start(args, format);
-    [MTRLogging logAtLevelV:level
-                     format:format
-                       args:args];
+    [MTRLogging logAtLevelV:level format:format args:args];
     va_end(args);
 }
 
-+ (void)logAtLevelV: (MTRLogLevel)level
-             format: (NSString*) format
-               args: (va_list) args NS_FORMAT_FUNCTION(2,0)
++ (void)logAtLevelV:(MTRLogLevel)level format:(NSString *)format args:(va_list)args NS_FORMAT_FUNCTION(2, 0)
 {
     // Fetch the currently-active MTRLogger
     id<MTRLogger> logger = [MTRLoggingConfiguration getLogger];
-    if (logger == nil)
-    {
+    if (logger == nil) {
         logger = [OsLogMTRLogger sharedInstance];
     }
 
     // Early return if logging is not currently enabled at the requested level.
-    if (![logger isLoggingEnabledAtLevel:level])
-    {
+    if (![logger isLoggingEnabledAtLevel:level]) {
         return;
     }
 
     // Format the message
-    NSString *message = [[NSString alloc] initWithFormat:format
-                                               arguments:args];
+    NSString * message = [[NSString alloc] initWithFormat:format arguments:args];
 
     // Log the message to the MTRLogger
     [logger logAtLevel:level message:message];

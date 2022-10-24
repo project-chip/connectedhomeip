@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "MTRLogger.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @note We declare the public API of `MTRLogging` in the `MTRLogger.h` public header file, while the non-public
  *       module API is declared in the original `MTRLogging.h`.
  */
-@interface MTRLogging : NSObject {}
+@interface MTRLogging : NSObject {
+}
 
 // Disable construction
 - (instancetype)init NS_UNAVAILABLE;
@@ -40,8 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param format The format of the message to be logged.
  * @param ... Optional arguments to be supplied with the format specifier.
  */
-+ (void)logAtLevel: (MTRLogLevel)level
-            format: (NSString *) format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)logAtLevel:(MTRLogLevel)level format:(NSString *)format, ... NS_FORMAT_FUNCTION(2, 3);
 
 /**
  * Logs a message at the given level.
@@ -50,28 +50,24 @@ NS_ASSUME_NONNULL_BEGIN
  * @param format The format of the message to be logged.
  * @param args The variadic list of arguments to be supplied to the format specifier.
  */
-+ (void)logAtLevelV: (MTRLogLevel)level
-             format: (NSString *) format
-               args: (va_list) args NS_FORMAT_FUNCTION(2,0);
++ (void)logAtLevelV:(MTRLogLevel)level format:(NSString *)format args:(va_list)args NS_FORMAT_FUNCTION(2, 0);
 
 @end
 
 /**
  * A macro that converts a C string (`char *`) into an `NSString *`.
  */
-#define MTR_C_STRING_TO_NSSTRING(x) ((NSString*)CFSTR(x))
+#define MTR_C_STRING_TO_NSSTRING(x) ((NSString *) CFSTR(x))
 
 /**
  * An always-inlined function that allows us to reliably invoke an Objective C function from a macro without having to deal
  * with non-standard behavior with trailing commas and logs with no arguments.
  */
-NS_INLINE NS_FORMAT_FUNCTION(2,3) void mtr_log(MTRLogLevel level, NSString *format, ...)
+NS_INLINE NS_FORMAT_FUNCTION(2, 3) void mtr_log(MTRLogLevel level, NSString * format, ...)
 {
     va_list args;
     va_start(args, format);
-    [MTRLogging logAtLevelV:level
-                     format:format
-                       args:args];
+    [MTRLogging logAtLevelV:level format:format args:args];
     va_end(args);
 }
 
