@@ -176,10 +176,6 @@ void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(En
 // Non-Cluster Related Callbacks
 //
 
-void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
 EmberAfAttributeWritePermission __attribute__((weak))
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
                                           uint8_t type)
@@ -227,11 +223,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback()
-{
-    return 0;
-}
-
 bool __attribute__((weak))
 emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
@@ -239,12 +230,6 @@ emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex
 }
 
 void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-EmberStatus __attribute__((weak))
-emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
-{
-    return EMBER_LIBRARY_NOT_PRESENT;
-}
 
 bool __attribute__((weak)) emberAfStartMoveCallback()
 {
