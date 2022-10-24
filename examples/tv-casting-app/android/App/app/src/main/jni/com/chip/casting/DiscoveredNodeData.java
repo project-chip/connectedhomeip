@@ -47,6 +47,8 @@ public class DiscoveredNodeData {
   private int numIPs;
   private List<InetAddress> ipAddresses;
 
+  private VideoPlayer connectableVideoPlayer;
+
   public DiscoveredNodeData(NsdServiceInfo serviceInfo) {
     Map<String, byte[]> attributes = serviceInfo.getAttributes();
     this.deviceName = new String(attributes.get(KEY_DEVICE_NAME), StandardCharsets.UTF_8);
@@ -67,6 +69,18 @@ public class DiscoveredNodeData {
     this.port = serviceInfo.getPort();
     this.ipAddresses = Arrays.asList(serviceInfo.getHost());
     this.numIPs = 1;
+  }
+
+  void setConnectableVideoPlayer(VideoPlayer videoPlayer) {
+    this.connectableVideoPlayer = videoPlayer;
+  }
+
+  public boolean isPreCommissioned() {
+    return connectableVideoPlayer != null;
+  }
+
+  public VideoPlayer toConnectableVideoPlayer() {
+    return connectableVideoPlayer;
   }
 
   public String getHostName() {

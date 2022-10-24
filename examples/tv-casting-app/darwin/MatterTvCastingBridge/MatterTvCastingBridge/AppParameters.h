@@ -15,18 +15,17 @@
  *    limitations under the License.
  */
 
-import SwiftUI
+#import <Foundation/Foundation.h>
 
-struct ContentView: View {
-    var body: some View {
-        NavigationView {
-            StartFromCacheView()
-        }
-    }
-}
+#ifndef AppParameters_h
+#define AppParameters_h
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+@interface AppParameters : NSObject
+
+@property NSData * rotatingDeviceIdUniqueId;
+
+- (AppParameters *)initWithRotatingDeviceIdUniqueId:(NSData *)rotatingDeviceIdUniqueId;
+
+@end
+
+#endif /* AppParameters_h */
