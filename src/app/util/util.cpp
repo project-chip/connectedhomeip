@@ -84,24 +84,6 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 //------------------------------------------------------------------------------
 
 // Device enabled/disabled functions
-bool emberAfIsDeviceEnabled(EndpointId endpoint)
-{
-    uint16_t index;
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    bool deviceEnabled;
-    if (emberAfReadServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &deviceEnabled,
-                                   sizeof(deviceEnabled)) == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return deviceEnabled;
-    }
-#endif
-    index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        return afDeviceEnabled[index];
-    }
-    return false;
-}
 
 void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
 {
@@ -290,16 +272,6 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
     }
 
     return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
-uint8_t emberAfNextSequence(void)
-{
-    return ((++emberAfSequenceNumber) & EMBER_AF_ZCL_SEQUENCE_MASK);
-}
-
-uint8_t emberAfGetLastSequenceNumber(void)
-{
-    return (emberAfSequenceNumber & EMBER_AF_ZCL_SEQUENCE_MASK);
 }
 
 // the caller to the library can set a flag to say do not respond to the

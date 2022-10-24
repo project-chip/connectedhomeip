@@ -104,22 +104,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
 #define emberAfWriteServerAttribute emberAfWriteAttribute
 
 /**
- * @brief Function that test the success of attribute write.
- *
- * This function returns success if attribute write would be successful.
- * It does not actually write anything, just validates for read-only and
- * data-type.
- *
- * @param endpoint Zigbee endpoint number
- * @param cluster Cluster ID of the sought cluster.
- * @param attributeID Attribute ID of the sought attribute.
- * @param dataPtr Location where attribute will be written from.
- * @param dataType ZCL attribute type.
- */
-EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
  * @brief Read the attribute value, performing all the checks.
  *
  * This function will attempt to read the attribute and store it into the
@@ -198,12 +182,6 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
  * Will return 0xFFFF if this is not a valid endpoint id.
  */
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
-
-/**
- * Returns the endpoint index within a given cluster (Client-side),
- * looking only for standard clusters.
- */
-uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * Returns the endpoint index within a given cluster (Server-side),
@@ -310,29 +288,10 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
  */
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
 
-/*
- * @brief Function that determines the size of a zigbee Cluster Library
- * attribute value (where the attribute could be non-string, string, or long
- * string). For strings, the size includes the length of the string plus the
- * number of the string's length prefix byte(s).
- */
-uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
-                                   const uint8_t * buffer);
-
 /** @} END Attribute Storage */
 
 /** @name Device Control */
 // @{
-
-/**
- * @brief Function that checks if endpoint is enabled.
- *
- * This function returns true if device at a given endpoint is
- * enabled. At startup all endpoints are enabled.
- *
- * @param endpoint Zigbee endpoint number
- */
-bool emberAfIsDeviceEnabled(chip::EndpointId endpoint);
 
 /**
  * @brief Function that checks if endpoint is identifying
@@ -385,31 +344,6 @@ bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
 
 /**
- * @brief The mask applied by ::emberAfNextSequence when generating ZCL
- * sequence numbers.
- */
-#define EMBER_AF_ZCL_SEQUENCE_MASK 0x7F
-
-/**
- * @brief Increments the ZCL sequence number and returns the value.
- *
- * ZCL messages have sequence numbers so that they can be matched up with other
- * messages in the transaction.  To avoid conflicts with sequence numbers
- * generated independently by the application, this API returns sequence
- * numbers with the high bit clear.  If the application generates its own
- * sequence numbers, it should use numbers with the high bit set.
- *
- * @return The next ZCL sequence number.
- */
-uint8_t emberAfNextSequence(void);
-
-/**
- * @brief Retrieves the last sequence number that was used.
- *
- */
-uint8_t emberAfGetLastSequenceNumber(void);
-
-/**
  * @brief Simple integer comparison function.
  * Compares two values of a known length as integers.
  * Signed integer comparison are supported for numbers with length of
@@ -427,12 +361,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
  * @brief populates the passed EUI64 with the local EUI64 MAC address.
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
-
-#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
-// Normally this is provided by the stack code, but on the host
-// it is provided by the application code.
-void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
-#endif
 
 /**
  * @brief Returns the node ID of the local node.

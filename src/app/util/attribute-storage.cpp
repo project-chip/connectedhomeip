@@ -779,12 +779,6 @@ uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId cl
     return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_SERVER);
 }
 
-// Client wrapper for findClusterEndpointIndex
-uint16_t emberAfFindClusterClientEndpointIndex(EndpointId endpoint, ClusterId clusterId)
-{
-    return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_CLIENT);
-}
-
 // Returns the endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask)
 {
