@@ -3751,8 +3751,9 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 // Timer callbacks
 // =============================================================================
 
-void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+void __attribute__((weak)) emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
 {
+    emberAfDoorLockClusterPrintln("Door Auto relock timer expired. Locking...");
     emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
     DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kAuto);
 }

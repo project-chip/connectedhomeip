@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/af-event.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip::app::Clusters;
@@ -41,7 +42,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == DoorLock::Id && attributeId == DoorLock::Attributes::LockState::Id)
     {
-        ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+        DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
+        ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
+                        to_underlying(lockState));
     }
 }
 
@@ -145,4 +148,12 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
                                           uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
     return LockMgr().SetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
+}
+
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+{
+    emberAfDoorLockClusterPrintln("Door Auto relock timer expired. Locking...");
+    emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
+    DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
+    LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
 }
