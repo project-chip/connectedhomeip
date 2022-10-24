@@ -74,6 +74,14 @@ steps:
               --target k32w-light-no-ota
               --target k32w-lock
               --target k32w-shell
+              build
+              --create-archives /workspace/artifacts/
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
               --target linux-arm64-all-clusters-clang
               --target linux-arm64-all-clusters-app-nodeps
               --target linux-arm64-all-clusters-app-nodeps-ipv6only
