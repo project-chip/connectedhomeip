@@ -43,13 +43,10 @@ declare_args() {
 
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
-}
 
-show_qr_code = false
+  board = "BL602-IoT-Matter-V1"
 
-# BL-HWC-G1 (No LCD)
-if (bl602_board == "BL-HWC-G1" || bl602_board == "IOT_DVK_3S") {
-  show_qr_code = false
+  baudrate = 2000000
 }
 
 bl602_sdk("sdk") {
@@ -68,6 +65,7 @@ bl602_sdk("sdk") {
     "CONFIG_PSM_EASYFLASH_SIZE=16384",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
+    "CHIP_UART_BAUDRATE=${baudrate}",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -107,16 +105,10 @@ bl602_executable("lighting_app") {
 
   include_dirs = [ "include" ]
 
-  if (bl602_board == "IOT_DVK_3S") {
-    defines = [ "BOARD_ID=0" ]
-  } else {
+  if ("BL602-IoT-Matter-V1" == board || "BL602-IOT-DVK-3S" == board) {
     defines = [ "BOARD_ID=1" ]
-  }
-
-  if (show_qr_code) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
-    defines += [ "DISPLAY_ENABLED" ]
+  } else {
+    defines = [ "BOARD_ID=0" ]
   }
 
   if (chip_enable_pw_rpc) {
