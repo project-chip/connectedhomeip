@@ -154,6 +154,9 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
+//
+// TODO: we likely now only have mask as CLUSTER_MASK_SERVER so this
+//       method should be renamed to emberAfFindServerCluster or similar and simplify the code.
 const EmberAfCluster * emberAfFindCluster(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
