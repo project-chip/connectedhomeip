@@ -46,6 +46,10 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#if CHIP_WITH_GIO
+#include <gio/gio.h>
+#endif
+
 using namespace ::chip::app::Clusters;
 
 namespace chip {
@@ -67,7 +71,7 @@ void GDBus_Thread()
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void PlatformManagerImpl::WiFIIPChangeListener()
+void PlatformManagerImpl::WiFiIPChangeListener()
 {
     int sock;
     if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
@@ -144,16 +148,12 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
 #if CHIP_WITH_GIO
-    GError * error = nullptr;
-
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-
     std::thread gdbusThread(GDBus_Thread);
     gdbusThread.detach();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFIIPChangeListener);
+    std::thread wifiIPThread(WiFiIPChangeListener);
     wifiIPThread.detach();
 #endif
 
