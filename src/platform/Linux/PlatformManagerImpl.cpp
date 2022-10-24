@@ -99,32 +99,24 @@ void * GLibMainLoopThread(void * loop)
 
 #endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-} // namespace
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void PlatformManagerImpl::WiFiIPChangeListener()
+
+gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
 {
-    int sock;
-    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
-        return;
-    }
 
-    struct sockaddr_nl addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.nl_family = AF_NETLINK;
-    addr.nl_groups = RTMGRP_IPV4_IFADDR;
-
-    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to bind netlink socket for ip addresses.");
-        return;
-    }
-
-    ssize_t len;
     char buffer[4096];
-    for (struct nlmsghdr * header = reinterpret_cast<struct nlmsghdr *>(buffer); (len = recv(sock, header, sizeof(buffer), 0)) > 0;)
+    auto * header = reinterpret_cast<struct nlmsghdr *>(buffer);
+    ssize_t len;
+
+    if ((len = recv(g_io_channel_unix_get_fd(ch), buffer, sizeof(buffer), 0)) == -1)
+    {
+        if (errno == EINTR || errno == EAGAIN)
+            return G_SOURCE_CONTINUE;
+        ChipLogError(DeviceLayer, "Error reading from netlink socket: %d", errno);
+        return G_SOURCE_CONTINUE;
+    }
+
+    if (len > 0)
     {
         for (struct nlmsghdr * messageHeader = header;
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
@@ -184,8 +176,51 @@ void PlatformManagerImpl::WiFiIPChangeListener()
             }
         }
     }
+    else
+    {
+        ChipLogError(DeviceLayer, "EOF on netlink socket");
+        return G_SOURCE_REMOVE;
+    }
+
+    return G_SOURCE_CONTINUE;
 }
+
+// The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+// This should be removed or find a better place once we deprecate the rendezvous session.
+CHIP_ERROR RunWiFiIPChangeListener()
+{
+    int sock;
+    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to init netlink socket for IP addresses: %d", errno);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    struct sockaddr_nl addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.nl_family = AF_NETLINK;
+    addr.nl_groups = RTMGRP_IPV4_IFADDR;
+
+    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to bind netlink socket for IP addresses: %d", errno);
+        close(sock);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    GIOChannel * ch = g_io_channel_unix_new(sock);
+    g_io_add_watch_full(ch, G_PRIORITY_DEFAULT, G_IO_IN, WiFiIPChangeListener, nullptr, nullptr);
+
+    g_io_channel_set_close_on_unref(ch, TRUE);
+    g_io_channel_set_encoding(ch, nullptr, nullptr);
+    g_io_channel_unref(ch);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+} // namespace
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
@@ -202,8 +237,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFiIPChangeListener);
-    wifiIPThread.detach();
+    ReturnErrorOnFailure(RunWiFiIPChangeListener());
 #endif
 
     // Initialize the configuration system.

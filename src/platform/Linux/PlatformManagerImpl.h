@@ -92,12 +92,6 @@ private:
 
     static PlatformManagerImpl sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we deprecate the rendezvous session.
-    static void WiFiIPChangeListener();
-#endif
-
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
     struct GLibMainLoopDeleter
     {
