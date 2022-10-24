@@ -17,10 +17,10 @@
  */
 package chip.devicecontroller.model;
 
-import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /** Class for tracking CHIP node state in a hierarchical manner. */
 public final class NodeState {

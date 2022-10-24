@@ -69,7 +69,7 @@ android_library("java") {
 
   deps = [
     ":android",
-    "${chip_root}/third_party/android_deps:annotation",
+    "${chip_root}/third_party/java_deps:annotation",
   ]
 
   data_deps = [

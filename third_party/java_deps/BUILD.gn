@@ -12,27 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+# === This BUILD file is auto-generated, modify the GnBuildGenerator task instead of editing this file manually. ===
+
 import("//build_overrides/chip.gni")
-
-import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
-import("${chip_root}/build/chip/tools.gni")
 
-android_binary("java-matter-controller") {
-  output_name = "java-matter-controller"
-
-  deps = [
-    "${chip_root}/src/controller/java",
-    "${chip_root}/src/setup_payload/java",
-    "${chip_root}/third_party/java_deps:annotation",
-  ]
-
-  sources = [ "java/src/com/matter/controller/Main.java" ]
-
-  javac_flags = [ "-Xlint:deprecation" ]
-}
-
-group("default") {
-  deps = [ ":java-matter-controller" ]
+java_prebuilt("annotation") {
+  jar_path = "artifacts/jsr305-3.0.2.jar"
 }
